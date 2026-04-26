@@ -151,8 +151,28 @@ class AdminBrokerController extends BaseApiController
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $effectiveTenantId = $this->resolveEffectiveTenantId($isSuperAdmin, $tenantId);
+
+        // Single-source tenant boundary: a non-super-admin who somehow
+        // reaches this method without a bound tenant (auth without tenant
+        // slug, middleware ordering bug) must NOT see cross-tenant
+        // aggregates. Previously this guard only existed before the
+        // recent_activity query — the eight count queries above it ran
+        // with `WHERE 1=1` in that case and silently aggregated across
+        // every tenant. Keep the guard here so every metric below
+        // benefits.
+        if (!$isSuperAdmin && $effectiveTenantId === null) {
+            return $this->respondWithError('TENANT_CONTEXT_ERROR', __('api.tenant_context_error'), null, 403);
+        }
+
         $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+
+        // Track which metrics failed to load so the response shape lets the
+        // frontend distinguish "real zero" from "we couldn't compute this".
+        // A safeguarding dashboard that silently coerces DB errors to zero
+        // is dangerous — the user sees a clean dashboard during exactly the
+        // moments they need it most.
+        $failedMetrics = [];
 
         $pendingExchanges = 0;
         try {
@@ -161,7 +181,10 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $pendingExchanges = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'pending_exchanges';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard pending_exchanges failed: ' . $e->getMessage());
+        }
 
         $unreviewedMessages = 0;
         try {
@@ -170,7 +193,10 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $unreviewedMessages = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'unreviewed_messages';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard unreviewed_messages failed: ' . $e->getMessage());
+        }
 
         $highRiskListings = 0;
         try {
@@ -179,7 +205,10 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $highRiskListings = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'high_risk_listings';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard high_risk_listings failed: ' . $e->getMessage());
+        }
 
         $monitoredUsers = 0;
         try {
@@ -188,7 +217,10 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $monitoredUsers = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'monitored_users';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard monitored_users failed: ' . $e->getMessage());
+        }
 
         $vettingPending = 0;
         $vettingExpiring = 0;
@@ -202,16 +234,36 @@ class AdminBrokerController extends BaseApiController
             );
             $vettingPending = (int) ($row->pending ?? 0);
             $vettingExpiring = (int) ($row->expiring ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'vetting_pending';
+            $failedMetrics[] = 'vetting_expiring';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard vetting failed: ' . $e->getMessage());
+        }
 
         $safeguardingAlerts = 0;
         try {
+            // abuse_alerts.status enum is ('new','reviewing','resolved','dismissed')
+            // — there is NO 'open' value (the previous query was silently
+            // returning zero forever). Match the canonical "open alert"
+            // semantics used by AbuseDetectionService::getAlertCounts and
+            // the auto-dismiss cron in CronJobRunner: anything not
+            // resolved/dismissed is open. The dashboard tile is tagged
+            // 'critical' in its deep-link so we further restrict to
+            // high+critical severity, which matches CronJobRunner's
+            // notify-on-new criteria and the user expectation that the
+            // tile reflects ESCALATION-WORTHY alerts, not noise.
             $row = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE {$tenantWhere} AND status = 'open'",
+                "SELECT COUNT(*) as cnt FROM abuse_alerts
+                 WHERE {$tenantWhere}
+                   AND status IN ('new', 'reviewing')
+                   AND severity IN ('high', 'critical')",
                 $tenantParams
             );
             $safeguardingAlerts = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'safeguarding_alerts';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard safeguarding_alerts failed: ' . $e->getMessage());
+        }
 
         $onboardingSafeguardingFlags = 0;
         try {
@@ -219,6 +271,11 @@ class AdminBrokerController extends BaseApiController
             // all-tenants, drop the tenant filter; otherwise scope to caller.
             $uspWhere  = $effectiveTenantId !== null ? 'usp.tenant_id = ?' : '1=1';
             $uspParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+            // The "already reviewed" subquery now also constrains tenant
+            // — without that, a `safeguarding_flag_reviewed` action_log row
+            // in tenant A could suppress the count in tenant B if user_ids
+            // ever overlap (federation, identity merges, future schema
+            // changes). Defensive correctness.
             $row = DB::selectOne(
                 "SELECT COUNT(DISTINCT usp.user_id) as cnt
                  FROM user_safeguarding_preferences usp
@@ -227,19 +284,21 @@ class AdminBrokerController extends BaseApiController
                  AND tso.triggers IS NOT NULL
                  AND NOT EXISTS (
                      SELECT 1 FROM activity_log al
-                     WHERE al.entity_type = 'user' AND al.entity_id = usp.user_id
-                     AND al.action = 'safeguarding_flag_reviewed'
+                     WHERE al.entity_type = 'user'
+                       AND al.entity_id = usp.user_id
+                       AND al.tenant_id = usp.tenant_id
+                       AND al.action = 'safeguarding_flag_reviewed'
                  )",
                 $uspParams
             );
             $onboardingSafeguardingFlags = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'onboarding_safeguarding_flags';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard onboarding_safeguarding_flags failed: ' . $e->getMessage());
+        }
 
         $recentActivity = [];
         try {
-            if (!$isSuperAdmin && $effectiveTenantId === null) {
-                return $this->respondWithError('TENANT_CONTEXT_ERROR', __('api.tenant_context_error'), null, 403);
-            }
             // Activity feed reads from BOTH activity_log and org_audit_log,
             // because broker actions are split between them by historical
             // accident: AdminVettingController logs via ActivityLog::log →
@@ -248,6 +307,11 @@ class AdminBrokerController extends BaseApiController
             // with the actual action keys those controllers write keeps the
             // dashboard panel populated regardless of which table a given
             // mutation hits.
+            //
+            // Each branch returns a literal `source` column ('activity' /
+            // 'audit') so the frontend can build a stable composite React
+            // key — without it, id=1 from activity_log collides with id=1
+            // from org_audit_log and React mis-reconciles list rows.
             $actWhere      = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
             $auditWhere    = $effectiveTenantId !== null ? 'oal.tenant_id = ?' : '1=1';
             $actParams     = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
@@ -256,7 +320,8 @@ class AdminBrokerController extends BaseApiController
                 // ActivityLog::log writes the specific action key to the
                 // `action` column and the broad category ('admin', 'system',
                 // ...) to `action_type`. Filter on `action`.
-                "(SELECT al.id, al.tenant_id, al.user_id, al.action AS action_type,
+                "(SELECT al.id, 'activity' AS source,
+                         al.tenant_id, al.user_id, al.action AS action_type,
                          al.details, al.created_at,
                          u.first_name, u.last_name, t.name as tenant_name
                   FROM activity_log al
@@ -272,7 +337,8 @@ class AdminBrokerController extends BaseApiController
                       'insurance_cert_deleted'
                   ))
                  UNION ALL
-                 (SELECT oal.id, oal.tenant_id, oal.user_id, oal.action AS action_type,
+                 (SELECT oal.id, 'audit' AS source,
+                         oal.tenant_id, oal.user_id, oal.action AS action_type,
                          oal.details, oal.created_at,
                          u.first_name, u.last_name, t.name as tenant_name
                   FROM org_audit_log oal
@@ -292,18 +358,26 @@ class AdminBrokerController extends BaseApiController
                 $unionParams
             );
             $recentActivity = array_map(fn($r) => (array)$r, $recentActivity);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            $failedMetrics[] = 'recent_activity';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard recent_activity failed: ' . $e->getMessage());
+        }
 
         return $this->respondWithData([
-            'pending_exchanges' => $pendingExchanges,
-            'unreviewed_messages' => $unreviewedMessages,
-            'high_risk_listings' => $highRiskListings,
-            'monitored_users' => $monitoredUsers,
-            'vetting_pending' => $vettingPending,
-            'vetting_expiring' => $vettingExpiring,
-            'safeguarding_alerts' => $safeguardingAlerts,
-            'onboarding_safeguarding_flags' => $onboardingSafeguardingFlags,
+            'pending_exchanges' => in_array('pending_exchanges', $failedMetrics, true) ? null : $pendingExchanges,
+            'unreviewed_messages' => in_array('unreviewed_messages', $failedMetrics, true) ? null : $unreviewedMessages,
+            'high_risk_listings' => in_array('high_risk_listings', $failedMetrics, true) ? null : $highRiskListings,
+            'monitored_users' => in_array('monitored_users', $failedMetrics, true) ? null : $monitoredUsers,
+            'vetting_pending' => in_array('vetting_pending', $failedMetrics, true) ? null : $vettingPending,
+            'vetting_expiring' => in_array('vetting_expiring', $failedMetrics, true) ? null : $vettingExpiring,
+            'safeguarding_alerts' => in_array('safeguarding_alerts', $failedMetrics, true) ? null : $safeguardingAlerts,
+            'onboarding_safeguarding_flags' => in_array('onboarding_safeguarding_flags', $failedMetrics, true) ? null : $onboardingSafeguardingFlags,
             'recent_activity' => $recentActivity,
+            // Frontend uses this to render a banner when one or more
+            // metrics dropped to null instead of a real number, so a DB
+            // hiccup doesn't masquerade as "no risk".
+            '_partial' => !empty($failedMetrics),
+            '_failed_metrics' => $failedMetrics,
         ]);
     }
 

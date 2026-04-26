@@ -9,7 +9,7 @@
  * Parity: PHP BrokerControlsController::dashboard()
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Divider } from '@heroui/react';
@@ -24,12 +24,28 @@ import Clock from 'lucide-react/icons/clock';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Activity from 'lucide-react/icons/activity';
 import Settings from 'lucide-react/icons/settings';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
 import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
 import { BrokerControlsHelp } from './BrokerHelpPage';
+
+/**
+ * MySQL TIMESTAMP/DATETIME columns are stored as UTC but returned as
+ * "YYYY-MM-DD HH:MM:SS" with no zone marker. JS `new Date(string)` then
+ * interprets the bare format as LOCAL time, which makes every "minutes ago"
+ * label drift by the user's UTC offset. Forcing the Z suffix fixes that
+ * without touching the API contract.
+ */
+function parseServerTimestamp(value: string): Date {
+  if (!value) return new Date(NaN);
+  // Already-ISO with timezone? Trust it.
+  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
+  // MySQL "2026-04-26 18:00:00" — promote to ISO UTC.
+  return new Date(value.replace(' ', 'T') + 'Z');
+}
 
 // Quick-link metadata. Title + description are translated at render time
 // using the broker.dashboard.links.* namespace so the dashboard respects
@@ -70,25 +86,44 @@ export function BrokerDashboard() {
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  // Stash the latest `t` and `toast` in refs so loadDashboard's identity
+  // doesn't churn on every language switch (which would otherwise refetch
+  // the entire dashboard for no reason — only labels translate, not numbers).
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminBroker.getDashboard();
       if (res.success && res.data) {
         setStats(res.data);
+      } else {
+        setLoadError(true);
+        toastRef.current.error(tRef.current('dashboard.load_failed'));
       }
     } catch {
-      toast.error(t('dashboard.load_failed'));
+      setLoadError(true);
+      toastRef.current.error(tRef.current('dashboard.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, []);
 
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  // A dash for null (load failed) and a dash for missing data both render
+  // identically — but the partial-load banner makes the difference visible.
+  const renderMetric = (value: number | null | undefined): number | string =>
+    typeof value === 'number' ? value : '—';
 
   return (
     <div>
@@ -108,12 +143,31 @@ export function BrokerDashboard() {
         }
       />
 
+      {/* Partial-load banner — surfaces when the controller's per-query
+          try/catch swallowed at least one error. Hiding this would mask
+          a DB hiccup as a clean dashboard, exactly the wrong direction
+          for a risk-surfacing UI. */}
+      {stats?._partial && (
+        <Card shadow="sm" className="mb-4 border border-warning-200 bg-warning-50/50">
+          <CardBody className="flex flex-row items-start gap-3 py-3">
+            <AlertCircle size={20} className="text-warning shrink-0 mt-0.5" />
+            <div className="flex-1 text-sm">
+              <p className="font-medium text-warning-700">{t('dashboard.partial_title')}</p>
+              <p className="text-default-600">{t('dashboard.partial_body')}</p>
+            </div>
+            <Button size="sm" variant="flat" color="warning" onPress={loadDashboard}>
+              {t('dashboard.refresh')}
+            </Button>
+          </CardBody>
+        </Card>
+      )}
+
       {/* Stats Grid — each tile deep-links into the relevant management page
           with the filter already applied, so admins triage in one click. */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           label={t('dashboard.pending_exchanges')}
-          value={stats?.pending_exchanges ?? '—'}
+          value={renderMetric(stats?.pending_exchanges)}
           icon={ArrowLeftRight}
           color="primary"
           loading={loading}
@@ -121,7 +175,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.unreviewed_messages')}
-          value={stats?.unreviewed_messages ?? '—'}
+          value={renderMetric(stats?.unreviewed_messages)}
           icon={MessageSquareWarning}
           color="warning"
           loading={loading}
@@ -129,7 +183,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.high_risk_listings')}
-          value={stats?.high_risk_listings ?? '—'}
+          value={renderMetric(stats?.high_risk_listings)}
           icon={ShieldAlert}
           color="danger"
           loading={loading}
@@ -137,7 +191,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.monitored_users')}
-          value={stats?.monitored_users ?? '—'}
+          value={renderMetric(stats?.monitored_users)}
           icon={Eye}
           color="secondary"
           loading={loading}
@@ -145,7 +199,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.vetting_pending')}
-          value={stats?.vetting_pending ?? '—'}
+          value={renderMetric(stats?.vetting_pending)}
           icon={ShieldCheck}
           color="success"
           loading={loading}
@@ -153,7 +207,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.vetting_expiring')}
-          value={stats?.vetting_expiring ?? '—'}
+          value={renderMetric(stats?.vetting_expiring)}
           icon={Clock}
           color="warning"
           loading={loading}
@@ -161,7 +215,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.safeguarding_alerts')}
-          value={stats?.safeguarding_alerts ?? '—'}
+          value={renderMetric(stats?.safeguarding_alerts)}
           icon={AlertTriangle}
           color="danger"
           loading={loading}
@@ -169,7 +223,7 @@ export function BrokerDashboard() {
         />
         <StatCard
           label={t('dashboard.safeguarding_flags')}
-          value={stats?.onboarding_safeguarding_flags ?? '—'}
+          value={renderMetric(stats?.onboarding_safeguarding_flags)}
           icon={ShieldAlert}
           color="warning"
           loading={loading}
@@ -205,6 +259,22 @@ export function BrokerDashboard() {
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
         </div>
+      ) : loadError && !stats ? (
+        // Distinct error state — without this, a load failure rendered as
+        // the friendly "no recent activity yet" empty state, which lies
+        // about what happened.
+        <Card shadow="sm">
+          <CardBody className="flex flex-col items-center justify-center py-10 text-center">
+            <AlertCircle size={40} className="text-danger mb-3" />
+            <p className="text-danger font-medium">{t('dashboard.load_error_title')}</p>
+            <p className="text-sm text-default-400 mt-1 mb-3">
+              {t('dashboard.load_error_hint')}
+            </p>
+            <Button size="sm" variant="flat" color="danger" onPress={loadDashboard}>
+              {t('dashboard.refresh')}
+            </Button>
+          </CardBody>
+        </Card>
       ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
@@ -214,23 +284,32 @@ export function BrokerDashboard() {
           <Divider className="my-2" />
           <CardBody className="p-0">
             <ul className="divide-y divide-divider">
-              {stats.recent_activity.map((entry: BrokerActivityEntry) => (
-                <li key={entry.id} className="flex items-center gap-3 px-4 py-3">
-                  <ActivityChip actionType={entry.action_type} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-foreground">
-                      <span className="font-medium">{entry.first_name} {entry.last_name}</span>
-                      {' '}{formatActionLabel(entry.action_type, t)}
-                    </p>
-                    {entry.details && (
-                      <p className="text-xs text-default-400 truncate">{entry.details}</p>
-                    )}
-                  </div>
-                  <span className="shrink-0 text-xs text-default-400">
-                    {formatTimeAgo(entry.created_at, t)}
-                  </span>
-                </li>
-              ))}
+              {stats.recent_activity.map((entry: BrokerActivityEntry) => {
+                // Composite key: ids collide between activity_log and
+                // org_audit_log, so the source tag from the controller is
+                // load-bearing here. Falling back to action_type+id keeps
+                // older API responses (pre-source) from breaking.
+                const rowKey = `${entry.source ?? entry.action_type}-${entry.id}`;
+                const fullName = `${entry.first_name ?? ''} ${entry.last_name ?? ''}`.trim();
+                const actorName = fullName || t('dashboard.deleted_user');
+                return (
+                  <li key={rowKey} className="flex items-center gap-3 px-4 py-3">
+                    <ActivityChip actionType={entry.action_type} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-foreground">
+                        <span className="font-medium">{actorName}</span>
+                        {' '}{formatActionLabel(entry.action_type, t)}
+                      </p>
+                      {entry.details && (
+                        <p className="text-xs text-default-400 truncate">{entry.details}</p>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-xs text-default-400">
+                      {formatTimeAgo(entry.created_at, t)}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </CardBody>
         </Card>
@@ -344,10 +423,14 @@ function formatActionLabel(actionType: string, t: TFunc): string {
 }
 
 function formatTimeAgo(dateStr: string, t: TFunc): string {
-  const date = new Date(dateStr);
+  const date = parseServerTimestamp(dateStr);
+  if (Number.isNaN(date.getTime())) return '';
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
+  // Clock skew between server and client can produce a negative diff.
+  // Clamp to 0 so the user doesn't see "in the future" labels on rows
+  // that just happened.
+  const diffMins = Math.max(0, Math.floor(diffMs / 60000));
   if (diffMins < 1) return t('dashboard.time_just_now');
   if (diffMins < 60) return t('dashboard.time_minutes_ago', { count: diffMins });
   const diffHrs = Math.floor(diffMins / 60);

@@ -142,7 +142,12 @@
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
-    "time_days_ago": "{{count}}d ago"
+    "time_days_ago": "{{count}}d ago",
+    "load_error_title": "Couldn't load the activity feed",
+    "load_error_hint": "Try again — if it keeps failing, the API may be unavailable.",
+    "deleted_user": "Deleted user",
+    "partial_title": "Some metrics couldn't be loaded",
+    "partial_body": "One or more counters above are showing a dash because the underlying query failed. Refresh to retry; if the dash persists, check the broker logs."
   },
   "members": {
     "title": "Członkowie",

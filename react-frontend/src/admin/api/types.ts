@@ -1013,24 +1013,38 @@ export type UpdateBlogPostPayload = Partial<CreateBlogPostPayload>;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface BrokerDashboardStats {
-  pending_exchanges: number;
-  unreviewed_messages: number;
-  high_risk_listings: number;
-  monitored_users: number;
-  vetting_pending: number;
-  vetting_expiring: number;
-  safeguarding_alerts: number;
-  onboarding_safeguarding_flags: number;
+  // Each metric is `null` when the controller's per-query try/catch
+  // failed to compute it. Frontend renders null as a dash and surfaces
+  // the partial-load banner — silently coercing to 0 would hide real
+  // safeguarding alerts during a DB hiccup.
+  pending_exchanges: number | null;
+  unreviewed_messages: number | null;
+  high_risk_listings: number | null;
+  monitored_users: number | null;
+  vetting_pending: number | null;
+  vetting_expiring: number | null;
+  safeguarding_alerts: number | null;
+  onboarding_safeguarding_flags: number | null;
   recent_activity: BrokerActivityEntry[];
+  /** True when one or more metrics failed to load. */
+  _partial?: boolean;
+  /** Names of metrics that returned null. */
+  _failed_metrics?: string[];
 }
 
 export interface BrokerActivityEntry {
   id: number;
-  user_id: number;
-  first_name: string;
-  last_name: string;
+  /**
+   * 'activity' for activity_log rows, 'audit' for org_audit_log rows.
+   * Used by the frontend to build a stable composite React key —
+   * id values collide across the two tables.
+   */
+  source: 'activity' | 'audit';
+  user_id: number | null;
+  first_name: string | null;
+  last_name: string | null;
   action_type: string;
-  details: string;
+  details: string | null;
   created_at: string;
 }
 
