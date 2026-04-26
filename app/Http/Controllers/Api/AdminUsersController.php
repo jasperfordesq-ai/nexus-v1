@@ -1861,7 +1861,7 @@ class AdminUsersController extends BaseApiController
 
                 Notification::createNotification(
                     (int) $user['id'],
-                    "Your account has been reactivated. Welcome back to {$tenant['name']}!",
+                    __('api_controllers_3.admin_bells.account_reactivated', ['community' => $tenant['name']]),
                     '/dashboard',
                     'system',
                     true,

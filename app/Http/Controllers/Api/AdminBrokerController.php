@@ -1117,7 +1117,9 @@ class AdminBrokerController extends BaseApiController
                 $this->auditLogService->log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
 
                 try {
-                    Notification::createNotification($userId, __('api_controllers_3.admin_bells.monitoring_lifted'), '/messages', 'system', true);
+                    LocaleContext::withLocale($user, function () use ($userId) {
+                        Notification::createNotification($userId, __('api_controllers_3.admin_bells.monitoring_lifted'), '/messages', 'system', true);
+                    });
                 } catch (\Throwable $e) { \Log::warning('[AdminBroker] restrictions-lifted notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);

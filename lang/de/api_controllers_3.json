@@ -62,6 +62,7 @@
     "monitoring_lifted": "Your messaging restrictions have been lifted.",
     "account_suspended": "Your account has been suspended. Contact support if you believe this is an error.",
     "account_banned": "Your account has been banned. Contact support if you believe this is an error.",
+    "account_reactivated": "Your account has been reactivated. Welcome back to {{community}}!",
     "super_admin_granted": "You have been granted Tenant Super Admin privileges.",
     "super_admin_revoked": "Your Tenant Super Admin privileges have been removed."
   },
