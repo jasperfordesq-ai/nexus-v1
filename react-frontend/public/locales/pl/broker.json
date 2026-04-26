@@ -237,7 +237,10 @@
     "reviewed_success": "Wiadomość przejrzana pomyślnie.",
     "no_flagged": "Brak oznaczonych wiadomości do przejrzenia.",
     "no_assignments": "Brak przypisań opiekunów.",
-    "no_preferences": "Brak zarejestrowanych preferencji ochrony członków."
+    "no_preferences": "Brak zarejestrowanych preferencji ochrony członków.",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "vetting": {
     "title": "Weryfikacja i DBS",

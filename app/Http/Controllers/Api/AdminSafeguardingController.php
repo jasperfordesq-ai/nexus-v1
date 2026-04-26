@@ -110,12 +110,19 @@ class AdminSafeguardingController extends BaseApiController
             }
         }
 
-        // Also count unreviewed safeguarding incidents as critical
+        // Also count unreviewed safeguarding incidents as critical.
+        // vol_safeguarding_incidents.status enum is
+        // ('open','investigating','resolved','escalated','closed') — terminal
+        // states are 'resolved' and 'closed', so an incident under
+        // active investigation OR escalated to authorities is STILL open
+        // from the dashboard's "needs attention" perspective. The previous
+        // `status = 'open'` filter silently dropped both, under-counting
+        // the most consequential category of safeguarding work.
         try {
             $criticalFlags += (int) DB::table('vol_safeguarding_incidents')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('severity', ['high', 'critical'])
-                ->where('status', 'open')
+                ->whereIn('status', ['open', 'investigating', 'escalated'])
                 ->count();
         } catch (\Illuminate\Database\QueryException $e) {
             // Table may not exist yet

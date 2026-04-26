@@ -237,7 +237,10 @@
     "reviewed_success": "Mensagem revisada com sucesso.",
     "no_flagged": "Nenhuma mensagem sinalizada para revisar.",
     "no_assignments": "Nenhuma atribuição de guardião.",
-    "no_preferences": "Nenhuma preferência de proteção de membro registrada."
+    "no_preferences": "Nenhuma preferência de proteção de membro registrada.",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "vetting": {
     "title": "Verificação e DBS",

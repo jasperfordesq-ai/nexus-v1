@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Tabs,
   Tab,
@@ -23,6 +24,25 @@ import {
   ModalFooter,
   Textarea,
 } from '@heroui/react';
+
+/**
+ * MySQL TIMESTAMP/DATETIME columns are stored UTC but returned without a
+ * zone marker. JS `new Date(string)` then interprets bare format as LOCAL
+ * time (per ECMA-262 § 21.4.3.2), which can shift dates across the day
+ * boundary for users far from the server's timezone. Promote bare strings
+ * to ISO-8601 UTC before parsing.
+ */
+function parseServerTimestamp(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
+  const d = new Date(value.replace(' ', 'T') + 'Z');
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatServerDate(value: string | null | undefined): string {
+  const d = parseServerTimestamp(value);
+  return d ? d.toLocaleDateString() : '—';
+}
 import Shield from 'lucide-react/icons/shield';
 import Flag from 'lucide-react/icons/flag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -91,7 +111,7 @@ interface MemberPreference {
 // Severity Chip Helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SeverityChip({ severity }: { severity: string }) {
+function SeverityChip({ severity, t }: { severity: string; t: TFunction }) {
   const colorMap: Record<string, 'default' | 'warning' | 'danger'> = {
     low: 'default',
     medium: 'warning',
@@ -100,9 +120,12 @@ function SeverityChip({ severity }: { severity: string }) {
   };
   const color = colorMap[severity] || 'default';
   const variant = severity === 'critical' ? 'solid' : 'flat';
+  // Reuse the existing broker.status namespace which already has
+  // low/medium/high/critical translated across all 11 languages —
+  // avoids a parallel severity.* keyset that would drift.
   return (
-    <Chip size="sm" color={color} variant={variant} className="capitalize">
-      {severity}
+    <Chip size="sm" color={color} variant={variant}>
+      {t(`status.${severity}`, { defaultValue: severity })}
     </Chip>
   );
 }
@@ -120,20 +143,24 @@ export default function SafeguardingPage() {
   // ── Dashboard stats ──────────────────────────────────────────────────────
   const [stats, setStats] = useState<SafeguardingDashboard | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(false);
 
   // ── Tab: Flagged Messages ────────────────────────────────────────────────
   const [flaggedMessages, setFlaggedMessages] = useState<FlaggedMessage[]>([]);
   const [flaggedLoading, setFlaggedLoading] = useState(true);
+  const [flaggedError, setFlaggedError] = useState(false);
   const [flaggedPage, setFlaggedPage] = useState(1);
   const [flaggedTotal, setFlaggedTotal] = useState(0);
 
   // ── Tab: Guardian Assignments ────────────────────────────────────────────
   const [assignments, setAssignments] = useState<GuardianAssignment[]>([]);
   const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [assignmentsError, setAssignmentsError] = useState(false);
 
   // ── Tab: Member Preferences ──────────────────────────────────────────────
   const [preferences, setPreferences] = useState<MemberPreference[]>([]);
   const [preferencesLoading, setPreferencesLoading] = useState(false);
+  const [preferencesError, setPreferencesError] = useState(false);
 
   // ── Review modal ─────────────────────────────────────────────────────────
   const [reviewTarget, setReviewTarget] = useState<FlaggedMessage | null>(null);
@@ -171,12 +198,15 @@ export default function SafeguardingPage() {
 
   const fetchStats = useCallback(async () => {
     setStatsLoading(true);
+    setStatsError(false);
     try {
       const res = await api.get<SafeguardingDashboard>('/v2/admin/safeguarding/dashboard');
       const payload = res.data as SafeguardingDashboard;
       setStats(payload);
     } catch {
-      // stats are non-critical — silently fail
+      // Surface the failure rather than silently zeroing safeguarding
+      // metrics — same lesson as the broker dashboard's _partial flag.
+      setStatsError(true);
     } finally {
       setStatsLoading(false);
     }
@@ -184,6 +214,7 @@ export default function SafeguardingPage() {
 
   const fetchFlagged = useCallback(async (page = 1) => {
     setFlaggedLoading(true);
+    setFlaggedError(false);
     try {
       const params = new URLSearchParams({ page: String(page), reviewed: '0' });
       if (severityFilter) params.set('severity', severityFilter);
@@ -199,6 +230,7 @@ export default function SafeguardingPage() {
       }
     } catch {
       setFlaggedMessages([]);
+      setFlaggedError(true);
     } finally {
       setFlaggedLoading(false);
     }
@@ -206,8 +238,14 @@ export default function SafeguardingPage() {
 
   const fetchAssignments = useCallback(async () => {
     setAssignmentsLoading(true);
+    setAssignmentsError(false);
     try {
-      const res = await api.get<unknown>('/v2/admin/safeguarding/assignments?status=active');
+      // No `?status=active` filter: the backend doesn't honour it (it
+      // returns all assignments and computes status from
+      // revoked_at/consent_given_at) and the table here intentionally
+      // shows every assignment with a colored status chip. Sending the
+      // param was misleading — it implied filtering that wasn't happening.
+      const res = await api.get<unknown>('/v2/admin/safeguarding/assignments');
       const payload = res.data as unknown;
       if (Array.isArray(payload)) {
         setAssignments(payload as GuardianAssignment[]);
@@ -217,6 +255,7 @@ export default function SafeguardingPage() {
       }
     } catch {
       setAssignments([]);
+      setAssignmentsError(true);
     } finally {
       setAssignmentsLoading(false);
     }
@@ -224,6 +263,7 @@ export default function SafeguardingPage() {
 
   const fetchPreferences = useCallback(async () => {
     setPreferencesLoading(true);
+    setPreferencesError(false);
     try {
       const res = await api.get<unknown>('/v2/admin/safeguarding/member-preferences');
       const payload = res.data as unknown;
@@ -235,6 +275,7 @@ export default function SafeguardingPage() {
       }
     } catch {
       setPreferences([]);
+      setPreferencesError(true);
     } finally {
       setPreferencesLoading(false);
     }
@@ -297,12 +338,12 @@ export default function SafeguardingPage() {
     {
       key: 'severity',
       label: t('safeguarding.col_severity'),
-      render: (item) => <SeverityChip severity={item.severity || item.flag_severity || 'low'} />,
+      render: (item) => <SeverityChip severity={item.severity || item.flag_severity || 'low'} t={t} />,
     },
     {
       key: 'created_at',
       label: t('safeguarding.col_date'),
-      render: (item) => new Date(item.created_at).toLocaleDateString(),
+      render: (item) => formatServerDate(item.created_at),
     },
     {
       key: 'is_reviewed',
@@ -362,13 +403,12 @@ export default function SafeguardingPage() {
     {
       key: 'consent_given_at',
       label: t('safeguarding.col_consent'),
-      render: (item) =>
-        item.consent_given_at ? new Date(item.consent_given_at).toLocaleDateString() : '—',
+      render: (item) => formatServerDate(item.consent_given_at),
     },
     {
       key: 'created_at',
       label: t('safeguarding.col_assigned'),
-      render: (item) => new Date(item.created_at).toLocaleDateString(),
+      render: (item) => formatServerDate(item.created_at),
     },
   ], [t]);
 
@@ -399,7 +439,7 @@ export default function SafeguardingPage() {
     {
       key: 'created_at',
       label: t('safeguarding.col_date'),
-      render: (item) => new Date(item.created_at).toLocaleDateString(),
+      render: (item) => formatServerDate(item.created_at),
     },
   ], [t]);
 
@@ -411,6 +451,33 @@ export default function SafeguardingPage() {
         title={t('safeguarding.title')}
         description={t('safeguarding.description')}
       />
+
+      {/* Surface load failures explicitly — silent zeros on a safeguarding
+          tile are dangerous in the same way the broker-dashboard
+          safeguarding_alerts bug was. The retry button gives the user a
+          path forward without forcing a full page reload. */}
+      {(statsError || flaggedError || assignmentsError || preferencesError) && (
+        <div className="rounded-lg border border-warning-200 bg-warning-50/50 p-3 flex items-start gap-3">
+          <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-warning-700">{t('safeguarding.load_error_title')}</p>
+            <p className="text-default-600">{t('safeguarding.load_error_body')}</p>
+          </div>
+          <Button
+            size="sm"
+            variant="flat"
+            color="warning"
+            onPress={() => {
+              if (statsError) void fetchStats();
+              if (flaggedError) void fetchFlagged(flaggedPage);
+              if (assignmentsError) void fetchAssignments();
+              if (preferencesError) void fetchPreferences();
+            }}
+          >
+            {t('safeguarding.retry')}
+          </Button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -571,7 +638,7 @@ export default function SafeguardingPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-default-500">{t('safeguarding.severity_label')}</span>
-                  <SeverityChip severity={reviewTarget.severity || reviewTarget.flag_severity || 'low'} />
+                  <SeverityChip severity={reviewTarget.severity || reviewTarget.flag_severity || 'low'} t={t} />
                 </div>
                 <Textarea
                   label={t('safeguarding.review_notes_label')}

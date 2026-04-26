@@ -237,7 +237,10 @@
     "reviewed_success": "メッセージをレビューしました。",
     "no_flagged": "レビューするフラグ付きメッセージはありません。",
     "no_assignments": "保護者の割り当てはありません。",
-    "no_preferences": "メンバーのセーフガーディング設定は記録されていません。"
+    "no_preferences": "メンバーのセーフガーディング設定は記録されていません。",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "vetting": {
     "title": "審査・DBS",

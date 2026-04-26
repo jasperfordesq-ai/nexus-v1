@@ -245,7 +245,10 @@
     "reviewed_success": "Message reviewed successfully.",
     "no_flagged": "No flagged messages to review.",
     "no_assignments": "No guardian assignments.",
-    "no_preferences": "No member safeguarding preferences recorded."
+    "no_preferences": "No member safeguarding preferences recorded.",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
 
   "vetting": {

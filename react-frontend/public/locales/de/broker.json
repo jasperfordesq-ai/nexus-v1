@@ -237,7 +237,10 @@
     "reviewed_success": "Nachricht erfolgreich überprüft.",
     "no_flagged": "Keine markierten Nachrichten zur Überprüfung.",
     "no_assignments": "Keine Aufträge für Wächter.",
-    "no_preferences": "Keine Präferenzen zum Schutz der Mitglieder aufgezeichnet."
+    "no_preferences": "Keine Präferenzen zum Schutz der Mitglieder aufgezeichnet.",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "vetting": {
     "title": "Überprüfung & DBS",

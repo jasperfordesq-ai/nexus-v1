@@ -237,7 +237,10 @@
     "reviewed_success": "D'éirigh le hathbhreithniú na teachtaireachta.",
     "no_flagged": "Níl aon teachtaireachtaí le bratach le hathbhreithniú.",
     "no_assignments": "Níl aon sannadh caomhnóirí.",
-    "no_preferences": "Níl aon sainroghanna cosanta ball taifeadta."
+    "no_preferences": "Níl aon sainroghanna cosanta ball taifeadta.",
+    "load_error_title": "Some safeguarding data couldn't be loaded",
+    "load_error_body": "One or more sections above failed to load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "vetting": {
     "title": "Scagadh & DBS",
