@@ -128,6 +128,7 @@ const VolunteerConsents = lazy(() => import('./modules/volunteering/VolunteerCon
 const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerProjects'));
 const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
 const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/CaringCommunityAdmin'));
+const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -512,6 +513,7 @@ export function AdminRoutes() {
       <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
       <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
       <Route path="caring-community" element={<Lazy><CaringCommunityAdmin /></Lazy>} />
+      <Route path="caring-community/workflow" element={<Lazy><CaringCommunityWorkflowPage /></Lazy>} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />

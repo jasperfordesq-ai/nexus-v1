@@ -113,6 +113,15 @@ export default function CaringCommunityAdmin() {
               {t('caring_community.actions.open_member_hub')}
             </Button>
             <Button
+              as={Link}
+              to={tenantPath('/admin/caring-community/workflow')}
+              variant="flat"
+              size="sm"
+              startContent={<ListChecks size={16} />}
+            >
+              {t('caring_community.actions.open_workflow')}
+            </Button>
+            <Button
               variant="flat"
               size="sm"
               startContent={<RefreshCw size={16} />}

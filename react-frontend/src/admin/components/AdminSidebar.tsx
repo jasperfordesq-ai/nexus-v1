@@ -62,6 +62,7 @@ import Cog from 'lucide-react/icons/cog';
 import Timer from 'lucide-react/icons/timer';
 import Contact from 'lucide-react/icons/contact';
 import StickyNote from 'lucide-react/icons/sticky-note';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Filter from 'lucide-react/icons/filter';
 import Activity from 'lucide-react/icons/activity';
@@ -250,6 +251,7 @@ function useAdminNav(): NavSection[] {
     const communityItems = [
       ...(hasFeature('caring_community') ? [
         { label: t('caring_community'), href: '/admin/caring-community', icon: Heart },
+        { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

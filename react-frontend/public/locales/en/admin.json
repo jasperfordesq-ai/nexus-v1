@@ -9,6 +9,7 @@
     },
     "actions": {
       "open_member_hub": "Open member hub",
+      "open_workflow": "Open KISS workflow",
       "refresh": "Refresh"
     },
     "stats": {
@@ -51,6 +52,97 @@
       "save_failed": "Failed to update Caring Community"
     },
     "config_route_note": "Dedicated admin configuration route: {{route}}"
+  },
+  "caring_workflow": {
+    "meta": {
+      "title": "KISS Workflow Console",
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+    },
+    "loading": "Loading KISS workflow data",
+    "actions": {
+      "open_hour_review": "Open hour review",
+      "open_report_pack": "Open report pack",
+      "refresh": "Refresh"
+    },
+    "stats": {
+      "pending_reviews": "Pending reviews",
+      "pending_hours": "Pending hours",
+      "approved_30d": "Approved in 30 days",
+      "coordinators": "Coordinators",
+      "role_presets_count": "{{count}} role presets"
+    },
+    "toast": {
+      "load_failed": "Failed to load KISS workflow data."
+    },
+    "review_queue": {
+      "title": "Trusted review queue",
+      "description": "Hour logs that need coordinator verification before they become accepted caring-community evidence.",
+      "empty": "No pending hour reviews. The coordinator queue is clear.",
+      "overdue": "{{count}} overdue",
+      "needs_review": "Needs review",
+      "unassigned": "Unassigned support activity",
+      "logged_on": "Logged {{date}}",
+      "submitted_on": "Submitted {{date}}"
+    },
+    "signals": {
+      "title": "Coordinator signals",
+      "description": "Quick operating indicators for matching, oversight, and partner activity.",
+      "active_requests": "Active requests",
+      "active_offers": "Active offers",
+      "trusted_organisations": "Trusted organisations",
+      "declined_30d": "Declined in 30 days"
+    },
+    "roles": {
+      "title": "Agoris/KISS role presets",
+      "national_admin": {
+        "title": "National foundation admin",
+        "description": "Cross-program oversight, reporting standards, and KISS network governance."
+      },
+      "canton_admin": {
+        "title": "Canton admin",
+        "description": "Regional performance view, municipal coordination, and canton-level reporting."
+      },
+      "municipality_admin": {
+        "title": "Municipality admin",
+        "description": "Local participation, requests, organisations, and public-sector report packs."
+      },
+      "cooperative_coordinator": {
+        "title": "Cooperative coordinator",
+        "description": "Member onboarding, matching, hour review, and sensitive support escalation."
+      },
+      "organisation_coordinator": {
+        "title": "Organisation coordinator",
+        "description": "Opportunity management, volunteer rosters, logged hours, and partner activity."
+      },
+      "trusted_reviewer": {
+        "title": "Trusted volunteer reviewer",
+        "description": "Limited review authority for approved hour logs and community trust signals."
+      }
+    },
+    "stages": {
+      "title": "KISS operating model",
+      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
+      "intake": {
+        "title": "Intake",
+        "description": "A member, family, organisation, or coordinator records a need or offer."
+      },
+      "match": {
+        "title": "Match",
+        "description": "Coordinators connect people, organisations, or trusted volunteers."
+      },
+      "log": {
+        "title": "Log hours",
+        "description": "Support time is recorded against the member, organisation, or activity."
+      },
+      "verify": {
+        "title": "Verify",
+        "description": "A trusted coordinator approves or declines the logged hours."
+      },
+      "statement": {
+        "title": "Statement",
+        "description": "Accepted hours feed member statements and municipal evidence packs."
+      }
+    }
   },
   "municipal_reports": {
     "meta": {

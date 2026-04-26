@@ -1142,6 +1142,7 @@ Route::get('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsCont
 Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag']);
 Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide']);
 Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy']);
+Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);
