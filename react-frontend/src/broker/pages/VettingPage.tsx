@@ -188,9 +188,10 @@ export function VettingRecords() {
   // Verify loading tracker
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
 
-  // Document upload (#10)
+  // Document upload (#10) — uploadingId tracks per-record loading state for
+  // the upload buttons. The actual <input type="file"> is spawned on demand
+  // by openFilePickerForRecord so no shared ref is needed.
   const [uploadingId, setUploadingId] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Bulk actions
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -870,25 +871,11 @@ export function VettingRecords() {
         }
       />
 
-      {/* File pickers are now spawned on demand via openFilePickerForRecord
-          so the recordId is captured in the click closure (no shared state).
-          A no-op input is left in the tree for backward compat with any test
-          that referenced it; the live upload path uses the disposable input. */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png,.webp"
-        className="hidden"
-        readOnly
-        onChange={(e) => {
-          // Legacy fallback path (kept for test backward-compat).
-          const file = e.target.files?.[0];
-          if (file && uploadingId) {
-            handleDocumentUpload(uploadingId, file);
-          }
-          e.target.value = '';
-        }}
-      />
+      {/* File pickers are spawned on demand via openFilePickerForRecord —
+          the recordId is captured in the click closure so there's no
+          shared state to race over. The legacy shared <input ref> was
+          removed once both upload buttons in the View modal were
+          migrated to openFilePickerForRecord. */}
 
       {/* Create Modal — #8: Member search autocomplete */}
       <Modal
@@ -1353,10 +1340,7 @@ export function VettingRecords() {
                     variant="flat"
                     startContent={<Upload size={14} />}
                     isLoading={uploadingId === viewItem.id}
-                    onPress={() => {
-                      setUploadingId(viewItem.id);
-                      fileInputRef.current?.click();
-                    }}
+                    onPress={() => openFilePickerForRecord(viewItem.id)}
                   >
                     {"Upload Document"}
                   </Button>

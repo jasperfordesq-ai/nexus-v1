@@ -208,21 +208,52 @@ class AdminBrokerController extends BaseApiController
             if (!$isSuperAdmin && $effectiveTenantId === null) {
                 return $this->respondWithError(__('api.tenant_context_error'), 403);
             }
-            $actWhere = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
-            $actParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+            // Activity feed reads from BOTH activity_log and org_audit_log,
+            // because broker actions are split between them by historical
+            // accident: AdminVettingController logs via ActivityLog::log →
+            // activity_log; AdminBrokerController + the R6 audit additions
+            // log via AuditLogService::log → org_audit_log. UNIONing the two
+            // with the actual action keys those controllers write keeps the
+            // dashboard panel populated regardless of which table a given
+            // mutation hits.
+            $actWhere      = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
+            $auditWhere    = $effectiveTenantId !== null ? 'oal.tenant_id = ?' : '1=1';
+            $actParams     = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
+            $unionParams   = array_merge($actParams, $actParams);
             $recentActivity = DB::select(
-                "SELECT al.*, u.first_name, u.last_name, t.name as tenant_name
-                 FROM activity_log al
-                 LEFT JOIN users u ON u.id = al.user_id
-                 LEFT JOIN tenants t ON al.tenant_id = t.id
-                 WHERE {$actWhere} AND al.action_type IN (
-                     'exchange_approved', 'exchange_rejected', 'message_reviewed',
-                     'risk_tag_added', 'user_monitored', 'vetting_verified', 'vetting_rejected',
-                     'user_banned', 'user_unbanned', 'balance_adjusted'
-                 )
-                 ORDER BY al.created_at DESC
+                "(SELECT al.id, al.tenant_id, al.user_id, al.action_type AS action_type,
+                         al.details, al.created_at,
+                         u.first_name, u.last_name, t.name as tenant_name
+                  FROM activity_log al
+                  LEFT JOIN users u ON u.id = al.user_id
+                  LEFT JOIN tenants t ON al.tenant_id = t.id
+                  WHERE {$actWhere} AND al.action_type IN (
+                      'vetting_record_verified', 'vetting_record_rejected',
+                      'vetting_record_created', 'vetting_record_updated',
+                      'vetting_record_deleted', 'vetting_document_uploaded',
+                      'insurance_cert_created', 'insurance_cert_updated',
+                      'insurance_cert_verified', 'insurance_cert_rejected',
+                      'insurance_cert_deleted'
+                  ))
+                 UNION ALL
+                 (SELECT oal.id, oal.tenant_id, oal.user_id, oal.action AS action_type,
+                         oal.details, oal.created_at,
+                         u.first_name, u.last_name, t.name as tenant_name
+                  FROM org_audit_log oal
+                  LEFT JOIN users u ON u.id = oal.user_id
+                  LEFT JOIN tenants t ON oal.tenant_id = t.id
+                  WHERE {$auditWhere} AND oal.action IN (
+                      'exchange_approved', 'exchange_rejected',
+                      'broker_message_reviewed', 'broker_message_approved',
+                      'broker_message_flagged',
+                      'listing_risk_tag_created', 'listing_risk_tag_updated',
+                      'listing_risk_tag_removed',
+                      'user_monitoring_added', 'user_monitoring_removed',
+                      'broker_config_updated'
+                  ))
+                 ORDER BY created_at DESC
                  LIMIT 20",
-                $actParams
+                $unionParams
             );
             $recentActivity = array_map(fn($r) => (array)$r, $recentActivity);
         } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
@@ -532,7 +563,6 @@ class AdminBrokerController extends BaseApiController
     public function saveRiskTag(int $listingId): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $riskLevel = $this->input('risk_level', 'low');
@@ -551,12 +581,14 @@ class AdminBrokerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.risk_category_required'), 'risk_category');
         }
 
+        // Always operate on caller's tenant — see approveExchange comment.
+        // Cross-tenant writes are unsupported because they produce a split
+        // audit trail (data lands in target tenant, audit row in caller's).
         try {
-            if ($isSuperAdmin) {
-                $listing = DB::selectOne("SELECT id, tenant_id FROM listings WHERE id = ?", [$listingId]);
-            } else {
-                $listing = DB::selectOne("SELECT id, tenant_id FROM listings WHERE id = ? AND tenant_id = ?", [$listingId, $tenantId]);
-            }
+            $listing = DB::selectOne(
+                "SELECT id, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            );
 
             if (!$listing) {
                 return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
@@ -605,22 +637,20 @@ class AdminBrokerController extends BaseApiController
     public function removeRiskTag(int $listingId): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Always operate on caller's tenant — see approveExchange comment.
         try {
-            if ($isSuperAdmin) {
-                $existing = DB::selectOne("SELECT id, tenant_id, risk_level FROM listing_risk_tags WHERE listing_id = ?", [$listingId]);
-            } else {
-                $existing = DB::selectOne("SELECT id, tenant_id, risk_level FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?", [$listingId, $tenantId]);
-            }
+            $existing = DB::selectOne(
+                "SELECT id, tenant_id, risk_level FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
+            );
 
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Risk tag']), null, 404);
             }
 
-            $recordTenantId = (int) $existing->tenant_id;
-            DB::delete("DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?", [$listingId, $recordTenantId]);
+            DB::delete("DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?", [$listingId, $tenantId]);
 
             $this->auditLogService->log('listing_risk_tag_removed', null, $adminId, ['listing_id' => $listingId, 'previous_risk_level' => $existing->risk_level ?? null]);
 
@@ -823,7 +853,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('ALREADY_ARCHIVED', __('api.already_archived'), null, 409);
             }
 
-            $adminRow = DB::selectOne("SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ? AND tenant_id = ?", [$adminId, $this->getTenantId()]);
+            $adminRow = DB::selectOne("SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ? AND tenant_id = ?", [$adminId, $tenantId]);
             $adminName = $adminRow->name ?? 'Unknown';
 
             $conversationRows = DB::select(
@@ -984,19 +1014,18 @@ class AdminBrokerController extends BaseApiController
     public function setMonitoring(int $userId): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $underMonitoring = (bool) $this->input('under_monitoring', true);
         $reason = trim($this->input('reason', ''));
         $messagingDisabled = (bool) $this->input('messaging_disabled', false);
         $expiresDays = $this->input('expires_days', null);
 
+        // Always operate on caller's tenant — see approveExchange comment.
         try {
-            if ($isSuperAdmin) {
-                $user = DB::selectOne("SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ?", [$userId]);
-            } else {
-                $user = DB::selectOne("SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
-            }
+            $user = DB::selectOne(
+                "SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            );
 
             if (!$user) {
                 return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
@@ -1394,7 +1423,10 @@ class AdminBrokerController extends BaseApiController
                         'risk_level' => $riskLevel,
                         'tagged_by' => $brokerId,
                     ],
-                    "Listing '{$listing->title}' tagged as {$riskLevel} risk"
+                    __('api.broker.listing_risk_tagged_message', [
+                        'title' => $listing->title ?? '',
+                        'level' => $riskLevel,
+                    ])
                 );
             }
         } catch (\Exception $e) {
