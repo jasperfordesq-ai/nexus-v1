@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Button, Chip, Divider, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import User from 'lucide-react/icons/user';
@@ -32,7 +33,8 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'
 };
 
 export default function ExchangeDetail() {
-  usePageTitle("Exchange Detail - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('exchanges.detail_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<ExchangeDetailType | null>(null);
@@ -46,25 +48,25 @@ export default function ExchangeDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError("Exchange Not Found");
+        setError(t('exchanges.detail_not_found'));
       }
     } catch {
-      setError("Failed to load exchange");
+      setError(t('exchanges.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!id) return;
     const numericId = parseInt(id, 10);
     if (Number.isNaN(numericId) || numericId <= 0) {
-      setError("Invalid exchange id");
+      setError(t('exchanges.detail_invalid_id'));
       setLoading(false);
       return;
     }
     loadExchange(numericId);
-  }, [id, loadExchange]);
+  }, [id, loadExchange, t]);
 
   if (loading) {
     return (
@@ -77,7 +79,7 @@ export default function ExchangeDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || "Exchange Not Found"}</p>
+        <p className="text-danger">{error || t('exchanges.detail_not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/broker/exchanges')}
@@ -85,7 +87,7 @@ export default function ExchangeDetail() {
           className="mt-4"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          {"Back to Exchanges"}
+          {t('exchanges.detail_back_to_exchanges')}
         </Button>
       </div>
     );
@@ -97,8 +99,8 @@ export default function ExchangeDetail() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Exchange #${exchange.id}`}
-        description={exchange.listing_title ?? "Exchange Request"}
+        title={t('exchanges.detail_header_title', { id: exchange.id })}
+        description={exchange.listing_title ?? t('exchanges.detail_default_description')}
         actions={
           <Button
             as={Link}
@@ -107,7 +109,7 @@ export default function ExchangeDetail() {
             startContent={<ArrowLeft className="w-4 h-4" />}
             size="sm"
           >
-            {"Back"}
+            {t('exchanges.back')}
           </Button>
         }
       />
@@ -116,19 +118,19 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-default-500">{"Status"}</p>
+            <p className="text-sm text-default-500">{t('exchanges.detail_status_label')}</p>
             <Chip color={statusColor} variant="flat" size="sm" className="capitalize">
               {exchange.status.replace(/_/g, ' ')}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
             <div className="space-y-1 text-center">
-              <p className="text-sm text-default-500">{"Hours"}</p>
-              <p className="text-sm font-semibold">{exchange.final_hours}h</p>
+              <p className="text-sm text-default-500">{t('exchanges.detail_hours_label')}</p>
+              <p className="text-sm font-semibold">{t('exchanges.detail_hours_value', { hours: exchange.final_hours })}</p>
             </div>
           )}
           <div className="space-y-1 text-right">
-            <p className="text-sm text-default-500">{"Created"}</p>
+            <p className="text-sm text-default-500">{t('exchanges.detail_created_label')}</p>
             <p className="text-sm">{new Date(exchange.created_at).toLocaleString()}</p>
           </div>
         </CardBody>
@@ -139,7 +141,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">{"Requester"}</span>
+            <span className="font-semibold">{t('exchanges.detail_requester')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -152,7 +154,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">{"Provider"}</span>
+            <span className="font-semibold">{t('exchanges.detail_provider')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -169,7 +171,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-warning" />
-            <span className="font-semibold">{"Risk Tag"}</span>
+            <span className="font-semibold">{t('exchanges.detail_risk_tag')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -189,13 +191,13 @@ export default function ExchangeDetail() {
             )}
             <div className="flex gap-3 mt-3">
               {risk_tag.requires_approval && (
-                <Chip size="sm" variant="dot" color="warning">{"Approval Required"}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_approval_required')}</Chip>
               )}
               {risk_tag.insurance_required && (
-                <Chip size="sm" variant="dot" color="warning">{"Insurance Required"}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_insurance_required')}</Chip>
               )}
               {risk_tag.dbs_required && (
-                <Chip size="sm" variant="dot" color="warning">{"Dbs Required"}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_dbs_required')}</Chip>
               )}
             </div>
           </CardBody>
@@ -205,7 +207,7 @@ export default function ExchangeDetail() {
       {/* Broker Notes */}
       {exchange.broker_notes && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">{"Broker Notes"}</span></CardHeader>
+          <CardHeader><span className="font-semibold">{t('exchanges.detail_broker_notes')}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_notes}</p>
@@ -216,7 +218,7 @@ export default function ExchangeDetail() {
       {/* Broker Conditions */}
       {exchange.broker_conditions && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">{"Broker Conditions"}</span></CardHeader>
+          <CardHeader><span className="font-semibold">{t('exchanges.detail_broker_conditions')}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_conditions}</p>
@@ -228,12 +230,12 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          <span className="font-semibold">{"History"}</span>
+          <span className="font-semibold">{t('exchanges.detail_history')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
           {history.length === 0 ? (
-            <p className="text-sm text-default-500">{"No history recorded found"}</p>
+            <p className="text-sm text-default-500">{t('exchanges.detail_no_history')}</p>
           ) : (
             <div className="space-y-3">
               {history.map((entry) => (
@@ -242,7 +244,7 @@ export default function ExchangeDetail() {
                   <div>
                     <p className="text-sm font-medium">{entry.action}</p>
                     {entry.actor_name && (
-                      <p className="text-xs text-default-500">by {entry.actor_name}</p>
+                      <p className="text-xs text-default-500">{t('exchanges.detail_history_by', { name: entry.actor_name })}</p>
                     )}
                     {entry.notes && (
                       <p className="text-xs text-default-400 mt-1">{entry.notes}</p>

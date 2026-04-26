@@ -12,6 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, Button, Chip, Input } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Search from 'lucide-react/icons/search';
@@ -23,7 +24,8 @@ import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerArchive } from '@/admin/api/types';
 
 export function ReviewArchive() {
-  usePageTitle("Review Archive - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('archives.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -48,11 +50,11 @@ export function ReviewArchive() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error("Failed to load archives");
+      toast.error(t('archives.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [page, filter, search, toast])
+  }, [page, filter, search, toast, t])
 
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export function ReviewArchive() {
   const columns: Column<BrokerArchive>[] = [
     {
       key: 'sender_name',
-      label: "Sender",
+      label: t('archives.col_sender'),
       sortable: true,
       render: (item) => (
         <Link
@@ -85,7 +87,7 @@ export function ReviewArchive() {
     },
     {
       key: 'receiver_name',
-      label: "Receiver",
+      label: t('archives.col_receiver'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -93,7 +95,7 @@ export function ReviewArchive() {
     },
     {
       key: 'listing_title',
-      label: "Listing",
+      label: t('archives.col_listing'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -103,7 +105,7 @@ export function ReviewArchive() {
     },
     {
       key: 'copy_reason',
-      label: "Copy Reason",
+      label: t('archives.col_copy_reason'),
       render: (item) => (
         <Chip size="sm" variant="flat" color="default" className="capitalize">
           {item.copy_reason.replace(/_/g, ' ')}
@@ -112,7 +114,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decision',
-      label: "Decision",
+      label: t('archives.col_decision'),
       render: (item) => {
         const isApproved = item.decision === 'approved';
         return (
@@ -130,7 +132,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_by_name',
-      label: "Decided by",
+      label: t('archives.col_decided_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-foreground">{item.decided_by_name}</span>
@@ -138,7 +140,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_at',
-      label: "Date",
+      label: t('archives.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -151,8 +153,8 @@ export function ReviewArchive() {
   return (
     <div>
       <PageHeader
-        title={"Review Archive"}
-        description={"Browse the archive of previously reviewed and resolved messages"}
+        title={t('archives.title')}
+        description={t('archives.description')}
         actions={
           <Button
             as={Link}
@@ -161,7 +163,7 @@ export function ReviewArchive() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {"Back"}
+            {t('archives.back')}
           </Button>
         }
       />
@@ -173,15 +175,15 @@ export function ReviewArchive() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="approved" title={"Approved"} />
-          <Tab key="flagged" title={"Flagged"} />
+          <Tab key="all" title={t('archives.tab_all')} />
+          <Tab key="approved" title={t('archives.tab_approved')} />
+          <Tab key="flagged" title={t('archives.tab_flagged')} />
         </Tabs>
 
         <Input
           className="w-full sm:max-w-xs"
-          placeholder={"Search Sender or Receiver..."}
-          aria-label={"Search Review Archive"}
+          placeholder={t('archives.search_placeholder')}
+          aria-label={t('archives.search_aria')}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={handleSearchChange}
@@ -202,7 +204,7 @@ export function ReviewArchive() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent={"No archive records found found"}
+        emptyContent={t('archives.empty')}
       />
     </div>
   );

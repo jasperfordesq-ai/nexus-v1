@@ -12,6 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -36,7 +37,8 @@ import { PageHeader } from '@/admin/components';
 import type { BrokerArchiveDetail as BrokerArchiveDetailType } from '@/admin/api/types';
 
 export function ArchiveDetail() {
-  usePageTitle("Archive Detail - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('archives.detail_page_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<BrokerArchiveDetailType | null>(null);
@@ -50,25 +52,25 @@ export function ArchiveDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError("Archive Record Not Found");
+        setError(t('archives.not_found'));
       }
     } catch {
-      setError("Failed to load archive record");
+      setError(t('archives.load_record_failed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!id) return;
     const numericId = Number(id);
     if (!Number.isFinite(numericId) || numericId <= 0) {
-      setError("Invalid archive id");
+      setError(t('archives.invalid_id'));
       setLoading(false);
       return;
     }
     loadArchive(numericId);
-  }, [id, loadArchive]);
+  }, [id, loadArchive, t]);
 
   if (loading) {
     return (
@@ -81,7 +83,7 @@ export function ArchiveDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || "Archive Record Not Found"}</p>
+        <p className="text-danger">{error || t('archives.not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/broker/archives')}
@@ -89,7 +91,7 @@ export function ArchiveDetail() {
           className="mt-4"
           startContent={<ArrowLeft size={16} />}
         >
-          {"Back to Archives"}
+          {t('archives.back_to_archives')}
         </Button>
       </div>
     );
@@ -100,7 +102,7 @@ export function ArchiveDetail() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={"Archive Detail"}
+        title={t('archives.detail_title')}
         actions={
           <Button
             as={Link}
@@ -109,7 +111,7 @@ export function ArchiveDetail() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {"Back"}
+            {t('archives.back')}
           </Button>
         }
       />
@@ -121,7 +123,7 @@ export function ArchiveDetail() {
         size="lg"
         startContent={<Lock size={14} />}
       >
-        {"Read Only Compliance Record"}
+        {t('archives.read_only_badge')}
       </Chip>
 
       {/* Decision Card */}
@@ -132,13 +134,13 @@ export function ArchiveDetail() {
           ) : (
             <Flag size={18} className="text-danger" />
           )}
-          <span className="font-semibold">{"Decision"}</span>
+          <span className="font-semibold">{t('archives.section_decision')}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <p className="text-xs text-default-400">{"Decision"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_decision')}</p>
               <Chip
                 size="sm"
                 variant="flat"
@@ -149,11 +151,11 @@ export function ArchiveDetail() {
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">{"Decided by"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_decided_by')}</p>
               <p className="text-sm font-medium mt-1">{data.decided_by_name}</p>
             </div>
             <div>
-              <p className="text-xs text-default-400">{"Date"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_date')}</p>
               <p className="text-sm mt-1">
                 {new Date(data.decided_at).toLocaleString()}
               </p>
@@ -162,14 +164,14 @@ export function ArchiveDetail() {
 
           {data.decision_notes && (
             <div>
-              <p className="text-xs text-default-400">{"Decision Notes"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_decision_notes')}</p>
               <p className="text-sm mt-1">{data.decision_notes}</p>
             </div>
           )}
 
           {data.flag_reason && (
             <div className="rounded-lg bg-danger-50 p-3">
-              <p className="text-xs text-danger font-medium">{"Flag Reason"}</p>
+              <p className="text-xs text-danger font-medium">{t('archives.label_flag_reason')}</p>
               <p className="text-sm mt-1">{data.flag_reason}</p>
               {data.flag_severity && (
                 <Chip
@@ -178,7 +180,7 @@ export function ArchiveDetail() {
                   color="danger"
                   className="capitalize mt-2"
                 >
-                  {`Severity`}
+                  {t('archives.label_severity')}
                 </Chip>
               )}
             </div>
@@ -190,7 +192,7 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Mail size={18} />
-          <span className="font-semibold">{"Target"}</span>
+          <span className="font-semibold">{t('archives.section_target')}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
@@ -198,14 +200,14 @@ export function ArchiveDetail() {
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">{"Sender"}</p>
+                <p className="text-xs text-default-400">{t('archives.label_sender')}</p>
                 <p className="text-sm font-medium">{data.sender_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">{"Receiver"}</p>
+                <p className="text-xs text-default-400">{t('archives.label_receiver')}</p>
                 <p className="text-sm font-medium">{data.receiver_name}</p>
               </div>
             </div>
@@ -214,26 +216,26 @@ export function ArchiveDetail() {
           <Divider />
 
           <div>
-            <p className="text-xs text-default-400">{"Body"}</p>
+            <p className="text-xs text-default-400">{t('archives.label_body')}</p>
             <p className="text-sm mt-1 whitespace-pre-wrap">{data.target_message_body}</p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <div>
-              <p className="text-xs text-default-400">{"Copy Reason"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_copy_reason')}</p>
               <Chip size="sm" variant="flat" color="default" className="capitalize mt-1">
                 {data.copy_reason.replace(/_/g, ' ')}
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">{"Sent at"}</p>
+              <p className="text-xs text-default-400">{t('archives.label_sent_at')}</p>
               <p className="text-sm mt-1">
                 {new Date(data.target_message_sent_at).toLocaleString()}
               </p>
             </div>
             {data.listing_title && (
               <div>
-                <p className="text-xs text-default-400">{"Listing"}</p>
+                <p className="text-xs text-default-400">{t('archives.label_listing')}</p>
                 <p className="text-sm mt-1">{data.listing_title}</p>
               </div>
             )}
@@ -245,15 +247,15 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <MessageSquare size={18} />
-          <span className="font-semibold">{"Conversation Snapshot"}</span>
+          <span className="font-semibold">{t('archives.section_conversation_snapshot')}</span>
           <Chip size="sm" variant="flat" color="default" className="ml-auto">
-            {`Messages Count`}
+            {t('archives.messages_count')}
           </Chip>
         </CardHeader>
         <Divider />
         <CardBody>
           {data.conversation_snapshot.length === 0 ? (
-            <p className="text-sm text-default-500">{"No conversation snapshot found"}</p>
+            <p className="text-sm text-default-500">{t('archives.no_snapshot')}</p>
           ) : (
             <ScrollShadow className="max-h-[500px]">
               <div className="space-y-0">
@@ -271,13 +273,13 @@ export function ArchiveDetail() {
                       </div>
                       <p className="text-sm text-default-600 whitespace-pre-wrap">
                         {msg.is_deleted ? (
-                          <span className="italic text-default-400">{"Deleted"}</span>
+                          <span className="italic text-default-400">{t('archives.deleted')}</span>
                         ) : (
                           msg.body
                         )}
                       </p>
                       {msg.is_edited && (
-                        <span className="text-xs text-default-400 italic">{"Edited"}</span>
+                        <span className="text-xs text-default-400 italic">{t('archives.edited')}</span>
                       )}
                     </div>
                   </div>

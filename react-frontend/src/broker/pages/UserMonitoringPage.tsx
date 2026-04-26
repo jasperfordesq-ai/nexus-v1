@@ -34,6 +34,7 @@ import UserPlus from 'lucide-react/icons/user-plus';
 import UserMinus from 'lucide-react/icons/user-minus';
 import X from 'lucide-react/icons/x';
 import Search from 'lucide-react/icons/search';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -42,7 +43,8 @@ import { DataTable, PageHeader, EmptyState, type Column } from '@/admin/componen
 import type { MonitoredUser, AdminUser } from '@/admin/api/types';
 
 export function UserMonitoring() {
-  usePageTitle("User Monitoring - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('monitoring.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -76,11 +78,11 @@ export function UserMonitoring() {
         setItems(res.data);
       }
     } catch {
-      toast.error("Failed to load monitored users");
+      toast.error(t('monitoring.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -183,11 +185,11 @@ export function UserMonitoring() {
 
   const handleAddMonitoring = async () => {
     if (!selectedUser) {
-      toast.error("Please select a user");
+      toast.error(t('monitoring.select_user_required'));
       return;
     }
     if (!monitoringReason.trim()) {
-      toast.error("A reason is required");
+      toast.error(t('monitoring.reason_required'));
       return;
     }
     setMonitoringLoading(true);
@@ -199,32 +201,32 @@ export function UserMonitoring() {
         ...(expiresDays ? { expires_days: Number(expiresDays) } : {}),
       });
       if (res?.success) {
-        toast.success(`User Added to Monitoring`);
+        toast.success(t('monitoring.add_success'));
         resetModalState();
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to add user to monitoring");
+        toast.error(res?.error || t('monitoring.add_failed'));
       }
     } catch {
-      toast.error("Failed to add user to monitoring");
+      toast.error(t('monitoring.add_failed'));
     } finally {
       setMonitoringLoading(false);
     }
   };
 
   const handleRemoveMonitoring = async (userId: number) => {
-    if (!window.confirm("Are you sure you want to remove monitoring?")) return;
+    if (!window.confirm(t('monitoring.confirm_remove'))) return;
     setRemovingId(userId);
     try {
       const res = await adminBroker.setMonitoring(userId, { under_monitoring: false });
       if (res?.success) {
-        toast.success("User removed from monitoring");
+        toast.success(t('monitoring.remove_success'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to remove user from monitoring");
+        toast.error(res?.error || t('monitoring.remove_failed'));
       }
     } catch {
-      toast.error("Failed to remove user from monitoring");
+      toast.error(t('monitoring.remove_failed'));
     } finally {
       setRemovingId(null);
     }
@@ -233,7 +235,7 @@ export function UserMonitoring() {
   const columns: Column<MonitoredUser>[] = [
     {
       key: 'user_name',
-      label: "User",
+      label: t('monitoring.col_user'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.user_name}</span>
@@ -241,7 +243,7 @@ export function UserMonitoring() {
     },
     {
       key: 'under_monitoring',
-      label: "Status",
+      label: t('monitoring.col_status'),
       render: (item) => (
         <div className="flex flex-wrap gap-1">
           <Chip
@@ -250,7 +252,7 @@ export function UserMonitoring() {
             color={item.under_monitoring ? 'warning' : 'default'}
             startContent={<Eye size={12} />}
           >
-            {"Monitored"}
+            {t('monitoring.status_monitored')}
           </Chip>
           {item.messaging_disabled && (
             <Chip
@@ -259,7 +261,7 @@ export function UserMonitoring() {
               color="danger"
               startContent={<MessageCircleOff size={12} />}
             >
-              {"Messaging Off"}
+              {t('monitoring.status_messaging_off')}
             </Chip>
           )}
         </div>
@@ -267,7 +269,7 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_reason',
-      label: "Reason",
+      label: t('monitoring.col_reason'),
       render: (item) => (
         <span className="text-sm text-default-600">
           {item.monitoring_reason || '—'}
@@ -276,7 +278,7 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_started_at',
-      label: "Started",
+      label: t('monitoring.col_started'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -289,11 +291,11 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_expires_at',
-      label: "Expires",
+      label: t('monitoring.col_expires'),
       sortable: true,
       render: (item) => {
         if (!item.monitoring_expires_at) {
-          return <span className="text-sm text-default-400">{"No expiry found"}</span>;
+          return <span className="text-sm text-default-400">{t('monitoring.no_expiry')}</span>;
         }
         const expiresAt = new Date(item.monitoring_expires_at);
         const isExpired = expiresAt <= new Date();
@@ -310,7 +312,7 @@ export function UserMonitoring() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('monitoring.col_actions'),
       render: (item) => (
         <Button
           isIconOnly
@@ -319,7 +321,7 @@ export function UserMonitoring() {
           color="danger"
           onPress={() => handleRemoveMonitoring(item.user_id)}
           isLoading={removingId === item.user_id}
-          aria-label={"Remove from Monitoring"}
+          aria-label={t('monitoring.remove_aria')}
         >
           <UserMinus size={14} />
         </Button>
@@ -330,8 +332,8 @@ export function UserMonitoring() {
   return (
     <div>
       <PageHeader
-        title={"User Monitoring"}
-        description={"Monitor members placed under observation and track their activity"}
+        title={t('monitoring.page_title')}
+        description={t('monitoring.page_description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -340,7 +342,7 @@ export function UserMonitoring() {
               size="sm"
               onPress={() => setMonitoringModalOpen(true)}
             >
-              {"Add to Monitoring"}
+              {t('monitoring.add_button')}
             </Button>
             <Button
               as={Link}
@@ -349,7 +351,7 @@ export function UserMonitoring() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              {"Back"}
+              {t('monitoring.back_button')}
             </Button>
           </div>
         }
@@ -358,8 +360,8 @@ export function UserMonitoring() {
       {!loading && items.length === 0 ? (
         <EmptyState
           icon={Eye}
-          title={"No monitored users found"}
-          description={"No users are currently under monitoring"}
+          title={t('monitoring.empty_title')}
+          description={t('monitoring.empty_description')}
         />
       ) : (
         <DataTable
@@ -380,7 +382,7 @@ export function UserMonitoring() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <UserPlus size={20} className="text-primary" />
-            {"Add User to Monitoring"}
+            {t('monitoring.modal_title')}
           </ModalHeader>
           <ModalBody>
             {/* User search / selection */}
@@ -403,7 +405,7 @@ export function UserMonitoring() {
                   size="sm"
                   variant="light"
                   onPress={clearSelectedUser}
-                  aria-label={"Clear Selection"}
+                  aria-label={t('monitoring.clear_selection_aria')}
                 >
                   <X size={14} />
                 </Button>
@@ -412,8 +414,8 @@ export function UserMonitoring() {
               <div ref={dropdownRef} className="relative">
                 <Input
                   ref={inputRef}
-                  label={"Search User"}
-                  placeholder={"Type a Name or Email..."}
+                  label={t('monitoring.search_user_label')}
+                  placeholder={t('monitoring.search_user_placeholder')}
                   variant="bordered"
                   isRequired
                   value={userSearchQuery}
@@ -465,14 +467,14 @@ export function UserMonitoring() {
                   </ul>
                 )}
                 {userSearchQuery.length >= 2 && !isSearching && userSearchResults.length === 0 && (
-                  <p className="mt-1 text-xs text-default-400">{"No users found found"}</p>
+                  <p className="mt-1 text-xs text-default-400">{t('monitoring.no_users_found')}</p>
                 )}
               </div>
             )}
 
             <Textarea
-              label={"Reason Required"}
-              placeholder={"Reason for Placing This User Under Monitoring..."}
+              label={t('monitoring.reason_label')}
+              placeholder={t('monitoring.reason_placeholder')}
               value={monitoringReason}
               onValueChange={setMonitoringReason}
               minRows={3}
@@ -480,7 +482,7 @@ export function UserMonitoring() {
               isRequired
             />
             <div className="flex items-center justify-between py-1">
-              <span className="text-sm text-default-600">{"Disable Messaging"}</span>
+              <span className="text-sm text-default-600">{t('monitoring.disable_messaging')}</span>
               <Switch
                 isSelected={messagingDisabled}
                 onValueChange={setMessagingDisabled}
@@ -488,8 +490,8 @@ export function UserMonitoring() {
               />
             </div>
             <Select
-              label={"Monitoring Duration"}
-              placeholder={"Enter no expiry..."}
+              label={t('monitoring.duration_label')}
+              placeholder={t('monitoring.duration_placeholder')}
               variant="bordered"
               selectedKeys={expiresDays ? [expiresDays] : []}
               onSelectionChange={(keys) => {
@@ -497,11 +499,11 @@ export function UserMonitoring() {
                 setExpiresDays(val ?? '');
               }}
             >
-              <SelectItem key="7">{"Days 7"}</SelectItem>
-              <SelectItem key="14">{"Days 14"}</SelectItem>
-              <SelectItem key="30">{"Days 30"}</SelectItem>
-              <SelectItem key="60">{"Days 60"}</SelectItem>
-              <SelectItem key="90">{"Days 90"}</SelectItem>
+              <SelectItem key="7">{t('monitoring.duration_7_days')}</SelectItem>
+              <SelectItem key="14">{t('monitoring.duration_14_days')}</SelectItem>
+              <SelectItem key="30">{t('monitoring.duration_30_days')}</SelectItem>
+              <SelectItem key="60">{t('monitoring.duration_60_days')}</SelectItem>
+              <SelectItem key="90">{t('monitoring.duration_90_days')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -510,7 +512,7 @@ export function UserMonitoring() {
               onPress={resetModalState}
               isDisabled={monitoringLoading}
             >
-              {"Cancel"}
+              {t('monitoring.cancel_button')}
             </Button>
             <Button
               color="primary"
@@ -519,7 +521,7 @@ export function UserMonitoring() {
               isDisabled={!selectedUser}
               startContent={!monitoringLoading && <UserPlus size={14} />}
             >
-              {"Add to Monitoring"}
+              {t('monitoring.add_button')}
             </Button>
           </ModalFooter>
         </ModalContent>

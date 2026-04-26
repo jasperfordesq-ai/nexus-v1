@@ -35,6 +35,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
 import Eye from 'lucide-react/icons/eye';
 import MessageSquare from 'lucide-react/icons/message-square';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
@@ -61,7 +62,8 @@ function severityColor(severity?: string): { color: SeverityChipColor; variant: 
 }
 
 export function MessageReview() {
-  usePageTitle("Message Review - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('messages.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -125,11 +127,11 @@ export function MessageReview() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error("Failed to load messages");
+      toast.error(t('messages.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [page, filter, toast])
+  }, [page, filter, toast, t])
 
 
   useEffect(() => {
@@ -141,13 +143,13 @@ export function MessageReview() {
     try {
       const res = await adminBroker.reviewMessage(id);
       if (res?.success) {
-        toast.success("Message marked as reviewed");
+        toast.success(t('messages.reviewed_success'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to mark message as reviewed");
+        toast.error(res?.error || t('messages.review_failed'));
       }
     } catch {
-      toast.error("Failed to mark message as reviewed");
+      toast.error(t('messages.review_failed'));
     } finally {
       setReviewingId(null);
     }
@@ -163,21 +165,21 @@ export function MessageReview() {
   const handleFlag = async () => {
     if (!selectedMessageId) return;
     if (!flagReason.trim()) {
-      toast.error("A reason is required to flag a message");
+      toast.error(t('messages.flag_reason_required'));
       return;
     }
     setFlagLoading(true);
     try {
       const res = await adminBroker.flagMessage(selectedMessageId, flagReason, flagSeverity);
       if (res?.success) {
-        toast.success("Message flagged successfully");
+        toast.success(t('messages.flag_success'));
         setFlagModalOpen(false);
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to flag message");
+        toast.error(res?.error || t('messages.flag_failed'));
       }
     } catch {
-      toast.error("Failed to flag message");
+      toast.error(t('messages.flag_failed'));
     } finally {
       setFlagLoading(false);
     }
@@ -214,25 +216,25 @@ export function MessageReview() {
     try {
       const res = await adminBroker.reviewMessage(detailItem.id, detailReviewNotes || undefined);
       if (res?.success) {
-        toast.success("Message marked as reviewed");
+        toast.success(t('messages.reviewed_success'));
         closeDetail();
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to mark message as reviewed");
+        toast.error(res?.error || t('messages.review_failed'));
       }
     } catch {
-      toast.error("Failed to mark message as reviewed");
+      toast.error(t('messages.review_failed'));
     } finally {
       setDetailReviewLoading(false);
     }
-  }, [detailItem, detailReviewNotes, closeDetail, loadItems, toast]);
+  }, [detailItem, detailReviewNotes, closeDetail, loadItems, toast, t]);
 
   const isDetailReviewed = !!(detailItem?.reviewed_at);
 
   const columns: Column<BrokerMessage>[] = [
     {
       key: 'sender_name',
-      label: "Sender",
+      label: t('messages.col_sender'),
       sortable: true,
       render: (item) => (
         <Link
@@ -245,7 +247,7 @@ export function MessageReview() {
     },
     {
       key: 'receiver_name',
-      label: "Receiver",
+      label: t('messages.col_receiver'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -253,7 +255,7 @@ export function MessageReview() {
     },
     {
       key: 'message_body',
-      label: "Preview",
+      label: t('messages.col_preview'),
       render: (item) => (
         <span className="text-sm text-default-500 line-clamp-1 max-w-[200px]">
           {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
@@ -262,7 +264,7 @@ export function MessageReview() {
     },
     {
       key: 'copy_reason',
-      label: "Reason",
+      label: t('messages.col_reason'),
       render: (item) => (
         item.copy_reason ? (
           <Chip size="sm" variant="flat" color="default">
@@ -273,9 +275,9 @@ export function MessageReview() {
     },
     {
       key: 'flagged',
-      label: "Flagged",
+      label: t('messages.col_flagged'),
       render: (item) => {
-        if (!item.flagged) return <span className="text-sm text-default-400">{"No"}</span>;
+        if (!item.flagged) return <span className="text-sm text-default-400">{t('messages.flagged_no')}</span>;
         const severityChipColor = {
           info: 'default' as const,
           warning: 'warning' as const,
@@ -289,29 +291,29 @@ export function MessageReview() {
             color={severityChipColor}
             startContent={<Flag size={12} />}
           >
-            {item.flag_severity || 'Flagged'}
+            {item.flag_severity || t('messages.flagged_label')}
           </Chip>
         );
       },
     },
     {
       key: 'reviewed_at',
-      label: "Status",
+      label: t('messages.col_status'),
       render: (item) => (
         item.reviewed_at ? (
           <Chip size="sm" variant="flat" color="success">
-            {"Reviewed"}
+            {t('messages.status_reviewed')}
           </Chip>
         ) : (
           <Chip size="sm" variant="flat" color="warning">
-            {"Unreviewed"}
+            {t('messages.status_unreviewed')}
           </Chip>
         )
       ),
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('messages.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -321,7 +323,7 @@ export function MessageReview() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('messages.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {!item.reviewed_at && (
@@ -332,9 +334,9 @@ export function MessageReview() {
               startContent={<CheckCircle size={14} />}
               onPress={() => handleReview(item.id)}
               isLoading={reviewingId === item.id}
-              aria-label={"Mark as Reviewed"}
+              aria-label={t('messages.mark_reviewed_aria')}
             >
-              {"Review"}
+              {t('messages.review_action')}
             </Button>
           )}
           <Button
@@ -343,7 +345,7 @@ export function MessageReview() {
             variant="flat"
             color="default"
             onPress={() => openDetail(item)}
-            aria-label={"Quick view"}
+            aria-label={t('messages.quick_view_aria')}
           >
             <Eye size={14} />
           </Button>
@@ -354,9 +356,9 @@ export function MessageReview() {
               color="warning"
               startContent={<Flag size={14} />}
               onPress={() => openFlagModal(item.id)}
-              aria-label={"Flag Message"}
+              aria-label={t('messages.flag_message_aria')}
             >
-              {"Flag"}
+              {t('messages.flag_action')}
             </Button>
           )}
         </div>
@@ -367,8 +369,8 @@ export function MessageReview() {
   return (
     <div>
       <PageHeader
-        title={"Message Review"}
-        description={"Review messages flagged for moderation or safeguarding concerns"}
+        title={t('messages.title')}
+        description={t('messages.page_description')}
         actions={
           <Button
             as={Link}
@@ -377,7 +379,7 @@ export function MessageReview() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {"Back"}
+            {t('messages.back')}
           </Button>
         }
       />
@@ -389,10 +391,10 @@ export function MessageReview() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="unreviewed" title={"Unreviewed"} />
-          <Tab key="flagged" title={"Flagged"} />
-          <Tab key="reviewed" title={"Reviewed"} />
-          <Tab key="all" title={"All"} />
+          <Tab key="unreviewed" title={t('messages.tab_unreviewed')} />
+          <Tab key="flagged" title={t('messages.tab_flagged')} />
+          <Tab key="reviewed" title={t('messages.tab_reviewed')} />
+          <Tab key="all" title={t('messages.tab_all')} />
         </Tabs>
       </div>
 
@@ -417,12 +419,12 @@ export function MessageReview() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Flag size={20} className="text-warning" />
-            {"Flag"}
+            {t('messages.flag_modal_title')}
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label={"Reason Required"}
-              placeholder={"Describe Why This Message is Being Flagged..."}
+              label={t('messages.flag_reason_label')}
+              placeholder={t('messages.flag_reason_placeholder')}
               value={flagReason}
               onValueChange={setFlagReason}
               minRows={3}
@@ -430,7 +432,7 @@ export function MessageReview() {
               isRequired
             />
             <Select
-              label={"Severity"}
+              label={t('messages.severity_label')}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
@@ -438,10 +440,10 @@ export function MessageReview() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">{"Severity Info"}</SelectItem>
-              <SelectItem key="warning">{"Severity Warning"}</SelectItem>
-              <SelectItem key="concern">{"Severity Concern"}</SelectItem>
-              <SelectItem key="urgent">{"Severity Urgent"}</SelectItem>
+              <SelectItem key="info">{t('messages.severity_info')}</SelectItem>
+              <SelectItem key="warning">{t('messages.severity_warning')}</SelectItem>
+              <SelectItem key="concern">{t('messages.severity_concern')}</SelectItem>
+              <SelectItem key="urgent">{t('messages.severity_urgent')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -450,7 +452,7 @@ export function MessageReview() {
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
-              {"Cancel"}
+              {t('messages.cancel')}
             </Button>
             <Button
               color="warning"
@@ -458,7 +460,7 @@ export function MessageReview() {
               isLoading={flagLoading}
               startContent={!flagLoading && <Flag size={14} />}
             >
-              {"Flag"}
+              {t('messages.flag_action')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -474,34 +476,34 @@ export function MessageReview() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <MessageSquare size={18} className="text-primary shrink-0" />
-            <span>{"Message Detail"}</span>
+            <span>{t('messages.quick_view_title')}</span>
           </ModalHeader>
 
           <ModalBody className="gap-4">
             {detailLoading && (
-              <p className="text-sm text-default-400 text-center py-8">{"Loading..."}</p>
+              <p className="text-sm text-default-400 text-center py-8">{t('messages.loading')}</p>
             )}
 
             {!detailLoading && detailItem && (
               <>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{"From"}</p>
+                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_from')}</p>
                     <p className="font-medium text-foreground">{detailItem.sender_name}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{"To"}</p>
+                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_to')}</p>
                     <p className="font-medium text-foreground">{detailItem.receiver_name}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{"Date"}</p>
+                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_date')}</p>
                     <p className="text-foreground">
                       {new Date(detailItem.sent_at ?? detailItem.created_at).toLocaleString()}
                     </p>
                   </div>
                   {(detailItem.flag_reason || detailItem.copy_reason) && (
                     <div>
-                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{"Reason"}</p>
+                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_reason')}</p>
                       <p className="text-foreground">
                         {detailItem.flag_reason || detailItem.copy_reason}
                       </p>
@@ -509,7 +511,7 @@ export function MessageReview() {
                   )}
                   {detailItem.flag_severity && (
                     <div>
-                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{"Severity"}</p>
+                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_severity')}</p>
                       {(() => {
                         const { color, variant } = severityColor(detailItem.flag_severity);
                         return (
@@ -525,7 +527,7 @@ export function MessageReview() {
                 <Divider />
 
                 <div>
-                  <p className="text-xs text-default-400 uppercase font-medium mb-2">{"Content"}</p>
+                  <p className="text-xs text-default-400 uppercase font-medium mb-2">{t('messages.content_label')}</p>
                   <div className="rounded-lg bg-default-50 p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed min-h-[80px]">
                     {detail?.copy?.message_body || detailItem.message_body || '--'}
                   </div>
@@ -536,7 +538,7 @@ export function MessageReview() {
                     <Divider />
                     <div>
                       <p className="text-xs text-default-400 uppercase font-medium mb-2">
-                        {"Conversation"} ({detail.thread.length})
+                        {t('messages.conversation_label')} ({detail.thread.length})
                       </p>
                       <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                         {detail.thread.map((msg) => (
@@ -560,7 +562,7 @@ export function MessageReview() {
                   <>
                     <Divider />
                     <div className="flex items-center gap-2 text-sm text-success">
-                      <Chip size="sm" color="success" variant="flat">{"Reviewed"}</Chip>
+                      <Chip size="sm" color="success" variant="flat">{t('messages.status_reviewed')}</Chip>
                       <span className="text-default-500">
                         {new Date(detailItem.reviewed_at!).toLocaleString()}
                       </span>
@@ -570,8 +572,8 @@ export function MessageReview() {
                   <>
                     <Divider />
                     <Textarea
-                      label={"Review notes"}
-                      placeholder={"Optional review notes"}
+                      label={t('messages.review_notes_label')}
+                      placeholder={t('messages.review_notes_placeholder')}
                       value={detailReviewNotes}
                       onValueChange={setDetailReviewNotes}
                       minRows={2}
@@ -585,7 +587,7 @@ export function MessageReview() {
 
           <ModalFooter>
             <Button variant="flat" onPress={closeDetail} isDisabled={detailReviewLoading}>
-              {"Cancel"}
+              {t('messages.cancel')}
             </Button>
             {!isDetailReviewed && detailItem && (
               <Button
@@ -595,7 +597,7 @@ export function MessageReview() {
                 isDisabled={detailReviewLoading}
                 onPress={handleDetailReview}
               >
-                {"Mark as Reviewed"}
+                {t('messages.mark_as_reviewed')}
               </Button>
             )}
           </ModalFooter>

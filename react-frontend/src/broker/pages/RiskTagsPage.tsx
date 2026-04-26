@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs, Tab, Button, Chip,
@@ -38,13 +39,6 @@ const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 
 const RISK_LEVEL_KEYS = ['low', 'medium', 'high', 'critical'] as const;
 
-const RISK_LEVEL_LABELS: Record<(typeof RISK_LEVEL_KEYS)[number], string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  critical: 'Critical',
-};
-
 const RISK_CATEGORY_KEYS = [
   'safeguarding',
   'financial',
@@ -54,16 +48,6 @@ const RISK_CATEGORY_KEYS = [
   'fraud',
   'other',
 ] as const;
-
-const RISK_CATEGORY_LABELS: Record<(typeof RISK_CATEGORY_KEYS)[number], string> = {
-  safeguarding: 'Safeguarding',
-  financial: 'Financial',
-  health_safety: 'Health & Safety',
-  legal: 'Legal',
-  reputation: 'Reputation',
-  fraud: 'Fraud',
-  other: 'Other',
-};
 
 interface RiskTagForm {
   listing_id: string;
@@ -94,7 +78,8 @@ interface ListingSearchResult {
 }
 
 export function RiskTagsPage() {
-  usePageTitle("Risk Tags - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('risk_tags.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -152,11 +137,11 @@ export function RiskTagsPage() {
         setItems(res.data);
       }
     } catch {
-      toast.error("Failed to load risk tags");
+      toast.error(t('risk_tags.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [riskLevel, toast])
+  }, [riskLevel, toast, t])
 
 
   useEffect(() => {
@@ -178,7 +163,7 @@ export function RiskTagsPage() {
           const data = Array.isArray(res.data) ? res.data : (res.data as { items?: ListingSearchResult[] }).items ?? [];
           setListingResults(data.slice(0, 8).map((l: Record<string, unknown>) => ({
             id: l.id as number,
-            title: (l.title as string) || `Listing #${l.id}`,
+            title: (l.title as string) || t('risk_tags.listing_fallback', { id: l.id }),
             owner_name: (l.owner_name ?? l.user_name ?? '') as string,
           })));
         }
@@ -189,7 +174,7 @@ export function RiskTagsPage() {
       }
     }, 300);
     return () => clearTimeout(searchDebounce.current);
-  }, [listingSearch]);
+  }, [listingSearch, t]);
 
   function openCreateModal() {
     setEditingTag(null);
@@ -237,11 +222,11 @@ export function RiskTagsPage() {
   async function handleSave() {
     const listingId = parseInt(form.listing_id);
     if (!listingId || listingId <= 0) {
-      toast.error("Please select a valid listing");
+      toast.error(t('risk_tags.select_listing_error'));
       return;
     }
     if (!form.risk_category.trim()) {
-      toast.error("Risk category is required");
+      toast.error(t('risk_tags.category_required_error'));
       return;
     }
 
@@ -257,14 +242,14 @@ export function RiskTagsPage() {
         dbs_required: form.dbs_required,
       });
       if (res.success) {
-        toast.success(editingTag ? "Risk Tag updated" : "Risk Tag created");
+        toast.success(editingTag ? t('risk_tags.updated_success') : t('risk_tags.created_success'));
         closeModal();
         loadItems();
       } else {
-        toast.error("Failed to save risk tag");
+        toast.error(t('risk_tags.save_failed'));
       }
     } catch {
-      toast.error("Failed to save risk tag");
+      toast.error(t('risk_tags.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -275,14 +260,14 @@ export function RiskTagsPage() {
     try {
       const res = await adminBroker.removeRiskTag(tag.listing_id);
       if (res.success) {
-        toast.success("Risk tag removed");
+        toast.success(t('risk_tags.removed_success'));
         loadItems();
         setRemoveTarget(null);
       } else {
-        toast.error("Failed to remove risk tag");
+        toast.error(t('risk_tags.remove_failed'));
       }
     } catch {
-      toast.error("Failed to remove risk tag");
+      toast.error(t('risk_tags.remove_failed'));
     } finally {
       setRemoving(null);
     }
@@ -303,7 +288,7 @@ export function RiskTagsPage() {
   const columns: Column<RiskTag>[] = [
     {
       key: 'listing_title',
-      label: "Listing",
+      label: t('risk_tags.col_listing'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">
@@ -313,7 +298,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'owner_name',
-      label: "Owner",
+      label: t('risk_tags.col_owner'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -323,7 +308,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'risk_level',
-      label: "Risk Level",
+      label: t('risk_tags.col_risk_level'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -336,50 +321,50 @@ export function RiskTagsPage() {
           }
           className="capitalize"
         >
-          {item.risk_level}
+          {t(`risk_tags.level_${item.risk_level}`, { defaultValue: item.risk_level })}
         </Chip>
       ),
     },
     {
       key: 'risk_category',
-      label: "Category",
+      label: t('risk_tags.col_category'),
       sortable: true,
       render: (item) => {
         const cat = item.risk_category;
-        const label = cat ? (RISK_CATEGORY_LABELS[cat as keyof typeof RISK_CATEGORY_LABELS] ?? cat) : '—';
+        const label = cat ? t(`risk_tags.category_${cat}`, { defaultValue: cat }) : '—';
         return <span className="text-sm">{label}</span>;
       },
     },
     {
       key: 'requires_approval',
-      label: "Approval Req",
+      label: t('risk_tags.col_approval_req'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.requires_approval ? 'warning' : 'default'}>
-          {item.requires_approval ? "Yes" : "No"}
+          {item.requires_approval ? t('risk_tags.yes') : t('risk_tags.no')}
         </Chip>
       ),
     },
     {
       key: 'insurance_required',
-      label: "Insurance",
+      label: t('risk_tags.col_insurance'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.insurance_required ? 'warning' : 'default'}>
-          {item.insurance_required ? "Yes" : "No"}
+          {item.insurance_required ? t('risk_tags.yes') : t('risk_tags.no')}
         </Chip>
       ),
     },
     {
       key: 'dbs_required',
-      label: "Dbs",
+      label: t('risk_tags.col_dbs'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.dbs_required ? 'warning' : 'default'}>
-          {item.dbs_required ? "Yes" : "No"}
+          {item.dbs_required ? t('risk_tags.yes') : t('risk_tags.no')}
         </Chip>
       ),
     },
     {
       key: 'tagged_by_name',
-      label: "Tagged by",
+      label: t('risk_tags.col_tagged_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -389,7 +374,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'created_at',
-      label: "Date",
+      label: t('risk_tags.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -399,7 +384,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'id',
-      label: "Actions",
+      label: t('risk_tags.col_actions'),
       render: (item) => (
         <div className="flex gap-2">
           <Button
@@ -408,7 +393,7 @@ export function RiskTagsPage() {
             color="primary"
             isIconOnly
             onPress={() => openEditModal(item)}
-            aria-label={"Edit Risk Tag"}
+            aria-label={t('risk_tags.edit_aria')}
           >
             <Edit size={14} />
           </Button>
@@ -419,7 +404,7 @@ export function RiskTagsPage() {
             isIconOnly
             isLoading={removing === item.listing_id}
             onPress={() => setRemoveTarget(item)}
-            aria-label={"Remove Risk Tag"}
+            aria-label={t('risk_tags.remove_aria')}
           >
             <Trash2 size={14} />
           </Button>
@@ -431,8 +416,8 @@ export function RiskTagsPage() {
   return (
     <div>
       <PageHeader
-        title={"Risk Tags"}
-        description={"Configure risk tags that can be applied to members"}
+        title={t('risk_tags.title')}
+        description={t('risk_tags.description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -441,7 +426,7 @@ export function RiskTagsPage() {
               onPress={openCreateModal}
               size="sm"
             >
-              {"Tag Listing"}
+              {t('risk_tags.tag_listing')}
             </Button>
             <Button
               as={Link}
@@ -450,7 +435,7 @@ export function RiskTagsPage() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              {"Back"}
+              {t('risk_tags.back')}
             </Button>
           </div>
         }
@@ -463,11 +448,11 @@ export function RiskTagsPage() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="critical" title={"Critical"} />
-          <Tab key="high" title={"High"} />
-          <Tab key="medium" title={"Medium"} />
-          <Tab key="low" title={"Low"} />
+          <Tab key="all" title={t('risk_tags.tab_all')} />
+          <Tab key="critical" title={t('risk_tags.level_critical')} />
+          <Tab key="high" title={t('risk_tags.level_high')} />
+          <Tab key="medium" title={t('risk_tags.level_medium')} />
+          <Tab key="low" title={t('risk_tags.level_low')} />
         </Tabs>
       </div>
 
@@ -484,7 +469,7 @@ export function RiskTagsPage() {
       <Modal isOpen={modalOpen} onClose={closeModal} size="lg">
         <ModalContent>
           <ModalHeader>
-            {editingTag ? "Edit Risk Tag" : "Tag Listing"}
+            {editingTag ? t('risk_tags.modal_title_edit') : t('risk_tags.modal_title_create')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             {/* Listing search — only shown when creating */}
@@ -495,7 +480,7 @@ export function RiskTagsPage() {
                     <div className="flex-1">
                       <p className="font-medium text-sm">{selectedListing.title}</p>
                       <p className="text-xs text-default-500">
-                        ID: {selectedListing.id}
+                        {t('risk_tags.id_label', { id: selectedListing.id })}
                         {selectedListing.owner_name && ` · ${selectedListing.owner_name}`}
                       </p>
                     </div>
@@ -507,16 +492,16 @@ export function RiskTagsPage() {
                         setForm(f => ({ ...f, listing_id: '' }));
                       }}
                     >
-                      {"Change"}
+                      {t('risk_tags.change')}
                     </Button>
                   </div>
                 ) : (
                   <>
                     <Input
-                      label={"Search Listing"}
+                      label={t('risk_tags.search_listing_label')}
                       value={listingSearch}
                       onValueChange={setListingSearch}
-                      placeholder={"Type to Search by Title or I D..."}
+                      placeholder={t('risk_tags.search_listing_placeholder')}
                       isRequired
                       startContent={searchingListings ? <Spinner size="sm" /> : <Search size={14} />}
                     />
@@ -532,7 +517,7 @@ export function RiskTagsPage() {
                             <div className="text-left">
                               <p className="text-sm font-medium">{listing.title}</p>
                               <p className="text-xs text-default-500">
-                                ID: {listing.id}
+                                {t('risk_tags.id_label', { id: listing.id })}
                                 {listing.owner_name && ` · ${listing.owner_name}`}
                               </p>
                             </div>
@@ -542,11 +527,11 @@ export function RiskTagsPage() {
                     )}
                     {/* Fallback: manual ID entry */}
                     <Input
-                      label={"Or enter listing ID directly"}
+                      label={t('risk_tags.manual_id_label')}
                       type="number"
                       value={form.listing_id}
                       onValueChange={v => setForm(f => ({ ...f, listing_id: v }))}
-                      placeholder="e.g. 42"
+                      placeholder={t('risk_tags.manual_id_placeholder')}
                       min={1}
                       className="mt-2"
                       size="sm"
@@ -557,13 +542,13 @@ export function RiskTagsPage() {
             )}
             {editingTag && (
               <div>
-                <p className="text-sm text-default-500">{"Listing"}</p>
-                <p className="font-medium">{editingTag.listing_title ?? `Listing #${editingTag.listing_id}`}</p>
+                <p className="text-sm text-default-500">{t('risk_tags.listing_field_label')}</p>
+                <p className="font-medium">{editingTag.listing_title ?? t('risk_tags.listing_fallback', { id: editingTag.listing_id })}</p>
               </div>
             )}
 
             <Select
-              label={"Risk Level"}
+              label={t('risk_tags.risk_level_label')}
               selectedKeys={new Set([form.risk_level])}
               onSelectionChange={keys => {
                 const val = Array.from(keys)[0] as RiskTagForm['risk_level'];
@@ -573,13 +558,13 @@ export function RiskTagsPage() {
             >
               {RISK_LEVEL_KEYS.map(key => (
                 <SelectItem key={key}>
-                  {RISK_LEVEL_LABELS[key]}
+                  {t(`risk_tags.level_${key}`)}
                 </SelectItem>
               ))}
             </Select>
 
             <Select
-              label={"Risk Category"}
+              label={t('risk_tags.risk_category_label')}
               selectedKeys={form.risk_category ? new Set([form.risk_category]) : new Set()}
               onSelectionChange={keys => {
                 const val = Array.from(keys)[0] as string;
@@ -589,31 +574,31 @@ export function RiskTagsPage() {
             >
               {RISK_CATEGORY_KEYS.map(key => (
                 <SelectItem key={key}>
-                  {RISK_CATEGORY_LABELS[key]}
+                  {t(`risk_tags.category_${key}`)}
                 </SelectItem>
               ))}
             </Select>
 
             <Textarea
-              label={"Risk Notes Internal"}
+              label={t('risk_tags.risk_notes_label')}
               value={form.risk_notes}
               onValueChange={v => setForm(f => ({ ...f, risk_notes: v }))}
-              placeholder={"Internal Notes Visible Only to Brokers..."}
+              placeholder={t('risk_tags.risk_notes_placeholder')}
               minRows={3}
             />
 
             <Textarea
-              label={"Member Visible Notes"}
+              label={t('risk_tags.member_visible_notes_label')}
               value={form.member_visible_notes}
               onValueChange={v => setForm(f => ({ ...f, member_visible_notes: v }))}
-              placeholder={"Notes Shown to Members When This Tag is Triggered..."}
+              placeholder={t('risk_tags.member_visible_notes_placeholder')}
               minRows={3}
             />
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">{"Requires Approval"}</p>
-                <p className="text-xs text-default-500">{"Requires Approval."}</p>
+                <p className="font-medium text-sm">{t('risk_tags.requires_approval_label')}</p>
+                <p className="text-xs text-default-500">{t('risk_tags.requires_approval_description')}</p>
               </div>
               <Switch
                 isSelected={form.requires_approval}
@@ -624,8 +609,8 @@ export function RiskTagsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">{"Insurance Required"}</p>
-                <p className="text-xs text-default-500">{"Insurance Required."}</p>
+                <p className="font-medium text-sm">{t('risk_tags.insurance_required_label')}</p>
+                <p className="text-xs text-default-500">{t('risk_tags.insurance_required_description')}</p>
               </div>
               <Switch
                 isSelected={form.insurance_required}
@@ -636,8 +621,8 @@ export function RiskTagsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">{"Dbs Check Required"}</p>
-                <p className="text-xs text-default-500">{"Dbs Check Required."}</p>
+                <p className="font-medium text-sm">{t('risk_tags.dbs_required_label')}</p>
+                <p className="text-xs text-default-500">{t('risk_tags.dbs_required_description')}</p>
               </div>
               <Switch
                 isSelected={form.dbs_required}
@@ -648,10 +633,10 @@ export function RiskTagsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal}>
-              {"Cancel"}
+              {t('risk_tags.cancel')}
             </Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingTag ? "Update Tag" : "Create Tag"}
+              {editingTag ? t('risk_tags.update_tag') : t('risk_tags.create_tag')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -664,13 +649,15 @@ export function RiskTagsPage() {
         isOpen={!!removeTarget}
         onClose={() => setRemoveTarget(null)}
         onConfirm={() => removeTarget && handleRemove(removeTarget)}
-        title="Remove risk tag"
+        title={t('risk_tags.confirm_remove_title')}
         message={
           removeTarget
-            ? `Remove the risk tag from "${removeTarget.listing_title ?? `Listing #${removeTarget.listing_id}`}"? This cannot be undone.`
+            ? t('risk_tags.confirm_remove_message', {
+                listing: removeTarget.listing_title ?? t('risk_tags.listing_fallback', { id: removeTarget.listing_id }),
+              })
             : ''
         }
-        confirmLabel="Remove"
+        confirmLabel={t('risk_tags.remove')}
         confirmColor="danger"
         isLoading={removing !== null}
       />

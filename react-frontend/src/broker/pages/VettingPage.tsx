@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
@@ -52,15 +53,15 @@ import { adminVetting, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
 import type { VettingRecord, VettingStats } from '@/admin/api/types';
 
-const VETTING_TYPE_LABELS: Record<string, string> = {
-  dbs_basic: 'DBS Basic',
-  dbs_standard: 'DBS Standard',
-  dbs_enhanced: 'DBS Enhanced',
-  garda_vetting: 'Garda Vetting',
-  access_ni: 'Access NI',
-  pvg_scotland: 'PVG Scotland',
-  international: 'International',
-  other: 'Other',
+const VETTING_TYPE_KEYS: Record<string, string> = {
+  dbs_basic: 'type_dbs_basic',
+  dbs_standard: 'type_dbs_standard',
+  dbs_enhanced: 'type_dbs_enhanced',
+  garda_vetting: 'type_garda_vetting',
+  access_ni: 'type_access_ni',
+  pvg_scotland: 'type_pvg_scotland',
+  international: 'type_international',
+  other: 'type_other',
 };
 
 const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'primary' | 'default'> = {
@@ -82,9 +83,15 @@ interface UserSearchResult {
 }
 
 export function VettingRecords() {
-  usePageTitle("Vetting Records - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('vetting.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  const getTypeLabel = (key: string): string => {
+    const tKey = VETTING_TYPE_KEYS[key];
+    return tKey ? t(`vetting.${tKey}`) : key;
+  };
 
   // Status filter is mirrored to the `?status=` URL param so the broker
   // dashboard stat cards can deep-link straight into a filtered view and
@@ -271,11 +278,11 @@ export function VettingRecords() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error("Failed to load vetting records");
+      toast.error(t('vetting.toast_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, debouncedSearch, userIdFilter, toast])
+  }, [page, statusFilter, debouncedSearch, userIdFilter, toast, t])
 
 
   useEffect(() => {
@@ -291,14 +298,14 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.verify(item.id);
       if (res?.success) {
-        toast.success(`Vetting Record Verified`);
+        toast.success(t('vetting.verified_success'));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || "Failed to verify record");
+        toast.error(res?.error || t('vetting.toast_verify_failed'));
       }
     } catch {
-      toast.error("Failed to verify record");
+      toast.error(t('vetting.toast_verify_failed'));
     } finally {
       setVerifyingId(null);
     }
@@ -306,21 +313,21 @@ export function VettingRecords() {
 
   const handleReject = async () => {
     if (!rejectModal || !rejectReason.trim()) {
-      toast.error("A reason is required to reject a vetting record");
+      toast.error(t('vetting.toast_reject_reason_required'));
       return;
     }
     setRejectLoading(true);
     try {
       const res = await adminVetting.reject(rejectModal.id, rejectReason);
       if (res?.success) {
-        toast.success("Vetting Record Rejected");
+        toast.success(t('vetting.rejected_success'));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || "Failed to reject record");
+        toast.error(res?.error || t('vetting.toast_reject_failed'));
       }
     } catch {
-      toast.error("Failed to reject record");
+      toast.error(t('vetting.toast_reject_failed'));
     } finally {
       setRejectLoading(false);
       setRejectModal(null);
@@ -334,14 +341,14 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.destroy(deleteItem.id);
       if (res?.success) {
-        toast.success("Vetting record deleted");
+        toast.success(t('vetting.toast_deleted'));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || "Failed to delete record");
+        toast.error(res?.error || t('vetting.toast_delete_failed'));
       }
     } catch {
-      toast.error("Failed to delete record");
+      toast.error(t('vetting.toast_delete_failed'));
     } finally {
       setDeleteLoading(false);
       setDeleteItem(null);
@@ -350,7 +357,7 @@ export function VettingRecords() {
 
   const handleCreate = async () => {
     if (!createForm.user_id) {
-      toast.error("Please select a member");
+      toast.error(t('vetting.toast_select_member'));
       return;
     }
     setCreateLoading(true);
@@ -369,16 +376,16 @@ export function VettingRecords() {
 
       const res = await adminVetting.create(payload as Partial<VettingRecord>);
       if (res?.success || res?.data) {
-        toast.success("Vetting record created");
+        toast.success(t('vetting.toast_created'));
         setCreateOpen(false);
         resetCreateForm();
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || "Failed to create record");
+        toast.error(res?.error || t('vetting.toast_create_failed'));
       }
     } catch {
-      toast.error("Failed to create record");
+      toast.error(t('vetting.toast_create_failed'));
     } finally {
       setCreateLoading(false);
     }
@@ -433,15 +440,15 @@ export function VettingRecords() {
 
       const res = await adminVetting.update(editItem.id, payload as Partial<VettingRecord>);
       if (res?.success) {
-        toast.success("Vetting record updated");
+        toast.success(t('vetting.toast_updated'));
         setEditItem(null);
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || "Failed to update record");
+        toast.error(res?.error || t('vetting.toast_update_failed'));
       }
     } catch {
-      toast.error("Failed to update record");
+      toast.error(t('vetting.toast_update_failed'));
     } finally {
       setEditLoading(false);
     }
@@ -453,17 +460,17 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.uploadDocument(recordId, file);
       if (res?.success) {
-        toast.success("Document Uploaded");
+        toast.success(t('vetting.toast_document_uploaded'));
         loadItems();
         // Refresh view modal if open
         if (viewItem?.id === recordId && res.data) {
           setViewItem(res.data as VettingRecord);
         }
       } else {
-        toast.error(res?.error || "Failed to upload document");
+        toast.error(res?.error || t('vetting.toast_upload_failed'));
       }
     } catch {
-      toast.error("Failed to upload document");
+      toast.error(t('vetting.toast_upload_failed'));
     } finally {
       setUploadingId(null);
     }
@@ -489,7 +496,7 @@ export function VettingRecords() {
         // on a doomed request.
         const MAX_BYTES = 10 * 1024 * 1024;
         if (file.size > MAX_BYTES) {
-          toast.error('File too large — max 10MB');
+          toast.error(t('vetting.toast_file_too_large'));
         } else {
           void handleDocumentUpload(recordId, file);
         }
@@ -503,14 +510,14 @@ export function VettingRecords() {
   // (toast/viewItem); we explicitly omit it from deps to keep this callback
   // stable, the recordId argument is passed in fresh on every invocation.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+  }, [toast, t]);
 
   // Bulk action handler
   const handleBulkAction = async () => {
     if (!bulkAction || selectedIds.size === 0) return;
 
     if (bulkAction === 'reject' && !bulkRejectReason.trim()) {
-      toast.error("A reason is required for bulk rejection");
+      toast.error(t('vetting.toast_bulk_reject_reason_required'));
       return;
     }
 
@@ -520,17 +527,19 @@ export function VettingRecords() {
       const res = await adminVetting.bulk(ids, bulkAction, bulkAction === 'reject' ? bulkRejectReason : undefined);
       if (res?.success && res.data) {
         const d = res.data as { processed: number; failed: number };
-        const label = bulkAction === 'verify' ? 'verified' : bulkAction === 'reject' ? 'rejected' : 'deleted';
-        const failedSuffix = d.failed > 0 ? `, ${d.failed} failed` : '';
-        toast.success(`${d.processed} record${d.processed === 1 ? '' : 's'} ${label}${failedSuffix}`);
+        toast.success(t('vetting.toast_bulk_success', {
+          count: d.processed,
+          action: t(`vetting.bulk_action_${bulkAction === 'verify' ? 'verified' : bulkAction === 'reject' ? 'rejected' : 'deleted'}`),
+          failedSuffix: d.failed > 0 ? t('vetting.toast_bulk_failed_suffix', { count: d.failed }) : '',
+        }));
         setSelectedIds(new Set());
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || `Bulk action failed`);
+        toast.error(res?.error || t('vetting.toast_bulk_failed'));
       }
     } catch {
-      toast.error(`Bulk Action failed`);
+      toast.error(t('vetting.toast_bulk_failed'));
     } finally {
       setBulkLoading(false);
       setBulkAction(null);
@@ -541,7 +550,7 @@ export function VettingRecords() {
   const columns: Column<VettingRecord>[] = [
     {
       key: 'member',
-      label: "Member",
+      label: t('vetting.col_member'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2">
@@ -562,17 +571,17 @@ export function VettingRecords() {
     },
     {
       key: 'vetting_type',
-      label: "Type",
+      label: t('vetting.col_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {VETTING_TYPE_LABELS[item.vetting_type] || item.vetting_type}
+          {getTypeLabel(item.vetting_type)}
         </Chip>
       ),
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('vetting.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -587,29 +596,29 @@ export function VettingRecords() {
     },
     {
       key: 'reference_number',
-      label: "Reference",
+      label: t('vetting.col_reference'),
       render: (item) => (
         <span className="text-sm text-default-600 font-mono">
-          {item.reference_number || '\u2014'}
+          {item.reference_number || '—'}
         </span>
       ),
     },
     {
       key: 'issue_date',
-      label: "Issue Date",
+      label: t('vetting.col_issue_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {item.issue_date ? new Date(item.issue_date).toLocaleDateString() : '\u2014'}
+          {item.issue_date ? new Date(item.issue_date).toLocaleDateString() : '—'}
         </span>
       ),
     },
     {
       key: 'expiry_date',
-      label: "Expiry Date",
+      label: t('vetting.col_expiry'),
       sortable: true,
       render: (item) => {
-        if (!item.expiry_date) return <span className="text-sm text-default-500">{'\u2014'}</span>;
+        if (!item.expiry_date) return <span className="text-sm text-default-500">{'—'}</span>;
         const expiry = new Date(item.expiry_date);
         const now = new Date();
         const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -625,28 +634,28 @@ export function VettingRecords() {
     },
     {
       key: 'safeguarding',
-      label: "Safeguarding",
+      label: t('vetting.col_safeguarding'),
       render: (item) => (
         <div className="flex gap-1">
           {item.works_with_children && (
             <Chip size="sm" variant="dot" color="warning" startContent={<Baby size={10} />}>
-              {"Checkbox Works With Children"}
+              {t('vetting.works_with_children')}
             </Chip>
           )}
           {item.works_with_vulnerable_adults && (
             <Chip size="sm" variant="dot" color="warning" startContent={<HeartHandshake size={10} />}>
-              {"Checkbox Works With Vulnerable Adults"}
+              {t('vetting.works_with_vulnerable_adults')}
             </Chip>
           )}
           {!item.works_with_children && !item.works_with_vulnerable_adults && (
-            <span className="text-sm text-default-400">{'\u2014'}</span>
+            <span className="text-sm text-default-400">{'—'}</span>
           )}
         </div>
       ),
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('vetting.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -654,7 +663,7 @@ export function VettingRecords() {
             size="sm"
             variant="flat"
             onPress={() => setViewItem(item)}
-            aria-label={"View Details"}
+            aria-label={t('vetting.action_view_details')}
           >
             <Eye size={14} />
           </Button>
@@ -663,7 +672,7 @@ export function VettingRecords() {
             size="sm"
             variant="flat"
             onPress={() => openEditModal(item)}
-            aria-label={"Edit Record"}
+            aria-label={t('vetting.action_edit_record')}
           >
             <Pencil size={14} />
           </Button>
@@ -676,7 +685,7 @@ export function VettingRecords() {
                 color="success"
                 isLoading={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
-                aria-label={"Verify Record"}
+                aria-label={t('vetting.action_verify_record')}
               >
                 <Check size={14} />
               </Button>
@@ -686,7 +695,7 @@ export function VettingRecords() {
                 variant="flat"
                 color="danger"
                 onPress={() => { setRejectModal(item); setRejectReason(''); }}
-                aria-label={"Reject Record"}
+                aria-label={t('vetting.action_reject_record')}
               >
                 <X size={14} />
               </Button>
@@ -698,7 +707,7 @@ export function VettingRecords() {
             variant="flat"
             color="danger"
             onPress={() => setDeleteItem(item)}
-            aria-label={"Delete Record"}
+            aria-label={t('vetting.action_delete_record')}
           >
             <Trash2 size={14} />
           </Button>
@@ -710,8 +719,8 @@ export function VettingRecords() {
   return (
     <div>
       <PageHeader
-        title={"Vetting Records"}
-        description={"Manage vetting records for members who require background checks"}
+        title={t('vetting.page_title')}
+        description={t('vetting.page_description')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -720,7 +729,7 @@ export function VettingRecords() {
               size="sm"
               onPress={() => { resetCreateForm(); setCreateOpen(true); }}
             >
-              {"Add Record"}
+              {t('vetting.add_record')}
             </Button>
             <Button
               as={Link}
@@ -729,7 +738,7 @@ export function VettingRecords() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              {"Back"}
+              {t('vetting.back')}
             </Button>
           </div>
         }
@@ -738,28 +747,28 @@ export function VettingRecords() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={"Total Records"}
+          label={t('vetting.stat_total_records')}
           value={stats?.total ?? 0}
           icon={FileText}
           color="primary"
           loading={statsLoading}
         />
         <StatCard
-          label={"Pending Review"}
+          label={t('vetting.stat_pending_review')}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label={"Verified"}
+          label={t('vetting.stat_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label={"Expiring Soon"}
+          label={t('vetting.stat_expiring_soon')}
           value={stats?.expiring_soon ?? 0}
           icon={ShieldAlert}
           color="danger"
@@ -770,8 +779,8 @@ export function VettingRecords() {
       {/* Search */}
       <div className="mb-4">
         <Input
-          placeholder={"Enter search by name email or reference number..."}
-          aria-label={"Search Vetting Records"}
+          placeholder={t('vetting.search_full_placeholder')}
+          aria-label={t('vetting.search_aria')}
           value={searchQuery}
           onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
           startContent={<Search size={16} className="text-default-400" />}
@@ -791,13 +800,13 @@ export function VettingRecords() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="pending" title={"Pending"} />
-          <Tab key="submitted" title={"Submitted"} />
-          <Tab key="verified" title={"Verified"} />
-          <Tab key="expired" title={"Expired"} />
-          <Tab key="expiring_soon" title={"Expiring Soon"} />
-          <Tab key="rejected" title={"Rejected"} />
+          <Tab key="all" title={t('vetting.tab_all')} />
+          <Tab key="pending" title={t('vetting.tab_pending')} />
+          <Tab key="submitted" title={t('vetting.tab_submitted')} />
+          <Tab key="verified" title={t('vetting.tab_verified')} />
+          <Tab key="expired" title={t('vetting.tab_expired')} />
+          <Tab key="expiring_soon" title={t('vetting.tab_expiring')} />
+          <Tab key="rejected" title={t('vetting.tab_rejected')} />
         </Tabs>
       </div>
 
@@ -805,9 +814,7 @@ export function VettingRecords() {
       {selectedIds.size > 0 && (
         <div className="mb-4 flex items-center gap-3 p-3 rounded-lg bg-primary-50 border border-primary-200">
           <span className="text-sm font-medium text-primary">
-            {selectedIds.size > 1
-              ? `Records Selected Plural`
-              : `Records Selected`}
+            {t('vetting.records_selected', { count: selectedIds.size })}
           </span>
           <div className="flex gap-2">
             <Button
@@ -817,7 +824,7 @@ export function VettingRecords() {
               startContent={<Check size={14} />}
               onPress={() => setBulkAction('verify')}
             >
-              {"Verify"}
+              {t('vetting.bulk_verify')}
             </Button>
             <Button
               size="sm"
@@ -826,7 +833,7 @@ export function VettingRecords() {
               startContent={<X size={14} />}
               onPress={() => { setBulkAction('reject'); setBulkRejectReason(''); }}
             >
-              {"Reject"}
+              {t('vetting.bulk_reject')}
             </Button>
             <Button
               size="sm"
@@ -835,7 +842,7 @@ export function VettingRecords() {
               startContent={<Trash2 size={14} />}
               onPress={() => setBulkAction('delete')}
             >
-              {"Delete"}
+              {t('vetting.bulk_delete')}
             </Button>
           </div>
           <Button
@@ -843,7 +850,7 @@ export function VettingRecords() {
             variant="light"
             onPress={() => setSelectedIds(new Set())}
           >
-            {"Clear"}
+            {t('vetting.bulk_clear')}
           </Button>
         </div>
       )}
@@ -865,8 +872,8 @@ export function VettingRecords() {
         emptyContent={
           <EmptyState
             icon={Users}
-            title={"No vetting records found found"}
-            description={statusFilter !== 'all' ? "Try Changing Filter" : "Add Vetting Record to Start"}
+            title={t('vetting.empty_title')}
+            description={statusFilter !== 'all' ? t('vetting.empty_try_filter') : t('vetting.empty_add_to_start')}
           />
         }
       />
@@ -887,7 +894,7 @@ export function VettingRecords() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Plus size={20} className="text-primary" />
-            {"Modal Add"}
+            {t('vetting.modal_add_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             {/* Member search instead of raw User ID */}
@@ -909,14 +916,14 @@ export function VettingRecords() {
                     setUserSearchQuery('');
                   }}
                 >
-                  {"Change"}
+                  {t('vetting.change')}
                 </Button>
               </div>
             ) : (
               <div>
                 <Input
-                  label={"Search Member"}
-                  placeholder={"Type a Name or Email to Search..."}
+                  label={t('vetting.search_member_label')}
+                  placeholder={t('vetting.search_member_placeholder')}
                   value={userSearchQuery}
                   onValueChange={setUserSearchQuery}
                   variant="bordered"
@@ -948,12 +955,12 @@ export function VettingRecords() {
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-default-400 mt-1">{"No members found found"}</p>
+                  <p className="text-xs text-default-400 mt-1">{t('vetting.no_members_found')}</p>
                 )}
               </div>
             )}
             <Select
-              label={"Vetting Type"}
+              label={t('vetting.field_vetting_type')}
               selectedKeys={[createForm.vetting_type]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
@@ -962,27 +969,27 @@ export function VettingRecords() {
               variant="bordered"
               isRequired
             >
-              {Object.entries(VETTING_TYPE_LABELS).map(([key, label]) => (
-                <SelectItem key={key}>{label}</SelectItem>
+              {Object.keys(VETTING_TYPE_KEYS).map((key) => (
+                <SelectItem key={key}>{getTypeLabel(key)}</SelectItem>
               ))}
             </Select>
             <Input
-              label={"Reference Number"}
-              placeholder={"Enter reference number..."}
+              label={t('vetting.field_reference_number')}
+              placeholder={t('vetting.field_reference_number_placeholder')}
               value={createForm.reference_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, reference_number: val }))}
               variant="bordered"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label={"Issue Date"}
+                label={t('vetting.field_issue_date')}
                 type="date"
                 value={createForm.issue_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, issue_date: val }))}
                 variant="bordered"
               />
               <Input
-                label={"Expiry Date"}
+                label={t('vetting.field_expiry_date')}
                 type="date"
                 value={createForm.expiry_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, expiry_date: val }))}
@@ -994,24 +1001,24 @@ export function VettingRecords() {
                 isSelected={createForm.works_with_children}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, works_with_children: val }))}
               >
-                {"Checkbox Works With Children"}
+                {t('vetting.works_with_children')}
               </Checkbox>
               <Checkbox
                 isSelected={createForm.works_with_vulnerable_adults}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, works_with_vulnerable_adults: val }))}
               >
-                {"Checkbox Works With Vulnerable Adults"}
+                {t('vetting.works_with_vulnerable_adults')}
               </Checkbox>
               <Checkbox
                 isSelected={createForm.requires_enhanced_check}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, requires_enhanced_check: val }))}
               >
-                {"Checkbox Requires Enhanced Check"}
+                {t('vetting.requires_enhanced_check')}
               </Checkbox>
             </div>
             <Textarea
-              label={"Notes"}
-              placeholder={"Additional Notes About This Vetting Record..."}
+              label={t('vetting.field_notes')}
+              placeholder={t('vetting.field_notes_placeholder')}
               value={createForm.notes}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, notes: val }))}
               variant="bordered"
@@ -1024,14 +1031,14 @@ export function VettingRecords() {
               onPress={() => setCreateOpen(false)}
               isDisabled={createLoading}
             >
-              {"Cancel"}
+              {t('vetting.cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleCreate}
               isLoading={createLoading}
             >
-              {"Create Record"}
+              {t('vetting.create_record')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1048,7 +1055,7 @@ export function VettingRecords() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <Pencil size={20} className="text-primary" />
-              {"Modal Edit"}
+              {t('vetting.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
               <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
@@ -1063,7 +1070,7 @@ export function VettingRecords() {
                 </div>
               </div>
               <Select
-                label={"Vetting Type"}
+                label={t('vetting.field_vetting_type')}
                 selectedKeys={[editForm.vetting_type]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
@@ -1072,27 +1079,27 @@ export function VettingRecords() {
                 variant="bordered"
                 isRequired
               >
-                {Object.entries(VETTING_TYPE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key}>{label}</SelectItem>
+                {Object.keys(VETTING_TYPE_KEYS).map((key) => (
+                  <SelectItem key={key}>{getTypeLabel(key)}</SelectItem>
                 ))}
               </Select>
               <Input
-                label={"Reference Number"}
-                placeholder={"Enter reference number..."}
+                label={t('vetting.field_reference_number')}
+                placeholder={t('vetting.field_reference_number_placeholder')}
                 value={editForm.reference_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, reference_number: val }))}
                 variant="bordered"
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={"Issue Date"}
+                  label={t('vetting.field_issue_date')}
                   type="date"
                   value={editForm.issue_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, issue_date: val }))}
                   variant="bordered"
                 />
                 <Input
-                  label={"Expiry Date"}
+                  label={t('vetting.field_expiry_date')}
                   type="date"
                   value={editForm.expiry_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
@@ -1104,24 +1111,24 @@ export function VettingRecords() {
                   isSelected={editForm.works_with_children}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, works_with_children: val }))}
                 >
-                  {"Checkbox Works With Children"}
+                  {t('vetting.works_with_children')}
                 </Checkbox>
                 <Checkbox
                   isSelected={editForm.works_with_vulnerable_adults}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, works_with_vulnerable_adults: val }))}
                 >
-                  {"Checkbox Works With Vulnerable Adults"}
+                  {t('vetting.works_with_vulnerable_adults')}
                 </Checkbox>
                 <Checkbox
                   isSelected={editForm.requires_enhanced_check}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, requires_enhanced_check: val }))}
                 >
-                  {"Checkbox Requires Enhanced Check"}
+                  {t('vetting.requires_enhanced_check')}
                 </Checkbox>
               </div>
               <Textarea
-                label={"Notes"}
-                placeholder={"Additional Notes About This Vetting Record..."}
+                label={t('vetting.field_notes')}
+                placeholder={t('vetting.field_notes_placeholder')}
                 value={editForm.notes}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
                 variant="bordered"
@@ -1134,14 +1141,14 @@ export function VettingRecords() {
                 onPress={() => setEditItem(null)}
                 isDisabled={editLoading}
               >
-                {"Cancel"}
+                {t('vetting.cancel')}
               </Button>
               <Button
                 color="primary"
                 onPress={handleEdit}
                 isLoading={editLoading}
               >
-                {"Save Changes"}
+                {t('vetting.save_changes')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1158,16 +1165,16 @@ export function VettingRecords() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <X size={20} className="text-danger" />
-              {"Modal Reject"}
+              {t('vetting.modal_reject_title')}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
-                Reject the vetting record for{' '}
-                <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>?
+                {t('vetting.reject_confirm_prefix')}{' '}
+                <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>{t('vetting.reject_confirm_suffix')}
               </p>
               <Textarea
-                label={"Reason Required"}
-                placeholder={"Provide a Reason for Rejection..."}
+                label={t('vetting.reject_reason_label')}
+                placeholder={t('vetting.reject_reason_placeholder')}
                 value={rejectReason}
                 onValueChange={setRejectReason}
                 minRows={3}
@@ -1181,14 +1188,14 @@ export function VettingRecords() {
                 onPress={() => { setRejectModal(null); setRejectReason(''); }}
                 isDisabled={rejectLoading}
               >
-                {"Cancel"}
+                {t('vetting.cancel')}
               </Button>
               <Button
                 color="danger"
                 onPress={handleReject}
                 isLoading={rejectLoading}
               >
-                {"Reject"}
+                {t('vetting.reject')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1205,7 +1212,7 @@ export function VettingRecords() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <FileText size={20} className="text-primary" />
-              {"Modal View"}
+              {t('vetting.modal_view_title')}
             </ModalHeader>
             <ModalBody>
               <div className="flex items-center gap-3 mb-4">
@@ -1221,41 +1228,41 @@ export function VettingRecords() {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <p className="text-default-400">{"Type"}</p>
-                  <p className="font-medium">{VETTING_TYPE_LABELS[viewItem.vetting_type] || viewItem.vetting_type}</p>
+                  <p className="text-default-400">{t('vetting.col_type')}</p>
+                  <p className="font-medium">{getTypeLabel(viewItem.vetting_type)}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Status"}</p>
+                  <p className="text-default-400">{t('vetting.col_status')}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {viewItem.status}
                   </Chip>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Reference Number"}</p>
-                  <p className="font-medium font-mono">{viewItem.reference_number || '\u2014'}</p>
+                  <p className="text-default-400">{t('vetting.field_reference_number')}</p>
+                  <p className="font-medium font-mono">{viewItem.reference_number || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Issue Date"}</p>
-                  <p className="font-medium">{viewItem.issue_date ? new Date(viewItem.issue_date).toLocaleDateString() : '\u2014'}</p>
+                  <p className="text-default-400">{t('vetting.field_issue_date')}</p>
+                  <p className="font-medium">{viewItem.issue_date ? new Date(viewItem.issue_date).toLocaleDateString() : '—'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Expiry Date"}</p>
-                  <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '\u2014'}</p>
+                  <p className="text-default-400">{t('vetting.field_expiry_date')}</p>
+                  <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '—'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Verified by"}</p>
+                  <p className="text-default-400">{t('vetting.verified_by')}</p>
                   <p className="font-medium">
                     {viewItem.verifier_first_name
                       ? `${viewItem.verifier_first_name} ${viewItem.verifier_last_name}`
-                      : '\u2014'}
+                      : '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Verified at"}</p>
-                  <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '\u2014'}</p>
+                  <p className="text-default-400">{t('vetting.verified_at')}</p>
+                  <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '—'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{"Created"}</p>
+                  <p className="text-default-400">{t('vetting.created')}</p>
                   <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
                 </div>
               </div>
@@ -1263,24 +1270,24 @@ export function VettingRecords() {
               {/* #11-12: Rejection details */}
               {viewItem.status === 'rejected' && (
                 <div className="mt-4 p-3 rounded-lg bg-danger-50 border border-danger-200">
-                  <p className="text-sm font-medium text-danger mb-1">{"Rejection Details"}</p>
+                  <p className="text-sm font-medium text-danger mb-1">{t('vetting.rejection_details')}</p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     <div>
-                      <p className="text-default-400">{"Rejected by"}</p>
+                      <p className="text-default-400">{t('vetting.rejected_by')}</p>
                       <p className="font-medium">
                         {viewItem.rejector_first_name
                           ? `${viewItem.rejector_first_name} ${viewItem.rejector_last_name}`
-                          : '\u2014'}
+                          : '—'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-default-400">{"Rejected at"}</p>
-                      <p className="font-medium">{viewItem.rejected_at ? new Date(viewItem.rejected_at).toLocaleString() : '\u2014'}</p>
+                      <p className="text-default-400">{t('vetting.rejected_at')}</p>
+                      <p className="font-medium">{viewItem.rejected_at ? new Date(viewItem.rejected_at).toLocaleString() : '—'}</p>
                     </div>
                   </div>
                   {viewItem.rejection_reason && (
                     <div className="mt-2">
-                      <p className="text-default-400 text-sm">{"Reason"}</p>
+                      <p className="text-default-400 text-sm">{t('vetting.reason')}</p>
                       <p className="text-sm">{viewItem.rejection_reason}</p>
                     </div>
                   )}
@@ -1290,30 +1297,30 @@ export function VettingRecords() {
               <div className="mt-4 flex gap-2 flex-wrap">
                 {viewItem.works_with_children && (
                   <Chip size="sm" variant="flat" color="warning" startContent={<Baby size={12} />}>
-                    {"Checkbox Works With Children"}
+                    {t('vetting.works_with_children')}
                   </Chip>
                 )}
                 {viewItem.works_with_vulnerable_adults && (
                   <Chip size="sm" variant="flat" color="warning" startContent={<HeartHandshake size={12} />}>
-                    {"Checkbox Works With Vulnerable Adults"}
+                    {t('vetting.works_with_vulnerable_adults')}
                   </Chip>
                 )}
                 {viewItem.requires_enhanced_check && (
                   <Chip size="sm" variant="flat" color="danger" startContent={<ShieldAlert size={12} />}>
-                    {"Checkbox Requires Enhanced Check"}
+                    {t('vetting.requires_enhanced_check')}
                   </Chip>
                 )}
               </div>
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">{"Notes"}</p>
+                  <p className="text-default-400 text-sm mb-1">{t('vetting.field_notes')}</p>
                   <p className="text-sm bg-default-100 p-3 rounded-lg whitespace-pre-wrap">{viewItem.notes}</p>
                 </div>
               )}
 
               {/* #10: Document section */}
               <div className="mt-4">
-                <p className="text-default-400 text-sm mb-2">{"Document"}</p>
+                <p className="text-default-400 text-sm mb-2">{t('vetting.document')}</p>
                 {viewItem.document_url ? (
                   <div className="flex items-center gap-2">
                     <a
@@ -1323,7 +1330,7 @@ export function VettingRecords() {
                       className="text-sm text-primary hover:underline flex items-center gap-1"
                     >
                       <FileText size={14} />
-                      {"Link View Document"}
+                      {t('vetting.view_document')}
                     </a>
                     <Button
                       size="sm"
@@ -1331,7 +1338,7 @@ export function VettingRecords() {
                       isLoading={uploadingId === viewItem.id}
                       onPress={() => openFilePickerForRecord(viewItem.id)}
                     >
-                      {"Replace"}
+                      {t('vetting.replace')}
                     </Button>
                   </div>
                 ) : (
@@ -1342,15 +1349,15 @@ export function VettingRecords() {
                     isLoading={uploadingId === viewItem.id}
                     onPress={() => openFilePickerForRecord(viewItem.id)}
                   >
-                    {"Upload Document"}
+                    {t('vetting.upload_document')}
                   </Button>
                 )}
-                <p className="text-xs text-default-400 mt-1">{"Document Types hint"}</p>
+                <p className="text-xs text-default-400 mt-1">{t('vetting.document_types_hint')}</p>
               </div>
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={() => setViewItem(null)}>
-                {"Close"}
+                {t('vetting.close')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1362,11 +1369,11 @@ export function VettingRecords() {
         isOpen={!!deleteItem}
         onClose={() => setDeleteItem(null)}
         onConfirm={handleDelete}
-        title={"Delete Vetting Record"}
+        title={t('vetting.delete_record_title')}
         message={deleteItem
-          ? `Delete Vetting Record Confirm`
+          ? t('vetting.delete_record_confirm')
           : ''}
-        confirmLabel={"Confirm Delete"}
+        confirmLabel={t('vetting.confirm_delete')}
         confirmColor="danger"
         isLoading={deleteLoading}
       />
@@ -1376,11 +1383,11 @@ export function VettingRecords() {
         isOpen={bulkAction === 'verify' || bulkAction === 'delete'}
         onClose={() => setBulkAction(null)}
         onConfirm={handleBulkAction}
-        title={bulkAction === 'verify' ? "Bulk Verify Records" : "Bulk Delete Records"}
+        title={bulkAction === 'verify' ? t('vetting.bulk_verify_title') : t('vetting.bulk_delete_title')}
         message={bulkAction === 'verify'
-          ? `Bulk Verify Confirm`
-          : `Bulk Delete Confirm`}
-        confirmLabel={bulkAction === 'verify' ? "Verify All" : "Delete All"}
+          ? t('vetting.bulk_verify_confirm', { count: selectedIds.size })
+          : t('vetting.bulk_delete_confirm', { count: selectedIds.size })}
+        confirmLabel={bulkAction === 'verify' ? t('vetting.verify_all') : t('vetting.delete_all')}
         confirmColor={bulkAction === 'verify' ? 'primary' : 'danger'}
         isLoading={bulkLoading}
       />
@@ -1395,15 +1402,15 @@ export function VettingRecords() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <X size={20} className="text-danger" />
-              {"Modal Bulk Reject"}
+              {t('vetting.modal_bulk_reject_title')}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
-                Reject <strong>{selectedIds.size}</strong> selected vetting record(s)?
+                {t('vetting.bulk_reject_confirm', { count: selectedIds.size })}
               </p>
               <Textarea
-                label={"Reason Required"}
-                placeholder={"Provide a Reason for Rejection..."}
+                label={t('vetting.reject_reason_label')}
+                placeholder={t('vetting.reject_reason_placeholder')}
                 value={bulkRejectReason}
                 onValueChange={setBulkRejectReason}
                 minRows={3}
@@ -1417,14 +1424,14 @@ export function VettingRecords() {
                 onPress={() => { setBulkAction(null); setBulkRejectReason(''); }}
                 isDisabled={bulkLoading}
               >
-                {"Cancel"}
+                {t('vetting.cancel')}
               </Button>
               <Button
                 color="danger"
                 onPress={handleBulkAction}
                 isLoading={bulkLoading}
               >
-                {"Reject All"}
+                {t('vetting.reject_all')}
               </Button>
             </ModalFooter>
           </ModalContent>

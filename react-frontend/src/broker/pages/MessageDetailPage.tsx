@@ -27,6 +27,7 @@ import MessageCircle from 'lucide-react/icons/message-circle';
 import User from 'lucide-react/icons/user';
 import Calendar from 'lucide-react/icons/calendar';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
@@ -51,7 +52,8 @@ function formatCopyReason(reason: string): string {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function MessageDetail() {
-  usePageTitle("Message Detail - Broker");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('messages.detail_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -82,7 +84,7 @@ export function MessageDetail() {
     if (!id) return;
     const numericId = Number(id);
     if (!Number.isFinite(numericId) || numericId <= 0) {
-      setError("Invalid message id");
+      setError(t('messages.detail_invalid_id'));
       setLoading(false);
       return;
     }
@@ -93,14 +95,14 @@ export function MessageDetail() {
       if (res.success && res.data) {
         setDetail(res.data);
       } else {
-        setError("Not Found");
+        setError(t('messages.detail_not_found'));
       }
     } catch {
-      setError("Failed to load message details");
+      setError(t('messages.detail_load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [id])
+  }, [id, t])
 
 
   useEffect(() => {
@@ -115,13 +117,13 @@ export function MessageDetail() {
     try {
       const res = await adminBroker.reviewMessage(Number(id));
       if (res?.success) {
-        toast.success("Message marked as reviewed");
+        toast.success(t('messages.reviewed_success'));
         loadDetail();
       } else {
-        toast.error(res?.error || "Failed to mark message as reviewed");
+        toast.error(res?.error || t('messages.review_failed'));
       }
     } catch {
-      toast.error("Failed to mark message as reviewed");
+      toast.error(t('messages.review_failed'));
     } finally {
       setReviewLoading(false);
     }
@@ -130,23 +132,23 @@ export function MessageDetail() {
   const handleFlag = async () => {
     if (!id) return;
     if (!flagReason.trim()) {
-      toast.error("A reason is required to flag a message");
+      toast.error(t('messages.flag_reason_required'));
       return;
     }
     setFlagLoading(true);
     try {
       const res = await adminBroker.flagMessage(Number(id), flagReason, flagSeverity);
       if (res?.success) {
-        toast.success("Message flagged successfully");
+        toast.success(t('messages.flag_success'));
         setFlagModalOpen(false);
         setFlagReason('');
         setFlagSeverity('concern');
         loadDetail();
       } else {
-        toast.error(res?.error || "Failed to flag message");
+        toast.error(res?.error || t('messages.flag_failed'));
       }
     } catch {
-      toast.error("Failed to flag message");
+      toast.error(t('messages.flag_failed'));
     } finally {
       setFlagLoading(false);
     }
@@ -158,14 +160,14 @@ export function MessageDetail() {
     try {
       const res = await adminBroker.approveMessage(Number(id), approveNotes || undefined);
       if (res?.success) {
-        toast.success("Message approved and archived");
+        toast.success(t('messages.detail_approve_success'));
         setApproveModalOpen(false);
         navigate(tenantPath('/broker/messages'));
       } else {
-        toast.error(res?.error || "Failed to approve message");
+        toast.error(res?.error || t('messages.detail_approve_failed'));
       }
     } catch {
-      toast.error("Failed to approve message");
+      toast.error(t('messages.detail_approve_failed'));
     } finally {
       setApproveLoading(false);
     }
@@ -186,7 +188,7 @@ export function MessageDetail() {
   if (error || !detail) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || "Not Found"}</p>
+        <p className="text-danger">{error || t('messages.detail_not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/broker/messages')}
@@ -194,7 +196,7 @@ export function MessageDetail() {
           className="mt-4"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          {"Back to Messages"}
+          {t('messages.detail_back_to_messages')}
         </Button>
       </div>
     );
@@ -209,8 +211,8 @@ export function MessageDetail() {
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
-        title={"Message Detail"}
-        description={`Copy #${copy.id} — ${copy.sender_name} to ${copy.receiver_name}`}
+        title={t('messages.detail_page_title')}
+        description={t('messages.detail_page_description', { id: copy.id, sender: copy.sender_name, receiver: copy.receiver_name })}
         actions={
           <Button
             as={Link}
@@ -219,7 +221,7 @@ export function MessageDetail() {
             startContent={<ArrowLeft className="w-4 h-4" />}
             size="sm"
           >
-            {"Back"}
+            {t('messages.back')}
           </Button>
         }
       />
@@ -228,7 +230,7 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Shield className="w-4 h-4" />
-          <span className="font-semibold">{"Metadata"}</span>
+          <span className="font-semibold">{t('messages.detail_metadata')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
@@ -236,7 +238,7 @@ export function MessageDetail() {
             {/* Sender */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <User className="w-3 h-3" /> {"Sender"}
+                <User className="w-3 h-3" /> {t('messages.col_sender')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.sender_name}</p>
             </div>
@@ -244,22 +246,22 @@ export function MessageDetail() {
             {/* Receiver */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <User className="w-3 h-3" /> {"Receiver"}
+                <User className="w-3 h-3" /> {t('messages.col_receiver')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.receiver_name}</p>
             </div>
 
             {/* Listing */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{"Listing"}</p>
+              <p className="text-sm text-default-500">{t('messages.detail_listing')}</p>
               <p className="text-sm text-foreground">
-                {copy.listing_title || <span className="text-default-400">{"None"}</span>}
+                {copy.listing_title || <span className="text-default-400">{t('messages.detail_none')}</span>}
               </p>
             </div>
 
             {/* Copy Reason */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{"Copy Reason"}</p>
+              <p className="text-sm text-default-500">{t('messages.detail_copy_reason')}</p>
               <Chip
                 size="sm"
                 variant="flat"
@@ -272,7 +274,7 @@ export function MessageDetail() {
             {/* Sent At */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <Calendar className="w-3 h-3" /> {"Sent"}
+                <Calendar className="w-3 h-3" /> {t('messages.detail_sent')}
               </p>
               <p className="text-sm text-foreground">
                 {new Date(copy.sent_at).toLocaleString()}
@@ -281,7 +283,7 @@ export function MessageDetail() {
 
             {/* Status Chips */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{"Status"}</p>
+              <p className="text-sm text-default-500">{t('messages.col_status')}</p>
               <div className="flex flex-wrap gap-1">
                 {isFlagged && (
                   <Chip
@@ -290,7 +292,7 @@ export function MessageDetail() {
                     color="danger"
                     startContent={<Flag className="w-3 h-3" />}
                   >
-                    {"Flagged"}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
+                    {t('messages.flagged_label')}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
                   </Chip>
                 )}
                 {isReviewed && (
@@ -300,7 +302,7 @@ export function MessageDetail() {
                     color="success"
                     startContent={<CheckCircle className="w-3 h-3" />}
                   >
-                    {"Reviewed"}
+                    {t('messages.status_reviewed')}
                   </Chip>
                 )}
                 {isArchived && (
@@ -310,12 +312,12 @@ export function MessageDetail() {
                     color="secondary"
                     startContent={<Archive className="w-3 h-3" />}
                   >
-                    {"Archived"}
+                    {t('messages.detail_archived')}
                   </Chip>
                 )}
                 {!isFlagged && !isReviewed && !isArchived && (
                   <Chip size="sm" variant="flat" color="warning">
-                    {"Unreviewed"}
+                    {t('messages.status_unreviewed')}
                   </Chip>
                 )}
               </div>
@@ -327,7 +329,7 @@ export function MessageDetail() {
             <>
               <Divider className="my-3" />
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{"Flag Reason"}</p>
+                <p className="text-sm text-default-500">{t('messages.detail_flag_reason')}</p>
                 <p className="text-sm text-foreground">{copy.flag_reason}</p>
               </div>
             </>
@@ -339,16 +341,16 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4" />
-          <span className="font-semibold">{"Conversation Thread"}</span>
+          <span className="font-semibold">{t('messages.detail_conversation_thread')}</span>
           <Chip size="sm" variant="flat" className="ml-auto">
-            {thread.length} message{thread.length !== 1 ? 's' : ''}
+            {t('messages.detail_message_count', { count: thread.length })}
           </Chip>
         </CardHeader>
         <Divider />
         <CardBody className="p-0">
           {thread.length === 0 ? (
             <div className="p-6 text-center">
-              <p className="text-sm text-default-500">{"No messages in thread found"}</p>
+              <p className="text-sm text-default-500">{t('messages.detail_no_thread_messages')}</p>
             </div>
           ) : (
             <ScrollShadow className="max-h-[500px]">
@@ -373,11 +375,11 @@ export function MessageDetail() {
                           {isTarget && (
                             <Chip size="sm" variant="flat" color="warning">
                               <AlertTriangle className="w-3 h-3 mr-1 inline" />
-                              {"Copied"}
+                              {t('messages.detail_copied')}
                             </Chip>
                           )}
                           {msg.is_edited && (
-                            <span className="text-xs text-default-400">{"Edited"}</span>
+                            <span className="text-xs text-default-400">{t('messages.detail_edited')}</span>
                           )}
                         </div>
                         <span className="text-xs text-default-500">
@@ -388,14 +390,14 @@ export function MessageDetail() {
                       {/* Subject line */}
                       {msg.subject && (
                         <p className="text-xs text-default-500 mb-1">
-                          {"Subject"}: {msg.subject}
+                          {t('messages.detail_subject')}: {msg.subject}
                         </p>
                       )}
 
                       {/* Message body */}
                       {msg.is_deleted ? (
                         <p className="text-sm italic text-default-400">
-                          {"This Message Has Been deleted"}
+                          {t('messages.detail_message_deleted')}
                         </p>
                       ) : (
                         <p className="text-sm text-foreground whitespace-pre-wrap">
@@ -416,13 +418,13 @@ export function MessageDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Archive className="w-4 h-4 text-secondary" />
-            <span className="font-semibold">{"Archive Record"}</span>
+            <span className="font-semibold">{t('messages.detail_archive_record')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{"Decision"}</p>
+                <p className="text-sm text-default-500">{t('messages.detail_decision')}</p>
                 <Chip
                   size="sm"
                   variant="flat"
@@ -433,11 +435,11 @@ export function MessageDetail() {
                 </Chip>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{"Decided by"}</p>
+                <p className="text-sm text-default-500">{t('messages.detail_decided_by')}</p>
                 <p className="text-sm font-medium text-foreground">{archive.decided_by_name}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{"Date"}</p>
+                <p className="text-sm text-default-500">{t('messages.detail_date')}</p>
                 <p className="text-sm text-foreground">
                   {new Date(archive.decided_at).toLocaleString()}
                 </p>
@@ -447,7 +449,7 @@ export function MessageDetail() {
               <>
                 <Divider className="my-3" />
                 <div className="space-y-1">
-                  <p className="text-sm text-default-500">{"Notes"}</p>
+                  <p className="text-sm text-default-500">{t('messages.detail_notes')}</p>
                   <p className="text-sm text-foreground">{archive.decision_notes}</p>
                 </div>
               </>
@@ -460,13 +462,13 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Shield className="w-4 h-4" />
-          <span className="font-semibold">{"Actions"}</span>
+          <span className="font-semibold">{t('messages.detail_actions')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
           {isArchived ? (
             <p className="text-sm text-default-500">
-              {"Archived No Actions"}
+              {t('messages.detail_archived_no_actions')}
             </p>
           ) : (
             <div className="flex flex-wrap gap-3">
@@ -479,7 +481,7 @@ export function MessageDetail() {
                   onPress={handleReview}
                   isLoading={reviewLoading}
                 >
-                  {"Mark Reviewed"}
+                  {t('messages.detail_mark_reviewed')}
                 </Button>
               )}
 
@@ -495,7 +497,7 @@ export function MessageDetail() {
                     setFlagModalOpen(true);
                   }}
                 >
-                  {"Flag"}
+                  {t('messages.flag_action')}
                 </Button>
               )}
 
@@ -508,7 +510,7 @@ export function MessageDetail() {
                   setApproveModalOpen(true);
                 }}
               >
-                {"Approve and Archive"}
+                {t('messages.detail_approve_archive')}
               </Button>
             </div>
           )}
@@ -524,12 +526,12 @@ export function MessageDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Flag className="w-5 h-5 text-warning" />
-            {"Flag"}
+            {t('messages.flag_modal_title')}
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label={"Reason Required"}
-              placeholder={"Describe Why This Message is Being Flagged..."}
+              label={t('messages.flag_reason_label')}
+              placeholder={t('messages.flag_reason_placeholder')}
               value={flagReason}
               onValueChange={setFlagReason}
               minRows={3}
@@ -537,7 +539,7 @@ export function MessageDetail() {
               isRequired
             />
             <Select
-              label={"Severity"}
+              label={t('messages.severity_label')}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
@@ -545,10 +547,10 @@ export function MessageDetail() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">{"Severity Info"}</SelectItem>
-              <SelectItem key="warning">{"Severity Warning"}</SelectItem>
-              <SelectItem key="concern">{"Severity Concern"}</SelectItem>
-              <SelectItem key="urgent">{"Severity Urgent"}</SelectItem>
+              <SelectItem key="info">{t('messages.severity_info')}</SelectItem>
+              <SelectItem key="warning">{t('messages.severity_warning')}</SelectItem>
+              <SelectItem key="concern">{t('messages.severity_concern')}</SelectItem>
+              <SelectItem key="urgent">{t('messages.severity_urgent')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -557,7 +559,7 @@ export function MessageDetail() {
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
-              {"Cancel"}
+              {t('messages.cancel')}
             </Button>
             <Button
               color="warning"
@@ -565,7 +567,7 @@ export function MessageDetail() {
               isLoading={flagLoading}
               startContent={!flagLoading && <Flag className="w-4 h-4" />}
             >
-              {"Flag"}
+              {t('messages.flag_action')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -580,15 +582,15 @@ export function MessageDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Archive className="w-5 h-5 text-primary" />
-            {"Approve and Archive"}
+            {t('messages.detail_approve_archive')}
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              {"Approve Archive Warning"}
+              {t('messages.detail_approve_warning')}
             </p>
             <Textarea
-              label={"Decision Notes Optional"}
-              placeholder={"Add Any Notes About This Review Decision..."}
+              label={t('messages.detail_decision_notes_label')}
+              placeholder={t('messages.detail_decision_notes_placeholder')}
               value={approveNotes}
               onValueChange={setApproveNotes}
               minRows={3}
@@ -601,7 +603,7 @@ export function MessageDetail() {
               onPress={() => setApproveModalOpen(false)}
               isDisabled={approveLoading}
             >
-              {"Cancel"}
+              {t('messages.cancel')}
             </Button>
             <Button
               color="primary"
@@ -609,7 +611,7 @@ export function MessageDetail() {
               isLoading={approveLoading}
               startContent={!approveLoading && <Archive className="w-4 h-4" />}
             >
-              {"Are you sure you want to approve?"}
+              {t('messages.detail_approve_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>
