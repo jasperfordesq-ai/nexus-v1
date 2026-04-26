@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\CaringCommunityRolePresetService;
+use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
 use Illuminate\Http\JsonResponse;
 
@@ -20,6 +21,7 @@ class AdminCaringCommunityController extends BaseApiController
     public function __construct(
         private readonly CaringCommunityWorkflowService $workflowService,
         private readonly CaringCommunityRolePresetService $rolePresetService,
+        private readonly CaringCommunityWorkflowPolicyService $policyService,
     ) {
     }
 
@@ -48,6 +50,14 @@ class AdminCaringCommunityController extends BaseApiController
         $presetKey = is_string($preset) && $preset !== '' ? $preset : null;
 
         return $this->respondWithData($this->rolePresetService->install(TenantContext::getId(), $presetKey));
+    }
+
+    public function updatePolicy(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->policyService->update(TenantContext::getId(), $this->getAllInput()));
     }
 
     private function guardCaringCommunity(): ?JsonResponse

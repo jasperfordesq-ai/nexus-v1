@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Divider, Spinner } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Divider, Input, Select, SelectItem, Spinner, Switch } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
@@ -13,6 +13,7 @@ import Clock from 'lucide-react/icons/clock';
 import FileText from 'lucide-react/icons/file-text';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +59,7 @@ type WorkflowSummary = {
     trusted_organisations: number;
   };
   role_pack?: RolePack;
+  policy?: WorkflowPolicy;
 };
 
 type RolePack = {
@@ -74,6 +76,19 @@ type RolePresetStatus = {
   installed: boolean;
   permission_count: number;
   installed_permissions: number;
+};
+
+type WorkflowPolicy = {
+  approval_required: boolean;
+  auto_approve_trusted_reviewers: boolean;
+  review_sla_days: number;
+  escalation_sla_days: number;
+  allow_member_self_log: boolean;
+  require_organisation_for_partner_hours: boolean;
+  monthly_statement_day: number;
+  municipal_report_default_period: string;
+  include_social_value_estimate: boolean;
+  default_hour_value_chf: number;
 };
 
 const workflowStages = [
@@ -93,6 +108,8 @@ const rolePresets = [
   { key: 'trusted_reviewer', icon: ClipboardCheck },
 ] as const;
 
+const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
+
 function isWorkflowSummary(value: unknown): value is WorkflowSummary {
   return Boolean(value && typeof value === 'object' && 'stats' in value && 'pending_reviews' in value);
 }
@@ -106,6 +123,7 @@ export default function CaringCommunityWorkflowPage() {
   const [summary, setSummary] = useState<WorkflowSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [installingRoles, setInstallingRoles] = useState(false);
+  const [savingPolicy, setSavingPolicy] = useState(false);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -139,6 +157,13 @@ export default function CaringCommunityWorkflowPage() {
     return new Map(statuses.map((status) => [status.key, status]));
   }, [rolePack]);
 
+  const updatePolicyField = useCallback(<K extends keyof WorkflowPolicy>(key: K, value: WorkflowPolicy[K]) => {
+    setSummary((current) => {
+      if (!current?.policy) return current;
+      return { ...current, policy: { ...current.policy, [key]: value } };
+    });
+  }, []);
+
   const installRolePack = useCallback(async () => {
     setInstallingRoles(true);
     try {
@@ -151,6 +176,21 @@ export default function CaringCommunityWorkflowPage() {
       setInstallingRoles(false);
     }
   }, [t, toast]);
+
+  const savePolicy = useCallback(async () => {
+    if (!summary?.policy) return;
+
+    setSavingPolicy(true);
+    try {
+      const res = await api.put<WorkflowPolicy>('/v2/admin/caring-community/workflow/policy', summary.policy);
+      setSummary((current) => current ? { ...current, policy: res.data } : current);
+      toast.success(t('caring_workflow.policy.save_success'));
+    } catch {
+      toast.error(t('caring_workflow.policy.save_failed'));
+    } finally {
+      setSavingPolicy(false);
+    }
+  }, [summary?.policy, t, toast]);
 
   if (loading) {
     return (
@@ -245,6 +285,104 @@ export default function CaringCommunityWorkflowPage() {
         </Card>
 
         <div className="space-y-6">
+          {summary?.policy && (
+            <Card shadow="sm">
+              <CardHeader className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold">{t('caring_workflow.policy.title')}</h2>
+                  <p className="mt-1 text-sm text-default-500">{t('caring_workflow.policy.description')}</p>
+                </div>
+                <Button
+                  color="primary"
+                  size="sm"
+                  startContent={<Save size={16} />}
+                  isLoading={savingPolicy}
+                  onPress={savePolicy}
+                >
+                  {t('caring_workflow.policy.save')}
+                </Button>
+              </CardHeader>
+              <Divider />
+              <CardBody className="gap-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={30}
+                    label={t('caring_workflow.policy.review_sla_days')}
+                    value={String(summary.policy.review_sla_days)}
+                    onValueChange={(value) => updatePolicyField('review_sla_days', Number(value || 1))}
+                  />
+                  <Input
+                    type="number"
+                    min={1}
+                    max={60}
+                    label={t('caring_workflow.policy.escalation_sla_days')}
+                    value={String(summary.policy.escalation_sla_days)}
+                    onValueChange={(value) => updatePolicyField('escalation_sla_days', Number(value || 1))}
+                  />
+                  <Input
+                    type="number"
+                    min={1}
+                    max={28}
+                    label={t('caring_workflow.policy.monthly_statement_day')}
+                    value={String(summary.policy.monthly_statement_day)}
+                    onValueChange={(value) => updatePolicyField('monthly_statement_day', Number(value || 1))}
+                  />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={500}
+                    label={t('caring_workflow.policy.default_hour_value_chf')}
+                    value={String(summary.policy.default_hour_value_chf)}
+                    onValueChange={(value) => updatePolicyField('default_hour_value_chf', Number(value || 0))}
+                  />
+                </div>
+                <Select
+                  label={t('caring_workflow.policy.municipal_report_default_period')}
+                  selectedKeys={[summary.policy.municipal_report_default_period]}
+                  onSelectionChange={(keys) => updatePolicyField('municipal_report_default_period', Array.from(keys)[0]?.toString() ?? 'last_90_days')}
+                >
+                  {reportPeriods.map((period) => (
+                    <SelectItem key={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
+                  ))}
+                </Select>
+                <div className="grid grid-cols-1 gap-3">
+                  <PolicySwitch
+                    label={t('caring_workflow.policy.approval_required')}
+                    description={t('caring_workflow.policy.approval_required_description')}
+                    value={summary.policy.approval_required}
+                    onChange={(value) => updatePolicyField('approval_required', value)}
+                  />
+                  <PolicySwitch
+                    label={t('caring_workflow.policy.auto_approve_trusted_reviewers')}
+                    description={t('caring_workflow.policy.auto_approve_trusted_reviewers_description')}
+                    value={summary.policy.auto_approve_trusted_reviewers}
+                    onChange={(value) => updatePolicyField('auto_approve_trusted_reviewers', value)}
+                  />
+                  <PolicySwitch
+                    label={t('caring_workflow.policy.allow_member_self_log')}
+                    description={t('caring_workflow.policy.allow_member_self_log_description')}
+                    value={summary.policy.allow_member_self_log}
+                    onChange={(value) => updatePolicyField('allow_member_self_log', value)}
+                  />
+                  <PolicySwitch
+                    label={t('caring_workflow.policy.require_organisation_for_partner_hours')}
+                    description={t('caring_workflow.policy.require_organisation_for_partner_hours_description')}
+                    value={summary.policy.require_organisation_for_partner_hours}
+                    onChange={(value) => updatePolicyField('require_organisation_for_partner_hours', value)}
+                  />
+                  <PolicySwitch
+                    label={t('caring_workflow.policy.include_social_value_estimate')}
+                    description={t('caring_workflow.policy.include_social_value_estimate_description')}
+                    value={summary.policy.include_social_value_estimate}
+                    onChange={(value) => updatePolicyField('include_social_value_estimate', value)}
+                  />
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
           <Card shadow="sm">
             <CardHeader>
               <div>
@@ -347,6 +485,18 @@ function SignalRow({ label, value }: { label: string; value: number }) {
     <div className="flex items-center justify-between gap-3 rounded-lg bg-default-100 px-3 py-2">
       <span className="text-sm text-default-600">{label}</span>
       <span className="text-sm font-semibold text-default-900">{value.toLocaleString()}</span>
+    </div>
+  );
+}
+
+function PolicySwitch({ label, description, value, onChange }: { label: string; description: string; value: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-3">
+      <div>
+        <p className="text-sm font-semibold text-default-900">{label}</p>
+        <p className="mt-1 text-xs text-default-500">{description}</p>
+      </div>
+      <Switch isSelected={value} onValueChange={onChange} aria-label={label} />
     </div>
   );
 }

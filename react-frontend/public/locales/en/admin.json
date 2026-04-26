@@ -92,6 +92,34 @@
       "trusted_organisations": "Trusted organisations",
       "declined_30d": "Declined in 30 days"
     },
+    "policy": {
+      "title": "Workflow policy",
+      "description": "Tenant-level defaults for KISS hour review, statements, and municipal evidence.",
+      "save": "Save policy",
+      "save_success": "Workflow policy saved.",
+      "save_failed": "Failed to save workflow policy.",
+      "review_sla_days": "Review SLA days",
+      "escalation_sla_days": "Escalation SLA days",
+      "monthly_statement_day": "Statement day",
+      "default_hour_value_chf": "Hour value CHF",
+      "municipal_report_default_period": "Default report period",
+      "approval_required": "Require hour approval",
+      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
+      "auto_approve_trusted_reviewers": "Auto-approve trusted reviewers",
+      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
+      "allow_member_self_log": "Allow member self logging",
+      "allow_member_self_log_description": "Members can record their own support activity before review.",
+      "require_organisation_for_partner_hours": "Require partner organisation",
+      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
+      "include_social_value_estimate": "Include social value estimate",
+      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
+      "periods": {
+        "last_30_days": "Last 30 days",
+        "last_90_days": "Last 90 days",
+        "year_to_date": "Year to date",
+        "previous_quarter": "Previous quarter"
+      }
+    },
     "roles": {
       "title": "Agoris/KISS role presets",
       "install_pack": "Install role pack",

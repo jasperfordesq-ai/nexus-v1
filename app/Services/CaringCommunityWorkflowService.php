@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Schema;
  */
 class CaringCommunityWorkflowService
 {
-    public function __construct(private readonly CaringCommunityRolePresetService $rolePresetService)
-    {
+    public function __construct(
+        private readonly CaringCommunityRolePresetService $rolePresetService,
+        private readonly CaringCommunityWorkflowPolicyService $policyService,
+    ) {
     }
 
     public function summary(int $tenantId): array
@@ -28,6 +30,7 @@ class CaringCommunityWorkflowService
             'recent_decisions' => $this->recentDecisions($tenantId),
             'coordinator_signals' => $this->coordinatorSignals($tenantId),
             'role_pack' => $this->rolePresetService->status($tenantId),
+            'policy' => $this->policyService->get($tenantId),
         ];
     }
 
