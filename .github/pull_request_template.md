@@ -10,6 +10,7 @@
 
 ## Contributor Terms
 - [ ] I have read and agree to `CONTRIBUTOR_TERMS.md`, including the licence grant, patent grant, ownership/employer-permission confirmation, third-party-code restrictions, and AI-disclosure requirements.
+- [ ] I confirm I own this contribution or am authorised to submit it on behalf of the person or organisation that owns it.
 - [ ] I have disclosed meaningful AI-generated or AI-assisted contributions in this PR, or this PR contains no meaningful AI-generated or AI-assisted contribution.
 
 **Third-Party Material Disclosure:** None

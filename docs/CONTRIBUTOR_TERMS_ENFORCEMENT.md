@@ -16,6 +16,7 @@ The job fails unless the PR description includes:
 
 - the `## Contributor Terms` section;
 - a checked acknowledgement for `CONTRIBUTOR_TERMS.md`;
+- a checked ownership or employer-authorisation acknowledgement;
 - a checked AI contribution disclosure acknowledgement;
 - a completed `Third-Party Material Disclosure` field;
 - a completed `AI Contribution Disclosure` field.

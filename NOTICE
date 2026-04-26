@@ -1,8 +1,28 @@
-Attribution and Credits
+Project NEXUS Attribution, Additional Terms, and Notices
 
-This software was created by Jasper Ford.
+This NOTICE file records authorship, attribution, trademark, warranty,
+liability, and AGPL-3.0-or-later Section 7 additional terms for Project
+NEXUS.
 
-Copyright © 2024–2026 Jasper Ford.
+Project NEXUS is licensed under the GNU Affero General Public License
+version 3 or, at your option, any later version published by the Free
+Software Foundation.
+
+Nothing in this NOTICE transfers ownership of Project NEXUS, grants any
+trademark licence, removes any right granted by AGPL-3.0-or-later, or
+prevents Jasper Ford from offering the same code under separate commercial,
+proprietary, support, hosting, warranty, or service terms to customers who
+receive such separate written terms.
+
+================================================================================
+AUTHORSHIP AND CREDITS
+================================================================================
+
+Original creator and copyright holder:
+- Jasper Ford
+
+Copyright:
+- Copyright (c) 2024-2026 Jasper Ford.
 
 Founders of the originating Irish timebank initiative hOUR Timebank CLG:
 - Jasper Ford
@@ -20,166 +40,183 @@ Acknowledgements:
 - Fergal Conlon, SICAP Manager
 
 ================================================================================
-REQUIRED UI ATTRIBUTION (AGPL Section 7(b))
+AGPL SECTION 7 ADDITIONAL TERMS
 ================================================================================
 
-In accordance with Section 7(b) of the GNU Affero General Public License v3,
-any application that uses, modifies, or is based on this software MUST display
-the following attribution in a user-visible location.
+The following additional terms are added under AGPL-3.0-or-later Section 7
+only to the extent permitted by that section and by applicable law. If any
+term below would be treated as an impermissible further restriction under the
+AGPL, that term is to be read as narrowly as necessary to remain valid under
+AGPL Section 7, or otherwise severed without affecting the remaining terms.
 
-CANONICAL ATTRIBUTION WORDING
------------------------------
+These additional terms apply only to material for which Jasper Ford has, or
+has received, the necessary copyright permission to impose them.
 
-1. ABOUT PAGE (Required)
-   The application's About page (or equivalent) MUST include:
+--------------------------------------------------------------------------------
+1. Preservation of Legal Notices and Attribution - AGPL Section 7(b)
+--------------------------------------------------------------------------------
 
-   a) Header attribution:
-      "Powered by Project NEXUS
-       Created by Jasper Ford
-       Licensed under AGPL v3"
-      [Link to: https://github.com/jasperfordesq-ai/nexus-v1]
+Covered works must preserve the copyright notices, licence notices, warranty
+notices, source-code notices, and author attributions contained in this
+repository and in the Project NEXUS user interface.
 
-   b) FULL CONTRIBUTOR LIST (Required):
-      The About page MUST display ALL contributors listed in CONTRIBUTORS.md
-      (or contributors.json). This includes:
-      - Creator (Jasper Ford)
-      - Founders (Jasper Ford, Mary Casey)
-      - All Contributors (with their roles)
-      - Research Foundation acknowledgement
-      - All Acknowledgements
+Interactive user interfaces based on Project NEXUS must display appropriate
+legal notices in a convenient and reasonably prominent location. The canonical
+Project NEXUS interface satisfies this through its footer, source-code link,
+auth-page attribution, mobile drawer attribution, and About page.
 
-      The contributor list must be rendered programmatically from the
-      canonical source file (contributors.json) to ensure consistency
-      and prevent accidental omissions.
+Downstream deployments and modified versions must preserve an equivalent
+notice path that is no less accessible to ordinary users than the original
+Project NEXUS notice path. A modified interface may adapt placement to fit its
+layout, but it must not remove, obscure, bury, or make misleading the required
+notices.
 
-      Displaying only a subset of contributors, or linking to the file
-      instead of displaying the full list, is NOT compliant.
+Canonical attribution wording:
 
-   c) If the application has multiple About screens (tenant, public, admin),
-      ALL must include the full contributor list.
+  Powered by Project NEXUS
+  Created by Jasper Ford
+  Licensed under AGPL v3-or-later
+  Source: https://github.com/jasperfordesq-ai/nexus-v1
 
-2. FOOTER ATTRIBUTION (Required)
-   The application's footer (visible on all pages) MUST include:
+Where the application has an About page, legal page, credits page, or
+equivalent screen, it must include the Project NEXUS attribution and the
+Project NEXUS contributor and acknowledgement list, either directly or by a
+clearly labelled link to the canonical contributor information included with
+the complete corresponding source.
 
-   "Built on Project NEXUS by Jasper Ford"
+Where the application has a global footer, mobile drawer, persistent app
+navigation, or equivalent legal-notice area, it must include a Project NEXUS
+attribution and source-code link.
 
-   This text MUST be a clickable hyperlink to:
-   https://github.com/jasperfordesq-ai/nexus-v1
+--------------------------------------------------------------------------------
+2. Modified-Version Notices - AGPL Section 7(c)
+--------------------------------------------------------------------------------
 
-3. SOURCE CODE LINK (Required by AGPL Section 13)
-   A clearly visible link to the complete source code repository must be
-   provided, accessible to all users of the network application:
-   https://github.com/jasperfordesq-ai/nexus-v1
+Modified versions must not misrepresent their origin.
 
-SCOPE OF REQUIREMENTS
----------------------
+If you modify Project NEXUS and convey or make available the modified version,
+including as a network service, you must clearly mark the work as modified in
+the appropriate legal notices, source-code notices, or equivalent location.
 
-These attribution requirements apply to:
-- Direct deployments of this software
-- Modified versions of this software
-- Applications that incorporate substantial portions of this code
-- SaaS or hosted versions accessible over a network
+A clear notice may use wording such as:
 
-Removal, obscuring, or modification of these attributions is a licence violation.
+  This software is a modified version of Project NEXUS.
+  Original software created by Jasper Ford.
+  This modified version is not endorsed by the original author unless a
+  separate written agreement says otherwise.
+
+You may use different wording if it gives users materially equivalent notice
+that the work is modified, identifies Project NEXUS as the original work, and
+does not imply endorsement by the original author or Project Steward.
+
+--------------------------------------------------------------------------------
+3. Names, Publicity, and Trademarks - AGPL Sections 7(d) and 7(e)
+--------------------------------------------------------------------------------
+
+The AGPL licence for the software does not grant trademark rights.
+
+Without separate written permission, you may not use the names "Project
+NEXUS", "Jasper Ford", "Mary Casey", or associated logos, marks, trade names,
+or branding to state or imply endorsement, sponsorship, certification,
+official partnership, or commercial affiliation.
+
+Required attribution, accurate statements of origin, nominative fair use, and
+other uses that cannot lawfully be restricted are not prohibited by this
+section.
+
+--------------------------------------------------------------------------------
+4. Limited Indemnity for Contractual Assumptions of Liability - AGPL Section 7(f)
+--------------------------------------------------------------------------------
+
+If you convey Project NEXUS, or a modified version of Project NEXUS, with
+contractual assumptions of liability to a recipient, you must indemnify the
+Project NEXUS licensors and authors for any liability that those contractual
+assumptions directly impose on them.
+
+This indemnity is limited to the scope permitted by AGPL-3.0-or-later Section
+7(f). It is not intended to impose a general indemnity merely because someone
+uses, runs, studies, modifies, hosts, or redistributes Project NEXUS under the
+AGPL.
+
+Broader indemnities, service commitments, warranties, support obligations, or
+commercial risk allocations may be agreed only in a separate written contract.
+
+--------------------------------------------------------------------------------
+5. Enhanced Warranty and Compliance Disclaimer - AGPL Section 7(a)
+--------------------------------------------------------------------------------
+
+In addition to the warranty disclaimer and liability limitation in
+AGPL-3.0-or-later Sections 15 and 16:
+
+Project NEXUS is provided for community timebanking, community exchange,
+volunteering, care-community, and related civic or social-purpose use cases.
+The authors and licensors make no representation that the software, as
+provided, is suitable for any particular legal, financial, tax, public-sector,
+healthcare, safeguarding, employment, data-protection, accessibility,
+procurement, or regulatory requirement.
+
+Operators are solely responsible for assessing and complying with laws and
+obligations that apply to their deployment, including data protection, privacy,
+safeguarding, financial regulation, employment law, consumer law, charity law,
+public-sector procurement, accessibility, security, and local regulatory
+requirements.
+
+The authors and licensors do not provide legal, financial, compliance,
+security, operational, hosting, support, warranty, or regulatory advice merely
+by publishing the software under the AGPL.
 
 ================================================================================
-PROHIBITION OF MISREPRESENTATION (Section 7(c) of AGPL v3)
+SOURCE CODE NOTICE - AGPL SECTION 13
 ================================================================================
 
-You may NOT:
-- Claim to be the original author of this software
-- Remove, alter, or obscure any copyright notices or author attributions
-- Present this software as your own creation
-- Imply endorsement by the original author without written permission
+If you modify Project NEXUS and users interact with the modified version
+remotely through a computer network, AGPL-3.0-or-later Section 13 requires
+that your modified version prominently offer those users an opportunity to
+receive the complete corresponding source code of your version.
 
-Modified versions MUST be clearly marked as modified. Any modified version
-must prominently display:
+The canonical public source repository for this version of Project NEXUS is:
 
-   "This software is a modified version of Project NEXUS.
-    Original software created by Jasper Ford.
-    This modified version is not endorsed by the original author."
+  https://github.com/jasperfordesq-ai/nexus-v1
 
-================================================================================
-NAME AND TRADEMARK RESTRICTIONS (Sections 7(d) and 7(e) of AGPL v3)
-================================================================================
-
-Without explicit written permission from Jasper Ford, you may NOT:
-- Use the names "Project NEXUS", "Jasper Ford", or "Mary Casey" for
-  publicity, marketing, or endorsement purposes
-- Use any logos, branding, or trademarks associated with this project
-- Imply that your product or service is officially affiliated with,
-  endorsed by, or sponsored by Project NEXUS or its creators
-
-The attribution requirements above are permitted and required uses.
-All other uses of names and marks require separate written permission.
+If you operate a modified network deployment, you must provide the complete
+corresponding source for your modified version, not merely a link to the
+unmodified upstream repository.
 
 ================================================================================
-INDEMNIFICATION (Section 7(f) of AGPL v3)
+COMMERCIAL LICENSING AND SERVICES
 ================================================================================
 
-By using, modifying, or distributing this software, you agree to indemnify,
-defend, and hold harmless Jasper Ford, Mary Casey, and any contributors from
-and against any and all claims, damages, losses, costs, and expenses
-(including reasonable legal fees) arising from:
+The public repository is licensed under AGPL-3.0-or-later. Separately, Jasper
+Ford, or an entity authorised by Jasper Ford, may offer commercial licences,
+proprietary licences, hosted services, support, maintenance, warranty,
+implementation, training, AI-credit billing, data-processing terms, or other
+commercial arrangements.
 
-- Your use, modification, or distribution of this software
-- Your violation of this license or any applicable laws
-- Any claims that your modifications infringe third-party rights
-- Any liability arising from your deployment of this software
-
-This indemnification obligation survives termination of the license.
-
-================================================================================
-ENHANCED WARRANTY DISCLAIMER (Section 7(a) of AGPL v3)
-================================================================================
-
-IN ADDITION TO THE STANDARD AGPL WARRANTY DISCLAIMER:
-
-THIS SOFTWARE IS PROVIDED FOR COMMUNITY TIMEBANKING PURPOSES. THE AUTHORS
-MAKE NO REPRESENTATIONS REGARDING SUITABILITY FOR ANY PARTICULAR PURPOSE,
-INCLUDING BUT NOT LIMITED TO FINANCIAL, LEGAL, OR REGULATORY COMPLIANCE.
-
-YOU ARE SOLELY RESPONSIBLE FOR:
-- Compliance with all applicable laws in your jurisdiction
-- Data protection and privacy (GDPR, CCPA, etc.)
-- Financial regulations if handling credits or transactions
-- Proper security measures for your deployment
-
-THE AUTHORS ACCEPT NO LIABILITY FOR ANY DAMAGES ARISING FROM YOUR USE,
-INCLUDING LOSS OF DATA, BUSINESS INTERRUPTION, OR REGULATORY PENALTIES.
+Receiving the software under AGPL-3.0-or-later does not entitle a recipient to
+commercial support, hosted service access, private modifications, trademark
+rights, warranties, service-level commitments, or proprietary licensing unless
+those rights are granted in a separate written agreement.
 
 ================================================================================
 RELATED PROJECTS
 ================================================================================
 
-Project NEXUS is actively developed across two codebases:
+Project NEXUS is actively developed across related codebases. This repository
+is the V1 PHP 8.2+ / React 18 / MariaDB implementation:
 
-  V1 (this repository):
-    PHP 8.2+ / React 18 / MariaDB
-    https://github.com/jasperfordesq-ai/nexus-v1
+  https://github.com/jasperfordesq-ai/nexus-v1
 
-  V2 (new backend):
-    ASP.NET Core 8 / React 18 / PostgreSQL
-    https://github.com/jasperfordesq-ai/api.project-nexus.net
-
-V1 is the original platform — functional, in production, and the foundation
-of all Project NEXUS communities. V2 is a new backend being built alongside
-V1, progressively replacing the PHP API. Both share the same React frontend
-and design system.
-
-Note: This section is informational. The attribution requirements in
-Section 7(b) above apply to THIS repository only. References to V2 are
-provided for context and are not required for downstream compliance.
+Any reference to related Project NEXUS codebases is informational only. The
+AGPL Section 7 additional terms in this NOTICE apply to this repository and
+to material from this repository for which the relevant copyright permission
+exists.
 
 ================================================================================
+TRADEMARKS
+================================================================================
 
-License
-
-This software is licensed under the GNU Affero General Public License
-version 3 or (at your option) any later version.
-
-Trademarks
-
-The names, logos, and branding associated with this project are not
-licensed under the GNU Affero General Public License.
-Use of trademarks or branding requires separate permission.
+The names, logos, and branding associated with Project NEXUS are not licensed
+under AGPL-3.0-or-later. Use of trademarks, trade names, logos, branding, or
+publicity rights requires separate permission except where required for
+copyright attribution, accurate statements of origin, nominative fair use, or
+other uses that cannot lawfully be restricted.

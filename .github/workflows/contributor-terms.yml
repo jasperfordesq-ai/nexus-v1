@@ -48,6 +48,10 @@ jobs:
             errors.push('The contributor terms acknowledgement checkbox must be checked.');
           }
 
+          if (!hasCheckedLine('I confirm I own this contribution or am authorised to submit it')) {
+            errors.push('The ownership or employer-authorisation checkbox must be checked.');
+          }
+
           if (!hasCheckedLine('I have disclosed meaningful AI-generated or AI-assisted contributions')) {
             errors.push('The AI contribution disclosure checkbox must be checked.');
           }
@@ -74,6 +78,7 @@ jobs:
             '',
             'Edit the PR description and make sure the Contributor Terms section includes:',
             '- a checked acknowledgement for `CONTRIBUTOR_TERMS.md`;',
+            '- a checked ownership or employer-authorisation acknowledgement;',
             '- a checked AI disclosure acknowledgement;',
             '- `Third-Party Material Disclosure: None` or a source/licence explanation;',
             '- `AI Contribution Disclosure: None` or a tool/model/scope explanation.',
