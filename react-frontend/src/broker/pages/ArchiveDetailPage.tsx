@@ -249,7 +249,7 @@ export function ArchiveDetail() {
           <MessageSquare size={18} />
           <span className="font-semibold">{t('archives.section_conversation_snapshot')}</span>
           <Chip size="sm" variant="flat" color="default" className="ml-auto">
-            {t('archives.messages_count')}
+            {t('archives.messages_count', { count: data.conversation_snapshot.length })}
           </Chip>
         </CardHeader>
         <Divider />

@@ -590,7 +590,7 @@ export function VettingRecords() {
           color={STATUS_COLOR_MAP[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {t(`status.${item.status}`, { defaultValue: item.status })}
         </Chip>
       ),
     },

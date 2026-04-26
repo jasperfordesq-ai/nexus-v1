@@ -460,7 +460,7 @@ export function UserMonitoring() {
                           <p className="text-xs text-default-500 truncate">{user.email}</p>
                         </div>
                         <Chip size="sm" variant="flat" color={user.status === 'active' ? 'success' : 'default'}>
-                          {user.status}
+                          {t(`status.${user.status}`, { defaultValue: user.status })}
                         </Chip>
                       </li>
                     ))}

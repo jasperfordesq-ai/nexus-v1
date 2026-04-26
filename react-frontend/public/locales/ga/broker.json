@@ -553,7 +553,10 @@
     "low": "Íseal",
     "medium": "Meánach",
     "high": "Ard",
-    "critical": "Criticiúil"
+    "critical": "Criticiúil",
+    "submitted": "Submitted",
+    "revoked": "Revoked",
+    "inactive": "Inactive"
   },
   "common": {
     "loading": "Á luchtú...",

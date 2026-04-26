@@ -553,7 +553,10 @@
     "low": "Niski",
     "medium": "Średni",
     "high": "Wysoki",
-    "critical": "Krytyczny"
+    "critical": "Krytyczny",
+    "submitted": "Submitted",
+    "revoked": "Revoked",
+    "inactive": "Inactive"
   },
   "common": {
     "loading": "Ładowanie...",
