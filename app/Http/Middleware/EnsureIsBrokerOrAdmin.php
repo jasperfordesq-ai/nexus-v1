@@ -48,7 +48,10 @@ class EnsureIsBrokerOrAdmin
             || $user->is_tenant_super_admin
             || $user->is_god;
 
-        $hasAdminRole = in_array($role, ['admin', 'tenant_admin', 'super_admin'], true);
+        // Role list mirrors BaseApiController::requireBrokerOrAdmin() so the
+        // route-level gate and the controller-level helper agree on what
+        // counts as admin-tier. 'god' is the platform's break-glass role.
+        $hasAdminRole = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
 
         $isBroker = $role === 'broker';
 

@@ -469,7 +469,7 @@ class AdminSafeguardingController extends BaseApiController
                             'user_id' => $guardianId,
                             'type' => 'safeguarding_assignment',
                             'message' => __('api_controllers_1.admin_safeguarding.guardian_assigned_notification', ['name' => $wardDisplayName ?? __('api_controllers_1.admin_safeguarding.a_member')]),
-                            'link' => '/admin/safeguarding',
+                            'link' => '/settings?tab=safeguarding',
                             'is_read' => false,
                         ]);
 
@@ -487,7 +487,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->greeting($safeGuardian)
                                 ->paragraph(__('emails_misc.safeguarding.guardian_assigned_body', ['name' => $safeWard, 'community' => $safeCommunity]))
                                 ->paragraph('<em>' . __('emails_misc.safeguarding.guardian_assigned_audit_note') . '</em>')
-                                ->button(__('emails_misc.safeguarding.guardian_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                                ->button(__('emails_misc.safeguarding.guardian_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings?tab=safeguarding'))
                                 ->render();
                             $subject = __('emails_misc.safeguarding.guardian_assigned_subject');
                             if (!$emailService->send($guardianUser->email, $subject, $html)) {
@@ -505,7 +505,7 @@ class AdminSafeguardingController extends BaseApiController
                             'user_id' => $wardId,
                             'type' => 'safeguarding_assignment',
                             'message' => __('api_controllers_1.admin_safeguarding.ward_assigned_notification', ['guardian' => $guardianDisplayName ?? __('api_controllers_1.admin_safeguarding.a_coordinator')]),
-                            'link' => '/settings/safeguarding',
+                            'link' => '/settings?tab=safeguarding',
                             'is_read' => false,
                         ]);
 
@@ -522,7 +522,7 @@ class AdminSafeguardingController extends BaseApiController
                                 ->previewText(__('emails_misc.safeguarding.ward_assigned_preview', ['guardian' => $safeGuardian2, 'community' => $safeCommunity2]))
                                 ->greeting($safeWard2)
                                 ->paragraph(__('emails_misc.safeguarding.ward_assigned_body', ['guardian' => $safeGuardian2, 'community' => $safeCommunity2]))
-                                ->button(__('emails_misc.safeguarding.ward_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings/safeguarding'))
+                                ->button(__('emails_misc.safeguarding.ward_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings?tab=safeguarding'))
                                 ->render();
                             $subject2 = __('emails_misc.safeguarding.ward_assigned_subject');
                             if (!$emailService->send($wardUser->email, $subject2, $html2)) {
@@ -617,7 +617,7 @@ class AdminSafeguardingController extends BaseApiController
                             'user_id'   => $assignment->guardian_user_id,
                             'type'      => 'safeguarding_assignment',
                             'message'   => __('emails_misc.safeguarding.assignment_revoked_guardian_bell', ['name' => $wardName]),
-                            'link'      => '/admin/safeguarding',
+                            'link'      => '/settings?tab=safeguarding',
                             'is_read'   => false,
                         ]);
 
@@ -645,7 +645,7 @@ class AdminSafeguardingController extends BaseApiController
                             'user_id'   => $assignment->ward_user_id,
                             'type'      => 'safeguarding_assignment',
                             'message'   => __('emails_misc.safeguarding.assignment_revoked_ward_bell'),
-                            'link'      => '/settings/safeguarding',
+                            'link'      => '/settings?tab=safeguarding',
                             'is_read'   => false,
                         ]);
 
