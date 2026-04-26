@@ -231,7 +231,39 @@
     "toast": {
       "load_failed": "Failed to load municipal impact data.",
       "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report."
+      "export_failed": "Failed to export the municipal report.",
+      "templates_load_failed": "Failed to load report templates.",
+      "template_saved": "Report template saved.",
+      "template_save_failed": "Failed to save the report template.",
+      "template_deleted": "Report template deleted.",
+      "template_delete_failed": "Failed to delete the report template."
+    },
+    "templates": {
+      "title": "Saved report templates",
+      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
+      "create": "New template",
+      "select_label": "Report template",
+      "default_policy": "Use workflow policy defaults",
+      "apply": "Apply",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save template",
+      "modal_title": "Create report template",
+      "hour_value_chip": "CHF {{value}}/h",
+      "fields": {
+        "name": "Template name",
+        "description": "Description",
+        "audience": "Audience",
+        "period": "Reporting period",
+        "hour_value": "Hour value override (CHF)",
+        "include_social_value": "Include social value estimate"
+      },
+      "audiences": {
+        "municipality": "Municipality",
+        "canton": "Canton",
+        "cooperative": "Cooperative",
+        "foundation": "Foundation"
+      }
     },
     "cards": {
       "verified_hours": {

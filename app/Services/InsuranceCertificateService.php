@@ -63,7 +63,17 @@ class InsuranceCertificateService
             ->where('insurance_certificates.tenant_id', $tenantId);
 
         if (!empty($filters['status'])) {
-            $query->where('insurance_certificates.status', $filters['status']);
+            // 'pending_review' is a UI-level alias for the union of
+            // pending + submitted — both are pre-verification states a
+            // broker still needs to action. Same semantic as the Vetting
+            // module; without this, a "Pending Review" stat-card click
+            // would only show literal-pending records and hide submitted
+            // certificates the broker still owns.
+            if ($filters['status'] === 'pending_review') {
+                $query->whereIn('insurance_certificates.status', ['pending', 'submitted']);
+            } else {
+                $query->where('insurance_certificates.status', $filters['status']);
+            }
         }
 
         if (!empty($filters['insurance_type'])) {
@@ -135,6 +145,10 @@ class InsuranceCertificateService
             'total' => (int) ($counts->total ?? 0),
             'pending' => (int) ($counts->pending ?? 0),
             'submitted' => (int) ($counts->submitted ?? 0),
+            // pending_review = pending + submitted — pre-verification states
+            // the broker still owns. Mirrors VettingService::getStats and
+            // matches what a "Pending Review" stat card means to a broker.
+            'pending_review' => (int) ($counts->pending ?? 0) + (int) ($counts->submitted ?? 0),
             'verified' => (int) ($counts->verified ?? 0),
             'expired' => (int) ($counts->expired ?? 0),
             'rejected' => (int) ($counts->rejected ?? 0),

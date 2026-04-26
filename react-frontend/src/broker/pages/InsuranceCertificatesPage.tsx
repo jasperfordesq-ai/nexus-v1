@@ -103,8 +103,12 @@ export function InsuranceCertificates() {
   // List state
   // Status filter is mirrored to `?status=` so stat-card deep-links and
   // browser back/forward work correctly.
+  // 'pending_review' is the union of literal-pending + submitted — both
+  // are pre-verification states the broker still owns. Mirrors the
+  // Vetting page's filter shape so the UX is consistent across the
+  // two compliance modules.
   const INSURANCE_STATUSES = [
-    'all', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+    'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
   ] as const;
   type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
   const [searchParams, setSearchParams] = useSearchParams();
@@ -143,6 +147,7 @@ export function InsuranceCertificates() {
 
   // Stats
   const [stats, setStats] = useState<InsuranceStats | null>(null);
+  const [statsError, setStatsError] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
 
   // Broker config (for expiry warning days)
@@ -233,13 +238,19 @@ export function InsuranceCertificates() {
 
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
+    setStatsError(false);
     try {
       const res = await adminInsurance.stats();
       if (res.success && res.data) {
         setStats(res.data as InsuranceStats);
+      } else {
+        // Same lesson as the dashboard / safeguarding / vetting fixes:
+        // a silently-zero "Pending" tile during a DB hiccup hides
+        // certificates that need attention. Surface the failure.
+        setStatsError(true);
       }
     } catch {
-      // Stats are non-critical
+      setStatsError(true);
     } finally {
       setStatsLoading(false);
     }
@@ -648,6 +659,19 @@ export function InsuranceCertificates() {
         }
       />
 
+      {statsError && (
+        <div className="rounded-lg border border-warning-200 bg-warning-50/50 p-3 flex items-start gap-3 mb-4">
+          <ShieldAlert size={20} className="text-warning shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-warning-700">{t('insurance.stats_error_title')}</p>
+            <p className="text-default-600">{t('insurance.stats_error_body')}</p>
+          </div>
+          <Button size="sm" variant="flat" color="warning" onPress={loadStats}>
+            {t('insurance.retry')}
+          </Button>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
@@ -658,8 +682,11 @@ export function InsuranceCertificates() {
           loading={statsLoading}
         />
         <StatCard
-          label={t('insurance.stat_pending')}
-          value={stats?.pending ?? 0}
+          label={t('insurance.stat_pending_review')}
+          // pending_review = pending + submitted (pre-verification states
+          // the broker still owns). Falls back to legacy `pending` for
+          // backwards compat with API responses that pre-date the field.
+          value={stats?.pending_review ?? stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
@@ -705,6 +732,7 @@ export function InsuranceCertificates() {
           size="sm"
         >
           <Tab key="all" title={t('insurance.tab_all')} />
+          <Tab key="pending_review" title={t('insurance.tab_pending_review')} />
           <Tab key="pending" title={t('insurance.tab_pending')} />
           <Tab key="submitted" title={t('insurance.tab_submitted')} />
           <Tab key="verified" title={t('insurance.tab_verified')} />

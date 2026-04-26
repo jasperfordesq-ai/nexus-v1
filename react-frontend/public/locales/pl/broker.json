@@ -785,7 +785,12 @@
     "label_certificate_file": "Certificate File",
     "label_created": "Created",
     "label_verified_at": "Verified at",
-    "label_verified_by": "Verified by"
+    "label_verified_by": "Verified by",
+    "stat_pending_review": "Pending Review",
+    "tab_pending_review": "Pending Review",
+    "stats_error_title": "Insurance stats couldn't be loaded",
+    "stats_error_body": "The counters above reflect the last successful load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "archives": {
     "title": "Review Archive",

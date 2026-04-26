@@ -1711,10 +1711,22 @@ export interface InsuranceCertificate {
 
 export interface InsuranceStats {
   total: number;
+  /** Records with literal status='pending'. */
   pending: number;
+  /** Records with literal status='submitted' (sent for verification). */
+  submitted?: number;
+  /**
+   * pending + submitted — pre-verification states the broker still owns.
+   * This is what the "Pending Review" stat card and the dashboard's
+   * insurance count (if added) should mean. Legacy `pending` field is
+   * kept for backwards compatibility with pre-update API responses.
+   */
+  pending_review?: number;
   verified: number;
   expired: number;
   expiring_soon: number;
+  rejected?: number;
+  revoked?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
