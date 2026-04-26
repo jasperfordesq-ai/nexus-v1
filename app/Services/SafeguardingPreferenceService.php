@@ -437,7 +437,7 @@ class SafeguardingPreferenceService
                         'user_id'   => $staff->id,
                         'type'      => 'safeguarding_flag',
                         'message'   => $bellMessage,
-                        'link'      => "/admin/safeguarding?user={$userId}",
+                        'link'      => "/broker/safeguarding?user={$userId}",
                         'is_read'   => false,
                     ]);
                 });

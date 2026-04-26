@@ -737,7 +737,7 @@ class SafeguardingService
                     'user_id' => $dlpUserId,
                     'type' => 'safeguarding_assignment',
                     'message' => __('emails_misc.safeguarding.dlp_assigned_bell', ['incident_id' => $incidentId]),
-                    'link' => '/admin/safeguarding',
+                    'link' => '/broker/safeguarding',
                     'is_read' => false,
                 ]);
             } catch (\Throwable $notifError) {
@@ -772,7 +772,7 @@ class SafeguardingService
                         ], __('emails_misc.safeguarding.info_card_incident_details'))
                         ->paragraph(__('emails_misc.safeguarding.dlp_assigned_body'))
                         ->paragraph(__('emails_misc.safeguarding.dlp_assigned_audit_note'))
-                        ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                        ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
                         ->render();
 
                     $emailService = app(\App\Services\EmailService::class);
@@ -828,7 +828,7 @@ class SafeguardingService
                     'user_id' => $staff->id,
                     'type' => 'safeguarding_flag',
                     'message' => $message,
-                    'link' => '/admin/safeguarding',
+                    'link' => '/broker/safeguarding',
                     'is_read' => false,
                 ]);
 
@@ -854,7 +854,7 @@ class SafeguardingService
                             ], __('emails_misc.safeguarding.info_card_incident_details'))
                             ->paragraph(__('emails_misc.safeguarding.incident_reported_review'))
                             ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
-                            ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                            ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
                             ->render();
 
                         $emailService = app(\App\Services\EmailService::class);
@@ -917,7 +917,7 @@ class SafeguardingService
                     'user_id' => $dlpUserId,
                     'type' => 'safeguarding_assignment',
                     'message' => __('emails_misc.safeguarding.incident_status_dlp_bell', ['incident_id' => $incidentId, 'status' => $label]),
-                    'link' => '/admin/safeguarding',
+                    'link' => '/broker/safeguarding',
                     'is_read' => false,
                 ]);
             }
@@ -981,7 +981,7 @@ class SafeguardingService
                     ], __('emails_misc.safeguarding.info_card_status_update'))
                     ->paragraph(__('emails_misc.safeguarding.incident_updated_review'))
                     ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
-                    ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                    ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
                     ->render();
 
                 $emailService = app(\App\Services\EmailService::class);

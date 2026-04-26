@@ -32,7 +32,10 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
             $baseUrl    = TenantContext::getFrontendUrl();
             $basePath   = TenantContext::getSlugPrefix();
-            $profileUrl = $baseUrl . $basePath . '/admin/members/' . $user->id;
+            // Recipients include broker/coordinator roles (line 43) who can't
+            // hit /admin/* routes — they're redirected to /dashboard. Use the
+            // user-facing /profile/{id} route which works for everyone.
+            $profileUrl = $baseUrl . $basePath . '/profile/' . $user->id;
 
             $newUserName  = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''))
                 ?: ($user->name ?? 'Unknown');
@@ -63,7 +66,10 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                         $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                         $bellContent = __('emails_misc.admin_notify.new_user_bell', ['name' => $newUserName]);
-                        Notification::createNotification((int) $admin->id, $bellContent, '/admin/members', 'new_user_registered');
+                        // Bell goes to broker/coordinator recipients too (line 43).
+                        // Use the broker panel members list which all admin-tier
+                        // and broker-tier roles can access.
+                        Notification::createNotification((int) $admin->id, $bellContent, '/broker/members', 'new_user_registered');
 
                         $subject = __('emails_misc.admin_notify.new_user_subject', ['community' => $tenantName]);
 

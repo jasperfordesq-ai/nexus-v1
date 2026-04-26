@@ -287,7 +287,7 @@ class SafeguardingReviewFlagsCommand extends Command
                 ->paragraph(__('safeguarding.review.escalation_body', ['name' => $safeMemberName]))
                 ->button(
                     __('safeguarding.review.escalation_cta'),
-                    EmailTemplateBuilder::tenantUrl('/admin/safeguarding')
+                    EmailTemplateBuilder::tenantUrl('/broker/safeguarding')
                 )
                 ->render();
 
@@ -299,7 +299,7 @@ class SafeguardingReviewFlagsCommand extends Command
                         'user_id' => $admin->id,
                         'type' => 'safeguarding_review_escalation',
                         'message' => __('safeguarding.review.escalation_title') . ': ' . $userBatch['name'],
-                        'link' => '/admin/safeguarding',
+                        'link' => '/broker/safeguarding',
                         'is_read' => false,
                     ]);
                 } catch (\Throwable $e) {

@@ -1015,12 +1015,19 @@ HTML;
                 $exchangeId = $data['exchange_id'] ?? 0;
                 return "/exchanges/{$exchangeId}";
             case 'exchange_pending_broker':
+                // Universal user-facing route: works for the requester (member),
+                // brokers, and admins alike. Pre-broker-port code linked to
+                // /admin/broker-controls/exchanges/{id} which 403'd brokers and
+                // 404'd members.
                 $exchangeId = $data['exchange_id'] ?? 0;
-                return "/admin/broker-controls/exchanges/{$exchangeId}";
+                return "/exchanges/{$exchangeId}";
             case 'exchange_request_declined':
                 return "/exchanges";
             case 'listing_risk_tagged':
-                return "/admin/broker-controls/risk-tags";
+                // Sent to admins/brokers/coordinators (notifyAdmins query).
+                // Brokers don't have admin-route access, so point at the
+                // broker panel which all three roles can reach.
+                return "/broker/risk-tags";
             case 'credit_received':
                 return "/wallet";
             default:

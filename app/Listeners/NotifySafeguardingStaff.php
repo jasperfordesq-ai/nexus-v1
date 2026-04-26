@@ -77,7 +77,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                 return;
             }
 
-            $adminLink = "/admin/safeguarding?user={$flaggedUserId}";
+            $adminLink = "/broker/safeguarding?user={$flaggedUserId}";
 
             foreach ($staffUsers as $staff) {
                 // Each staff member sees bell copy + email in THEIR language.

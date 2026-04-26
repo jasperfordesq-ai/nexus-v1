@@ -149,7 +149,11 @@ class BrokerMessageVisibilityService
                 ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                 ->get();
 
-            $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/admin/broker-controls/messages';
+            // Recipients include role='broker', who can't access /admin/* routes
+            // (BrokerRoute redirects them to /dashboard). Use the broker panel
+            // path which all four notified roles (admin, tenant_admin, broker,
+            // super_admin) can reach.
+            $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/broker/messages';
 
             foreach ($brokerUsers as $broker) {
                 if ((int) $broker->id === (int) $message->sender_id) {
@@ -162,7 +166,7 @@ class BrokerMessageVisibilityService
                         'tenant_id' => $tenantId,
                         'user_id'   => $broker->id,
                         'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
-                        'link'      => '/admin/broker-controls/messages',
+                        'link'      => '/broker/messages',
                         'type'      => 'broker_review',
                     ]);
 
