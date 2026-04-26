@@ -35,3 +35,30 @@ To make this layer enforceable on GitHub, enable branch protection or a reposito
 - do not allow bypassing the rules unless deliberately needed by the repository owner.
 
 GitHub repository settings, not files in the repository, control whether failed checks and Code Owner reviews block merging. The workflow provides the check; the repository ruleset makes it mandatory.
+
+## Applying The Ruleset
+
+After these files are pushed to GitHub, run:
+
+```bash
+gh auth login -h github.com
+node scripts/configure-contributor-terms-ruleset.mjs --repo jasperfordesq-ai/nexus-v1
+```
+
+The script creates or updates a repository ruleset named `Project NEXUS contributor terms gate`. It protects `main` by requiring:
+
+- pull requests before merging;
+- one approving review;
+- Code Owner review;
+- approval from someone other than the last pusher;
+- all review threads resolved;
+- the `Contributor Terms Acceptance` status check;
+- branch up to date with `main` before merge;
+- no branch deletion;
+- no force-pushes.
+
+Use `--dry-run` to inspect the API payload without changing GitHub:
+
+```bash
+node scripts/configure-contributor-terms-ruleset.mjs --repo jasperfordesq-ai/nexus-v1 --dry-run
+```
