@@ -1,4 +1,9 @@
 {
+  "community_not_found": "Community not found",
+  "community_not_found_message": "No community found at '{{slug}}'.",
+  "community_not_found_detail": "This timebank may have moved, been renamed, or may not exist yet.",
+  "go_home": "Go home",
+  "find_community": "Find a community",
   "admin": {
     "federation": {
       "unknown_key": "Unknown key: :key",

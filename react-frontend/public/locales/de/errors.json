@@ -1,33 +1,38 @@
 {
+  "community_not_found": "Gemeinschaft nicht gefunden",
+  "community_not_found_message": "Keine Gemeinschaft unter '{{slug}}' gefunden.",
+  "community_not_found_detail": "Diese Zeitbank wurde möglicherweise verschoben, umbenannt oder existiert noch nicht.",
+  "go_home": "Zur Startseite",
+  "find_community": "Gemeinschaft suchen",
   "admin": {
     "federation": {
-      "unknown_key": "Unknown key: :key",
-      "must_be_array": ":field must be an array",
-      "failed_to_load_partner": "Failed to load partner"
+      "unknown_key": "Unbekannter Schlüssel: :key",
+      "must_be_array": ":field muss ein Array sein",
+      "failed_to_load_partner": "Partner konnte nicht geladen werden"
     }
   },
   "validation": {
-    "badge_keys_must_be_array": "badge_keys must be an array",
-    "member_ids_must_be_array": "member_ids must be an array"
+    "badge_keys_must_be_array": "badge_keys muss ein Array sein",
+    "member_ids_must_be_array": "member_ids muss ein Array sein"
   },
   "group_files": {
-    "listing_failed": "Error listing files",
-    "upload_failed": "Upload failed",
-    "download_failed": "Download failed",
-    "delete_failed": "Delete failed"
+    "listing_failed": "Fehler beim Auflisten der Dateien",
+    "upload_failed": "Hochladen fehlgeschlagen",
+    "download_failed": "Herunterladen fehlgeschlagen",
+    "delete_failed": "Löschen fehlgeschlagen"
   },
   "group_invites": {
-    "listing_failed": "Error listing invites",
-    "create_failed": "Error creating invite link",
-    "send_failed": "Error sending invites",
-    "revoke_failed": "Error revoking invite",
-    "accept_failed": "Error accepting invite"
+    "listing_failed": "Fehler beim Auflisten der Einladungen",
+    "create_failed": "Fehler beim Erstellen des Einladungslinks",
+    "send_failed": "Fehler beim Senden der Einladungen",
+    "revoke_failed": "Fehler beim Widerrufen der Einladung",
+    "accept_failed": "Fehler beim Annehmen der Einladung"
   },
   "generic": {
-    "export_failed": "Export failed",
-    "update_failed": "Failed to update"
+    "export_failed": "Export fehlgeschlagen",
+    "update_failed": "Aktualisierung fehlgeschlagen"
   },
   "federation": {
-    "feature_disabled": "Federation is not enabled for this community"
+    "feature_disabled": "Föderation ist für diese Gemeinschaft nicht aktiviert"
   }
 }

@@ -29,11 +29,11 @@
     "volunteering": "Freiwilligenarbeit",
     "blogs": "Blog",
     "discussions": "Diskussionen",
-    "following": "Following",
-    "saved": "Saved",
-    "clear": "Clear feed filters",
-    "more": "More",
-    "select": "Select feed filter"
+    "following": "Folge ich",
+    "saved": "Gespeichert",
+    "clear": "Feed-Filter zurücksetzen",
+    "more": "Mehr",
+    "select": "Feed-Filter auswählen"
   },
   "report": {
     "title": "Beitrag melden",
@@ -54,17 +54,17 @@
     "deleted": "Beitrag gelöscht",
     "delete_failed": "Beitrag konnte nicht gelöscht werden",
     "vote_failed": "Abstimmung konnte nicht abgegeben werden",
-    "not_interested": "We'll show you less like this",
-    "post_updated": "Post updated",
-    "update_failed": "Failed to update post",
-    "post_shared": "Beitrag in deinem Feed geteilt",
+    "not_interested": "Wir werden Ihnen weniger davon zeigen",
+    "post_updated": "Beitrag aktualisiert",
+    "update_failed": "Beitrag konnte nicht aktualisiert werden",
+    "post_shared": "Beitrag in Ihrem Feed geteilt",
     "share_removed": "Teilen entfernt",
     "share_failed": "Beitrag konnte nicht geteilt werden",
-    "like_failed": "Failed to update like"
+    "like_failed": "„Gefällt mir“ konnte nicht aktualisiert werden"
   },
   "realtime": {
-    "new_posts_one": "1 neuer Beitrag",
-    "new_posts_other": "{{count}} neue Beiträge"
+    "new_posts_one": "1 neuer Beitrag — Tippen, um anzuzeigen",
+    "new_posts_other": "{{count}} neue Beiträge — Tippen, um anzuzeigen"
   },
   "compose": {
     "create_title": "{{type}} erstellen",
@@ -200,16 +200,16 @@
     "create_post": "Beitrag erstellen",
     "alt_text_placeholder": "Dieses Bild beschreiben...",
     "alt_text_label": "Alternativtext für Bild",
-    "media_rejected": "{{count}} Datei(en) übersprungen (falscher Typ oder zu groß)",
+    "media_rejected": "{{count}} Datei(en) übersprungen (falscher Typ oder zu gross)",
     "media_compression_failed": "{{count}} Bild(er) konnten nicht verarbeitet werden",
     "media_upload_error": "Bilder konnten nicht verarbeitet werden",
     "sdg_selected_one": "{{count}} Ziel ausgewählt",
     "sdg_selected_other": "{{count}} Ziele ausgewählt",
-    "save_changes": "Save",
+    "save_changes": "Speichern",
     "placeholder_hours": "1",
-    "content_required": "Post content cannot be empty.",
-    "content_too_long": "Post is too long (max {{max}} characters).",
-    "groups_load_error": "Failed to load groups."
+    "content_required": "Der Beitragsinhalt darf nicht leer sein.",
+    "content_too_long": "Der Beitrag ist zu lang (max. {{max}} Zeichen).",
+    "groups_load_error": "Gruppen konnten nicht geladen werden."
   },
   "card": {
     "edited": "bearbeitet",
@@ -278,43 +278,43 @@
     "detail_challenge": "Herausforderung ansehen",
     "detail_volunteer": "Möglichkeit ansehen",
     "detail_blog": "Artikel lesen",
-    "scheduled": "Scheduled",
-    "edit": "Edit",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "delete_comment_confirm": "Delete this comment?",
-    "delete_comment_title": "Delete Comment",
-    "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone.",
-    "comments_load_failed": "Failed to load comments.",
-    "mute_user_label": "Mute {{name}}",
+    "scheduled": "Geplant",
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "delete_comment_confirm": "Diesen Kommentar löschen?",
+    "delete_comment_title": "Kommentar löschen",
+    "delete_comment_body": "Möchten Sie diesen Kommentar wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "comments_load_failed": "Kommentare konnten nicht geladen werden.",
+    "mute_user_label": "{{name}} stummschalten",
     "event": {
-      "starts_in_minutes": "Starts in {{minutes}}m",
-      "starts_in_hours": "Starts in {{hours}}h"
+      "starts_in_minutes": "Beginnt in {{minutes}} Min.",
+      "starts_in_hours": "Beginnt in {{hours}} Std."
     },
     "job": {
-      "type_paid": "Paid",
-      "type_volunteer": "Volunteer",
-      "type_timebank": "Time Credits",
-      "commitment_full_time": "Full-time",
-      "commitment_part_time": "Part-time",
-      "commitment_contract": "Contract",
-      "commitment_flexible": "Flexible"
+      "type_paid": "Bezahlt",
+      "type_volunteer": "Freiwillig",
+      "type_timebank": "Zeitgutschriften",
+      "commitment_full_time": "Vollzeit",
+      "commitment_part_time": "Teilzeit",
+      "commitment_contract": "Auftrag",
+      "commitment_flexible": "Flexibel"
     },
     "volunteer": {
-      "credits_offered": "{{count}} time credits"
+      "credits_offered": "{{count}} Zeitgutschriften"
     },
     "challenge": {
-      "closing_soon": "Closing soon",
-      "closes_on": "Closes {{date}}",
-      "ideas_count": "{{count}} ideas"
+      "closing_soon": "Schliesst bald",
+      "closes_on": "Schliesst am {{date}}",
+      "ideas_count": "{{count}} Ideen"
     },
     "review": {
-      "rating_aria": "{{rating}} out of 5 stars"
+      "rating_aria": "{{rating}} von 5 Sternen"
     },
     "milestone": {
-      "badge_unlocked": "Badge unlocked",
-      "level_reached": "Level reached"
+      "badge_unlocked": "Abzeichen freigeschaltet",
+      "level_reached": "Stufe erreicht"
     }
   },
   "hashtag": {
@@ -372,13 +372,13 @@
     "dm_hint": "Gib mindestens 2 Zeichen ein, um zu suchen",
     "dm_sent": "Beitrag geteilt mit {{name}}",
     "dm_failed": "Nachricht konnte nicht gesendet werden",
-    "repost": "Repost",
-    "quote_submit": "Post",
-    "dm_sent_label": "Sent",
-    "dm_send": "Send",
-    "dm_done": "Done",
-    "shared_by_text": "shared this",
-    "cannot_share_own_post": "You cannot share your own post"
+    "repost": "Erneut posten",
+    "quote_submit": "Posten",
+    "dm_sent_label": "Gesendet",
+    "dm_send": "Senden",
+    "dm_done": "Fertig",
+    "shared_by_text": "hat dies geteilt",
+    "cannot_share_own_post": "Sie können Ihren eigenen Beitrag nicht teilen"
   },
   "trending": {
     "title": "Im Trend",
@@ -483,7 +483,7 @@
   },
   "lightbox": {
     "aria_label": "Bildansicht",
-    "close": "Bildansicht schließen",
+    "close": "Bildansicht schliessen",
     "counter": "{{current}} von {{total}}",
     "download": "Bild herunterladen"
   },
@@ -504,69 +504,69 @@
     "too_large": "Video muss kleiner als {{size}}MB sein",
     "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
     "remove": "Video entfernen",
-    "mute": "Mute",
-    "unmute": "Unmute"
+    "mute": "Stummschalten",
+    "unmute": "Stummschaltung aufheben"
   },
   "why_shown": {
     "label": "Warum sehe ich das?",
-    "title": "Warum du das siehst",
-    "default_reason": "Ranked for you based on your activity",
-    "popular": "Beliebt in deiner Gemeinschaft",
-    "some_engagement": "Engagement erhalten",
+    "title": "Warum Sie das sehen",
+    "default_reason": "Für Sie aufgrund Ihrer Aktivität gerankt",
+    "popular": "Beliebt in Ihrer Gemeinschaft",
+    "some_engagement": "Erhält Engagement",
     "community_content": "Gemeinschaftsaktivität",
     "fresh": "Kürzlich gepostet",
     "has_media": "Enthält Fotos oder Videos",
-    "reactions": "Vielfältige Reaktionen erhalten",
-    "from_connection": "Von jemandem, mit dem du interagierst",
+    "reactions": "Erhält vielfältige Reaktionen",
+    "from_connection": "Von jemandem, mit dem Sie interagieren",
     "trending": "Momentan im Trend",
     "quality_content": "Qualitativ hochwertiger Inhalt",
     "active_discussion": "Aktive Diskussion",
     "frequently_saved": "Häufig von anderen gespeichert"
   },
   "analytics": {
-    "title": "Beitragsanalysen",
+    "title": "Beitragsanalyse",
     "reactions_breakdown": "Reaktionsübersicht",
-    "views": "Views",
-    "likes": "Likes",
-    "comments": "Comments",
-    "shares": "Shares",
-    "reach": "Reach",
-    "loading": "Loading analytics...",
-    "load_failed": "Failed to load analytics."
+    "views": "Aufrufe",
+    "likes": "Gefällt-mir-Angaben",
+    "comments": "Kommentare",
+    "shares": "Geteilt",
+    "reach": "Reichweite",
+    "loading": "Analysen werden geladen...",
+    "load_failed": "Analysen konnten nicht geladen werden."
   },
-  "failed_to_load_analytics": "Failed to load analytics",
+  "failed_to_load_analytics": "Analysen konnten nicht geladen werden",
   "suggestions": {
-    "title": "People You May Know",
-    "see_all": "See All",
-    "mutual": "{{count}} mutual connections",
-    "connect": "Connect",
-    "connect_sent": "Connection request sent!",
-    "connect_failed": "Failed to send request",
-    "pending": "Pending",
-    "dismiss": "Dismiss",
-    "load_failed": "Failed to load suggestions"
+    "title": "Personen, die Sie kennen könnten",
+    "see_all": "Alle anzeigen",
+    "mutual": "{{count}} gemeinsame Verbindungen",
+    "connect": "Verbinden",
+    "connect_sent": "Verbindungsanfrage gesendet!",
+    "connect_failed": "Anfrage konnte nicht gesendet werden",
+    "pending": "Ausstehend",
+    "dismiss": "Verwerfen",
+    "load_failed": "Vorschläge konnten nicht geladen werden"
   },
   "moderation": {
-    "unauthorized": "You do not have permission to perform this action."
+    "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
   },
   "poll": {
-    "load_failed": "Failed to load poll data.",
-    "expired": "This poll has ended.",
-    "expiry_past": "Poll expiry date must be in the future.",
-    "min_options_hint": "At least 2 options are required.",
-    "closed": "Closed",
-    "closes_hours": "Closes in {{hours}}h",
-    "closes_days": "Closes in {{days}}d",
-    "closes_minutes": "Closes in {{minutes}}m",
+    "load_failed": "Umfragedaten konnten nicht geladen werden.",
+    "expired": "Diese Umfrage ist beendet.",
+    "expiry_past": "Das Ablaufdatum der Umfrage muss in der Zukunft liegen.",
+    "min_options_hint": "Es sind mindestens 2 Optionen erforderlich.",
+    "closed": "Geschlossen",
+    "closes_hours": "Schliesst in {{hours}} Std.",
+    "closes_days": "Schliesst in {{days}} T.",
+    "closes_minutes": "Schliesst in {{minutes}} Min.",
     "live": "Live",
-    "view_full": "View full poll",
-    "vote_to_see_results": "Vote to see results",
-    "results_hidden_until_close": "Results revealed when poll closes",
-    "your_vote": "Your vote"
+    "view_full": "Vollständige Umfrage anzeigen",
+    "vote_to_see_results": "Abstimmen, um Ergebnisse zu sehen",
+    "results_hidden_until_close": "Ergebnisse werden bei Schliessung der Umfrage offengelegt",
+    "your_vote": "Ihre Stimme"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "Sie sind auf dem neuesten Stand!"
   },
-  "you": "You",
-  "items_loaded": "{{count}} posts"
+  "you": "Sie",
+  "items_loaded": "{{count}} Beiträge"
 }

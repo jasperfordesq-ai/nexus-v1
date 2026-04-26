@@ -13,7 +13,7 @@
     "organisations": "Organisationen",
     "resources": "Ressourcen",
     "exchanges": "Austausche",
-    "group_exchanges": "Gruppenaustaüsche",
+    "group_exchanges": "Gruppenaustausche",
     "wallet": "Zeitkonto",
     "achievements": "Erfolge",
     "goals": "Ziele",
@@ -49,9 +49,9 @@
     "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
     "timebanking": "Zeitbank",
     "explore": "Entdecken",
-    "saved": "Saved",
-    "marketplace": "Marketplace",
-    "verify_identity": "Verify Your Identity"
+    "saved": "Gespeichert",
+    "marketplace": "Marktplatz",
+    "verify_identity": "Identität verifizieren"
   },
   "nav_desc": {
     "feed": "Community-Feed",
@@ -193,7 +193,7 @@
     "switch_to_dark": "Zum dunklen Modus wechseln",
     "skip_to_content": "Zum Hauptinhalt springen",
     "menu_opened": "Navigationsmenü geöffnet",
-    "close": "Schließen",
+    "close": "Schliessen",
     "scroll_to_top": "Nach oben scrollen",
     "breadcrumb": "Brotkrümel"
   },
@@ -262,34 +262,34 @@
     "fallback_name": "Mitglied",
     "load_failed": "Mitglieder konnten nicht geladen werden",
     "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden",
-    "near_me": "Near me",
-    "near_me_no_location": "Set your location in your profile to use Near me",
+    "near_me": "In meiner Nähe",
+    "near_me_no_location": "Legen Sie Ihren Standort in Ihrem Profil fest, um die Funktion „In meiner Nähe“ zu nutzen",
     "radius_label": "Radius",
-    "sort_communityrank": "Community Rank",
-    "avatar_alt": "{{name}} avatar",
-    "joined_date": "Joined {{date}}",
-    "showcased_badges": "Showcased badges",
-    "verified_member": "Verified member",
-    "community_rank_score_tooltip": "CommunityRank score",
-    "rating_aria": "Rating: {{rating}} out of 5",
-    "hours_exchanged_aria": "{{count}} hours exchanged",
+    "sort_communityrank": "Community-Rang",
+    "avatar_alt": "Profilbild von {{name}}",
+    "joined_date": "Beigetreten am {{date}}",
+    "showcased_badges": "Hervorgehobene Abzeichen",
+    "verified_member": "Verifiziertes Mitglied",
+    "community_rank_score_tooltip": "Community-Rang-Punktzahl",
+    "rating_aria": "Bewertung: {{rating}} von 5",
+    "hours_exchanged_aria": "{{count}} Stunden ausgetauscht",
     "my_profile": "Mein Profil",
     "load_more_count": "Mehr laden ({{remaining}} verbleibend)",
-    "quick_filters": "Member filters",
-    "applied_filters": "Active filters",
-    "search_filter": "Search: {{query}}",
-    "nearby_filter": "Within {{radius}} km",
-    "clear_search": "Clear search",
-    "results_count": "{{count}} members shown",
-    "profile_aria": "View {{name}}'s profile",
+    "quick_filters": "Mitgliederfilter",
+    "applied_filters": "Aktive Filter",
+    "search_filter": "Suche: {{query}}",
+    "nearby_filter": "Innerhalb von {{radius}} km",
+    "clear_search": "Suche zurücksetzen",
+    "results_count": "{{count}} Mitglieder angezeigt",
+    "profile_aria": "Profil von {{name}} anzeigen",
     "distance_km": "{{distance}} km",
     "location_distance": "{{location}} · {{distance}}",
-    "hours_short": "{{count}}h"
+    "hours_short": "{{count}} Std."
   },
   "update_banner": {
     "message": "Eine neue Version ist verfügbar.",
     "update_now": "Jetzt aktualisieren",
-    "dismiss": "Aktualisierungsbenachrichtigung schließen"
+    "dismiss": "Aktualisierungsbenachrichtigung schliessen"
   },
   "error_boundary": {
     "title": "Etwas ist schiefgelaufen",
@@ -300,7 +300,7 @@
   },
   "quick_create": {
     "title": "Neu erstellen",
-    "close_aria": "Erstellungsmenü schließen",
+    "close_aria": "Erstellungsmenü schliessen",
     "new_listing": "Neues Inserat",
     "new_listing_desc": "Einen Service anbieten oder anfragen",
     "new_event": "Neue Veranstaltung",
@@ -327,7 +327,7 @@
     "aria_label": "Entwicklungsstatus",
     "dev_notice": "Entwicklerhinweis",
     "status": "{{stage}}",
-    "summary": "New and improving fast.",
+    "summary": "Neu und sich schnell verbessernd.",
     "read_more": "Mehr lesen"
   },
   "aria": {
@@ -354,7 +354,7 @@
     "community_navigation": "Community-Navigation",
     "create_actions": "Erstellen-Aktionen",
     "user_actions": "Benutzeraktionen",
-    "close_menu": "Menü schließen",
+    "close_menu": "Menü schliessen",
     "open_search": "Suche öffnen",
     "mobile_navigation": "Mobile Navigation",
     "engage_navigation": "Engagement-Navigation",
@@ -406,7 +406,7 @@
       "expert": "Experte"
     },
     "aria_clear_search": "Suche löschen",
-    "aria_close_members_list": "Mitgliederliste schließen",
+    "aria_close_members_list": "Mitgliederliste schliessen",
     "category_optional": "Kategorie (optional)",
     "proficiency_level": "Kompetenzstufe"
   },
@@ -420,11 +420,11 @@
   },
   "toast": {
     "aria_notifications": "Benachrichtigungen",
-    "aria_dismiss_notification": "Benachrichtigung schließen"
+    "aria_dismiss_notification": "Benachrichtigung schliessen"
   },
-  "verified": "Verified",
-  "map_unavailable": "Map view is not available",
-  "identity_not_verified": "Identity not verified",
+  "verified": "Verifiziert",
+  "map_unavailable": "Kartenansicht ist nicht verfügbar",
+  "identity_not_verified": "Identität nicht verifiziert",
   "verification": {
     "not_id_verified": "Nicht ID-verifiziert"
   },
@@ -434,7 +434,7 @@
     },
     "members": {
       "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus.",
-      "title": "Members"
+      "title": "Mitglieder"
     }
   },
   "radius_5": "5 km",
@@ -442,11 +442,11 @@
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
-  "go_back": "Go back",
-  "checking_authentication": "Checking authentication...",
-  "verification_status": "Verification Status",
-  "verify_identity": "Verify Identity",
-  "level_short": "Lv. {{level}}",
-  "cancel": "Cancel",
-  "save": "Save"
+  "go_back": "Zurück",
+  "checking_authentication": "Authentifizierung wird geprüft...",
+  "verification_status": "Verifizierungsstatus",
+  "verify_identity": "Identität verifizieren",
+  "level_short": "St. {{level}}",
+  "cancel": "Abbrechen",
+  "save": "Speichern"
 }

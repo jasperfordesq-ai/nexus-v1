@@ -61,7 +61,7 @@
     "submit_failed": "Einreichung fehlgeschlagen",
     "try_again": "Bitte versuchen Sie es erneut",
     "submit_error_desc": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "recipient_load_failed": "Could not load recipient. Please search manually."
+    "recipient_load_failed": "Empfänger konnte nicht geladen werden. Bitte suchen Sie manuell."
   },
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",
@@ -79,7 +79,7 @@
   "donate_message": "Nachricht (optional)",
   "donate_confirm": "Spenden",
   "donate_success": "Spende gesendet!",
-  "donate_success_desc": "Vielen Dank für Ihre Großzügigkeit.",
+  "donate_success_desc": "Vielen Dank für Ihre Grosszügigkeit.",
   "donate_failed": "Spende fehlgeschlagen",
   "donate_community_fund": "Gemeinschaftsfonds",
   "donate_community_desc": "Unterstützen Sie den Zeitkreditpool Ihrer Gemeinschaft",
@@ -91,7 +91,7 @@
   "donate_message_placeholder": "Fügen Sie Ihrer Spende eine Notiz hinzu...",
   "donate_balance_info": "Ihr Guthaben: {{balance}} Stunden",
   "donate_invalid_amount": "Ungültiger Betrag",
-  "donate_invalid_amount_desc": "Bitte geben Sie einen Betrag größer als 0 ein",
+  "donate_invalid_amount_desc": "Bitte geben Sie einen Betrag grösser als 0 ein",
   "donate_insufficient": "Unzureichendes Guthaben",
   "donate_insufficient_desc": "Sie haben nicht genügend Kredite",
   "donate_recipient_required": "Empfänger erforderlich",
@@ -102,7 +102,7 @@
   "community_fund_desc": "Gemeinsamer Zeitkreditpool",
   "community_fund_hours": "Stunden verfügbar",
   "community_fund_deposited": "Eingezahlt",
-  "community_fund_withdrawn": "Zurückgezogen",
+  "community_fund_withdrawn": "Entnommen",
   "rating": {
     "title": "Bewerten Sie Ihren Tausch",
     "prompt": "Wie war Ihr Tausch?",
@@ -135,9 +135,9 @@
   "description_placeholder": "Wofür ist diese Überweisung?",
   "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
   "validation": {
-    "select_recipient": "Please select a recipient",
-    "valid_amount": "Please enter a valid amount",
-    "insufficient_balance": "Insufficient balance",
-    "max_transfer": "Maximum transfer is {{max}} hours"
+    "select_recipient": "Bitte wählen Sie einen Empfänger aus",
+    "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",
+    "insufficient_balance": "Unzureichendes Guthaben",
+    "max_transfer": "Maximale Überweisung beträgt {{max}} Stunden"
   }
 }
