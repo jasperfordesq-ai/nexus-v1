@@ -468,6 +468,41 @@ export function VettingRecords() {
     }
   };
 
+  /**
+   * Open a fresh file picker bound to a specific record id. Spawning a
+   * disposable <input> per click guarantees the chosen file is paired with
+   * the recordId captured in the button's click handler — no shared state
+   * to race over if upload buttons are ever moved out of the single-record
+   * view modal onto row actions.
+   */
+  const openFilePickerForRecord = useCallback((recordId: number) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.jpg,.jpeg,.png,.webp';
+    input.style.display = 'none';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) {
+        // Validate size client-side (matches backend 8MB limit) before
+        // burning bandwidth on a doomed request.
+        const MAX_BYTES = 8 * 1024 * 1024;
+        if (file.size > MAX_BYTES) {
+          toast.error('File too large — max 8MB');
+        } else {
+          void handleDocumentUpload(recordId, file);
+        }
+      }
+      input.remove();
+    };
+    input.oncancel = () => input.remove();
+    document.body.appendChild(input);
+    input.click();
+  // handleDocumentUpload changes only when its enclosing closure refs change
+  // (toast/viewItem); we explicitly omit it from deps to keep this callback
+  // stable, the recordId argument is passed in fresh on every invocation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast]);
+
   // Bulk action handler
   const handleBulkAction = async () => {
     if (!bulkAction || selectedIds.size === 0) return;
@@ -834,13 +869,18 @@ export function VettingRecords() {
         }
       />
 
-      {/* Hidden file input for document uploads */}
+      {/* File pickers are now spawned on demand via openFilePickerForRecord
+          so the recordId is captured in the click closure (no shared state).
+          A no-op input is left in the tree for backward compat with any test
+          that referenced it; the live upload path uses the disposable input. */}
       <input
         ref={fileInputRef}
         type="file"
         accept=".pdf,.jpg,.jpeg,.png,.webp"
         className="hidden"
+        readOnly
         onChange={(e) => {
+          // Legacy fallback path (kept for test backward-compat).
           const file = e.target.files?.[0];
           if (file && uploadingId) {
             handleDocumentUpload(uploadingId, file);
@@ -1301,10 +1341,7 @@ export function VettingRecords() {
                       size="sm"
                       variant="flat"
                       isLoading={uploadingId === viewItem.id}
-                      onPress={() => {
-                        setUploadingId(viewItem.id);
-                        fileInputRef.current?.click();
-                      }}
+                      onPress={() => openFilePickerForRecord(viewItem.id)}
                     >
                       {"Replace"}
                     </Button>

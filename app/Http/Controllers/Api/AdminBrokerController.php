@@ -46,14 +46,25 @@ class AdminBrokerController extends BaseApiController
     // contains literal strings assembled by this controller, not raw request data.
     // ORDER BY columns are validated against explicit whitelists before use.
 
+    /**
+     * Platform-level super admin check — used to gate cross-tenant access via
+     * `?tenant_id=` query overrides on the broker dashboard, exchanges,
+     * messages, etc.
+     *
+     * IMPORTANT: this MUST NOT include `is_tenant_super_admin`. A
+     * tenant-super-admin is scoped to their own tenant by design — letting
+     * them pass `?tenant_id=N` to read another tenant's broker data is a
+     * cross-tenant data-leak. Only true platform-level admins
+     * (role=super_admin/god or is_super_admin flag) get the override.
+     */
     private function isSuperAdmin(): bool
     {
         $user = $this->resolveUserObject();
         $role = $user->role ?? 'member';
-        if (in_array($role, ['super_admin', 'god'])) {
+        if (in_array($role, ['super_admin', 'god'], true)) {
             return true;
         }
-        return ($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false);
+        return (bool) ($user->is_super_admin ?? false);
     }
 
     private function resolveUserObject(): object

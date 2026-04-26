@@ -991,10 +991,10 @@ Route::post('/v2/admin/users/badges/recheck-all', [\App\Http\Controllers\Api\Adm
 Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\AdminUsersController::class, 'addBadge']);
 Route::delete('/v2/admin/users/{id}/badges/{badgeId}', [\App\Http\Controllers\Api\AdminUsersController::class, 'removeBadge']);
 // impersonate, super-admin promotion — moved to super-admin middleware group (see below)
-Route::post('/v2/admin/users/{id}/badges/recheck', [\App\Http\Controllers\Api\AdminUsersController::class, 'recheckBadges']);
-Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents']);
-Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword']);
-Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset']);
+Route::post('/v2/admin/users/{id}/badges/recheck', [\App\Http\Controllers\Api\AdminUsersController::class, 'recheckBadges'])->whereNumber('id');
+Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents'])->whereNumber('id');
+Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword'])->whereNumber('id');
+Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset'])->whereNumber('id');
 Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail']);
 // Listings index is used by the broker panel's Risk Tags create-modal
 // autocomplete. Other listing-management endpoints stay admin-only.

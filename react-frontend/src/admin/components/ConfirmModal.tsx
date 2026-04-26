@@ -8,6 +8,7 @@
  * Used before delete, ban, suspend, and other destructive operations
  */
 
+import { useRef } from 'react';
 import {
   Modal,
   ModalContent,
@@ -42,8 +43,28 @@ export function ConfirmModal({
   children,
 }: ConfirmModalProps) {
   const resolvedConfirmLabel = confirmLabel ?? "Confirm";
+  // Synchronous double-click gate. `isLoading` becomes true after the parent
+  // re-renders; in the microsecond window between the two clicks, the second
+  // press still fires onConfirm. The ref blocks re-entry within the same
+  // render tick. Reset whenever the modal closes.
+  const inFlightRef = useRef(false);
+  if (!isOpen && inFlightRef.current) {
+    inFlightRef.current = false;
+  }
+  const handleConfirm = () => {
+    if (inFlightRef.current || isLoading) return;
+    inFlightRef.current = true;
+    onConfirm();
+  };
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        inFlightRef.current = false;
+        onClose();
+      }}
+      size="sm"
+    >
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <AlertTriangle size={20} className="text-warning" />
@@ -60,9 +81,9 @@ export function ConfirmModal({
           <Button
             autoFocus
             color={confirmColor}
-            onPress={onConfirm}
+            onPress={handleConfirm}
             isLoading={isLoading}
-            isDisabled={isLoading}
+            isDisabled={isLoading || inFlightRef.current}
           >
             {resolvedConfirmLabel}
           </Button>

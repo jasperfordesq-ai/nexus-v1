@@ -268,8 +268,14 @@ export default function MembersPage() {
     }
   }, [confirmAction, toast, t, fetchMembers]);
 
+  // Per-id loading flag prevents double-click from spamming the
+  // reactivate endpoint (which fires welcome-back emails + bell
+  // notifications on every call — the backend is not idempotent).
+  const [reactivatingId, setReactivatingId] = useState<number | null>(null);
   const handleReactivate = useCallback(
     async (user: AdminUser) => {
+      if (reactivatingId !== null) return;
+      setReactivatingId(user.id);
       try {
         const res = await adminUsers.reactivate(user.id);
         if (res.success) {
@@ -280,9 +286,11 @@ export default function MembersPage() {
         }
       } catch {
         toast.error(t('members.action_failed'));
+      } finally {
+        setReactivatingId(null);
       }
     },
-    [toast, t, fetchMembers],
+    [reactivatingId, toast, t, fetchMembers],
   );
 
   // ─── Columns ──────────────────────────────────────────────────────────────

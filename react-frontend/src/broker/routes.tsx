@@ -11,6 +11,18 @@
 import { Suspense, lazy } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
+import { useTenant } from '@/contexts';
+
+/**
+ * Tenant-aware fallback for unmatched /broker/* paths. Without using
+ * tenantPath() here a literal `/broker` redirect would drop the tenant
+ * slug; with relative `to=""` React Router preserves the current path
+ * and never resolves the unmatched segment.
+ */
+function BrokerNotFoundRedirect() {
+  const { tenantPath } = useTenant();
+  return <Navigate to={tenantPath('/broker')} replace />;
+}
 
 // Core daily-workflow pages
 const BrokerDashboardPage = lazy(() => import('./pages/BrokerDashboardPage'));
@@ -74,7 +86,8 @@ export function BrokerRoutes() {
       <Route path="configuration" element={<Lazy><BrokerConfigurationPage /></Lazy>} />
       <Route path="help" element={<Lazy><BrokerHelpPage /></Lazy>} />
 
-      <Route path="*" element={<Navigate to="" replace />} />
+      {/* Unknown sub-route under /broker → bounce back to the broker dashboard. */}
+      <Route path="*" element={<BrokerNotFoundRedirect />} />
     </>
   );
 }
