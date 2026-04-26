@@ -636,6 +636,7 @@ export function MembersPage() {
                   )}
                   isLoading={isLoading}
                   emptyMessage={t('members.no_location')}
+                  onMapsFailed={() => setViewMode('grid')}
                 />
               ) : (
                 <motion.div

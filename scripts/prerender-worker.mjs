@@ -30,6 +30,15 @@ async function renderPage(page, url) {
   // Extra settle time for tenant bootstrap + content rendering
   await page.waitForTimeout(SETTLE_TIME);
 
+  // Strip dynamically injected Google Maps scripts — they're added at runtime
+  // by APIProvider. Leaving them in the prerendered HTML causes double-loading
+  // when the SPA boots, which breaks the Maps API with "loaded multiple times".
+  await page.evaluate(() => {
+    document.querySelectorAll(
+      'script[src*="maps.googleapis.com"], script[src*="maps-api-v3"]'
+    ).forEach((s) => s.remove());
+  });
+
   return await page.content();
 }
 

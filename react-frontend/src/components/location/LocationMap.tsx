@@ -54,6 +54,8 @@ export interface LocationMapProps {
   fitBounds?: boolean;
   /** Enable marker clustering. Defaults to true when markers.length > 10. */
   cluster?: boolean;
+  /** Called once when the Maps API fails to load (billing/key issue). */
+  onMapsFailed?: () => void;
 }
 
 /** Default center: neutral global fallback */
@@ -213,6 +215,7 @@ function LocationMapInner({
   onMarkerClick,
   fitBounds = true,
   cluster,
+  onMapsFailed,
 }: LocationMapProps) {
   const { resolvedTheme } = useTheme();
   const map = useMap();
@@ -222,6 +225,14 @@ function LocationMapInner({
   // Resolve whether clustering should be active
   const clusteringEnabled =
     cluster !== undefined ? cluster : markers.length > CLUSTER_AUTO_THRESHOLD;
+
+  // Notify parent when Maps fails to load (e.g. billing disabled, key restricted,
+  // or double-load from prerendered HTML). Parent can switch to a fallback view.
+  useEffect(() => {
+    if (status === APILoadingStatus.AUTH_FAILURE || status === APILoadingStatus.FAILED) {
+      onMapsFailed?.();
+    }
+  }, [status, onMapsFailed]);
 
   // Auto-fit bounds when markers change
   useEffect(() => {

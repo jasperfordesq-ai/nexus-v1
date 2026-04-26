@@ -25,6 +25,8 @@ export interface EntityMapViewProps<T> {
   className?: string;
   isLoading?: boolean;
   emptyMessage?: string;
+  /** Called when Google Maps fails to load (auth/billing error). */
+  onMapsFailed?: () => void;
 }
 
 export function EntityMapView<T>({
@@ -37,6 +39,7 @@ export function EntityMapView<T>({
   className = '',
   isLoading = false,
   emptyMessage = 'No items with location data',
+  onMapsFailed,
 }: EntityMapViewProps<T>) {
   const { t } = useTranslation('common');
   const markers: MapMarker[] = useMemo(() => {
@@ -92,6 +95,7 @@ export function EntityMapView<T>({
       height={height}
       className={className}
       fitBounds
+      onMapsFailed={onMapsFailed}
     />
   );
 }
