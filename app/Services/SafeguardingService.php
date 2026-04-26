@@ -337,33 +337,36 @@ class SafeguardingService
             // Notify the user whose training was verified (bell + email)
             try {
                 $trainingName = $record->training_name ?? 'safeguarding training';
-                \App\Models\Notification::createNotification(
-                    (int) $record->user_id,
-                    __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]),
-                    '/dashboard',
-                    'moderation',
-                    true,
-                    $tenantId
-                );
-
                 $trainee = User::find($record->user_id);
-                if ($trainee && !empty($trainee->email)) {
-                    $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
-                    $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
-                    $emailBody = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_misc.safeguarding.training_verified_title'))
-                        ->previewText(__('emails_misc.safeguarding.training_verified_preview', ['training' => $safeTraining]))
-                        ->greeting($traineeName)
-                        ->paragraph(__('emails_misc.safeguarding.training_verified_body', ['training' => $safeTraining]))
-                        ->button(__('emails_misc.safeguarding.training_verified_cta'), EmailTemplateBuilder::tenantUrl('/dashboard'))
-                        ->render();
-                    $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
-                    $emailService = app(\App\Services\EmailService::class);
-                    if (!$emailService->send($trainee->email, $subject, $emailBody)) {
-                        Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
+
+                LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $tenantId, $recordId) {
+                    \App\Models\Notification::createNotification(
+                        (int) $record->user_id,
+                        __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]),
+                        '/dashboard',
+                        'moderation',
+                        true,
+                        $tenantId
+                    );
+
+                    if ($trainee && !empty($trainee->email)) {
+                        $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                        $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                        $emailBody = EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title(__('emails_misc.safeguarding.training_verified_title'))
+                            ->previewText(__('emails_misc.safeguarding.training_verified_preview', ['training' => $safeTraining]))
+                            ->greeting($traineeName)
+                            ->paragraph(__('emails_misc.safeguarding.training_verified_body', ['training' => $safeTraining]))
+                            ->button(__('emails_misc.safeguarding.training_verified_cta'), EmailTemplateBuilder::tenantUrl('/dashboard'))
+                            ->render();
+                        $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
+                        $emailService = app(\App\Services\EmailService::class);
+                        if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                            Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
+                        }
                     }
-                }
+                });
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::verifyTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
             }
@@ -409,38 +412,41 @@ class SafeguardingService
             // Notify the user whose training was rejected (bell + email — rejection is critical)
             try {
                 $trainingName = $record->training_name ?? 'safeguarding training';
-                \App\Models\Notification::createNotification(
-                    (int) $record->user_id,
-                    __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]),
-                    '/help',
-                    'moderation',
-                    true,
-                    $tenantId
-                );
-
                 $trainee = User::find($record->user_id);
-                if ($trainee && !empty($trainee->email)) {
-                    $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
-                    $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
-                    $safeReason   = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-                    $emailBody = EmailTemplateBuilder::make()
-                        ->theme('warning')
-                        ->title(__('emails_misc.safeguarding.training_rejected_title'))
-                        ->previewText(__('emails_misc.safeguarding.training_rejected_preview', ['training' => $safeTraining]))
-                        ->greeting($traineeName)
-                        ->paragraph(__('emails_misc.safeguarding.training_rejected_body', ['training' => $safeTraining]))
-                        ->paragraph(__('emails_misc.safeguarding.training_rejected_next_steps'))
-                        ->infoCard([
-                            __('emails_misc.safeguarding.training_rejected_reason_label') => $safeReason,
-                        ])
-                        ->button(__('emails_misc.safeguarding.training_rejected_cta'), EmailTemplateBuilder::tenantUrl('/help'))
-                        ->render();
-                    $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
-                    $emailService = app(\App\Services\EmailService::class);
-                    if (!$emailService->send($trainee->email, $subject, $emailBody)) {
-                        Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
+
+                LocaleContext::withLocale($trainee, function () use ($trainee, $record, $trainingName, $reason, $tenantId, $recordId) {
+                    \App\Models\Notification::createNotification(
+                        (int) $record->user_id,
+                        __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]),
+                        '/help',
+                        'moderation',
+                        true,
+                        $tenantId
+                    );
+
+                    if ($trainee && !empty($trainee->email)) {
+                        $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                        $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                        $safeReason   = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+                        $emailBody = EmailTemplateBuilder::make()
+                            ->theme('warning')
+                            ->title(__('emails_misc.safeguarding.training_rejected_title'))
+                            ->previewText(__('emails_misc.safeguarding.training_rejected_preview', ['training' => $safeTraining]))
+                            ->greeting($traineeName)
+                            ->paragraph(__('emails_misc.safeguarding.training_rejected_body', ['training' => $safeTraining]))
+                            ->paragraph(__('emails_misc.safeguarding.training_rejected_next_steps'))
+                            ->infoCard([
+                                __('emails_misc.safeguarding.training_rejected_reason_label') => $safeReason,
+                            ])
+                            ->button(__('emails_misc.safeguarding.training_rejected_cta'), EmailTemplateBuilder::tenantUrl('/help'))
+                            ->render();
+                        $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
+                        $emailService = app(\App\Services\EmailService::class);
+                        if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                            Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
+                        }
                     }
-                }
+                });
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::rejectTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
             }
@@ -736,69 +742,71 @@ class SafeguardingService
                 'dlp_user_id' => $dlpUserId,
             ]);
 
-            // Notify the assigned DLP (bell notification)
-            try {
-                \App\Models\Notification::create([
-                    'tenant_id' => $tenantId,
-                    'user_id' => $dlpUserId,
-                    'type' => 'safeguarding_assignment',
-                    'message' => __('emails_misc.safeguarding.dlp_assigned_bell', ['incident_id' => $incidentId]),
-                    'link' => '/broker/safeguarding',
-                    'is_read' => false,
-                ]);
-            } catch (\Throwable $notifError) {
-                Log::critical('SafeguardingService::assignDlp: failed to create DLP bell notification', [
-                    'dlp_user_id' => $dlpUserId,
-                    'incident_id' => $incidentId,
-                    'error' => $notifError->getMessage(),
-                ]);
-            }
-
-            // Email the assigned DLP — DLP assignment is critical and time-sensitive
-            // Safeguarding emails bypass user preferences — always send
-            if (!empty($dlpUser->email)) {
+            // Notify the assigned DLP (bell notification + email) — render in DLP's preferred locale
+            LocaleContext::withLocale($dlpUser, function () use ($dlpUser, $dlpUserId, $tenantId, $incidentId, $incident) {
                 try {
-                    $severityLabel = strtoupper($incident->severity ?? 'UNKNOWN');
-                    $dlpName = trim(($dlpUser->first_name ?? '') . ' ' . ($dlpUser->last_name ?? '')) ?: ($dlpUser->name ?? 'Team member');
-
-                    $safeDlpName = htmlspecialchars($dlpName, ENT_QUOTES, 'UTF-8');
-                    $safeTitle = htmlspecialchars($incident->title ?? 'N/A', ENT_QUOTES, 'UTF-8');
-                    $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
-
-                    $emailBody = EmailTemplateBuilder::make()
-                        ->theme('danger')
-                        ->title(__('emails_misc.safeguarding.dlp_assigned_title', ['incident_id' => $incidentId]))
-                        ->previewText(__('emails_misc.safeguarding.dlp_assigned_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId]))
-                        ->greeting($safeDlpName)
-                        ->highlight(__('emails_misc.safeguarding.dlp_assigned_highlight'), '🚨')
-                        ->infoCard([
-                            __('emails_misc.safeguarding.info_card_incident') => "#{$incidentId}",
-                            __('emails_misc.safeguarding.info_card_severity') => $safeSeverity,
-                            __('emails_misc.safeguarding.info_card_title')    => $safeTitle,
-                        ], __('emails_misc.safeguarding.info_card_incident_details'))
-                        ->paragraph(__('emails_misc.safeguarding.dlp_assigned_body'))
-                        ->paragraph(__('emails_misc.safeguarding.dlp_assigned_audit_note'))
-                        ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
-                        ->render();
-
-                    $emailService = app(\App\Services\EmailService::class);
-                    $subject = __('emails_misc.safeguarding.dlp_assigned_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId]);
-                    $sent = $emailService->send($dlpUser->email, $subject, $emailBody);
-                    if (!$sent) {
-                        Log::critical('SafeguardingService::assignDlp: DLP assignment email failed to send', [
-                            'dlp_user_id' => $dlpUserId,
-                            'dlp_email' => $dlpUser->email,
-                            'incident_id' => $incidentId,
-                        ]);
-                    }
-                } catch (\Throwable $emailError) {
-                    Log::critical('SafeguardingService::assignDlp: DLP assignment email exception', [
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id' => $dlpUserId,
+                        'type' => 'safeguarding_assignment',
+                        'message' => __('emails_misc.safeguarding.dlp_assigned_bell', ['incident_id' => $incidentId]),
+                        'link' => '/broker/safeguarding',
+                        'is_read' => false,
+                    ]);
+                } catch (\Throwable $notifError) {
+                    Log::critical('SafeguardingService::assignDlp: failed to create DLP bell notification', [
                         'dlp_user_id' => $dlpUserId,
                         'incident_id' => $incidentId,
-                        'error' => $emailError->getMessage(),
+                        'error' => $notifError->getMessage(),
                     ]);
                 }
-            }
+
+                // Email the assigned DLP — DLP assignment is critical and time-sensitive
+                // Safeguarding emails bypass user preferences — always send
+                if (!empty($dlpUser->email)) {
+                    try {
+                        $severityLabel = strtoupper($incident->severity ?? 'UNKNOWN');
+                        $dlpName = trim(($dlpUser->first_name ?? '') . ' ' . ($dlpUser->last_name ?? '')) ?: ($dlpUser->name ?? 'Team member');
+
+                        $safeDlpName = htmlspecialchars($dlpName, ENT_QUOTES, 'UTF-8');
+                        $safeTitle = htmlspecialchars($incident->title ?? 'N/A', ENT_QUOTES, 'UTF-8');
+                        $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
+
+                        $emailBody = EmailTemplateBuilder::make()
+                            ->theme('danger')
+                            ->title(__('emails_misc.safeguarding.dlp_assigned_title', ['incident_id' => $incidentId]))
+                            ->previewText(__('emails_misc.safeguarding.dlp_assigned_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId]))
+                            ->greeting($safeDlpName)
+                            ->highlight(__('emails_misc.safeguarding.dlp_assigned_highlight'), '🚨')
+                            ->infoCard([
+                                __('emails_misc.safeguarding.info_card_incident') => "#{$incidentId}",
+                                __('emails_misc.safeguarding.info_card_severity') => $safeSeverity,
+                                __('emails_misc.safeguarding.info_card_title')    => $safeTitle,
+                            ], __('emails_misc.safeguarding.info_card_incident_details'))
+                            ->paragraph(__('emails_misc.safeguarding.dlp_assigned_body'))
+                            ->paragraph(__('emails_misc.safeguarding.dlp_assigned_audit_note'))
+                            ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
+                            ->render();
+
+                        $emailService = app(\App\Services\EmailService::class);
+                        $subject = __('emails_misc.safeguarding.dlp_assigned_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId]);
+                        $sent = $emailService->send($dlpUser->email, $subject, $emailBody);
+                        if (!$sent) {
+                            Log::critical('SafeguardingService::assignDlp: DLP assignment email failed to send', [
+                                'dlp_user_id' => $dlpUserId,
+                                'dlp_email' => $dlpUser->email,
+                                'incident_id' => $incidentId,
+                            ]);
+                        }
+                    } catch (\Throwable $emailError) {
+                        Log::critical('SafeguardingService::assignDlp: DLP assignment email exception', [
+                            'dlp_user_id' => $dlpUserId,
+                            'incident_id' => $incidentId,
+                            'error' => $emailError->getMessage(),
+                        ]);
+                    }
+                }
+            });
 
             return true;
         } catch (\Throwable $e) {
@@ -821,70 +829,73 @@ class SafeguardingService
             $reporterName = $reporter ? trim(($reporter->first_name ?? '') . ' ' . ($reporter->last_name ?? '')) : 'A member';
 
             $staffUsers = DB::select(
-                "SELECT id, email FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
+                "SELECT id, email, preferred_language FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
                 [$tenantId]
             );
 
             $severityLabel = strtoupper($severity);
-            $message = __('emails_misc.safeguarding.incident_reported_bell', ['severity' => $severityLabel, 'reporter' => $reporterName, 'title' => $title]);
 
             foreach ($staffUsers as $staff) {
-                \App\Models\Notification::create([
-                    'tenant_id' => $tenantId,
-                    'user_id' => $staff->id,
-                    'type' => 'safeguarding_flag',
-                    'message' => $message,
-                    'link' => '/broker/safeguarding',
-                    'is_read' => false,
-                ]);
+                LocaleContext::withLocale($staff, function () use ($staff, $tenantId, $incidentId, $reporterName, $title, $severity, $severityLabel, $type) {
+                    $message = __('emails_misc.safeguarding.incident_reported_bell', ['severity' => $severityLabel, 'reporter' => $reporterName, 'title' => $title]);
 
-                // Send email for ALL safeguarding incidents (legal requirement)
-                // Severity label is included in subject for prioritization
-                if (!empty($staff->email)) {
-                    try {
-                        $safeReporterName = htmlspecialchars($reporterName, ENT_QUOTES, 'UTF-8');
-                        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-                        $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
-                        $safeType = htmlspecialchars($type, ENT_QUOTES, 'UTF-8');
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id' => $staff->id,
+                        'type' => 'safeguarding_flag',
+                        'message' => $message,
+                        'link' => '/broker/safeguarding',
+                        'is_read' => false,
+                    ]);
 
-                        $emailBody = EmailTemplateBuilder::make()
-                            ->theme('danger')
-                            ->title(__('emails_misc.safeguarding.incident_reported_title'))
-                            ->previewText(__('emails_misc.safeguarding.incident_reported_preview', ['severity' => $safeSeverity, 'type' => $safeType, 'reporter' => $safeReporterName]))
-                            ->highlight(__('emails_misc.safeguarding.incident_reported_highlight', ['severity' => $safeSeverity]), '🚨')
-                            ->infoCard([
-                                __('emails_misc.safeguarding.info_card_reported_by') => $safeReporterName,
-                                __('emails_misc.safeguarding.info_card_title')       => $safeTitle,
-                                __('emails_misc.safeguarding.info_card_severity')    => $safeSeverity,
-                                __('emails_misc.safeguarding.info_card_type')        => $safeType,
-                            ], __('emails_misc.safeguarding.info_card_incident_details'))
-                            ->paragraph(__('emails_misc.safeguarding.incident_reported_review'))
-                            ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
-                            ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
-                            ->render();
+                    // Send email for ALL safeguarding incidents (legal requirement)
+                    // Severity label is included in subject for prioritization
+                    if (!empty($staff->email)) {
+                        try {
+                            $safeReporterName = htmlspecialchars($reporterName, ENT_QUOTES, 'UTF-8');
+                            $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+                            $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
+                            $safeType = htmlspecialchars($type, ENT_QUOTES, 'UTF-8');
 
-                        $emailService = app(\App\Services\EmailService::class);
-                        $sent = $emailService->send(
-                            $staff->email,
-                            __('emails_misc.safeguarding.incident_reported_subject', ['severity' => $severityLabel, 'title' => $title]),
-                            $emailBody
-                        );
-                        if (!$sent) {
-                            Log::critical('SafeguardingService: safeguarding incident email failed to send', [
+                            $emailBody = EmailTemplateBuilder::make()
+                                ->theme('danger')
+                                ->title(__('emails_misc.safeguarding.incident_reported_title'))
+                                ->previewText(__('emails_misc.safeguarding.incident_reported_preview', ['severity' => $safeSeverity, 'type' => $safeType, 'reporter' => $safeReporterName]))
+                                ->highlight(__('emails_misc.safeguarding.incident_reported_highlight', ['severity' => $safeSeverity]), '🚨')
+                                ->infoCard([
+                                    __('emails_misc.safeguarding.info_card_reported_by') => $safeReporterName,
+                                    __('emails_misc.safeguarding.info_card_title')       => $safeTitle,
+                                    __('emails_misc.safeguarding.info_card_severity')    => $safeSeverity,
+                                    __('emails_misc.safeguarding.info_card_type')        => $safeType,
+                                ], __('emails_misc.safeguarding.info_card_incident_details'))
+                                ->paragraph(__('emails_misc.safeguarding.incident_reported_review'))
+                                ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
+                                ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
+                                ->render();
+
+                            $emailService = app(\App\Services\EmailService::class);
+                            $sent = $emailService->send(
+                                $staff->email,
+                                __('emails_misc.safeguarding.incident_reported_subject', ['severity' => $severityLabel, 'title' => $title]),
+                                $emailBody
+                            );
+                            if (!$sent) {
+                                Log::critical('SafeguardingService: safeguarding incident email failed to send', [
+                                    'staff_id' => $staff->id,
+                                    'incident_id' => $incidentId,
+                                    'severity' => $severity,
+                                ]);
+                            }
+                        } catch (\Throwable $emailError) {
+                            Log::critical('SafeguardingService: safeguarding incident email exception', [
                                 'staff_id' => $staff->id,
                                 'incident_id' => $incidentId,
                                 'severity' => $severity,
+                                'error' => $emailError->getMessage(),
                             ]);
                         }
-                    } catch (\Throwable $emailError) {
-                        Log::critical('SafeguardingService: safeguarding incident email exception', [
-                            'staff_id' => $staff->id,
-                            'incident_id' => $incidentId,
-                            'severity' => $severity,
-                            'error' => $emailError->getMessage(),
-                        ]);
                     }
-                }
+                });
             }
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::notifyAdminsOfIncident error: ' . $e->getMessage());
@@ -904,28 +915,33 @@ class SafeguardingService
                 'closed' => 'closed',
             ];
             $label = $statusLabels[$newStatus] ?? $newStatus;
-            $message = __('emails_misc.safeguarding.incident_status_changed', ['incident_id' => $incidentId, 'status' => $label]);
 
-            // Notify reporter (bell)
-            \App\Models\Notification::create([
-                'tenant_id' => $tenantId,
-                'user_id' => $reporterId,
-                'type' => 'safeguarding_flag',
-                'message' => $message,
-                'link' => '/safeguarding/incidents',
-                'is_read' => false,
-            ]);
-
-            // Notify assigned DLP if different from reporter (bell)
-            if ($dlpUserId && $dlpUserId !== $reporterId) {
+            // Notify reporter (bell) — render in reporter's locale
+            $reporterForBell = User::find($reporterId);
+            LocaleContext::withLocale($reporterForBell, function () use ($reporterForBell, $tenantId, $reporterId, $incidentId, $label) {
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
-                    'user_id' => $dlpUserId,
-                    'type' => 'safeguarding_assignment',
-                    'message' => __('emails_misc.safeguarding.incident_status_dlp_bell', ['incident_id' => $incidentId, 'status' => $label]),
-                    'link' => '/broker/safeguarding',
+                    'user_id' => $reporterId,
+                    'type' => 'safeguarding_flag',
+                    'message' => __('emails_misc.safeguarding.incident_status_changed', ['incident_id' => $incidentId, 'status' => $label]),
+                    'link' => '/safeguarding/incidents',
                     'is_read' => false,
                 ]);
+            });
+
+            // Notify assigned DLP if different from reporter (bell) — render in DLP's locale
+            if ($dlpUserId && $dlpUserId !== $reporterId) {
+                $dlpForBell = User::find($dlpUserId);
+                LocaleContext::withLocale($dlpForBell, function () use ($dlpForBell, $tenantId, $dlpUserId, $incidentId, $label) {
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id' => $dlpUserId,
+                        'type' => 'safeguarding_assignment',
+                        'message' => __('emails_misc.safeguarding.incident_status_dlp_bell', ['incident_id' => $incidentId, 'status' => $label]),
+                        'link' => '/broker/safeguarding',
+                        'is_read' => false,
+                    ]);
+                });
             }
 
             // Also email the reporter about status changes (always, regardless of severity)
@@ -971,66 +987,76 @@ class SafeguardingService
 
             if ($incident && in_array($incident->severity, ['high', 'critical'])) {
                 $severityLabel = strtoupper($incident->severity);
-                $emailSubject = __('emails_misc.safeguarding.incident_updated_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId, 'status' => $label]);
-
                 $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
                 $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
-                $emailBody = EmailTemplateBuilder::make()
-                    ->theme('danger')
-                    ->title(__('emails_misc.safeguarding.incident_updated_title'))
-                    ->previewText(__('emails_misc.safeguarding.incident_updated_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId, 'status' => $safeLabel]))
-                    ->infoCard([
-                        __('emails_misc.safeguarding.info_card_incident')   => "#{$incidentId}",
-                        __('emails_misc.safeguarding.info_card_new_status') => $safeLabel,
-                        __('emails_misc.safeguarding.info_card_severity')   => $safeSeverity,
-                    ], __('emails_misc.safeguarding.info_card_status_update'))
-                    ->paragraph(__('emails_misc.safeguarding.incident_updated_review'))
-                    ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
-                    ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
-                    ->render();
+                $renderForRecipient = function () use ($severityLabel, $safeSeverity, $safeLabel, $incidentId, $label) {
+                    $emailBody = EmailTemplateBuilder::make()
+                        ->theme('danger')
+                        ->title(__('emails_misc.safeguarding.incident_updated_title'))
+                        ->previewText(__('emails_misc.safeguarding.incident_updated_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId, 'status' => $safeLabel]))
+                        ->infoCard([
+                            __('emails_misc.safeguarding.info_card_incident')   => "#{$incidentId}",
+                            __('emails_misc.safeguarding.info_card_new_status') => $safeLabel,
+                            __('emails_misc.safeguarding.info_card_severity')   => $safeSeverity,
+                        ], __('emails_misc.safeguarding.info_card_status_update'))
+                        ->paragraph(__('emails_misc.safeguarding.incident_updated_review'))
+                        ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
+                        ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/broker/safeguarding'))
+                        ->render();
+
+                    $emailSubject = __('emails_misc.safeguarding.incident_updated_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId, 'status' => $label]);
+
+                    return [$emailSubject, $emailBody];
+                };
 
                 $emailService = app(\App\Services\EmailService::class);
 
-                // Email the reporter
+                // Email the reporter — render in reporter's locale
                 $reporter = User::find($reporterId);
                 if ($reporter && !empty($reporter->email)) {
-                    try {
-                        $sent = $emailService->send($reporter->email, $emailSubject, $emailBody);
-                        if (!$sent) {
-                            Log::critical('SafeguardingService: status change email failed for reporter', [
-                                'reporter_id' => $reporterId,
-                                'incident_id' => $incidentId,
-                            ]);
-                        }
-                    } catch (\Throwable $emailError) {
-                        Log::critical('SafeguardingService: status change email exception for reporter', [
-                            'reporter_id' => $reporterId,
-                            'incident_id' => $incidentId,
-                            'error' => $emailError->getMessage(),
-                        ]);
-                    }
-                }
-
-                // Email the assigned DLP if different from reporter
-                if ($dlpUserId && $dlpUserId !== $reporterId) {
-                    $dlpUser = User::find($dlpUserId);
-                    if ($dlpUser && !empty($dlpUser->email)) {
+                    LocaleContext::withLocale($reporter, function () use ($reporter, $reporterId, $incidentId, $emailService, $renderForRecipient) {
                         try {
-                            $sent = $emailService->send($dlpUser->email, $emailSubject, $emailBody);
+                            [$subject, $body] = $renderForRecipient();
+                            $sent = $emailService->send($reporter->email, $subject, $body);
                             if (!$sent) {
-                                Log::critical('SafeguardingService: status change email failed for DLP', [
-                                    'dlp_user_id' => $dlpUserId,
+                                Log::critical('SafeguardingService: status change email failed for reporter', [
+                                    'reporter_id' => $reporterId,
                                     'incident_id' => $incidentId,
                                 ]);
                             }
                         } catch (\Throwable $emailError) {
-                            Log::critical('SafeguardingService: status change email exception for DLP', [
-                                'dlp_user_id' => $dlpUserId,
+                            Log::critical('SafeguardingService: status change email exception for reporter', [
+                                'reporter_id' => $reporterId,
                                 'incident_id' => $incidentId,
                                 'error' => $emailError->getMessage(),
                             ]);
                         }
+                    });
+                }
+
+                // Email the assigned DLP if different from reporter — render in DLP's locale
+                if ($dlpUserId && $dlpUserId !== $reporterId) {
+                    $dlpUser = User::find($dlpUserId);
+                    if ($dlpUser && !empty($dlpUser->email)) {
+                        LocaleContext::withLocale($dlpUser, function () use ($dlpUser, $dlpUserId, $incidentId, $emailService, $renderForRecipient) {
+                            try {
+                                [$subject, $body] = $renderForRecipient();
+                                $sent = $emailService->send($dlpUser->email, $subject, $body);
+                                if (!$sent) {
+                                    Log::critical('SafeguardingService: status change email failed for DLP', [
+                                        'dlp_user_id' => $dlpUserId,
+                                        'incident_id' => $incidentId,
+                                    ]);
+                                }
+                            } catch (\Throwable $emailError) {
+                                Log::critical('SafeguardingService: status change email exception for DLP', [
+                                    'dlp_user_id' => $dlpUserId,
+                                    'incident_id' => $incidentId,
+                                    'error' => $emailError->getMessage(),
+                                ]);
+                            }
+                        });
                     }
                 }
             }

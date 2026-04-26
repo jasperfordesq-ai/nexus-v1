@@ -131,7 +131,13 @@
       "verb_insurance_updated": "updated an insurance certificate",
       "verb_insurance_verified": "verified an insurance certificate",
       "verb_insurance_rejected": "rejected an insurance certificate",
-      "verb_insurance_deleted": "removed an insurance certificate"
+      "verb_insurance_deleted": "removed an insurance certificate",
+      "chip_vetting_bulk_verify": "Bulk Verified",
+      "chip_vetting_bulk_reject": "Bulk Rejected",
+      "chip_vetting_bulk_delete": "Bulk Removed",
+      "verb_vetting_bulk_verify": "verified vetting records in bulk",
+      "verb_vetting_bulk_reject": "rejected vetting records in bulk",
+      "verb_vetting_bulk_delete": "removed vetting records in bulk"
     },
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}}m ago",

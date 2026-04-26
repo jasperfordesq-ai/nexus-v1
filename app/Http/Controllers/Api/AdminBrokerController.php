@@ -239,6 +239,7 @@ class AdminBrokerController extends BaseApiController
                       'vetting_record_verified', 'vetting_record_rejected',
                       'vetting_record_created', 'vetting_record_updated',
                       'vetting_record_deleted', 'vetting_document_uploaded',
+                      'vetting_bulk_verify', 'vetting_bulk_reject', 'vetting_bulk_delete',
                       'insurance_cert_created', 'insurance_cert_updated',
                       'insurance_cert_verified', 'insurance_cert_rejected',
                       'insurance_cert_deleted'
