@@ -1,0 +1,84 @@
+name: Contributor Terms Acceptance
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+jobs:
+  contributor-terms-check:
+    name: Contributor Terms Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Validate contributor terms acknowledgement
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+          const pr = event.pull_request || {};
+          const body = pr.body || '';
+          const lines = body.split(/\r?\n/);
+
+          const hasCheckedLine = (requiredText) =>
+            lines.some((line) => {
+              const normalized = line.trim();
+              return /^-\s*\[[xX]\]\s*/.test(normalized) && normalized.includes(requiredText);
+            });
+
+          const hasRequiredField = (label) => {
+            const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const match = body.match(new RegExp(`^\\*\\*${escapedLabel}:\\*\\*\\s*(.+)$`, 'mi'));
+            const value = match?.[1]?.trim() ?? '';
+            return value.length > 0 && !value.startsWith('<!--');
+          };
+
+          const errors = [];
+
+          if (!/^## Contributor Terms\s*$/mi.test(body)) {
+            errors.push('Missing "Contributor Terms" section from the PR description.');
+          }
+
+          if (!hasCheckedLine('I have read and agree to `CONTRIBUTOR_TERMS.md`')) {
+            errors.push('The contributor terms acknowledgement checkbox must be checked.');
+          }
+
+          if (!hasCheckedLine('I have disclosed meaningful AI-generated or AI-assisted contributions')) {
+            errors.push('The AI contribution disclosure checkbox must be checked.');
+          }
+
+          if (!hasRequiredField('Third-Party Material Disclosure')) {
+            errors.push('Missing "Third-Party Material Disclosure:" field. Use "None" if there is no third-party material.');
+          }
+
+          if (!hasRequiredField('AI Contribution Disclosure')) {
+            errors.push('Missing "AI Contribution Disclosure:" field. Use "None" if there was no meaningful AI-generated or AI-assisted contribution.');
+          }
+
+          if (errors.length === 0) {
+            console.log('Contributor terms acknowledgement and disclosures are present.');
+            process.exit(0);
+          }
+
+          const message = [
+            'Contributor Terms Acceptance Required',
+            '',
+            'This repository requires explicit contributor-terms acceptance before a pull request can be merged.',
+            '',
+            ...errors.map((error) => `- ${error}`),
+            '',
+            'Edit the PR description and make sure the Contributor Terms section includes:',
+            '- a checked acknowledgement for `CONTRIBUTOR_TERMS.md`;',
+            '- a checked AI disclosure acknowledgement;',
+            '- `Third-Party Material Disclosure: None` or a source/licence explanation;',
+            '- `AI Contribution Disclosure: None` or a tool/model/scope explanation.',
+          ].join('\n');
+
+          console.error(message);
+          process.exit(1);
+          NODE

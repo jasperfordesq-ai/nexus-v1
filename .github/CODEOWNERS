@@ -7,3 +7,13 @@
 /react-frontend/src/i18n.ts @jasperfordesq-ai
 /react-frontend/i18next.config.ts @jasperfordesq-ai
 /.github/LOCALIZATION_WORKFLOW.md @jasperfordesq-ai
+
+# Licensing, attribution, and contributor intake ownership
+/LICENSE @jasperfordesq-ai
+/NOTICE @jasperfordesq-ai
+/CONTRIBUTING.md @jasperfordesq-ai
+/CONTRIBUTOR_TERMS.md @jasperfordesq-ai
+/.github/CODEOWNERS @jasperfordesq-ai
+/.github/pull_request_template.md @jasperfordesq-ai
+/.github/workflows/contributor-terms.yml @jasperfordesq-ai
+/.github/workflows/pr-checks.yml @jasperfordesq-ai

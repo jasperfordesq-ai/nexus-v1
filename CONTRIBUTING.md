@@ -42,6 +42,8 @@ All contributions are subject to the [Project NEXUS Contributor Terms](CONTRIBUT
 
 Do not submit a contribution unless you have the right to make that grant. Contributions must not include secrets, confidential material, incompatible third-party code, or undisclosed AI-generated material.
 
+Pull requests are checked automatically. A PR cannot pass the Project NEXUS PR quality checks unless the contributor-terms acknowledgement is checked and the AI and third-party-material disclosure fields are completed.
+
 ---
 
 ## Getting Started

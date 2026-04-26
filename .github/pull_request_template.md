@@ -12,6 +12,12 @@
 - [ ] I have read and agree to `CONTRIBUTOR_TERMS.md`, including the licence grant, patent grant, ownership/employer-permission confirmation, third-party-code restrictions, and AI-disclosure requirements.
 - [ ] I have disclosed meaningful AI-generated or AI-assisted contributions in this PR, or this PR contains no meaningful AI-generated or AI-assisted contribution.
 
+**Third-Party Material Disclosure:** None
+<!-- If this PR includes third-party material, list the source, licence, and why it is compatible with Project NEXUS licensing. -->
+
+**AI Contribution Disclosure:** None
+<!-- If AI tools materially generated, rewrote, translated, designed, or structured this PR, list the tool/model and what it was used for. -->
+
 ## Root Cause Analysis (required for bug fixes)
 <!-- If this is a bug fix, you MUST fill in these fields. Delete this section for non-fix PRs. -->
 **What was the bug?**
