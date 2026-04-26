@@ -448,13 +448,15 @@ class AdminVettingController extends BaseApiController
                 });
             }
             foreach ($notifyDeleted as $userId) {
-                Notification::createNotification(
-                    $userId,
-                    'Your verification record has been removed.',
-                    null,
-                    'moderation',
-                    false
-                );
+                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_3.admin_bells.vetting_removed'),
+                        null,
+                        'moderation',
+                        false
+                    );
+                });
             }
         } catch (\Throwable $e) {
             Log::warning("AdminVettingController::bulk notifications failed: " . $e->getMessage());

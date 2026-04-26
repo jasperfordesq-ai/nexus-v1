@@ -7,7 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\InsuranceCertificateService;
@@ -88,6 +91,20 @@ class AdminInsuranceCertificateController extends BaseApiController
 
         if (!$userId) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 422);
+        }
+
+        // Tenant integrity: user_id MUST belong to the caller's tenant. Without
+        // this check a broker could pass a user_id from another tenant and
+        // create an insurance row whose tenant_id (TenantContext) doesn't match
+        // the user's actual tenant — silent cross-tenant data leak. Same
+        // pattern as AdminVettingController::store.
+        $tenantId = TenantContext::getId();
+        $userExists = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+        if (!$userExists) {
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), 'user_id', 404);
         }
 
         $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
@@ -197,16 +214,26 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             ActivityLog::log($adminId, 'insurance_cert_verified', "Verified insurance certificate #{$id} for user #{$existing['user_id']}", false, null, 'admin', 'insurance_cert', $id);
 
-            // Notify the user that their insurance certificate was verified
+            // Notify the user that their insurance certificate was verified.
+            // Wrapped in LocaleContext so the bell renders in the recipient's
+            // preferred_language, not the broker's. See CLAUDE.md
+            // "EMAIL & NOTIFICATION LOCALE — MUST WRAP IN LocaleContext".
             try {
                 if (!empty($existing['user_id'])) {
-                    Notification::createNotification(
-                        (int) $existing['user_id'],
-                        __('api_controllers_3.admin_bells.insurance_verified'),
-                        '/dashboard',
-                        'moderation',
-                        true
+                    $userId = (int) $existing['user_id'];
+                    $recipient = DB::selectOne(
+                        "SELECT id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                        [$userId, TenantContext::getId()]
                     );
+                    LocaleContext::withLocale($recipient, function () use ($userId) {
+                        Notification::createNotification(
+                            $userId,
+                            __('api_controllers_3.admin_bells.insurance_verified'),
+                            '/dashboard',
+                            'moderation',
+                            true
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminInsuranceCertificateController::verify notification failed for cert #{$id}: " . $e->getMessage());
@@ -240,16 +267,25 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             ActivityLog::log($adminId, 'insurance_cert_rejected', "Rejected insurance certificate #{$id}: {$reason}", false, null, 'admin', 'insurance_cert', $id);
 
-            // Notify the user that their insurance certificate was not approved
+            // Notify the user that their insurance certificate was not
+            // approved — wrapped in LocaleContext so the bell renders in
+            // the recipient's preferred_language.
             try {
                 if (!empty($existing['user_id'])) {
-                    Notification::createNotification(
-                        (int) $existing['user_id'],
-                        __('api_controllers_3.admin_bells.insurance_rejected'),
-                        '/help',
-                        'moderation',
-                        true
+                    $userId = (int) $existing['user_id'];
+                    $recipient = DB::selectOne(
+                        "SELECT id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                        [$userId, TenantContext::getId()]
                     );
+                    LocaleContext::withLocale($recipient, function () use ($userId) {
+                        Notification::createNotification(
+                            $userId,
+                            __('api_controllers_3.admin_bells.insurance_rejected'),
+                            '/help',
+                            'moderation',
+                            true
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminInsuranceCertificateController::reject notification failed for cert #{$id}: " . $e->getMessage());
