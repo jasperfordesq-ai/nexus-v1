@@ -11,10 +11,12 @@ use App\Services\HoursReportService;
 use App\Services\InactiveMemberService;
 use App\Services\ReportExportService;
 use App\Services\MunicipalImpactReportService;
+use App\Services\MunicipalReportTemplateService;
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Services\MemberReportService;
 use App\Services\ContentModerationService;
+use Illuminate\Database\QueryException;
 
 /**
  * AdminAnalyticsReportsController -- Admin analytics and reporting endpoints.
@@ -31,6 +33,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         private readonly InactiveMemberService $inactiveMemberService,
         private readonly ReportExportService $reportExportService,
         private readonly MunicipalImpactReportService $municipalImpactReportService,
+        private readonly MunicipalReportTemplateService $municipalReportTemplateService,
         private readonly MemberReportService $memberReportService,
         private readonly ContentModerationService $contentModerationService,
     ) {}
@@ -160,13 +163,124 @@ class AdminAnalyticsReportsController extends BaseApiController
         }
 
         $tenantId = TenantContext::getId();
+        $filters = [
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+        ];
+
+        $templateId = $this->queryInt('template_id', 0, 0);
+        if ($templateId > 0) {
+            $template = $this->municipalReportTemplateService->get($tenantId, $templateId);
+            if (!$template) {
+                return $this->respondWithError('NOT_FOUND', __('api.municipal_report_template_not_found'), null, 404);
+            }
+
+            $filters = array_merge($filters, [
+                'date_preset' => $template['date_preset'],
+                'include_social_value' => $template['include_social_value'],
+                'hour_value_chf' => $template['hour_value_chf'],
+            ]);
+        }
 
         return $this->respondWithData(
-            $this->municipalImpactReportService->summary($tenantId, [
-                'date_from' => $this->query('date_from'),
-                'date_to' => $this->query('date_to'),
-            ])
+            $this->municipalImpactReportService->summary($tenantId, $filters)
         );
+    }
+
+    /** GET /api/v2/admin/reports/municipal-impact/templates */
+    public function municipalImpactTemplates(): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'templates' => $this->municipalReportTemplateService->list(TenantContext::getId()),
+        ]);
+    }
+
+    /** POST /api/v2/admin/reports/municipal-impact/templates */
+    public function createMunicipalImpactTemplate(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        if (trim((string) $this->input('name', '')) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.municipal_report_template_name_required'), 'name', 400);
+        }
+
+        try {
+            $template = $this->municipalReportTemplateService->create(TenantContext::getId(), $adminId, [
+                'name' => $this->input('name'),
+                'description' => $this->input('description'),
+                'audience' => $this->input('audience'),
+                'date_preset' => $this->input('date_preset'),
+                'include_social_value' => $this->input('include_social_value', true),
+                'hour_value_chf' => $this->input('hour_value_chf'),
+                'sections' => $this->input('sections', []),
+            ]);
+        } catch (QueryException) {
+            return $this->respondWithError('ALREADY_EXISTS', __('api.municipal_report_template_exists'), 'name', 409);
+        }
+
+        return $this->respondWithData([
+            'template' => $template,
+            'message' => __('api.municipal_report_template_created'),
+        ], null, 201);
+    }
+
+    /** PUT /api/v2/admin/reports/municipal-impact/templates/{id} */
+    public function updateMunicipalImpactTemplate(int $id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        if (trim((string) $this->input('name', '')) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.municipal_report_template_name_required'), 'name', 400);
+        }
+
+        try {
+            $template = $this->municipalReportTemplateService->update(TenantContext::getId(), $adminId, $id, [
+                'name' => $this->input('name'),
+                'description' => $this->input('description'),
+                'audience' => $this->input('audience'),
+                'date_preset' => $this->input('date_preset'),
+                'include_social_value' => $this->input('include_social_value', true),
+                'hour_value_chf' => $this->input('hour_value_chf'),
+                'sections' => $this->input('sections', []),
+            ]);
+        } catch (QueryException) {
+            return $this->respondWithError('ALREADY_EXISTS', __('api.municipal_report_template_exists'), 'name', 409);
+        }
+
+        if (!$template) {
+            return $this->respondWithError('NOT_FOUND', __('api.municipal_report_template_not_found'), null, 404);
+        }
+
+        return $this->respondWithData([
+            'template' => $template,
+            'message' => __('api.municipal_report_template_updated'),
+        ]);
+    }
+
+    /** DELETE /api/v2/admin/reports/municipal-impact/templates/{id} */
+    public function deleteMunicipalImpactTemplate(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        if (!$this->municipalReportTemplateService->delete(TenantContext::getId(), $id)) {
+            return $this->respondWithError('NOT_FOUND', __('api.municipal_report_template_not_found'), null, 404);
+        }
+
+        return $this->respondWithData(['message' => __('api.municipal_report_template_deleted')]);
     }
 
     // ============================================
@@ -264,6 +378,22 @@ class AdminAnalyticsReportsController extends BaseApiController
             'status' => $this->query('status'),
             'days' => $this->queryInt('days', 90),
         ];
+
+        if ($type === 'municipal_impact') {
+            $templateId = $this->queryInt('template_id', 0, 0);
+            if ($templateId > 0) {
+                $template = $this->municipalReportTemplateService->get($tenantId, $templateId);
+                if (!$template) {
+                    return $this->respondWithError('NOT_FOUND', __('api.municipal_report_template_not_found'), null, 404);
+                }
+
+                $filters = array_merge($filters, [
+                    'date_preset' => $template['date_preset'],
+                    'include_social_value' => $template['include_social_value'],
+                    'hour_value_chf' => $template['hour_value_chf'],
+                ]);
+            }
+        }
 
         if ($format === 'pdf') {
             $result = $this->reportExportService->exportPdf($type, $tenantId, $filters);

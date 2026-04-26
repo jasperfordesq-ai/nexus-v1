@@ -5333,7 +5333,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6767,6 +6767,28 @@ CREATE TABLE `monthly_engagement` (
   UNIQUE KEY `uniq_monthly_engagement` (`tenant_id`,`user_id`,`year_month`),
   KEY `idx_me_tenant` (`tenant_id`),
   KEY `idx_me_user_month` (`user_id`,`year_month`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `municipal_report_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `municipal_report_templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `name` varchar(160) NOT NULL,
+  `description` text DEFAULT NULL,
+  `audience` varchar(40) NOT NULL DEFAULT 'municipality',
+  `date_preset` varchar(40) NOT NULL DEFAULT 'last_90_days',
+  `include_social_value` tinyint(1) NOT NULL DEFAULT 1,
+  `hour_value_chf` smallint(5) unsigned DEFAULT NULL,
+  `sections` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`sections`)),
+  `created_by` int(10) unsigned DEFAULT NULL,
+  `updated_by` int(10) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `municipal_report_templates_tenant_name_unique` (`tenant_id`,`name`),
+  KEY `municipal_report_templates_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `news`;
@@ -11369,7 +11391,8 @@ INSERT INTO `laravel_migrations` VALUES
 (126,'2026_04_21_200000_add_safeguarding_statement_to_tenants',52),
 (127,'2026_04_21_200100_add_annual_review_to_user_safeguarding_preferences',52),
 (128,'2026_04_25_120000_add_tenant_id_to_password_resets',53),
-(129,'2026_04_26_120000_unique_broker_message_copies_per_message',54);
+(129,'2026_04_26_120000_unique_broker_message_copies_per_message',54),
+(130,'2026_04_26_191500_create_municipal_report_templates_table',55);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

@@ -1153,6 +1153,10 @@ Route::put('/v2/admin/reports/social-value/config', [\App\Http\Controllers\Api\A
 Route::get('/v2/admin/reports/members', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'memberReports']);
 Route::get('/v2/admin/reports/hours', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'hoursReports']);
 Route::get('/v2/admin/reports/municipal-impact', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'municipalImpact']);
+Route::get('/v2/admin/reports/municipal-impact/templates', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'municipalImpactTemplates']);
+Route::post('/v2/admin/reports/municipal-impact/templates', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'createMunicipalImpactTemplate']);
+Route::put('/v2/admin/reports/municipal-impact/templates/{id}', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateMunicipalImpactTemplate']);
+Route::delete('/v2/admin/reports/municipal-impact/templates/{id}', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'deleteMunicipalImpactTemplate']);
 Route::get('/v2/admin/reports/export-types', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'exportTypes']);
 Route::get('/v2/admin/reports/{type}/export', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'exportReport']);
 Route::get('/v2/admin/reports/{id}', [\App\Http\Controllers\Api\AdminReportsController::class, 'show']);

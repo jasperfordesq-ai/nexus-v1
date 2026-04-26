@@ -1733,4 +1733,10 @@ return [
 
     // Caring Community workflow policy
     'caring_self_log_disabled'                   => 'Member self-logging is disabled for this community. A coordinator must record or approve these hours.',
+    'municipal_report_template_name_required'    => 'Report template name is required.',
+    'municipal_report_template_exists'           => 'A report template with this name already exists.',
+    'municipal_report_template_not_found'        => 'Report template not found.',
+    'municipal_report_template_created'          => 'Report template saved.',
+    'municipal_report_template_updated'          => 'Report template updated.',
+    'municipal_report_template_deleted'          => 'Report template deleted.',
 ];

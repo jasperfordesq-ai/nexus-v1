@@ -4,7 +4,26 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Divider, Spinner } from '@heroui/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Divider,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
+  Switch,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
 import { Link } from 'react-router-dom';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Clock from 'lucide-react/icons/clock';
@@ -14,6 +33,10 @@ import Heart from 'lucide-react/icons/heart';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import Layers from 'lucide-react/icons/layers';
+import Plus from 'lucide-react/icons/plus';
+import Save from 'lucide-react/icons/save';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -42,18 +65,46 @@ type MunicipalImpactSummary = {
   trends: Array<{ period: string; verified_hours: number; activities: number; participants: number }>;
 };
 
+type ReportTemplate = {
+  id: number;
+  name: string;
+  description: string | null;
+  audience: 'municipality' | 'canton' | 'cooperative' | 'foundation';
+  date_preset: 'last_30_days' | 'last_90_days' | 'year_to_date' | 'previous_quarter';
+  include_social_value: boolean;
+  hour_value_chf: number | null;
+  sections: string[];
+};
+
+type TemplatesResponse = {
+  templates: ReportTemplate[];
+};
+
+const defaultTemplateForm = {
+  name: '',
+  description: '',
+  audience: 'municipality' as ReportTemplate['audience'],
+  date_preset: 'last_90_days' as ReportTemplate['date_preset'],
+  include_social_value: true,
+  hour_value_chf: '',
+  sections: ['summary', 'hours', 'members', 'organisations', 'categories', 'trends', 'trust'],
+};
+
 function isMunicipalImpactSummary(value: unknown): value is MunicipalImpactSummary {
   return Boolean(value && typeof value === 'object' && 'period' in value && 'stats' in value);
 }
 
-async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string) {
+async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, templateId?: number) {
   const headers: Record<string, string> = {};
   const token = tokenManager.getAccessToken();
   const tenantId = tokenManager.getTenantId();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
 
-  const res = await fetch(`${API_BASE}/v2/admin/reports/municipal_impact/export?format=${format}`, {
+  const params = new URLSearchParams({ format });
+  if (templateId) params.set('template_id', String(templateId));
+
+  const res = await fetch(`${API_BASE}/v2/admin/reports/municipal_impact/export?${params.toString()}`, {
     headers,
     credentials: 'include',
   });
@@ -72,26 +123,52 @@ export default function MunicipalImpactReportsPage() {
   const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   usePageTitle(t('municipal_reports.meta.title'));
   const [summary, setSummary] = useState<MunicipalImpactSummary | null>(null);
+  const [templates, setTemplates] = useState<ReportTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [templateForm, setTemplateForm] = useState(defaultTemplateForm);
   const [loading, setLoading] = useState(true);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [deletingTemplateId, setDeletingTemplateId] = useState<number | null>(null);
   const [exporting, setExporting] = useState<'csv' | 'pdf' | null>(null);
 
   const loadSummary = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get<MunicipalImpactSummary>('/v2/admin/reports/municipal-impact');
+      const endpoint = selectedTemplateId
+        ? `/v2/admin/reports/municipal-impact?template_id=${selectedTemplateId}`
+        : '/v2/admin/reports/municipal-impact';
+      const res = await api.get<MunicipalImpactSummary>(endpoint);
       if (isMunicipalImpactSummary(res.data)) setSummary(res.data);
     } catch {
       toast.error(t('municipal_reports.toast.load_failed'));
     } finally {
       setLoading(false);
     }
+  }, [selectedTemplateId, t, toast]);
+
+  const loadTemplates = useCallback(async () => {
+    setTemplatesLoading(true);
+    try {
+      const res = await api.get<TemplatesResponse>('/v2/admin/reports/municipal-impact/templates');
+      setTemplates(res.data?.templates ?? []);
+    } catch {
+      toast.error(t('municipal_reports.toast.templates_load_failed'));
+    } finally {
+      setTemplatesLoading(false);
+    }
   }, [t, toast]);
 
   useEffect(() => {
     loadSummary();
   }, [loadSummary]);
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
   const stats = summary?.stats ?? {};
   const currencyFormatter = useMemo(() => new Intl.NumberFormat(undefined, {
@@ -106,12 +183,53 @@ export default function MunicipalImpactReportsPage() {
   const handleExport = async (format: 'csv' | 'pdf') => {
     setExporting(format);
     try {
-      await downloadMunicipalExport(format, `municipal-impact-pack.${format}`);
+      await downloadMunicipalExport(format, `municipal-impact-pack.${format}`, selectedTemplateId ?? undefined);
       toast.success(t('municipal_reports.toast.export_started'));
     } catch {
       toast.error(t('municipal_reports.toast.export_failed'));
     } finally {
       setExporting(null);
+    }
+  };
+
+  const selectedTemplate = templates.find((template) => template.id === selectedTemplateId) ?? null;
+
+  const openTemplateModal = () => {
+    setTemplateForm(defaultTemplateForm);
+    onOpen();
+  };
+
+  const saveTemplate = async () => {
+    setSavingTemplate(true);
+    try {
+      const payload = {
+        ...templateForm,
+        hour_value_chf: templateForm.hour_value_chf === '' ? null : Number(templateForm.hour_value_chf),
+      };
+      const res = await api.post<{ template: ReportTemplate }>('/v2/admin/reports/municipal-impact/templates', payload);
+      const template = res.data?.template;
+      await loadTemplates();
+      if (template) setSelectedTemplateId(template.id);
+      toast.success(t('municipal_reports.toast.template_saved'));
+      onClose();
+    } catch {
+      toast.error(t('municipal_reports.toast.template_save_failed'));
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
+
+  const deleteTemplate = async (templateId: number) => {
+    setDeletingTemplateId(templateId);
+    try {
+      await api.delete(`/v2/admin/reports/municipal-impact/templates/${templateId}`);
+      if (selectedTemplateId === templateId) setSelectedTemplateId(null);
+      await loadTemplates();
+      toast.success(t('municipal_reports.toast.template_deleted'));
+    } catch {
+      toast.error(t('municipal_reports.toast.template_delete_failed'));
+    } finally {
+      setDeletingTemplateId(null);
     }
   };
 
@@ -205,6 +323,93 @@ export default function MunicipalImpactReportsPage() {
         </Card>
       )}
 
+      <Card className="mb-6" shadow="sm">
+        <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Layers size={20} />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">{t('municipal_reports.templates.title')}</h2>
+              <p className="mt-1 text-sm text-default-500">{t('municipal_reports.templates.description')}</p>
+            </div>
+          </div>
+          <Button
+            className="md:ml-auto"
+            color="primary"
+            variant="flat"
+            size="sm"
+            startContent={<Plus size={16} />}
+            onPress={openTemplateModal}
+          >
+            {t('municipal_reports.templates.create')}
+          </Button>
+        </CardHeader>
+        <Divider />
+        <CardBody className="gap-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+            <Select
+              label={t('municipal_reports.templates.select_label')}
+              selectedKeys={[selectedTemplateId ? String(selectedTemplateId) : 'default']}
+              isLoading={templatesLoading}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0];
+                setSelectedTemplateId(value && value !== 'default' ? Number(value) : null);
+              }}
+            >
+              <SelectItem key="default">{t('municipal_reports.templates.default_policy')}</SelectItem>
+              {templates.map((template) => (
+                <SelectItem key={String(template.id)}>
+                  {template.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <Button
+              variant="flat"
+              startContent={<Save size={16} />}
+              onPress={loadSummary}
+              isLoading={loading}
+            >
+              {t('municipal_reports.templates.apply')}
+            </Button>
+          </div>
+
+          {selectedTemplate && (
+            <div className="grid grid-cols-1 gap-3 rounded-lg border border-default-200 p-3 md:grid-cols-[minmax(0,1fr)_auto]">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-default-800">{selectedTemplate.name}</p>
+                  <Chip size="sm" variant="flat" color="primary">
+                    {t(`municipal_reports.templates.audiences.${selectedTemplate.audience}`)}
+                  </Chip>
+                  <Chip size="sm" variant="flat" color="secondary">
+                    {t(`caring_workflow.policy.periods.${selectedTemplate.date_preset}`)}
+                  </Chip>
+                  {selectedTemplate.hour_value_chf !== null && (
+                    <Chip size="sm" variant="flat" color="success">
+                      {t('municipal_reports.templates.hour_value_chip', { value: selectedTemplate.hour_value_chf })}
+                    </Chip>
+                  )}
+                </div>
+                {selectedTemplate.description && (
+                  <p className="mt-2 text-sm text-default-500">{selectedTemplate.description}</p>
+                )}
+              </div>
+              <Button
+                color="danger"
+                variant="light"
+                size="sm"
+                startContent={<Trash2 size={16} />}
+                isLoading={deletingTemplateId === selectedTemplate.id}
+                onPress={() => deleteTemplate(selectedTemplate.id)}
+              >
+                {t('municipal_reports.templates.delete')}
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {reportCards.map((report) => {
           const Icon = report.icon;
@@ -288,6 +493,78 @@ export default function MunicipalImpactReportsPage() {
           </Card>
         </div>
       )}
+
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+        <ModalContent>
+          <ModalHeader>{t('municipal_reports.templates.modal_title')}</ModalHeader>
+          <ModalBody className="gap-4">
+            <Input
+              label={t('municipal_reports.templates.fields.name')}
+              value={templateForm.name}
+              onValueChange={(name) => setTemplateForm((form) => ({ ...form, name }))}
+              isRequired
+            />
+            <Textarea
+              label={t('municipal_reports.templates.fields.description')}
+              value={templateForm.description}
+              onValueChange={(description) => setTemplateForm((form) => ({ ...form, description }))}
+              minRows={2}
+            />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Select
+                label={t('municipal_reports.templates.fields.audience')}
+                selectedKeys={[templateForm.audience]}
+                onSelectionChange={(keys) => {
+                  const value = Array.from(keys)[0] as ReportTemplate['audience'] | undefined;
+                  if (value) setTemplateForm((form) => ({ ...form, audience: value }));
+                }}
+              >
+                {(['municipality', 'canton', 'cooperative', 'foundation'] as const).map((audience) => (
+                  <SelectItem key={audience}>{t(`municipal_reports.templates.audiences.${audience}`)}</SelectItem>
+                ))}
+              </Select>
+              <Select
+                label={t('municipal_reports.templates.fields.period')}
+                selectedKeys={[templateForm.date_preset]}
+                onSelectionChange={(keys) => {
+                  const value = Array.from(keys)[0] as ReportTemplate['date_preset'] | undefined;
+                  if (value) setTemplateForm((form) => ({ ...form, date_preset: value }));
+                }}
+              >
+                {(['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const).map((period) => (
+                  <SelectItem key={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Input
+                label={t('municipal_reports.templates.fields.hour_value')}
+                type="number"
+                min={0}
+                max={500}
+                value={templateForm.hour_value_chf}
+                onValueChange={(hour_value_chf) => setTemplateForm((form) => ({ ...form, hour_value_chf }))}
+              />
+              <div className="flex items-center rounded-lg border border-default-200 px-3">
+                <Switch
+                  isSelected={templateForm.include_social_value}
+                  onValueChange={(include_social_value) => setTemplateForm((form) => ({ ...form, include_social_value }))}
+                >
+                  {t('municipal_reports.templates.fields.include_social_value')}
+                </Switch>
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onClose} isDisabled={savingTemplate}>
+              {t('municipal_reports.templates.cancel')}
+            </Button>
+            <Button color="primary" startContent={<Save size={16} />} onPress={saveTemplate} isLoading={savingTemplate}>
+              {t('municipal_reports.templates.save')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

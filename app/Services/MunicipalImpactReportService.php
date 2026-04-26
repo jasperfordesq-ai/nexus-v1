@@ -27,6 +27,7 @@ class MunicipalImpactReportService
     public function summary(int $tenantId, array $filters = []): array
     {
         $policy = $this->policyService->get($tenantId);
+        $policy = $this->applyTemplateOverrides($policy, $filters);
         $range = $this->normaliseDateRange($filters, $policy);
         $hourConfig = $this->hourValueConfig($tenantId, $policy);
 
@@ -160,6 +161,23 @@ class MunicipalImpactReportService
             'social_multiplier' => (float) ($config->social_multiplier ?? self::DEFAULT_SOCIAL_MULTIPLIER),
             'currency' => (string) ($config->hour_value_currency ?? self::DEFAULT_CURRENCY),
         ];
+    }
+
+    private function applyTemplateOverrides(array $policy, array $filters): array
+    {
+        if (!empty($filters['date_preset'])) {
+            $policy['municipal_report_default_period'] = (string) $filters['date_preset'];
+        }
+
+        if (array_key_exists('include_social_value', $filters) && $filters['include_social_value'] !== null) {
+            $policy['include_social_value_estimate'] = filter_var($filters['include_social_value'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if (isset($filters['hour_value_chf']) && $filters['hour_value_chf'] !== '') {
+            $policy['default_hour_value_chf'] = max(0, min(500, (int) $filters['hour_value_chf']));
+        }
+
+        return $policy;
     }
 
     private function previousQuarterStart(string $date): string
