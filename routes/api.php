@@ -1143,6 +1143,8 @@ Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminRevie
 Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide']);
 Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy']);
 Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);
+Route::get('/v2/admin/caring-community/role-presets', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'rolePresets']);
+Route::post('/v2/admin/caring-community/role-presets/install', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'installRolePresets']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);
@@ -1304,22 +1306,28 @@ Route::get('/v2/admin/legal-documents/{docId}/versions/{versionId}/pending-count
 Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
     Route::get('/v2/admin/broker/dashboard', [\App\Http\Controllers\Api\AdminBrokerController::class, 'dashboard']);
     Route::get('/v2/admin/broker/exchanges', [\App\Http\Controllers\Api\AdminBrokerController::class, 'exchanges']);
-    Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange']);
-    Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange']);
+    // Mutation endpoints throttled to 60/min/user to limit blast radius
+    // from a compromised broker account: mass-flagging messages, mass-
+    // toggling monitoring, mass-tagging listings would otherwise be
+    // unbounded. 60/min is well above any reasonable interactive use
+    // (one decision every second is already very fast for a human
+    // reviewer) but blocks scripted abuse.
+    Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange'])->middleware('throttle:60,1');
     Route::get('/v2/admin/broker/risk-tags', [\App\Http\Controllers\Api\AdminBrokerController::class, 'riskTags']);
     Route::get('/v2/admin/broker/messages', [\App\Http\Controllers\Api\AdminBrokerController::class, 'messages']);
     Route::get('/v2/admin/broker/messages/unreviewed-count', [\App\Http\Controllers\Api\AdminBrokerController::class, 'unreviewedCount']);
-    Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage']);
+    Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage'])->middleware('throttle:60,1');
     Route::get('/v2/admin/broker/monitoring', [\App\Http\Controllers\Api\AdminBrokerController::class, 'monitoring']);
-    Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage']);
-    Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring']);
-    Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag']);
-    Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag']);
+    Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag'])->middleware('throttle:60,1');
+    Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag'])->middleware('throttle:60,1');
     Route::get('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'getConfiguration']);
-    Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration']);
+    Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration'])->middleware('throttle:30,1');
     Route::get('/v2/admin/broker/exchanges/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showExchange']);
     Route::get('/v2/admin/broker/messages/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showMessage']);
-    Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage']);
+    Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage'])->middleware('throttle:60,1');
     Route::get('/v2/admin/broker/archives', [\App\Http\Controllers\Api\AdminBrokerController::class, 'archives']);
     Route::get('/v2/admin/broker/archives/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showArchive']);
     Route::get('/v2/admin/vetting/stats', [\App\Http\Controllers\Api\AdminVettingController::class, 'stats']);

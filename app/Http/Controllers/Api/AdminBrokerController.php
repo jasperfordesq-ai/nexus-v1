@@ -68,6 +68,33 @@ class AdminBrokerController extends BaseApiController
         return (bool) ($user->is_super_admin ?? false);
     }
 
+    /**
+     * Caller's role label for audit-log context. Brokers, coordinators, and
+     * admins all reach these endpoints via broker-or-admin middleware; the
+     * audit log treated them identically until this helper. Tagging the role
+     * lets a downstream auditor distinguish a broker's flag/approve from an
+     * admin's, which matters for accountability and for spotting privilege
+     * misuse without joining back to users.role at audit-read time.
+     */
+    private function resolveActorRole(): string
+    {
+        $user = $this->resolveUserObject();
+        $role = (string) ($user->role ?? '');
+        if ($role !== '') {
+            return $role;
+        }
+        if (($user->is_super_admin ?? false) || ($user->is_god ?? false)) {
+            return 'super_admin';
+        }
+        if (($user->is_tenant_super_admin ?? false)) {
+            return 'tenant_super_admin';
+        }
+        if (($user->is_admin ?? false)) {
+            return 'admin';
+        }
+        return 'unknown';
+    }
+
     private function resolveUserObject(): object
     {
         $user = \Illuminate\Support\Facades\Auth::user();
@@ -474,7 +501,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'exchange']), null, 500);
             }
 
-            $this->auditLogService->log('exchange_approved', null, $adminId, ['exchange_id' => $id, 'notes' => $notes]);
+            $this->auditLogService->log('exchange_approved', null, $adminId, ['exchange_id' => $id, 'notes' => $notes, 'actor_role' => $this->resolveActorRole()]);
 
             return $this->respondWithData(['id' => $id, 'status' => 'accepted']);
         } catch (\Exception $e) {
@@ -516,7 +543,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'exchange']), null, 500);
             }
 
-            $this->auditLogService->log('exchange_rejected', null, $adminId, ['exchange_id' => $id, 'reason' => $reason]);
+            $this->auditLogService->log('exchange_rejected', null, $adminId, ['exchange_id' => $id, 'reason' => $reason, 'actor_role' => $this->resolveActorRole()]);
 
             return $this->respondWithData(['id' => $id, 'status' => 'cancelled']);
         } catch (\Exception $e) {
@@ -633,7 +660,7 @@ class AdminBrokerController extends BaseApiController
                     [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
                 );
                 $tagId = $existing->id;
-                $this->auditLogService->log('listing_risk_tag_updated', null, $adminId, ['listing_id' => $listingId, 'old_risk_level' => $oldRiskLevel, 'new_risk_level' => $riskLevel]);
+                $this->auditLogService->log('listing_risk_tag_updated', null, $adminId, ['listing_id' => $listingId, 'old_risk_level' => $oldRiskLevel, 'new_risk_level' => $riskLevel, 'actor_role' => $this->resolveActorRole()]);
 
                 $highLevels = [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL];
                 if (in_array($riskLevel, $highLevels, true) && !in_array($oldRiskLevel, $highLevels, true)) {
@@ -645,7 +672,7 @@ class AdminBrokerController extends BaseApiController
                     [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
                 );
                 $tagId = (int) DB::getPdo()->lastInsertId();
-                $this->auditLogService->log('listing_risk_tag_created', null, $adminId, ['listing_id' => $listingId, 'tag_id' => $tagId, 'risk_level' => $riskLevel]);
+                $this->auditLogService->log('listing_risk_tag_created', null, $adminId, ['listing_id' => $listingId, 'tag_id' => $tagId, 'risk_level' => $riskLevel, 'actor_role' => $this->resolveActorRole()]);
 
                 if (in_array($riskLevel, [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL], true)) {
                     $this->notifyAdminsOfRiskTagChange($listingId, $riskLevel, $adminId);
@@ -677,7 +704,7 @@ class AdminBrokerController extends BaseApiController
 
             DB::delete("DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?", [$listingId, $tenantId]);
 
-            $this->auditLogService->log('listing_risk_tag_removed', null, $adminId, ['listing_id' => $listingId, 'previous_risk_level' => $existing->risk_level ?? null]);
+            $this->auditLogService->log('listing_risk_tag_removed', null, $adminId, ['listing_id' => $listingId, 'previous_risk_level' => $existing->risk_level ?? null, 'actor_role' => $this->resolveActorRole()]);
 
             return $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
         } catch (\Exception $e) {
@@ -841,7 +868,7 @@ class AdminBrokerController extends BaseApiController
                 [$adminId, $id, $tenantId]
             );
 
-            $this->auditLogService->log('broker_message_reviewed', null, $adminId, ['message_id' => $id]);
+            $this->auditLogService->log('broker_message_reviewed', null, $adminId, ['message_id' => $id, 'actor_role' => $this->resolveActorRole()]);
 
             return $this->respondWithData(['id' => $id, 'reviewed' => true]);
         } catch (\Exception $e) {
@@ -935,6 +962,7 @@ class AdminBrokerController extends BaseApiController
                 'archive_id' => $archiveId,
                 'decision'   => $decision,
                 'has_notes'  => $notes !== '',
+                'actor_role' => $this->resolveActorRole(),
             ]);
 
             return $this->respondWithData(['id' => $id, 'archive_id' => $archiveId, 'decision' => $decision, 'decided_by' => $adminName]);
@@ -980,6 +1008,7 @@ class AdminBrokerController extends BaseApiController
                 'message_id' => $id,
                 'severity'   => $severity,
                 'reason'     => $reason,
+                'actor_role' => $this->resolveActorRole(),
             ]);
 
             return $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
@@ -1090,6 +1119,7 @@ class AdminBrokerController extends BaseApiController
                     'user_id' => $userId, 'user_name' => $userName, 'reason' => $reason,
                     'messaging_disabled' => $messagingDisabled,
                     'expires_days' => $expiresDays ? (int) $expiresDays : null, 'expires_at' => $expiresAt,
+                    'actor_role' => $this->resolveActorRole(),
                 ]);
 
                 try {
@@ -1131,7 +1161,7 @@ class AdminBrokerController extends BaseApiController
                     }
                 }
 
-                $this->auditLogService->log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
+                $this->auditLogService->log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName, 'actor_role' => $this->resolveActorRole()]);
 
                 try {
                     LocaleContext::withLocale($user, function () use ($userId) {
@@ -1463,7 +1493,7 @@ class AdminBrokerController extends BaseApiController
                 'broker_config_updated',
                 null,
                 $adminId,
-                ['updated_keys' => array_keys($config)]
+                ['updated_keys' => array_keys($config), 'actor_role' => $this->resolveActorRole()]
             );
 
             return $this->respondWithData($config);
