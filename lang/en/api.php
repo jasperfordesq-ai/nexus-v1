@@ -12,7 +12,6 @@ return [
     'auth_required_detail'         => 'You must be logged in to access this resource.',
     'admin_access_required'        => 'Admin access required',
     'broker_or_admin_access_required' => 'Broker or admin access required',
-    'broker.listing_risk_tagged_message' => "Listing ':title' tagged as :level risk",
     'super_admin_required'         => 'Super admin access required',
     'insufficient_permissions'     => 'Insufficient permissions',
 

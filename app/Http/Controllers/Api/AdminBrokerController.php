@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\AuditLogService;
 use App\Services\BrokerControlConfigService;
 use App\Services\ExchangeWorkflowService;
@@ -187,18 +188,22 @@ class AdminBrokerController extends BaseApiController
 
         $onboardingSafeguardingFlags = 0;
         try {
+            // Match the other dashboard counts: when super-admin views
+            // all-tenants, drop the tenant filter; otherwise scope to caller.
+            $uspWhere  = $effectiveTenantId !== null ? 'usp.tenant_id = ?' : '1=1';
+            $uspParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
             $row = DB::selectOne(
                 "SELECT COUNT(DISTINCT usp.user_id) as cnt
                  FROM user_safeguarding_preferences usp
                  JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
-                 WHERE usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1
+                 WHERE {$uspWhere} AND usp.revoked_at IS NULL AND tso.is_active = 1
                  AND tso.triggers IS NOT NULL
                  AND NOT EXISTS (
                      SELECT 1 FROM activity_log al
                      WHERE al.entity_type = 'user' AND al.entity_id = usp.user_id
                      AND al.action = 'safeguarding_flag_reviewed'
                  )",
-                [$effectiveTenantId ?? TenantContext::getId()]
+                $uspParams
             );
             $onboardingSafeguardingFlags = (int) ($row->cnt ?? 0);
         } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
@@ -206,7 +211,7 @@ class AdminBrokerController extends BaseApiController
         $recentActivity = [];
         try {
             if (!$isSuperAdmin && $effectiveTenantId === null) {
-                return $this->respondWithError(__('api.tenant_context_error'), 403);
+                return $this->respondWithError('TENANT_CONTEXT_ERROR', __('api.tenant_context_error'), null, 403);
             }
             // Activity feed reads from BOTH activity_log and org_audit_log,
             // because broker actions are split between them by historical
@@ -221,13 +226,16 @@ class AdminBrokerController extends BaseApiController
             $actParams     = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
             $unionParams   = array_merge($actParams, $actParams);
             $recentActivity = DB::select(
-                "(SELECT al.id, al.tenant_id, al.user_id, al.action_type AS action_type,
+                // ActivityLog::log writes the specific action key to the
+                // `action` column and the broad category ('admin', 'system',
+                // ...) to `action_type`. Filter on `action`.
+                "(SELECT al.id, al.tenant_id, al.user_id, al.action AS action_type,
                          al.details, al.created_at,
                          u.first_name, u.last_name, t.name as tenant_name
                   FROM activity_log al
                   LEFT JOIN users u ON u.id = al.user_id
                   LEFT JOIN tenants t ON al.tenant_id = t.id
-                  WHERE {$actWhere} AND al.action_type IN (
+                  WHERE {$actWhere} AND al.action IN (
                       'vetting_record_verified', 'vetting_record_rejected',
                       'vetting_record_created', 'vetting_record_updated',
                       'vetting_record_deleted', 'vetting_document_uploaded',
@@ -292,7 +300,7 @@ class AdminBrokerController extends BaseApiController
 
             $effectiveTenantId = $this->resolveEffectiveTenantId($isSuperAdmin, $tenantId);
             if (!$isSuperAdmin && $effectiveTenantId === null) {
-                return $this->respondWithError(__('api.tenant_context_error'), 403);
+                return $this->respondWithError('TENANT_CONTEXT_ERROR', __('api.tenant_context_error'), null, 403);
             }
             if ($effectiveTenantId !== null) {
                 $conditions[] = 'er.tenant_id = ?';
@@ -1022,8 +1030,11 @@ class AdminBrokerController extends BaseApiController
 
         // Always operate on caller's tenant — see approveExchange comment.
         try {
+            // preferred_language is fetched so the bell notification renders
+            // in the recipient's locale, not the broker's. See CLAUDE.md
+            // "EMAIL & NOTIFICATION LOCALE — MUST WRAP IN LocaleContext".
             $user = DB::selectOne(
-                "SELECT id, tenant_id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                "SELECT id, tenant_id, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
             );
 
@@ -1065,10 +1076,12 @@ class AdminBrokerController extends BaseApiController
                 ]);
 
                 try {
-                    $msg = $messagingDisabled
-                        ? __('api_controllers_3.admin_bells.monitoring_restricted')
-                        : __('api_controllers_3.admin_bells.monitoring_under_review');
-                    Notification::createNotification($userId, $msg, '/messages', 'system', true);
+                    LocaleContext::withLocale($user, function () use ($userId, $messagingDisabled) {
+                        $msg = $messagingDisabled
+                            ? __('api_controllers_3.admin_bells.monitoring_restricted')
+                            : __('api_controllers_3.admin_bells.monitoring_under_review');
+                        Notification::createNotification($userId, $msg, '/messages', 'system', true);
+                    });
                 } catch (\Throwable $e) { \Log::warning('[AdminBroker] monitoring notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
@@ -1414,6 +1427,10 @@ class AdminBrokerController extends BaseApiController
             );
 
             if ($listing) {
+                // Don't pass an explicit $message — let notifyAdmins fall back
+                // to its built-in NotificationDispatcher::buildNotificationContent
+                // which renders via __('notifications.listing_risk_tagged', ...)
+                // per-recipient (each admin gets the bell in their own locale).
                 $this->notificationDispatcher->notifyAdmins(
                     'listing_risk_tagged',
                     [
@@ -1422,11 +1439,9 @@ class AdminBrokerController extends BaseApiController
                         'owner_name' => $listing->owner_name ?? 'Unknown',
                         'risk_level' => $riskLevel,
                         'tagged_by' => $brokerId,
-                    ],
-                    __('api.broker.listing_risk_tagged_message', [
                         'title' => $listing->title ?? '',
                         'level' => $riskLevel,
-                    ])
+                    ]
                 );
             }
         } catch (\Exception $e) {
