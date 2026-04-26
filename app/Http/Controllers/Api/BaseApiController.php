@@ -632,7 +632,11 @@ abstract class BaseApiController extends Controller
 
         $role = $user->role ?? 'member';
 
-        if ($role === 'broker') {
+        // 'broker' and 'coordinator' are operational roles that share the
+        // same panel as admins. Notification recipient queries throughout
+        // the codebase include 'coordinator' alongside 'broker' — granting
+        // them parity here so /broker/* deep-links from those bells work.
+        if (in_array($role, ['broker', 'coordinator'], true)) {
             return $userId;
         }
 

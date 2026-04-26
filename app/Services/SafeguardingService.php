@@ -695,14 +695,20 @@ class SafeguardingService
     public function assignDlp(int $incidentId, int $dlpUserId, int $adminId, int $tenantId): bool
     {
         try {
-            // Validate the DLP user exists in this tenant and has an appropriate role
+            // Validate the DLP user exists in this tenant AND has a role that
+            // can actually act on the assignment. The bell points at
+            // /broker/safeguarding which is gated by BrokerRoute (admin /
+            // tenant_admin / super_admin / broker / coordinator). Assigning a
+            // regular member as DLP would send them a bell that bounces back
+            // to /dashboard.
             $dlpUser = User::where('id', $dlpUserId)
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
+                ->whereIn('role', ['admin', 'tenant_admin', 'super_admin', 'broker', 'coordinator'])
                 ->first();
 
             if (!$dlpUser) {
-                Log::warning('SafeguardingService::assignDlp: DLP user not found in tenant', [
+                Log::warning('SafeguardingService::assignDlp: DLP user not found, inactive, or lacks broker-tier role', [
                     'dlp_user_id' => $dlpUserId, 'tenant_id' => $tenantId,
                 ]);
                 return false;

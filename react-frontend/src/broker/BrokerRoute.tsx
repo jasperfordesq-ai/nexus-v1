@@ -30,8 +30,14 @@ export function BrokerRoute() {
 
   const role = (user?.role as string) || '';
   const userRecord = user as Record<string, unknown> | null;
+  // Mirrors backend EnsureIsBrokerOrAdmin / requireBrokerOrAdmin — kept
+  // in sync so route-level gate, controller helper, and frontend guard
+  // agree. 'coordinator' is an operational role included in many
+  // notification-recipient queries; without granting them broker-panel
+  // access, every /broker/* deep-link from those bells bounces them.
   const hasBrokerAccess =
     role === 'broker' ||
+    role === 'coordinator' ||
     role === 'admin' ||
     role === 'tenant_admin' ||
     role === 'super_admin' ||

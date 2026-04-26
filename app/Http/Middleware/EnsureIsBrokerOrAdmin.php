@@ -53,9 +53,15 @@ class EnsureIsBrokerOrAdmin
         // counts as admin-tier. 'god' is the platform's break-glass role.
         $hasAdminRole = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
 
-        $isBroker = $role === 'broker';
+        // 'broker' and 'coordinator' are operational roles that share the
+        // same panel as admins. Several notification-recipient queries
+        // (NotifyAdminOfNewRegistration, MatchApprovalWorkflowService,
+        // notifyAdmins for listing_risk_tagged, etc.) include 'coordinator'
+        // — without granting them broker-panel access, every /broker/*
+        // notification link bounced them to /dashboard.
+        $isBrokerTier = in_array($role, ['broker', 'coordinator'], true);
 
-        if (!$isBroker && !$hasAdminFlag && !$hasAdminRole) {
+        if (!$isBrokerTier && !$hasAdminFlag && !$hasAdminRole) {
             return response()->json([
                 'errors' => [
                     ['code' => 'forbidden', 'message' => __('api.broker_or_admin_access_required')],
