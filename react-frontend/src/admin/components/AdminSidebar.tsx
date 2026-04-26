@@ -20,7 +20,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
-import { adminBroker } from '../api/adminApi';
 import { api } from '@/lib/api';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
@@ -73,13 +72,9 @@ import Mail from 'lucide-react/icons/mail';
 import Wrench from 'lucide-react/icons/wrench';
 import Stethoscope from 'lucide-react/icons/stethoscope';
 import MessageSquare from 'lucide-react/icons/message-square';
-import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import Star from 'lucide-react/icons/star';
 import Flag from 'lucide-react/icons/flag';
-import Eye from 'lucide-react/icons/eye';
-import Archive from 'lucide-react/icons/archive';
-import FileCheck from 'lucide-react/icons/file-check';
 import UserX from 'lucide-react/icons/user-x';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
@@ -277,16 +272,15 @@ function useAdminNav(): NavSection[] {
     ];
 
     // ── Matching items — broker/exchange gated; safeguarding always shown ─
+    // Broker Controls moved to /broker/* — single "Broker Panel" entry here
+    // links into the dedicated panel. The 6 sub-pages that used to live
+    // under Matching & Safety (Message Review, User Monitoring, Vetting,
+    // Insurance, Review Archive) are now in the broker panel's own sidebar.
     const matchingItems = [
       ...(hasFeature('exchange_workflow') ? [
         { label: "Smart Matching", href: '/admin/smart-matching', icon: Brain },
         { label: "Match Approvals", href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
-        { label: "Broker Controls", href: '/admin/broker-controls', icon: Shield },
-        { label: "Message Review", href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
-        { label: "User Monitoring", href: '/admin/broker-controls/monitoring', icon: Eye },
-        { label: "Vetting Records", href: '/admin/broker-controls/vetting', icon: ShieldCheck },
-        { label: "Insurance Certificates", href: '/admin/broker-controls/insurance', icon: FileCheck },
-        { label: "Review Archive", href: '/admin/broker-controls/archives', icon: Archive },
+        { label: "Broker Panel", href: '/broker', icon: Shield },
       ] : []),
       { label: "Safeguarding", href: '/admin/safeguarding', icon: ShieldCheck },
       { label: "Member Safeguarding", href: '/admin/safeguarding?tab=preferences', icon: Users },
@@ -624,21 +618,13 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   // ── Recent pages (from localStorage) ────────────────────────────────────
   const [recentPages, setRecentPages] = useState<RecentPage[]>(() => readRecentPages());
 
-  // ── Dynamic unreviewed message count for sidebar badge ──────────────────
-  const [unreviewedCount, setUnreviewedCount] = useState(0);
   // ── Dynamic unreviewed safeguarding flag count ──────────────────────────
   const [safeguardingFlagCount, setSafeguardingFlagCount] = useState(0);
 
-  const fetchUnreviewedCount = useCallback(async () => {
-    try {
-      const res = await adminBroker.getUnreviewedCount();
-      if (res.success && res.data) {
-        setUnreviewedCount(res.data.count);
-      }
-    } catch {
-      // Silently fail — sidebar badge is non-critical
-    }
-  }, []);
+  // The unreviewed-message badge moved to the broker panel sidebar when
+  // /admin/broker-controls/messages was retired. The broker panel polls
+  // its own dashboard endpoint for the count; the admin sidebar no longer
+  // needs to.
 
   // Fetch the safeguarding dashboard summary so the Safeguarding nav item can
   // show a live red badge when there are unreviewed flags waiting. Failure is
@@ -658,14 +644,10 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   }, []);
 
   useEffect(() => {
-    fetchUnreviewedCount();
     fetchSafeguardingFlags();
-    const interval = setInterval(() => {
-      fetchUnreviewedCount();
-      fetchSafeguardingFlags();
-    }, 60000);
+    const interval = setInterval(fetchSafeguardingFlags, 60000);
     return () => clearInterval(interval);
-  }, [fetchUnreviewedCount, fetchSafeguardingFlags]);
+  }, [fetchSafeguardingFlags]);
 
   // ── Section map for O(1) zone lookup ────────────────────────────────────
   const sectionMap = useMemo(
@@ -765,18 +747,16 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   // ── Render a single nav item link ────────────────────────────────────────
   const renderNavItem = (item: NavItem) => {
     const ItemIcon = item.icon;
-    const isMessageReview = item.href === '/admin/broker-controls/messages';
     // Safeguarding root link carries a red live-count badge for unreviewed
     // flags (excluding the query-scoped Member Safeguarding child link).
+    // The unreviewed-message badge moved to the broker panel sidebar when
+    // /admin/broker-controls/messages was retired.
     const isSafeguardingRoot = item.href === '/admin/safeguarding';
     const showSafeguardingBadge = isSafeguardingRoot && safeguardingFlagCount > 0;
-    const showMessageBadge = isMessageReview && unreviewedCount > 0;
-    const dynamicBadge = showMessageBadge
-      ? String(unreviewedCount)
-      : showSafeguardingBadge
+    const dynamicBadge = showSafeguardingBadge
       ? String(safeguardingFlagCount)
       : item.badge;
-    const isUrgentBadge = showMessageBadge || showSafeguardingBadge;
+    const isUrgentBadge = showSafeguardingBadge;
 
     return (
       <li key={item.href}>

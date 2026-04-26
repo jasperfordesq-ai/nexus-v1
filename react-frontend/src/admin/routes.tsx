@@ -48,18 +48,9 @@ const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
 const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
 const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
 const StartingBalances = lazy(() => import('./modules/timebanking/StartingBalances'));
-const BrokerDashboard = lazy(() => import('./modules/broker/BrokerDashboard'));
-const ExchangeManagement = lazy(() => import('./modules/broker/ExchangeManagement'));
-const RiskTags = lazy(() => import('./modules/broker/RiskTags'));
-const MessageReview = lazy(() => import('./modules/broker/MessageReview'));
-const UserMonitoring = lazy(() => import('./modules/broker/UserMonitoring'));
-const VettingRecords = lazy(() => import('./modules/broker/VettingRecords'));
-const InsuranceCertificates = lazy(() => import('./modules/broker/InsuranceCertificates'));
-const BrokerConfiguration = lazy(() => import('./modules/broker/BrokerConfiguration'));
-const ExchangeDetail = lazy(() => import('./modules/broker/ExchangeDetail'));
-const MessageDetail = lazy(() => import('./modules/broker/MessageDetail'));
-const ReviewArchive = lazy(() => import('./modules/broker/ReviewArchive'));
-const ArchiveDetail = lazy(() => import('./modules/broker/ArchiveDetail'));
+// admin/modules/broker/* retired — broker control panel lives at /broker/*
+// (see react-frontend/src/broker/pages/). Legacy /admin/broker-controls/*
+// URLs redirect via the TenantRedirect Route below.
 const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
 const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
@@ -353,18 +344,12 @@ export function AdminRoutes() {
       <Route path="smart-matching/configuration" element={<Lazy><MatchingConfig /></Lazy>} />
       <Route path="match-approvals" element={<Lazy><MatchApprovals /></Lazy>} />
       <Route path="match-approvals/:id" element={<Lazy><MatchDetail /></Lazy>} />
-      <Route path="broker-controls" element={<Lazy><BrokerDashboard /></Lazy>} />
-      <Route path="broker-controls/exchanges" element={<Lazy><ExchangeManagement /></Lazy>} />
-      <Route path="broker-controls/risk-tags" element={<Lazy><RiskTags /></Lazy>} />
-      <Route path="broker-controls/messages" element={<Lazy><MessageReview /></Lazy>} />
-      <Route path="broker-controls/monitoring" element={<Lazy><UserMonitoring /></Lazy>} />
-      <Route path="broker-controls/vetting" element={<Lazy><VettingRecords /></Lazy>} />
-      <Route path="broker-controls/insurance" element={<Lazy><InsuranceCertificates /></Lazy>} />
-      <Route path="broker-controls/configuration" element={<Lazy><BrokerConfiguration /></Lazy>} />
-      <Route path="broker-controls/exchanges/:id" element={<Lazy><ExchangeDetail /></Lazy>} />
-      <Route path="broker-controls/messages/:id" element={<Lazy><MessageDetail /></Lazy>} />
-      <Route path="broker-controls/archives" element={<Lazy><ReviewArchive /></Lazy>} />
-      <Route path="broker-controls/archives/:id" element={<Lazy><ArchiveDetail /></Lazy>} />
+      {/* /admin/broker-controls/* retired — broker control panel lives at
+          /broker/* (see react-frontend/src/broker/). Anyone landing on a
+          legacy bookmark is redirected to the new home, preserving the
+          tenant slug via TenantRedirect. */}
+      <Route path="broker-controls" element={<TenantRedirect to="/broker" />} />
+      <Route path="broker-controls/*" element={<TenantRedirect to="/broker" />} />
 
       {/* ─── MODERATION ─── */}
       <Route path="moderation/feed" element={<Lazy><FeedModeration /></Lazy>} />

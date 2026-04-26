@@ -63,16 +63,11 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   campaigns: 'breadcrumbs.campaigns',
   'custom-badges': 'breadcrumbs.custom_badges',
 
-  // Matching & Broker
+  // Matching & Broker — broker-controls retired; legacy URL redirects to
+  // /broker/* via TenantRedirect in admin/routes.tsx.
   'smart-matching': 'breadcrumbs.smart_matching',
   configuration: 'breadcrumbs.configuration',
   'match-approvals': 'breadcrumbs.match_approvals',
-  'broker-controls': 'breadcrumbs.broker_controls',
-  exchanges: 'breadcrumbs.exchanges',
-  'risk-tags': 'breadcrumbs.risk_tags',
-  messages: 'breadcrumbs.messages',
-  vetting: 'breadcrumbs.vetting',
-  insurance: 'breadcrumbs.insurance',
   archives: 'breadcrumbs.archives',
   'match-debug': 'breadcrumbs.match_debug',
 

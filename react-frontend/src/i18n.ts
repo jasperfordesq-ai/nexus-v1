@@ -119,9 +119,17 @@ i18n
           // keys are picked up without having to clear localStorage manually.
           // Prod: 1-hour cache avoids re-fetching 52 namespaces × 11 languages per view.
           expirationTime: import.meta.env.DEV ? 0 : 60 * 60 * 1000,
+          // Namespacing the localStorage cache by build commit means every
+          // deploy gets a fresh cache. Without this, users who load the app
+          // before a deploy have up-to-1-hour-stale translations even though
+          // the new JSON is sitting on the CDN — exactly what bit us when
+          // round 4 added new sidebar nav keys.
+          prefix: `i18n_${__BUILD_COMMIT__}_`,
         },
         {
-          loadPath: '/locales/{{lng}}/{{ns}}.json',
+          // Append the build commit as a query string so each deploy
+          // bypasses any HTTP cache (browser, Cloudflare) on the JSON files.
+          loadPath: `/locales/{{lng}}/{{ns}}.json?v=${__BUILD_COMMIT__}`,
         },
       ],
     },

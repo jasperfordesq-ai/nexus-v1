@@ -11,6 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Divider } from '@heroui/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
@@ -30,49 +31,17 @@ import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
 import { BrokerControlsHelp } from './BrokerHelpPage';
 
+// Quick-link metadata. Title + description are translated at render time
+// using the broker.dashboard.links.* namespace so the dashboard respects
+// the user's preferred language. Path/icon/color are presentation-only
+// and stay defined here.
 const QUICK_LINKS = [
-  {
-    title: 'Exchange Management',
-    description: 'Review and approve exchange requests flagged for broker attention.',
-    icon: ArrowLeftRight,
-    color: 'primary' as const,
-    path: '/broker/exchanges',
-  },
-  {
-    title: 'Risk Tags',
-    description: 'Manage risk classifications on listings.',
-    icon: ShieldAlert,
-    color: 'danger' as const,
-    path: '/broker/risk-tags',
-  },
-  {
-    title: 'Message Review',
-    description: 'Review broker copies of flagged conversations.',
-    icon: MessageSquareWarning,
-    color: 'warning' as const,
-    path: '/broker/messages',
-  },
-  {
-    title: 'User Monitoring',
-    description: 'Track members under broker oversight.',
-    icon: Eye,
-    color: 'secondary' as const,
-    path: '/broker/monitoring',
-  },
-  {
-    title: 'Vetting Records',
-    description: 'Manage DBS / Garda vetting records.',
-    icon: ShieldCheck,
-    color: 'success' as const,
-    path: '/broker/vetting',
-  },
-  {
-    title: 'Configuration',
-    description: 'Configure broker control settings.',
-    icon: Settings,
-    color: 'default' as const,
-    path: '/broker/configuration',
-  },
+  { key: 'exchanges',     icon: ArrowLeftRight,        color: 'primary'   as const, path: '/broker/exchanges' },
+  { key: 'risk_tags',     icon: ShieldAlert,           color: 'danger'    as const, path: '/broker/risk-tags' },
+  { key: 'messages',      icon: MessageSquareWarning,  color: 'warning'   as const, path: '/broker/messages' },
+  { key: 'monitoring',    icon: Eye,                   color: 'secondary' as const, path: '/broker/monitoring' },
+  { key: 'vetting',       icon: ShieldCheck,           color: 'success'   as const, path: '/broker/vetting' },
+  { key: 'configuration', icon: Settings,              color: 'default'   as const, path: '/broker/configuration' },
 ];
 
 // Tailwind JIT needs full class names at build time — dynamic `bg-${color}/10` won't work
@@ -94,7 +63,8 @@ const quickLinkTextClass: Record<string, string> = {
 };
 
 export function BrokerDashboard() {
-  usePageTitle("Broker Dashboard");
+  const { t } = useTranslation('broker');
+  usePageTitle(t('dashboard.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -109,11 +79,11 @@ export function BrokerDashboard() {
         setStats(res.data);
       }
     } catch {
-      toast.error("Failed to load broker dashboard");
+      toast.error(t('dashboard.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -123,8 +93,8 @@ export function BrokerDashboard() {
   return (
     <div>
       <PageHeader
-        title={"Broker Dashboard"}
-        description={"Overview of pending exchanges, insurance, vetting, and monitored users"}
+        title={t('dashboard.title')}
+        description={t('dashboard.description')}
         actions={
           <Button
             variant="flat"
@@ -133,7 +103,7 @@ export function BrokerDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('dashboard.refresh')}
           </Button>
         }
       />
@@ -142,7 +112,7 @@ export function BrokerDashboard() {
           with the filter already applied, so admins triage in one click. */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={"Pending Exchanges"}
+          label={t('dashboard.pending_exchanges')}
           value={stats?.pending_exchanges ?? '—'}
           icon={ArrowLeftRight}
           color="primary"
@@ -150,7 +120,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/exchanges?status=pending_broker')}
         />
         <StatCard
-          label={"Unreviewed Messages"}
+          label={t('dashboard.unreviewed_messages')}
           value={stats?.unreviewed_messages ?? '—'}
           icon={MessageSquareWarning}
           color="warning"
@@ -158,7 +128,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/messages?status=unreviewed')}
         />
         <StatCard
-          label={"High Risk Listings"}
+          label={t('dashboard.high_risk_listings')}
           value={stats?.high_risk_listings ?? '—'}
           icon={ShieldAlert}
           color="danger"
@@ -166,7 +136,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/risk-tags?level=high')}
         />
         <StatCard
-          label={"Monitored Users"}
+          label={t('dashboard.monitored_users')}
           value={stats?.monitored_users ?? '—'}
           icon={Eye}
           color="secondary"
@@ -174,7 +144,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/monitoring')}
         />
         <StatCard
-          label={"Vetting Pending"}
+          label={t('dashboard.vetting_pending')}
           value={stats?.vetting_pending ?? '—'}
           icon={ShieldCheck}
           color="success"
@@ -182,7 +152,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/vetting?status=pending')}
         />
         <StatCard
-          label={"Expiring Soon"}
+          label={t('dashboard.vetting_expiring')}
           value={stats?.vetting_expiring ?? '—'}
           icon={Clock}
           color="warning"
@@ -190,7 +160,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/vetting?status=expiring_soon')}
         />
         <StatCard
-          label={"Safeguarding Alerts"}
+          label={t('dashboard.safeguarding_alerts')}
           value={stats?.safeguarding_alerts ?? '—'}
           icon={AlertTriangle}
           color="danger"
@@ -198,7 +168,7 @@ export function BrokerDashboard() {
           to={tenantPath('/broker/safeguarding?filter=critical')}
         />
         <StatCard
-          label={"Onboarding Flags"}
+          label={t('dashboard.safeguarding_flags')}
           value={stats?.onboarding_safeguarding_flags ?? '—'}
           icon={ShieldAlert}
           color="warning"
@@ -208,7 +178,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-lg font-semibold text-foreground mb-4">{"Quick Access"}</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{t('dashboard.quick_access')}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {QUICK_LINKS.map((link) => {
           const Icon = link.icon;
@@ -219,8 +189,8 @@ export function BrokerDashboard() {
                   <Icon size={24} className={quickLinkTextClass[link.color]} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-foreground">{link.title}</p>
-                  <p className="text-sm text-default-500">{link.description}</p>
+                  <p className="font-semibold text-foreground">{t(`dashboard.links.${link.key}_title`)}</p>
+                  <p className="text-sm text-default-500">{t(`dashboard.links.${link.key}_desc`)}</p>
                 </div>
                 <ChevronRight size={20} className="text-default-400 shrink-0" />
               </CardBody>
@@ -230,7 +200,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{"Recent Activity"}</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{t('dashboard.recent_activity')}</h2>
       {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
@@ -239,7 +209,7 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
             <Activity size={18} className="text-default-500" />
-            <span className="text-sm font-semibold text-foreground">{"Broker Actions"}</span>
+            <span className="text-sm font-semibold text-foreground">{t('dashboard.broker_actions_heading')}</span>
           </CardHeader>
           <Divider className="my-2" />
           <CardBody className="p-0">
@@ -250,14 +220,14 @@ export function BrokerDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground">
                       <span className="font-medium">{entry.first_name} {entry.last_name}</span>
-                      {' '}{formatActionLabel(entry.action_type)}
+                      {' '}{formatActionLabel(entry.action_type, t)}
                     </p>
                     {entry.details && (
                       <p className="text-xs text-default-400 truncate">{entry.details}</p>
                     )}
                   </div>
                   <span className="shrink-0 text-xs text-default-400">
-                    {formatTimeAgo(entry.created_at)}
+                    {formatTimeAgo(entry.created_at, t)}
                   </span>
                 </li>
               ))}
@@ -268,9 +238,9 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <Activity size={40} className="text-default-300 mb-3" />
-            <p className="text-default-500 font-medium">No recent broker activity</p>
+            <p className="text-default-500 font-medium">{t('dashboard.no_recent_activity')}</p>
             <p className="text-sm text-default-400 mt-1">
-              Approvals, message reviews, and other broker actions will appear here as they happen.
+              {t('dashboard.no_recent_activity_hint')}
             </p>
           </CardBody>
         </Card>
@@ -315,63 +285,42 @@ const actionChipColorMap: Record<string, ChipColor> = {
   insurance_cert_deleted: 'default',
 };
 
-const actionChipLabel: Record<string, string> = {
-  // org_audit_log
-  exchange_approved: 'Approved',
-  exchange_rejected: 'Rejected',
-  broker_message_reviewed: 'Reviewed',
-  broker_message_approved: 'Approved',
-  broker_message_flagged: 'Flagged',
-  listing_risk_tag_created: 'Risk Tagged',
-  listing_risk_tag_updated: 'Risk Updated',
-  listing_risk_tag_removed: 'Risk Removed',
-  user_monitoring_added: 'Monitored',
-  user_monitoring_removed: 'Monitor Cleared',
-  broker_config_updated: 'Config',
-  // activity_log
-  vetting_record_verified: 'Verified',
-  vetting_record_rejected: 'Vetting Rejected',
-  vetting_record_created: 'Vetting Added',
-  vetting_record_updated: 'Vetting Updated',
-  vetting_record_deleted: 'Vetting Removed',
-  vetting_document_uploaded: 'Document',
-  insurance_cert_created: 'Insurance Added',
-  insurance_cert_updated: 'Insurance Updated',
-  insurance_cert_verified: 'Insurance Verified',
-  insurance_cert_rejected: 'Insurance Rejected',
-  insurance_cert_deleted: 'Insurance Removed',
-};
-
-const actionVerbLabel: Record<string, string> = {
-  // org_audit_log
-  exchange_approved: 'approved an exchange',
-  exchange_rejected: 'rejected an exchange',
-  broker_message_reviewed: 'reviewed a message',
-  broker_message_approved: 'approved a message',
-  broker_message_flagged: 'flagged a message',
-  listing_risk_tag_created: 'tagged a listing',
-  listing_risk_tag_updated: 'updated a listing risk tag',
-  listing_risk_tag_removed: 'removed a listing risk tag',
-  user_monitoring_added: 'placed a user under monitoring',
-  user_monitoring_removed: 'cleared monitoring on a user',
-  broker_config_updated: 'updated broker configuration',
-  // activity_log
-  vetting_record_verified: 'verified a vetting record',
-  vetting_record_rejected: 'rejected a vetting record',
-  vetting_record_created: 'added a vetting record',
-  vetting_record_updated: 'updated a vetting record',
-  vetting_record_deleted: 'deleted a vetting record',
-  vetting_document_uploaded: 'uploaded a vetting document',
-  insurance_cert_created: 'added an insurance certificate',
-  insurance_cert_updated: 'updated an insurance certificate',
-  insurance_cert_verified: 'verified an insurance certificate',
-  insurance_cert_rejected: 'rejected an insurance certificate',
-  insurance_cert_deleted: 'removed an insurance certificate',
+// Action keys → broker.json sub-key suffix. The full path is
+// `dashboard.activity.chip_${suffix}` and `dashboard.activity.verb_${suffix}`.
+// Mapping is needed because the backend emits keys like
+// 'broker_message_reviewed' but i18n keys are kept short ('message_reviewed').
+const actionI18nKeySuffix: Record<string, string> = {
+  exchange_approved: 'exchange_approved',
+  exchange_rejected: 'exchange_rejected',
+  broker_message_reviewed: 'message_reviewed',
+  broker_message_approved: 'message_approved',
+  broker_message_flagged: 'message_flagged',
+  listing_risk_tag_created: 'risk_tag_created',
+  listing_risk_tag_updated: 'risk_tag_updated',
+  listing_risk_tag_removed: 'risk_tag_removed',
+  user_monitoring_added: 'monitoring_added',
+  user_monitoring_removed: 'monitoring_removed',
+  broker_config_updated: 'config_updated',
+  vetting_record_verified: 'vetting_verified',
+  vetting_record_rejected: 'vetting_rejected',
+  vetting_record_created: 'vetting_created',
+  vetting_record_updated: 'vetting_updated',
+  vetting_record_deleted: 'vetting_deleted',
+  vetting_document_uploaded: 'vetting_document',
+  insurance_cert_created: 'insurance_created',
+  insurance_cert_updated: 'insurance_updated',
+  insurance_cert_verified: 'insurance_verified',
+  insurance_cert_rejected: 'insurance_rejected',
+  insurance_cert_deleted: 'insurance_deleted',
 };
 
 function ActivityChip({ actionType }: { actionType: string }) {
+  const { t } = useTranslation('broker');
   const color: ChipColor = actionChipColorMap[actionType] ?? 'default';
-  const label = actionChipLabel[actionType] ?? actionType.replace(/_/g, ' ');
+  const suffix = actionI18nKeySuffix[actionType];
+  const label = suffix
+    ? t(`dashboard.activity.chip_${suffix}`)
+    : actionType.replace(/_/g, ' ');
   return (
     <Chip size="sm" variant="flat" color={color} className="shrink-0">
       {label}
@@ -379,21 +328,26 @@ function ActivityChip({ actionType }: { actionType: string }) {
   );
 }
 
-function formatActionLabel(actionType: string): string {
-  return actionVerbLabel[actionType] ?? actionType.replace(/_/g, ' ');
+type TFunc = (key: string, options?: Record<string, unknown>) => string;
+
+function formatActionLabel(actionType: string, t: TFunc): string {
+  const suffix = actionI18nKeySuffix[actionType];
+  return suffix
+    ? t(`dashboard.activity.verb_${suffix}`)
+    : actionType.replace(/_/g, ' ');
 }
 
-function formatTimeAgo(dateStr: string): string {
+function formatTimeAgo(dateStr: string, t: TFunc): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffMins < 1) return t('dashboard.time_just_now');
+  if (diffMins < 60) return t('dashboard.time_minutes_ago', { count: diffMins });
   const diffHrs = Math.floor(diffMins / 60);
-  if (diffHrs < 24) return `${diffHrs}h ago`;
+  if (diffHrs < 24) return t('dashboard.time_hours_ago', { count: diffHrs });
   const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 7) return t('dashboard.time_days_ago', { count: diffDays });
   return date.toLocaleDateString();
 }
 
