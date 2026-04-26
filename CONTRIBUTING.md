@@ -4,6 +4,8 @@ Thank you for your interest in contributing to Project NEXUS — an open-source,
 
 Project NEXUS is released under **AGPL-3.0-or-later**. By contributing, you agree that your contributions will be licensed under the same terms.
 
+By submitting a contribution, you also agree to the [Project NEXUS Contributor Terms](CONTRIBUTOR_TERMS.md), including the licence, patent, ownership, third-party-code, and AI-disclosure terms described there.
+
 **Repository:** https://github.com/jasperfordesq-ai/nexus-v1
 
 ---
@@ -11,25 +13,34 @@ Project NEXUS is released under **AGPL-3.0-or-later**. By contributing, you agre
 ## Table of Contents
 
 1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Environment Setup](#development-environment-setup)
-4. [Project Structure Overview](#project-structure-overview)
-5. [How to Contribute](#how-to-contribute)
-6. [Frontend Contribution Workflow](#frontend-contribution-workflow)
-7. [Backend Contribution Workflow](#backend-contribution-workflow)
-8. [Mobile Contribution Workflow](#mobile-contribution-workflow)
-9. [SPDX Header Requirement (Mandatory)](#spdx-header-requirement-mandatory)
-10. [Coding Standards](#coding-standards)
-11. [Git Commit Convention](#git-commit-convention)
-12. [Running Tests](#running-tests)
-13. [AGPL-3.0 Compliance](#agpl-30-compliance)
-14. [Attribution Requirements](#attribution-requirements)
+2. [Contributor Terms](#contributor-terms)
+3. [Getting Started](#getting-started)
+4. [Development Environment Setup](#development-environment-setup)
+5. [Project Structure Overview](#project-structure-overview)
+6. [How to Contribute](#how-to-contribute)
+7. [Frontend Contribution Workflow](#frontend-contribution-workflow)
+8. [Backend Contribution Workflow](#backend-contribution-workflow)
+9. [Mobile Contribution Workflow](#mobile-contribution-workflow)
+10. [SPDX Header Requirement (Mandatory)](#spdx-header-requirement-mandatory)
+11. [Coding Standards](#coding-standards)
+12. [Git Commit Convention](#git-commit-convention)
+13. [Running Tests](#running-tests)
+14. [AGPL-3.0 Compliance](#agpl-30-compliance)
+15. [Attribution Requirements](#attribution-requirements)
 
 ---
 
 ## Code of Conduct
 
 All contributors are expected to behave respectfully and professionally. We do not tolerate harassment, discrimination, or hostile behaviour in any project space — issues, pull requests, discussions, or elsewhere. Please report any concerns to the project maintainer.
+
+---
+
+## Contributor Terms
+
+All contributions are subject to the [Project NEXUS Contributor Terms](CONTRIBUTOR_TERMS.md). These terms give Jasper Ford, and any entity he designates to steward Project NEXUS, the right to use contributions under AGPL-3.0-or-later and under commercial or proprietary licence terms.
+
+Do not submit a contribution unless you have the right to make that grant. Contributions must not include secrets, confidential material, incompatible third-party code, or undisclosed AI-generated material.
 
 ---
 

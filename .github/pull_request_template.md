@@ -8,6 +8,10 @@
 - [ ] Refactoring (no functional changes)
 - [ ] Documentation update
 
+## Contributor Terms
+- [ ] I have read and agree to `CONTRIBUTOR_TERMS.md`, including the licence grant, patent grant, ownership/employer-permission confirmation, third-party-code restrictions, and AI-disclosure requirements.
+- [ ] I have disclosed meaningful AI-generated or AI-assisted contributions in this PR, or this PR contains no meaningful AI-generated or AI-assisted contribution.
+
 ## Root Cause Analysis (required for bug fixes)
 <!-- If this is a bug fix, you MUST fill in these fields. Delete this section for non-fix PRs. -->
 **What was the bug?**
