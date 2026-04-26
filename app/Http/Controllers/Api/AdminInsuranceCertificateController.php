@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\InsuranceCertificateService;
 
@@ -80,7 +81,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** POST /api/v2/admin/insurance-certificates */
     public function store(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         $userId = $this->inputInt('user_id');
         $insuranceType = $this->input('insurance_type');
@@ -117,6 +118,8 @@ class AdminInsuranceCertificateController extends BaseApiController
             $id = $this->insuranceCertificateService->create($data);
             $record = $this->insuranceCertificateService->getById($id);
 
+            ActivityLog::log($adminId, 'insurance_cert_created', "Created insurance certificate #{$id} for user #{$userId} ({$data['insurance_type']})", false, null, 'admin', 'insurance_cert', $id);
+
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_create_failed'), null, 500);
@@ -126,7 +129,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** PUT /api/v2/admin/insurance-certificates/{id} */
     public function update(int $id): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
@@ -167,6 +170,9 @@ class AdminInsuranceCertificateController extends BaseApiController
             $this->insuranceCertificateService->update($id, $data);
             $record = $this->insuranceCertificateService->getById($id);
 
+            $changedFields = implode(',', array_keys($data));
+            ActivityLog::log($adminId, 'insurance_cert_updated', "Updated insurance certificate #{$id} ({$changedFields})", false, null, 'admin', 'insurance_cert', $id);
+
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_update_failed'), null, 500);
@@ -188,6 +194,8 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             $this->insuranceCertificateService->verify($id, $adminId);
+
+            ActivityLog::log($adminId, 'insurance_cert_verified', "Verified insurance certificate #{$id} for user #{$existing['user_id']}", false, null, 'admin', 'insurance_cert', $id);
 
             // Notify the user that their insurance certificate was verified
             try {
@@ -230,6 +238,8 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             $this->insuranceCertificateService->reject($id, $adminId, $reason);
 
+            ActivityLog::log($adminId, 'insurance_cert_rejected', "Rejected insurance certificate #{$id}: {$reason}", false, null, 'admin', 'insurance_cert', $id);
+
             // Notify the user that their insurance certificate was not approved
             try {
                 if (!empty($existing['user_id'])) {
@@ -256,7 +266,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** DELETE /api/v2/admin/insurance-certificates/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
@@ -265,6 +275,10 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             $this->insuranceCertificateService->delete($id);
+
+            $type = $existing['insurance_type'] ?? 'unknown';
+            ActivityLog::log($adminId, 'insurance_cert_deleted', "Deleted insurance certificate #{$id} ({$type})", false, null, 'admin', 'insurance_cert', $id);
+
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_delete_failed'), null, 500);

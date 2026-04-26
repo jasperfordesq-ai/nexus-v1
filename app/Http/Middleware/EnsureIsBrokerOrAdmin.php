@@ -33,7 +33,7 @@ class EnsureIsBrokerOrAdmin
         if (!$user) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'auth_required', 'message' => 'Authentication required'],
+                    ['code' => 'auth_required', 'message' => __('api.auth_required')],
                 ],
                 'success' => false,
             ], 401, [
@@ -55,7 +55,7 @@ class EnsureIsBrokerOrAdmin
         if (!$isBroker && !$hasAdminFlag && !$hasAdminRole) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'forbidden', 'message' => 'Broker or admin access required'],
+                    ['code' => 'forbidden', 'message' => __('api.broker_or_admin_access_required')],
                 ],
                 'success' => false,
             ], 403, [

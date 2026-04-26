@@ -401,20 +401,20 @@ class AdminBrokerController extends BaseApiController
     public function approveExchange(int $id): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = $this->input('notes', '');
 
+        // Cross-tenant write paths previously looked up exchanges across all
+        // tenants for super admins, but the downstream ExchangeWorkflowService
+        // is auto tenant-scoped (HasTenantScope) and silently failed. Always
+        // operate on the caller's tenant — platform super-admins who need to
+        // act in another tenant should switch context first.
+
         try {
-            if ($isSuperAdmin) {
-                $exchange = DB::selectOne(
-                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ?", [$id]
-                );
-            } else {
-                $exchange = DB::selectOne(
-                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]
-                );
-            }
+            $exchange = DB::selectOne(
+                "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
 
             if (!$exchange) {
                 return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
@@ -428,6 +428,8 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'exchange']), null, 500);
             }
 
+            $this->auditLogService->log('exchange_approved', null, $adminId, ['exchange_id' => $id, 'notes' => $notes]);
+
             return $this->respondWithData(['id' => $id, 'status' => 'accepted']);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'exchange']), null, 500);
@@ -438,7 +440,6 @@ class AdminBrokerController extends BaseApiController
     public function rejectExchange(int $id): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = $this->input('reason', '');
 
@@ -446,16 +447,12 @@ class AdminBrokerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required_reject_exchange'), 'reason');
         }
 
+        // Always operate on caller's tenant — see approveExchange comment.
         try {
-            if ($isSuperAdmin) {
-                $exchange = DB::selectOne(
-                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ?", [$id]
-                );
-            } else {
-                $exchange = DB::selectOne(
-                    "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]
-                );
-            }
+            $exchange = DB::selectOne(
+                "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
 
             if (!$exchange) {
                 return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
@@ -468,6 +465,8 @@ class AdminBrokerController extends BaseApiController
             if (!$success) {
                 return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'exchange']), null, 500);
             }
+
+            $this->auditLogService->log('exchange_rejected', null, $adminId, ['exchange_id' => $id, 'reason' => $reason]);
 
             return $this->respondWithData(['id' => $id, 'status' => 'cancelled']);
         } catch (\Exception $e) {
@@ -768,25 +767,26 @@ class AdminBrokerController extends BaseApiController
     public function reviewMessage(int $id): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
+        // Cross-tenant write: removed (always caller's tenant). Super-admins
+        // who need to act in another tenant should switch context first.
         try {
-            if ($isSuperAdmin) {
-                $message = DB::selectOne("SELECT id, tenant_id FROM broker_message_copies WHERE id = ?", [$id]);
-            } else {
-                $message = DB::selectOne("SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-            }
+            $message = DB::selectOne(
+                "SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
 
             if (!$message) {
                 return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Message']), null, 404);
             }
 
-            $recordTenantId = (int) $message->tenant_id;
             DB::update(
                 "UPDATE broker_message_copies SET reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$adminId, $id, $recordTenantId]
+                [$adminId, $id, $tenantId]
             );
+
+            $this->auditLogService->log('broker_message_reviewed', null, $adminId, ['message_id' => $id]);
 
             return $this->respondWithData(['id' => $id, 'reviewed' => true]);
         } catch (\Exception $e) {
@@ -798,10 +798,10 @@ class AdminBrokerController extends BaseApiController
     public function approveMessage(int $id): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = trim($this->input('notes', ''));
 
+        // Always operate on caller's tenant — see approveExchange comment.
         try {
             $baseSelect = "SELECT bmc.*, CONCAT(s.first_name, ' ', s.last_name) as sender_name,
                 CONCAT(r.first_name, ' ', r.last_name) as receiver_name, l.title as listing_title
@@ -810,11 +810,7 @@ class AdminBrokerController extends BaseApiController
                 LEFT JOIN users r ON bmc.receiver_id = r.id
                 LEFT JOIN listings l ON bmc.related_listing_id = l.id";
 
-            if ($isSuperAdmin) {
-                $copy = DB::selectOne("{$baseSelect} WHERE bmc.id = ?", [$id]);
-            } else {
-                $copy = DB::selectOne("{$baseSelect} WHERE bmc.id = ? AND bmc.tenant_id = ?", [$id, $tenantId]);
-            }
+            $copy = DB::selectOne("{$baseSelect} WHERE bmc.id = ? AND bmc.tenant_id = ?", [$id, $tenantId]);
 
             if (!$copy) {
                 return $this->respondWithError('NOT_FOUND', __('api.broker_message_not_found'), null, 404);
@@ -877,6 +873,15 @@ class AdminBrokerController extends BaseApiController
                 [$archiveId, $adminId, $id, $copyTenantId]
             );
 
+            // Audit — approveMessage archives the message + writes a snapshot,
+            // the most consequential broker review action.
+            $this->auditLogService->log('broker_message_approved', null, $adminId, [
+                'message_id' => $id,
+                'archive_id' => $archiveId,
+                'decision'   => $decision,
+                'has_notes'  => $notes !== '',
+            ]);
+
             return $this->respondWithData(['id' => $id, 'archive_id' => $archiveId, 'decision' => $decision, 'decided_by' => $adminName]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'message archive']), null, 500);
@@ -887,7 +892,6 @@ class AdminBrokerController extends BaseApiController
     public function flagMessage(int $id): JsonResponse
     {
         $adminId = $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = trim($this->input('reason', ''));
         $severity = $this->input('severity', 'concern');
@@ -901,22 +905,27 @@ class AdminBrokerController extends BaseApiController
             $severity = 'concern';
         }
 
+        // Always operate on caller's tenant — see approveExchange comment.
         try {
-            if ($isSuperAdmin) {
-                $message = DB::selectOne("SELECT id, tenant_id FROM broker_message_copies WHERE id = ?", [$id]);
-            } else {
-                $message = DB::selectOne("SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-            }
+            $message = DB::selectOne(
+                "SELECT id, tenant_id FROM broker_message_copies WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
 
             if (!$message) {
                 return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Message']), null, 404);
             }
 
-            $recordTenantId = (int) $message->tenant_id;
             DB::update(
                 "UPDATE broker_message_copies SET flagged = 1, flag_reason = ?, flag_severity = ?, reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$reason, $severity, $adminId, $id, $recordTenantId]
+                [$reason, $severity, $adminId, $id, $tenantId]
             );
+
+            $this->auditLogService->log('broker_message_flagged', null, $adminId, [
+                'message_id' => $id,
+                'severity'   => $severity,
+                'reason'     => $reason,
+            ]);
 
             return $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
         } catch (\Exception $e) {
@@ -1265,16 +1274,20 @@ class AdminBrokerController extends BaseApiController
     /** PUT /api/v2/admin/broker/configuration */
     public function saveConfiguration(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
-        $isSuperAdmin = $this->isSuperAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $body = $this->getAllInput();
 
+        // Cross-tenant config writes are NOT supported here. The legacy
+        // body.tenant_id override let a super-admin write tenant B's
+        // tenant_settings row while the downstream BrokerControlConfigService
+        // (which uses TenantContext::getId() internally) wrote tenant A's
+        // tenants.configuration JSON — a silent split that left the two
+        // halves of the config in different tenants. Always operate on
+        // the caller's home tenant. Super admins who need to edit
+        // another tenant's broker config should switch tenant first.
         $targetTenantId = $tenantId;
-        if ($isSuperAdmin && !empty($body['tenant_id'])) {
-            $targetTenantId = (int) $body['tenant_id'];
-        }
 
         $allowedKeys = [
             'broker_messaging_enabled', 'broker_copy_all_messages', 'broker_copy_threshold_hours',
@@ -1331,6 +1344,17 @@ class AdminBrokerController extends BaseApiController
             if (!empty($workflowConfig)) {
                 $this->brokerControlConfigService->updateConfig($workflowConfig);
             }
+
+            // Audit log — broker config governs platform-wide messaging
+            // visibility, vetting/insurance enforcement, and approval rules.
+            // Changes MUST be auditable. AuditLogService::log signature is
+            // ($action, $organizationId, $userId, $details, $targetUserId).
+            $this->auditLogService->log(
+                'broker_config_updated',
+                null,
+                $adminId,
+                ['updated_keys' => array_keys($config)]
+            );
 
             return $this->respondWithData($config);
         } catch (\Exception $e) {

@@ -362,6 +362,7 @@ export default function OnboardingPage() {
         title={t('members.confirm_approve_title')}
         message={t('members.confirm_approve_message')}
         confirmLabel={t('members.approve')}
+        cancelLabel={t('common.cancel')}
         confirmColor="primary"
         isLoading={actionLoading}
       />

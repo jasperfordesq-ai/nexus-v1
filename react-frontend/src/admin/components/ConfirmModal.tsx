@@ -26,6 +26,13 @@ interface ConfirmModalProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  /**
+   * Label for the Cancel button. Pass a translated string from the
+   * caller's i18n namespace — the broker panel uses `t('common.cancel')`.
+   * Defaults to "Cancel" for backward compatibility with existing admin
+   * call sites.
+   */
+  cancelLabel?: string;
   confirmColor?: 'danger' | 'warning' | 'primary';
   isLoading?: boolean;
   children?: React.ReactNode;
@@ -38,11 +45,13 @@ export function ConfirmModal({
   title,
   message,
   confirmLabel,
+  cancelLabel,
   confirmColor = 'danger',
   isLoading = false,
   children,
 }: ConfirmModalProps) {
   const resolvedConfirmLabel = confirmLabel ?? "Confirm";
+  const resolvedCancelLabel = cancelLabel ?? "Cancel";
   // Synchronous double-click gate. `isLoading` becomes true after the parent
   // re-renders; in the microsecond window between the two clicks, the second
   // press still fires onConfirm. The ref blocks re-entry within the same
@@ -76,7 +85,7 @@ export function ConfirmModal({
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} isDisabled={isLoading}>
-            {"Cancel"}
+            {resolvedCancelLabel}
           </Button>
           <Button
             autoFocus

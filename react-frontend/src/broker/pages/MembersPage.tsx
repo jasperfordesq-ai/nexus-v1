@@ -516,6 +516,7 @@ export default function MembersPage() {
         title={t('members.confirm_approve_title')}
         message={t('members.confirm_approve_message')}
         confirmLabel={t('members.approve')}
+        cancelLabel={t('common.cancel')}
         confirmColor="primary"
         isLoading={actionLoading}
       />
@@ -528,6 +529,7 @@ export default function MembersPage() {
         title={t('members.confirm_suspend_title')}
         message={t('members.confirm_suspend_message')}
         confirmLabel={t('members.suspend')}
+        cancelLabel={t('common.cancel')}
         confirmColor="danger"
         isLoading={actionLoading}
       />

@@ -483,11 +483,12 @@ export function VettingRecords() {
     input.onchange = () => {
       const file = input.files?.[0];
       if (file) {
-        // Validate size client-side (matches backend 8MB limit) before
-        // burning bandwidth on a doomed request.
-        const MAX_BYTES = 8 * 1024 * 1024;
+        // Validate size client-side (matches backend 10MB limit at
+        // AdminVettingController::uploadDocument) before burning bandwidth
+        // on a doomed request.
+        const MAX_BYTES = 10 * 1024 * 1024;
         if (file.size > MAX_BYTES) {
-          toast.error('File too large — max 8MB');
+          toast.error('File too large — max 10MB');
         } else {
           void handleDocumentUpload(recordId, file);
         }
