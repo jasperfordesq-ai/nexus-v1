@@ -79,10 +79,13 @@
       "description": "Hour logs that need coordinator verification before they become accepted caring-community evidence.",
       "empty": "No pending hour reviews. The coordinator queue is clear.",
       "overdue": "{{count}} overdue",
+      "escalated": "{{count}} escalated",
       "needs_review": "Needs review",
+      "escalate_now": "Escalate now",
       "unassigned": "Unassigned support activity",
       "logged_on": "Logged {{date}}",
-      "submitted_on": "Submitted {{date}}"
+      "submitted_on": "Submitted {{date}}",
+      "age_days": "{{count}} days waiting"
     },
     "signals": {
       "title": "Coordinator signals",
@@ -210,6 +213,7 @@
     "period": "Reporting period",
     "hour_value": "Hour value",
     "multiplier": "Social multiplier",
+    "policy_default": "Policy default",
     "sections": {
       "categories": "Support categories",
       "trends": "Verified activity trend"
@@ -220,6 +224,7 @@
     },
     "values": {
       "hours": "{{count}}h",
+      "disabled": "Disabled",
       "activities": "{{count}} activities",
       "trend_detail": "{{participants}} participants, {{activities}} activities"
     },

@@ -20,10 +20,15 @@ class MunicipalImpactReportService
     private const DEFAULT_SOCIAL_MULTIPLIER = 2.8;
     private const DEFAULT_CURRENCY = 'CHF';
 
+    public function __construct(private readonly CaringCommunityWorkflowPolicyService $policyService)
+    {
+    }
+
     public function summary(int $tenantId, array $filters = []): array
     {
-        $range = $this->normaliseDateRange($filters);
-        $hourConfig = $this->hourValueConfig($tenantId);
+        $policy = $this->policyService->get($tenantId);
+        $range = $this->normaliseDateRange($filters, $policy);
+        $hourConfig = $this->hourValueConfig($tenantId, $policy);
 
         $timebank = $this->timebankSummary($tenantId, $range);
         $volunteering = $this->volunteeringSummary($tenantId, $range);
@@ -42,6 +47,11 @@ class MunicipalImpactReportService
             'currency' => $hourConfig['currency'],
             'hour_value' => $hourConfig['hour_value'],
             'social_multiplier' => $hourConfig['social_multiplier'],
+            'policy' => [
+                'default_period' => $policy['municipal_report_default_period'],
+                'include_social_value_estimate' => (bool) $policy['include_social_value_estimate'],
+                'default_hour_value_chf' => (int) $policy['default_hour_value_chf'],
+            ],
             'stats' => [
                 'verified_hours' => round($verifiedHours, 1),
                 'volunteer_hours' => round($volunteering['approved_hours'], 1),
@@ -55,8 +65,8 @@ class MunicipalImpactReportService
                 'support_requests' => $requests['support_requests'],
                 'support_offers' => $requests['support_offers'],
                 'direct_value' => $directValue,
-                'social_value' => $socialValue,
-                'total_value' => round($directValue + $socialValue, 2),
+                'social_value' => $policy['include_social_value_estimate'] ? $socialValue : 0.0,
+                'total_value' => round($directValue + ($policy['include_social_value_estimate'] ? $socialValue : 0.0), 2),
             ],
             'categories' => $categories,
             'trends' => $trends,
@@ -118,27 +128,54 @@ class MunicipalImpactReportService
         ];
     }
 
-    private function normaliseDateRange(array $filters): array
+    private function normaliseDateRange(array $filters, array $policy): array
     {
         $to = !empty($filters['date_to']) ? (string) $filters['date_to'] : date('Y-m-d');
-        $from = !empty($filters['date_from'])
-            ? (string) $filters['date_from']
-            : date('Y-m-d', strtotime($to . ' -12 months'));
+        if (!empty($filters['date_from'])) {
+            return ['from' => (string) $filters['date_from'], 'to' => $to];
+        }
+
+        $from = match ($policy['municipal_report_default_period'] ?? 'last_90_days') {
+            'last_30_days' => date('Y-m-d', strtotime($to . ' -30 days')),
+            'year_to_date' => date('Y-01-01', strtotime($to)),
+            'previous_quarter' => $this->previousQuarterStart($to),
+            default => date('Y-m-d', strtotime($to . ' -90 days')),
+        };
+
+        if (($policy['municipal_report_default_period'] ?? '') === 'previous_quarter') {
+            $to = $this->previousQuarterEnd($to);
+        }
 
         return ['from' => $from, 'to' => $to];
     }
 
-    private function hourValueConfig(int $tenantId): array
+    private function hourValueConfig(int $tenantId, array $policy): array
     {
         $config = Schema::hasTable('social_value_config')
             ? DB::table('social_value_config')->where('tenant_id', $tenantId)->first()
             : null;
 
         return [
-            'hour_value' => (float) ($config->hour_value_amount ?? self::DEFAULT_HOUR_VALUE),
+            'hour_value' => (float) ($config->hour_value_amount ?? $policy['default_hour_value_chf'] ?? self::DEFAULT_HOUR_VALUE),
             'social_multiplier' => (float) ($config->social_multiplier ?? self::DEFAULT_SOCIAL_MULTIPLIER),
             'currency' => (string) ($config->hour_value_currency ?? self::DEFAULT_CURRENCY),
         ];
+    }
+
+    private function previousQuarterStart(string $date): string
+    {
+        $timestamp = strtotime($date) ?: time();
+        $quarter = (int) ceil((int) date('n', $timestamp) / 3);
+        $previousQuarter = $quarter === 1 ? 4 : $quarter - 1;
+        $year = (int) date('Y', $timestamp) - ($quarter === 1 ? 1 : 0);
+        $month = (($previousQuarter - 1) * 3) + 1;
+
+        return sprintf('%04d-%02d-01', $year, $month);
+    }
+
+    private function previousQuarterEnd(string $date): string
+    {
+        return date('Y-m-t', strtotime($this->previousQuarterStart($date) . ' +2 months'));
     }
 
     private function timebankSummary(int $tenantId, array $range): array

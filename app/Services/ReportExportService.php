@@ -167,7 +167,7 @@ class ReportExportService
     private function municipalImpactReportService(): MunicipalImpactReportService
     {
         if (!$this->municipalImpactReportService) {
-            $this->municipalImpactReportService = new MunicipalImpactReportService();
+            $this->municipalImpactReportService = app(MunicipalImpactReportService::class);
         }
 
         return $this->municipalImpactReportService;

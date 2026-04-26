@@ -32,6 +32,11 @@ type MunicipalImpactSummary = {
   currency: string;
   hour_value: number;
   social_multiplier: number;
+  policy?: {
+    default_period: string;
+    include_social_value_estimate: boolean;
+    default_hour_value_chf: number;
+  };
   stats: Record<string, number>;
   categories: Array<{ name: string; hours: number; count: number }>;
   trends: Array<{ period: string; verified_hours: number; activities: number; participants: number }>;
@@ -173,7 +178,7 @@ export default function MunicipalImpactReportsPage() {
 
       {!loading && summary && (
         <Card className="mb-6" shadow="sm">
-          <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div>
               <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.period')}</p>
               <p className="mt-1 text-sm font-semibold text-default-800">{summary.period.from} - {summary.period.to}</p>
@@ -184,7 +189,17 @@ export default function MunicipalImpactReportsPage() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.multiplier')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">{summary.social_multiplier}x</p>
+              <p className="mt-1 text-sm font-semibold text-default-800">
+                {summary.policy?.include_social_value_estimate === false
+                  ? t('municipal_reports.values.disabled')
+                  : `${summary.social_multiplier}x`}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.policy_default')}</p>
+              <p className="mt-1 text-sm font-semibold text-default-800">
+                {t(`caring_workflow.policy.periods.${summary.policy?.default_period ?? 'last_90_days'}`)}
+              </p>
             </div>
           </CardBody>
         </Card>

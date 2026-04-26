@@ -30,7 +30,9 @@ type PendingReview = {
   hours: number;
   date_logged: string;
   created_at: string;
+  age_days: number;
   is_overdue: boolean;
+  is_escalated: boolean;
 };
 
 type RecentDecision = {
@@ -47,6 +49,7 @@ type WorkflowSummary = {
     pending_count: number;
     pending_hours: number;
     overdue_count: number;
+    escalated_count: number;
     approved_30d_hours: number;
     declined_30d_count: number;
     coordinator_count: number;
@@ -252,7 +255,12 @@ export default function CaringCommunityWorkflowPage() {
               <p className="mt-1 text-sm text-default-500">{t('caring_workflow.review_queue.description')}</p>
             </div>
             {(stats?.overdue_count ?? 0) > 0 && (
-              <Chip color="danger" variant="flat">{t('caring_workflow.review_queue.overdue', { count: stats?.overdue_count ?? 0 })}</Chip>
+              <div className="flex flex-wrap gap-2">
+                {(stats?.escalated_count ?? 0) > 0 && (
+                  <Chip color="danger" variant="flat">{t('caring_workflow.review_queue.escalated', { count: stats?.escalated_count ?? 0 })}</Chip>
+                )}
+                <Chip color="warning" variant="flat">{t('caring_workflow.review_queue.overdue', { count: stats?.overdue_count ?? 0 })}</Chip>
+              </div>
             )}
           </CardHeader>
           <Divider />
@@ -271,13 +279,15 @@ export default function CaringCommunityWorkflowPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {review.is_overdue && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.review_queue.needs_review')}</Chip>}
+                    {review.is_escalated && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.review_queue.escalate_now')}</Chip>}
+                    {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">{t('caring_workflow.review_queue.needs_review')}</Chip>}
                     <Chip size="sm" color="primary" variant="flat">{formatHours(review.hours)}</Chip>
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-default-500">
                   <span>{t('caring_workflow.review_queue.logged_on', { date: review.date_logged })}</span>
                   <span>{t('caring_workflow.review_queue.submitted_on', { date: review.created_at })}</span>
+                  <span>{t('caring_workflow.review_queue.age_days', { count: review.age_days })}</span>
                 </div>
               </div>
             ))}

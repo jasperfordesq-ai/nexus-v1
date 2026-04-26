@@ -24,56 +24,67 @@ class CaringCommunityWorkflowService
 
     public function summary(int $tenantId): array
     {
+        $policy = $this->policyService->get($tenantId);
+
         return [
-            'stats' => $this->stats($tenantId),
-            'pending_reviews' => $this->pendingReviews($tenantId),
+            'stats' => $this->stats($tenantId, $policy),
+            'pending_reviews' => $this->pendingReviews($tenantId, $policy),
             'recent_decisions' => $this->recentDecisions($tenantId),
             'coordinator_signals' => $this->coordinatorSignals($tenantId),
             'role_pack' => $this->rolePresetService->status($tenantId),
-            'policy' => $this->policyService->get($tenantId),
+            'policy' => $policy,
         ];
     }
 
-    private function stats(int $tenantId): array
+    private function stats(int $tenantId, array $policy): array
     {
         if (!Schema::hasTable('vol_logs')) {
             return [
                 'pending_count' => 0,
                 'pending_hours' => 0.0,
                 'overdue_count' => 0,
+                'escalated_count' => 0,
                 'approved_30d_hours' => 0.0,
                 'declined_30d_count' => 0,
                 'coordinator_count' => $this->coordinatorCount($tenantId),
             ];
         }
 
+        $reviewSlaDays = (int) ($policy['review_sla_days'] ?? 7);
+        $escalationSlaDays = (int) ($policy['escalation_sla_days'] ?? 14);
+
         $row = DB::selectOne(
             "SELECT
                 COUNT(CASE WHEN status = 'pending' THEN 1 END) AS pending_count,
                 COALESCE(SUM(CASE WHEN status = 'pending' THEN hours ELSE 0 END), 0) AS pending_hours,
-                COUNT(CASE WHEN status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) AS overdue_count,
+                COUNT(CASE WHEN status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY) THEN 1 END) AS overdue_count,
+                COUNT(CASE WHEN status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY) THEN 1 END) AS escalated_count,
                 COALESCE(SUM(CASE WHEN status = 'approved' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN hours ELSE 0 END), 0) AS approved_30d_hours,
                 COUNT(CASE WHEN status = 'declined' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) AS declined_30d_count
              FROM vol_logs
              WHERE tenant_id = ?",
-            [$tenantId]
+            [$reviewSlaDays, $escalationSlaDays, $tenantId]
         );
 
         return [
             'pending_count' => (int) ($row->pending_count ?? 0),
             'pending_hours' => round((float) ($row->pending_hours ?? 0), 1),
             'overdue_count' => (int) ($row->overdue_count ?? 0),
+            'escalated_count' => (int) ($row->escalated_count ?? 0),
             'approved_30d_hours' => round((float) ($row->approved_30d_hours ?? 0), 1),
             'declined_30d_count' => (int) ($row->declined_30d_count ?? 0),
             'coordinator_count' => $this->coordinatorCount($tenantId),
         ];
     }
 
-    private function pendingReviews(int $tenantId): array
+    private function pendingReviews(int $tenantId, array $policy): array
     {
         if (!Schema::hasTable('vol_logs')) {
             return [];
         }
+
+        $reviewSlaDays = (int) ($policy['review_sla_days'] ?? 7);
+        $escalationSlaDays = (int) ($policy['escalation_sla_days'] ?? 14);
 
         $rows = DB::select(
             "SELECT
@@ -97,8 +108,10 @@ class CaringCommunityWorkflowService
             [$tenantId]
         );
 
-        return array_map(function ($row) {
+        return array_map(function ($row) use ($reviewSlaDays, $escalationSlaDays) {
             $fullName = trim((string) ($row->first_name ?? '') . ' ' . (string) ($row->last_name ?? ''));
+            $createdAt = strtotime((string) $row->created_at) ?: time();
+            $ageDays = max(0, (int) floor((time() - $createdAt) / 86400));
             return [
                 'id' => (int) $row->id,
                 'member_name' => $fullName !== '' ? $fullName : (string) ($row->member_name ?? ''),
@@ -107,7 +120,9 @@ class CaringCommunityWorkflowService
                 'hours' => round((float) $row->hours, 1),
                 'date_logged' => (string) $row->date_logged,
                 'created_at' => (string) $row->created_at,
-                'is_overdue' => strtotime((string) $row->created_at) < strtotime('-7 days'),
+                'age_days' => $ageDays,
+                'is_overdue' => $ageDays >= $reviewSlaDays,
+                'is_escalated' => $ageDays >= $escalationSlaDays,
             ];
         }, $rows);
     }
