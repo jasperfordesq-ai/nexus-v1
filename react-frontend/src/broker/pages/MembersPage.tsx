@@ -102,7 +102,7 @@ export default function MembersPage() {
   const timeAgo = useTimeAgo();
   const toast = useToast();
   const { tenantPath } = useTenant();
-  usePageTitle(t('members.title') + ' - Broker');
+  usePageTitle(t('members.page_title'));
 
   // Data state
   const [members, setMembers] = useState<AdminUser[]>([]);

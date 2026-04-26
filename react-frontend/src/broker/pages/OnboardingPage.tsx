@@ -51,7 +51,7 @@ export default function OnboardingPage() {
   const { t } = useTranslation('broker');
   const toast = useToast();
   const { tenantPath } = useTenant();
-  usePageTitle(t('onboarding.title') + ' - Broker');
+  usePageTitle(t('onboarding.page_title'));
 
   // Funnel state
   const [funnel, setFunnel] = useState<FunnelData | null>(null);

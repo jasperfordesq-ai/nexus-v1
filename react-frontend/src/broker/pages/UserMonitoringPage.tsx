@@ -398,7 +398,7 @@ export function UserMonitoring() {
                   <p className="text-xs text-default-500 truncate">{selectedUser.email}</p>
                 </div>
                 <Chip size="sm" variant="flat" color={selectedUser.status === 'active' ? 'success' : 'default'}>
-                  {selectedUser.status}
+                  {t(`status.${selectedUser.status}`, { defaultValue: selectedUser.status })}
                 </Chip>
                 <Button
                   isIconOnly

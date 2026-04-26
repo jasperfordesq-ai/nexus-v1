@@ -1234,7 +1234,7 @@ export function VettingRecords() {
                 <div>
                   <p className="text-default-400">{t('vetting.col_status')}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
-                    {viewItem.status}
+                    {t(`status.${viewItem.status}`, { defaultValue: viewItem.status })}
                   </Chip>
                 </div>
                 <div>

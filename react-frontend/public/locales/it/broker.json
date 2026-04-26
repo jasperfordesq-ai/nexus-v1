@@ -183,7 +183,8 @@
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
-    "time_days_ago": "{{count}}d ago"
+    "time_days_ago": "{{count}}d ago",
+    "page_title": "Members - Broker"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -194,7 +195,8 @@
     "stage_profile_complete": "Profilo completo",
     "stage_first_exchange": "Primo scambio",
     "pending_approvals": "Approvazioni in sospeso",
-    "no_pending": "Nessun membro in sospeso da approvare."
+    "no_pending": "Nessun membro in sospeso da approvare.",
+    "page_title": "Onboarding - Broker"
   },
   "safeguarding": {
     "title": "Safeguarding",
@@ -907,5 +909,123 @@
     "field_risk_tagging_enabled_help": "Allow brokers to tag listings with risk classifications.",
     "field_notify_on_high_risk_match_label": "Notify on high-risk match",
     "field_notify_on_high_risk_match_help": "Send an alert when a member engages with a listing tagged as high risk."
+  },
+  "help": {
+    "page_title": "Help - Broker",
+    "title": "Guidance & reference",
+    "subtitle": "How the brokering and safeguarding system works — for admins and coordinators. Each section is independent — open whichever you need.",
+    "overview": {
+      "aria": "What Broker Controls manages",
+      "title": "What this module manages",
+      "intro": "Broker Controls is the operational hub for coordinators, brokers, and admins who mediate between members when safeguarding or compliance concerns are in play. It brings together six sub-modules:",
+      "bullet_exchange": "<b>Exchange management</b> — approve or reject exchanges that need broker sign-off.",
+      "bullet_risk_tags": "<b>Risk tags</b> — manually flag listings you want to watch.",
+      "bullet_message_review": "<b>Message review</b> — triage messages that have been copied to the broker queue.",
+      "bullet_user_monitoring": "<b>User monitoring</b> — put a member's communications under broker oversight.",
+      "bullet_vetting": "<b>Vetting records</b> — track DBS, Garda Vetting, PVG, and AccessNI checks.",
+      "bullet_configuration": "<b>Configuration</b> — tune thresholds for how the system decides what to copy.",
+      "access_note": "Access is restricted to users with the <code>admin</code>, <code>tenant_admin</code>, <code>broker</code>, or <code>super_admin</code> role. Every view and action is written to the audit log."
+    },
+    "workflow": {
+      "aria": "Your daily broker workflow",
+      "title": "Your daily workflow",
+      "intro": "A recommended daily check-in routine for coordinators:",
+      "step_unreviewed": "<b>Unreviewed messages</b> — open Message Review and clear anything flagged red (high severity) first. Aim for a 24-hour SLA on flagged items.",
+      "step_pending": "<b>Pending exchanges</b> — approve or reject exchanges awaiting broker sign-off. An unapproved exchange blocks both parties.",
+      "step_alerts": "<b>Safeguarding alerts</b> — if the red counter on the safeguarding tile is non-zero, jump to the Safeguarding dashboard to triage.",
+      "step_vetting": "<b>Vetting expiring</b> — members flagged as expiring in 30 days need a renewal reminder. The system also emails them automatically.",
+      "step_activity": "<b>Recent activity feed</b> — skim the activity list to catch patterns: repeat senders, unusual volumes, new monitored users.",
+      "tip": "The stat tiles all deep-link into the correct filter — one click from overview to actionable list."
+    },
+    "messages": {
+      "aria": "How message review works",
+      "title": "How message review works",
+      "intro": "When a member is under monitoring (either self-declared during onboarding or placed under monitoring by an admin), the system automatically copies each message they send or receive into a separate broker review queue. The original message is delivered normally — members never know a copy was made unless you tell them.",
+      "severity_heading": "Severity levels",
+      "severity_high": "<b class=\"text-danger\">High</b> — flagged by the content scanner for keywords or patterns of concern.",
+      "severity_medium": "<b class=\"text-warning\">Medium</b> — sender or recipient is a flagged user (no content match).",
+      "severity_low": "<b class=\"text-default-500\">Low</b> — routine copy for audit; no automatic concerns.",
+      "action_heading": "How to action",
+      "action_open": "Open the message from the queue.",
+      "action_read": "Read the full exchange — previous messages give context.",
+      "action_mark": "Click <i>Mark as reviewed</i> with optional notes, or escalate.",
+      "action_escalate": "If the message is a safeguarding concern, also create or update a guardian assignment in the Safeguarding dashboard.",
+      "retention": "Reviewed copies stay in the archive for 180 days then auto-purge (configurable in the Configuration sub-module)."
+    },
+    "monitoring": {
+      "aria": "User monitoring and risk tags",
+      "title": "User monitoring & risk tags",
+      "intro": "There are two ways a member can end up on a watch list:",
+      "automatic": "<b>Automatic (self-identified)</b> — during onboarding, the member ticked a safeguarding option that has <code>restricts_messaging</code> or <code>requires_broker_approval</code> triggers. These are written to <code>user_messaging_restrictions</code> with reason <i>\"Safeguarding: self-identified during onboarding\"</i>.",
+      "manual": "<b>Manual (admin-initiated)</b> — you open User Monitoring and add a member with a reason and optional expiry date. The reason is stored so any future reviewer knows why.",
+      "expiry": "Monitoring can be <i>time-limited</i> — set <code>monitoring_expires_at</code> and the daily <code>safeguarding:clear-expired-monitoring</code> command will silently lift the flag once the date passes.",
+      "risk_tags": "<b>Risk tags</b> are a listing-level flag, not a member-level one. Tag a listing if you want to watch how it performs without restricting the member."
+    },
+    "vetting": {
+      "aria": "Vetting records",
+      "title": "Vetting records (DBS, Garda, PVG, AccessNI)",
+      "intro": "A vetting record captures one submitted background-check reference. Supported types:",
+      "type_garda": "<b>garda_vetting</b> — Ireland, National Vetting Bureau (NVB).",
+      "type_dbs": "<b>dbs_basic / standard / enhanced</b> — England & Wales, Disclosure & Barring Service.",
+      "type_pvg": "<b>pvg_scotland</b> — Scotland, Protecting Vulnerable Groups scheme.",
+      "type_access_ni": "<b>access_ni</b> — Northern Ireland, AccessNI disclosure.",
+      "type_international": "<b>international</b> — for members with overseas vetting.",
+      "type_other": "<b>other</b> — anything non-standard; use sparingly.",
+      "lifecycle_heading": "Life cycle",
+      "lifecycle_pending": "Member submits reference and expiry date → status <code>pending</code>.",
+      "lifecycle_verified": "You verify against the issuing authority → status <code>verified</code>, which stamps <code>verified_by</code> and <code>verified_at</code>.",
+      "lifecycle_reminder": "30 days before <code>expiry_date</code> the member receives a reminder.",
+      "lifecycle_expired": "Past expiry → status <code>expired</code>; they lose the benefit of the vetting until renewed.",
+      "lifecycle_rejected": "If evidence is bad, <i>reject</i> with a reason. Rejected records preserve the audit trail (soft delete) for legal retention.",
+      "match_note": "The vetting status also powers the discovery filter in the Smart Matching Engine — a member who has declared <i>\"I only want vetted contacts\"</i> will never see un-vetted members in their match suggestions."
+    },
+    "alerts": {
+      "aria": "Safeguarding alerts",
+      "title": "Safeguarding alerts & escalation",
+      "intro": "The safeguarding alerts tile counts:",
+      "counts_messages": "Unreviewed flagged message copies (content-matched).",
+      "counts_incidents": "Open high- or critical-severity volunteer safeguarding incidents.",
+      "escalate_heading": "When to escalate",
+      "escalate_abuse": "<b>Suspected abuse or exploitation:</b> stop, document, and contact your Designated Safeguarding Lead (DSL) before taking any user-facing action. Do not warn the member; do not delete messages. The audit trail is evidence.",
+      "escalate_child": "<b>Child protection concern:</b> in Ireland, notify Tusla; in UK, notify the local authority children's services. The law requires this regardless of the platform's internal process.",
+      "escalate_vetting": "<b>Vetting mismatch:</b> if the name or DoB on submitted vetting evidence does not match the profile, reject with reason and ask for a fresh submission."
+    },
+    "legal": {
+      "aria": "Legal framework",
+      "title": "Legal framework & compliance",
+      "disclaimer": "The following legislation underpins how we gate interactions with children and vulnerable adults. This is not legal advice — consult your DSL or legal team for specific situations.",
+      "law_nvb": "<b>National Vetting Bureau (Children and Vulnerable Persons) Acts 2012–2016</b> (Ireland) — Garda Vetting is a legal requirement for relevant work with children and vulnerable adults. Our system blocks unvetted contact, it does not merely warn.",
+      "law_children_first": "<b>Children First Act 2015</b> (Ireland) — requires any organisation working with children to publish a Child Safeguarding Statement. When a tenant admin ticks the <i>\"works with children\"</i> flag, the system enforces PDF upload of this statement.",
+      "law_svga": "<b>Safeguarding Vulnerable Groups Act 2006</b> (England & Wales) — backs the DBS system. Enhanced DBS required for regulated activity.",
+      "law_pvg": "<b>Protection of Vulnerable Groups (Scotland) Act 2007</b> — the PVG Scheme.",
+      "law_svgni": "<b>Safeguarding Vulnerable Groups (Northern Ireland) Order 2007</b> — AccessNI disclosures.",
+      "law_gdpr": "<b>GDPR / UK GDPR</b> — vetting data and safeguarding preferences are <i>special category</i> personal data. Access is restricted, audit-logged, and retained only as long as operationally required."
+    },
+    "data": {
+      "aria": "Where data lives",
+      "title": "Where the data lives & retention",
+      "monitoring_status": "<b>Monitoring status</b>: <code>user_messaging_restrictions</code>. Cleared automatically when expiry passes.",
+      "message_copies": "<b>Message copies</b>: <code>broker_message_copies</code>. 180-day auto-purge via weekly scheduled command.",
+      "vetting_records": "<b>Vetting records</b>: <code>vetting_records</code>. Legally retained (soft delete) — cannot be hard-deleted through the UI.",
+      "user_prefs": "<b>Member safeguarding preferences</b>: <code>user_safeguarding_preferences</code>. Revoked by the member from their settings; tombstoned, not deleted.",
+      "guardian_assignments": "<b>Guardian assignments</b>: <code>safeguarding_assignments</code>. Revocation is soft — the audit trail is preserved.",
+      "audit_trail": "<b>All admin access</b> to any of the above is written to <code>activity_log</code> with <code>action_type = 'safeguarding'</code>. Use the per-member activity drill-down on the Safeguarding dashboard to export a full trail as CSV."
+    },
+    "contacts": {
+      "aria": "Who to contact",
+      "title": "Who to contact & when",
+      "technical": "<b>Technical issue with this panel</b> — open a ticket with your platform administrator; include the URL and approximate timestamp.",
+      "safeguarding": "<b>Safeguarding concern about a member</b> — your community's Designated Safeguarding Lead (DSL), not the platform. The DSL decides whether to escalate to statutory services.",
+      "criminality": "<b>Suspected criminality</b> — law enforcement (999 / 112 for immediate danger). The platform's audit trail will support any subsequent investigation.",
+      "policy": "<b>Policy question</b> — your tenant admin or compliance officer. Safeguarding options and country presets are configurable per-tenant."
+    },
+    "troubleshooting": {
+      "aria": "Troubleshooting",
+      "title": "Troubleshooting common situations",
+      "cant_message": "<b>\"A member says they can't message someone\"</b> — check whether the recipient has safeguarding preferences requiring vetting types the sender doesn't hold. The frontend shows a <i>VETTING_REQUIRED</i> banner with the specific types needed.",
+      "wrong_member": "<b>\"The wrong member is flagged\"</b> — open User Monitoring, remove them manually. If it was the onboarding auto-flag, the member can also revoke their own preference from <i>Settings → Safeguarding</i>.",
+      "vetting_stuck": "<b>\"The vetting tile is stuck\"</b> — the Vetting Pending counter is driven by <code>vetting_records.status = 'pending'</code>. Either verify or reject; nothing will clear the tile until each pending row has moved on.",
+      "no_copies": "<b>\"Messages aren't being copied\"</b> — confirm the member has <code>under_monitoring = 1</code> on <code>user_messaging_restrictions</code>. If the row is missing, add them via User Monitoring with a reason."
+    }
   }
 }

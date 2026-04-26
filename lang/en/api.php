@@ -332,6 +332,11 @@ return [
     // ============================================
     'exchange_not_pending'                 => 'Exchange is not pending broker approval',
     'reason_required_reject_exchange'      => 'A reason is required to reject an exchange',
+    'cannot_broker_own_exchange'           => 'You cannot approve or reject an exchange you are a party to.',
+    'invalid_flag_severity'                => 'Invalid severity. Must be one of: info, warning, concern, urgent.',
+    'risk_notes_max_length'                => 'Risk notes must be 2000 characters or less.',
+    'member_visible_notes_max_length'      => 'Member-visible notes must be 500 characters or less.',
+    'broker_config_admin_only_keys'        => 'These configuration keys can only be changed by an admin: :keys',
     'invalid_risk_level'                   => 'Invalid risk level',
     'risk_category_required'               => 'Risk category is required',
     'broker_message_not_found'             => 'Broker message copy not found',

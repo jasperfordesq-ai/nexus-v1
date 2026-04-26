@@ -41,7 +41,8 @@
     "view_wallet": "Bekijk portemonnee",
     "find_members": "Vind leden",
     "browse_events": "Blader door evenementen",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "caring_community": "Care Hub"
   },
   "listings": {
     "offering": "Offering",
@@ -104,5 +105,14 @@
   "fallback_name": "there",
   "common": {
     "loading": "Loading"
+  },
+  "caring_community": {
+    "title": "Caring Community",
+    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "actions": {
+      "open_hub": "Open hub",
+      "request_help": "Request help",
+      "log_hours": "Log hours"
+    }
   }
 }

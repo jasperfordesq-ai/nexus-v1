@@ -212,7 +212,7 @@ export function MessageDetail() {
       {/* Page Header */}
       <PageHeader
         title={t('messages.detail_page_title')}
-        description={t('messages.detail_page_description', { id: copy.id, sender: copy.sender_name, receiver: copy.receiver_name })}
+        description={t('messages.detail_page_description')}
         actions={
           <Button
             as={Link}

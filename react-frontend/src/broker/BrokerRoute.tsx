@@ -41,9 +41,11 @@ export function BrokerRoute() {
     role === 'admin' ||
     role === 'tenant_admin' ||
     role === 'super_admin' ||
+    role === 'god' ||
     userRecord?.is_admin === true ||
     userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+    userRecord?.is_tenant_super_admin === true ||
+    userRecord?.is_god === true;
 
   if (!hasBrokerAccess) {
     return <Navigate to={tenantPath('/dashboard')} replace />;

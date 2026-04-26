@@ -114,26 +114,36 @@ class BrokerMessageVisibilityService
             return null;
         }
 
-        // Check if already copied
-        if (BrokerMessageCopy::where('original_message_id', $messageId)->exists()) {
-            return null;
-        }
-
         $ids = [(int) $message->sender_id, (int) $message->receiver_id];
         sort($ids);
         $conversationKey = md5(implode('-', $ids));
 
-        $copy = BrokerMessageCopy::create([
-            'tenant_id' => $tenantId,
-            'original_message_id' => $message->id,
-            'conversation_key' => $conversationKey,
-            'sender_id' => $message->sender_id,
-            'receiver_id' => $message->receiver_id,
-            'message_body' => $message->body ?? '',
-            'sent_at' => $message->created_at,
-            'copy_reason' => $reason,
-            'related_listing_id' => $message->listing_id ?? null,
-        ]);
+        // firstOrCreate is atomic against the
+        // (tenant_id, original_message_id) unique index. A retried queue job
+        // (or duplicate event dispatch) will return the existing copy
+        // instead of inserting a duplicate row.
+        $copy = BrokerMessageCopy::firstOrCreate(
+            [
+                'tenant_id' => $tenantId,
+                'original_message_id' => $message->id,
+            ],
+            [
+                'conversation_key' => $conversationKey,
+                'sender_id' => $message->sender_id,
+                'receiver_id' => $message->receiver_id,
+                'message_body' => $message->body ?? '',
+                'sent_at' => $message->created_at,
+                'copy_reason' => $reason,
+                'related_listing_id' => $message->listing_id ?? null,
+            ]
+        );
+
+        // wasRecentlyCreated tells us whether THIS call inserted the row.
+        // If a parallel worker beat us to it, we exit silently — the other
+        // worker will dispatch the broker notifications.
+        if (!$copy->wasRecentlyCreated) {
+            return $copy->id;
+        }
 
         // Notify admin brokers — in-app bell + email for high-priority reasons
         try {

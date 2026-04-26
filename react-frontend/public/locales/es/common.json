@@ -51,7 +51,8 @@
     "explore": "Explorar",
     "saved": "Saved",
     "marketplace": "Marketplace",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "caring_community": "Caring Community"
   },
   "nav_desc": {
     "feed": "Feed de la comunidad",
@@ -97,7 +98,8 @@
     "strategic_plan": "Nuestra dirección estratégica",
     "timebanking_listings": "Ofertas y solicitudes",
     "messages": "Tus mensajes",
-    "marketplace": "Compra y vende en tu comunidad"
+    "marketplace": "Compra y vende en tu comunidad",
+    "caring_community": "Time banking, care support, organisations, and impact"
   },
   "user_menu": {
     "my_profile": "Mi Perfil",
@@ -308,7 +310,9 @@
     "new_group": "Nuevo grupo",
     "new_group_desc": "Iniciar un grupo comunitario",
     "new_goal": "Nuevo objetivo",
-    "new_goal_desc": "Establecer un objetivo personal"
+    "new_goal_desc": "Establecer un objetivo personal",
+    "offer_time": "Offer Time",
+    "offer_time_desc": "Open the care hub"
   },
   "gif": {
     "search_placeholder": "Buscar GIFs...",
@@ -448,5 +452,81 @@
   "verify_identity": "Verify Identity",
   "level_short": "Lv. {{level}}",
   "cancel": "Cancel",
-  "save": "Save"
+  "save": "Save",
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Coordinate time banking, volunteering, organisations, trusted support, and local impact."
+    },
+    "badge": "Integrated module",
+    "title": "Caring Community",
+    "subtitle": "Bring time-bank exchange, verified volunteering, trusted organisations, groups, events, resources, and impact signals into one coordinated care workflow.",
+    "actions": {
+      "request_help": "Request help",
+      "offer_time": "Offer time",
+      "log_hours": "Log hours",
+      "coordinate_org": "Coordinate organisation"
+    },
+    "operating_model": {
+      "title": "Operating model",
+      "subtitle": "Designed for KISS-style reciprocal support",
+      "trusted_requests": {
+        "title": "Trusted requests",
+        "description": "Members can ask for practical support through time-bank listings and coordinator-led volunteering."
+      },
+      "verified_hours": {
+        "title": "Verified hours",
+        "description": "Support activity can flow through approvals, logs, reviews, and time-credit balances."
+      },
+      "municipal_value": {
+        "title": "Municipal value",
+        "description": "The module prepares the surface for canton, municipality, and cooperative impact reporting."
+      }
+    },
+    "modules": {
+      "title": "Connected capabilities",
+      "subtitle": "The hub is only visible when the Caring Community switch is enabled.",
+      "open": "Open",
+      "timebank": {
+        "title": "Time bank",
+        "description": "Coordinate offers, requests, reciprocity, and time-credit exchange."
+      },
+      "volunteering": {
+        "title": "Volunteering",
+        "description": "Manage opportunities, applications, shifts, verification, and support hours."
+      },
+      "organisations": {
+        "title": "Organisations",
+        "description": "Bring cooperatives, local partners, and service providers into the care network."
+      },
+      "events": {
+        "title": "Events",
+        "description": "Run conferences, neighborhood cafes, trainings, and community sessions."
+      },
+      "groups": {
+        "title": "Groups",
+        "description": "Support neighborhood circles, canton pilots, and working groups."
+      },
+      "resources": {
+        "title": "Resources",
+        "description": "Share guides, privacy documents, playbooks, and onboarding material."
+      },
+      "goals": {
+        "title": "Goals",
+        "description": "Track personal, community, and municipal support targets."
+      },
+      "federation": {
+        "title": "Federation",
+        "description": "Connect regional nodes, cooperatives, and partner communities."
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Keep member, coordinator, and organisation communication close to the work."
+      },
+      "trust": {
+        "title": "Trust and verification",
+        "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
+      }
+    }
+  }
 }

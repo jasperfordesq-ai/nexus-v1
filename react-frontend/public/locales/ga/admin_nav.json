@@ -171,5 +171,8 @@
   "zone_community": "Community",
   "zone_safety": "Safety",
   "zone_growth": "Growth",
-  "zone_platform": "Platform"
+  "zone_platform": "Platform",
+  "caring_community": "Caring Community",
+  "caring_workflow": "KISS Workflow",
+  "municipal_impact_reports": "Municipal Impact Reports"
 }

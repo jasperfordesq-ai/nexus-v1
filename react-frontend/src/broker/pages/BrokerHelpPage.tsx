@@ -13,13 +13,10 @@
  * The presentational `BrokerControlsHelp` component does NOT call usePageTitle —
  * if it did, embedding it on the dashboard would clobber the dashboard's title.
  * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
- *
- * Content is written in British English. The broker panel supports i18n; once
- * the help copy is ready to translate, lift these strings into a `broker_help.*`
- * namespace and reference them via `useTranslation('broker')`.
  */
 
 import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider } from '@heroui/react';
+import { Trans, useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import BookOpen from 'lucide-react/icons/book-open';
 import Workflow from 'lucide-react/icons/workflow';
@@ -32,7 +29,15 @@ import Scale from 'lucide-react/icons/scale';
 import Phone from 'lucide-react/icons/phone';
 import Database from 'lucide-react/icons/database';
 
+const richComponents = {
+  b: <strong />,
+  i: <em />,
+  code: <code />,
+};
+
 export function BrokerControlsHelp() {
+  const { t } = useTranslation('broker');
+
   return (
     <section className="mt-10">
       <Card shadow="sm" className="border border-default-200">
@@ -42,418 +47,261 @@ export function BrokerControlsHelp() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
-              Guidance &amp; reference
+              {t('help.title')}
             </h2>
             <p className="text-xs text-default-500">
-              How the brokering and safeguarding system works — for admins and coordinators.
-              Each section is independent — open whichever you need.
+              {t('help.subtitle')}
             </p>
           </div>
         </CardHeader>
         <Divider />
         <CardBody className="pt-4">
           <Accordion variant="splitted" selectionMode="multiple">
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Overview */}
             <AccordionItem
               key="overview"
-              aria-label="What Broker Controls manages"
+              aria-label={t('help.overview.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Workflow className="w-4 h-4 text-primary" />
-                  <span className="font-medium">What this module manages</span>
+                  <span className="font-medium">{t('help.overview.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  Broker Controls is the operational hub for coordinators, brokers, and admins who
-                  mediate between members when safeguarding or compliance concerns are in play.
-                  It brings together six sub-modules:
-                </p>
+                <p>{t('help.overview.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>Exchange management</strong> — approve or reject exchanges that need broker sign-off.</li>
-                  <li><strong>Risk tags</strong> — manually flag listings you want to watch.</li>
-                  <li><strong>Message review</strong> — triage messages that have been copied to the broker queue.</li>
-                  <li><strong>User monitoring</strong> — put a member's communications under broker oversight.</li>
-                  <li><strong>Vetting records</strong> — track DBS, Garda Vetting, PVG, and AccessNI checks.</li>
-                  <li><strong>Configuration</strong> — tune thresholds for how the system decides what to copy.</li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_exchange" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_risk_tags" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_message_review" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_user_monitoring" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_vetting" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.overview.bullet_configuration" components={richComponents} /></li>
                 </ul>
-                <p>
-                  Access is restricted to users with the <code>admin</code>, <code>tenant_admin</code>,
-                  <code> broker</code>, or <code>super_admin</code> role. Every view and action is written
-                  to the audit log.
-                </p>
+                <p><Trans t={t} i18nKey="help.overview.access_note" components={richComponents} /></p>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Workflow */}
             <AccordionItem
               key="workflow"
-              aria-label="Your daily broker workflow"
+              aria-label={t('help.workflow.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Workflow className="w-4 h-4 text-secondary" />
-                  <span className="font-medium">Your daily workflow</span>
+                  <span className="font-medium">{t('help.workflow.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>A recommended daily check-in routine for coordinators:</p>
+                <p>{t('help.workflow.intro')}</p>
                 <ol className="list-decimal pl-5 space-y-2">
-                  <li>
-                    <strong>Unreviewed messages</strong> — open Message Review and clear anything
-                    flagged red (high severity) first. Aim for a 24-hour SLA on flagged items.
-                  </li>
-                  <li>
-                    <strong>Pending exchanges</strong> — approve or reject exchanges awaiting broker
-                    sign-off. An unapproved exchange blocks both parties.
-                  </li>
-                  <li>
-                    <strong>Safeguarding alerts</strong> — if the red counter on the safeguarding
-                    tile is non-zero, jump to the Safeguarding dashboard to triage.
-                  </li>
-                  <li>
-                    <strong>Vetting expiring</strong> — members flagged as expiring in 30 days need
-                    a renewal reminder. The system also emails them automatically.
-                  </li>
-                  <li>
-                    <strong>Recent activity feed</strong> — skim the activity list to catch
-                    patterns: repeat senders, unusual volumes, new monitored users.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.workflow.step_unreviewed" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.workflow.step_pending" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.workflow.step_alerts" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.workflow.step_vetting" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.workflow.step_activity" components={richComponents} /></li>
                 </ol>
-                <p className="italic text-default-500">
-                  The stat tiles all deep-link into the correct filter — one click from overview
-                  to actionable list.
-                </p>
+                <p className="italic text-default-500">{t('help.workflow.tip')}</p>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Messages */}
             <AccordionItem
               key="messages"
-              aria-label="How message review works"
+              aria-label={t('help.messages.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <MessageSquareWarning className="w-4 h-4 text-warning" />
-                  <span className="font-medium">How message review works</span>
+                  <span className="font-medium">{t('help.messages.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  When a member is under monitoring (either self-declared during onboarding or
-                  placed under monitoring by an admin), the system automatically copies each message
-                  they send or receive into a separate broker review queue. The original message is
-                  delivered normally — members never know a copy was made unless you tell them.
-                </p>
-                <p className="font-medium text-foreground">Severity levels</p>
+                <p>{t('help.messages.intro')}</p>
+                <p className="font-medium text-foreground">{t('help.messages.severity_heading')}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong className="text-danger">High</strong> — flagged by the content scanner for keywords or patterns of concern.</li>
-                  <li><strong className="text-warning">Medium</strong> — sender or recipient is a flagged user (no content match).</li>
-                  <li><strong className="text-default-500">Low</strong> — routine copy for audit; no automatic concerns.</li>
+                  <li><Trans t={t} i18nKey="help.messages.severity_high" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.messages.severity_medium" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.messages.severity_low" components={richComponents} /></li>
                 </ul>
-                <p className="font-medium text-foreground">How to action</p>
+                <p className="font-medium text-foreground">{t('help.messages.action_heading')}</p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Open the message from the queue.</li>
-                  <li>Read the full exchange — previous messages give context.</li>
-                  <li>Click <em>Mark as reviewed</em> with optional notes, or escalate.</li>
-                  <li>If the message is a safeguarding concern, also create or update a guardian
-                      assignment in the Safeguarding dashboard.</li>
+                  <li>{t('help.messages.action_open')}</li>
+                  <li>{t('help.messages.action_read')}</li>
+                  <li><Trans t={t} i18nKey="help.messages.action_mark" components={richComponents} /></li>
+                  <li>{t('help.messages.action_escalate')}</li>
                 </ol>
-                <p>
-                  Reviewed copies stay in the archive for 180 days then auto-purge (configurable
-                  in the Configuration sub-module).
-                </p>
+                <p>{t('help.messages.retention')}</p>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Monitoring */}
             <AccordionItem
               key="monitoring"
-              aria-label="User monitoring and risk tags"
+              aria-label={t('help.monitoring.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4 text-secondary" />
-                  <span className="font-medium">User monitoring &amp; risk tags</span>
+                  <span className="font-medium">{t('help.monitoring.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  There are two ways a member can end up on a watch list:
-                </p>
+                <p>{t('help.monitoring.intro')}</p>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Automatic (self-identified)</strong> — during onboarding, the member
-                    ticked a safeguarding option that has <code>restricts_messaging</code> or
-                    <code> requires_broker_approval</code> triggers. These are written to
-                    <code> user_messaging_restrictions</code> with reason
-                    <em> "Safeguarding: self-identified during onboarding"</em>.
-                  </li>
-                  <li>
-                    <strong>Manual (admin-initiated)</strong> — you open User Monitoring and add
-                    a member with a reason and optional expiry date. The reason is stored so any
-                    future reviewer knows why.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.monitoring.automatic" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.monitoring.manual" components={richComponents} /></li>
                 </ul>
-                <p>
-                  Monitoring can be <em>time-limited</em> — set <code>monitoring_expires_at</code>
-                  and the daily <code>safeguarding:clear-expired-monitoring</code> command will
-                  silently lift the flag once the date passes.
-                </p>
-                <p>
-                  <strong>Risk tags</strong> are a listing-level flag, not a member-level one.
-                  Tag a listing if you want to watch how it performs without restricting the member.
-                </p>
+                <p><Trans t={t} i18nKey="help.monitoring.expiry" components={richComponents} /></p>
+                <p><Trans t={t} i18nKey="help.monitoring.risk_tags" components={richComponents} /></p>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Vetting */}
             <AccordionItem
               key="vetting"
-              aria-label="Vetting records"
+              aria-label={t('help.vetting.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-success" />
-                  <span className="font-medium">Vetting records (DBS, Garda, PVG, AccessNI)</span>
+                  <span className="font-medium">{t('help.vetting.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  A vetting record captures one submitted background-check reference. Supported types:
-                </p>
+                <p>{t('help.vetting.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>garda_vetting</strong> — Ireland, National Vetting Bureau (NVB).</li>
-                  <li><strong>dbs_basic / standard / enhanced</strong> — England &amp; Wales, Disclosure &amp; Barring Service.</li>
-                  <li><strong>pvg_scotland</strong> — Scotland, Protecting Vulnerable Groups scheme.</li>
-                  <li><strong>access_ni</strong> — Northern Ireland, AccessNI disclosure.</li>
-                  <li><strong>international</strong> — for members with overseas vetting.</li>
-                  <li><strong>other</strong> — anything non-standard; use sparingly.</li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_garda" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_dbs" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_pvg" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_access_ni" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_international" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.type_other" components={richComponents} /></li>
                 </ul>
-                <p className="font-medium text-foreground">Life cycle</p>
+                <p className="font-medium text-foreground">{t('help.vetting.lifecycle_heading')}</p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Member submits reference and expiry date → status <code>pending</code>.</li>
-                  <li>You verify against the issuing authority → status <code>verified</code>, which
-                      stamps <code>verified_by</code> and <code>verified_at</code>.</li>
-                  <li>30 days before <code>expiry_date</code> the member receives a reminder.</li>
-                  <li>Past expiry → status <code>expired</code>; they lose the benefit of the
-                      vetting until renewed.</li>
-                  <li>If evidence is bad, <em>reject</em> with a reason. Rejected records preserve
-                      the audit trail (soft delete) for legal retention.</li>
+                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_pending" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_verified" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_reminder" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_expired" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_rejected" components={richComponents} /></li>
                 </ol>
-                <p className="italic text-default-500">
-                  The vetting status also powers the discovery filter in the Smart Matching Engine —
-                  a member who has declared <em>"I only want vetted contacts"</em> will never see
-                  un-vetted members in their match suggestions.
-                </p>
+                <p className="italic text-default-500"><Trans t={t} i18nKey="help.vetting.match_note" components={richComponents} /></p>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Alerts */}
             <AccordionItem
               key="alerts"
-              aria-label="Safeguarding alerts"
+              aria-label={t('help.alerts.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-danger" />
-                  <span className="font-medium">Safeguarding alerts &amp; escalation</span>
+                  <span className="font-medium">{t('help.alerts.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  The safeguarding alerts tile counts:
-                </p>
+                <p>{t('help.alerts.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Unreviewed flagged message copies (content-matched).</li>
-                  <li>Open high- or critical-severity volunteer safeguarding incidents.</li>
+                  <li>{t('help.alerts.counts_messages')}</li>
+                  <li>{t('help.alerts.counts_incidents')}</li>
                 </ul>
-                <p className="font-medium text-foreground">When to escalate</p>
+                <p className="font-medium text-foreground">{t('help.alerts.escalate_heading')}</p>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Suspected abuse or exploitation:</strong> stop, document, and contact your
-                    Designated Safeguarding Lead (DSL) before taking any user-facing action. Do not
-                    warn the member; do not delete messages. The audit trail is evidence.
-                  </li>
-                  <li>
-                    <strong>Child protection concern:</strong> in Ireland, notify Tusla; in UK,
-                    notify the local authority children's services. The law requires this regardless
-                    of the platform's internal process.
-                  </li>
-                  <li>
-                    <strong>Vetting mismatch:</strong> if the name or DoB on submitted vetting
-                    evidence does not match the profile, reject with reason and ask for a fresh
-                    submission.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.alerts.escalate_abuse" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.alerts.escalate_child" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.alerts.escalate_vetting" components={richComponents} /></li>
                 </ul>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Legal */}
             <AccordionItem
               key="legal"
-              aria-label="Legal framework"
+              aria-label={t('help.legal.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Scale className="w-4 h-4 text-default-500" />
-                  <span className="font-medium">Legal framework &amp; compliance</span>
+                  <span className="font-medium">{t('help.legal.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
-                <p>
-                  The following legislation underpins how we gate interactions with children and
-                  vulnerable adults. This is not legal advice — consult your DSL or legal team for
-                  specific situations.
-                </p>
+                <p>{t('help.legal.disclaimer')}</p>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>National Vetting Bureau (Children and Vulnerable Persons) Acts 2012–2016</strong>
-                    {' '}(Ireland) — Garda Vetting is a legal requirement for relevant work with
-                    children and vulnerable adults. Our system blocks unvetted contact, it does not
-                    merely warn.
-                  </li>
-                  <li>
-                    <strong>Children First Act 2015</strong> (Ireland) — requires any organisation
-                    working with children to publish a Child Safeguarding Statement. When a tenant
-                    admin ticks the <em>"works with children"</em> flag, the system enforces PDF
-                    upload of this statement.
-                  </li>
-                  <li>
-                    <strong>Safeguarding Vulnerable Groups Act 2006</strong> (England &amp; Wales) —
-                    backs the DBS system. Enhanced DBS required for regulated activity.
-                  </li>
-                  <li>
-                    <strong>Protection of Vulnerable Groups (Scotland) Act 2007</strong> — the PVG
-                    Scheme.
-                  </li>
-                  <li>
-                    <strong>Safeguarding Vulnerable Groups (Northern Ireland) Order 2007</strong> —
-                    AccessNI disclosures.
-                  </li>
-                  <li>
-                    <strong>GDPR / UK GDPR</strong> — vetting data and safeguarding preferences are
-                    <em> special category</em> personal data. Access is restricted, audit-logged,
-                    and retained only as long as operationally required.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.legal.law_nvb" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.legal.law_children_first" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.legal.law_svga" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.legal.law_pvg" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.legal.law_svgni" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.legal.law_gdpr" components={richComponents} /></li>
                 </ul>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Data */}
             <AccordionItem
               key="data"
-              aria-label="Where data lives"
+              aria-label={t('help.data.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-default-500" />
-                  <span className="font-medium">Where the data lives &amp; retention</span>
+                  <span className="font-medium">{t('help.data.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Monitoring status</strong>: <code>user_messaging_restrictions</code>.
-                    Cleared automatically when expiry passes.
-                  </li>
-                  <li>
-                    <strong>Message copies</strong>: <code>broker_message_copies</code>. 180-day
-                    auto-purge via weekly scheduled command.
-                  </li>
-                  <li>
-                    <strong>Vetting records</strong>: <code>vetting_records</code>. Legally retained
-                    (soft delete) — cannot be hard-deleted through the UI.
-                  </li>
-                  <li>
-                    <strong>Member safeguarding preferences</strong>:
-                    <code> user_safeguarding_preferences</code>. Revoked by the member from their
-                    settings; tombstoned, not deleted.
-                  </li>
-                  <li>
-                    <strong>Guardian assignments</strong>: <code>safeguarding_assignments</code>.
-                    Revocation is soft — the audit trail is preserved.
-                  </li>
-                  <li>
-                    <strong>All admin access</strong> to any of the above is written to
-                    <code> activity_log</code> with <code>action_type = 'safeguarding'</code>. Use
-                    the per-member activity drill-down on the Safeguarding dashboard to export
-                    a full trail as CSV.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.data.monitoring_status" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.data.message_copies" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.data.vetting_records" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.data.user_prefs" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.data.guardian_assignments" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.data.audit_trail" components={richComponents} /></li>
                 </ul>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Contacts */}
             <AccordionItem
               key="contacts"
-              aria-label="Who to contact"
+              aria-label={t('help.contacts.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-primary" />
-                  <span className="font-medium">Who to contact &amp; when</span>
+                  <span className="font-medium">{t('help.contacts.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Technical issue with this panel</strong> — open a ticket with your
-                    platform administrator; include the URL and approximate timestamp.
-                  </li>
-                  <li>
-                    <strong>Safeguarding concern about a member</strong> — your community's
-                    Designated Safeguarding Lead (DSL), not the platform. The DSL decides
-                    whether to escalate to statutory services.
-                  </li>
-                  <li>
-                    <strong>Suspected criminality</strong> — law enforcement (999 / 112 for
-                    immediate danger). The platform's audit trail will support any subsequent
-                    investigation.
-                  </li>
-                  <li>
-                    <strong>Policy question</strong> — your tenant admin or compliance officer.
-                    Safeguarding options and country presets are configurable per-tenant.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.contacts.technical" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.contacts.safeguarding" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.contacts.criminality" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.contacts.policy" components={richComponents} /></li>
                 </ul>
               </div>
             </AccordionItem>
 
-            {/* ─────────────────────────────────────────────────────────────── */}
+            {/* Troubleshooting */}
             <AccordionItem
               key="troubleshooting"
-              aria-label="Troubleshooting"
+              aria-label={t('help.troubleshooting.aria')}
               title={
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-warning" />
-                  <span className="font-medium">Troubleshooting common situations</span>
+                  <span className="font-medium">{t('help.troubleshooting.title')}</span>
                 </div>
               }
             >
               <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>"A member says they can't message someone"</strong> — check whether the
-                    recipient has safeguarding preferences requiring vetting types the sender doesn't
-                    hold. The frontend shows a <em>VETTING_REQUIRED</em> banner with the specific
-                    types needed.
-                  </li>
-                  <li>
-                    <strong>"The wrong member is flagged"</strong> — open User Monitoring, remove
-                    them manually. If it was the onboarding auto-flag, the member can also revoke
-                    their own preference from <em>Settings → Safeguarding</em>.
-                  </li>
-                  <li>
-                    <strong>"The vetting tile is stuck"</strong> — the Vetting Pending counter is
-                    driven by <code>vetting_records.status = 'pending'</code>. Either verify or
-                    reject; nothing will clear the tile until each pending row has moved on.
-                  </li>
-                  <li>
-                    <strong>"Messages aren't being copied"</strong> — confirm the member has
-                    <code> under_monitoring = 1</code> on <code>user_messaging_restrictions</code>.
-                    If the row is missing, add them via User Monitoring with a reason.
-                  </li>
+                  <li><Trans t={t} i18nKey="help.troubleshooting.cant_message" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.troubleshooting.wrong_member" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.troubleshooting.vetting_stuck" components={richComponents} /></li>
+                  <li><Trans t={t} i18nKey="help.troubleshooting.no_copies" components={richComponents} /></li>
                 </ul>
               </div>
             </AccordionItem>
@@ -469,6 +317,7 @@ export function BrokerControlsHelp() {
  * usage on the dashboard renders the bare `BrokerControlsHelp` component.
  */
 export default function BrokerHelpPage() {
-  usePageTitle('Help - Broker');
+  const { t } = useTranslation('broker');
+  usePageTitle(t('help.page_title'));
   return <BrokerControlsHelp />;
 }

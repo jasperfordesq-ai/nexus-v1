@@ -452,7 +452,7 @@ class AdminBrokerController extends BaseApiController
 
         try {
             $exchange = DB::selectOne(
-                "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                "SELECT id, status, tenant_id, requester_id, provider_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
 
@@ -461,6 +461,12 @@ class AdminBrokerController extends BaseApiController
             }
             if ($exchange->status !== 'pending_broker') {
                 return $this->respondWithError('INVALID_STATUS', __('api.exchange_not_pending'));
+            }
+            // Conflict-of-interest: a broker/admin who is a party to the
+            // exchange must not sign it off themselves.
+            if ((int) $exchange->requester_id === (int) $adminId
+                || (int) $exchange->provider_id === (int) $adminId) {
+                return $this->respondWithError('FORBIDDEN', __('api.cannot_broker_own_exchange'), null, 403);
             }
 
             $success = $this->exchangeWorkflowService->approveExchange($id, $adminId, $notes);
@@ -490,7 +496,7 @@ class AdminBrokerController extends BaseApiController
         // Always operate on caller's tenant — see approveExchange comment.
         try {
             $exchange = DB::selectOne(
-                "SELECT id, status, tenant_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
+                "SELECT id, status, tenant_id, requester_id, provider_id FROM exchange_requests WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
 
@@ -499,6 +505,10 @@ class AdminBrokerController extends BaseApiController
             }
             if ($exchange->status !== 'pending_broker') {
                 return $this->respondWithError('INVALID_STATUS', __('api.exchange_not_pending'));
+            }
+            if ((int) $exchange->requester_id === (int) $adminId
+                || (int) $exchange->provider_id === (int) $adminId) {
+                return $this->respondWithError('FORBIDDEN', __('api.cannot_broker_own_exchange'), null, 403);
             }
 
             $success = $this->exchangeWorkflowService->rejectExchange($id, $adminId, $reason);
@@ -588,6 +598,12 @@ class AdminBrokerController extends BaseApiController
         }
         if (empty($riskCategory)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.risk_category_required'), 'risk_category');
+        }
+        if (mb_strlen($riskNotes) > 2000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.risk_notes_max_length'), 'risk_notes');
+        }
+        if (mb_strlen($memberVisibleNotes) > 500) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.member_visible_notes_max_length'), 'member_visible_notes');
         }
 
         // Always operate on caller's tenant — see approveExchange comment.
@@ -940,8 +956,8 @@ class AdminBrokerController extends BaseApiController
         }
 
         $allowedSeverities = ['info', 'warning', 'concern', 'urgent'];
-        if (!in_array($severity, $allowedSeverities)) {
-            $severity = 'concern';
+        if (!in_array($severity, $allowedSeverities, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_flag_severity'), 'severity');
         }
 
         // Always operate on caller's tenant — see approveExchange comment.
@@ -1100,9 +1116,9 @@ class AdminBrokerController extends BaseApiController
                     DB::update(
                         "UPDATE user_messaging_restrictions
                          SET under_monitoring = 0, messaging_disabled = 0, monitoring_expires_at = NULL,
-                             restriction_reason = CONCAT(COALESCE(restriction_reason, ''), ' [Removed by admin {$adminId}]')
+                             restriction_reason = CONCAT(COALESCE(restriction_reason, ''), ' [Removed by admin ', ?, ']')
                          WHERE user_id = ? AND tenant_id = ?",
-                        [$userId, $userTenantId]
+                        [(int) $adminId, $userId, $userTenantId]
                     );
 
                     // If safeguarding-set, also clear requires_broker_approval
@@ -1349,11 +1365,47 @@ class AdminBrokerController extends BaseApiController
             'vetting_expiry_warning_days', 'insurance_expiry_warning_days',
         ];
 
+        // Privilege boundary: brokers/coordinators tune their day-to-day
+        // operating thresholds (e.g. monitoring days, retention, copy
+        // criteria), but tenant-wide enforcement toggles — vetting/insurance
+        // gating, approval requirements, blanket message copying — are
+        // policy decisions reserved for admins. Without this gate a broker
+        // could disable platform-wide vetting enforcement for their tenant.
+        $adminOnlyKeys = [
+            'broker_messaging_enabled', 'broker_copy_all_messages',
+            'risk_tagging_enabled', 'broker_approval_required',
+            'vetting_enabled', 'insurance_enabled',
+            'enforce_vetting_on_exchanges', 'enforce_insurance_on_exchanges',
+            'require_exchange_for_listings',
+        ];
+        $callerUser = $this->resolveUserObject();
+        $callerRole = (string) ($callerUser->role ?? 'member');
+        $isAdminTier = in_array($callerRole, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || ($callerUser->is_admin ?? false)
+            || ($callerUser->is_super_admin ?? false)
+            || ($callerUser->is_tenant_super_admin ?? false)
+            || ($callerUser->is_god ?? false);
+
         $config = [];
+        $rejectedAdminOnly = [];
         foreach ($allowedKeys as $key) {
-            if (array_key_exists($key, $body)) {
-                $config[$key] = $body[$key];
+            if (!array_key_exists($key, $body)) {
+                continue;
             }
+            if (in_array($key, $adminOnlyKeys, true) && !$isAdminTier) {
+                $rejectedAdminOnly[] = $key;
+                continue;
+            }
+            $config[$key] = $body[$key];
+        }
+
+        if (!empty($rejectedAdminOnly)) {
+            return $this->respondWithError(
+                'FORBIDDEN',
+                __('api.broker_config_admin_only_keys', ['keys' => implode(', ', $rejectedAdminOnly)]),
+                null,
+                403
+            );
         }
 
         try {
@@ -1375,6 +1427,11 @@ class AdminBrokerController extends BaseApiController
                 );
             }
 
+            // Workflow keys gate when an exchange needs broker sign-off. They
+            // are platform-wide policy and require admin tier — the same
+            // boundary as the JSON-stored broker_config above. Brokers may
+            // already have helped author the policy, but flipping the
+            // toggles is an admin decision.
             $workflowKeys = [
                 'require_broker_approval', 'auto_approve_low_risk', 'max_hours_without_approval',
                 'exchange_workflow_enabled', 'require_broker_approval_new_members',
@@ -1385,6 +1442,14 @@ class AdminBrokerController extends BaseApiController
                 if (array_key_exists($key, $body)) {
                     $workflowConfig[$key] = $body[$key];
                 }
+            }
+            if (!empty($workflowConfig) && !$isAdminTier) {
+                return $this->respondWithError(
+                    'FORBIDDEN',
+                    __('api.broker_config_admin_only_keys', ['keys' => implode(', ', array_keys($workflowConfig))]),
+                    null,
+                    403
+                );
             }
             if (!empty($workflowConfig)) {
                 $this->brokerControlConfigService->updateConfig($workflowConfig);

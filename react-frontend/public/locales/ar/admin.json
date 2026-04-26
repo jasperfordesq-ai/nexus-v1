@@ -8210,5 +8210,236 @@
   "label_new_this_month": "New This Month",
   "label_pending_approvals": "Pending Approvals",
   "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members"
+  "label_total_members": "Total Members",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Configure the integrated care hub, dependent capabilities, and municipal reporting surfaces."
+    },
+    "actions": {
+      "open_member_hub": "Open member hub",
+      "open_workflow": "Open KISS workflow",
+      "refresh": "Refresh"
+    },
+    "stats": {
+      "master_switch": "Master switch",
+      "connected_capabilities": "Connected capabilities",
+      "reporting_pack": "Reporting pack",
+      "reporting_ready": "Ready"
+    },
+    "switch": {
+      "title": "Module kill switch",
+      "description": "When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.",
+      "aria": "Toggle Caring Community module"
+    },
+    "capabilities": {
+      "timebank": "Time bank exchange",
+      "volunteering": "Verified volunteering",
+      "organisations": "Trusted organisations",
+      "groups": "Neighbourhood groups",
+      "resources": "Resource library",
+      "trust": "Trust and reviews"
+    },
+    "capability_type": {
+      "feature": "Feature",
+      "module": "Module"
+    },
+    "reporting": {
+      "title": "Municipal reporting",
+      "description": "Jump into the reporting surfaces needed for canton, municipality, and cooperative conversations.",
+      "community_analytics": "Community analytics",
+      "impact_report": "Impact report",
+      "municipal_pack": "Municipal report pack",
+      "note": "These surfaces use existing NEXUS reporting today and are ready for KISS-specific exports next."
+    },
+    "messages": {
+      "enabled": "Caring Community enabled",
+      "disabled": "Caring Community disabled"
+    },
+    "errors": {
+      "load_failed": "Failed to load Caring Community configuration",
+      "save_failed": "Failed to update Caring Community"
+    },
+    "config_route_note": "Dedicated admin configuration route: {{route}}"
+  },
+  "caring_workflow": {
+    "meta": {
+      "title": "KISS Workflow Console",
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+    },
+    "loading": "Loading KISS workflow data",
+    "actions": {
+      "open_hour_review": "Open hour review",
+      "open_report_pack": "Open report pack",
+      "refresh": "Refresh"
+    },
+    "stats": {
+      "pending_reviews": "Pending reviews",
+      "pending_hours": "Pending hours",
+      "approved_30d": "Approved in 30 days",
+      "coordinators": "Coordinators",
+      "role_presets_count": "{{count}} role presets"
+    },
+    "toast": {
+      "load_failed": "Failed to load KISS workflow data."
+    },
+    "review_queue": {
+      "title": "Trusted review queue",
+      "description": "Hour logs that need coordinator verification before they become accepted caring-community evidence.",
+      "empty": "No pending hour reviews. The coordinator queue is clear.",
+      "overdue": "{{count}} overdue",
+      "needs_review": "Needs review",
+      "unassigned": "Unassigned support activity",
+      "logged_on": "Logged {{date}}",
+      "submitted_on": "Submitted {{date}}"
+    },
+    "signals": {
+      "title": "Coordinator signals",
+      "description": "Quick operating indicators for matching, oversight, and partner activity.",
+      "active_requests": "Active requests",
+      "active_offers": "Active offers",
+      "trusted_organisations": "Trusted organisations",
+      "declined_30d": "Declined in 30 days"
+    },
+    "roles": {
+      "title": "Agoris/KISS role presets",
+      "install_pack": "Install role pack",
+      "installing": "Installing",
+      "installed_chip": "Installed",
+      "not_installed_chip": "Not installed",
+      "install_success": "KISS role pack installed.",
+      "install_failed": "Failed to install KISS role pack.",
+      "installed_count": "{{installed}} of {{total}} presets installed",
+      "permissions_status": "{{installed}} of {{total}} permissions",
+      "national_admin": {
+        "title": "National foundation admin",
+        "description": "Cross-program oversight, reporting standards, and KISS network governance."
+      },
+      "canton_admin": {
+        "title": "Canton admin",
+        "description": "Regional performance view, municipal coordination, and canton-level reporting."
+      },
+      "municipality_admin": {
+        "title": "Municipality admin",
+        "description": "Local participation, requests, organisations, and public-sector report packs."
+      },
+      "cooperative_coordinator": {
+        "title": "Cooperative coordinator",
+        "description": "Member onboarding, matching, hour review, and sensitive support escalation."
+      },
+      "organisation_coordinator": {
+        "title": "Organisation coordinator",
+        "description": "Opportunity management, volunteer rosters, logged hours, and partner activity."
+      },
+      "trusted_reviewer": {
+        "title": "Trusted volunteer reviewer",
+        "description": "Limited review authority for approved hour logs and community trust signals."
+      }
+    },
+    "stages": {
+      "title": "KISS operating model",
+      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
+      "intake": {
+        "title": "Intake",
+        "description": "A member, family, organisation, or coordinator records a need or offer."
+      },
+      "match": {
+        "title": "Match",
+        "description": "Coordinators connect people, organisations, or trusted volunteers."
+      },
+      "log": {
+        "title": "Log hours",
+        "description": "Support time is recorded against the member, organisation, or activity."
+      },
+      "verify": {
+        "title": "Verify",
+        "description": "A trusted coordinator approves or declines the logged hours."
+      },
+      "statement": {
+        "title": "Statement",
+        "description": "Accepted hours feed member statements and municipal evidence packs."
+      }
+    }
+  },
+  "municipal_reports": {
+    "meta": {
+      "title": "Municipal Impact Reports",
+      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+    },
+    "actions": {
+      "analytics": "Community analytics",
+      "impact_report": "Impact report",
+      "open_source_report": "Open source report",
+      "export_csv": "Export CSV",
+      "export_pdf": "Export PDF"
+    },
+    "stats": {
+      "report_pack": "Report pack",
+      "ready": "Ready",
+      "hours_source": "Hours source",
+      "verified": "Verified",
+      "audience": "Audience",
+      "municipal": "Municipal",
+      "exports": "Exports",
+      "csv_pdf": "CSV/PDF",
+      "verified_hours": "Verified hours",
+      "participants": "Participants",
+      "organisations": "Organisations",
+      "total_value": "Total value"
+    },
+    "loading": "Loading municipal impact data",
+    "period": "Reporting period",
+    "hour_value": "Hour value",
+    "multiplier": "Social multiplier",
+    "sections": {
+      "categories": "Support categories",
+      "trends": "Verified activity trend"
+    },
+    "empty": {
+      "categories": "No completed support categories in this period.",
+      "trends": "No verified activity trend is available for this period."
+    },
+    "values": {
+      "hours": "{{count}}h",
+      "activities": "{{count}} activities",
+      "trend_detail": "{{participants}} participants, {{activities}} activities"
+    },
+    "toast": {
+      "load_failed": "Failed to load municipal impact data.",
+      "export_started": "Report export started.",
+      "export_failed": "Failed to export the municipal report."
+    },
+    "cards": {
+      "verified_hours": {
+        "title": "Verified hours and economic value",
+        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
+        "metric_1": "Approved hours",
+        "metric_2": "Active contributors",
+        "metric_3": "Value estimate"
+      },
+      "active_members": {
+        "title": "Member reach and inclusion",
+        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
+        "metric_1": "Active members",
+        "metric_2": "New joiners",
+        "metric_3": "Inactive members"
+      },
+      "organisations": {
+        "title": "Organisation and partner activity",
+        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
+        "metric_1": "Organisations",
+        "metric_2": "Opportunities",
+        "metric_3": "Verified logs"
+      },
+      "trust_pack": {
+        "title": "Trust, safeguarding, and compliance",
+        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
+        "metric_1": "Verification",
+        "metric_2": "Reviews",
+        "metric_3": "Audit trail"
+      }
+    }
+  }
 }

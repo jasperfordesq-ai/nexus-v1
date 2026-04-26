@@ -94,6 +94,14 @@
     },
     "roles": {
       "title": "Agoris/KISS role presets",
+      "install_pack": "Install role pack",
+      "installing": "Installing",
+      "installed_chip": "Installed",
+      "not_installed_chip": "Not installed",
+      "install_success": "KISS role pack installed.",
+      "install_failed": "Failed to install KISS role pack.",
+      "installed_count": "{{installed}} of {{total}} presets installed",
+      "permissions_status": "{{installed}} of {{total}} permissions",
       "national_admin": {
         "title": "National foundation admin",
         "description": "Cross-program oversight, reporting standards, and KISS network governance."

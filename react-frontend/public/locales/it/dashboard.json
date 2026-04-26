@@ -41,7 +41,8 @@
     "view_wallet": "Vedi Portafoglio",
     "find_members": "Trova Membri",
     "browse_events": "Sfoglia Eventi",
-    "notifications": "Notifiche"
+    "notifications": "Notifiche",
+    "caring_community": "Care Hub"
   },
   "listings": {
     "offering": "Offerta",
@@ -104,5 +105,14 @@
   "fallback_name": "there",
   "common": {
     "loading": "Loading"
+  },
+  "caring_community": {
+    "title": "Caring Community",
+    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "actions": {
+      "open_hub": "Open hub",
+      "request_help": "Request help",
+      "log_hours": "Log hours"
+    }
   }
 }
