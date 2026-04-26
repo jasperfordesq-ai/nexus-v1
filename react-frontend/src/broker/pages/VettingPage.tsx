@@ -75,6 +75,37 @@ const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'prima
 
 const SEARCH_DEBOUNCE_MS = 300;
 
+/**
+ * MySQL DATE/DATETIME columns are returned as bare strings without a zone
+ * marker; JS `new Date()` parses bare datetime strings as LOCAL time, which
+ * shifts displayed dates across the day boundary for users far from server
+ * timezone. Promote bare strings to ISO-8601 UTC before parsing. For pure
+ * date columns (issue_date, expiry_date) the issue is more subtle but the
+ * day-boundary math (days-until-expiry) is sensitive to it.
+ */
+function parseServerTimestamp(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
+  // YYYY-MM-DD (date only) — anchor at UTC midday so day-of-month is
+  // stable across timezones up to ±12h. YYYY-MM-DD HH:MM:SS — promote
+  // to ISO with Z.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(value + 'T12:00:00Z');
+  }
+  const d = new Date(value.replace(' ', 'T') + 'Z');
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatServerDate(value: string | null | undefined): string {
+  const d = parseServerTimestamp(value);
+  return d ? d.toLocaleDateString() : '—';
+}
+
+function formatServerDateTime(value: string | null | undefined): string {
+  const d = parseServerTimestamp(value);
+  return d ? d.toLocaleString() : '—';
+}
+
 interface UserSearchResult {
   id: number;
   first_name: string;
@@ -96,8 +127,13 @@ export function VettingRecords() {
   // Status filter is mirrored to the `?status=` URL param so the broker
   // dashboard stat cards can deep-link straight into a filtered view and
   // the browser back button round-trips correctly.
+  // 'pending_review' is the union of literal-pending + submitted — both
+  // are pre-verification states the broker still owns. This is what the
+  // broker dashboard's "Vetting Pending" tile counts and what the
+  // "Pending Review" stat card on this page surfaces. The narrower
+  // 'pending' / 'submitted' filters are still available for drill-down.
   const VETTING_STATUSES = [
-    'all', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+    'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
   ] as const;
   type VettingStatus = (typeof VETTING_STATUSES)[number];
   const [searchParams, setSearchParams] = useSearchParams();
@@ -143,6 +179,7 @@ export function VettingRecords() {
   // Stats
   const [stats, setStats] = useState<VettingStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(false);
 
   // Create modal
   const [createOpen, setCreateOpen] = useState(false);
@@ -243,13 +280,20 @@ export function VettingRecords() {
 
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
+    setStatsError(false);
     try {
       const res = await adminVetting.stats();
       if (res.success && res.data) {
         setStats(res.data as VettingStats);
+      } else {
+        // Surface failure rather than silently zeroing — same lesson as
+        // the broker dashboard's _partial flag. Vetting counts feed the
+        // operational picture; a clean dashboard during outages hides
+        // expiring records that need attention.
+        setStatsError(true);
       }
     } catch {
-      // Stats are non-critical
+      setStatsError(true);
     } finally {
       setStatsLoading(false);
     }
@@ -609,7 +653,7 @@ export function VettingRecords() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {item.issue_date ? new Date(item.issue_date).toLocaleDateString() : '—'}
+          {formatServerDate(item.issue_date)}
         </span>
       ),
     },
@@ -618,8 +662,8 @@ export function VettingRecords() {
       label: t('vetting.col_expiry'),
       sortable: true,
       render: (item) => {
-        if (!item.expiry_date) return <span className="text-sm text-default-500">{'—'}</span>;
-        const expiry = new Date(item.expiry_date);
+        const expiry = parseServerTimestamp(item.expiry_date);
+        if (!expiry) return <span className="text-sm text-default-500">{'—'}</span>;
         const now = new Date();
         const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 30;
@@ -744,6 +788,19 @@ export function VettingRecords() {
         }
       />
 
+      {statsError && (
+        <div className="rounded-lg border border-warning-200 bg-warning-50/50 p-3 flex items-start gap-3 mb-4">
+          <ShieldAlert size={20} className="text-warning shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-warning-700">{t('vetting.stats_error_title')}</p>
+            <p className="text-default-600">{t('vetting.stats_error_body')}</p>
+          </div>
+          <Button size="sm" variant="flat" color="warning" onPress={loadStats}>
+            {t('vetting.retry')}
+          </Button>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
@@ -755,7 +812,10 @@ export function VettingRecords() {
         />
         <StatCard
           label={t('vetting.stat_pending_review')}
-          value={stats?.pending ?? 0}
+          // pending_review = pending + submitted (pre-verification states
+          // the broker still owns). Falls back to legacy `pending` for
+          // backwards-compat with API responses that pre-date the field.
+          value={stats?.pending_review ?? stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
@@ -801,6 +861,7 @@ export function VettingRecords() {
           size="sm"
         >
           <Tab key="all" title={t('vetting.tab_all')} />
+          <Tab key="pending_review" title={t('vetting.tab_pending_review')} />
           <Tab key="pending" title={t('vetting.tab_pending')} />
           <Tab key="submitted" title={t('vetting.tab_submitted')} />
           <Tab key="verified" title={t('vetting.tab_verified')} />
@@ -1243,11 +1304,11 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.field_issue_date')}</p>
-                  <p className="font-medium">{viewItem.issue_date ? new Date(viewItem.issue_date).toLocaleDateString() : '—'}</p>
+                  <p className="font-medium">{formatServerDate(viewItem.issue_date)}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.field_expiry_date')}</p>
-                  <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '—'}</p>
+                  <p className="font-medium">{formatServerDate(viewItem.expiry_date)}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.verified_by')}</p>
@@ -1259,11 +1320,11 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.verified_at')}</p>
-                  <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '—'}</p>
+                  <p className="font-medium">{formatServerDateTime(viewItem.verified_at)}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.created')}</p>
-                  <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
+                  <p className="font-medium">{formatServerDateTime(viewItem.created_at)}</p>
                 </div>
               </div>
 
@@ -1282,7 +1343,7 @@ export function VettingRecords() {
                     </div>
                     <div>
                       <p className="text-default-400">{t('vetting.rejected_at')}</p>
-                      <p className="font-medium">{viewItem.rejected_at ? new Date(viewItem.rejected_at).toLocaleString() : '—'}</p>
+                      <p className="font-medium">{formatServerDateTime(viewItem.rejected_at)}</p>
                     </div>
                   </div>
                   {viewItem.rejection_reason && (

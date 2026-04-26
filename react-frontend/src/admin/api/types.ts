@@ -1664,10 +1664,21 @@ export interface VettingRecord {
 
 export interface VettingStats {
   total: number;
+  /** Records with literal status='pending' (broker hasn't actioned them). */
   pending: number;
+  /** Records with literal status='submitted' (sent to authority, awaiting confirmation). */
+  submitted?: number;
+  /**
+   * Union of pending+submitted — pre-verification states still owned by
+   * the broker. This is the value the dashboard tile and the "Pending
+   * Review" stat card mean. The legacy `pending` field is the literal
+   * pending count and is kept for backwards compatibility.
+   */
+  pending_review?: number;
   verified: number;
   expired: number;
   expiring_soon: number;
+  rejected?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

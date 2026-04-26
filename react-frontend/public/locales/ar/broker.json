@@ -375,7 +375,11 @@
     "toast_bulk_reject_reason_required": "A reason is required to reject the selected records.",
     "toast_document_uploaded": "Document uploaded.",
     "toast_upload_failed": "Failed to upload document.",
-    "toast_file_too_large": "File is too large. Maximum size is 5MB."
+    "toast_file_too_large": "File is too large. Maximum size is 5MB.",
+    "tab_pending_review": "Pending Review",
+    "stats_error_title": "Vetting stats couldn't be loaded",
+    "stats_error_body": "The counters above reflect the last successful load. Retry — if the failure persists, check the broker logs.",
+    "retry": "Retry"
   },
   "exchanges": {
     "title": "Exchanges",

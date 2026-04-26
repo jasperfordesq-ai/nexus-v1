@@ -203,7 +203,11 @@ export function BrokerDashboard() {
           icon={ShieldCheck}
           color="success"
           loading={loading}
-          to={tenantPath('/broker/vetting?status=pending')}
+          // Tile counts pending+submitted (pre-verification states); link
+          // must match. ?status=pending alone showed only the literal-
+          // pending subset, hiding submitted records that the user
+          // expected to see when clicking through from the count.
+          to={tenantPath('/broker/vetting?status=pending_review')}
         />
         <StatCard
           label={t('dashboard.vetting_expiring')}

@@ -130,7 +130,17 @@ class VettingService
                 ]);
 
             if (!empty($filters['status'])) {
-                $query->where('vetting_records.status', $filters['status']);
+                // 'pending_review' is a UI-level alias for the union of
+                // pending + submitted — both are pre-verification states
+                // a broker still needs to action. Without this, the
+                // dashboard tile counted both but its deep-link
+                // `?status=pending` only showed the literal-pending
+                // subset, hiding submitted records from the user.
+                if ($filters['status'] === 'pending_review') {
+                    $query->whereIn('vetting_records.status', ['pending', 'submitted']);
+                } else {
+                    $query->where('vetting_records.status', $filters['status']);
+                }
             }
 
             if (!empty($filters['vetting_type'])) {
@@ -244,6 +254,12 @@ class VettingService
                 'expiring_soon' => $expiringSoon,
                 'expired' => $expired,
                 'pending' => (int) ($byStatus['pending'] ?? 0),
+                'submitted' => (int) ($byStatus['submitted'] ?? 0),
+                // pending_review = pending + submitted — the union of
+                // pre-verification states a broker still owns. Matches
+                // the broker dashboard's "Vetting Pending" tile and the
+                // VettingPage's "Pending Review" stat-card definition.
+                'pending_review' => (int) ($byStatus['pending'] ?? 0) + (int) ($byStatus['submitted'] ?? 0),
                 'verified' => (int) ($byStatus['verified'] ?? 0),
                 'rejected' => (int) ($byStatus['rejected'] ?? 0),
             ];
@@ -252,7 +268,8 @@ class VettingService
             return [
                 'total' => 0, 'by_status' => [], 'by_type' => [],
                 'expiring_soon' => 0, 'expired' => 0,
-                'pending' => 0, 'verified' => 0, 'rejected' => 0,
+                'pending' => 0, 'submitted' => 0, 'pending_review' => 0,
+                'verified' => 0, 'rejected' => 0,
             ];
         }
     }
