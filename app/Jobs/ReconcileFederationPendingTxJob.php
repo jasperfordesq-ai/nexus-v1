@@ -43,16 +43,22 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
     /** Cap how many stale rows we surface per run, to avoid log floods. */
     private const MAX_PER_RUN = 100;
 
-    // Untyped to match Illuminate\Bus\Queueable's `public $queue;` — PHP 8.4
-    // rejects trait composition where the same property has incompatible
-    // type declarations across the using class and the trait.
-    public $queue = 'federation';
+    // PHP 8.4 strict trait composition rejects ANY property re-declaration
+    // when the trait's signature differs (Queueable declares `public $queue;`
+    // with implicit null default; we need to assign 'federation'). Setting
+    // $this->queue inside the constructor sidesteps the trait conflict
+    // entirely while preserving the queue routing.
 
     public int $tries = 3;
 
     public array $backoff = [60, 300, 900];
 
     public int $timeout = 120;
+
+    public function __construct()
+    {
+        $this->queue = 'federation';
+    }
 
     public function handle(): void
     {
