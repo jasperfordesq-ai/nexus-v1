@@ -284,43 +284,89 @@ export function BrokerDashboard() {
 
 type ChipColor = 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default';
 
+// Action keys MUST match the action strings emitted by the backend dashboard
+// query in AdminBrokerController::dashboard (UNION of activity_log +
+// org_audit_log). Any mismatch causes the row to render with a default-grey
+// chip and a snake_case label like "vetting record verified".
 const actionChipColorMap: Record<string, ChipColor> = {
+  // org_audit_log entries (broker controller writes via AuditLogService::log)
   exchange_approved: 'success',
   exchange_rejected: 'danger',
-  message_reviewed: 'primary',
-  risk_tag_added: 'warning',
-  user_monitored: 'secondary',
-  vetting_verified: 'success',
-  vetting_rejected: 'danger',
-  user_banned: 'danger',
-  user_unbanned: 'success',
-  balance_adjusted: 'primary',
+  broker_message_reviewed: 'primary',
+  broker_message_approved: 'success',
+  broker_message_flagged: 'warning',
+  listing_risk_tag_created: 'warning',
+  listing_risk_tag_updated: 'warning',
+  listing_risk_tag_removed: 'default',
+  user_monitoring_added: 'secondary',
+  user_monitoring_removed: 'default',
+  broker_config_updated: 'primary',
+  // activity_log entries (vetting/insurance controllers write via ActivityLog::log)
+  vetting_record_verified: 'success',
+  vetting_record_rejected: 'danger',
+  vetting_record_created: 'primary',
+  vetting_record_updated: 'primary',
+  vetting_record_deleted: 'default',
+  vetting_document_uploaded: 'primary',
+  insurance_cert_created: 'primary',
+  insurance_cert_updated: 'primary',
+  insurance_cert_verified: 'success',
+  insurance_cert_rejected: 'danger',
+  insurance_cert_deleted: 'default',
 };
 
 const actionChipLabel: Record<string, string> = {
+  // org_audit_log
   exchange_approved: 'Approved',
   exchange_rejected: 'Rejected',
-  message_reviewed: 'Reviewed',
-  risk_tag_added: 'Risk Tagged',
-  user_monitored: 'Monitored',
-  vetting_verified: 'Verified',
-  vetting_rejected: 'Vetting Rejected',
-  user_banned: 'Banned',
-  user_unbanned: 'Unbanned',
-  balance_adjusted: 'Balance',
+  broker_message_reviewed: 'Reviewed',
+  broker_message_approved: 'Approved',
+  broker_message_flagged: 'Flagged',
+  listing_risk_tag_created: 'Risk Tagged',
+  listing_risk_tag_updated: 'Risk Updated',
+  listing_risk_tag_removed: 'Risk Removed',
+  user_monitoring_added: 'Monitored',
+  user_monitoring_removed: 'Monitor Cleared',
+  broker_config_updated: 'Config',
+  // activity_log
+  vetting_record_verified: 'Verified',
+  vetting_record_rejected: 'Vetting Rejected',
+  vetting_record_created: 'Vetting Added',
+  vetting_record_updated: 'Vetting Updated',
+  vetting_record_deleted: 'Vetting Removed',
+  vetting_document_uploaded: 'Document',
+  insurance_cert_created: 'Insurance Added',
+  insurance_cert_updated: 'Insurance Updated',
+  insurance_cert_verified: 'Insurance Verified',
+  insurance_cert_rejected: 'Insurance Rejected',
+  insurance_cert_deleted: 'Insurance Removed',
 };
 
 const actionVerbLabel: Record<string, string> = {
+  // org_audit_log
   exchange_approved: 'approved an exchange',
   exchange_rejected: 'rejected an exchange',
-  message_reviewed: 'reviewed a message',
-  risk_tag_added: 'tagged a listing',
-  user_monitored: 'placed a user under monitoring',
-  vetting_verified: 'verified a vetting record',
-  vetting_rejected: 'rejected a vetting record',
-  user_banned: 'banned a user',
-  user_unbanned: 'unbanned a user',
-  balance_adjusted: 'adjusted a balance',
+  broker_message_reviewed: 'reviewed a message',
+  broker_message_approved: 'approved a message',
+  broker_message_flagged: 'flagged a message',
+  listing_risk_tag_created: 'tagged a listing',
+  listing_risk_tag_updated: 'updated a listing risk tag',
+  listing_risk_tag_removed: 'removed a listing risk tag',
+  user_monitoring_added: 'placed a user under monitoring',
+  user_monitoring_removed: 'cleared monitoring on a user',
+  broker_config_updated: 'updated broker configuration',
+  // activity_log
+  vetting_record_verified: 'verified a vetting record',
+  vetting_record_rejected: 'rejected a vetting record',
+  vetting_record_created: 'added a vetting record',
+  vetting_record_updated: 'updated a vetting record',
+  vetting_record_deleted: 'deleted a vetting record',
+  vetting_document_uploaded: 'uploaded a vetting document',
+  insurance_cert_created: 'added an insurance certificate',
+  insurance_cert_updated: 'updated an insurance certificate',
+  insurance_cert_verified: 'verified an insurance certificate',
+  insurance_cert_rejected: 'rejected an insurance certificate',
+  insurance_cert_deleted: 'removed an insurance certificate',
 };
 
 function ActivityChip({ actionType }: { actionType: string }) {
