@@ -393,7 +393,12 @@ class NotificationDispatcher
 
         LocaleContext::withLocale($broker, function () use ($brokerId, $userName, $listingTitle, $requestId) {
             $content = __('notifications.match_approval_request', ['name' => $userName, 'title' => $listingTitle]);
-            $link = "/admin/match-approvals";
+            // Recipient query upstream (MatchApprovalWorkflowService) targets
+            // role IN ('admin','broker','coordinator'). /admin/match-approvals
+            // 403's brokers — link to the broker exchanges queue with the
+            // pending_broker filter, which renders the same pending requests
+            // in a broker-accessible UI for all three roles.
+            $link = "/broker/exchanges?status=pending_broker";
 
             Notification::createNotification((int) $brokerId, $content, $link, 'match_approval_request');
 
@@ -1351,7 +1356,7 @@ HTML;
             {$reviewNote}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$btnReview}</a>
+            <a href="{$frontendUrl}{$basePath}/broker/exchanges?status=pending_broker" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$btnReview}</a>
         </div>
     </div>
 </div>

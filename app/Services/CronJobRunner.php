@@ -1202,8 +1202,11 @@ class CronJobRunner
             return;
         }
 
-        // Fetch ONLY items we just claimed (limit matches claim batch)
-        $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
+        // Fetch ONLY items we just claimed (limit matches claim batch).
+        // preferred_language is loaded so the subject (and any locale-aware
+        // body interpolation) renders in the recipient's locale, not the
+        // cron worker's. Mirrors the public runInstantQueue() at line 409.
+        $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id, u.preferred_language
                 FROM notification_queue q
                 JOIN users u ON q.user_id = u.id
                 WHERE q.frequency = 'instant' AND q.status = 'processing'
@@ -1221,7 +1224,13 @@ class CronJobRunner
                     TenantContext::setById($item['user_tenant_id']);
                 }
 
-                $subject = self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '');
+                // Subject rendering must use recipient's preferred language
+                // (cron worker default is the system locale, not the user's).
+                // Same pattern as public runInstantQueue().
+                $subject = LocaleContext::withLocale(
+                    $item['preferred_language'] ?? null,
+                    fn () => self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '')
+                );
 
                 $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 

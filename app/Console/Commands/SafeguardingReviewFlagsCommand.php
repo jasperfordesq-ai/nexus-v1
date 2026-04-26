@@ -247,14 +247,19 @@ class SafeguardingReviewFlagsCommand extends Command
     private function bellReminder(array $userBatch): void
     {
         try {
-            Notification::create([
-                'tenant_id' => $userBatch['tenant_id'],
-                'user_id' => $userBatch['user_id'],
-                'type' => 'safeguarding_review_reminder',
-                'message' => __('safeguarding.review.reminder_title'),
-                'link' => '/settings/safeguarding',
-                'is_read' => false,
-            ]);
+            // Cron worker boots with the system default locale; without
+            // wrapping per-recipient, the bell text would render in the
+            // worker's locale rather than the user's preferred_language.
+            LocaleContext::withLocale($userBatch['preferred_language'] ?? null, function () use ($userBatch) {
+                Notification::create([
+                    'tenant_id' => $userBatch['tenant_id'],
+                    'user_id' => $userBatch['user_id'],
+                    'type' => 'safeguarding_review_reminder',
+                    'message' => __('safeguarding.review.reminder_title'),
+                    'link' => '/settings?tab=safeguarding',
+                    'is_read' => false,
+                ]);
+            });
         } catch (\Throwable $e) {
             Log::warning('SafeguardingReviewFlagsCommand: reminder bell failed', [
                 'user_id' => $userBatch['user_id'],
@@ -265,11 +270,13 @@ class SafeguardingReviewFlagsCommand extends Command
 
     private function notifyAdminsOfEscalation(array $userBatch): void
     {
+        // Includes preferred_language so each staff member's bell + email
+        // renders in their own locale (not the cron worker's default).
         $staff = DB::table('users')
             ->where('tenant_id', $userBatch['tenant_id'])
             ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
             ->where('status', 'active')
-            ->select(['id', 'email', 'first_name', 'last_name', 'name'])
+            ->select(['id', 'email', 'first_name', 'last_name', 'name', 'preferred_language'])
             ->get();
 
         if ($staff->isEmpty()) {
@@ -281,49 +288,57 @@ class SafeguardingReviewFlagsCommand extends Command
             TenantContext::setById($userBatch['tenant_id']);
 
             $safeMemberName = htmlspecialchars($userBatch['name'], ENT_QUOTES, 'UTF-8');
-            $escalationHtml = EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->title(__('safeguarding.review.escalation_title'))
-                ->paragraph(__('safeguarding.review.escalation_body', ['name' => $safeMemberName]))
-                ->button(
-                    __('safeguarding.review.escalation_cta'),
-                    EmailTemplateBuilder::tenantUrl('/broker/safeguarding')
-                )
-                ->render();
 
             foreach ($staff as $admin) {
-                // Bell
-                try {
-                    Notification::create([
-                        'tenant_id' => $userBatch['tenant_id'],
-                        'user_id' => $admin->id,
-                        'type' => 'safeguarding_review_escalation',
-                        'message' => __('safeguarding.review.escalation_title') . ': ' . $userBatch['name'],
-                        'link' => '/broker/safeguarding',
-                        'is_read' => false,
-                    ]);
-                } catch (\Throwable $e) {
-                    Log::warning('SafeguardingReviewFlagsCommand: escalation bell failed', [
-                        'admin_id' => $admin->id,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
+                // Wrap the per-admin bell + email in their preferred_language
+                // so the email body, subject, AND bell text all render in
+                // the recipient's locale. The HTML body must be built INSIDE
+                // the wrap (was previously built once outside the loop in
+                // the worker's locale).
+                LocaleContext::withLocale($admin, function () use ($admin, $userBatch, $safeMemberName) {
+                    $escalationHtml = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('safeguarding.review.escalation_title'))
+                        ->paragraph(__('safeguarding.review.escalation_body', ['name' => $safeMemberName]))
+                        ->button(
+                            __('safeguarding.review.escalation_cta'),
+                            EmailTemplateBuilder::tenantUrl('/broker/safeguarding')
+                        )
+                        ->render();
 
-                // Email (one per admin)
-                if (!empty($admin->email)) {
+                    // Bell
                     try {
-                        app(EmailService::class)->send(
-                            $admin->email,
-                            __('safeguarding.review.escalation_subject'),
-                            $escalationHtml
-                        );
+                        Notification::create([
+                            'tenant_id' => $userBatch['tenant_id'],
+                            'user_id' => $admin->id,
+                            'type' => 'safeguarding_review_escalation',
+                            'message' => __('safeguarding.review.escalation_title') . ': ' . $userBatch['name'],
+                            'link' => '/broker/safeguarding',
+                            'is_read' => false,
+                        ]);
                     } catch (\Throwable $e) {
-                        Log::warning('SafeguardingReviewFlagsCommand: escalation email failed', [
+                        Log::warning('SafeguardingReviewFlagsCommand: escalation bell failed', [
                             'admin_id' => $admin->id,
                             'error' => $e->getMessage(),
                         ]);
                     }
-                }
+
+                    // Email
+                    if (!empty($admin->email)) {
+                        try {
+                            app(EmailService::class)->send(
+                                $admin->email,
+                                __('safeguarding.review.escalation_subject'),
+                                $escalationHtml
+                            );
+                        } catch (\Throwable $e) {
+                            Log::warning('SafeguardingReviewFlagsCommand: escalation email failed', [
+                                'admin_id' => $admin->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                });
             }
         } finally {
             if ($previousTenantId !== null) {
