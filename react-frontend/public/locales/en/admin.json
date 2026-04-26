@@ -60,7 +60,9 @@
     "actions": {
       "analytics": "Community analytics",
       "impact_report": "Impact report",
-      "open_source_report": "Open source report"
+      "open_source_report": "Open source report",
+      "export_csv": "Export CSV",
+      "export_pdf": "Export PDF"
     },
     "stats": {
       "report_pack": "Report pack",
@@ -70,7 +72,33 @@
       "audience": "Audience",
       "municipal": "Municipal",
       "exports": "Exports",
-      "csv_pdf": "CSV/PDF"
+      "csv_pdf": "CSV/PDF",
+      "verified_hours": "Verified hours",
+      "participants": "Participants",
+      "organisations": "Organisations",
+      "total_value": "Total value"
+    },
+    "loading": "Loading municipal impact data",
+    "period": "Reporting period",
+    "hour_value": "Hour value",
+    "multiplier": "Social multiplier",
+    "sections": {
+      "categories": "Support categories",
+      "trends": "Verified activity trend"
+    },
+    "empty": {
+      "categories": "No completed support categories in this period.",
+      "trends": "No verified activity trend is available for this period."
+    },
+    "values": {
+      "hours": "{{count}}h",
+      "activities": "{{count}} activities",
+      "trend_detail": "{{participants}} participants, {{activities}} activities"
+    },
+    "toast": {
+      "load_failed": "Failed to load municipal impact data.",
+      "export_started": "Report export started.",
+      "export_failed": "Failed to export the municipal report."
     },
     "cards": {
       "verified_hours": {

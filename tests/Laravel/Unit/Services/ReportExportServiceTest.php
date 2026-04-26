@@ -27,7 +27,8 @@ class ReportExportServiceTest extends TestCase
         $this->assertArrayHasKey('members', $types);
         $this->assertArrayHasKey('hours_summary', $types);
         $this->assertArrayHasKey('social_value', $types);
-        $this->assertCount(8, $types);
+        $this->assertArrayHasKey('municipal_impact', $types);
+        $this->assertCount(9, $types);
     }
 
     public function test_export_returns_failure_for_empty_data(): void

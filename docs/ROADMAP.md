@@ -488,6 +488,7 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | Deploy warning to investigate | `php artisan storage:link` logged `symlink(): Read-only file system` during cache rebuild. Deploy continued and smoke tests passed. Decide whether storage symlink should be prebuilt into image, mounted writable, skipped when already present, or made read-only-safe. |
 | Initial module build | `caring_community` feature flag added, admin module switch registered, React tenant typing updated, public `/caring-community` hub page added, Community nav entry added, and mobile quick-create action added. All new entry points are hidden when the feature switch is off. |
 | Module completion pass | Dashboard Caring Community card and quick action added, admin Caring Community configuration detail page added, admin module registry linked to the detail page, admin sidebar entries gated, municipal/KISS reporting pack surface added, and route/nav smoke coverage expanded. Frontend build passed. |
+| Municipal report data pass | Added tenant-scoped municipal impact report service, admin API endpoint, CSV/PDF export type, real reporting metrics on the municipal report page, category/trend sections, and export buttons. Route cache was cleared locally to verify the new route. |
 
 ### Immediate Next Actions
 
@@ -498,7 +499,7 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | AG3 | Write diligence question pack | High | Registry/UID, live deployments, pricing, KPIs, security/privacy docs, hosting, integrations, roadmap, data ownership, procurement expectations. |
 | AG4 | Build formal Caring Community module profile | Critical | Done for the first production-ready shell: feature flag, preset, admin switch, public hub route, nav gate, quick-create gate, dashboard entry points, admin configuration detail page, and municipal reporting surface are implemented. Next: wire deeper KISS-specific workflows and real export generation. |
 | AG5 | Add kill-switch regression tests | Critical | Partial: quick-create, route config, community nav, and dashboard feature-gating tests are implemented and passing. Next: admin toggle end-to-end coverage and API affordance audit. |
-| AG6 | Create municipal impact report exports | High | Reporting surface exists at `/admin/reports/municipal-impact`. Next: generate PDF/CSV packs for verified hours, active members, organization activity, support categories, SROI, and trendlines. |
+| AG6 | Create municipal impact report exports | High | Partial: `/admin/reports/municipal-impact` now loads real tenant metrics and exports CSV/PDF via `municipal_impact`. Next: make the PDF presentation-grade, add date filters, and separate canton/municipality/cooperative report variants. |
 | AG7 | Harden Swiss localization | Medium | Native German review first; then French/Italian. Add KISS/Agoris glossary terms. |
 | AG8 | Prepare technical architecture response | High | Explain how NEXUS can be adapted, how add-ons embed, how module switches work, and how data remains tenant-scoped. |
 

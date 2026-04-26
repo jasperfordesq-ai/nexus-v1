@@ -10,6 +10,7 @@ use App\Services\SocialValueService;
 use App\Services\HoursReportService;
 use App\Services\InactiveMemberService;
 use App\Services\ReportExportService;
+use App\Services\MunicipalImpactReportService;
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Services\MemberReportService;
@@ -29,6 +30,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         private readonly HoursReportService $hoursReportService,
         private readonly InactiveMemberService $inactiveMemberService,
         private readonly ReportExportService $reportExportService,
+        private readonly MunicipalImpactReportService $municipalImpactReportService,
         private readonly MemberReportService $memberReportService,
         private readonly ContentModerationService $contentModerationService,
     ) {}
@@ -147,6 +149,24 @@ class AdminAnalyticsReportsController extends BaseApiController
         }
 
         return $this->respondWithData($data);
+    }
+
+    /** GET /api/v2/admin/reports/municipal-impact */
+    public function municipalImpact(): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        return $this->respondWithData(
+            $this->municipalImpactReportService->summary($tenantId, [
+                'date_from' => $this->query('date_from'),
+                'date_to' => $this->query('date_to'),
+            ])
+        );
     }
 
     // ============================================

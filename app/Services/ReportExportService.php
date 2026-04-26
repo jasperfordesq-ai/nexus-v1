@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
  */
 class ReportExportService
 {
+    private ?MunicipalImpactReportService $municipalImpactReportService;
+
     /**
      * Supported export report types.
      */
@@ -28,10 +30,12 @@ class ReportExportService
         'listings'        => 'Listings Report',
         'inactive'        => 'Inactive Members',
         'social_value'    => 'Social Value (SROI)',
+        'municipal_impact' => 'Municipal Impact Pack',
     ];
 
-    public function __construct()
+    public function __construct(?MunicipalImpactReportService $municipalImpactReportService = null)
     {
+        $this->municipalImpactReportService = $municipalImpactReportService;
     }
 
     /**
@@ -155,8 +159,18 @@ class ReportExportService
             'listings'       => $this->getListingData($tenantId, $filters),
             'inactive'       => $this->getInactiveData($tenantId, $filters),
             'social_value'   => $this->getSocialValueData($tenantId, $filters),
+            'municipal_impact' => $this->municipalImpactReportService()->exportData($tenantId, $filters),
             default          => ['headers' => [], 'rows' => []],
         };
+    }
+
+    private function municipalImpactReportService(): MunicipalImpactReportService
+    {
+        if (!$this->municipalImpactReportService) {
+            $this->municipalImpactReportService = new MunicipalImpactReportService();
+        }
+
+        return $this->municipalImpactReportService;
     }
 
     private function getTransactionData(int $tenantId, array $filters): array
