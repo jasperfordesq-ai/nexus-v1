@@ -57,6 +57,23 @@ type WorkflowSummary = {
     active_offers: number;
     trusted_organisations: number;
   };
+  role_pack?: RolePack;
+};
+
+type RolePack = {
+  available: boolean;
+  installed_count: number;
+  total_count: number;
+  presets: RolePresetStatus[];
+};
+
+type RolePresetStatus = {
+  key: string;
+  role_name: string;
+  role_id: number | null;
+  installed: boolean;
+  permission_count: number;
+  installed_permissions: number;
 };
 
 const workflowStages = [
@@ -88,6 +105,7 @@ export default function CaringCommunityWorkflowPage() {
 
   const [summary, setSummary] = useState<WorkflowSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [installingRoles, setInstallingRoles] = useState(false);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -107,11 +125,32 @@ export default function CaringCommunityWorkflowPage() {
 
   const stats = summary?.stats;
   const signals = summary?.coordinator_signals;
+  const rolePack = summary?.role_pack;
   const formatHours = (value: number) => t('municipal_reports.values.hours', { count: value.toLocaleString(undefined, { maximumFractionDigits: 1 }) });
 
   const roleCountLabel = useMemo(() => (
-    t('caring_workflow.stats.role_presets_count', { count: rolePresets.length })
-  ), [t]);
+    rolePack
+      ? t('caring_workflow.roles.installed_count', { installed: rolePack.installed_count, total: rolePack.total_count })
+      : t('caring_workflow.stats.role_presets_count', { count: rolePresets.length })
+  ), [rolePack, t]);
+
+  const roleStatusByKey = useMemo(() => {
+    const statuses = rolePack?.presets ?? [];
+    return new Map(statuses.map((status) => [status.key, status]));
+  }, [rolePack]);
+
+  const installRolePack = useCallback(async () => {
+    setInstallingRoles(true);
+    try {
+      const res = await api.post<RolePack>('/v2/admin/caring-community/role-presets/install', {});
+      setSummary((current) => current ? { ...current, role_pack: res.data } : current);
+      toast.success(t('caring_workflow.roles.install_success'));
+    } catch {
+      toast.error(t('caring_workflow.roles.install_failed'));
+    } finally {
+      setInstallingRoles(false);
+    }
+  }, [t, toast]);
 
   if (loading) {
     return (
@@ -223,24 +262,47 @@ export default function CaringCommunityWorkflowPage() {
           </Card>
 
           <Card shadow="sm">
-            <CardHeader>
+            <CardHeader className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.roles.title')}</h2>
                 <p className="mt-1 text-sm text-default-500">{roleCountLabel}</p>
               </div>
+              <Button
+                color="primary"
+                size="sm"
+                variant="flat"
+                isLoading={installingRoles}
+                onPress={installRolePack}
+              >
+                {installingRoles ? t('caring_workflow.roles.installing') : t('caring_workflow.roles.install_pack')}
+              </Button>
             </CardHeader>
             <Divider />
             <CardBody className="gap-3">
               {rolePresets.map((role) => {
                 const Icon = role.icon;
+                const status = roleStatusByKey.get(role.key);
                 return (
                   <div key={role.key} className="flex items-start gap-3 rounded-lg border border-default-200 p-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Icon size={18} />
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.roles.${role.key}.title`)}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.roles.${role.key}.title`)}</p>
+                        <Chip size="sm" color={status?.installed ? 'success' : 'default'} variant="flat">
+                          {status?.installed ? t('caring_workflow.roles.installed_chip') : t('caring_workflow.roles.not_installed_chip')}
+                        </Chip>
+                      </div>
                       <p className="mt-1 text-xs text-default-500">{t(`caring_workflow.roles.${role.key}.description`)}</p>
+                      {status && (
+                        <p className="mt-2 text-xs text-default-400">
+                          {t('caring_workflow.roles.permissions_status', {
+                            installed: status.installed_permissions,
+                            total: status.permission_count,
+                          })}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
