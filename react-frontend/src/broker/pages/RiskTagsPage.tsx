@@ -26,6 +26,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminListings } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '@/admin/components';
 import type { RiskTag } from '@/admin/api/types';
@@ -378,7 +379,7 @@ export function RiskTagsPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {new Date(item.created_at).toLocaleDateString()}
+          {formatServerDate(item.created_at)}
         </span>
       ),
     },

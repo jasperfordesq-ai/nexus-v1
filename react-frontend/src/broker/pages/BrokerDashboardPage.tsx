@@ -30,22 +30,8 @@ import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
 import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
+import { parseServerTimestamp } from '@/lib/serverTime';
 import { BrokerControlsHelp } from './BrokerHelpPage';
-
-/**
- * MySQL TIMESTAMP/DATETIME columns are stored as UTC but returned as
- * "YYYY-MM-DD HH:MM:SS" with no zone marker. JS `new Date(string)` then
- * interprets the bare format as LOCAL time, which makes every "minutes ago"
- * label drift by the user's UTC offset. Forcing the Z suffix fixes that
- * without touching the API contract.
- */
-function parseServerTimestamp(value: string): Date {
-  if (!value) return new Date(NaN);
-  // Already-ISO with timezone? Trust it.
-  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
-  // MySQL "2026-04-26 18:00:00" — promote to ISO UTC.
-  return new Date(value.replace(' ', 'T') + 'Z');
-}
 
 // Quick-link metadata. Title + description are translated at render time
 // using the broker.dashboard.links.* namespace so the dashboard respects
@@ -428,7 +414,7 @@ function formatActionLabel(actionType: string, t: TFunc): string {
 
 function formatTimeAgo(dateStr: string, t: TFunc): string {
   const date = parseServerTimestamp(dateStr);
-  if (Number.isNaN(date.getTime())) return '';
+  if (!date) return '';
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   // Clock skew between server and client can produce a negative diff.

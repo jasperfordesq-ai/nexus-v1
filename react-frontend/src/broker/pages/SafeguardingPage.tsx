@@ -25,24 +25,6 @@ import {
   Textarea,
 } from '@heroui/react';
 
-/**
- * MySQL TIMESTAMP/DATETIME columns are stored UTC but returned without a
- * zone marker. JS `new Date(string)` then interprets bare format as LOCAL
- * time (per ECMA-262 § 21.4.3.2), which can shift dates across the day
- * boundary for users far from the server's timezone. Promote bare strings
- * to ISO-8601 UTC before parsing.
- */
-function parseServerTimestamp(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
-  const d = new Date(value.replace(' ', 'T') + 'Z');
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function formatServerDate(value: string | null | undefined): string {
-  const d = parseServerTimestamp(value);
-  return d ? d.toLocaleDateString() : '—';
-}
 import Shield from 'lucide-react/icons/shield';
 import Flag from 'lucide-react/icons/flag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -53,6 +35,7 @@ import UserCheck from 'lucide-react/icons/user-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { formatServerDate } from '@/lib/serverTime';
 import { PageHeader, DataTable, StatCard, EmptyState } from '@/admin/components';
 import type { Column } from '@/admin/components';
 

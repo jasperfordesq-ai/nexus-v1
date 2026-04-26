@@ -38,6 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { parseServerTimestamp, formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '@/admin/components';
 import type { MonitoredUser, AdminUser } from '@/admin/api/types';
@@ -283,7 +284,7 @@ export function UserMonitoring() {
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.monitoring_started_at
-            ? new Date(item.monitoring_started_at).toLocaleDateString()
+            ? formatServerDate(item.monitoring_started_at)
             : '—'
           }
         </span>
@@ -294,10 +295,10 @@ export function UserMonitoring() {
       label: t('monitoring.col_expires'),
       sortable: true,
       render: (item) => {
-        if (!item.monitoring_expires_at) {
+        const expiresAt = parseServerTimestamp(item.monitoring_expires_at);
+        if (!expiresAt) {
           return <span className="text-sm text-default-400">{t('monitoring.no_expiry')}</span>;
         }
-        const expiresAt = new Date(item.monitoring_expires_at);
         const isExpired = expiresAt <= new Date();
         return (
           <Chip

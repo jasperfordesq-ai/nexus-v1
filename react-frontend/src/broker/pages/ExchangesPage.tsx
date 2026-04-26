@@ -29,6 +29,7 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Eye from 'lucide-react/icons/eye';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, StatusBadge, PageHeader, type Column } from '@/admin/components';
 import type { ExchangeRequest } from '@/admin/api/types';
@@ -190,7 +191,7 @@ export function ExchangeManagement() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {new Date(item.created_at).toLocaleDateString()}
+          {formatServerDate(item.created_at)}
         </span>
       ),
     },

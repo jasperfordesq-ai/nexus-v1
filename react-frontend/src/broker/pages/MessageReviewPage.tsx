@@ -38,6 +38,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerMessage, BrokerMessageDetail } from '@/admin/api/types';
@@ -317,7 +318,7 @@ export function MessageReview() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {new Date(item.created_at).toLocaleDateString()}
+          {formatServerDate(item.created_at)}
         </span>
       ),
     },
@@ -498,7 +499,7 @@ export function MessageReview() {
                   <div>
                     <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_date')}</p>
                     <p className="text-foreground">
-                      {new Date(detailItem.sent_at ?? detailItem.created_at).toLocaleString()}
+                      {formatServerDateTime(detailItem.sent_at ?? detailItem.created_at)}
                     </p>
                   </div>
                   {(detailItem.flag_reason || detailItem.copy_reason) && (
@@ -548,7 +549,7 @@ export function MessageReview() {
                           >
                             <span className="font-medium text-foreground mr-2">{msg.sender_name}</span>
                             <span className="text-default-500 text-xs">
-                              {new Date(msg.created_at).toLocaleString()}
+                              {formatServerDateTime(msg.created_at)}
                             </span>
                             <p className="mt-1 text-default-700 whitespace-pre-wrap">{msg.body}</p>
                           </div>
@@ -564,7 +565,7 @@ export function MessageReview() {
                     <div className="flex items-center gap-2 text-sm text-success">
                       <Chip size="sm" color="success" variant="flat">{t('messages.status_reviewed')}</Chip>
                       <span className="text-default-500">
-                        {new Date(detailItem.reviewed_at!).toLocaleString()}
+                        {formatServerDateTime(detailItem.reviewed_at!)}
                       </span>
                     </div>
                   </>

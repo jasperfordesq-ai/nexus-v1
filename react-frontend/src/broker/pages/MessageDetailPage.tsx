@@ -30,6 +30,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components';
 import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types';
@@ -277,7 +278,7 @@ export function MessageDetail() {
                 <Calendar className="w-3 h-3" /> {t('messages.detail_sent')}
               </p>
               <p className="text-sm text-foreground">
-                {new Date(copy.sent_at).toLocaleString()}
+                {formatServerDateTime(copy.sent_at)}
               </p>
             </div>
 
@@ -383,7 +384,7 @@ export function MessageDetail() {
                           )}
                         </div>
                         <span className="text-xs text-default-500">
-                          {new Date(msg.created_at).toLocaleString()}
+                          {formatServerDateTime(msg.created_at)}
                         </span>
                       </div>
 
@@ -441,7 +442,7 @@ export function MessageDetail() {
               <div className="space-y-1">
                 <p className="text-sm text-default-500">{t('messages.detail_date')}</p>
                 <p className="text-sm text-foreground">
-                  {new Date(archive.decided_at).toLocaleString()}
+                  {formatServerDateTime(archive.decided_at)}
                 </p>
               </div>
             </div>

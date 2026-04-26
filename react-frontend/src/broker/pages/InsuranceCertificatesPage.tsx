@@ -47,6 +47,7 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminInsurance, adminUsers, adminBroker } from '@/admin/api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
 import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '@/admin/api/types';
@@ -540,8 +541,8 @@ export function InsuranceCertificates() {
       label: t('insurance.col_expiry'),
       sortable: true,
       render: (item) => {
-        if (!item.expiry_date) return <span className="text-sm text-default-500">{'—'}</span>;
-        const expiry = new Date(item.expiry_date);
+        const expiry = parseServerTimestamp(item.expiry_date);
+        if (!expiry) return <span className="text-sm text-default-500">{'—'}</span>;
         const now = new Date();
         const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         // #12: Use configurable expiry warning days
@@ -1093,11 +1094,11 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_start_date')}</p>
-                  <p className="font-medium">{viewItem.start_date ? new Date(viewItem.start_date).toLocaleDateString() : '—'}</p>
+                  <p className="font-medium">{viewItem.start_date ? formatServerDate(viewItem.start_date) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_expiry_date')}</p>
-                  <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '—'}</p>
+                  <p className="font-medium">{viewItem.expiry_date ? formatServerDate(viewItem.expiry_date) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_verified_by')}</p>
@@ -1109,11 +1110,11 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_verified_at')}</p>
-                  <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '—'}</p>
+                  <p className="font-medium">{viewItem.verified_at ? formatServerDateTime(viewItem.verified_at) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_created')}</p>
-                  <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
+                  <p className="font-medium">{formatServerDateTime(viewItem.created_at)}</p>
                 </div>
               </div>
               {/* #1: Certificate file display/download */}

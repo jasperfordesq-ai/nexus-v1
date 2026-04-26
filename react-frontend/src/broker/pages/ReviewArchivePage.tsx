@@ -19,6 +19,7 @@ import Search from 'lucide-react/icons/search';
 import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerArchive } from '@/admin/api/types';
@@ -144,7 +145,7 @@ export function ReviewArchive() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {new Date(item.decided_at).toLocaleDateString()}
+          {formatServerDate(item.decided_at)}
         </span>
       ),
     },

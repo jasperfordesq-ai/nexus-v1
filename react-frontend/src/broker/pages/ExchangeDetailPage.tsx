@@ -22,6 +22,7 @@ import { adminBroker } from '@/admin/api/adminApi';
 import type { ExchangeDetail as ExchangeDetailType } from '@/admin/api/types';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { useTenant } from '@/contexts';
+import { formatServerDateTime } from '@/lib/serverTime';
 
 const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default' | 'primary'> = {
   pending_broker: 'warning',
@@ -131,7 +132,7 @@ export default function ExchangeDetail() {
           )}
           <div className="space-y-1 text-right">
             <p className="text-sm text-default-500">{t('exchanges.detail_created_label')}</p>
-            <p className="text-sm">{new Date(exchange.created_at).toLocaleString()}</p>
+            <p className="text-sm">{formatServerDateTime(exchange.created_at)}</p>
           </div>
         </CardBody>
       </Card>
@@ -249,7 +250,7 @@ export default function ExchangeDetail() {
                     {entry.notes && (
                       <p className="text-xs text-default-400 mt-1">{entry.notes}</p>
                     )}
-                    <p className="text-xs text-default-300">{new Date(entry.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-default-300">{formatServerDateTime(entry.created_at)}</p>
                   </div>
                 </div>
               ))}

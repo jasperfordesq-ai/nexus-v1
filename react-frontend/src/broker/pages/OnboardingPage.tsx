@@ -28,6 +28,7 @@ import ArrowDown from 'lucide-react/icons/arrow-down';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
+import { formatServerDate } from '@/lib/serverTime';
 import { adminCrm, adminUsers } from '@/admin/api/adminApi';
 import type { AdminUser, CrmFunnelStage } from '@/admin/api/types';
 import { DataTable, PageHeader, ConfirmModal } from '@/admin/components';
@@ -181,7 +182,7 @@ export default function OnboardingPage() {
         label: t('members.col_joined'),
         sortable: true,
         render: (user: AdminUser) =>
-          new Date(user.created_at).toLocaleDateString(),
+          formatServerDate(user.created_at),
       },
       {
         key: 'actions',

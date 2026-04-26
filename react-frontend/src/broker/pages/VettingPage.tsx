@@ -49,6 +49,7 @@ import Upload from 'lucide-react/icons/upload';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminVetting, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
 import type { VettingRecord, VettingStats } from '@/admin/api/types';
@@ -74,37 +75,6 @@ const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'prima
 };
 
 const SEARCH_DEBOUNCE_MS = 300;
-
-/**
- * MySQL DATE/DATETIME columns are returned as bare strings without a zone
- * marker; JS `new Date()` parses bare datetime strings as LOCAL time, which
- * shifts displayed dates across the day boundary for users far from server
- * timezone. Promote bare strings to ISO-8601 UTC before parsing. For pure
- * date columns (issue_date, expiry_date) the issue is more subtle but the
- * day-boundary math (days-until-expiry) is sensitive to it.
- */
-function parseServerTimestamp(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value);
-  // YYYY-MM-DD (date only) — anchor at UTC midday so day-of-month is
-  // stable across timezones up to ±12h. YYYY-MM-DD HH:MM:SS — promote
-  // to ISO with Z.
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return new Date(value + 'T12:00:00Z');
-  }
-  const d = new Date(value.replace(' ', 'T') + 'Z');
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function formatServerDate(value: string | null | undefined): string {
-  const d = parseServerTimestamp(value);
-  return d ? d.toLocaleDateString() : '—';
-}
-
-function formatServerDateTime(value: string | null | undefined): string {
-  const d = parseServerTimestamp(value);
-  return d ? d.toLocaleString() : '—';
-}
 
 interface UserSearchResult {
   id: number;

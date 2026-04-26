@@ -32,6 +32,7 @@ import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
+import { formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components';
 import type { BrokerArchiveDetail as BrokerArchiveDetailType } from '@/admin/api/types';
@@ -157,7 +158,7 @@ export function ArchiveDetail() {
             <div>
               <p className="text-xs text-default-400">{t('archives.label_date')}</p>
               <p className="text-sm mt-1">
-                {new Date(data.decided_at).toLocaleString()}
+                {formatServerDateTime(data.decided_at)}
               </p>
             </div>
           </div>
@@ -230,7 +231,7 @@ export function ArchiveDetail() {
             <div>
               <p className="text-xs text-default-400">{t('archives.label_sent_at')}</p>
               <p className="text-sm mt-1">
-                {new Date(data.target_message_sent_at).toLocaleString()}
+                {formatServerDateTime(data.target_message_sent_at)}
               </p>
             </div>
             {data.listing_title && (
@@ -268,7 +269,7 @@ export function ArchiveDetail() {
                           {msg.sender_name}
                         </span>
                         <span className="text-xs text-default-400">
-                          {new Date(msg.created_at).toLocaleString()}
+                          {formatServerDateTime(msg.created_at)}
                         </span>
                       </div>
                       <p className="text-sm text-default-600 whitespace-pre-wrap">

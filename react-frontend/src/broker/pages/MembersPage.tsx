@@ -47,6 +47,7 @@ import type { AdminUser } from '@/admin/api/types';
 import { DataTable, PageHeader, ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
@@ -81,7 +82,10 @@ function useTimeAgo() {
   const { t } = useTranslation('broker');
   return (dateStr: string | null | undefined): string => {
     if (!dateStr) return t('members.time_never');
-    const diff = Date.now() - new Date(dateStr).getTime();
+    const parsed = parseServerTimestamp(dateStr);
+    if (!parsed) return t('members.time_never');
+    // Clamp to 0 so server clock skew doesn't render rows as "in the future".
+    const diff = Math.max(0, Date.now() - parsed.getTime());
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return t('members.time_just_now');
     if (mins < 60) return t('members.time_minutes_ago', { count: mins });
@@ -89,7 +93,7 @@ function useTimeAgo() {
     if (hours < 24) return t('members.time_hours_ago', { count: hours });
     const days = Math.floor(hours / 24);
     if (days < 30) return t('members.time_days_ago', { count: days });
-    return new Date(dateStr).toLocaleDateString();
+    return formatServerDate(dateStr);
   };
 }
 
@@ -362,7 +366,7 @@ export default function MembersPage() {
         key: 'last_active_at',
         label: t('members.col_last_active'),
         render: (user: AdminUser) => (
-          <Tooltip content={user.last_active_at ? new Date(user.last_active_at).toLocaleString() : 'Never'}>
+          <Tooltip content={user.last_active_at ? formatServerDateTime(user.last_active_at) : 'Never'}>
             <div className="flex items-center gap-1.5 text-sm text-default-500">
               <Clock size={14} />
               <span>{timeAgo(user.last_active_at)}</span>
@@ -376,7 +380,7 @@ export default function MembersPage() {
         sortable: true,
         render: (user: AdminUser) => (
           <span className="text-sm text-default-500">
-            {new Date(user.created_at).toLocaleDateString()}
+            {formatServerDate(user.created_at)}
           </span>
         ),
       },
@@ -594,7 +598,7 @@ export default function MembersPage() {
                         <div className="mt-2 flex items-center gap-2 text-xs text-default-400">
                           <span>{note.author_name || note.author?.name || 'System'}</span>
                           <span>&middot;</span>
-                          <span>{new Date(note.created_at).toLocaleString()}</span>
+                          <span>{formatServerDateTime(note.created_at)}</span>
                           {note.category && (
                             <>
                               <span>&middot;</span>
