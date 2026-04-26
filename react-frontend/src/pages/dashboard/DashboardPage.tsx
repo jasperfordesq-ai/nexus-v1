@@ -45,6 +45,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatDayOfMonth, formatMonthShort, formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import type { WalletBalance, Listing, Event, Group } from '@/types/api';
+import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 
 interface GamificationProfile {
   level: number;
@@ -151,6 +152,7 @@ export function DashboardPage() {
   const hasEvents = useFeature('events');
   const hasGroups = useFeature('groups');
   const hasConnections = useFeature('connections');
+  const hasCaringCommunity = useFeature(CARING_COMMUNITY_ROUTE.feature);
   const hasFeedModule = useModule('feed');
   const hasListingsModule = useModule('listings');
   const hasProfileModule = useModule('profile');
@@ -302,6 +304,43 @@ export function DashboardPage() {
             </div>
           </GlassCard>
         </motion.div>
+
+        {hasCaringCommunity && (
+          <motion.div variants={itemVariants}>
+            <GlassCard className="p-6 border-l-4 border-l-emerald-500">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-3">
+                  <SectionIcon color="emerald">
+                    <Heart className="w-4 h-4 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
+                  </SectionIcon>
+                  <div>
+                    <h2 className="text-lg font-semibold text-theme-primary">{t('caring_community.title')}</h2>
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-theme-muted">
+                      {t('caring_community.subtitle')}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:min-w-[420px]">
+                  <Link to={tenantPath(CARING_COMMUNITY_ROUTE.href)}>
+                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Heart className="w-4 h-4" aria-hidden="true" />}>
+                      {t('caring_community.actions.open_hub')}
+                    </Button>
+                  </Link>
+                  <Link to={tenantPath('/listings/create?type=request')}>
+                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}>
+                      {t('caring_community.actions.request_help')}
+                    </Button>
+                  </Link>
+                  <Link to={tenantPath('/volunteering?tab=hours')}>
+                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Clock className="w-4 h-4" aria-hidden="true" />}>
+                      {t('caring_community.actions.log_hours')}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
 
         {/* Stats Grid */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
@@ -594,6 +633,7 @@ export function DashboardPage() {
                 <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('quick_actions.view_wallet')} />
                 {hasConnections && <QuickActionLink to={tenantPath('/members')} icon={<Users aria-hidden="true" />} label={t('quick_actions.find_members')} />}
                 {hasEvents && (<QuickActionLink to={tenantPath('/events')} icon={<Calendar aria-hidden="true" />} label={t('quick_actions.browse_events')} />)}
+                {hasCaringCommunity && <QuickActionLink to={tenantPath(CARING_COMMUNITY_ROUTE.href)} icon={<Heart aria-hidden="true" />} label={t('quick_actions.caring_community')} />}
                 <QuickActionLink to={tenantPath('/notifications')} icon={<Bell aria-hidden="true" />} label={t('quick_actions.notifications')} />
               </div>
             </GlassCard>

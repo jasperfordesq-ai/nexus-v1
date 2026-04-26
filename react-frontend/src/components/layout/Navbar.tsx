@@ -76,6 +76,8 @@ import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
 import { PresenceIndicator, StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
+import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
+import type { TenantFeatures } from '@/types/api';
 
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
@@ -89,6 +91,22 @@ interface NavbarProps {
   onSearchOpenChange?: (open: boolean) => void;
   /** Whether the mobile drawer is currently open — hides navbar on mobile when true */
   isMobileMenuOpen?: boolean;
+}
+
+export interface CommunityNavItem {
+  label: string;
+  desc: string;
+  path: string;
+  href: string;
+  icon: typeof Users;
+  feature: keyof TenantFeatures;
+}
+
+export function getVisibleCommunityItems(
+  items: CommunityNavItem[],
+  hasFeature: (feature: keyof TenantFeatures) => boolean,
+): CommunityNavItem[] {
+  return items.filter(item => hasFeature(item.feature));
 }
 
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
@@ -242,7 +260,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     return true;
   }), [t, tenantPath, hasFeature, hasModule]);
 
-  const communityItems = useMemo(() => [
+  const communityItems = useMemo<CommunityNavItem[]>(() => [
+    { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
     { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
     { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
     { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
@@ -251,7 +270,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.marketplace', 'Marketplace'), desc: t('nav_desc.marketplace', 'Buy & sell in your community'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
-  ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
+  ], [t, tenantPath]);
+  const visibleCommunityItems = useMemo(
+    () => getVisibleCommunityItems(communityItems, hasFeature),
+    [communityItems, hasFeature],
+  );
 
   // Helper to filter items by feature/module gates
   const gateFilter = useCallback((item: Record<string, unknown> & { feature?: string; module?: string }) => {
@@ -364,7 +387,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about, gateFilter]);
 
   const timebankingPaths = useMemo(() => timebankingItems.map(i => i.href), [timebankingItems]);
-  const communityPaths = useMemo(() => communityItems.map(i => i.href), [communityItems]);
+  const communityPaths = useMemo(() => visibleCommunityItems.map(i => i.href), [visibleCommunityItems]);
   const morePaths = useMemo(() => [
     ...leftSections.flatMap(s => s.items.map(i => i.href)),
     ...rightSections.flatMap(s => s.items.map(i => i.href)),
@@ -628,7 +651,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               )}
 
               {/* Community Dropdown — always visible on desktop */}
-              {communityItems.length > 0 && (
+              {visibleCommunityItems.length > 0 && (
                 <Dropdown placement="bottom-start" isOpen={communityOpen} onOpenChange={handleCommunityOpenChange} shouldBlockScroll={false}>
                   <DropdownTrigger>
                     <Button
@@ -655,7 +678,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       dropdownNavigate(String(key));
                     }}
                   >
-                    {communityItems.map((item) => (
+                    {visibleCommunityItems.map((item) => (
                       <DropdownItem
                         key={item.href}
                         description={item.desc}

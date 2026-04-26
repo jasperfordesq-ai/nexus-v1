@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-12 (added TD8–TD15 from full-platform audit)
+> **Last updated:** 2026-04-26 (added Agoris/KISS strategic opportunity, diligence record, and production seed/deploy notes)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -19,6 +19,7 @@ This is the **single, canonical roadmap** for Project NEXUS. All feature plannin
 7. [Infrastructure & Integrations](#7-infrastructure--integrations)
 8. [Marketplace Module (Commercial)](#8-marketplace-module-commercial)
 9. [Completed Work](#9-completed-work)
+10. [Strategic Partnerships: Agoris / KISS Caring Communities](#10-strategic-partnerships-agoris--kiss-caring-communities)
 
 ---
 
@@ -394,6 +395,120 @@ Summary of major completed initiatives. These are kept for historical reference 
 ### Light/Dark Mode (2026-02-07)
 - Requested by Matt (Crewkerne Timebank)
 - System preference detection, persists across sessions
+
+---
+
+## 10. Strategic Partnerships: Agoris / KISS Caring Communities
+
+This section preserves the Agoris/KISS research, April 2026 email context, product conclusions, production tenant work, and recommended next moves so the opportunity can be recalled without relying on chat history.
+
+### Source Materials And Session Record
+
+| Source | Status | Notes |
+|---|---|---|
+| Martin Villiger email, 2026-04-25 | Active opportunity | KISS has strong current political attention in Switzerland. A KISS half-day conference in Zurich included a member of the Swiss national parliament, a Zurich canton government member, and another canton representative discussing the economic value of volunteering and time banking. Martin reports steep social-cost increases from demographic change and says the KISS time-banking model is attracting attention across cantons. He asked for administration access for Roland Greber and Christopher Mueller and asked whether NEXUS can be adapted and extended with additional functionality. |
+| `C:\Users\jaspe\Downloads\deep-research-report (1).md` | Read 2026-04-26 | Research frames AGORIS AG as a Swiss "marketplace of trust" / regional civic platform connecting residents, municipalities, organizations, clubs, local businesses, and potential banking/payment/admin integrations. It finds a credible leadership story but limited public proof of execution. |
+| `C:\Users\jaspe\Downloads\Researching Agoris' Business and Reputation.md` | Read 2026-04-26 | Strategic report frames Agoris as digital civic infrastructure for Caring Communities: time banking, municipal coordination, local commerce, data sovereignty, AI matching, and regional nodes of roughly 15,000-30,000 residents. Some claims in the report should be treated as strategic analysis rather than verified facts. |
+| Production `/agoris` tenant seed | Completed 2026-04-26 | Backed up production DB, downloaded the backup locally, seeded a professional Agoris Caring Community tenant, verified API bootstrap, verified frontend route, then deployed production. |
+
+### Agoris/KISS Opportunity Summary
+
+Agoris appears to be a Swiss early-commercial or early-stage civic platform opportunity centered on a trusted regional ecosystem. Its public story is broader than a normal municipal app: it combines caring-community coordination, time banking, local commerce visibility, municipal communication, organizations, resident participation, and future-facing integrations with banking, payments, public administration, data, and AI.
+
+The most important strategic fit for NEXUS is that Agoris/KISS are not asking for a generic timebank. They are asking for a time bank embedded in a wider Caring Community platform. NEXUS already has much of that wider platform: tenants, modules, feature gates, multilingual UI, time-credit wallet, listings, feed, events, groups, volunteering, organizations, resources, polls, goals, gamification, federation, messaging, translation, marketplace, admin analytics, and white-label tenant configuration foundations.
+
+The most important product implication is that any Agoris/KISS work should be built as a switchable module or module cluster. It must behave like other NEXUS modules: tenant-level enable/disable, module configuration, kill switch, and no orphan UI. If the switch is turned off, routes, nav links, dashboard cards, buttons, calls to action, feed cards, admin menu entries, and API feature surfaces must disappear immediately.
+
+### What We Already Have In NEXUS
+
+| Capability | Current Fit | Notes |
+|---|---|---|
+| Multi-tenant platform | Strong | `/agoris` exists as tenant slug. Tenant bootstrap supports feature/module config. |
+| Time-credit exchange | Strong | Wallet, listings, transactions, reviews, service exchange workflow, and tenant currency naming support the core time-banking model. |
+| Caring Community primitives | Strong | Feed, groups, events, members, connections, goals, resources, polls, volunteering, organizations, volunteer opportunities, shifts, logs, and impact reporting are already in the product surface. |
+| Feature/module kill switches | Strong foundation | Tenant features/modules already hide/show core areas. Agoris-specific work should reuse the same mechanism and harden any remaining stray buttons or links. |
+| Multilingual Switzerland readiness | Good | Agoris tenant is configured for `de`, `fr`, `it`, `en`, with German default. Native-speaker review remains a roadmap item. |
+| Federation | Strong strategic fit | Supports multi-community networks and could map well to canton, municipality, regional-node, or KISS cooperative federation models. |
+| Volunteering and organizations | Strong | Existing module supports organizations, opportunities, shifts, applications, logs, verification, wellbeing, matching, certificates, safeguarding, expenses, and QR check-in configuration. |
+| Admin/reporting | Good | Analytics, tenant settings, module toggles, billing, CSV import, and admin tooling exist. Agoris/KISS will need municipal-grade reports and export packs. |
+| Marketplace/local commerce | Strong but likely disabled initially | Full standalone commercial marketplace exists with hybrid time-credit/cash pricing and community delivery. Agoris public materials mention local commerce, but KISS immediate need appears caring community/time bank first. |
+| AI/translation | Good | AI chat and message translation exist. Useful later for Swiss multilingual support, matching, onboarding, and summaries. |
+
+### What Is Missing Or Needs Hardening
+
+| Gap | Priority | Recommendation |
+|---|---|---|
+| Agoris/KISS module boundary | Critical | Create an `agoris_caring_community` or `caring_community` module profile that bundles the right capabilities while still allowing submodule toggles. Every added UI entry point must be feature-gated. |
+| Formal kill-switch audit | Critical | Add tests or a route/nav audit ensuring module-off means no visible Agoris buttons, dashboard cards, admin nav entries, route links, or API affordances. |
+| KISS time-bank workflow detail | Critical | Model KISS-specific rules: hour approval, volunteer verification, reciprocal credits, future-care credit framing, organization/canton reporting, member onboarding, and trusted coordinators. |
+| Municipal/canton reporting | High | Add dashboards for social-care cost avoidance, verified support hours, active volunteers, recipient reach, isolation reduction proxies, organization participation, and SROI. |
+| Admin roles for Agoris/KISS | High | Add or configure roles for national foundation admin, canton admin, municipality admin, cooperative coordinator, organization coordinator, and trusted volunteer reviewer. |
+| Swiss trust/compliance pack | High | Prepare documentation and in-product settings for Swiss FADP/GDPR posture, data processing, retention, consent, audit logs, exports, and hosting/data-residency options. |
+| Data sovereignty / regional node story | High | Define whether NEXUS tenants, federation, and white-label domains can represent Agoris regional nodes. Decide what can be shared across nodes and what remains tenant-local. |
+| Onboarding for older/nontechnical users | High | Review UX for elderly users, coordinators, and local organizations. Add assisted onboarding, printable invite codes, coordinator-created profiles, and low-friction help requests if missing. |
+| Evidence and demo polish | High | The Agoris tenant should look like a busy, professional production tenant: realistic German content, Swiss locations, organizations, events, logs, resources, goals, and activity. Keep demo/test wording out of visible content. |
+| Local commerce / POS integrations | Medium | Public Agoris materials and research point to local commerce and possible POS/inventory/loyalty. This should be a phase-two integration after KISS time-bank fit is proven. |
+| Banking/payment/admin interfaces | Medium | Research highlights future banking, payments, and administrative integrations. Treat as strategic roadmap, not day-one build. |
+| Public proof and diligence | High | Agoris public evidence is thin. Before heavy custom build, ask for registry/UID, live deployments, customers, pricing, KPIs, security docs, architecture docs, product demo, and roadmap. |
+
+### Agoris Diligence Findings To Preserve
+
+The strongest positive signal is the leadership mix. Publicly named roles align with the opportunity: Roland Greber for banking/innovation and regulated commercial models; Martin Villiger for KISS, time banking, governance, privacy, and caring-community credibility; Dr. Christopher H. Mueller for UX and regional development; Tom Debus for technology, AI, and data. This is unusually well matched to a platform that must blend social infrastructure, municipal trust, local commerce, and technology.
+
+The main concern is public proof of execution. The research did not find enough visible evidence of live customers, public price sheets, quantified case studies, implementation metrics, certification pages, current app-store traction, or a fully verifiable public registry extract. This does not make the opportunity weak, but it means the next stage should be founder-led diligence and document-backed validation rather than assumption-led buildout.
+
+Closest comparables to track: Crossiety, Localcities, My Local Services, Hoplr, nebenan.de, beUnity, and Locality. Crossiety and Localcities are the most important Swiss benchmarks because they already occupy municipal/community communication layers. Hoplr and nebenan.de prove neighborhood networks can scale. beUnity overlaps with trusted member/community spaces.
+
+### Recommended Product Direction
+
+Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only fork. The module cluster should be reusable for KISS, Swiss cantons, Irish/UK timebanks, public-sector pilots, and international federation partners.
+
+| Module Area | Build Direction |
+|---|---|
+| Caring Community dashboard | Single home for requests, offers, support hours, trusted organizations, upcoming events, priority needs, and coordinator actions. |
+| KISS time-bank workflows | Verified hour logging, approval queues, recurring support relationships, future-care credit story, member statements, and cooperative-level reporting. |
+| Municipal/canton console | Dashboards for verified hours, active contributors, care categories, geography, SROI, unmet needs, and exportable reports for public-sector stakeholders. |
+| Organization coordination | Organization profiles, programs, volunteer rosters, shifts, training/credentials, approval workflows, safeguarding notes, and coordinator permissions. |
+| Trust and safety | Identity/trust badges, verification state, audit trail, privacy controls, moderation queues, and sensitive-care escalation paths. |
+| Multilingual Swiss support | German-first tenant, French/Italian/English support, translation glossary for KISS/Agoris terminology, and native-speaker review. |
+| Federation and regional nodes | Support canton/municipality/cooperative nodes with opt-in cross-node discovery, shared resources, and controlled data boundaries. |
+| Local commerce later phase | Optional marketplace/local-business visibility, regional campaigns, hybrid cash/time-credit offers, loyalty hooks, and POS/API partner exploration. |
+
+### Production Work Completed On 2026-04-26
+
+| Item | Result |
+|---|---|
+| Development seed | `tenant:seed-agoris-demo agoris` succeeded locally before production work. |
+| Production DB backup | Created `/opt/nexus-php/backups/nexus_pre_agoris_seed_20260426_163432.sql.gz` on production. |
+| Local backup copy | Downloaded and verified at `C:\platforms\htdocs\staging\backups\nexus_pre_agoris_seed_20260426_163432.sql.gz`. SHA-256 matched the server copy: `E1CD1BB8070295BACFE52C4E2665936FF09141194FEBB8F768937B7649E7E7D7`. |
+| Production seed | Seeded tenant `/agoris` as `Agoris Caring Community`, German default, supported languages `de`, `fr`, `it`, `en`, teal branding, caring-community modules on, unrelated modules like blog/jobs/ideation/marketplace off. |
+| Seeded production counts | Users 10, listings 27, organizations 4, opportunities 5, volunteer logs 15, transactions 6, feed posts 4, events 4, groups 3, resources 4, goals 3, polls 1. |
+| Production deploy | Full deploy started 2026-04-26 with `safe-deploy.sh full --detach`. Containers rebuilt, migrations up to date, maintenance mode turned off, Cloudflare purged for all domains, smoke tests passed. Per-tenant pre-render continued after the site was live. |
+| Smoke checks | API health returned healthy with database/Redis connected. `https://api.project-nexus.ie/api/v2/tenant/bootstrap?slug=agoris` returned the expected Agoris tenant config. `https://app.project-nexus.ie/agoris` returned HTTP 200. |
+| Deploy warning to investigate | `php artisan storage:link` logged `symlink(): Read-only file system` during cache rebuild. Deploy continued and smoke tests passed. Decide whether storage symlink should be prebuilt into image, mounted writable, skipped when already present, or made read-only-safe. |
+| Initial module build | `caring_community` feature flag added, admin module switch registered, React tenant typing updated, public `/caring-community` hub page added, Community nav entry added, and mobile quick-create action added. All new entry points are hidden when the feature switch is off. |
+| Module completion pass | Dashboard Caring Community card and quick action added, admin Caring Community configuration detail page added, admin module registry linked to the detail page, admin sidebar entries gated, municipal/KISS reporting pack surface added, and route/nav smoke coverage expanded. Frontend build passed. |
+
+### Immediate Next Actions
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG1 | Provide admin access to Roland Greber and Christopher Mueller | High | User-facing request from Martin. Use real emails only after Jasper confirms addresses. Grant least-privilege admin/coordinator access appropriate for evaluation. |
+| AG2 | Create Agoris/KISS demo script and walkthrough | High | 20-30 minute flow: dashboard, member onboarding, request/offer exchange, verified hours, organization opportunity, event, report, module kill switch. |
+| AG3 | Write diligence question pack | High | Registry/UID, live deployments, pricing, KPIs, security/privacy docs, hosting, integrations, roadmap, data ownership, procurement expectations. |
+| AG4 | Build formal Caring Community module profile | Critical | Done for the first production-ready shell: feature flag, preset, admin switch, public hub route, nav gate, quick-create gate, dashboard entry points, admin configuration detail page, and municipal reporting surface are implemented. Next: wire deeper KISS-specific workflows and real export generation. |
+| AG5 | Add kill-switch regression tests | Critical | Partial: quick-create, route config, community nav, and dashboard feature-gating tests are implemented and passing. Next: admin toggle end-to-end coverage and API affordance audit. |
+| AG6 | Create municipal impact report exports | High | Reporting surface exists at `/admin/reports/municipal-impact`. Next: generate PDF/CSV packs for verified hours, active members, organization activity, support categories, SROI, and trendlines. |
+| AG7 | Harden Swiss localization | Medium | Native German review first; then French/Italian. Add KISS/Agoris glossary terms. |
+| AG8 | Prepare technical architecture response | High | Explain how NEXUS can be adapted, how add-ons embed, how module switches work, and how data remains tenant-scoped. |
+
+### Suggested Reply Themes For Martin
+
+- Yes, NEXUS can be adapted and extended with additional functionality.
+- The right architecture is a switchable Caring Community add-on/module cluster integrated with the rest of the platform.
+- Any added buttons, routes, dashboard widgets, admin links, or feature affordances should be governed by the same tenant module configuration and disappear immediately when disabled.
+- NEXUS already covers a large portion of the requested platform: time banking, volunteering, organizations, groups, events, resources, goals, polls, feed, messaging, multilingual support, admin reporting, and federation.
+- The next step should be a guided evaluation with Roland and Christopher, followed by a focused diligence/product workshop on KISS workflows, municipal reports, data protection, and Swiss deployment expectations.
 
 ---
 

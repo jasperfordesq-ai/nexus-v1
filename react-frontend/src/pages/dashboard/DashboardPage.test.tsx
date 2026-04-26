@@ -19,6 +19,7 @@ const {
 } = vi.hoisted(() => ({
   featureFlags: {
     connections: true,
+    caring_community: false,
     events: true,
     gamification: true,
     groups: true,
@@ -148,6 +149,7 @@ describe('DashboardPage', () => {
     vi.clearAllMocks();
     Object.assign(featureFlags, {
       connections: true,
+      caring_community: false,
       events: true,
       gamification: true,
       groups: true,
@@ -177,6 +179,19 @@ describe('DashboardPage', () => {
   it('shows community name in welcome section', () => {
     render(<DashboardPage />);
     expect(screen.getByText(/Test Community/i)).toBeInTheDocument();
+  });
+
+  it('shows the Caring Community dashboard card only when the feature is enabled', () => {
+    featureFlags.caring_community = true;
+    render(<DashboardPage />);
+    expect(screen.getByText('Caring Community')).toBeInTheDocument();
+    expect(screen.getByText('Open hub')).toBeInTheDocument();
+  });
+
+  it('hides the Caring Community dashboard card when the feature is disabled', () => {
+    featureFlags.caring_community = false;
+    render(<DashboardPage />);
+    expect(screen.queryByText('Open hub')).not.toBeInTheDocument();
   });
 
   it('renders stat cards', () => {

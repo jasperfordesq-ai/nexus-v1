@@ -127,6 +127,7 @@ const VolunteerGivingDays = lazy(() => import('./modules/volunteering/VolunteerG
 const VolunteerConsents = lazy(() => import('./modules/volunteering/VolunteerConsents'));
 const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerProjects'));
 const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
+const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/CaringCommunityAdmin'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -236,6 +237,7 @@ const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage
 const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
 const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
+const MunicipalImpactReportsPage = lazy(() => import('./modules/reports/MunicipalImpactReportsPage'));
 
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
@@ -509,6 +511,7 @@ export function AdminRoutes() {
       <Route path="volunteering/consents" element={<Lazy><VolunteerConsents /></Lazy>} />
       <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
       <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
+      <Route path="caring-community" element={<Lazy><CaringCommunityAdmin /></Lazy>} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
@@ -582,6 +585,7 @@ export function AdminRoutes() {
       <Route path="reports/social-value" element={<TenantRedirect to="/admin/impact-report" />} />
       <Route path="reports/members" element={<Lazy><MemberReportsPage /></Lazy>} />
       <Route path="reports/hours" element={<Lazy><HoursReportsPage /></Lazy>} />
+      <Route path="reports/municipal-impact" element={<Lazy><MunicipalImpactReportsPage /></Lazy>} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
 

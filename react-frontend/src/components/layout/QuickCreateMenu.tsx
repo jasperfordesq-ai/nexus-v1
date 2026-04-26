@@ -21,6 +21,7 @@ import ListTodo from 'lucide-react/icons/list-todo';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
 import Target from 'lucide-react/icons/target';
+import Heart from 'lucide-react/icons/heart';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -31,7 +32,7 @@ interface QuickCreateMenuProps {
   onClose: () => void;
 }
 
-interface CreateOptionDef {
+export interface CreateOptionDef {
   labelKey: string;
   descKey: string;
   href: string;
@@ -49,6 +50,14 @@ const createOptionDefs: CreateOptionDef[] = [
     icon: ListTodo,
     color: 'from-emerald-500 to-teal-600',
     module: 'listings',
+  },
+  {
+    labelKey: 'quick_create.offer_time',
+    descKey: 'quick_create.offer_time_desc',
+    href: '/caring-community',
+    icon: Heart,
+    color: 'from-teal-500 to-emerald-600',
+    feature: 'caring_community',
   },
   {
     labelKey: 'quick_create.new_event',
@@ -76,16 +85,23 @@ const createOptionDefs: CreateOptionDef[] = [
   },
 ];
 
+export function getVisibleCreateOptions(
+  hasFeature: (feature: keyof TenantFeatures) => boolean,
+  hasModule: (module: keyof TenantModules) => boolean,
+): CreateOptionDef[] {
+  return createOptionDefs.filter((option) => {
+    if (option.feature && !hasFeature(option.feature)) return false;
+    if (option.module && !hasModule(option.module)) return false;
+    return true;
+  });
+}
+
 export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const { hasFeature, hasModule, tenantPath } = useTenant();
 
-  const visibleOptions = createOptionDefs.filter((option) => {
-    if (option.feature && !hasFeature(option.feature)) return false;
-    if (option.module && !hasModule(option.module)) return false;
-    return true;
-  });
+  const visibleOptions = getVisibleCreateOptions(hasFeature, hasModule);
 
   const handleSelect = (href: string) => {
     onClose();

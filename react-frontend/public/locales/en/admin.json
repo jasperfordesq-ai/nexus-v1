@@ -1,5 +1,108 @@
 {
   "active": "Active",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Configure the integrated care hub, dependent capabilities, and municipal reporting surfaces."
+    },
+    "actions": {
+      "open_member_hub": "Open member hub",
+      "refresh": "Refresh"
+    },
+    "stats": {
+      "master_switch": "Master switch",
+      "connected_capabilities": "Connected capabilities",
+      "reporting_pack": "Reporting pack",
+      "reporting_ready": "Ready"
+    },
+    "switch": {
+      "title": "Module kill switch",
+      "description": "When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.",
+      "aria": "Toggle Caring Community module"
+    },
+    "capabilities": {
+      "timebank": "Time bank exchange",
+      "volunteering": "Verified volunteering",
+      "organisations": "Trusted organisations",
+      "groups": "Neighbourhood groups",
+      "resources": "Resource library",
+      "trust": "Trust and reviews"
+    },
+    "capability_type": {
+      "feature": "Feature",
+      "module": "Module"
+    },
+    "reporting": {
+      "title": "Municipal reporting",
+      "description": "Jump into the reporting surfaces needed for canton, municipality, and cooperative conversations.",
+      "community_analytics": "Community analytics",
+      "impact_report": "Impact report",
+      "municipal_pack": "Municipal report pack",
+      "note": "These surfaces use existing NEXUS reporting today and are ready for KISS-specific exports next."
+    },
+    "messages": {
+      "enabled": "Caring Community enabled",
+      "disabled": "Caring Community disabled"
+    },
+    "errors": {
+      "load_failed": "Failed to load Caring Community configuration",
+      "save_failed": "Failed to update Caring Community"
+    },
+    "config_route_note": "Dedicated admin configuration route: {{route}}"
+  },
+  "municipal_reports": {
+    "meta": {
+      "title": "Municipal Impact Reports",
+      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+    },
+    "actions": {
+      "analytics": "Community analytics",
+      "impact_report": "Impact report",
+      "open_source_report": "Open source report"
+    },
+    "stats": {
+      "report_pack": "Report pack",
+      "ready": "Ready",
+      "hours_source": "Hours source",
+      "verified": "Verified",
+      "audience": "Audience",
+      "municipal": "Municipal",
+      "exports": "Exports",
+      "csv_pdf": "CSV/PDF"
+    },
+    "cards": {
+      "verified_hours": {
+        "title": "Verified hours and economic value",
+        "description": "Summarise approved support hours, transaction volume, active contributors, and estimated value.",
+        "metric_1": "Approved hours",
+        "metric_2": "Active contributors",
+        "metric_3": "Value estimate"
+      },
+      "active_members": {
+        "title": "Member reach and inclusion",
+        "description": "Track active members, new joiners, inactive members, and groups that need coordinator attention.",
+        "metric_1": "Active members",
+        "metric_2": "New joiners",
+        "metric_3": "Inactive members"
+      },
+      "organisations": {
+        "title": "Organisation and partner activity",
+        "description": "Show participating organisations, opportunities, verified logs, and coordinator workflows.",
+        "metric_1": "Organisations",
+        "metric_2": "Opportunities",
+        "metric_3": "Verified logs"
+      },
+      "trust_pack": {
+        "title": "Trust, safeguarding, and compliance",
+        "description": "Surface verification, review, safeguarding, consent, and audit signals for sensitive care coordination.",
+        "metric_1": "Verification",
+        "metric_2": "Reviews",
+        "metric_3": "Audit trail"
+      }
+    }
+  },
   "activity": {
     "card_title": "Activity",
     "empty": "No activity found",

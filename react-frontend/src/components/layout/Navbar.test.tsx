@@ -87,6 +87,16 @@ const i18nMap: Record<string, string> = {
   'nav.messages': 'Messages',
   'nav.community': 'Community',
   'nav.more': 'More',
+  'accessibility.create_new': 'Create new',
+  'accessibility.open_menu': 'Open menu',
+  'accessibility.search': 'Search',
+  'accessibility.search_ctrl_k': 'Search (Ctrl+K)',
+  'accessibility.skip_to_content': 'Skip to main content',
+  'aria.main_navigation': 'Main navigation',
+  'aria.timebanking_navigation': 'Timebanking navigation',
+  'aria.community_navigation': 'Community navigation',
+  'aria.create_actions': 'Create actions',
+  'aria.user_actions': 'User actions',
   'auth.log_in': 'Log In',
   'auth.sign_up': 'Sign Up',
   'create.new_listing': 'New Listing',
@@ -109,7 +119,8 @@ vi.mock('@/lib/api', () => ({
   API_BASE: 'http://localhost:8090/api',
 }));
 
-import { Navbar } from './Navbar';
+import Users from 'lucide-react/icons/users';
+import { Navbar, getVisibleCommunityItems, type CommunityNavItem } from './Navbar';
 
 // Helper to set up default context mock values
 function setupDefaultMocks(overrides: {
@@ -150,6 +161,24 @@ describe('Navbar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setupDefaultMocks();
+  });
+
+  describe('community feature gates', () => {
+    it('removes the Caring Community nav item when the master switch is off', () => {
+      const items: CommunityNavItem[] = [
+        {
+          label: 'Caring Community',
+          desc: 'Care hub',
+          path: '/caring-community',
+          href: '/test/caring-community',
+          icon: Users,
+          feature: 'caring_community',
+        },
+      ];
+
+      expect(getVisibleCommunityItems(items, () => false)).toHaveLength(0);
+      expect(getVisibleCommunityItems(items, feature => feature === 'caring_community')).toHaveLength(1);
+    });
   });
 
   describe('Brand / Logo', () => {
@@ -222,7 +251,7 @@ describe('Navbar', () => {
     it('renders search trigger with Ctrl+K hint', () => {
       render(<Navbar />);
       // Desktop search button has aria-label
-      expect(screen.getByLabelText('Search (Ctrl+K)')).toBeInTheDocument();
+      expect(screen.getAllByLabelText('Search (Ctrl+K)').length).toBeGreaterThanOrEqual(1);
     });
 
     it('renders notification bell button', () => {
@@ -245,7 +274,7 @@ describe('Navbar', () => {
     it('shows search button (accessible to authenticated users)', () => {
       render(<Navbar />);
       // The search button always renders with aria-label "Search (Ctrl+K)"
-      expect(screen.getByLabelText('Search (Ctrl+K)')).toBeInTheDocument();
+      expect(screen.getAllByLabelText('Search (Ctrl+K)').length).toBeGreaterThanOrEqual(1);
     });
   });
 

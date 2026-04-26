@@ -332,6 +332,20 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     ],
   },
   {
+    id: 'caring_community',
+    name: 'Caring Community',
+    description: 'Integrated hub for time banking, volunteering, organisations, impact, and mutual aid',
+    icon: Heart,
+    type: 'feature',
+    configSource: 'tenant_features',
+    detailPageUrl: '/admin/caring-community',
+    configOptions: [
+      { key: 'caring_community.dashboard_enabled', label: 'Dashboard Hub', description: 'Show the integrated Caring Community hub in member navigation', type: 'boolean', defaultValue: true, category: 'Visibility' },
+      { key: 'caring_community.show_municipal_reporting', label: 'Municipal Reporting', description: 'Show municipal/canton reporting surfaces when available', type: 'boolean', defaultValue: true, category: 'Reporting' },
+      { key: 'caring_community.show_trust_pack', label: 'Trust Pack', description: 'Show trust, verification, and compliance prompts when available', type: 'boolean', defaultValue: true, category: 'Trust & Safety', comingSoon: true },
+    ],
+  },
+  {
     id: 'volunteering',
     name: 'Volunteering',
     description: 'Volunteer opportunities and hours',

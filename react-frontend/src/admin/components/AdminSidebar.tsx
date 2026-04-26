@@ -248,6 +248,9 @@ function useAdminNav(): NavSection[] {
   return useMemo(() => {
     // ── Community items — each sub-feature gated independently ───────────
     const communityItems = [
+      ...(hasFeature('caring_community') ? [
+        { label: t('caring_community'), href: '/admin/caring-community', icon: Heart },
+      ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
         { label: "Group Types", href: '/admin/groups/types', icon: FolderTree },
@@ -463,6 +466,9 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: "Community Analytics", href: '/admin/community-analytics', icon: BarChart3 },
           { label: "Impact Report", href: '/admin/impact-report', icon: FileText },
+          ...(hasFeature('caring_community') ? [
+            { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: Heart },
+          ] : []),
           { label: "Member Reports", href: '/admin/reports/members', icon: Users },
           ...(hasModule('wallet') ? [
             { label: "Hours Reports", href: '/admin/reports/hours', icon: Clock },
@@ -565,7 +571,7 @@ function useAdminNav(): NavSection[] {
     }
 
     return sections;
-  }, [hasFeature, hasModule, isPlatformSuperAdmin, isSuperAdmin])
+  }, [hasFeature, hasModule, isPlatformSuperAdmin, isSuperAdmin, t])
 
 }
 

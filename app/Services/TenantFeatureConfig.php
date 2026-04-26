@@ -22,6 +22,7 @@ class TenantFeatureConfig
         'goals' => true,
         'blog' => true,
         'resources' => true,
+        'caring_community' => false,
         'volunteering' => true,
         'exchange_workflow' => true,
         'organisations' => true,

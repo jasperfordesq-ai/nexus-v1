@@ -1115,6 +1115,7 @@ export interface TenantFeatures {
   goals: boolean;
   blog: boolean;
   resources: boolean;
+  caring_community: boolean;
   volunteering: boolean;
   exchange_workflow: boolean;
   organisations: boolean;

@@ -78,6 +78,7 @@ import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
 import { ToastProvider, ThemeProvider, CookieConsentProvider, useTenant } from '@/contexts';
+import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 
 // Google Maps Provider (loads API key, enables PlaceAutocompleteInput)
 import { GoogleMapsProvider } from '@/components/location';
@@ -152,6 +153,7 @@ const CreateChallengePage = lazyWithRetry(() => import('@/pages/ideation/CreateC
 const CampaignsPage = lazyWithRetry(() => import('@/pages/ideation/CampaignsPage'));
 const CampaignDetailPage = lazyWithRetry(() => import('@/pages/ideation/CampaignDetailPage'));
 const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/OutcomesDashboardPage'));
+const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community/CaringCommunityPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
@@ -469,6 +471,15 @@ function AppRoutes() {
           <FeatureGate feature="marketplace" redirect="/">
             <FeatureErrorBoundary featureName="Marketplace">
               <MarketplaceListingPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Caring Community (feature-gated hub) */}
+        <Route path={CARING_COMMUNITY_ROUTE.path} element={
+          <FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <CaringCommunityPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

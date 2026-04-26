@@ -17,6 +17,15 @@
     "get_started": "Get Started"
   },
   "new_listing": "New Listing",
+  "caring_community": {
+    "title": "Caring Community",
+    "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
+    "actions": {
+      "open_hub": "Open hub",
+      "request_help": "Request help",
+      "log_hours": "Log hours"
+    }
+  },
   "stats": {
     "balance": "Balance",
     "active_listings": "Active Listings",
@@ -45,6 +54,7 @@
     "view_wallet": "View Wallet",
     "find_members": "Find Members",
     "browse_events": "Browse Events",
+    "caring_community": "Care Hub",
     "notifications": "Notifications"
   },
   "listings": {

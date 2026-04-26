@@ -52,6 +52,7 @@ class ApplyCaringCommunityPreset extends Command
      */
     private const PRESET = [
         // Core caring-community / timebank features — ON
+        'caring_community'   => true,  // Master add-on switch for the integrated Caring Community hub
         'volunteering'        => true,  // Volunteer offers + organisations
         'exchange_workflow'   => true,  // Time-credit exchanges (timebank core)
         'organisations'       => true,  // Associations, NGOs, future municipality entities
