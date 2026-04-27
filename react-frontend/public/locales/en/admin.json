@@ -222,12 +222,32 @@
     },
     "loading": "Loading municipal impact data",
     "period": "Reporting period",
+    "audience": "Audience",
     "hour_value": "Hour value",
     "multiplier": "Social multiplier",
     "policy_default": "Policy default",
     "sections": {
+      "readiness": "Procurement readiness signals",
       "categories": "Support categories",
       "trends": "Verified activity trend"
+    },
+    "filters": {
+      "title": "Reporting window",
+      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
+      "date_from": "From",
+      "date_to": "To",
+      "apply": "Apply dates",
+      "clear": "Clear"
+    },
+    "readiness": {
+      "municipal_value": "Municipal value",
+      "participation": "Participation",
+      "partner_network": "Partner network",
+      "local_exchange": "Local exchange",
+      "status": {
+        "ready": "Ready",
+        "needs_data": "Needs data"
+      }
     },
     "empty": {
       "categories": "No completed support categories in this period.",

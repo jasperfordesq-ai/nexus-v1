@@ -63,6 +63,16 @@ type MunicipalImpactSummary = {
   stats: Record<string, number>;
   categories: Array<{ name: string; hours: number; count: number }>;
   trends: Array<{ period: string; verified_hours: number; activities: number; participants: number }>;
+  report_context?: {
+    audience: ReportTemplate['audience'];
+    template_name: string | null;
+    sections: string[];
+  };
+  readiness_signals?: Array<{
+    key: 'municipal_value' | 'participation' | 'partner_network' | 'local_exchange';
+    status: 'ready' | 'needs_data';
+    value: number;
+  }>;
 };
 
 type ReportTemplate = {
@@ -94,15 +104,28 @@ function isMunicipalImpactSummary(value: unknown): value is MunicipalImpactSumma
   return Boolean(value && typeof value === 'object' && 'period' in value && 'stats' in value);
 }
 
-async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, templateId?: number) {
+type ReportDateFilters = {
+  dateFrom: string;
+  dateTo: string;
+};
+
+function municipalReportParams(templateId: number | null, filters: ReportDateFilters) {
+  const params = new URLSearchParams();
+  if (templateId) params.set('template_id', String(templateId));
+  if (filters.dateFrom) params.set('date_from', filters.dateFrom);
+  if (filters.dateTo) params.set('date_to', filters.dateTo);
+  return params;
+}
+
+async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, templateId: number | null, filters: ReportDateFilters) {
   const headers: Record<string, string> = {};
   const token = tokenManager.getAccessToken();
   const tenantId = tokenManager.getTenantId();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
 
-  const params = new URLSearchParams({ format });
-  if (templateId) params.set('template_id', String(templateId));
+  const params = municipalReportParams(templateId, filters);
+  params.set('format', format);
 
   const res = await fetch(`${API_BASE}/v2/admin/reports/municipal_impact/export?${params.toString()}`, {
     headers,
@@ -129,6 +152,7 @@ export default function MunicipalImpactReportsPage() {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const [templateForm, setTemplateForm] = useState(defaultTemplateForm);
+  const [dateFilters, setDateFilters] = useState<ReportDateFilters>({ dateFrom: '', dateTo: '' });
   const [loading, setLoading] = useState(true);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [savingTemplate, setSavingTemplate] = useState(false);
@@ -139,16 +163,17 @@ export default function MunicipalImpactReportsPage() {
     setLoading(true);
     try {
       const endpoint = selectedTemplateId
-        ? `/v2/admin/reports/municipal-impact?template_id=${selectedTemplateId}`
+        ? `/v2/admin/reports/municipal-impact?${municipalReportParams(selectedTemplateId, dateFilters).toString()}`
         : '/v2/admin/reports/municipal-impact';
-      const res = await api.get<MunicipalImpactSummary>(endpoint);
+      const untemplatedEndpoint = `/v2/admin/reports/municipal-impact?${municipalReportParams(null, dateFilters).toString()}`;
+      const res = await api.get<MunicipalImpactSummary>(selectedTemplateId ? endpoint : untemplatedEndpoint);
       if (isMunicipalImpactSummary(res.data)) setSummary(res.data);
     } catch {
       toast.error(t('municipal_reports.toast.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [selectedTemplateId, t, toast]);
+  }, [dateFilters, selectedTemplateId, t, toast]);
 
   const loadTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -183,7 +208,7 @@ export default function MunicipalImpactReportsPage() {
   const handleExport = async (format: 'csv' | 'pdf') => {
     setExporting(format);
     try {
-      await downloadMunicipalExport(format, `municipal-impact-pack.${format}`, selectedTemplateId ?? undefined);
+      await downloadMunicipalExport(format, `municipal-impact-pack.${format}`, selectedTemplateId, dateFilters);
       toast.success(t('municipal_reports.toast.export_started'));
     } catch {
       toast.error(t('municipal_reports.toast.export_failed'));
@@ -193,6 +218,7 @@ export default function MunicipalImpactReportsPage() {
   };
 
   const selectedTemplate = templates.find((template) => template.id === selectedTemplateId) ?? null;
+  const reportAudience = summary?.report_context?.audience ?? selectedTemplate?.audience ?? 'municipality';
 
   const openTemplateModal = () => {
     setTemplateForm(defaultTemplateForm);
@@ -296,10 +322,16 @@ export default function MunicipalImpactReportsPage() {
 
       {!loading && summary && (
         <Card className="mb-6" shadow="sm">
-          <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-5">
             <div>
               <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.period')}</p>
               <p className="mt-1 text-sm font-semibold text-default-800">{summary.period.from} - {summary.period.to}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.audience')}</p>
+              <p className="mt-1 text-sm font-semibold text-default-800">
+                {t(`municipal_reports.templates.audiences.${reportAudience}`)}
+              </p>
             </div>
             <div>
               <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.hour_value')}</p>
@@ -322,6 +354,38 @@ export default function MunicipalImpactReportsPage() {
           </CardBody>
         </Card>
       )}
+
+      <Card className="mb-6" shadow="sm">
+        <CardHeader className="flex flex-col items-start gap-1">
+          <h2 className="text-base font-semibold">{t('municipal_reports.filters.title')}</h2>
+          <p className="text-sm text-default-500">{t('municipal_reports.filters.description')}</p>
+        </CardHeader>
+        <Divider />
+        <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
+          <Input
+            type="date"
+            label={t('municipal_reports.filters.date_from')}
+            value={dateFilters.dateFrom}
+            onValueChange={(dateFrom) => setDateFilters((filters) => ({ ...filters, dateFrom }))}
+          />
+          <Input
+            type="date"
+            label={t('municipal_reports.filters.date_to')}
+            value={dateFilters.dateTo}
+            onValueChange={(dateTo) => setDateFilters((filters) => ({ ...filters, dateTo }))}
+          />
+          <Button variant="flat" onPress={loadSummary} isLoading={loading}>
+            {t('municipal_reports.filters.apply')}
+          </Button>
+          <Button
+            variant="light"
+            onPress={() => setDateFilters({ dateFrom: '', dateTo: '' })}
+            isDisabled={!dateFilters.dateFrom && !dateFilters.dateTo}
+          >
+            {t('municipal_reports.filters.clear')}
+          </Button>
+        </CardBody>
+      </Card>
 
       <Card className="mb-6" shadow="sm">
         <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center">
@@ -450,6 +514,26 @@ export default function MunicipalImpactReportsPage() {
 
       {!loading && summary && (
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card shadow="sm" className="lg:col-span-2">
+            <CardHeader>
+              <h2 className="text-base font-semibold">{t('municipal_reports.sections.readiness')}</h2>
+            </CardHeader>
+            <Divider />
+            <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-4">
+              {(summary.readiness_signals ?? []).map((signal) => (
+                <div key={signal.key} className="rounded-lg border border-default-200 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-default-800">{t(`municipal_reports.readiness.${signal.key}`)}</p>
+                    <Chip size="sm" color={signal.status === 'ready' ? 'success' : 'warning'} variant="flat">
+                      {t(`municipal_reports.readiness.status.${signal.status}`)}
+                    </Chip>
+                  </div>
+                  <p className="mt-2 text-2xl font-semibold text-default-900">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+
           <Card shadow="sm">
             <CardHeader>
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.categories')}</h2>

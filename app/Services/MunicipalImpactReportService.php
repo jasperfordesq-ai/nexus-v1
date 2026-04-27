@@ -30,6 +30,7 @@ class MunicipalImpactReportService
         $policy = $this->applyTemplateOverrides($policy, $filters);
         $range = $this->normaliseDateRange($filters, $policy);
         $hourConfig = $this->hourValueConfig($tenantId, $policy);
+        $reportContext = $this->reportContext($filters);
 
         $timebank = $this->timebankSummary($tenantId, $range);
         $volunteering = $this->volunteeringSummary($tenantId, $range);
@@ -53,6 +54,7 @@ class MunicipalImpactReportService
                 'include_social_value_estimate' => (bool) $policy['include_social_value_estimate'],
                 'default_hour_value_chf' => (int) $policy['default_hour_value_chf'],
             ],
+            'report_context' => $reportContext,
             'stats' => [
                 'verified_hours' => round($verifiedHours, 1),
                 'volunteer_hours' => round($volunteering['approved_hours'], 1),
@@ -71,6 +73,7 @@ class MunicipalImpactReportService
             ],
             'categories' => $categories,
             'trends' => $trends,
+            'readiness_signals' => $this->readinessSignals($verifiedHours, $members, $organisations, $requests),
             'report_pack' => [
                 'csv_export' => '/api/v2/admin/reports/municipal_impact/export?format=csv',
                 'pdf_export' => '/api/v2/admin/reports/municipal_impact/export?format=pdf',
@@ -126,6 +129,54 @@ class MunicipalImpactReportService
         return [
             'headers' => ['Metric', 'Value', 'Notes'],
             'rows' => $rows,
+        ];
+    }
+
+    private function reportContext(array $filters): array
+    {
+        $audience = (string) ($filters['audience'] ?? 'municipality');
+        if (!in_array($audience, ['municipality', 'canton', 'cooperative', 'foundation'], true)) {
+            $audience = 'municipality';
+        }
+
+        $sections = $filters['sections'] ?? ['summary', 'hours', 'members', 'organisations', 'categories', 'trends', 'trust'];
+        if (is_string($sections)) {
+            $decoded = json_decode($sections, true);
+            $sections = is_array($decoded) ? $decoded : explode(',', $sections);
+        }
+
+        $sections = array_values(array_filter(array_map('strval', is_array($sections) ? $sections : [])));
+
+        return [
+            'audience' => $audience,
+            'template_name' => isset($filters['template_name']) ? (string) $filters['template_name'] : null,
+            'sections' => $sections === [] ? ['summary', 'hours', 'members', 'organisations', 'categories', 'trends', 'trust'] : $sections,
+        ];
+    }
+
+    private function readinessSignals(float $verifiedHours, array $members, array $organisations, array $requests): array
+    {
+        return [
+            [
+                'key' => 'municipal_value',
+                'status' => $verifiedHours > 0 ? 'ready' : 'needs_data',
+                'value' => round($verifiedHours, 1),
+            ],
+            [
+                'key' => 'participation',
+                'status' => $members['participating_members'] > 0 ? 'ready' : 'needs_data',
+                'value' => $members['participating_members'],
+            ],
+            [
+                'key' => 'partner_network',
+                'status' => $organisations['trusted_organisations'] > 0 ? 'ready' : 'needs_data',
+                'value' => $organisations['trusted_organisations'],
+            ],
+            [
+                'key' => 'local_exchange',
+                'status' => ($requests['support_requests'] + $requests['support_offers']) > 0 ? 'ready' : 'needs_data',
+                'value' => $requests['support_requests'] + $requests['support_offers'],
+            ],
         ];
     }
 

@@ -179,6 +179,9 @@ class AdminAnalyticsReportsController extends BaseApiController
                 'date_preset' => $template['date_preset'],
                 'include_social_value' => $template['include_social_value'],
                 'hour_value_chf' => $template['hour_value_chf'],
+                'audience' => $template['audience'],
+                'sections' => $template['sections'],
+                'template_name' => $template['name'],
             ]);
         }
 
@@ -391,6 +394,9 @@ class AdminAnalyticsReportsController extends BaseApiController
                     'date_preset' => $template['date_preset'],
                     'include_social_value' => $template['include_social_value'],
                     'hour_value_chf' => $template['hour_value_chf'],
+                    'audience' => $template['audience'],
+                    'sections' => $template['sections'],
+                    'template_name' => $template['name'],
                 ]);
             }
         }

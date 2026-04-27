@@ -104,6 +104,10 @@ class ReportExportService
      */
     public function exportPdf(string $type, int $tenantId, array $filters = []): array
     {
+        if ($type === 'municipal_impact') {
+            return $this->exportMunicipalImpactPdf($tenantId, $filters);
+        }
+
         $data = $this->getReportData($type, $tenantId, $filters);
 
         if (empty($data['rows'])) {
@@ -124,6 +128,29 @@ class ReportExportService
             'pdf'      => $pdf,
             'filename' => $filename,
             'rows'     => count($data['rows']),
+        ];
+    }
+
+    private function exportMunicipalImpactPdf(int $tenantId, array $filters): array
+    {
+        $summary = $this->municipalImpactReportService()->summary($tenantId, $filters);
+        if (empty($summary['stats'])) {
+            return [
+                'success' => false,
+                'message' => __('svc_notifications_2.report_export.no_data'),
+                'pdf' => '',
+                'filename' => '',
+            ];
+        }
+
+        $pdf = $this->generateMunicipalImpactPdf($summary);
+        $date = now()->format('Y-m-d');
+
+        return [
+            'success' => true,
+            'pdf' => $pdf,
+            'filename' => "municipal_impact_pack_{$date}.pdf",
+            'rows' => count($summary['categories']) + count($summary['trends']) + count($summary['readiness_signals']),
         ];
     }
 
@@ -558,6 +585,92 @@ class ReportExportService
 
         // Generate minimal PDF
         return $this->buildMinimalPdf($text);
+    }
+
+    private function generateMunicipalImpactPdf(array $summary): string
+    {
+        $stats = $summary['stats'];
+        $context = $summary['report_context'] ?? [];
+        $audience = (string) ($context['audience'] ?? 'municipality');
+        $templateName = (string) ($context['template_name'] ?? __('api.municipal_pdf_default_template'));
+        $sections = implode(', ', $context['sections'] ?? []);
+        $period = $summary['period']['from'] . ' to ' . $summary['period']['to'];
+        $currency = (string) ($summary['currency'] ?? 'CHF');
+
+        $lines = [
+            __('api.municipal_pdf_title'),
+            __('api.municipal_pdf_generated', ['date' => now()->format('Y-m-d H:i')]),
+            __('api.municipal_pdf_audience', ['audience' => $audience]),
+            __('api.municipal_pdf_template', ['template' => $templateName]),
+            __('api.municipal_pdf_period', ['period' => $period]),
+            __('api.municipal_pdf_sections', ['sections' => $sections]),
+            '',
+            __('api.municipal_pdf_executive_summary'),
+            __('api.municipal_pdf_summary_line', [
+                'hours' => number_format((float) ($stats['verified_hours'] ?? 0), 1),
+                'members' => number_format((int) ($stats['participating_members'] ?? 0)),
+                'organisations' => number_format((int) ($stats['trusted_organisations'] ?? 0)),
+                'value' => $currency . ' ' . number_format((float) ($stats['total_value'] ?? 0), 0),
+            ]),
+            '',
+            __('api.municipal_pdf_core_metrics'),
+            __('api.municipal_pdf_metric_verified_hours', ['value' => number_format((float) ($stats['verified_hours'] ?? 0), 1)]),
+            __('api.municipal_pdf_metric_volunteer_hours', ['value' => number_format((float) ($stats['volunteer_hours'] ?? 0), 1)]),
+            __('api.municipal_pdf_metric_timebank_hours', ['value' => number_format((float) ($stats['timebank_hours'] ?? 0), 1)]),
+            __('api.municipal_pdf_metric_pending_hours', ['value' => number_format((float) ($stats['pending_hours'] ?? 0), 1)]),
+            __('api.municipal_pdf_metric_active_members', ['value' => number_format((int) ($stats['active_members'] ?? 0))]),
+            __('api.municipal_pdf_metric_new_members', ['value' => number_format((int) ($stats['new_members'] ?? 0))]),
+            __('api.municipal_pdf_metric_support_requests', ['value' => number_format((int) ($stats['support_requests'] ?? 0))]),
+            __('api.municipal_pdf_metric_support_offers', ['value' => number_format((int) ($stats['support_offers'] ?? 0))]),
+            __('api.municipal_pdf_metric_direct_value', ['value' => $currency . ' ' . number_format((float) ($stats['direct_value'] ?? 0), 0)]),
+            __('api.municipal_pdf_metric_social_value', ['value' => $currency . ' ' . number_format((float) ($stats['social_value'] ?? 0), 0)]),
+            '',
+            __('api.municipal_pdf_readiness'),
+        ];
+
+        foreach ($summary['readiness_signals'] ?? [] as $signal) {
+            $lines[] = __('api.municipal_pdf_readiness_line', [
+                'label' => __('api.municipal_pdf_signal_' . $signal['key']),
+                'status' => __('api.municipal_pdf_status_' . $signal['status']),
+                'value' => number_format((float) ($signal['value'] ?? 0), 1),
+            ]);
+        }
+
+        $lines[] = '';
+        $lines[] = __('api.municipal_pdf_categories');
+        foreach (array_slice($summary['categories'] ?? [], 0, 8) as $category) {
+            $lines[] = __('api.municipal_pdf_category_line', [
+                'name' => (string) $category['name'],
+                'hours' => number_format((float) $category['hours'], 1),
+                'count' => number_format((int) $category['count']),
+            ]);
+        }
+
+        $lines[] = '';
+        $lines[] = __('api.municipal_pdf_trends');
+        foreach (array_slice($summary['trends'] ?? [], -8) as $trend) {
+            $lines[] = __('api.municipal_pdf_trend_line', [
+                'period' => (string) $trend['period'],
+                'hours' => number_format((float) $trend['verified_hours'], 1),
+                'participants' => number_format((int) $trend['participants']),
+                'activities' => number_format((int) $trend['activities']),
+            ]);
+        }
+
+        return $this->buildMinimalPdf(implode("\n", $this->wrapPdfLines($lines)));
+    }
+
+    private function wrapPdfLines(array $lines, int $width = 92): array
+    {
+        $wrapped = [];
+        foreach ($lines as $line) {
+            $parts = explode("\n", wordwrap((string) $line, $width, "\n", false));
+            foreach ($parts as $part) {
+                $wrapped[] = $part;
+            }
+        }
+
+        return $wrapped;
     }
 
     /**

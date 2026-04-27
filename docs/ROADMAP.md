@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-26 (added Agoris/KISS strategic opportunity, diligence record, and production seed/deploy notes)
+> **Last updated:** 2026-04-27 (aligned Agoris/KISS module work with ChatGPT and Gemini research briefs; added municipal report proof-pack polish)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -496,6 +496,7 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | Hour logging policy pass | Volunteering hour submission now honours the Caring Community workflow policy for approval-required, trusted-reviewer auto-approval, and member self-logging. Approved-on-submit logs return `approved` to the API instead of always reporting `pending`. |
 | Saved municipal report templates | Added tenant-scoped municipal/KISS report templates with API storage, admin UI, audience/period/social-value/hour-value assumptions, template-aware report preview, and template-aware CSV/PDF export links. |
 | Workflow assignment and escalation | Pending KISS hour reviews can now be assigned to coordinators and manually escalated. The workflow console shows assigned coordinator, escalation state, and uses tenant-scoped API actions backed by `vol_logs` assignment/escalation fields. |
+| Municipal proof-pack polish | Re-checked the module against the Agoris research briefs. Added explicit report date filters, audience context, procurement-readiness signals, and a stronger municipal/KISS PDF export narrative so the module better addresses the research gap around public proof, municipal value, participation evidence, and partner-network credibility. |
 
 ### Immediate Next Actions
 
@@ -506,9 +507,11 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | AG3 | Write diligence question pack | High | Registry/UID, live deployments, pricing, KPIs, security/privacy docs, hosting, integrations, roadmap, data ownership, procurement expectations. |
 | AG4 | Build formal Caring Community module profile | Critical | Strong partial: feature flag, preset, admin switch, public hub route, nav gate, quick-create gate, dashboard entry points, admin configuration detail page, municipal reporting, KISS workflow console, installable KISS role pack, tenant-level workflow policy controls, SLA-driven review queue, policy-aware municipal reporting, approval/self-log policy enforcement in hour submission, saved municipal report templates, and coordinator assignment/escalation actions are implemented. Next: add auto-payment parity for auto-approved logs and a schema migration if partner-hour logs should support no organization. |
 | AG5 | Add kill-switch regression tests | Critical | Partial: quick-create, route config, community nav, and dashboard feature-gating tests are implemented and passing. Next: admin toggle end-to-end coverage and API affordance audit. |
-| AG6 | Create municipal impact report exports | High | Partial: `/admin/reports/municipal-impact` now loads real tenant metrics, saves audience-specific templates, and exports CSV/PDF via `municipal_impact` with template assumptions. Next: make the PDF presentation-grade, add explicit date filters, and separate canton/municipality/cooperative report variants. |
+| AG6 | Create municipal impact report exports | High | Strong partial: `/admin/reports/municipal-impact` now loads real tenant metrics, saves audience-specific templates, supports explicit date filters, shows audience/readiness context, and exports CSV/PDF via `municipal_impact` with template assumptions. Next: native German copy review, richer visual PDF layout when a full PDF library is introduced, and more explicit canton/municipality/cooperative narrative variants. |
 | AG7 | Harden Swiss localization | Medium | Native German review first; then French/Italian. Add KISS/Agoris glossary terms. |
 | AG8 | Prepare technical architecture response | High | Explain how NEXUS can be adapted, how add-ons embed, how module switches work, and how data remains tenant-scoped. |
+| AG9 | Define regional-node and data-sovereignty architecture | High | The Gemini brief stresses 15,000-30,000 citizen nodes, federation, and optional isolated/localized nodes. Map this to NEXUS tenants, domains, federation, export boundaries, tenant-local storage, and any future per-node deployment model. |
+| AG10 | Build older-user and coordinator onboarding aids | High | Add assisted onboarding, printable invite/invite-code flows, coordinator-created profiles, and low-friction support requests for elderly/nontechnical participants. |
 
 ### Suggested Reply Themes For Martin
 
