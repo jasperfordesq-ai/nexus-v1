@@ -475,7 +475,9 @@
       "coordinate_org_sub": "Deine Freiwilligen-Organisationen verwalten",
       "my_relationships_sub": "Laufende Unterstützungsbeziehungen ansehen",
       "markt": "Marktplatz",
-      "markt_sub": "Lokale Dienste, Waren und Zeitgutschrift-Angebote entdecken."
+      "markt_sub": "Lokale Dienste, Waren und Zeitgutschrift-Angebote entdecken.",
+      "loyalty_history": "Meine Einlösungen",
+      "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt."
     },
     "operating_model": {
       "title": "Funktionsweise",
@@ -727,5 +729,44 @@
   },
   "feed": {
     "official_badge": "Offiziell"
+  },
+  "loyalty": {
+    "section_title": "Zeitgutschriften einsetzen",
+    "available": "Sie haben {{credits}} Stunden verfügbar",
+    "merchant_accepts": "Dieser lokale Händler akzeptiert Zeitgutschriften",
+    "merchant_does_not_accept": "Dieser Händler akzeptiert keine Zeitgutschriften",
+    "exchange_rate": "1 Stunde = CHF {{rate}} Rabatt",
+    "max_discount": "Maximaler Rabatt: {{percent}}% der Bestellung",
+    "credits_to_use_label": "Wie viele Stunden möchten Sie einsetzen?",
+    "discount_preview": "Rabatt: CHF {{discount}}",
+    "new_total": "Neuer Gesamtbetrag: CHF {{total}}",
+    "apply": "Zeitgutschriften anwenden",
+    "applying": "Wird angewendet...",
+    "applied_success": "{{credits}} Stunden eingelöst — CHF {{discount}} gespart",
+    "errors": {
+      "insufficient_credits": "Nicht genügend Zeitgutschriften in Ihrer Brieftasche.",
+      "merchant_disabled": "Dieser Händler akzeptiert derzeit keine Zeitgutschriften mehr.",
+      "exceeds_max": "Das übersteigt den maximal zulässigen Rabatt dieses Händlers.",
+      "redemption_failed": "Ihre Gutschriften konnten nicht angewendet werden. Bitte versuchen Sie es erneut."
+    },
+    "history": {
+      "meta": {
+        "title": "Meine Einlösungen",
+        "description": "Ihr Verlauf der Zeitgutschriften-Einlösungen bei lokalen Händlern"
+      },
+      "subtitle": "So haben Sie Ihre verdienten Stunden bei lokalen Unternehmen eingesetzt.",
+      "back": "Zurück zum Community-Hub",
+      "table": {
+        "date": "Datum",
+        "merchant": "Händler",
+        "item": "Artikel",
+        "credits": "Stunden eingesetzt",
+        "discount": "Rabatt"
+      },
+      "empty": {
+        "title": "Noch keine Einlösungen",
+        "body": "Sobald Sie Ihre Zeitgutschriften bei einem lokalen Händler einsetzen, erscheint die Einlösung hier."
+      }
+    }
   }
 }

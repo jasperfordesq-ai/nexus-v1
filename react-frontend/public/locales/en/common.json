@@ -337,7 +337,9 @@
       "my_relationships": "My Support Relationships",
       "my_relationships_sub": "View your ongoing support connections",
       "markt": "Marktplatz",
-      "markt_sub": "Browse local services, goods and time-credit offers."
+      "markt_sub": "Browse local services, goods and time-credit offers.",
+      "loyalty_history": "My Time Credit Redemptions",
+      "loyalty_history_sub": "See how you've used your earned hours at local merchants."
     },
     "operating_model": {
       "title": "Operating model",
@@ -727,5 +729,44 @@
   },
   "feed": {
     "official_badge": "Official"
+  },
+  "loyalty": {
+    "section_title": "Use Your Time Credits",
+    "available": "You have {{credits}} hours available",
+    "merchant_accepts": "This merchant accepts time credits",
+    "merchant_does_not_accept": "This merchant does not accept time credits",
+    "exchange_rate": "1 hour = CHF {{rate}} discount",
+    "max_discount": "Maximum discount: {{percent}}% of order",
+    "credits_to_use_label": "How many hours would you like to use?",
+    "discount_preview": "Discount: CHF {{discount}}",
+    "new_total": "New total: CHF {{total}}",
+    "apply": "Apply Time Credits",
+    "applying": "Applying...",
+    "applied_success": "{{credits}} hours applied — saved CHF {{discount}}",
+    "errors": {
+      "insufficient_credits": "Not enough time credits in your wallet.",
+      "merchant_disabled": "This merchant is no longer accepting time credits.",
+      "exceeds_max": "That exceeds the maximum discount allowed by this merchant.",
+      "redemption_failed": "Could not apply your credits. Please try again."
+    },
+    "history": {
+      "meta": {
+        "title": "My Time Credit Redemptions",
+        "description": "Your history of using time credits at local merchants"
+      },
+      "subtitle": "See how you've used your earned hours at local businesses.",
+      "back": "Back to Community Hub",
+      "table": {
+        "date": "Date",
+        "merchant": "Merchant",
+        "item": "Item",
+        "credits": "Hours Used",
+        "discount": "Discount"
+      },
+      "empty": {
+        "title": "No Redemptions Yet",
+        "body": "When you use your time credits at a local merchant, the redemption will appear here."
+      }
+    }
   }
 }

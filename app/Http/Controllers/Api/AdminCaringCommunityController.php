@@ -19,6 +19,7 @@ use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
 use App\Services\CaringInviteCodeService;
+use App\Services\CaringLoyaltyService;
 use App\Services\CaringSupportRelationshipService;
 use App\Services\CaringTandemMatchingService;
 use Illuminate\Http\JsonResponse;
@@ -36,6 +37,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringSupportRelationshipService $supportRelationshipService,
         private readonly CaringInviteCodeService $inviteCodeService,
         private readonly CaringTandemMatchingService $tandemMatchingService,
+        private readonly CaringLoyaltyService $loyaltyService,
     ) {
     }
 
@@ -492,6 +494,72 @@ class AdminCaringCommunityController extends BaseApiController
             'count' => $total,
             'items' => $items,
         ]);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/loyalty/redemptions
+     *
+     * Returns the most recent tenant-wide loyalty redemptions plus
+     * aggregate stats for the KISS Workflow Console card.
+     */
+    public function listLoyaltyRedemptions(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $limit = (int) (request()->query('limit') ?? 50);
+
+        return $this->respondWithData([
+            'stats'       => $this->loyaltyService->tenantStats(),
+            'redemptions' => $this->loyaltyService->listTenantRedemptions($limit),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/loyalty/seller-settings/{userId}
+     *
+     * Read a single seller's loyalty configuration. Returns sane defaults
+     * when no row exists yet so the admin form can render.
+     */
+    public function getLoyaltySellerSettings(int $userId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->loyaltyService->getSellerSettings($userId));
+    }
+
+    /**
+     * PUT /api/v2/admin/caring-community/loyalty/seller-settings
+     *
+     * Body: { seller_user_id, accepts_time_credits, loyalty_chf_per_hour, loyalty_max_discount_pct }
+     */
+    public function updateLoyaltySellerSettings(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $input = $this->getAllInput();
+
+        $sellerId = (int) ($input['seller_user_id'] ?? 0);
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_user_id', 422);
+        }
+
+        try {
+            $result = $this->loyaltyService->updateSellerSettings(
+                sellerId:           $sellerId,
+                acceptsTimeCredits: (bool) ($input['accepts_time_credits'] ?? false),
+                chfPerHour:         (float) ($input['loyalty_chf_per_hour'] ?? 25.0),
+                maxDiscountPct:     (int) ($input['loyalty_max_discount_pct'] ?? 50),
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 503);
+        }
+
+        return $this->respondWithData($result);
     }
 
     private function guardCaringCommunity(): ?JsonResponse

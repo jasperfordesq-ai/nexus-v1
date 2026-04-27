@@ -252,6 +252,7 @@ function useAdminNav(): NavSection[] {
       ...(hasFeature('caring_community') ? [
         { label: t('caring_community'), href: '/admin/caring-community', icon: Heart },
         { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
+        { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

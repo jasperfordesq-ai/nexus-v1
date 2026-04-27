@@ -19,6 +19,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
+import Coins from 'lucide-react/icons/coins';
 import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
 import Wallet from 'lucide-react/icons/wallet';
@@ -46,6 +47,7 @@ const primaryActions: ActionDef[] = [
   { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
   { key: 'my_relationships', href: '/caring-community/my-relationships', icon: Users, feature: 'caring_community' },
   { key: 'markt', href: '/caring-community/markt', icon: Store, feature: 'caring_community' },
+  { key: 'loyalty_history', href: '/caring-community/loyalty/history', icon: Coins, feature: 'caring_community' },
 ];
 
 const moduleCards: ActionDef[] = [

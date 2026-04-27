@@ -148,6 +148,7 @@ const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerPro
 const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
 const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/CaringCommunityAdmin'));
 const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
+const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -545,6 +546,14 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><CaringCommunityWorkflowPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+      <Route
+        path="caring-community/loyalty"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><LoyaltyAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

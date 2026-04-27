@@ -159,6 +159,7 @@ const MySupportRelationshipsPage = lazyWithRetry(() => import('@/pages/caring-co
 const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-community/InviteRedemptionPage'));
 const OfferFavourPage = lazyWithRetry(() => import('@/pages/caring-community/OfferFavourPage'));
 const MarktPage = lazyWithRetry(() => import('@/pages/caring-community/MarktPage'));
+const LoyaltyHistoryPage = lazyWithRetry(() => import('@/pages/caring-community/LoyaltyHistoryPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
@@ -522,6 +523,15 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MarktPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Time-credit ↔ marketplace loyalty redemption history */}
+        <Route path="caring-community/loyalty/history" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <LoyaltyHistoryPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

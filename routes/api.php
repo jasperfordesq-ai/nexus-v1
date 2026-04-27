@@ -1181,6 +1181,16 @@ Route::get('/v2/admin/caring-community/favours', [\App\Http\Controllers\Api\Admi
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
 Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
+
+// Caring loyalty bridge (time credits ↔ marketplace) — member-facing
+Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
+Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
+Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);
+
+// Caring loyalty bridge — admin
+Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
+Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getLoyaltySellerSettings']);
+Route::put('/v2/admin/caring-community/loyalty/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateLoyaltySellerSettings']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);

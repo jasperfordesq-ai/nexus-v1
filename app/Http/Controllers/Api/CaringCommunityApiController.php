@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\CaringInviteCodeService;
+use App\Services\CaringLoyaltyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -27,6 +28,7 @@ class CaringCommunityApiController extends BaseApiController
 
     public function __construct(
         private readonly CaringInviteCodeService $inviteCodeService,
+        private readonly CaringLoyaltyService $loyaltyService,
     ) {
     }
 
@@ -426,6 +428,105 @@ class CaringCommunityApiController extends BaseApiController
             'per_page'               => $perPage,
             'has_more'               => ($offset + $perPage) < $total,
             'marketplace_available'  => $marketplaceAvailable,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // Loyalty bridge — time credits ↔ marketplace
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/caring-community/loyalty/quote
+     *
+     * Compute the maximum discount the authenticated member can apply at a
+     * given seller for a given order total. Used by the checkout UI to render
+     * the "use my time credits" card live before the buy.
+     *
+     * Query: seller_id, order_total_chf, listing_id (optional, for context).
+     */
+    public function loyaltyQuote(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $sellerId = (int) ($this->query('seller_id') ?? 0);
+        $orderTotalChf = (float) ($this->query('order_total_chf') ?? 0);
+
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
+        }
+        if ($orderTotalChf <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'order_total_chf', 422);
+        }
+
+        return $this->respondWithData(
+            $this->loyaltyService->calculateAvailableDiscount($userId, $sellerId, $orderTotalChf)
+        );
+    }
+
+    /**
+     * POST /api/v2/caring-community/loyalty/redeem
+     *
+     * Body: { seller_id, listing_id?, credits_to_use, order_total_chf }
+     *
+     * Atomically debits the member's wallet and records a redemption. Returns
+     * the new wallet balance and the discount applied (CHF). The frontend then
+     * proceeds with the actual buy at order_total - discount_chf.
+     */
+    public function loyaltyRedeem(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $sellerId      = (int) ($input['seller_id'] ?? 0);
+        $listingId     = isset($input['listing_id']) && $input['listing_id'] !== '' ? (int) $input['listing_id'] : null;
+        $creditsToUse  = (float) ($input['credits_to_use'] ?? 0);
+        $orderTotalChf = (float) ($input['order_total_chf'] ?? 0);
+
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
+        }
+
+        try {
+            $result = $this->loyaltyService->redeem(
+                memberId:      $userId,
+                sellerId:      $sellerId,
+                listingId:     $listingId,
+                creditsToUse:  $creditsToUse,
+                orderTotalChf: $orderTotalChf,
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $code = str_contains(strtolower($msg), 'enough') ? 'INSUFFICIENT_CREDITS' : 'REDEMPTION_FAILED';
+            return $this->respondWithError($code, $msg, null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/caring-community/loyalty/my-history
+     *
+     * Returns the authenticated member's last 50 redemptions for the
+     * "My Time Credit Redemptions" page.
+     */
+    public function loyaltyMyHistory(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'items' => $this->loyaltyService->listMemberHistory($userId, 50),
         ]);
     }
 

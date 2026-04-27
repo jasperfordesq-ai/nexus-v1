@@ -51,7 +51,7 @@ import Flag from 'lucide-react/icons/flag';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { BuyNowButton, MarketplaceListingDetailSkeleton } from '@/components/marketplace';
+import { BuyNowButton, LoyaltyRedemptionCard, MarketplaceListingDetailSkeleton } from '@/components/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -646,16 +646,24 @@ export function MarketplaceListingPage() {
               {/* Action buttons */}
               <div className="flex flex-col gap-2 pt-2">
                 {listing.price_type === 'fixed' && listing.price != null && listing.price > 0 && (
-                  <BuyNowButton
-                    listingId={listing.id}
-                    listingTitle={listing.title}
-                    price={listing.price}
-                    currency={listing.price_currency}
-                    sellerId={listing.user?.id ?? 0}
-                    onSuccess={() => {
-                      toast.success(t('listing.order_created', 'Order created!'));
-                    }}
-                  />
+                  <>
+                    <LoyaltyRedemptionCard
+                      sellerId={listing.user?.id ?? 0}
+                      listingId={listing.id}
+                      orderTotalChf={listing.price}
+                      currency={listing.price_currency || 'CHF'}
+                    />
+                    <BuyNowButton
+                      listingId={listing.id}
+                      listingTitle={listing.title}
+                      price={listing.price}
+                      currency={listing.price_currency}
+                      sellerId={listing.user?.id ?? 0}
+                      onSuccess={() => {
+                        toast.success(t('listing.order_created', 'Order created!'));
+                      }}
+                    />
+                  </>
                 )}
                 <div className="flex gap-2">
                   {listing.price_type !== 'free' && (

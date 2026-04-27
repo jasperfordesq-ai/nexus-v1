@@ -34,6 +34,7 @@ export { ListingLocationMap } from './ListingLocationMap';
 
 // Stripe Payment Flow
 export { BuyNowButton } from './BuyNowButton';
+export { LoyaltyRedemptionCard } from './LoyaltyRedemptionCard';
 export { StripeCheckoutModal } from './StripeCheckoutModal';
 export { OrderStatusBadge } from './OrderStatusBadge';
 export { RatingModal } from './RatingModal';
