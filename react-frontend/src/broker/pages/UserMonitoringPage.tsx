@@ -40,7 +40,7 @@ import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
-import { DataTable, PageHeader, EmptyState, type Column } from '@/admin/components';
+import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '@/admin/components';
 import type { MonitoredUser, AdminUser } from '@/admin/api/types';
 
 export function UserMonitoring() {
@@ -59,6 +59,7 @@ export function UserMonitoring() {
   const [expiresDays, setExpiresDays] = useState('');
   const [monitoringLoading, setMonitoringLoading] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [confirmRemoveUserId, setConfirmRemoveUserId] = useState<number | null>(null);
 
   // User search state
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
@@ -216,7 +217,6 @@ export function UserMonitoring() {
   };
 
   const handleRemoveMonitoring = async (userId: number) => {
-    if (!window.confirm(t('monitoring.confirm_remove'))) return;
     setRemovingId(userId);
     try {
       const res = await adminBroker.setMonitoring(userId, { under_monitoring: false });
@@ -320,7 +320,7 @@ export function UserMonitoring() {
           size="sm"
           variant="flat"
           color="danger"
-          onPress={() => handleRemoveMonitoring(item.user_id)}
+          onPress={() => setConfirmRemoveUserId(item.user_id)}
           isLoading={removingId === item.user_id}
           aria-label={t('monitoring.remove_aria')}
         >
@@ -527,6 +527,23 @@ export function UserMonitoring() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Remove from monitoring confirmation modal */}
+      <ConfirmModal
+        isOpen={confirmRemoveUserId !== null}
+        onClose={() => setConfirmRemoveUserId(null)}
+        onConfirm={() => {
+          if (confirmRemoveUserId !== null) {
+            handleRemoveMonitoring(confirmRemoveUserId);
+          }
+          setConfirmRemoveUserId(null);
+        }}
+        title={t('monitoring.confirm_remove_title')}
+        message={t('monitoring.confirm_remove')}
+        confirmLabel={t('monitoring.confirm_remove_confirm')}
+        cancelLabel={t('common.cancel')}
+        isLoading={removingId !== null}
+      />
     </div>
   );
 }

@@ -90,12 +90,12 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
             <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
               <Avatar
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
-                name={user?.name || 'Broker'}
+                name={user?.name || t('header.user_fallback')}
                 size="sm"
                 className="h-8 w-8"
               />
               <span className="hidden text-sm font-medium text-foreground sm:block">
-                {user?.name || 'Broker'}
+                {user?.name || t('header.user_fallback')}
               </span>
             </Button>
           </DropdownTrigger>

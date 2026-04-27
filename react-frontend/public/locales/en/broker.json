@@ -19,7 +19,8 @@
     "notifications": "Notifications",
     "user_menu": "User menu",
     "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "sign_out": "Sign Out",
+    "user_fallback": "Broker"
   },
 
   "nav": {
@@ -195,7 +196,8 @@
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
-    "time_days_ago": "{{count}}d ago"
+    "time_days_ago": "{{count}}d ago",
+    "note_system_author": "System"
   },
 
   "onboarding": {
@@ -567,7 +569,13 @@
     "detail_approve_warning": "Once archived, this record becomes read-only.",
     "detail_approve_success": "Message approved and archived.",
     "detail_approve_failed": "Failed to approve message.",
-    "detail_none": "—"
+    "detail_none": "—",
+    "copy_reason_first_contact": "First Contact",
+    "copy_reason_high_risk_listing": "High Risk Listing",
+    "copy_reason_new_member": "New Member",
+    "copy_reason_flagged_user": "Flagged User",
+    "copy_reason_manual_monitoring": "Manual Monitoring",
+    "copy_reason_random_sample": "Random Sample"
   },
 
   "monitoring": {
@@ -584,7 +592,9 @@
     "remove_aria": "Remove from monitoring",
     "remove_failed": "Failed to remove monitored user.",
     "remove_success": "User removed from monitoring.",
+    "confirm_remove_title": "Remove from Monitoring",
     "confirm_remove": "Are you sure you want to remove this user from monitoring?",
+    "confirm_remove_confirm": "Remove",
     "clear_selection_aria": "Clear selection",
     "col_user": "User",
     "col_reason": "Reason",
@@ -679,6 +689,7 @@
     "category_health_safety": "Health & Safety",
     "category_legal": "Legal",
     "category_reputation": "Reputation",
+    "category_fraud": "Potential Fraud",
     "category_other": "Other"
   },
 
@@ -822,7 +833,19 @@
     "label_copy_reason": "Copy Reason",
     "label_decision": "Decision",
     "label_decided_by": "Decided By",
-    "label_decision_notes": "Decision Notes"
+    "label_decision_notes": "Decision Notes",
+    "decision_approved": "Approved",
+    "decision_flagged": "Flagged",
+    "copy_reason_first_contact": "First Contact",
+    "copy_reason_high_risk_listing": "High Risk Listing",
+    "copy_reason_new_member": "New Member",
+    "copy_reason_flagged_user": "Flagged User",
+    "copy_reason_manual_monitoring": "Manual Monitoring",
+    "copy_reason_random_sample": "Random Sample",
+    "severity_low": "Low",
+    "severity_medium": "Medium",
+    "severity_high": "High",
+    "severity_critical": "Critical"
   },
 
   "configuration": {
@@ -933,7 +956,14 @@
     "low": "Low",
     "medium": "Medium",
     "high": "High",
-    "critical": "Critical"
+    "critical": "Critical",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "pending_broker": "Pending Broker Approval",
+    "pending_provider": "Pending Provider",
+    "accepted": "Accepted",
+    "in_progress": "In Progress",
+    "pending_confirmation": "Pending Confirmation"
   },
 
   "common": {

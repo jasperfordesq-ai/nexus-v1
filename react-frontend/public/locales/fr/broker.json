@@ -17,7 +17,8 @@
     "notifications": "Notifications",
     "user_menu": "Menu utilisateur",
     "my_profile": "Mon profil",
-    "sign_out": "Se déconnecter"
+    "sign_out": "Se déconnecter",
+    "user_fallback": "Broker"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -189,7 +190,8 @@
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
     "time_days_ago": "{{count}}d ago",
-    "page_title": "Members - Broker"
+    "page_title": "Members - Broker",
+    "note_system_author": "System"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -556,7 +558,13 @@
     "detail_approve_warning": "Once archived, this record becomes read-only.",
     "detail_approve_success": "Message approved and archived.",
     "detail_approve_failed": "Failed to approve message.",
-    "detail_none": "—"
+    "detail_none": "—",
+    "copy_reason_first_contact": "First Contact",
+    "copy_reason_high_risk_listing": "High Risk Listing",
+    "copy_reason_new_member": "New Member",
+    "copy_reason_flagged_user": "Flagged User",
+    "copy_reason_manual_monitoring": "Manual Monitoring",
+    "copy_reason_random_sample": "Random Sample"
   },
   "status": {
     "active": "Active",
@@ -576,7 +584,14 @@
     "critical": "Critical",
     "submitted": "Submitted",
     "revoked": "Revoked",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "pending_broker": "Pending Broker Approval",
+    "pending_provider": "Pending Provider",
+    "accepted": "Accepted",
+    "in_progress": "In Progress",
+    "pending_confirmation": "Pending Confirmation"
   },
   "common": {
     "loading": "Chargement...",
@@ -628,7 +643,9 @@
     "duration_90_days": "90 days",
     "disable_messaging": "Disable messaging while monitored",
     "status_monitored": "Monitored",
-    "status_messaging_off": "Messaging disabled"
+    "status_messaging_off": "Messaging disabled",
+    "confirm_remove_title": "Remove from Monitoring",
+    "confirm_remove_confirm": "Remove"
   },
   "risk_tags": {
     "title": "Risk Tags",
@@ -695,7 +712,8 @@
     "category_health_safety": "Health & Safety",
     "category_legal": "Legal",
     "category_reputation": "Reputation",
-    "category_other": "Other"
+    "category_other": "Other",
+    "category_fraud": "Potential Fraud"
   },
   "insurance": {
     "title": "Insurance Certificates",
@@ -836,7 +854,19 @@
     "label_copy_reason": "Copy Reason",
     "label_decision": "Decision",
     "label_decided_by": "Decided By",
-    "label_decision_notes": "Decision Notes"
+    "label_decision_notes": "Decision Notes",
+    "decision_approved": "Approved",
+    "decision_flagged": "Flagged",
+    "copy_reason_first_contact": "First Contact",
+    "copy_reason_high_risk_listing": "High Risk Listing",
+    "copy_reason_new_member": "New Member",
+    "copy_reason_flagged_user": "Flagged User",
+    "copy_reason_manual_monitoring": "Manual Monitoring",
+    "copy_reason_random_sample": "Random Sample",
+    "severity_low": "Low",
+    "severity_medium": "Medium",
+    "severity_high": "High",
+    "severity_critical": "Critical"
   },
   "configuration": {
     "title": "Broker Configuration",

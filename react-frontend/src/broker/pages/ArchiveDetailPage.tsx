@@ -146,9 +146,9 @@ export function ArchiveDetail() {
                 size="sm"
                 variant="flat"
                 color={isApproved ? 'success' : 'danger'}
-                className="capitalize mt-1"
+                className="mt-1"
               >
-                {data.decision}
+                {t(`archives.decision_${data.decision}`, { defaultValue: data.decision })}
               </Chip>
             </div>
             <div>
@@ -175,14 +175,16 @@ export function ArchiveDetail() {
               <p className="text-xs text-danger font-medium">{t('archives.label_flag_reason')}</p>
               <p className="text-sm mt-1">{data.flag_reason}</p>
               {data.flag_severity && (
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="danger"
-                  className="capitalize mt-2"
-                >
-                  {t('archives.label_severity')}
-                </Chip>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-danger font-medium">{t('archives.label_severity')}</span>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color="danger"
+                  >
+                    {t(`archives.severity_${data.flag_severity}`, { defaultValue: data.flag_severity })}
+                  </Chip>
+                </div>
               )}
             </div>
           )}
@@ -224,8 +226,8 @@ export function ArchiveDetail() {
           <div className="flex flex-wrap gap-4">
             <div>
               <p className="text-xs text-default-400">{t('archives.label_copy_reason')}</p>
-              <Chip size="sm" variant="flat" color="default" className="capitalize mt-1">
-                {data.copy_reason.replace(/_/g, ' ')}
+              <Chip size="sm" variant="flat" color="default" className="mt-1">
+                {t(`archives.copy_reason_${data.copy_reason}`, { defaultValue: data.copy_reason.replace(/_/g, ' ') })}
               </Chip>
             </div>
             <div>

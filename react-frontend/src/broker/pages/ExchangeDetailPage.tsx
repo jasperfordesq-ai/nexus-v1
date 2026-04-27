@@ -120,8 +120,8 @@ export default function ExchangeDetail() {
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
             <p className="text-sm text-default-500">{t('exchanges.detail_status_label')}</p>
-            <Chip color={statusColor} variant="flat" size="sm" className="capitalize">
-              {exchange.status.replace(/_/g, ' ')}
+            <Chip color={statusColor} variant="flat" size="sm">
+              {t(`status.${exchange.status}`, { defaultValue: exchange.status.replace(/_/g, ' ') })}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
@@ -181,11 +181,10 @@ export default function ExchangeDetail() {
                 color={risk_tag.risk_level === 'critical' || risk_tag.risk_level === 'high' ? 'danger' : 'warning'}
                 variant="flat"
                 size="sm"
-                className="capitalize"
               >
-                {risk_tag.risk_level}
+                {t(`risk_tags.level_${risk_tag.risk_level}`, { defaultValue: risk_tag.risk_level })}
               </Chip>
-              <span className="text-sm capitalize">{risk_tag.risk_category}</span>
+              <span className="text-sm">{t(`risk_tags.category_${risk_tag.risk_category}`, { defaultValue: risk_tag.risk_category })}</span>
             </div>
             {risk_tag.risk_notes && (
               <p className="text-sm text-default-500 mt-2">{risk_tag.risk_notes}</p>

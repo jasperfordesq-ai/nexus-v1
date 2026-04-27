@@ -108,8 +108,8 @@ export function ReviewArchive() {
       key: 'copy_reason',
       label: t('archives.col_copy_reason'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color="default" className="capitalize">
-          {item.copy_reason.replace(/_/g, ' ')}
+        <Chip size="sm" variant="flat" color="default">
+          {t(`archives.copy_reason_${item.copy_reason}`, { defaultValue: item.copy_reason.replace(/_/g, ' ') })}
         </Chip>
       ),
     },
@@ -124,9 +124,8 @@ export function ReviewArchive() {
             variant="flat"
             color={isApproved ? 'success' : 'danger'}
             startContent={!isApproved ? <Flag size={12} /> : undefined}
-            className="capitalize"
           >
-            {item.decision}
+            {t(`archives.decision_${item.decision}`, { defaultValue: item.decision })}
           </Chip>
         );
       },

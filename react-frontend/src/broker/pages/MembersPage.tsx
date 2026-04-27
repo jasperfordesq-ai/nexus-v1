@@ -366,7 +366,7 @@ export default function MembersPage() {
         key: 'last_active_at',
         label: t('members.col_last_active'),
         render: (user: AdminUser) => (
-          <Tooltip content={user.last_active_at ? formatServerDateTime(user.last_active_at) : 'Never'}>
+          <Tooltip content={user.last_active_at ? formatServerDateTime(user.last_active_at) : t('members.time_never')}>
             <div className="flex items-center gap-1.5 text-sm text-default-500">
               <Clock size={14} />
               <span>{timeAgo(user.last_active_at)}</span>
@@ -596,7 +596,7 @@ export default function MembersPage() {
                       <div key={note.id} className="rounded-lg bg-default-50 p-3">
                         <p className="text-sm text-foreground whitespace-pre-wrap">{note.content}</p>
                         <div className="mt-2 flex items-center gap-2 text-xs text-default-400">
-                          <span>{note.author_name || note.author?.name || 'System'}</span>
+                          <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
                           <span>&middot;</span>
                           <span>{formatServerDateTime(note.created_at)}</span>
                           {note.category && (

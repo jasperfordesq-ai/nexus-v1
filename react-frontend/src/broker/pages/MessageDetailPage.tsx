@@ -46,9 +46,6 @@ const COPY_REASON_COLORS: Record<string, 'primary' | 'danger' | 'success' | 'war
   random_sample: 'default',
 };
 
-function formatCopyReason(reason: string): string {
-  return reason.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -268,7 +265,7 @@ export function MessageDetail() {
                 variant="flat"
                 color={COPY_REASON_COLORS[copy.copy_reason] ?? 'default'}
               >
-                {formatCopyReason(copy.copy_reason)}
+                {t(`messages.copy_reason_${copy.copy_reason}`, { defaultValue: copy.copy_reason.replace(/_/g, ' ') })}
               </Chip>
             </div>
 
