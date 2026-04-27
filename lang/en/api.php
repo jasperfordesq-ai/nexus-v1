@@ -229,6 +229,7 @@ return [
     'social_value_config_updated'          => 'Social value configuration updated',
     'moderation_settings_updated'          => 'Moderation settings updated',
     'decision_required'                    => 'Decision is required (approved or rejected)',
+    'invalid_decision'                     => 'Invalid decision value. Allowed: approved, rejected.',
     'failed_update_moderation'             => 'Failed to update moderation settings',
 
     // ============================================

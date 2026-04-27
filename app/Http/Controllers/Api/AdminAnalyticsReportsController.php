@@ -42,7 +42,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A1: SOCIAL VALUE / SROI
     // ============================================
 
-    /** GET /api/v2/admin/analytics/social-value */
+    /** GET /v2/admin/reports/social-value */
     public function socialValue(): JsonResponse
     {
         $this->requireAdmin();
@@ -55,7 +55,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData($report);
     }
 
-    /** PUT /api/v2/admin/analytics/social-value/config */
+    /** PUT /v2/admin/reports/social-value/config */
     public function updateSocialValueConfig(): JsonResponse
     {
         $this->requireAdmin();
@@ -93,7 +93,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A2: MEMBER REPORTS
     // ============================================
 
-    /** GET /api/v2/admin/analytics/member-reports */
+    /** GET /v2/admin/reports/members */
     public function memberReports(): JsonResponse
     {
         $this->requireAdmin();
@@ -127,7 +127,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A3: HOURS REPORTS
     // ============================================
 
-    /** GET /api/v2/admin/analytics/hours-reports */
+    /** GET /v2/admin/reports/hours */
     public function hoursReports(): JsonResponse
     {
         $this->requireAdmin();
@@ -154,7 +154,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData($data);
     }
 
-    /** GET /api/v2/admin/reports/municipal-impact */
+    /** GET /v2/admin/reports/municipal-impact */
     public function municipalImpact(): JsonResponse
     {
         $this->requireAdmin();
@@ -190,7 +190,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         );
     }
 
-    /** GET /api/v2/admin/reports/municipal-impact/templates */
+    /** GET /v2/admin/reports/municipal-impact/templates */
     public function municipalImpactTemplates(): JsonResponse
     {
         $this->requireAdmin();
@@ -203,7 +203,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ]);
     }
 
-    /** POST /api/v2/admin/reports/municipal-impact/templates */
+    /** POST /v2/admin/reports/municipal-impact/templates */
     public function createMunicipalImpactTemplate(): JsonResponse
     {
         $adminId = $this->requireAdmin();
@@ -235,7 +235,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ], null, 201);
     }
 
-    /** PUT /api/v2/admin/reports/municipal-impact/templates/{id} */
+    /** PUT /v2/admin/reports/municipal-impact/templates/{id} */
     public function updateMunicipalImpactTemplate(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
@@ -271,7 +271,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ]);
     }
 
-    /** DELETE /api/v2/admin/reports/municipal-impact/templates/{id} */
+    /** DELETE /v2/admin/reports/municipal-impact/templates/{id} */
     public function deleteMunicipalImpactTemplate(int $id): JsonResponse
     {
         $this->requireAdmin();
@@ -290,7 +290,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A4: INACTIVE MEMBERS
     // ============================================
 
-    /** GET /api/v2/admin/analytics/inactive-members */
+    /** GET /v2/admin/members/inactive */
     public function inactiveMembers(): JsonResponse
     {
         $this->requireAdmin();
@@ -318,7 +318,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ]);
     }
 
-    /** POST /api/v2/admin/analytics/detect-inactive */
+    /** POST /v2/admin/members/inactive/detect */
     public function detectInactive(): JsonResponse
     {
         $this->requireAdmin();
@@ -331,7 +331,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData($result);
     }
 
-    /** POST /api/v2/admin/analytics/mark-inactive-notified */
+    /** POST /v2/admin/members/inactive/notify */
     public function markInactiveNotified(): JsonResponse
     {
         $this->requireAdmin();
@@ -357,7 +357,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A5: CSV EXPORT
     // ============================================
 
-    /** GET /api/v2/admin/analytics/export/{type} */
+    /** GET /v2/admin/reports/{type}/export */
     public function exportReport(string $type)
     {
         $this->requireAdmin();
@@ -436,7 +436,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ]);
     }
 
-    /** GET /api/v2/admin/analytics/export-types */
+    /** GET /v2/admin/reports/export-types */
     public function exportTypes(): JsonResponse
     {
         $this->requireAdmin();
@@ -458,7 +458,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A7: CONTENT MODERATION
     // ============================================
 
-    /** GET /api/v2/admin/analytics/moderation-queue */
+    /** GET /v2/admin/moderation/queue */
     public function moderationQueue(): JsonResponse
     {
         $this->requireAdmin();
@@ -479,7 +479,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithPaginatedCollection($result['items'], $result['total'], $page, $limit);
     }
 
-    /** POST /api/v2/admin/analytics/moderation/{id}/review */
+    /** POST /v2/admin/moderation/{id}/review */
     public function moderationReview(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
@@ -492,6 +492,15 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.decision_required'), 'decision', 400);
         }
 
+        // Only the two statuses that ContentModerationService::review() accepts.
+        $allowedDecisions = [
+            \App\Services\ContentModerationService::STATUS_APPROVED,
+            \App\Services\ContentModerationService::STATUS_REJECTED,
+        ];
+        if (!in_array($decision, $allowedDecisions, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_decision'), 'decision', 422);
+        }
+
         $result = $this->contentModerationService->review($id, $tenantId, $adminId, $decision, $rejectionReason);
 
         if ($result['success']) {
@@ -501,7 +510,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithError('REVIEW_FAILED', $result['message'], null, 400);
     }
 
-    /** GET /api/v2/admin/analytics/moderation-stats */
+    /** GET /v2/admin/moderation/stats */
     public function moderationStats(): JsonResponse
     {
         $this->requireAdmin();
@@ -512,7 +521,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData($stats);
     }
 
-    /** GET /api/v2/admin/analytics/moderation-settings */
+    /** GET /v2/admin/moderation/settings */
     public function moderationSettings(): JsonResponse
     {
         $this->requireAdmin();
@@ -523,13 +532,15 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData($settings);
     }
 
-    /** PUT /api/v2/admin/analytics/moderation-settings */
+    /** PUT /v2/admin/moderation/settings */
     public function updateModerationSettings(): JsonResponse
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $settings = $this->getAllInput();
+        // Allowlist matches ContentModerationService::updateSettings() accepted keys.
+        $allowedKeys = ['enabled', 'require_post', 'require_listing', 'require_event', 'require_comment', 'auto_filter'];
+        $settings = array_intersect_key($this->getAllInput(), array_flip($allowedKeys));
 
         $success = $this->contentModerationService->updateSettings($tenantId, $settings);
 
