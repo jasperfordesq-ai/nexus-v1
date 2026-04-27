@@ -66,15 +66,41 @@ class VolunteerService
             $query->where('id', '<', (int) $cid);
         }
 
-        $query->orderByDesc('id');
+        // Proximity / radius filter using Haversine formula
+        $nearLat = isset($filters['near_lat']) ? (float) $filters['near_lat'] : null;
+        $nearLng = isset($filters['near_lng']) ? (float) $filters['near_lng'] : null;
+        $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+
+        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+            $haversine = "(6371 * acos(LEAST(1.0, GREATEST(-1.0,
+                cos(radians(?)) * cos(radians(vol_opportunities.latitude)) * cos(radians(vol_opportunities.longitude) - radians(?)) +
+                sin(radians(?)) * sin(radians(vol_opportunities.latitude))
+            ))))";
+            $query->whereNotNull('vol_opportunities.latitude')
+                  ->whereNotNull('vol_opportunities.longitude')
+                  ->selectRaw("vol_opportunities.*, {$haversine} AS distance_km", [$nearLat, $nearLng, $nearLat])
+                  ->having('distance_km', '<=', $radiusKm)
+                  ->orderBy('distance_km');
+        } else {
+            $query->orderByDesc('id');
+        }
+
         $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
         }
 
+        $results = $items->map(function ($opp) {
+            $data = $opp->toArray();
+            if (isset($opp->distance_km)) {
+                $data['distance_km'] = round((float) $opp->distance_km, 2);
+            }
+            return $data;
+        })->all();
+
         return [
-            'items'    => $items->toArray(),
+            'items'    => array_values($results),
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];

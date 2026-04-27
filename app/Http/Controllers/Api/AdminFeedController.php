@@ -393,6 +393,77 @@ class AdminFeedController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/admin/feed/grant-announcer
+     *
+     * Grant the municipality_announcer role to a user.
+     * Body: { "user_id": int }
+     */
+    public function grantAnnouncer(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $userId = (int) ($this->input('user_id') ?? 0);
+
+        if (!$userId) {
+            return $this->respondWithError('VALIDATION', 'user_id is required', null, 422);
+        }
+
+        // Ensure the user belongs to this tenant
+        $user = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ? LIMIT 1",
+            [$userId, $tenantId]
+        );
+        if (!$user) {
+            return $this->respondWithError('NOT_FOUND', 'User not found in this tenant', null, 404);
+        }
+
+        // Resolve role ID
+        $role = DB::selectOne(
+            "SELECT id FROM roles WHERE name = 'municipality_announcer' LIMIT 1"
+        );
+        if (!$role) {
+            return $this->respondWithError('NOT_FOUND', 'municipality_announcer role not found — run migrations', null, 500);
+        }
+
+        // Idempotent insert
+        DB::statement(
+            "INSERT IGNORE INTO user_roles (user_id, role_id, tenant_id) VALUES (?, ?, ?)",
+            [$userId, (int) $role->id, $tenantId]
+        );
+
+        ActivityLog::log($adminId, 'grant_municipality_announcer', "Granted municipality_announcer to user #{$userId} (tenant {$tenantId})");
+
+        return $this->respondWithData(['success' => true, 'message' => 'Municipal Announcer role granted']);
+    }
+
+    /**
+     * DELETE /api/v2/admin/feed/revoke-announcer/{user_id}
+     *
+     * Revoke the municipality_announcer role from a user.
+     */
+    public function revokeAnnouncer(int $userId): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $role = DB::selectOne(
+            "SELECT id FROM roles WHERE name = 'municipality_announcer' LIMIT 1"
+        );
+        if (!$role) {
+            return $this->respondWithError('NOT_FOUND', 'municipality_announcer role not found', null, 500);
+        }
+
+        DB::delete(
+            "DELETE FROM user_roles WHERE user_id = ? AND role_id = ? AND tenant_id = ?",
+            [$userId, (int) $role->id, $tenantId]
+        );
+
+        ActivityLog::log($adminId, 'revoke_municipality_announcer', "Revoked municipality_announcer from user #{$userId} (tenant {$tenantId})");
+
+        return $this->respondWithData(['success' => true, 'message' => 'Municipal Announcer role revoked']);
+    }
+
+    /**
      * GET /api/v2/admin/feed/stats
      */
     public function stats(): JsonResponse

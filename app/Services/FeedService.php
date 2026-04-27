@@ -485,6 +485,10 @@ class FeedService
             if ($hasViewsCount) {
                 $selectCols[] = 'views_count';
             }
+            $hasIsOfficial = Schema::hasColumn('feed_posts', 'is_official');
+            if ($hasIsOfficial) {
+                $selectCols[] = 'is_official';
+            }
             $postMeta = DB::table('feed_posts')
                 ->whereIn('id', $postIds)
                 ->where('tenant_id', $tenantId)
@@ -495,6 +499,9 @@ class FeedService
                 if ($item['type'] === 'post' && isset($postMeta[$item['id']])) {
                     $item['views_count'] = $hasViewsCount ? (int) $postMeta[$item['id']]->views_count : 0;
                     $item['share_count'] = (int) $postMeta[$item['id']]->share_count;
+                    if ($hasIsOfficial) {
+                        $item['is_official'] = (bool) $postMeta[$item['id']]->is_official;
+                    }
                 }
             }
             unset($item);
@@ -1107,6 +1114,14 @@ class FeedService
             ]);
         }
 
+        // AG14: check if the author has the municipality_announcer role
+        $isMunicipalityAnnouncer = DB::table('user_roles as ur')
+            ->join('roles as r', 'ur.role_id', '=', 'r.id')
+            ->where('ur.user_id', $userId)
+            ->where('ur.tenant_id', $tenantId)
+            ->where('r.name', 'municipality_announcer')
+            ->exists();
+
         $post = $this->feedPost->newInstance([
             'user_id'        => $userId,
             'tenant_id'      => $tenantId,
@@ -1122,6 +1137,11 @@ class FeedService
             'scheduled_at'   => $scheduledAt,
             'quoted_post_id' => $quotedPostId,
         ]);
+
+        if ($isMunicipalityAnnouncer) {
+            $post->is_official = true;
+            $post->is_pinned   = true;
+        }
 
         $post->save();
 

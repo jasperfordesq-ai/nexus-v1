@@ -57,6 +57,7 @@ import Zap from 'lucide-react/icons/zap';
 import Pencil from 'lucide-react/icons/pencil';
 import X from 'lucide-react/icons/x';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import Landmark from 'lucide-react/icons/landmark';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
@@ -864,6 +865,17 @@ const FeedCard = React.memo(function FeedCard({
                       {typeLabel}
                     </Chip>
                   )
+                )}
+                {/* AG14: Official badge — shown when posted by a municipality_announcer */}
+                {item.is_official && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    startContent={<Landmark className="w-3 h-3" aria-hidden="true" />}
+                    className="text-[10px] h-5 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-400/30"
+                  >
+                    {t('feed.official_badge', { ns: 'common' })}
+                  </Chip>
                 )}
                 {/* Scheduling indicator — visible only to the post author */}
                 {item.publish_status === 'scheduled' && isOwnPost && item.scheduled_at && (

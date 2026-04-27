@@ -80,6 +80,8 @@ export interface FeedItem {
   publish_status?: 'published' | 'scheduled' | 'draft';
   /** Scheduling: when the post is scheduled to be published */
   scheduled_at?: string;
+  /** AG14: true when posted by a municipality_announcer — renders an official badge */
+  is_official?: boolean;
   /**
    * When the viewer sees this item because someone they know reposted it,
    * the backend populates this field so the card can render a "Shared by X" header.

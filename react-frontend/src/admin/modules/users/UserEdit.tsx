@@ -42,9 +42,11 @@ import Mail from 'lucide-react/icons/mail';
 import Building2 from 'lucide-react/icons/building-2';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import FileCheck from 'lucide-react/icons/file-check';
+import Landmark from 'lucide-react/icons/landmark';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { api } from '@/lib/api';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
@@ -85,6 +87,10 @@ export function UserEdit() {
   // Global super admin toggle (god-only, bypasses all tenant isolation)
   const [isGlobalSuperAdmin, setIsGlobalSuperAdmin] = useState(false);
   const [globalSuperAdminLoading, setGlobalSuperAdminLoading] = useState(false);
+
+  // Municipal Announcer role (AG14)
+  const [isMunicipalityAnnouncer, setIsMunicipalityAnnouncer] = useState(false);
+  const [announcerLoading, setAnnouncerLoading] = useState(false);
 
   // Impersonate
   const [impersonateLoading, setImpersonateLoading] = useState(false);
@@ -144,6 +150,8 @@ export function UserEdit() {
         setOrganizationName(userData.organization_name || '');
         setIsTenantSuperAdmin(userData.is_tenant_super_admin || false);
         setIsGlobalSuperAdmin(userData.is_super_admin || false);
+        const roles = (userData as unknown as Record<string, unknown>).roles as string[] | undefined;
+        setIsMunicipalityAnnouncer(Array.isArray(roles) ? roles.includes('municipality_announcer') : false);
       } else {
         setLoadError(res.error || "Load error");
       }
@@ -269,6 +277,26 @@ export function UserEdit() {
       toast.error("Failed to update global super admin status");
     } finally {
       setGlobalSuperAdminLoading(false);
+    }
+  }
+
+  async function handleToggleMunicipalityAnnouncer() {
+    if (!id) return;
+    setAnnouncerLoading(true);
+    try {
+      if (isMunicipalityAnnouncer) {
+        await api.delete(`/v2/admin/feed/revoke-announcer/${id}`);
+        setIsMunicipalityAnnouncer(false);
+        toast.success("Municipal Announcer role revoked");
+      } else {
+        await api.post('/v2/admin/feed/grant-announcer', { user_id: Number(id) });
+        setIsMunicipalityAnnouncer(true);
+        toast.success("Municipal Announcer role granted");
+      }
+    } catch {
+      toast.error("Failed to update Municipal Announcer role");
+    } finally {
+      setAnnouncerLoading(false);
     }
   }
 
@@ -645,6 +673,35 @@ export function UserEdit() {
               {user.id === currentUser?.id && (
                 <p className="text-xs text-default-400 mt-2">{"You cannot modify your own account from this panel"}</p>
               )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Municipal Announcer (AG14) */}
+        {isSuperAdmin && (
+          <Card className="border border-indigo-400/30">
+            <CardHeader className="px-6 pt-5 pb-0">
+              <div className="flex items-center gap-2">
+                <Landmark size={18} className="text-indigo-500" />
+                <h3 className="text-lg font-semibold text-foreground">{"Municipal Announcer"}</h3>
+              </div>
+            </CardHeader>
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">{"Official announcement channel"}</p>
+                  <p className="text-sm text-default-500">
+                    {"Posts by this user will display an Official badge and be pinned to the top of the feed"}
+                  </p>
+                </div>
+                <Switch
+                  isSelected={isMunicipalityAnnouncer}
+                  onValueChange={handleToggleMunicipalityAnnouncer}
+                  isDisabled={announcerLoading}
+                  color="primary"
+                  aria-label={"Toggle municipal announcer role"}
+                />
+              </div>
             </CardBody>
           </Card>
         )}

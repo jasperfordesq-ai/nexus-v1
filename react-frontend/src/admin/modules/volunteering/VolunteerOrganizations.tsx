@@ -77,9 +77,11 @@ interface OrgFormData {
   description: string;
   contact_email: string;
   website: string;
+  org_type: 'organisation' | 'club';
+  meeting_schedule: string;
 }
 
-const EMPTY_ORG_FORM: OrgFormData = { name: '', description: '', contact_email: '', website: '' };
+const EMPTY_ORG_FORM: OrgFormData = { name: '', description: '', contact_email: '', website: '', org_type: 'organisation', meeting_schedule: '' };
 
 const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'> = {
   active: 'success',
@@ -273,6 +275,8 @@ export function VolunteerOrganizations() {
       description: '',
       contact_email: '',
       website: '',
+      org_type: 'organisation',
+      meeting_schedule: '',
     });
     editModal.onOpen();
   }, [editModal]);
@@ -345,6 +349,8 @@ export function VolunteerOrganizations() {
         description: createForm.description.trim(),
         contact_email: createForm.contact_email.trim(),
         website: createForm.website.trim(),
+        org_type: createForm.org_type,
+        meeting_schedule: createForm.meeting_schedule.trim() || undefined,
       });
       if (res.success) {
         toast.success(t('volunteering.org_created', 'Organization created'));
@@ -792,6 +798,27 @@ export function VolunteerOrganizations() {
                   variant="bordered"
                   placeholder="https://"
                 />
+                <Select
+                  label="Type"
+                  selectedKeys={new Set([createForm.org_type])}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as 'organisation' | 'club';
+                    setCreateForm(prev => ({ ...prev, org_type: val || 'organisation' }));
+                  }}
+                  variant="bordered"
+                >
+                  <SelectItem key="organisation">Organisation</SelectItem>
+                  <SelectItem key="club">Club (Verein)</SelectItem>
+                </Select>
+                {createForm.org_type === 'club' && (
+                  <Input
+                    label="Meeting Schedule"
+                    value={createForm.meeting_schedule}
+                    onValueChange={(v) => setCreateForm(prev => ({ ...prev, meeting_schedule: v }))}
+                    variant="bordered"
+                    placeholder="e.g. Every Tuesday 19:00"
+                  />
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>

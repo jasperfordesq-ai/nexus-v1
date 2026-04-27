@@ -22,6 +22,7 @@ class FeedPost extends Model
         'tenant_id', 'user_id', 'content', 'emoji', 'image_url', 'type',
         'parent_id', 'parent_type', 'visibility', 'group_id',
         'scheduled_at', 'publish_status', 'quoted_post_id',
+        'is_official', 'is_pinned',
     ];
 
     /**
@@ -37,6 +38,7 @@ class FeedPost extends Model
         'comments_count' => 'integer',
         'views_count' => 'integer',
         'is_pinned' => 'boolean',
+        'is_official' => 'boolean',
         'is_hidden' => 'boolean',
         'scheduled_at' => 'datetime',
     ];
