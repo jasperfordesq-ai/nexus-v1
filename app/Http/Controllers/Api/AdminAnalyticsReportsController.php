@@ -375,6 +375,10 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_export_type', ['type' => $type, 'valid' => $validTypes]), 'type', 400);
         }
 
+        if ($type === 'municipal_impact' && !TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
         $filters = [
             'date_from' => $this->query('date_from'),
             'date_to' => $this->query('date_to'),
@@ -438,6 +442,9 @@ class AdminAnalyticsReportsController extends BaseApiController
         $this->requireAdmin();
 
         $types = $this->reportExportService->getSupportedTypes();
+        if (!TenantContext::hasFeature('caring_community')) {
+            unset($types['municipal_impact']);
+        }
 
         $formatted = [];
         foreach ($types as $key => $label) {

@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -20,6 +22,22 @@ use Tests\Laravel\TestCase;
 class AdminAnalyticsReportsControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    private function setCaringCommunityFeature(bool $enabled): void
+    {
+        $tenant = DB::table('tenants')->where('id', $this->testTenantId)->first();
+        $features = [];
+        if ($tenant && !empty($tenant->features)) {
+            $decoded = is_string($tenant->features) ? json_decode($tenant->features, true) : $tenant->features;
+            $features = is_array($decoded) ? $decoded : [];
+        }
+
+        $features['caring_community'] = $enabled;
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+        TenantContext::setById($this->testTenantId);
+    }
 
     // ================================================================
     // SOCIAL VALUE — GET /v2/admin/reports/social-value
@@ -155,5 +173,29 @@ class AdminAnalyticsReportsControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/reports/export-types');
 
         $response->assertStatus(401);
+    }
+
+    public function test_export_types_hide_municipal_impact_when_caring_community_disabled(): void
+    {
+        $this->setCaringCommunityFeature(false);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/reports/export-types');
+
+        $response->assertStatus(200);
+        $response->assertJsonMissing(['type' => 'municipal_impact']);
+    }
+
+    public function test_municipal_impact_export_returns_403_when_caring_community_disabled(): void
+    {
+        $this->setCaringCommunityFeature(false);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/reports/municipal_impact/export?format=pdf');
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
     }
 }
