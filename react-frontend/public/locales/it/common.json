@@ -611,5 +611,34 @@
       "body": "This invite link is not valid. Please check the link and try again."
     },
     "loading": "Checking your invite..."
+  },
+  "markt": {
+    "meta": {
+      "title": "Marktplatz",
+      "description": "Find services, goods and community offers near you"
+    },
+    "subtitle": "Discover time-credit services and local goods from your community — all in one place.",
+    "tabs": {
+      "all": "All",
+      "listings": "Time Credits",
+      "marketplace": "Goods & Services"
+    },
+    "badges": {
+      "listing": "Time Credits",
+      "marketplace": "Goods & Services"
+    },
+    "credits_per_hour": "{{credits}} credits/hr",
+    "free": "Free",
+    "view": "View",
+    "empty": {
+      "all": "Nothing listed yet.",
+      "listings": "No time-credit services listed.",
+      "marketplace": "No goods or services listed."
+    },
+    "marketplace_unavailable": "The local marketplace is not enabled for this community.",
+    "load_more": "Load more",
+    "errors": {
+      "load_failed": "Could not load the Marktplatz. Please try again."
+    }
   }
 }

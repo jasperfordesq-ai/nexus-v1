@@ -113,6 +113,79 @@ class CaringCommunityApiController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/caring-community/offer-favour
+     *
+     * Record a credit-free informal neighbourly favour. No wallet transaction —
+     * purely a record of kindness for community insight and coordinator visibility.
+     */
+    public function offerFavour(): JsonResponse
+    {
+        $userId   = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+
+        $description    = trim((string) ($input['description'] ?? ''));
+        $category       = trim((string) ($input['category'] ?? ''));
+        $receivedByName = trim((string) ($input['received_by_name'] ?? ''));
+        $favourDate     = trim((string) ($input['favour_date'] ?? ''));
+        $isAnonymous    = (bool) ($input['is_anonymous'] ?? false);
+
+        $errors = [];
+
+        if ($description === '') {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.field_required'), 'field' => 'description'];
+        } elseif (mb_strlen($description) > 500) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.field_too_long'), 'field' => 'description'];
+        }
+
+        if ($favourDate === '') {
+            $favourDate = now()->toDateString();
+        } elseif (!\DateTime::createFromFormat('Y-m-d', $favourDate)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_date'), 'field' => 'favour_date'];
+        }
+
+        if (!empty($errors)) {
+            return $this->respondWithErrors($errors, 422);
+        }
+
+        $allowedCategories = ['companionship', 'shopping', 'transport', 'home_help', 'gardening', 'meals', 'other'];
+        if ($category !== '' && !in_array($category, $allowedCategories, true)) {
+            $category = 'other';
+        }
+
+        try {
+            DB::table('caring_favours')->insert([
+                'tenant_id'            => $tenantId,
+                'offered_by_user_id'   => $userId,
+                'received_by_user_id'  => null,
+                'category'             => $category !== '' ? $category : null,
+                'description'          => $description,
+                'favour_date'          => $favourDate,
+                'is_anonymous'         => $isAnonymous,
+                'created_at'           => now(),
+                'updated_at'           => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[CaringCommunity] offerFavour insert failed', [
+                'tenant_id' => $tenantId,
+                'user_id'   => $userId,
+                'error'     => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        return $this->respondWithData([
+            'success' => true,
+            'message' => 'caring_community.favour.recorded',
+        ], null, 201);
+    }
+
+    /**
      * GET /api/v2/caring-community/my-relationships
      *
      * Returns the authenticated member's support relationships (as supporter
@@ -186,6 +259,174 @@ class CaringCommunityApiController extends BaseApiController
         );
 
         return $this->respondWithData($items);
+    }
+
+    /**
+     * GET /api/v2/caring-community/markt
+     *
+     * Unified "Marktplatz" aggregator — combines active time-credit listings and
+     * (when the marketplace feature is on) commercial marketplace items into a
+     * single chronological feed.
+     *
+     * Query params:
+     *   type      all|listings|marketplace  (default: all)
+     *   page      int                        (default: 1)
+     *   per_page  int                        (default: 20, max: 50)
+     */
+    public function markt(): JsonResponse
+    {
+        $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $type    = $this->query('type') ?? 'all';
+        if (!in_array($type, ['all', 'listings', 'marketplace'], true)) {
+            $type = 'all';
+        }
+        $page    = max(1, (int) ($this->query('page') ?? 1));
+        $perPage = min(50, max(1, (int) ($this->query('per_page') ?? 20)));
+
+        // When combining both sources each gets half the page budget
+        $sourceLimit = (int) ceil($perPage / 2);
+
+        $items = [];
+
+        // ── Time-credit listings ────────────────────────────────────────────
+        if (in_array($type, ['all', 'listings'], true)) {
+            $limit = $type === 'all' ? $sourceLimit : $perPage;
+            $listingRows = DB::select(
+                "SELECT
+                    l.id,
+                    l.title,
+                    l.description,
+                    l.type            AS listing_type,
+                    l.image_url,
+                    l.hours_estimate,
+                    l.created_at,
+                    u.name            AS user_name,
+                    u.first_name      AS user_first_name,
+                    u.last_name       AS user_last_name,
+                    u.profile_photo   AS user_avatar,
+                    c.name            AS category_name
+                 FROM listings l
+                 LEFT JOIN users u
+                        ON u.id = l.user_id AND u.tenant_id = l.tenant_id
+                 LEFT JOIN categories c
+                        ON c.id = l.category_id
+                 WHERE l.tenant_id = ?
+                   AND l.status = 'active'
+                   AND (l.deleted_at IS NULL OR l.deleted_at > NOW())
+                 ORDER BY l.created_at DESC
+                 LIMIT ?",
+                [$tenantId, $limit]
+            );
+
+            foreach ($listingRows as $row) {
+                $items[] = [
+                    'source'         => 'listing',
+                    'id'             => (int) $row->id,
+                    'title'          => (string) $row->title,
+                    'description'    => $row->description ? mb_substr((string) $row->description, 0, 200) : null,
+                    'listing_type'   => (string) $row->listing_type, // offer|request
+                    'image_url'      => $row->image_url ? (string) $row->image_url : null,
+                    'hours_estimate' => $row->hours_estimate !== null ? round((float) $row->hours_estimate, 1) : null,
+                    'price_cash'     => null,
+                    'price_credits'  => null,
+                    'price_type'     => null,
+                    'price_currency' => null,
+                    'category'       => $row->category_name ? (string) $row->category_name : null,
+                    'user_name'      => $this->buildDisplayName($row),
+                    'user_avatar'    => $row->user_avatar ? (string) $row->user_avatar : null,
+                    'created_at'     => (string) $row->created_at,
+                    'detail_path'    => '/listings/' . $row->id,
+                ];
+            }
+        }
+
+        // ── Commercial marketplace items ────────────────────────────────────
+        $marketplaceAvailable = TenantContext::hasFeature('marketplace')
+            && Schema::hasTable('marketplace_listings');
+
+        if (in_array($type, ['all', 'marketplace'], true) && $marketplaceAvailable) {
+            $limit = $type === 'all' ? $sourceLimit : $perPage;
+            $mktRows = DB::select(
+                "SELECT
+                    ml.id,
+                    ml.title,
+                    ml.description,
+                    ml.price,
+                    ml.price_type,
+                    ml.price_currency,
+                    ml.time_credit_price,
+                    ml.created_at,
+                    u.name            AS user_name,
+                    u.first_name      AS user_first_name,
+                    u.last_name       AS user_last_name,
+                    u.profile_photo   AS user_avatar,
+                    mc.name           AS category_name,
+                    mi.image_url      AS primary_image_url
+                 FROM marketplace_listings ml
+                 LEFT JOIN users u
+                        ON u.id = ml.user_id AND u.tenant_id = ml.tenant_id
+                 LEFT JOIN marketplace_categories mc
+                        ON mc.id = ml.category_id
+                 LEFT JOIN marketplace_images mi
+                        ON mi.marketplace_listing_id = ml.id AND mi.is_primary = 1
+                 WHERE ml.tenant_id = ?
+                   AND ml.status = 'active'
+                   AND ml.moderation_status = 'approved'
+                 ORDER BY ml.created_at DESC
+                 LIMIT ?",
+                [$tenantId, $limit]
+            );
+
+            foreach ($mktRows as $row) {
+                $priceCash = $row->price !== null ? (float) $row->price : null;
+                if ($row->price_type === 'free') {
+                    $priceCash = 0.0;
+                }
+                $items[] = [
+                    'source'         => 'marketplace',
+                    'id'             => (int) $row->id,
+                    'title'          => (string) $row->title,
+                    'description'    => $row->description ? mb_substr((string) $row->description, 0, 200) : null,
+                    'listing_type'   => null,
+                    'image_url'      => $row->primary_image_url ? (string) $row->primary_image_url : null,
+                    'hours_estimate' => null,
+                    'price_cash'     => $priceCash,
+                    'price_credits'  => $row->time_credit_price !== null ? round((float) $row->time_credit_price, 1) : null,
+                    'price_type'     => (string) $row->price_type,
+                    'price_currency' => (string) $row->price_currency,
+                    'category'       => $row->category_name ? (string) $row->category_name : null,
+                    'user_name'      => $this->buildDisplayName($row),
+                    'user_avatar'    => $row->user_avatar ? (string) $row->user_avatar : null,
+                    'created_at'     => (string) $row->created_at,
+                    'detail_path'    => '/marketplace/' . $row->id,
+                ];
+            }
+        }
+
+        // Merge and sort by created_at DESC
+        usort($items, static fn (array $a, array $b): int => strcmp(
+            (string) ($b['created_at'] ?? ''),
+            (string) ($a['created_at'] ?? ''),
+        ));
+
+        // Pagination slice
+        $offset = ($page - 1) * $perPage;
+        $sliced = array_slice($items, $offset, $perPage);
+        $total  = count($items);
+
+        return $this->respondWithData($sliced, [
+            'total'                  => $total,
+            'page'                   => $page,
+            'per_page'               => $perPage,
+            'has_more'               => ($offset + $perPage) < $total,
+            'marketplace_available'  => $marketplaceAvailable,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -295,5 +536,18 @@ class CaringCommunityApiController extends BaseApiController
             . (string) ($row->{$prefix . '_last_name'} ?? '')
         );
         return $full !== '' ? $full : (string) ($row->{$prefix . '_name'} ?? '');
+    }
+
+    /**
+     * Build a display name from a DB row that has user_first_name / user_last_name / user_name.
+     */
+    private function buildDisplayName(object $row): string
+    {
+        $full = trim(
+            (string) ($row->user_first_name ?? '')
+            . ' '
+            . (string) ($row->user_last_name ?? '')
+        );
+        return $full !== '' ? $full : (string) ($row->user_name ?? '');
     }
 }
