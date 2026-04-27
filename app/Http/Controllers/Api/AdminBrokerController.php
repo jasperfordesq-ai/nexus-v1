@@ -320,9 +320,24 @@ class AdminBrokerController extends BaseApiController
                 // ActivityLog::log writes the specific action key to the
                 // `action` column and the broad category ('admin', 'system',
                 // ...) to `action_type`. Filter on `action`.
+                // The two tables have different default collations on
+                // production (activity_log = utf8mb4_general_ci,
+                // org_audit_log = utf8mb4_unicode_ci) and the `action` /
+                // `details` columns inherited those defaults. Without
+                // explicit COLLATE clauses, MySQL's UNION ALL fails with
+                // ER 1271 ("Illegal mix of collations") and the entire
+                // recent_activity feed silently falls into the catch-all
+                // (now reported via _partial). Force both branches to
+                // utf8mb4_unicode_ci so the UNION is robust regardless
+                // of which side wins the collation negotiation. action
+                // values are ASCII-safe enum keys; details are short
+                // JSON strings — neither cares which Unicode collation
+                // we pick, only that they match.
                 "(SELECT al.id, 'activity' AS source,
-                         al.tenant_id, al.user_id, al.action AS action_type,
-                         al.details, al.created_at,
+                         al.tenant_id, al.user_id,
+                         al.action COLLATE utf8mb4_unicode_ci AS action_type,
+                         CONVERT(al.details USING utf8mb4) COLLATE utf8mb4_unicode_ci AS details,
+                         al.created_at,
                          u.first_name, u.last_name, t.name as tenant_name
                   FROM activity_log al
                   LEFT JOIN users u ON u.id = al.user_id
@@ -338,8 +353,10 @@ class AdminBrokerController extends BaseApiController
                   ))
                  UNION ALL
                  (SELECT oal.id, 'audit' AS source,
-                         oal.tenant_id, oal.user_id, oal.action AS action_type,
-                         oal.details, oal.created_at,
+                         oal.tenant_id, oal.user_id,
+                         oal.action COLLATE utf8mb4_unicode_ci AS action_type,
+                         CONVERT(oal.details USING utf8mb4) COLLATE utf8mb4_unicode_ci AS details,
+                         oal.created_at,
                          u.first_name, u.last_name, t.name as tenant_name
                   FROM org_audit_log oal
                   LEFT JOIN users u ON u.id = oal.user_id
