@@ -18,6 +18,7 @@ use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
+use App\Services\CaringInviteCodeService;
 use App\Services\CaringSupportRelationshipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +33,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityWorkflowPolicyService $policyService,
         private readonly CaringCommunityMemberStatementService $memberStatementService,
         private readonly CaringSupportRelationshipService $supportRelationshipService,
+        private readonly CaringInviteCodeService $inviteCodeService,
     ) {
     }
 
@@ -316,6 +318,49 @@ class AdminCaringCommunityController extends BaseApiController
             ],
             'temp_password' => $tempPassword,
         ], null, 201);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/invite-codes
+     *
+     * Generate a new invite code for a coordinator to share with a prospective
+     * member. The code allows the recipient to reach a warm-welcome page and
+     * continue to registration without needing an email invitation.
+     */
+    public function generateInviteCode(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        $tenantId = TenantContext::getId();
+        $input    = $this->getAllInput();
+
+        $label       = trim((string) ($input['label'] ?? ''));
+        $expiresDays = max(1, min(365, (int) ($input['expires_days'] ?? 30)));
+
+        $result = $this->inviteCodeService->generate($tenantId, $adminId, $label ?: null, $expiresDays);
+
+        if (($result['success'] ?? false) !== true) {
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        return $this->respondWithData($result['code'], null, 201);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/invite-codes
+     *
+     * List the last 20 invite codes created for this tenant, with usage status.
+     */
+    public function listInviteCodes(): JsonResponse
+    {
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        return $this->respondWithData(
+            $this->inviteCodeService->list(TenantContext::getId())
+        );
     }
 
     private function guardCaringCommunity(): ?JsonResponse

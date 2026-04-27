@@ -591,5 +591,25 @@
   "verify_identity": "Verify Identity",
   "level_short": "Lv. {{level}}",
   "cancel": "Cancel",
-  "save": "Save"
+  "save": "Save",
+  "invite": {
+    "valid": {
+      "title": "You're Invited",
+      "body": "You've been invited to join {{community}}'s Caring Community. Join us to exchange time, skills and support with your neighbours.",
+      "cta": "Join Now"
+    },
+    "expired": {
+      "title": "This Invite Has Expired",
+      "body": "This invite link has expired. Please ask your coordinator for a new one."
+    },
+    "used": {
+      "title": "Invite Already Used",
+      "body": "This invite link has already been used. If you need help, please contact your coordinator."
+    },
+    "invalid": {
+      "title": "Invalid Invite",
+      "body": "This invite link is not valid. Please check the link and try again."
+    },
+    "loading": "Checking your invite..."
+  }
 }

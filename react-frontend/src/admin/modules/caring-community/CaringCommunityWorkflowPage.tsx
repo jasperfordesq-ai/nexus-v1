@@ -12,9 +12,11 @@ import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Clock from 'lucide-react/icons/clock';
 import Copy from 'lucide-react/icons/copy';
 import Download from 'lucide-react/icons/download';
+import ExternalLink from 'lucide-react/icons/external-link';
 import FileText from 'lucide-react/icons/file-text';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Pause from 'lucide-react/icons/pause';
+import Printer from 'lucide-react/icons/printer';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
@@ -177,6 +179,26 @@ type SupportRelationshipList = {
   items: SupportRelationship[];
 };
 
+type InviteCode = {
+  id: number;
+  code: string;
+  label: string | null;
+  expires_at: string;
+  used_at: string | null;
+  used_by: string | null;
+  status: 'active' | 'used' | 'expired';
+  created_at: string;
+  invite_url: string;
+};
+
+type GeneratedCode = {
+  id: number;
+  code: string;
+  label: string | null;
+  expires_at: string;
+  invite_url: string;
+};
+
 const workflowStages = [
   { key: 'intake', icon: HeartHandshake },
   { key: 'match', icon: Users },
@@ -239,6 +261,15 @@ export default function CaringCommunityWorkflowPage() {
   const [relationshipLogDate, setRelationshipLogDate] = useState('');
   const [relationshipLogHours, setRelationshipLogHours] = useState('');
   const [relationshipLogDescription, setRelationshipLogDescription] = useState('');
+
+  // Invite code state
+  const [inviteLabel, setInviteLabel] = useState('');
+  const [generatingCode, setGeneratingCode] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState<GeneratedCode | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [loadingInviteCodes, setLoadingInviteCodes] = useState(false);
+  const [printCodeId, setPrintCodeId] = useState<number | null>(null);
 
   // Assisted onboarding state
   const [onboardingName, setOnboardingName] = useState('');
@@ -541,6 +572,57 @@ export default function CaringCommunityWorkflowPage() {
     t,
     toast,
   ]);
+
+  const loadInviteCodes = useCallback(async () => {
+    setLoadingInviteCodes(true);
+    try {
+      const res = await api.get<InviteCode[]>('/v2/admin/caring-community/invite-codes');
+      if (Array.isArray(res.data)) setInviteCodes(res.data);
+    } catch {
+      toast.error('Could not load invite codes.');
+    } finally {
+      setLoadingInviteCodes(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadInviteCodes();
+  }, [loadInviteCodes]);
+
+  const generateInviteCode = useCallback(async () => {
+    setGeneratingCode(true);
+    setGeneratedCode(null);
+    try {
+      const res = await api.post<GeneratedCode>('/v2/admin/caring-community/invite-codes', {
+        label: inviteLabel.trim() || undefined,
+        expires_days: 30,
+      });
+      if (res.data) {
+        setGeneratedCode(res.data);
+        setInviteLabel('');
+        toast.success('Invite code generated.');
+        loadInviteCodes();
+      }
+    } catch {
+      toast.error('Could not generate invite code.');
+    } finally {
+      setGeneratingCode(false);
+    }
+  }, [inviteLabel, loadInviteCodes, toast]);
+
+  const copyInviteCode = useCallback((text: string) => {
+    void navigator.clipboard.writeText(text);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  }, []);
+
+  const printInviteCard = useCallback((code: GeneratedCode | InviteCode) => {
+    setPrintCodeId(code.id);
+    setTimeout(() => {
+      window.print();
+      setPrintCodeId(null);
+    }, 50);
+  }, []);
 
   const submitAssistedOnboarding = useCallback(async () => {
     if (!onboardingName.trim() || !onboardingEmail.trim()) {
@@ -1214,6 +1296,186 @@ export default function CaringCommunityWorkflowPage() {
         </CardBody>
       </Card>
 
+      {/* Invite Codes card */}
+      <Card className="mt-6" shadow="sm">
+        <CardHeader className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Invite Codes</h2>
+            <p className="mt-1 text-sm text-default-500">
+              Generate a printable code that a new member can use to join without needing an email invitation.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="flat"
+            startContent={<RefreshCw size={16} />}
+            isLoading={loadingInviteCodes}
+            onPress={loadInviteCodes}
+          >
+            Refresh
+          </Button>
+        </CardHeader>
+        <Divider />
+        <CardBody className="gap-4">
+          {/* Generate form */}
+          <div className="flex flex-wrap items-end gap-3">
+            <Input
+              className="flex-1"
+              label="Label (optional)"
+              placeholder="e.g. For Mary's neighbour"
+              value={inviteLabel}
+              onValueChange={setInviteLabel}
+            />
+            <Button
+              color="primary"
+              variant="flat"
+              startContent={<Plus size={16} />}
+              isLoading={generatingCode}
+              onPress={generateInviteCode}
+            >
+              Generate Code
+            </Button>
+          </div>
+
+          {/* Result box */}
+          {generatedCode && (
+            <div className="rounded-lg border border-success-200 bg-success-50 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs text-default-500">New invite code</p>
+                  <p className="mt-1 font-mono text-3xl font-bold tracking-widest text-success-700">
+                    {generatedCode.code}
+                  </p>
+                  {generatedCode.label && (
+                    <p className="mt-1 text-xs text-default-600">{generatedCode.label}</p>
+                  )}
+                  <p className="mt-1 text-xs text-default-400">
+                    Expires: {new Date(generatedCode.expires_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    startContent={<Copy size={14} />}
+                    onPress={() => copyInviteCode(generatedCode.invite_url)}
+                  >
+                    {codeCopied ? 'Copied!' : 'Copy URL'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    startContent={<Printer size={14} />}
+                    onPress={() => printInviteCard(generatedCode)}
+                  >
+                    Print Card
+                  </Button>
+                  <Button
+                    as="a"
+                    href={generatedCode.invite_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    size="sm"
+                    variant="flat"
+                    startContent={<ExternalLink size={14} />}
+                  >
+                    Open
+                  </Button>
+                </div>
+              </div>
+
+              {/* Print card — hidden on screen, visible when printing */}
+              {printCodeId === generatedCode.id && (
+                <div className="hidden print:block">
+                  <PrintableInviteCard
+                    code={generatedCode.code}
+                    label={generatedCode.label}
+                    inviteUrl={generatedCode.invite_url}
+                    expiresAt={generatedCode.expires_at}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Recent codes table */}
+          {inviteCodes.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-default-200 text-left text-xs text-default-500">
+                    <th className="pb-2 pr-4 font-medium">Code</th>
+                    <th className="pb-2 pr-4 font-medium">Label</th>
+                    <th className="pb-2 pr-4 font-medium">Expires</th>
+                    <th className="pb-2 pr-4 font-medium">Status</th>
+                    <th className="pb-2 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-default-100">
+                  {inviteCodes.map((ic) => (
+                    <tr key={ic.id} className="text-xs">
+                      <td className="py-2 pr-4 font-mono font-semibold tracking-wider text-default-900">{ic.code}</td>
+                      <td className="py-2 pr-4 text-default-600">{ic.label ?? '—'}</td>
+                      <td className="py-2 pr-4 text-default-500">{new Date(ic.expires_at).toLocaleDateString()}</td>
+                      <td className="py-2 pr-4">
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color={ic.status === 'active' ? 'success' : ic.status === 'used' ? 'default' : 'warning'}
+                        >
+                          {ic.status === 'active' ? 'Active' : ic.status === 'used' ? `Used${ic.used_by ? ` by ${ic.used_by}` : ''}` : 'Expired'}
+                        </Chip>
+                      </td>
+                      <td className="py-2">
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            isIconOnly
+                            variant="light"
+                            title="Copy URL"
+                            onPress={() => copyInviteCode(ic.invite_url)}
+                          >
+                            <Copy size={14} />
+                          </Button>
+                          {ic.status === 'active' && (
+                            <Button
+                              size="sm"
+                              isIconOnly
+                              variant="light"
+                              title="Print card"
+                              onPress={() => printInviteCard(ic)}
+                            >
+                              <Printer size={14} />
+                            </Button>
+                          )}
+                        </div>
+                        {/* Print card for this row */}
+                        {printCodeId === ic.id && (
+                          <div className="hidden print:block">
+                            <PrintableInviteCard
+                              code={ic.code}
+                              label={ic.label}
+                              inviteUrl={ic.invite_url}
+                              expiresAt={ic.expires_at}
+                            />
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {inviteCodes.length === 0 && !loadingInviteCodes && (
+            <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
+              No invite codes yet. Generate one above to share with a prospective member.
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
       <Card className="mt-6" shadow="sm">
         <CardHeader>
           <div>
@@ -1261,6 +1523,63 @@ function PolicySwitch({ label, description, value, onChange }: { label: string; 
         <p className="mt-1 text-xs text-default-500">{description}</p>
       </div>
       <Switch isSelected={value} onValueChange={onChange} aria-label={label} />
+    </div>
+  );
+}
+
+function PrintableInviteCard({
+  code,
+  label,
+  inviteUrl,
+  expiresAt,
+}: {
+  code: string;
+  label: string | null;
+  inviteUrl: string;
+  expiresAt: string;
+}) {
+  return (
+    <div
+      style={{
+        fontFamily: 'Georgia, serif',
+        border: '3px solid #333',
+        borderRadius: '12px',
+        padding: '32px',
+        maxWidth: '400px',
+        margin: '0 auto',
+        textAlign: 'center',
+      }}
+    >
+      <p style={{ fontSize: '13px', color: '#666', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        Caring Community
+      </p>
+      <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px' }}>
+        Your Invitation Code
+      </p>
+      <div
+        style={{
+          border: '2px solid #333',
+          borderRadius: '8px',
+          padding: '16px 24px',
+          display: 'inline-block',
+          marginBottom: '20px',
+          background: '#f9f9f9',
+        }}
+      >
+        <span style={{ fontSize: '40px', fontFamily: 'monospace', fontWeight: 'bold', letterSpacing: '0.25em', color: '#111' }}>
+          {code}
+        </span>
+      </div>
+      {label && (
+        <p style={{ fontSize: '14px', color: '#555', marginBottom: '12px', fontStyle: 'italic' }}>{label}</p>
+      )}
+      <p style={{ fontSize: '12px', color: '#555', marginBottom: '8px' }}>
+        Visit the link below or ask your coordinator to help you get started.
+      </p>
+      <p style={{ fontSize: '11px', color: '#333', wordBreak: 'break-all', fontFamily: 'monospace' }}>{inviteUrl}</p>
+      <p style={{ fontSize: '11px', color: '#999', marginTop: '12px' }}>
+        Valid until {new Date(expiresAt).toLocaleDateString()}
+      </p>
     </div>
   );
 }

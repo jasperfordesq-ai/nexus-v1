@@ -156,6 +156,7 @@ const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/Outco
 const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community/CaringCommunityPage'));
 const RequestHelpPage = lazyWithRetry(() => import('@/pages/caring-community/RequestHelpPage'));
 const MySupportRelationshipsPage = lazyWithRetry(() => import('@/pages/caring-community/MySupportRelationshipsPage'));
+const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-community/InviteRedemptionPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
@@ -503,6 +504,9 @@ function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
+
+        {/* Public: Caring Community invite redemption — no auth, no feature gate needed */}
+        <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />
 
         {/* Public: Volunteering (feature-gated, view-only) */}
         <Route path="volunteering" element={

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CaringInviteCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,27 @@ use Illuminate\Support\Facades\Log;
 class CaringCommunityApiController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly CaringInviteCodeService $inviteCodeService,
+    ) {
+    }
+
+    /**
+     * GET /api/v2/caring-community/invite/{code}  (PUBLIC — no auth)
+     *
+     * Look up a single invite code's status so the member-facing join page can
+     * show the appropriate state (valid / expired / already_used / invalid).
+     *
+     * Intentionally always returns 200 (never 404) to prevent code enumeration.
+     */
+    public function lookupInvite(string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $result   = $this->inviteCodeService->lookup($tenantId, strtoupper(trim($code)));
+
+        return $this->respondWithData($result);
+    }
 
     /**
      * POST /api/v2/caring-community/request-help

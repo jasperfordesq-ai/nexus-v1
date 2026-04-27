@@ -1143,6 +1143,11 @@ Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminRevie
 Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide']);
 Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy']);
 
+// Public caring community endpoint — no auth required (invite lookup)
+Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'lookupInvite'])
+    ->withoutMiddleware('auth:sanctum')
+    ->middleware('throttle:60,1');
+
 // Member-facing caring community endpoints (auth:sanctum via global middleware)
 Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp']);
 
@@ -1159,6 +1164,8 @@ Route::post('/v2/admin/caring-community/support-relationships', [\App\Http\Contr
 Route::put('/v2/admin/caring-community/support-relationships/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateSupportRelationship']);
 Route::post('/v2/admin/caring-community/support-relationships/{id}/hours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'logSupportRelationshipHours']);
 Route::post('/v2/admin/caring-community/assisted-onboarding', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assistedOnboarding']);
+Route::post('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'generateInviteCode']);
+Route::get('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listInviteCodes']);
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
