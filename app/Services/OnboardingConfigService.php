@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -61,32 +62,49 @@ class OnboardingConfigService
         'confirm' => ['key' => 'step_confirm', 'label' => 'Confirm'],
     ];
 
+    /** Cache key for the per-tenant config blob. */
+    private const CONFIG_CACHE_PREFIX = 'onboarding_config:';
+    private const CONFIG_CACHE_TTL = 1800; // 30 minutes — invalidated explicitly on admin save
+
     /**
      * Get the full onboarding config for a tenant, with defaults.
+     * Cached per-tenant; invalidate via clearConfigCache() on admin updates.
      */
     public static function getConfig(?int $tenantId = null): array
     {
         $tenantId = $tenantId ?? TenantContext::getId();
+        $cacheKey = self::CONFIG_CACHE_PREFIX . $tenantId;
 
-        $rows = DB::select(
-            "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key LIKE 'onboarding.%'",
-            [$tenantId]
-        );
+        return Cache::remember($cacheKey, self::CONFIG_CACHE_TTL, function () use ($tenantId) {
+            $rows = DB::select(
+                "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key LIKE 'onboarding.%'",
+                [$tenantId]
+            );
 
-        $stored = [];
-        foreach ($rows as $row) {
-            $stored[$row->setting_key] = $row->setting_value;
-        }
+            $stored = [];
+            foreach ($rows as $row) {
+                $stored[$row->setting_key] = $row->setting_value;
+            }
 
-        // Merge stored values over defaults
-        $config = [];
-        foreach (self::DEFAULTS as $key => $default) {
-            $shortKey = str_replace('onboarding.', '', $key);
-            $raw = $stored[$key] ?? $default;
-            $config[$shortKey] = self::castValue($shortKey, $raw);
-        }
+            // Merge stored values over defaults
+            $config = [];
+            foreach (self::DEFAULTS as $key => $default) {
+                $shortKey = str_replace('onboarding.', '', $key);
+                $raw = $stored[$key] ?? $default;
+                $config[$shortKey] = self::castValue($shortKey, $raw);
+            }
+            return $config;
+        });
+    }
 
-        return $config;
+    /**
+     * Invalidate the cached config for a tenant. Called by AdminOnboardingConfigController
+     * after persisting a settings change.
+     */
+    public static function clearConfigCache(?int $tenantId = null): void
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+        Cache::forget(self::CONFIG_CACHE_PREFIX . $tenantId);
     }
 
     /**

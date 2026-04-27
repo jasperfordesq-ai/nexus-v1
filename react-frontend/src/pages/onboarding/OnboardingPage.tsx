@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Button,
   Spinner,
@@ -504,17 +504,28 @@ export function OnboardingPage() {
 
   // ── Animation variants ─────────────────────────────────────────────────
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 60 : -60,
-      opacity: 0,
-    }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 60 : -60,
-      opacity: 0,
-    }),
-  };
+  // Honor prefers-reduced-motion (WCAG 2.3.3 / vestibular accessibility).
+  // When reduced motion is requested, we cross-fade instead of horizontal slides
+  // and skip the celebration spinning animation entirely.
+  const prefersReducedMotion = useReducedMotion();
+
+  const slideVariants = prefersReducedMotion
+    ? {
+        enter: { opacity: 0 },
+        center: { opacity: 1 },
+        exit: { opacity: 0 },
+      }
+    : {
+        enter: (direction: number) => ({
+          x: direction > 0 ? 60 : -60,
+          opacity: 0,
+        }),
+        center: { x: 0, opacity: 1 },
+        exit: (direction: number) => ({
+          x: direction < 0 ? 60 : -60,
+          opacity: 0,
+        }),
+      };
 
   // ── Derived state for Step 2 validation ──────────────────────────────────
 
@@ -530,17 +541,17 @@ export function OnboardingPage() {
     return (
       <div className="max-w-2xl mx-auto py-12">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={prefersReducedMotion ? false : { scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5, ease: 'easeOut' }}
           className="text-center space-y-6"
         >
           <motion.div
-            animate={{
+            animate={prefersReducedMotion ? {} : {
               rotate: [0, -10, 10, -10, 10, 0],
               scale: [1, 1.2, 1],
             }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, delay: 0.3 }}
             className="inline-flex p-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20"
           >
             <PartyPopper className="w-16 h-16 text-emerald-500" />

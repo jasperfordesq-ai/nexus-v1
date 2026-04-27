@@ -173,7 +173,7 @@ Route::get('/v2/listings/saved', [\App\Http\Controllers\Api\ListingsController::
 Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags'])->withoutMiddleware('auth:sanctum');
-Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store']);
+Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store'])->middleware('onboarding-required');
 Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
 Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
@@ -197,7 +197,7 @@ Route::post('/v2/listings/{id}/report', [\App\Http\Controllers\Api\ListingsContr
 Route::get('/v2/messages', [\App\Http\Controllers\Api\MessagesController::class, 'conversations']);
 Route::get('/v2/messages/unread-count', [\App\Http\Controllers\Api\MessagesController::class, 'unreadCount']);
 Route::get('/v2/messages/restriction-status', [\App\Http\Controllers\Api\MessagesController::class, 'restrictionStatus']);
-Route::post('/v2/messages', [\App\Http\Controllers\Api\MessagesController::class, 'send']);
+Route::post('/v2/messages', [\App\Http\Controllers\Api\MessagesController::class, 'send'])->middleware('onboarding-required');
 Route::post('/v2/messages/typing', [\App\Http\Controllers\Api\MessagesController::class, 'typing']);
 Route::post('/v2/messages/upload-voice', [\App\Http\Controllers\Api\MessagesController::class, 'uploadVoice']);
 Route::post('/v2/messages/voice', [\App\Http\Controllers\Api\MessagesController::class, 'sendVoice']);
@@ -445,7 +445,7 @@ Route::get('/v2/realtime/config', [\App\Http\Controllers\Api\RealtimeController:
 Route::get('/v2/wallet/balance', [\App\Http\Controllers\Api\WalletController::class, 'balance']);
 Route::get('/v2/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactions']);
 Route::get('/v2/wallet/transactions/{id}', [\App\Http\Controllers\Api\WalletController::class, 'showTransaction']);
-Route::post('/v2/wallet/transfer', [\App\Http\Controllers\Api\WalletController::class, 'transfer']);
+Route::post('/v2/wallet/transfer', [\App\Http\Controllers\Api\WalletController::class, 'transfer'])->middleware('onboarding-required');
 Route::delete('/v2/wallet/transactions/{id}', [\App\Http\Controllers\Api\WalletController::class, 'destroyTransaction']);
 Route::get('/v2/wallet/user-search', [\App\Http\Controllers\Api\WalletController::class, 'userSearch']);
 Route::get('/v2/wallet/pending-count', [\App\Http\Controllers\Api\WalletController::class, 'pendingCount']);
@@ -1149,6 +1149,9 @@ Route::put('/v2/admin/caring-community/workflow/reviews/{id}/escalate', [\App\Ht
 Route::get('/v2/admin/caring-community/role-presets', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'rolePresets']);
 Route::post('/v2/admin/caring-community/role-presets/install', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'installRolePresets']);
 Route::get('/v2/admin/caring-community/member-statements/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'memberStatement']);
+Route::get('/v2/admin/caring-community/support-relationships', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'supportRelationships']);
+Route::post('/v2/admin/caring-community/support-relationships', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'createSupportRelationship']);
+Route::put('/v2/admin/caring-community/support-relationships/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateSupportRelationship']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);

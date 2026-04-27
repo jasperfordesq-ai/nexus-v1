@@ -66,6 +66,8 @@ class RegistrationService
             $user->email = strtolower(trim($data['email']));
             $user->password_hash = Hash::make($data['password']);
             $user->status = 'pending';
+            // Defensive: never trust the column default for an auth-gating flag
+            $user->onboarding_completed = false;
 
             // Welcome credits are granted during admin approval (AdminUsersController::grantWelcomeCredits)
             // NOT at registration time — to avoid double-crediting on tenants with admin_approval enabled

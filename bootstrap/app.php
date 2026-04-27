@@ -208,6 +208,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'broker-or-admin' => \App\Http\Middleware\EnsureIsBrokerOrAdmin::class,
             'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
             'federation.api' => \App\Http\Middleware\FederationApiAuth::class,
+            'onboarding-required' => \App\Http\Middleware\EnsureOnboardingComplete::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -1,4 +1,4 @@
-/*M!999999\- enable the sandbox mode */ 
+﻿/*M!999999\- enable the sandbox mode */ 
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -667,6 +667,41 @@ CREATE TABLE `campaigns` (
   PRIMARY KEY (`id`),
   KEY `idx_tenant_status` (`tenant_id`,`status`),
   KEY `idx_dates` (`tenant_id`,`start_date`,`end_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_support_relationships`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_support_relationships` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `supporter_id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  `coordinator_id` int(11) DEFAULT NULL,
+  `organization_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `frequency` enum('weekly','fortnightly','monthly','ad_hoc') NOT NULL DEFAULT 'weekly',
+  `expected_hours` decimal(5,2) NOT NULL DEFAULT 1.00,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `status` enum('active','paused','completed','cancelled') NOT NULL DEFAULT 'active',
+  `last_logged_at` timestamp NULL DEFAULT NULL,
+  `next_check_in_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_csr_tenant_status` (`tenant_id`,`status`),
+  KEY `idx_csr_recipient_status` (`tenant_id`,`recipient_id`,`status`),
+  KEY `idx_csr_supporter_status` (`tenant_id`,`supporter_id`,`status`),
+  KEY `idx_csr_next_check_in` (`tenant_id`,`next_check_in_at`),
+  KEY `caring_support_relationships_tenant_id_index` (`tenant_id`),
+  KEY `caring_support_relationships_supporter_id_index` (`supporter_id`),
+  KEY `caring_support_relationships_recipient_id_index` (`recipient_id`),
+  KEY `caring_support_relationships_coordinator_id_index` (`coordinator_id`),
+  KEY `caring_support_relationships_organization_id_index` (`organization_id`),
+  KEY `caring_support_relationships_category_id_index` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `categories`;
@@ -5340,7 +5375,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5704,6 +5739,7 @@ CREATE TABLE `listings` (
   KEY `idx_listings_tenant_status` (`tenant_id`,`status`),
   KEY `idx_listings_tenant_status_id` (`tenant_id`,`status`,`id`),
   KEY `idx_listings_tenant_featured` (`tenant_id`,`is_featured`,`featured_until`),
+  KEY `idx_listings_tenant_user` (`tenant_id`,`user_id`),
   FULLTEXT KEY `ft_listings_search` (`title`,`description`),
   CONSTRAINT `listings_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -11409,7 +11445,10 @@ INSERT INTO `laravel_migrations` VALUES
 (130,'2026_04_26_191500_create_municipal_report_templates_table',55),
 (131,'2026_04_27_090000_add_assignment_to_vol_logs_table',56),
 (132,'2026_04_27_080000_align_activity_log_collation_to_unicode',57),
-(133,'2026_04_27_080024_fix_broker_schema_fks_and_tenant_scoping',58);
+(133,'2026_04_27_080024_fix_broker_schema_fks_and_tenant_scoping',58),
+(134,'2026_04_27_084131_patch_agoris_supported_languages',59),
+(135,'2026_04_27_140000_add_listings_tenant_user_index',60),
+(136,'2026_04_27_100000_create_caring_support_relationships_table',61);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

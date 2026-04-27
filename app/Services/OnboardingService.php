@@ -142,14 +142,25 @@ class OnboardingService
             ->where('interest_type', 'interest')
             ->delete();
 
-        foreach ($categoryIds as $catId) {
-            UserInterest::firstOrCreate([
-                'user_id' => $userId,
-                'tenant_id' => $tenantId,
-                'category_id' => (int) $catId,
-                'interest_type' => 'interest',
-            ]);
+        if (empty($categoryIds)) {
+            return;
         }
+
+        // Batch insert — single query instead of N firstOrCreate calls.
+        // The unique index (tenant_id, user_id, category_id, interest_type)
+        // makes insertOrIgnore safe against duplicates.
+        $rows = [];
+        $now = now();
+        foreach ($categoryIds as $catId) {
+            $rows[] = [
+                'user_id'       => $userId,
+                'tenant_id'     => $tenantId,
+                'category_id'   => (int) $catId,
+                'interest_type' => 'interest',
+                'created_at'    => $now,
+            ];
+        }
+        DB::table('user_interests')->insertOrIgnore($rows);
     }
 
     /**
@@ -164,22 +175,28 @@ class OnboardingService
             ->whereIn('interest_type', ['skill_offer', 'skill_need'])
             ->delete();
 
+        $rows = [];
+        $now = now();
         foreach ($offers as $catId) {
-            UserInterest::firstOrCreate([
-                'user_id' => $userId,
-                'tenant_id' => $tenantId,
-                'category_id' => (int) $catId,
+            $rows[] = [
+                'user_id'       => $userId,
+                'tenant_id'     => $tenantId,
+                'category_id'   => (int) $catId,
                 'interest_type' => 'skill_offer',
-            ]);
+                'created_at'    => $now,
+            ];
         }
-
         foreach ($needs as $catId) {
-            UserInterest::firstOrCreate([
-                'user_id' => $userId,
-                'tenant_id' => $tenantId,
-                'category_id' => (int) $catId,
+            $rows[] = [
+                'user_id'       => $userId,
+                'tenant_id'     => $tenantId,
+                'category_id'   => (int) $catId,
                 'interest_type' => 'skill_need',
-            ]);
+                'created_at'    => $now,
+            ];
+        }
+        if (!empty($rows)) {
+            DB::table('user_interests')->insertOrIgnore($rows);
         }
     }
 

@@ -165,6 +165,10 @@ class AdminOnboardingConfigController extends BaseApiController
             // Redis not available — cache will expire naturally
         }
 
+        // Invalidate the per-tenant onboarding config cache so the next read
+        // sees the freshly-saved settings instead of the stale 30-min entry.
+        OnboardingConfigService::clearConfigCache($tenantId);
+
         return $this->respondWithData([
             'message' => __('api_controllers_1.admin_onboarding.settings_updated'),
             'updated_keys' => $updated,
