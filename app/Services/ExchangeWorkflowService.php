@@ -452,8 +452,17 @@ class ExchangeWorkflowService
         }
 
         $isRequester = (int) $exchange->requester_id === $userId;
-        $isProvider = (int) $exchange->provider_id === $userId;
-        $role = $isRequester ? 'requester' : ($isProvider ? 'provider' : 'broker');
+        $isProvider  = (int) $exchange->provider_id  === $userId;
+
+        if (!$isRequester && !$isProvider) {
+            $caller = \App\Models\User::find($userId);
+            if (!$caller || (!$caller->is_broker && !$caller->is_admin && !$caller->is_super_admin && !$caller->is_god)) {
+                throw new \RuntimeException('UNAUTHORIZED: caller is not a party to this exchange and does not have broker/admin privileges');
+            }
+            $role = 'broker';
+        } else {
+            $role = $isRequester ? 'requester' : 'provider';
+        }
 
         $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
 
@@ -1055,13 +1064,14 @@ class ExchangeWorkflowService
     ): void {
         ExchangeHistory::create([
             'exchange_id' => $exchangeId,
-            'action' => $action,
-            'actor_id' => $actorId,
-            'actor_role' => $actorRole,
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-            'notes' => $notes,
-            'created_at' => now(),
+            'tenant_id'   => TenantContext::getId(),
+            'action'      => $action,
+            'actor_id'    => $actorId,
+            'actor_role'  => $actorRole,
+            'old_status'  => $oldStatus,
+            'new_status'  => $newStatus,
+            'notes'       => $notes,
+            'created_at'  => now(),
         ]);
     }
 

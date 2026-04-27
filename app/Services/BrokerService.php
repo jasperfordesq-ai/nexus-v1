@@ -11,20 +11,45 @@ use Illuminate\Support\Facades\DB;
 /**
  * BrokerService — Laravel DI-based service for broker operations.
  *
- * and message visibility settings.
+ * @deprecated This class references non-existent tables (broker_config, broker_messages)
+ *   that were never created in the actual schema. It is kept here only because it is
+ *   still registered in AppServiceProvider (singleton binding) and has a unit test.
+ *
+ *   TODO: remove — use BrokerControlConfigService and BrokerMessageVisibilityService
+ *   instead, which are the live implementations backed by tenant_settings and
+ *   broker_message_copies respectively.
+ *
+ * All methods below return safe fallbacks so that any accidental call to this class
+ * at runtime does NOT throw a QueryException due to missing tables.
  */
 class BrokerService
 {
     /**
      * Get broker configuration for a tenant.
+     *
+     * @deprecated Use BrokerControlConfigService::getConfig() instead.
      */
     public function getConfig(int $tenantId): array
     {
-        $config = DB::table('broker_config')
-            ->where('tenant_id', $tenantId)
-            ->first();
+        // Guard: broker_config table does not exist — return safe defaults rather
+        // than throwing a QueryException that would surface as a 500 error.
+        try {
+            $config = DB::table('broker_config')
+                ->where('tenant_id', $tenantId)
+                ->first();
 
-        if (! $config) {
+            if (! $config) {
+                return [
+                    'enabled'             => false,
+                    'auto_match'          => false,
+                    'visibility'          => 'admin_only',
+                    'notification_emails' => [],
+                ];
+            }
+
+            return (array) $config;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[BrokerService] getConfig failed (table likely missing): ' . $e->getMessage());
             return [
                 'enabled'             => false,
                 'auto_match'          => false,
@@ -32,31 +57,39 @@ class BrokerService
                 'notification_emails' => [],
             ];
         }
-
-        return (array) $config;
     }
 
     /**
      * Get broker messages for a tenant.
+     *
+     * @deprecated Use BrokerMessageVisibilityService instead.
      */
     public function getMessages(int $tenantId, int $limit = 20, int $offset = 0): array
     {
-        $query = DB::table('broker_messages')
-            ->where('tenant_id', $tenantId);
+        // Guard: broker_messages table does not exist — return safe empty result.
+        try {
+            $query = DB::table('broker_messages')
+                ->where('tenant_id', $tenantId);
 
-        $total = $query->count();
-        $items = $query->orderByDesc('created_at')
-            ->offset($offset)
-            ->limit(min($limit, 100))
-            ->get()
-            ->map(fn ($r) => (array) $r)
-            ->all();
+            $total = $query->count();
+            $items = $query->orderByDesc('created_at')
+                ->offset($offset)
+                ->limit(min($limit, 100))
+                ->get()
+                ->map(fn ($r) => (array) $r)
+                ->all();
 
-        return ['items' => $items, 'total' => $total];
+            return ['items' => $items, 'total' => $total];
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[BrokerService] getMessages failed (table likely missing): ' . $e->getMessage());
+            return ['items' => [], 'total' => 0];
+        }
     }
 
     /**
      * Update message visibility setting.
+     *
+     * @deprecated Use BrokerControlConfigService::updateConfig() instead.
      */
     public function updateVisibility(int $tenantId, string $visibility): bool
     {
@@ -65,10 +98,16 @@ class BrokerService
             return false;
         }
 
-        return DB::table('broker_config')
-            ->updateOrInsert(
-                ['tenant_id' => $tenantId],
-                ['visibility' => $visibility, 'updated_at' => now()]
-            );
+        // Guard: broker_config table does not exist — return false rather than throwing.
+        try {
+            return DB::table('broker_config')
+                ->updateOrInsert(
+                    ['tenant_id' => $tenantId],
+                    ['visibility' => $visibility, 'updated_at' => now()]
+                );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[BrokerService] updateVisibility failed (table likely missing): ' . $e->getMessage());
+            return false;
+        }
     }
 }

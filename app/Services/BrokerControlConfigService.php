@@ -121,7 +121,11 @@ class BrokerControlConfigService
             $fullConfig = json_decode($tenant->configuration, true) ?? [];
         }
 
-        $fullConfig['broker_controls'] = self::sanitizeConfig($data);
+        // Deep-merge into the existing broker_controls section so that sections
+        // not present in $data are preserved rather than silently reset to defaults.
+        $existing = $fullConfig['broker_controls'] ?? [];
+        $sanitized = self::sanitizeConfig($data);
+        $fullConfig['broker_controls'] = array_replace_recursive($existing, $sanitized);
 
         $result = DB::table('tenants')
             ->where('id', $tenantId)

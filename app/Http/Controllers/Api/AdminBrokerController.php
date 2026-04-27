@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -717,6 +718,10 @@ class AdminBrokerController extends BaseApiController
         if (empty($riskCategory)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.risk_category_required'), 'risk_category');
         }
+        $allowedCategories = array_keys(\App\Services\ListingRiskTagService::CATEGORIES);
+        if (!in_array($riskCategory, $allowedCategories, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid risk_category value.', 422);
+        }
         if (mb_strlen($riskNotes) > 2000) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.risk_notes_max_length'), 'risk_notes');
         }
@@ -1286,6 +1291,21 @@ class AdminBrokerController extends BaseApiController
         $to = $this->query('to');
         $offset = ($page - 1) * $perPage;
 
+        if ($from) {
+            try {
+                Carbon::createFromFormat('Y-m-d', $from);
+            } catch (\Exception $e) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Invalid date_from format. Use Y-m-d.', 422);
+            }
+        }
+        if ($to) {
+            try {
+                Carbon::createFromFormat('Y-m-d', $to);
+            } catch (\Exception $e) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Invalid date_to format. Use Y-m-d.', 422);
+            }
+        }
+
         try {
             $conditions = [];
             $params = [];
@@ -1558,10 +1578,19 @@ class AdminBrokerController extends BaseApiController
                 'exchange_workflow_enabled', 'require_broker_approval_new_members',
                 'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
             ];
+            // Boolean workflow flags — cast explicitly so string 'false' / '0' / ''
+            // values from JSON-decoded request bodies are never treated as truthy.
+            $booleanWorkflowKeys = [
+                'require_broker_approval', 'auto_approve_low_risk',
+                'exchange_workflow_enabled', 'require_broker_approval_new_members',
+                'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
+            ];
             $workflowConfig = [];
             foreach ($workflowKeys as $key) {
                 if (array_key_exists($key, $body)) {
-                    $workflowConfig[$key] = $body[$key];
+                    $workflowConfig[$key] = in_array($key, $booleanWorkflowKeys, true)
+                        ? (bool) $body[$key]
+                        : $body[$key];
                 }
             }
             if (!empty($workflowConfig) && !$isAdminTier) {

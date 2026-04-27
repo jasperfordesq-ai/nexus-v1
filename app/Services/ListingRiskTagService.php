@@ -228,16 +228,23 @@ class ListingRiskTagService
                 ->first();
 
             if ($listing) {
+                // Omit the $message argument so NotificationDispatcher::notifyAdmins()
+                // renders each admin's bell notification via buildNotificationContent()
+                // under that admin's preferred_language via LocaleContext::withLocale().
+                // Passing a hardcoded English string here would override that per-locale
+                // rendering and send every admin an English notification regardless of
+                // their preferred_language setting.
                 \App\Services\NotificationDispatcher::notifyAdmins(
                     'listing_risk_tagged',
                     [
-                        'listing_id' => $listingId,
+                        'listing_id'    => $listingId,
                         'listing_title' => $listing->title ?? 'Unknown',
-                        'owner_name' => $listing->owner_name ?? 'Unknown',
-                        'risk_level' => $riskLevel,
-                        'tagged_by' => $brokerId,
-                    ],
-                    "Listing '{$listing->title}' tagged as {$riskLevel} risk"
+                        'owner_name'    => $listing->owner_name ?? 'Unknown',
+                        'risk_level'    => $riskLevel,
+                        'tagged_by'     => $brokerId,
+                        'title'         => $listing->title ?? '',
+                        'level'         => $riskLevel,
+                    ]
                 );
             }
         } catch (\Exception $e) {
