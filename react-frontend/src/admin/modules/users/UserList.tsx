@@ -220,12 +220,18 @@ export function UserList() {
       case 'impersonate': {
         res = await adminUsers.impersonate(user.id);
         if (res?.success && res.data) {
-          const tokenData = res.data as { token?: string; impersonation_token?: string };
+          const tokenData = res.data as { token?: string; impersonation_token?: string; tenant_slug?: string };
           const token = tokenData.token || tokenData.impersonation_token;
+          const targetSlug = tokenData.tenant_slug || '';
           if (token) {
-            // Use BroadcastChannel for memory-only token handoff — never persisted
+            // Open the new tab on the IMPERSONATED user's tenant URL — without
+            // this, the URL inherits the admin's slug and /v2/users/me returns
+            // 403 tenant_mismatch on the impersonated user's first request.
+            const targetUrl = targetSlug
+              ? `${window.location.origin}/${targetSlug}/dashboard`
+              : `${window.location.origin}${tenantPath('/dashboard')}`;
             const { sendImpersonationToken } = await import('@/lib/impersonate');
-            sendImpersonationToken(token, `${window.location.origin}${tenantPath('/dashboard')}`);
+            sendImpersonationToken(token, targetUrl);
             toast.success(`Impersonate successfully`);
           } else {
             toast.success("Impersonate Started");

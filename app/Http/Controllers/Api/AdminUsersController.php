@@ -1077,13 +1077,23 @@ class AdminUsersController extends BaseApiController
             // Generate a short-lived, single-use impersonation token (5 min TTL)
             $token = $this->tokenService->generateImpersonationToken($id, $userTenantId, $adminId);
 
+            // Resolve the target user's tenant slug so the frontend can open the
+            // new tab on that tenant's URL — without it, the new tab inherits
+            // the admin's tenant slug from localStorage and the impersonation
+            // token is rejected as a cross-tenant mismatch.
+            $tenantSlug = \Illuminate\Support\Facades\DB::table('tenants')
+                ->where('id', $userTenantId)
+                ->value('slug');
+
             ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
             $this->auditLogService->logUserImpersonated($adminId, $id, $user['email']);
 
             $responseData = [
-                'token' => $token,
-                'user_id' => $id,
-                'user_name' => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
+                'token'        => $token,
+                'user_id'      => $id,
+                'user_name'    => trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')),
+                'tenant_id'    => $userTenantId,
+                'tenant_slug'  => $tenantSlug,
             ];
             if ($gateBlock) {
                 $responseData['gate_warning'] = $gateBlock['message'];
