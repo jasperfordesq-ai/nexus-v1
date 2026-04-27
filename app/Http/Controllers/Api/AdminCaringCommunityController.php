@@ -13,6 +13,7 @@ use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
+use App\Services\CaringSupportRelationshipService;
 use Illuminate\Http\JsonResponse;
 
 class AdminCaringCommunityController extends BaseApiController
@@ -24,6 +25,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityRolePresetService $rolePresetService,
         private readonly CaringCommunityWorkflowPolicyService $policyService,
         private readonly CaringCommunityMemberStatementService $memberStatementService,
+        private readonly CaringSupportRelationshipService $supportRelationshipService,
     ) {
     }
 
@@ -121,6 +123,46 @@ class AdminCaringCommunityController extends BaseApiController
         }
 
         return $this->respondWithData($statement);
+    }
+
+    public function supportRelationships(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->supportRelationshipService->list(TenantContext::getId(), [
+            'status' => $this->query('status', 'active'),
+        ]));
+    }
+
+    public function createSupportRelationship(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $result = $this->supportRelationshipService->create(TenantContext::getId(), $this->getAllInput(), (int) auth()->id());
+        if (($result['success'] ?? false) !== true) {
+            $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
+            $message = $code === 'USER_NOT_FOUND'
+                ? __('api.user_not_found')
+                : __('api.caring_support_relationship_create_failed');
+            return $this->respondWithError($code, $message, null, 422);
+        }
+
+        return $this->respondWithData($result['relationship'], null, 201);
+    }
+
+    public function updateSupportRelationship(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $relationship = $this->supportRelationshipService->update(TenantContext::getId(), $id, $this->getAllInput());
+        if (!$relationship) {
+            return $this->respondWithError('NOT_FOUND', __('api.caring_support_relationship_not_found'), null, 404);
+        }
+
+        return $this->respondWithData($relationship);
     }
 
     private function guardCaringCommunity(): ?JsonResponse

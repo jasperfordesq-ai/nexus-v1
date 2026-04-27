@@ -56,6 +56,14 @@ class AdminCaringCommunityControllerTest extends TestCase
                 'preset' => 'municipality_admin',
             ]],
             'member statement' => ['GET', '/v2/admin/caring-community/member-statements/999'],
+            'support relationships' => ['GET', '/v2/admin/caring-community/support-relationships'],
+            'support relationship create' => ['POST', '/v2/admin/caring-community/support-relationships', [
+                'supporter_id' => 999,
+                'recipient_id' => 998,
+            ]],
+            'support relationship update' => ['PUT', '/v2/admin/caring-community/support-relationships/999', [
+                'status' => 'paused',
+            ]],
         ];
     }
 
@@ -182,5 +190,43 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertJsonPath('data.summary.wallet_hours_spent', 1);
         $response->assertJsonPath('data.summary.estimated_social_value_chf', 140);
         $response->assertJsonPath('data.support_hours_by_organisation.0.organisation_name', 'KISS Zurich');
+    }
+
+    public function test_support_relationships_can_be_created_listed_and_paused(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $supporter = User::factory()->forTenant($this->testTenantId)->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $create = $this->apiPost('/v2/admin/caring-community/support-relationships', [
+            'supporter_id' => $supporter->id,
+            'recipient_id' => $recipient->id,
+            'title' => 'Weekly companionship',
+            'description' => 'Standing check-in and short local walk.',
+            'frequency' => 'weekly',
+            'expected_hours' => 2.5,
+            'start_date' => '2026-04-20',
+        ]);
+
+        $create->assertStatus(201);
+        $create->assertJsonPath('data.title', 'Weekly companionship');
+        $create->assertJsonPath('data.frequency', 'weekly');
+        $create->assertJsonPath('data.expected_hours', 2.5);
+        $relationshipId = (int) $create->json('data.id');
+
+        $list = $this->apiGet('/v2/admin/caring-community/support-relationships');
+        $list->assertStatus(200);
+        $list->assertJsonPath('data.stats.active_count', 1);
+        $list->assertJsonPath('data.items.0.id', $relationshipId);
+
+        $update = $this->apiPut("/v2/admin/caring-community/support-relationships/{$relationshipId}", [
+            'status' => 'paused',
+        ]);
+        $update->assertStatus(200);
+        $update->assertJsonPath('data.status', 'paused');
+
+        $this->assertSame('paused', DB::table('caring_support_relationships')->where('id', $relationshipId)->value('status'));
     }
 }
