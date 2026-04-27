@@ -465,7 +465,8 @@
       "request_help": "Request help",
       "offer_time": "Offer time",
       "log_hours": "Log hours",
-      "coordinate_org": "Coordinate organisation"
+      "coordinate_org": "Coordinate organisation",
+      "my_relationships": "My Support Relationships"
     },
     "operating_model": {
       "title": "Operating model",
@@ -527,6 +528,41 @@
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       }
+    }
+  },
+  "my_support_relationships": {
+    "meta": {
+      "title": "My Support Relationships",
+      "description": "View your ongoing support relationships"
+    },
+    "empty": {
+      "title": "No Support Relationships",
+      "body": "You have no active support relationships."
+    },
+    "role": {
+      "supporter": "Supporter",
+      "recipient": "Recipient"
+    },
+    "frequency": {
+      "weekly": "Weekly",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "ad_hoc": "Ad Hoc"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "next_check_in": "Next check-in",
+    "overdue": "Overdue",
+    "expected_hours": "{{hours}}h expected",
+    "recent_logs": "Recent hours logged",
+    "no_recent_logs": "No hours logged yet",
+    "back": "Back to Community Hub",
+    "errors": {
+      "load_failed": "Could not load your support relationships."
     }
   }
 }

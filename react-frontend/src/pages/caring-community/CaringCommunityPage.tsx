@@ -35,10 +35,12 @@ interface ActionDef {
 }
 
 const primaryActions: ActionDef[] = [
-  { key: 'request_help', href: '/listings/create?type=request', icon: ListChecks, module: 'listings' },
+  // "Request Help" always visible within the hub — uses the dedicated low-friction flow
+  { key: 'request_help', href: '/caring-community/request-help', icon: ListChecks },
   { key: 'offer_time', href: '/listings/create?type=offer', icon: Heart, module: 'listings' },
   { key: 'log_hours', href: '/volunteering?tab=hours', icon: Wallet, feature: 'volunteering' },
   { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
+  { key: 'my_relationships', href: '/caring-community/my-relationships', icon: Users, feature: 'caring_community' },
 ];
 
 const moduleCards: ActionDef[] = [

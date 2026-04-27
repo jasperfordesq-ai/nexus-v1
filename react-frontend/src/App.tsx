@@ -154,6 +154,8 @@ const CampaignsPage = lazyWithRetry(() => import('@/pages/ideation/CampaignsPage
 const CampaignDetailPage = lazyWithRetry(() => import('@/pages/ideation/CampaignDetailPage'));
 const OutcomesDashboardPage = lazyWithRetry(() => import('@/pages/ideation/OutcomesDashboardPage'));
 const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community/CaringCommunityPage'));
+const RequestHelpPage = lazyWithRetry(() => import('@/pages/caring-community/RequestHelpPage'));
+const MySupportRelationshipsPage = lazyWithRetry(() => import('@/pages/caring-community/MySupportRelationshipsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
@@ -480,6 +482,15 @@ function AppRoutes() {
           <FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CaringCommunityPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Member-facing: My Support Relationships (AG4) */}
+        <Route path="caring-community/my-relationships" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MySupportRelationshipsPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
