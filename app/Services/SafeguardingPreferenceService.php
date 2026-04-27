@@ -339,6 +339,18 @@ class SafeguardingPreferenceService
                     continue;
                 }
 
+                // For select-type options, validate submitted value against allowlist
+                if ($option->option_type === 'select') {
+                    $allowedValues = [];
+                    $decoded = json_decode($option->select_options ?? '[]', true);
+                    if (is_array($decoded)) {
+                        $allowedValues = array_column($decoded, 'value');
+                    }
+                    if (!empty($allowedValues) && !in_array($value, $allowedValues, true)) {
+                        continue; // Silently reject out-of-allowlist values
+                    }
+                }
+
                 // Upsert preference with consent timestamp
                 UserSafeguardingPreference::updateOrCreate(
                     [

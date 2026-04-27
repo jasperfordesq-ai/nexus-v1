@@ -249,18 +249,22 @@ class OnboardingService
             $catName = $categories[$item['category_id']] ?? 'Service';
             $isOffer = $item['type'] === 'offer';
 
-            $listing = Listing::create([
-                'tenant_id' => $tenantId,
-                'title' => $isOffer ? "I can help with {$catName}" : "Looking for help with {$catName}",
-                'description' => $isOffer
-                    ? "I'm available to help with {$catName}. Get in touch to arrange!"
-                    : "I'm looking for someone who can help me with {$catName}.",
-                'type' => $item['type'],
-                'category_id' => $item['category_id'],
-                'user_id' => $userId,
-                'status' => $status,
-                'moderation_status' => $moderationStatus,
-            ]);
+            // firstOrCreate prevents duplicate listings if onboarding is retried
+            $listing = Listing::firstOrCreate(
+                [
+                    'user_id'     => $userId,
+                    'category_id' => $item['category_id'],
+                    'type'        => $item['type'],
+                ],
+                [
+                    'title'            => $isOffer ? "I can help with {$catName}" : "Looking for help with {$catName}",
+                    'description'      => $isOffer
+                        ? "I'm available to help with {$catName}. Get in touch to arrange!"
+                        : "I'm looking for someone who can help me with {$catName}.",
+                    'status'           => $status,
+                    'moderation_status' => $moderationStatus,
+                ]
+            );
 
             $createdIds[] = $listing->id;
         }

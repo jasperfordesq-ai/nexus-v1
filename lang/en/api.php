@@ -780,6 +780,8 @@ return [
     'label_is_required'                    => 'label is required',
     'safeguarding_invalid_option_type'     => 'option_type must be one of: checkbox, info, select',
     'safeguarding_triggers_json_required'  => 'triggers must be a JSON object',
+    'safeguarding_trigger_key_invalid'     => "Unknown trigger key ':key'",
+    'safeguarding_trigger_type_invalid'    => "Trigger ':key' has the wrong type — boolean fields must be true/false, vetting_type_required must be a string or null",
     'safeguarding_select_options_required' => 'select_options must be a non-empty array for select type',
     'safeguarding_select_option_invalid'   => "select_options[:idx] must have 'value' and 'label' keys",
     'safeguarding_max_50_options'          => 'Maximum 50 safeguarding options per tenant',

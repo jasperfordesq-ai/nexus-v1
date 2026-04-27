@@ -77,9 +77,33 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_invalid_option_type'), 'option_type', 422);
         }
 
-        // Validate triggers
-        if (!empty($data['triggers']) && !is_array($data['triggers'])) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_triggers_json_required'), 'triggers', 422);
+        // Validate triggers — whitelist keys and types to prevent arbitrary injection
+        $allowedTriggerKeys = [
+            'requires_vetted_interaction' => 'boolean',
+            'requires_broker_approval'    => 'boolean',
+            'restricts_messaging'         => 'boolean',
+            'restricts_matching'          => 'boolean',
+            'notify_admin_on_selection'   => 'boolean',
+            'vetting_type_required'       => 'string_or_null',
+        ];
+        if (!empty($data['triggers'])) {
+            if (!is_array($data['triggers'])) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_triggers_json_required'), 'triggers', 422);
+            }
+            foreach ($data['triggers'] as $key => $val) {
+                if (!array_key_exists($key, $allowedTriggerKeys)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_key_invalid', ['key' => $key]), 'triggers', 422);
+                }
+                $expectedType = $allowedTriggerKeys[$key];
+                if ($expectedType === 'boolean' && !is_bool($val)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_type_invalid', ['key' => $key]), 'triggers', 422);
+                }
+                if ($expectedType === 'string_or_null' && !is_null($val) && !is_string($val)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_type_invalid', ['key' => $key]), 'triggers', 422);
+                }
+            }
+            // Strip any keys that somehow slipped past (belt and suspenders)
+            $data['triggers'] = array_intersect_key($data['triggers'], $allowedTriggerKeys);
         }
 
         // Validate select_options structure when option_type is 'select'

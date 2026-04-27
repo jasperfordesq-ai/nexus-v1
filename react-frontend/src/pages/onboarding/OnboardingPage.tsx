@@ -142,8 +142,12 @@ export function OnboardingPage() {
 
   // Guard against state updates after unmount
   const mountedRef = useRef(true);
+  const completionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+      if (completionTimerRef.current) clearTimeout(completionTimerRef.current);
+    };
   }, []);
 
   // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
@@ -443,6 +447,8 @@ export function OnboardingPage() {
         if (response.code === 'VALIDATION_REQUIRED_FIELD') {
           toast.error(t('toast_profile_incomplete'), message);
           goToStep(profileStepIdx);
+        } else if (response.code === 'SESSION_EXPIRED') {
+          navigate(tenantPath('/login'), { replace: true });
         } else {
           toast.error(t('toast_setup_failed'), message);
         }
@@ -453,7 +459,7 @@ export function OnboardingPage() {
       await refreshUser();
       if (!mountedRef.current) return;
 
-      setTimeout(() => {
+      completionTimerRef.current = setTimeout(() => {
         toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
         navigate(tenantPath('/dashboard'));
       }, 1800);
