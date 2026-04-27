@@ -111,20 +111,21 @@ export function RequestHelpPage() {
         </div>
 
         <GlassCard className="p-6 sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-500/15">
-              <Heart className="h-5 w-5 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+          <div className="mb-7 flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-500/15">
+              <Heart className="h-6 w-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-theme-primary">{t('request_help.meta.title')}</h1>
-              <p className="text-sm text-theme-muted">{t('request_help.meta.description')}</p>
+              <h1 className="text-2xl font-bold leading-tight text-theme-primary">{t('request_help.meta.title')}</h1>
+              <p className="mt-1 text-base leading-7 text-theme-muted">{t('request_help.subtitle')}</p>
             </div>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6">
             <div>
               <Textarea
                 label={t('request_help.form.what_label')}
+                classNames={{ label: 'text-base font-medium' }}
                 placeholder={t('request_help.form.what_placeholder')}
                 value={what}
                 onValueChange={setWhat}
@@ -159,13 +160,13 @@ export function RequestHelpPage() {
             </RadioGroup>
 
             {error && (
-              <p className="text-sm text-danger">{error}</p>
+              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
             )}
 
             <Button
               color="primary"
               size="lg"
-              className="w-full"
+              className="w-full text-base"
               isLoading={submitting}
               isDisabled={!what.trim() || !when.trim() || charCount > charLimit}
               onPress={handleSubmit}

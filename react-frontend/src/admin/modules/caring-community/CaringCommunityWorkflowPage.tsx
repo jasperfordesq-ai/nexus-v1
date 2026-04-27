@@ -14,6 +14,7 @@ import Copy from 'lucide-react/icons/copy';
 import Download from 'lucide-react/icons/download';
 import ExternalLink from 'lucide-react/icons/external-link';
 import FileText from 'lucide-react/icons/file-text';
+import Heart from 'lucide-react/icons/heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Pause from 'lucide-react/icons/pause';
 import Printer from 'lucide-react/icons/printer';
@@ -219,6 +220,17 @@ const rolePresets = [
 const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
 const relationshipFrequencies = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'] as const;
 
+type FavourItem = {
+  id: number;
+  category: string | null;
+  description: string;
+  favour_date: string;
+  is_anonymous: boolean;
+  offerer_name: string | null;
+};
+
+type FavoursData = { count: number; items: FavourItem[] };
+
 function isWorkflowSummary(value: unknown): value is WorkflowSummary {
   return Boolean(value && typeof value === 'object' && 'stats' in value && 'pending_reviews' in value);
 }
@@ -271,6 +283,10 @@ export default function CaringCommunityWorkflowPage() {
   const [loadingInviteCodes, setLoadingInviteCodes] = useState(false);
   const [printCodeId, setPrintCodeId] = useState<number | null>(null);
 
+  // Informal favours state
+  const [favoursData, setFavoursData] = useState<FavoursData | null>(null);
+  const [loadingFavours, setLoadingFavours] = useState(false);
+
   // Assisted onboarding state
   const [onboardingName, setOnboardingName] = useState('');
   const [onboardingEmail, setOnboardingEmail] = useState('');
@@ -311,6 +327,18 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadSupportRelationships();
   }, [loadSupportRelationships]);
+
+  useEffect(() => {
+    setLoadingFavours(true);
+    api.get<FavoursData>('/v2/admin/caring-community/favours')
+      .then((res) => {
+        if (res.data && typeof res.data === 'object' && 'count' in res.data) {
+          setFavoursData(res.data);
+        }
+      })
+      .catch(() => { /* non-critical — silently ignore */ })
+      .finally(() => setLoadingFavours(false));
+  }, []);
 
   const stats = summary?.stats;
   const signals = summary?.coordinator_signals;
@@ -1165,6 +1193,44 @@ export default function CaringCommunityWorkflowPage() {
               <SignalRow label={t('caring_workflow.signals.active_offers')} value={signals?.active_offers ?? 0} />
               <SignalRow label={t('caring_workflow.signals.trusted_organisations')} value={signals?.trusted_organisations ?? 0} />
               <SignalRow label={t('caring_workflow.signals.declined_30d')} value={stats?.declined_30d_count ?? 0} />
+            </CardBody>
+          </Card>
+
+          {/* Informal Favours (AG11) */}
+          <Card shadow="sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Heart size={18} className="text-rose-500" />
+                <div>
+                  <h2 className="text-lg font-semibold">Informal Favours</h2>
+                  <p className="mt-0.5 text-sm text-default-500">
+                    {loadingFavours ? 'Loading...' : `${favoursData?.count ?? 0} total recorded`}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <Divider />
+            <CardBody className="gap-2">
+              {loadingFavours && (
+                <p className="text-sm text-default-500">Loading favours...</p>
+              )}
+              {!loadingFavours && !favoursData?.items?.length && (
+                <p className="text-sm text-default-500">No favours recorded yet.</p>
+              )}
+              {!loadingFavours && (favoursData?.items ?? []).slice(0, 5).map((f) => (
+                <div key={f.id} className="rounded-lg border border-default-200 p-3">
+                  <div className="flex items-center justify-between gap-2 text-xs text-default-500">
+                    <span>{f.is_anonymous ? 'Anonymous' : (f.offerer_name ?? 'Unknown')}</span>
+                    <span>{f.favour_date}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-default-800 line-clamp-2">{f.description}</p>
+                  {f.category && (
+                    <span className="mt-1 inline-block rounded bg-default-100 px-1.5 py-0.5 text-xs text-default-600">
+                      {f.category}
+                    </span>
+                  )}
+                </div>
+              ))}
             </CardBody>
           </Card>
 

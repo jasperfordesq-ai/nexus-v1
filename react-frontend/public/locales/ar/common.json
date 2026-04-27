@@ -466,7 +466,14 @@
       "offer_time": "Offer time",
       "log_hours": "Log hours",
       "coordinate_org": "Coordinate organisation",
-      "my_relationships": "My Support Relationships"
+      "my_relationships": "My Support Relationships",
+      "request_help_sub": "Ask your community for practical support",
+      "offer_favour": "Offer a Favour",
+      "offer_favour_sub": "Record an informal act of kindness — no credits needed",
+      "offer_time_sub": "List a service or skill you can share",
+      "log_hours_sub": "Record volunteering time for approval",
+      "coordinate_org_sub": "Manage your volunteering organisations",
+      "my_relationships_sub": "View your ongoing support connections"
     },
     "operating_model": {
       "title": "Operating model",
@@ -528,7 +535,8 @@
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       }
-    }
+    },
+    "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger."
   },
   "my_support_relationships": {
     "meta": {
@@ -563,7 +571,9 @@
     "back": "Back to Community Hub",
     "errors": {
       "load_failed": "Could not load your support relationships."
-    }
+    },
+    "subtitle": "Your support connections — the people you help and those who help you.",
+    "loading": "Getting your information..."
   },
   "request_help": {
     "meta": {
@@ -590,7 +600,8 @@
     "errors": {
       "submit_failed": "Could not submit your request. Please try again."
     },
-    "back": "Back to Community Hub"
+    "back": "Back to Community Hub",
+    "subtitle": "Your neighbours care. Tell us what you need and we'll do our best to help."
   },
   "invite": {
     "valid": {
@@ -640,5 +651,77 @@
     "errors": {
       "load_failed": "Could not load the Marktplatz. Please try again."
     }
+  },
+  "proximity": {
+    "near_me": "Near Me",
+    "radius": "Within {{radius}}",
+    "radii": {
+      "500m": "500 m",
+      "1km": "1 km",
+      "2km": "2 km",
+      "5km": "5 km",
+      "10km": "10 km"
+    },
+    "distance_away": "{{distance}} km away",
+    "getting_location": "Getting your location...",
+    "location_denied": "Location access was denied. Please enable it in your browser settings.",
+    "location_error": "Could not get your location. Please try again.",
+    "clear": "Clear proximity filter"
+  },
+  "offer_favour": {
+    "meta": {
+      "title": "Offer a Favour",
+      "description": "Record an informal act of neighbourly help"
+    },
+    "subtitle": "No time credits needed — just record an act of kindness for your community.",
+    "form": {
+      "what_label": "What did you do to help?",
+      "what_placeholder": "e.g. Helped carry shopping, gave a lift, shared a meal...",
+      "category_label": "Category",
+      "categories": {
+        "companionship": "Companionship",
+        "shopping": "Shopping & Errands",
+        "transport": "Transport",
+        "home_help": "Home Help",
+        "gardening": "Gardening",
+        "meals": "Meals",
+        "other": "Other"
+      },
+      "recipient_label": "Who did you help? (optional)",
+      "recipient_placeholder": "Name, or leave blank to keep anonymous",
+      "date_label": "When?",
+      "submit": "Record Favour",
+      "submitting": "Recording..."
+    },
+    "success": {
+      "title": "Thank You!",
+      "body": "Every act of kindness strengthens your community. Your favour has been recorded.",
+      "back": "Back to Community Hub"
+    },
+    "errors": {
+      "submit_failed": "Could not record your favour. Please try again."
+    },
+    "back": "Back to Community Hub"
+  },
+  "clubs": {
+    "meta": {
+      "title": "Clubs & Associations",
+      "description": "Discover local clubs and associations in your community"
+    },
+    "subtitle": "Find local clubs, associations and groups that bring your community together.",
+    "search_placeholder": "Search clubs...",
+    "member_count": "{{count}} members",
+    "meeting_schedule": "Meets: {{schedule}}",
+    "view": "View Club",
+    "empty": {
+      "title": "No Clubs Yet",
+      "body": "No clubs or associations have been listed yet."
+    },
+    "errors": {
+      "load_failed": "Could not load clubs. Please try again."
+    }
+  },
+  "feed": {
+    "official_badge": "Official"
   }
 }

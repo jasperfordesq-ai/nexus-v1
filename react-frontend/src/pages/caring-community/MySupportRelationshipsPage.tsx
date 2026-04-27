@@ -240,11 +240,11 @@ export function MySupportRelationshipsPage() {
               <Users className="h-6 w-6 text-[var(--color-primary)]" aria-hidden="true" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
+              <h1 className="text-2xl font-bold leading-tight text-theme-primary sm:text-3xl">
                 {t('my_support_relationships.meta.title')}
               </h1>
-              <p className="mt-2 text-base leading-7 text-theme-muted">
-                {t('my_support_relationships.meta.description')}
+              <p className="mt-2 text-base leading-8 text-theme-muted">
+                {t('my_support_relationships.subtitle')}
               </p>
             </div>
           </div>
@@ -263,6 +263,7 @@ export function MySupportRelationshipsPage() {
         {/* Loading skeletons */}
         {isLoading && (
           <div className="space-y-4">
+            <p className="text-center text-base text-theme-muted">{t('my_support_relationships.loading')}</p>
             {[0, 1, 2].map((i) => (
               <RelationshipCardSkeleton key={i} />
             ))}

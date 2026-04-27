@@ -13,6 +13,7 @@ import FileText from 'lucide-react/icons/file-text';
 import Globe from 'lucide-react/icons/globe';
 import Handshake from 'lucide-react/icons/handshake';
 import Heart from 'lucide-react/icons/heart';
+import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import ListChecks from 'lucide-react/icons/list-checks';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -37,6 +38,7 @@ interface ActionDef {
 const primaryActions: ActionDef[] = [
   // "Request Help" always visible within the hub — uses the dedicated low-friction flow
   { key: 'request_help', href: '/caring-community/request-help', icon: ListChecks },
+  { key: 'offer_favour', href: '/caring-community/offer-favour', icon: HeartHandshake, feature: 'caring_community' },
   { key: 'offer_time', href: '/listings/create?type=offer', icon: Heart, module: 'listings' },
   { key: 'log_hours', href: '/volunteering?tab=hours', icon: Wallet, feature: 'volunteering' },
   { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
@@ -83,9 +85,16 @@ export function CaringCommunityPage() {
       />
 
       <div className="space-y-6">
+        {/* AG16 — warm welcome banner for elderly/non-technical users */}
+        <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/60 px-5 py-4 dark:border-emerald-800/40 dark:bg-emerald-950/30">
+          <p className="text-base leading-7 text-emerald-800 dark:text-emerald-300">
+            {t('caring_community.welcome_banner')}
+          </p>
+        </div>
+
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <GlassCard className="p-6 sm:p-8">
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-6">
               <div className="flex flex-wrap items-center gap-2">
                 <Chip color="success" variant="flat" size="sm">
                   {t('caring_community.badge')}
@@ -95,25 +104,30 @@ export function CaringCommunityPage() {
                 </Chip>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-theme-primary sm:text-4xl">
+                <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
                   {t('caring_community.title')}
                 </h1>
-                <p className="mt-3 max-w-3xl text-base leading-7 text-theme-muted">
+                <p className="mt-3 max-w-3xl text-base leading-8 text-theme-muted">
                   {t('caring_community.subtitle')}
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleActions.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link key={item.key} to={tenantPath(item.href)}>
                       <Button
-                        className="h-full min-h-20 w-full justify-start bg-theme-elevated text-theme-primary"
+                        className="h-full min-h-24 w-full flex-col items-start justify-start gap-1 bg-theme-elevated px-4 py-4 text-theme-primary"
                         variant="flat"
-                        startContent={<Icon className="h-5 w-5 shrink-0" aria-hidden="true" />}
                       >
-                        <span className="text-left text-sm font-semibold">
-                          {t(`caring_community.actions.${item.key}`)}
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                          <span className="text-left text-sm font-semibold">
+                            {t(`caring_community.actions.${item.key}`)}
+                          </span>
+                        </span>
+                        <span className="text-left text-xs font-normal leading-5 text-theme-muted">
+                          {t(`caring_community.actions.${item.key}_sub`)}
                         </span>
                       </Button>
                     </Link>

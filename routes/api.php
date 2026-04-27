@@ -57,6 +57,11 @@ Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::c
 Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml']);
 
 // ============================================
+// PUBLIC ROUTES — Clubs / Verein directory (AG15, no auth required)
+// ============================================
+Route::get('/v2/clubs', [\App\Http\Controllers\Api\ClubsApiController::class, 'index']);
+
+// ============================================
 // PUBLIC ROUTES — SEO metadata (no auth required)
 // React frontend fetches per-page metadata for <head> tags
 // ============================================
@@ -1133,6 +1138,9 @@ Route::get('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedCont
 Route::post('/v2/admin/feed/posts/{id}/hide', [\App\Http\Controllers\Api\AdminFeedController::class, 'hide']);
 Route::delete('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'destroy']);
 Route::get('/v2/admin/feed/stats', [\App\Http\Controllers\Api\AdminFeedController::class, 'stats']);
+// AG14: Municipal Announcer role management
+Route::post('/v2/admin/feed/grant-announcer', [\App\Http\Controllers\Api\AdminFeedController::class, 'grantAnnouncer']);
+Route::delete('/v2/admin/feed/revoke-announcer/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'revokeAnnouncer']);
 Route::get('/v2/admin/comments', [\App\Http\Controllers\Api\AdminCommentsController::class, 'index']);
 Route::get('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'show']);
 Route::post('/v2/admin/comments/{id}/hide', [\App\Http\Controllers\Api\AdminCommentsController::class, 'hide']);

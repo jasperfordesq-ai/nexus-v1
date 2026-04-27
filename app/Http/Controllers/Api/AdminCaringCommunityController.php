@@ -363,6 +363,73 @@ class AdminCaringCommunityController extends BaseApiController
         );
     }
 
+    /**
+     * GET /api/v2/admin/caring-community/favours
+     *
+     * Returns the last 50 informal favours recorded for this tenant.
+     * Hides the offerer's name when is_anonymous is true.
+     */
+    public function listFavours(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('caring_favours')) {
+            return $this->respondWithData(['count' => 0, 'items' => []]);
+        }
+
+        $rows = \Illuminate\Support\Facades\DB::select(
+            "SELECT
+                cf.id,
+                cf.category,
+                cf.description,
+                cf.favour_date,
+                cf.is_anonymous,
+                cf.created_at,
+                u.name        AS offerer_name,
+                u.first_name  AS offerer_first_name,
+                u.last_name   AS offerer_last_name
+             FROM caring_favours cf
+             LEFT JOIN users u
+                    ON u.id = cf.offered_by_user_id
+                   AND u.tenant_id = cf.tenant_id
+             WHERE cf.tenant_id = ?
+             ORDER BY cf.created_at DESC
+             LIMIT 50",
+            [$tenantId]
+        );
+
+        $total = (int) \Illuminate\Support\Facades\DB::table('caring_favours')
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        $items = array_map(static function (object $row): array {
+            $isAnon = (bool) $row->is_anonymous;
+            $name = '';
+            if (!$isAnon) {
+                $full = trim((string) ($row->offerer_first_name ?? '') . ' ' . (string) ($row->offerer_last_name ?? ''));
+                $name = $full !== '' ? $full : (string) ($row->offerer_name ?? '');
+            }
+
+            return [
+                'id'          => (int) $row->id,
+                'category'    => $row->category,
+                'description' => (string) $row->description,
+                'favour_date' => (string) $row->favour_date,
+                'is_anonymous' => $isAnon,
+                'offerer_name' => $isAnon ? null : $name,
+                'created_at'  => (string) $row->created_at,
+            ];
+        }, $rows);
+
+        return $this->respondWithData([
+            'count' => $total,
+            'items' => $items,
+        ]);
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();
