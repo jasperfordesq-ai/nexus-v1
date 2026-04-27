@@ -87,7 +87,7 @@ class SeedAgorisDemoData extends Command
         $existingConfig = DB::table('tenants')->where('id', $tenantId)->value('configuration');
         $config = is_string($existingConfig) ? (json_decode($existingConfig, true) ?: []) : [];
         $config['default_language'] = 'de';
-        $config['supported_languages'] = ['de', 'fr', 'it', 'en'];
+        $config['supported_languages'] = ['de', 'fr', 'it', 'en', 'es', 'pt'];
         $config['primary_color'] = '#0f766e';
         $config['secondary_color'] = '#ea580c';
         $config['modules'] = array_merge($config['modules'] ?? [], [

@@ -363,7 +363,7 @@ export function OnboardingPage() {
         if (!mountedRef.current) return;
         goNextAnimated();
       } else {
-        toast.error(t('toast_save_failed'), t('toast_save_failed_desc'));
+        toast.error(t('toast_save_failed'), response.error || t('toast_save_failed_desc'));
       }
     } catch (error) {
       logError('Failed to save bio during onboarding', error);
@@ -440,7 +440,7 @@ export function OnboardingPage() {
 
       if (!response.success) {
         const message = response.error || t('toast_something_went_wrong');
-        if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
+        if (response.code === 'VALIDATION_REQUIRED_FIELD') {
           toast.error(t('toast_profile_incomplete'), message);
           goToStep(profileStepIdx);
         } else {
@@ -862,7 +862,7 @@ export function OnboardingPage() {
                   endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                   onPress={handleSaveProfileAndProceed}
                   isLoading={isSavingProfile}
-                  isDisabled={!profileStepComplete || isSavingProfile}
+                  isDisabled={!profileStepComplete || isSavingProfile || isUploadingAvatar}
                 >
                   {t('next')}
                 </Button>
@@ -958,7 +958,7 @@ export function OnboardingPage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium"
                     endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                     onPress={handleSaveInterestsAndProceed}
-                    isDisabled={selectedInterests.length === 0}
+                    isDisabled={categoriesLoading}
                   >
                     {t('next')}
                   </Button>
