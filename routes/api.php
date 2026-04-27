@@ -1172,6 +1172,8 @@ Route::get('/v2/admin/caring-community/support-relationships', [\App\Http\Contro
 Route::post('/v2/admin/caring-community/support-relationships', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'createSupportRelationship']);
 Route::put('/v2/admin/caring-community/support-relationships/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateSupportRelationship']);
 Route::post('/v2/admin/caring-community/support-relationships/{id}/hours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'logSupportRelationshipHours']);
+Route::get('/v2/admin/caring-community/tandem-suggestions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'tandemSuggestions']);
+Route::post('/v2/admin/caring-community/tandem-suggestions/dismiss', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'dismissTandemSuggestion']);
 Route::post('/v2/admin/caring-community/assisted-onboarding', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assistedOnboarding']);
 Route::post('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'generateInviteCode']);
 Route::get('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listInviteCodes']);

@@ -22,6 +22,7 @@ import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Search from 'lucide-react/icons/search';
+import Sparkles from 'lucide-react/icons/sparkles';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import UserPlus from 'lucide-react/icons/user-plus';
@@ -231,6 +232,37 @@ type FavourItem = {
 
 type FavoursData = { count: number; items: FavourItem[] };
 
+type TandemSuggestionMember = {
+  id: number;
+  name: string;
+  avatar_url: string;
+  languages: string[];
+  skills: string[];
+};
+
+type TandemSuggestion = {
+  supporter: TandemSuggestionMember;
+  recipient: TandemSuggestionMember;
+  score: number;
+  signals: {
+    distance_km?: number;
+    language_overlap?: number;
+    skill_complement?: number;
+    availability_overlap?: number;
+    interest_overlap?: number;
+  };
+  reason: string;
+};
+
+type TandemSuggestionsResponse = {
+  suggestions: TandemSuggestion[];
+  generated_at: string;
+};
+
+function isTandemSuggestionsResponse(value: unknown): value is TandemSuggestionsResponse {
+  return Boolean(value && typeof value === 'object' && 'suggestions' in value && Array.isArray((value as TandemSuggestionsResponse).suggestions));
+}
+
 function isWorkflowSummary(value: unknown): value is WorkflowSummary {
   return Boolean(value && typeof value === 'object' && 'stats' in value && 'pending_reviews' in value);
 }
@@ -287,6 +319,12 @@ export default function CaringCommunityWorkflowPage() {
   const [favoursData, setFavoursData] = useState<FavoursData | null>(null);
   const [loadingFavours, setLoadingFavours] = useState(false);
 
+  // Tandem suggestions state (admin English-only)
+  const [tandemSuggestions, setTandemSuggestions] = useState<TandemSuggestion[]>([]);
+  const [loadingTandems, setLoadingTandems] = useState(false);
+  const [tandemError, setTandemError] = useState<string | null>(null);
+  const [dismissingTandemKey, setDismissingTandemKey] = useState<string | null>(null);
+
   // Assisted onboarding state
   const [onboardingName, setOnboardingName] = useState('');
   const [onboardingEmail, setOnboardingEmail] = useState('');
@@ -327,6 +365,71 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadSupportRelationships();
   }, [loadSupportRelationships]);
+
+  const loadTandemSuggestions = useCallback(async () => {
+    setLoadingTandems(true);
+    setTandemError(null);
+    try {
+      const res = await api.get<TandemSuggestionsResponse>('/v2/admin/caring-community/tandem-suggestions?limit=20');
+      if (isTandemSuggestionsResponse(res.data)) {
+        setTandemSuggestions(res.data.suggestions);
+      } else {
+        setTandemSuggestions([]);
+      }
+    } catch {
+      setTandemError('Could not load tandem suggestions.');
+    } finally {
+      setLoadingTandems(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTandemSuggestions();
+  }, [loadTandemSuggestions]);
+
+  const dismissTandemSuggestion = useCallback(async (suggestion: TandemSuggestion) => {
+    const key = `${suggestion.supporter.id}:${suggestion.recipient.id}`;
+    setDismissingTandemKey(key);
+    try {
+      await api.post('/v2/admin/caring-community/tandem-suggestions/dismiss', {
+        supporter_id: suggestion.supporter.id,
+        recipient_id: suggestion.recipient.id,
+      });
+      setTandemSuggestions((prev) => prev.filter((s) => `${s.supporter.id}:${s.recipient.id}` !== key));
+      toast.success('Suggestion dismissed.');
+    } catch {
+      toast.error('Could not dismiss suggestion.');
+    } finally {
+      setDismissingTandemKey(null);
+    }
+  }, [toast]);
+
+  const createTandemFromSuggestion = useCallback((suggestion: TandemSuggestion) => {
+    const supporter: MemberSearchMember = {
+      id: suggestion.supporter.id,
+      name: suggestion.supporter.name,
+      email: '',
+      avatar_url: suggestion.supporter.avatar_url || null,
+    };
+    const recipient: MemberSearchMember = {
+      id: suggestion.recipient.id,
+      name: suggestion.recipient.name,
+      email: '',
+      avatar_url: suggestion.recipient.avatar_url || null,
+    };
+    setRelationshipSupporterId(String(suggestion.supporter.id));
+    setRelationshipRecipientId(String(suggestion.recipient.id));
+    setRelationshipSupporter(supporter);
+    setRelationshipRecipient(recipient);
+    setRelationshipTitle(`Tandem: ${suggestion.supporter.name} & ${suggestion.recipient.name}`);
+    // Scroll to the support-relationships create form so the coordinator sees it.
+    if (typeof window !== 'undefined') {
+      const target = document.getElementById('caring-support-relationship-form');
+      if (target && typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setLoadingFavours(true);
@@ -863,7 +966,7 @@ export default function CaringCommunityWorkflowPage() {
                 <SignalRow label={t('caring_workflow.support_relationships.check_ins_due')} value={relationships?.stats.check_ins_due ?? 0} />
                 <SignalRow label={t('caring_workflow.support_relationships.expected_hours')} value={relationships?.stats.expected_active_hours ?? 0} />
               </div>
-              <div className="rounded-lg border border-default-200 p-3">
+              <div id="caring-support-relationship-form" className="rounded-lg border border-default-200 p-3">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <MemberSearchPicker
                     value={relationshipSupporterId}
@@ -989,6 +1092,139 @@ export default function CaringCommunityWorkflowPage() {
                   )}
                 </div>
               ))}
+            </CardBody>
+          </Card>
+
+          <Card shadow="sm">
+            <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Sparkles size={18} className="text-primary" />
+                  Tandem Suggestions
+                </h2>
+                <p className="mt-1 text-sm text-default-500">
+                  AI-suggested supporter–recipient pairs based on location, language, skills and availability.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<RefreshCw size={16} />}
+                isLoading={loadingTandems}
+                onPress={loadTandemSuggestions}
+              >
+                Refresh
+              </Button>
+            </CardHeader>
+            <Divider />
+            <CardBody className="gap-3">
+              {loadingTandems && tandemSuggestions.length === 0 ? (
+                <div className="flex items-center justify-center py-8">
+                  <Spinner size="md" />
+                </div>
+              ) : tandemError ? (
+                <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700">
+                  {tandemError}
+                </div>
+              ) : tandemSuggestions.length === 0 ? (
+                <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+                  No suggestions right now. Add more members or adjust availability.
+                </div>
+              ) : (
+                tandemSuggestions.map((suggestion) => {
+                  const key = `${suggestion.supporter.id}:${suggestion.recipient.id}`;
+                  const scoreColor: 'success' | 'warning' | 'default' =
+                    suggestion.score >= 0.7 ? 'success' : suggestion.score >= 0.5 ? 'warning' : 'default';
+                  const signals = suggestion.signals;
+                  const chips: { key: string; label: string }[] = [];
+                  if (typeof signals.distance_km === 'number') {
+                    chips.push({ key: 'distance', label: `${signals.distance_km.toFixed(1)} km` });
+                  }
+                  if (typeof signals.language_overlap === 'number' && signals.language_overlap > 0.4) {
+                    chips.push({ key: 'language', label: 'Same language' });
+                  }
+                  if (typeof signals.skill_complement === 'number' && signals.skill_complement > 0.4) {
+                    chips.push({ key: 'skills', label: 'Complementary skills' });
+                  }
+                  if (typeof signals.availability_overlap === 'number' && signals.availability_overlap > 0.4) {
+                    chips.push({ key: 'availability', label: 'Availability overlap' });
+                  }
+                  if (typeof signals.interest_overlap === 'number' && signals.interest_overlap > 0.4) {
+                    chips.push({ key: 'interests', label: 'Shared interests' });
+                  }
+                  return (
+                    <div key={key} className="rounded-lg border border-default-200 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-9 w-9 overflow-hidden rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold">
+                              {suggestion.supporter.avatar_url ? (
+                                <img src={suggestion.supporter.avatar_url} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                suggestion.supporter.name.charAt(0).toUpperCase()
+                              )}
+                            </div>
+                            <div className="text-sm">
+                              <div className="font-semibold text-default-900">{suggestion.supporter.name}</div>
+                              <div className="text-xs text-default-500">Supporter</div>
+                            </div>
+                          </div>
+                          <HeartHandshake size={20} className="text-primary" />
+                          <div className="flex items-center gap-2">
+                            <div className="h-9 w-9 overflow-hidden rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold">
+                              {suggestion.recipient.avatar_url ? (
+                                <img src={suggestion.recipient.avatar_url} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                suggestion.recipient.name.charAt(0).toUpperCase()
+                              )}
+                            </div>
+                            <div className="text-sm">
+                              <div className="font-semibold text-default-900">{suggestion.recipient.name}</div>
+                              <div className="text-xs text-default-500">Recipient</div>
+                            </div>
+                          </div>
+                        </div>
+                        <Chip size="sm" color={scoreColor} variant="flat">
+                          Score {Math.round(suggestion.score * 100)}%
+                        </Chip>
+                      </div>
+                      {chips.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {chips.map((chip) => (
+                            <Chip key={chip.key} size="sm" variant="flat" color="primary">
+                              {chip.label}
+                            </Chip>
+                          ))}
+                        </div>
+                      )}
+                      {suggestion.reason && (
+                        <p className="mt-2 text-xs text-default-500">{suggestion.reason}</p>
+                      )}
+                      <div className="mt-3 flex flex-wrap justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          color="default"
+                          startContent={<XCircle size={16} />}
+                          isLoading={dismissingTandemKey === key}
+                          onPress={() => dismissTandemSuggestion(suggestion)}
+                        >
+                          Dismiss
+                        </Button>
+                        <Button
+                          size="sm"
+                          color="primary"
+                          variant="flat"
+                          startContent={<Heart size={16} />}
+                          onPress={() => createTandemFromSuggestion(suggestion)}
+                        >
+                          Create Tandem
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </CardBody>
           </Card>
         </div>

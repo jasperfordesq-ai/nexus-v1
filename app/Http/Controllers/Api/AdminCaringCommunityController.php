@@ -20,6 +20,7 @@ use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringSupportRelationshipService;
+use App\Services\CaringTandemMatchingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -34,6 +35,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityMemberStatementService $memberStatementService,
         private readonly CaringSupportRelationshipService $supportRelationshipService,
         private readonly CaringInviteCodeService $inviteCodeService,
+        private readonly CaringTandemMatchingService $tandemMatchingService,
     ) {
     }
 
@@ -169,7 +171,10 @@ class AdminCaringCommunityController extends BaseApiController
         $disabled = $this->guardCaringCommunity();
         if ($disabled) return $disabled;
 
-        $result = $this->supportRelationshipService->create(TenantContext::getId(), $this->getAllInput(), (int) auth()->id());
+        $tenantId = TenantContext::getId();
+        $coordinatorId = (int) auth()->id();
+        $input = $this->getAllInput();
+        $result = $this->supportRelationshipService->create($tenantId, $input, $coordinatorId);
         if (($result['success'] ?? false) !== true) {
             $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
             $message = $code === 'USER_NOT_FOUND'
@@ -178,7 +183,66 @@ class AdminCaringCommunityController extends BaseApiController
             return $this->respondWithError($code, $message, null, 422);
         }
 
+        // Log so we don't keep re-suggesting this pair to coordinators.
+        $supporterId = (int) ($input['supporter_id'] ?? 0);
+        $recipientId = (int) ($input['recipient_id'] ?? 0);
+        if ($supporterId > 0 && $recipientId > 0) {
+            $this->tandemMatchingService->markSuggestionAsConsidered(
+                $tenantId,
+                $supporterId,
+                $recipientId,
+                'created_relationship',
+                $coordinatorId,
+            );
+        }
+
         return $this->respondWithData($result['relationship'], null, 201);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/tandem-suggestions
+     *
+     * Returns coordinator-ready supporter/recipient pair suggestions.
+     */
+    public function tandemSuggestions(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $suggestions = $this->tandemMatchingService->suggestTandems(TenantContext::getId(), $limit);
+
+        return $this->respondWithData([
+            'suggestions' => $suggestions,
+            'generated_at' => now()->toIso8601String(),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/tandem-suggestions/dismiss
+     *
+     * Suppress a suggested pair for 90 days so it stops appearing in the list.
+     */
+    public function dismissTandemSuggestion(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $supporterId = $this->inputInt('supporter_id', null, 1);
+        $recipientId = $this->inputInt('recipient_id', null, 1);
+        if ($supporterId === null || $recipientId === null || $supporterId === $recipientId) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.validation_failed'), null, 422);
+        }
+
+        $this->tandemMatchingService->markSuggestionAsConsidered(
+            TenantContext::getId(),
+            $supporterId,
+            $recipientId,
+            'dismissed',
+            (int) auth()->id(),
+        );
+
+        return $this->respondWithData(['success' => true]);
     }
 
     public function updateSupportRelationship(int $id): JsonResponse
