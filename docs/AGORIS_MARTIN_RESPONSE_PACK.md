@@ -2,7 +2,7 @@
 title: Project NEXUS — Response Pack for Martin Villiger, Roland Greber, and Christopher Mueller
 audience: Agoris AG / Fondation KISS leadership
 prepared_by: Jasper Ford, Project NEXUS
-date: 2026-04-27
+date: 2026-04-27 (revised after live diligence)
 status: Draft for review before sending
 ---
 
@@ -49,6 +49,8 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Offer a Favour (credit-free pay-it-forward) | `/caring-community/offer-favour` | Live |
 | My Support Relationships | `/caring-community/my-relationships` | Live |
 | Marktplatz (unified time-credit + commercial) | `/caring-community/markt` | Live |
+| Time-credit ↔ merchant loyalty redemption (closed-loop economy) | Inline at marketplace checkout | Live |
+| My Loyalty Redemptions history | `/caring-community/loyalty/history` | Live |
 | Invite Redemption | `/join/:code` | Live |
 | Clubs & Associations directory | `/clubs` | Live |
 | Time-credit listings | `/listings` | Live |
@@ -73,6 +75,7 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Workflow policy controls (SLAs, CHF hour value, statement day) | Inside Workflow Console | Live |
 | KISS role-pack installer (six presets) | Inside Workflow Console | Live |
 | Tandem suggestion engine (location/language/skills/availability scoring) | Inside Workflow Console | Live |
+| Loyalty redemption ledger + per-merchant settings | `/admin/caring-community/loyalty` | Live |
 | Coordinator-assisted member onboarding (temp password) | Inside Workflow Console | Live |
 | Printable invite codes (6-char + print card) | Inside Workflow Console | Live |
 | Informal favours log | Inside Workflow Console | Live |
@@ -104,7 +107,7 @@ I have read the public Agoris materials (LinkedIn, RocketReach, the live agoris.
 |----------------------|---------------|-------|
 | KISS time-banking (Zeitvorsorge) | **95%** | Production-ready. Tandem matching, member statements, CHF social value, and policy-driven approval flows all in place. |
 | Voluntary help without time tracking | **70%** | Offer a Favour flow now live (no wallet, no credits). Could go further with category-based browsing of recent favours. |
-| Unified Marktplatz (commercial + voluntary) | **80%** | `/caring-community/markt` aggregator now live. Future polish: shared category taxonomy across both sides. |
+| Unified Marktplatz (commercial + voluntary) + closed-loop loyalty | **90%** | `/caring-community/markt` aggregator live, AND time-credit ↔ merchant loyalty bridge live (members earn hours via care, spend them as discounts at participating merchants). This closed-loop is the Agoris vision in working form. Future polish: shared category taxonomy, regional-points third currency type. |
 | Regional infrastructure (Vereine, municipality, proximity) | **80%** | Verein directory live, municipality announcer role live, proximity filter live. Future polish: verified municipality identity and Verein membership management. |
 | Modern UX hiding complexity for elderly users | **80%** | Warmth pass complete; native German pass complete. Future polish: assisted onboarding flow refinement based on real user testing. |
 
@@ -119,6 +122,86 @@ Six items are scoped on the roadmap as AG11 through AG16: credit-free favour flo
 ### Where Phase 3 and beyond live
 
 POS / inventory / merchant-side integrations (Agoris has a separate App Store app) are not in NEXUS today. Banking and payment integrations are not in NEXUS today. These are explicitly Phase 3, after KISS time-bank fit is proven and the regional commerce layer is decided.
+
+---
+
+## 4a. What we know about Agoris's actual product surface today
+
+I have done structured diligence using the public agoris.ch site, two independent research reports (one ChatGPT-led, one Gemini-led), the LinkedIn company page, RocketReach, the Fondation KISS website, the Swiss caring-communities network materials, and external software directories (G2, Capterra). The picture is consistent across sources, so I want to share it openly so we are calibrated together.
+
+**What is publicly verifiable about Agoris today:**
+
+- **Legal entity**: AGORIS AG, registered in Cham, Zug, Switzerland, at Obermühlestrasse 8, 6330 Cham.
+- **Co-located with KISS Genossenschaft Cham at the same address** — operationally inseparable from the KISS pilot and the strongest point of credibility.
+- **Four-person leadership** with relevant credentials: you (Martin) on time-banking and governance; Roland Greber on banking, payments, and innovation (CEO Swiss Bankers Prepaid Services); Dr. Christopher Mueller on UX (Die Ergonomen Usability AG, ETH Zurich); Tom Debus on technology and AI (Ferris).
+- **Stated commercial model**: free for residents, monetized via local advertising, push campaigns, premium features, and later regional insights / data services.
+- **Architecture intent**: federated regional nodes of approximately 15,000–30,000 citizens each, with options for centralised hosting or canton-controlled isolated nodes; "data sovereignty" and "Swiss Made Privacy" framing.
+- **A founder-associated 99designs brief** describes transactions in **money, hours, OR regional points** — a third currency type beyond cash and time credits. This is on the Agoris roadmap publicly but does not yet appear to be live.
+- **Software directory listings** (G2, Capterra) reference an "Agoris Smart POS & Inventory" product line with tiered SaaS pricing (Discovery free, Essential ~CHF 14.99, Growth ~CHF 29.99) — Miderva-developed merchant tooling — but this is a separate product surface from the civic platform on agoris.ch.
+
+**What I could not find in public sources:**
+
+- A published list of currently live municipalities or KISS cooperatives running Agoris.
+- A public price sheet for municipalities or organisations.
+- Quantified case studies, retention metrics, or implementation outcomes attributable to the current Cham-based AGORIS AG.
+- A current Swiss Handelsregister extract surfaced on the live website.
+- Mainstream press coverage or analyst writeups of the current company (as opposed to the historical Chablais AGORIS regional-integration project from 2008–2015, which appears to be brand/domain heritage rather than confirmed corporate lineage).
+- A stable agoris.ch — the site was returning database errors during my research.
+
+This is the normal profile of an early-stage or early-commercialisation Swiss platform with a strong founding narrative and limited public proof. Nothing about it is disqualifying. But it does mean that, in any partnership or evaluation conversation, **NEXUS's working production tenant with 19 commits of polished, audited features is genuinely the most concrete, demonstrable Caring Community implementation in the room**. That asymmetry should shape how we approach the engagement.
+
+---
+
+## 4b. Why NEXUS is complementary to Crossiety and Localcities, not competitive with them
+
+A neutral diligence read of the Swiss municipal-tech landscape places three incumbents close to the broader Agoris vision:
+
+- **Crossiety** — 160+ digital village squares, 15,000+ groups, 730,000+ residents across Switzerland, Germany, and Liechtenstein. The dominant Swiss municipal/community resident app.
+- **Localcities** — represented in 2,000+ Swiss municipalities. Strong incumbent in the municipal information layer.
+- **Hoplr / nebenan.de** — European neighbourhood network scale (1.2M and 4M+ users respectively).
+
+**NEXUS does not try to compete with these on municipal communication breadth.** That bar is real and high, and we would lose on scale.
+
+**NEXUS competes — and wins — on the layer none of them have:**
+
+| Layer | Crossiety | Localcities | Hoplr / nebenan.de | NEXUS Caring Community |
+|-------|:---------:|:-----------:|:------------------:|:----------------------:|
+| Resident communication / village square | ✅ | ✅ | ✅ | Basic (feed, groups) |
+| Municipal information (waste, events, business directory) | ✅ | ✅ | Partial | Partial |
+| **KISS-compatible time-bank workflow** | ✗ | ✗ | ✗ | **✅ Production-ready** |
+| **Verified hour logging with coordinator review and SLAs** | ✗ | ✗ | ✗ | **✅** |
+| **Tandem matching engine** | ✗ | ✗ | ✗ | **✅** |
+| **Recurring support relationships with check-in tracking** | ✗ | ✗ | ✗ | **✅** |
+| **Member statements with CHF social value estimate** | ✗ | ✗ | ✗ | **✅** |
+| **Municipal impact reports (canton / municipality / cooperative variants)** | ✗ | ✗ | ✗ | **✅** |
+| **Closed-loop time-credit-to-merchant loyalty bridge** | ✗ | ✗ | ✗ | **✅ New** |
+| **Open source AGPL** | ✗ | ✗ | ✗ | **✅** |
+
+**The strategic implication is straightforward**: NEXUS Caring Community is the engine that plugs into the regional/municipal communication layer that Crossiety, Localcities, or even a future Agoris super-app provides. A KISS cooperative running NEXUS today does not compete with Crossiety; it can run alongside Crossiety and offer the Zeitvorsorge layer that Crossiety lacks.
+
+This positioning matters for two reasons:
+
+1. **For KISS cooperatives evaluating us**, the question is not "should we replace Crossiety with NEXUS?" but "should we add NEXUS to deliver the time-bank workflow Crossiety cannot?". That is a much easier conversation.
+2. **For Agoris specifically**, NEXUS's open-source nature means the Caring Community module cluster could be embedded into an Agoris-led regional super-app rather than competing with it. The AGPL licence requires that any modifications stay open, which aligns with Agoris's own data-sovereignty narrative.
+
+---
+
+## 4c. The closed-loop loyalty bridge — a uniquely strong differentiator
+
+The Gemini research identifies a feature Agoris's public materials describe but the company does not appear to have shipped: **time credits earned in the Caring Community become discounts at participating local merchants**. This is the closed-loop regional economy that ties the social engine to the commercial engine.
+
+**As of 2026-04-27, NEXUS has shipped this feature.** Concrete implementation:
+
+- A KISS member earns hours by helping a neighbour (verified, coordinator-reviewed).
+- The hours land in the member's wallet (existing).
+- A local marketplace merchant who has opted in sets an exchange rate (e.g. CHF 25 per hour) and a maximum discount per order (e.g. 50%).
+- At checkout, the member sees a "Use my time credits" card with a live discount preview, applies hours, and pays the reduced cash price.
+- The redemption is logged to an immutable `caring_loyalty_redemptions` ledger; the merchant absorbs the discount as a community-engagement cost; the member's wallet debits.
+- Admin sees a full redemption ledger and per-merchant participation report.
+
+This is not a research project. It is a working endpoint set: `GET /v2/caring-community/loyalty/quote`, `POST /v2/caring-community/loyalty/redeem`, `GET /v2/caring-community/loyalty/my-history`, plus the admin equivalents. With Stripe Connect already integrated into the Marketplace module, the cash side of the transaction is production-grade.
+
+This bridges Layer 1 (KISS time-bank) and Layer 3 (commercial Marktplatz) of the Agoris vision in a way that no visible competitor — Swiss or international — currently offers. **It is the single feature that, in a 30-minute walkthrough, separates NEXUS from every adjacent platform.**
 
 ---
 
@@ -171,13 +254,13 @@ If you want to evaluate the platform yourself before scheduling the walkthrough:
 
 - Visit `https://app.project-nexus.ie/agoris` — the production Agoris tenant.
 - Browse the public Caring Community hub at `/caring-community`.
-- Browse the public Clubs directory at `/clubs`.
+- Browse the public Clubs directory at `/clubs` — populated with realistic Cham Vereine (Männerturnverein, Frauenchor Cham-Hagendorn, Velo-Club Cham, Quartierverein Lorzenhof, and others).
 - Browse the public Marktplatz at `/caring-community/markt`.
-- Check the listings, events, organisations, federation, and member directories.
+- Check the listings, events, organisations, federation, and member directories — populated with realistic Cham/Zug content: KISS Genossenschaft Cham as primary partner, Spitex Zug, Pro Senectute Zug, Tafel Zug, Bibliothek Cham, plus a 15-member fictional Caring Community with 50+ logged hours over 30 days, 5 active recurring tandems, and an upcoming KISS Cham Mitgliederversammlung.
 - Review the open-source code at `https://github.com/jasperfordesq-ai/nexus-v1`.
 - Read the architecture note at `docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md` in the repo.
 
-The German UI is the default for that tenant, with French / Italian / English available via the language switcher.
+The German UI is the default for that tenant, with French / Italian / English available via the language switcher. KISS-specific terminology has been hand-translated to native Swiss German throughout: Zeitvorsorge, Sorgende Gemeinschaft, Vertrauensperson, Unterstützungsbeziehung, Gefälligkeit, with du-form addressing for community warmth.
 
 ---
 
