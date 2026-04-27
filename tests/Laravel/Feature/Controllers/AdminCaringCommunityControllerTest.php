@@ -55,6 +55,7 @@ class AdminCaringCommunityControllerTest extends TestCase
             'role preset install' => ['POST', '/v2/admin/caring-community/role-presets/install', [
                 'preset' => 'municipality_admin',
             ]],
+            'member statement' => ['GET', '/v2/admin/caring-community/member-statements/999'],
         ];
     }
 
@@ -90,5 +91,96 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/caring-community/workflow');
 
         $response->assertStatus(401);
+    }
+
+    public function test_member_statement_returns_kiss_support_and_wallet_context(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create(['balance' => 7]);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        Sanctum::actingAs($admin);
+
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $this->testTenantId,
+                'setting_key' => 'caring_community.workflow.default_hour_value_chf',
+            ],
+            [
+                'setting_value' => '35',
+                'setting_type' => 'integer',
+                'category' => 'caring_community',
+                'updated_at' => now(),
+            ]
+        );
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'KISS Zurich',
+            'slug' => 'kiss-zurich-' . uniqid(),
+            'status' => 'active',
+            'balance' => 100,
+            'created_at' => now(),
+        ]);
+
+        DB::table('vol_logs')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'organization_id' => $orgId,
+                'date_logged' => '2026-04-10',
+                'hours' => 4.00,
+                'description' => 'Weekly neighbour visit.',
+                'status' => 'approved',
+                'created_at' => '2026-04-10 09:00:00',
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'organization_id' => $orgId,
+                'date_logged' => '2026-04-12',
+                'hours' => 1.50,
+                'description' => 'Shopping accompaniment.',
+                'status' => 'pending',
+                'created_at' => '2026-04-12 09:00:00',
+            ],
+        ]);
+
+        DB::table('transactions')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'sender_id' => $owner->id,
+                'receiver_id' => $member->id,
+                'amount' => 4,
+                'description' => 'Volunteer auto-payment.',
+                'transaction_type' => 'volunteer',
+                'status' => 'completed',
+                'created_at' => '2026-04-10 10:00:00',
+                'updated_at' => '2026-04-10 10:00:00',
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'sender_id' => $member->id,
+                'receiver_id' => $owner->id,
+                'amount' => 1,
+                'description' => 'Timebank exchange.',
+                'transaction_type' => 'exchange',
+                'status' => 'completed',
+                'created_at' => '2026-04-15 10:00:00',
+                'updated_at' => '2026-04-15 10:00:00',
+            ],
+        ]);
+
+        $response = $this->apiGet("/v2/admin/caring-community/member-statements/{$member->id}?start_date=2026-04-01&end_date=2026-04-30");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.user.id', $member->id);
+        $response->assertJsonPath('data.summary.approved_support_hours', 4);
+        $response->assertJsonPath('data.summary.pending_support_hours', 1.5);
+        $response->assertJsonPath('data.summary.wallet_hours_earned', 4);
+        $response->assertJsonPath('data.summary.wallet_hours_spent', 1);
+        $response->assertJsonPath('data.summary.estimated_social_value_chf', 140);
+        $response->assertJsonPath('data.support_hours_by_organisation.0.organisation_name', 'KISS Zurich');
     }
 }

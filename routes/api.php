@@ -1148,6 +1148,7 @@ Route::put('/v2/admin/caring-community/workflow/reviews/{id}/assign', [\App\Http
 Route::put('/v2/admin/caring-community/workflow/reviews/{id}/escalate', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'escalateReview']);
 Route::get('/v2/admin/caring-community/role-presets', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'rolePresets']);
 Route::post('/v2/admin/caring-community/role-presets/install', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'installRolePresets']);
+Route::get('/v2/admin/caring-community/member-statements/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'memberStatement']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);

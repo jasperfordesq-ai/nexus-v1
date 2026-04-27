@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
@@ -22,6 +23,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityWorkflowService $workflowService,
         private readonly CaringCommunityRolePresetService $rolePresetService,
         private readonly CaringCommunityWorkflowPolicyService $policyService,
+        private readonly CaringCommunityMemberStatementService $memberStatementService,
     ) {
     }
 
@@ -91,6 +93,34 @@ class AdminCaringCommunityController extends BaseApiController
             'review' => $review,
             'message' => __('api.caring_review_escalated'),
         ]);
+    }
+
+    public function memberStatement(int $userId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $filters = [
+            'start_date' => $this->query('start_date'),
+            'end_date' => $this->query('end_date'),
+        ];
+        $format = (string) $this->query('format', 'json');
+
+        if ($format === 'csv') {
+            $csv = $this->memberStatementService->csv(TenantContext::getId(), $userId, $filters);
+            if (!$csv) {
+                return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
+            }
+
+            return $this->respondWithData($csv);
+        }
+
+        $statement = $this->memberStatementService->statement(TenantContext::getId(), $userId, $filters);
+        if (!$statement) {
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
+        }
+
+        return $this->respondWithData($statement);
     }
 
     private function guardCaringCommunity(): ?JsonResponse
