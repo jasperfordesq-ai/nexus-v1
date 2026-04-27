@@ -148,22 +148,46 @@ class SafeguardingPreferenceService
             return false;
         }
 
-        $option->update(['is_active' => false]);
+        $tenantId = TenantContext::getId();
 
-        // Re-evaluate triggers for affected users — deactivating an option may
-        // remove monitoring/broker-approval requirements if it was the only trigger
-        $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
+        // Capture affected users BEFORE revoking (so we know whose triggers to re-evaluate)
+        $affectedUserIds = UserSafeguardingPreference::where('option_id', $optionId)
+            ->where('tenant_id', $tenantId)
             ->whereNull('revoked_at')
             ->distinct()
-            ->pluck('user_id');
+            ->pluck('user_id')
+            ->all();
 
-        $tenantId = TenantContext::getId();
+        DB::transaction(function () use ($option, $optionId, $tenantId) {
+            $option->update(['is_active' => false]);
+
+            // Auto-revoke any active member preferences for this option — keeping them
+            // active would leave the data inconsistent with the option's state and
+            // weaken the audit trail (a "live" preference for a non-existent option).
+            UserSafeguardingPreference::where('option_id', $optionId)
+                ->where('tenant_id', $tenantId)
+                ->whereNull('revoked_at')
+                ->update(['revoked_at' => now()]);
+        });
+
+        // Re-evaluate triggers for affected users — deactivating an option may
+        // remove monitoring/broker-approval requirements if it was the only trigger.
+        // Wrapped in try/catch so a single user re-eval failure doesn't kill the whole request.
         foreach ($affectedUserIds as $userId) {
-            SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
+            try {
+                SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
+            } catch (\Throwable $e) {
+                Log::error('SafeguardingPreferenceService::deleteOption: trigger re-eval failed', [
+                    'user_id'   => $userId,
+                    'option_id' => $optionId,
+                    'error'     => $e->getMessage(),
+                ]);
+            }
         }
 
         self::logActivity(null, 'safeguarding_option_deleted', 'safeguarding_option', $optionId, [
-            'option_key' => $option->option_key,
+            'option_key'    => $option->option_key,
+            'auto_revoked'  => count($affectedUserIds),
         ]);
 
         return true;
@@ -379,8 +403,19 @@ class SafeguardingPreferenceService
             'options_count' => count($preferences),
         ]);
 
-        // Activate broker protections based on triggers
-        SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+        // Activate broker protections based on triggers — wrapped in try/catch
+        // because consent has already been committed. A trigger-activation failure
+        // must not 500 the user-facing request; we log loudly so it can be retried
+        // by a sweep job or admin tooling.
+        try {
+            SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingPreferenceService: trigger activation failed after consent commit', [
+                'user_id'   => $userId,
+                'tenant_id' => $tenantId,
+                'error'     => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -469,7 +504,9 @@ class SafeguardingPreferenceService
     // =========================================================================
 
     /**
-     * Validate a URL is HTTP(S) — reject javascript: and other schemes.
+     * Validate a URL is well-formed HTTPS — reject javascript:, http:, and malformed URLs.
+     * help_url is rendered as a clickable link to members, so non-HTTPS or
+     * malformed URLs are rejected entirely rather than coerced.
      */
     private static function validateUrl(?string $url): ?string
     {
@@ -477,10 +514,17 @@ class SafeguardingPreferenceService
             return null;
         }
         $url = trim($url);
-        if (preg_match('#^https?://#i', $url)) {
-            return $url;
+        if (!preg_match('#^https://#i', $url)) {
+            return null;
         }
-        return null;
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!$host || !preg_match('/\./', $host)) {
+            return null; // require a real domain (no localhost, no bare hostnames)
+        }
+        return $url;
     }
 
     /**

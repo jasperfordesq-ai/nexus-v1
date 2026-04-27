@@ -137,8 +137,27 @@ export function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Track which steps have been visited (for stepper)
-  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
+  // Track which steps have been visited (for stepper). Persisted to sessionStorage
+  // so a refresh mid-wizard preserves the indicator's "visited" markers.
+  const VISITED_STORAGE_KEY = 'onboarding_visited_steps';
+  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(() => {
+    try {
+      const raw = sessionStorage.getItem(VISITED_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return new Set(parsed.filter((n) => typeof n === 'number'));
+        }
+      }
+    } catch { /* sessionStorage may be unavailable (private mode) */ }
+    return new Set([1]);
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(VISITED_STORAGE_KEY, JSON.stringify(Array.from(visitedSteps)));
+    } catch { /* ignore quota/availability errors */ }
+  }, [visitedSteps]);
 
   // Guard against state updates after unmount
   const mountedRef = useRef(true);

@@ -180,14 +180,27 @@ class SafeguardingTriggerService
             }
         });
 
-        // Notify admins/brokers if any trigger requires it
+        // Notify admins/brokers if any trigger requires it.
+        // Deduplicate: if we just fired the event for this user/tenant within
+        // the last 10 minutes (e.g. user retried their save, or admin re-evaluated),
+        // skip the dispatch so admins don't receive N copies of the same alert.
         if ($needsNotification) {
-            try {
-                event(new SafeguardingFlaggedEvent($userId, $tenantId, $triggers));
-            } catch (\Throwable $e) {
-                Log::error('SafeguardingTriggerService: failed to dispatch SafeguardingFlaggedEvent', [
+            $dedupKey = self::CACHE_PREFIX . "flagged:{$tenantId}:{$userId}";
+            if (Cache::add($dedupKey, 1, 600)) {
+                try {
+                    event(new SafeguardingFlaggedEvent($userId, $tenantId, $triggers));
+                } catch (\Throwable $e) {
+                    Log::error('SafeguardingTriggerService: failed to dispatch SafeguardingFlaggedEvent', [
+                        'user_id' => $userId,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Roll back the dedup key so a manual retry can re-fire
+                    Cache::forget($dedupKey);
+                }
+            } else {
+                Log::info('SafeguardingTriggerService: SafeguardingFlaggedEvent suppressed (dedup window)', [
                     'user_id' => $userId,
-                    'error' => $e->getMessage(),
+                    'tenant_id' => $tenantId,
                 ]);
             }
         }
