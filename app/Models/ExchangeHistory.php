@@ -6,20 +6,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ExchangeHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'exchange_history';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'exchange_id', 'action', 'actor_id', 'actor_role',
+        'tenant_id', 'exchange_id', 'action', 'actor_id', 'actor_role',
         'old_status', 'new_status', 'notes', 'created_at',
     ];
 

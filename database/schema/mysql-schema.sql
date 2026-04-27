@@ -555,6 +555,10 @@ CREATE TABLE `broker_message_copies` (
   KEY `related_listing_id` (`related_listing_id`),
   KEY `related_exchange_id` (`related_exchange_id`),
   KEY `idx_bmc_archived` (`tenant_id`,`archived_at`),
+  KEY `bmc_ibfk_orig_msg` (`original_message_id`),
+  KEY `bmc_ibfk_archive` (`archive_id`),
+  CONSTRAINT `bmc_ibfk_archive` FOREIGN KEY (`archive_id`) REFERENCES `broker_review_archives` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `bmc_ibfk_orig_msg` FOREIGN KEY (`original_message_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE,
   CONSTRAINT `broker_message_copies_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `broker_message_copies_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `broker_message_copies_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -596,8 +600,9 @@ CREATE TABLE `broker_review_archives` (
   KEY `idx_listing` (`tenant_id`,`related_listing_id`),
   KEY `idx_broker_copy` (`broker_copy_id`),
   KEY `idx_decided_by` (`decided_by`),
-  CONSTRAINT `broker_review_archives_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `broker_review_archives_ibfk_2` FOREIGN KEY (`decided_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `bra_ibfk_broker_copy` FOREIGN KEY (`broker_copy_id`) REFERENCES `broker_message_copies` (`id`),
+  CONSTRAINT `bra_ibfk_decided_by` FOREIGN KEY (`decided_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `broker_review_archives_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `campaign_awards`;
@@ -997,7 +1002,7 @@ CREATE TABLE `community_ranks` (
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_rank_score` (`rank_score`),
   KEY `idx_position` (`tenant_id`,`rank_position`)
-) ENGINE=InnoDB AUTO_INCREMENT=1829 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
+) ENGINE=InnoDB AUTO_INCREMENT=1995 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `communityrank_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2004,6 +2009,7 @@ DROP TABLE IF EXISTS `exchange_history`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `exchange_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL DEFAULT 0,
   `exchange_id` int(11) NOT NULL,
   `action` varchar(100) NOT NULL COMMENT 'e.g., created, accepted, broker_approved, confirmed',
   `actor_id` int(11) DEFAULT NULL COMMENT 'User who performed action',
@@ -2017,6 +2023,7 @@ CREATE TABLE `exchange_history` (
   KEY `idx_exchange` (`exchange_id`),
   KEY `idx_actor` (`actor_id`),
   KEY `idx_action` (`action`),
+  KEY `idx_tenant_exchange` (`tenant_id`,`exchange_id`),
   CONSTRAINT `exchange_history_ibfk_1` FOREIGN KEY (`exchange_id`) REFERENCES `exchange_requests` (`id`) ON DELETE CASCADE,
   CONSTRAINT `exchange_history_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -5333,7 +5340,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5594,11 +5601,11 @@ CREATE TABLE `listing_risk_tags` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_listing_tag` (`listing_id`),
-  KEY `idx_tenant_listing` (`tenant_id`,`listing_id`),
+  UNIQUE KEY `unique_tenant_listing` (`tenant_id`,`listing_id`),
   KEY `idx_risk_level` (`tenant_id`,`risk_level`),
   KEY `idx_requires_approval` (`tenant_id`,`requires_approval`),
   KEY `tagged_by` (`tagged_by`),
+  KEY `listing_risk_tags_ibfk_2` (`listing_id`),
   CONSTRAINT `listing_risk_tags_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `listing_risk_tags_ibfk_2` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE,
   CONSTRAINT `listing_risk_tags_ibfk_3` FOREIGN KEY (`tagged_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
@@ -5716,7 +5723,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=35589 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35591 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -9653,6 +9660,7 @@ CREATE TABLE `user_first_contacts` (
   UNIQUE KEY `unique_user_pair` (`tenant_id`,`user1_id`,`user2_id`),
   KEY `idx_user1` (`user1_id`),
   KEY `idx_user2` (`user2_id`),
+  KEY `idx_first_message` (`first_message_id`),
   CONSTRAINT `user_first_contacts_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `user_first_contacts_ibfk_2` FOREIGN KEY (`user1_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `user_first_contacts_ibfk_3` FOREIGN KEY (`user2_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -11400,7 +11408,8 @@ INSERT INTO `laravel_migrations` VALUES
 (129,'2026_04_26_120000_unique_broker_message_copies_per_message',54),
 (130,'2026_04_26_191500_create_municipal_report_templates_table',55),
 (131,'2026_04_27_090000_add_assignment_to_vol_logs_table',56),
-(132,'2026_04_27_080000_align_activity_log_collation_to_unicode',57);
+(132,'2026_04_27_080000_align_activity_log_collation_to_unicode',57),
+(133,'2026_04_27_080024_fix_broker_schema_fks_and_tenant_scoping',58);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
