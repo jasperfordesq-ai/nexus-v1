@@ -473,7 +473,9 @@
       "offer_time_sub": "List a service or skill you can share",
       "log_hours_sub": "Record volunteering time for approval",
       "coordinate_org_sub": "Manage your volunteering organisations",
-      "my_relationships_sub": "View your ongoing support connections"
+      "my_relationships_sub": "View your ongoing support connections",
+      "markt": "Marktplatz",
+      "markt_sub": "Browse local services, goods and time-credit offers."
     },
     "operating_model": {
       "title": "Operating model",
@@ -534,7 +536,9 @@
       "trust": {
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
-      }
+      },
+      "clubs": "Clubs & Associations",
+      "markt": "Marktplatz"
     },
     "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger."
   },

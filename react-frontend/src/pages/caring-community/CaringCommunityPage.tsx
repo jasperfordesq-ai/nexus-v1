@@ -17,6 +17,8 @@ import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import ListChecks from 'lucide-react/icons/list-checks';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Store from 'lucide-react/icons/store';
 import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
 import Wallet from 'lucide-react/icons/wallet';
@@ -43,6 +45,7 @@ const primaryActions: ActionDef[] = [
   { key: 'log_hours', href: '/volunteering?tab=hours', icon: Wallet, feature: 'volunteering' },
   { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
   { key: 'my_relationships', href: '/caring-community/my-relationships', icon: Users, feature: 'caring_community' },
+  { key: 'markt', href: '/caring-community/markt', icon: Store, feature: 'caring_community' },
 ];
 
 const moduleCards: ActionDef[] = [
@@ -54,6 +57,7 @@ const moduleCards: ActionDef[] = [
   { key: 'resources', href: '/resources', icon: FileText, feature: 'resources' },
   { key: 'goals', href: '/goals', icon: Target, feature: 'goals' },
   { key: 'federation', href: '/federation', icon: Globe, feature: 'federation' },
+  { key: 'clubs', href: '/clubs', icon: ShoppingBag },
   { key: 'messages', href: '/messages', icon: MessageSquare, module: 'messages' },
   { key: 'trust', href: '/verify-identity', icon: ShieldCheck },
 ];

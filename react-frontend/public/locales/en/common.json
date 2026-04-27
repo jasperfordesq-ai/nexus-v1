@@ -335,7 +335,9 @@
       "coordinate_org": "Coordinate organisation",
       "coordinate_org_sub": "Manage your volunteering organisations",
       "my_relationships": "My Support Relationships",
-      "my_relationships_sub": "View your ongoing support connections"
+      "my_relationships_sub": "View your ongoing support connections",
+      "markt": "Marktplatz",
+      "markt_sub": "Browse local services, goods and time-credit offers."
     },
     "operating_model": {
       "title": "Operating model",
@@ -396,7 +398,9 @@
       "trust": {
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
-      }
+      },
+      "clubs": "Clubs & Associations",
+      "markt": "Marktplatz"
     }
   },
   "request_help": {

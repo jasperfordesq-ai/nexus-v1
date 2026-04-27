@@ -157,6 +157,9 @@ const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community
 const RequestHelpPage = lazyWithRetry(() => import('@/pages/caring-community/RequestHelpPage'));
 const MySupportRelationshipsPage = lazyWithRetry(() => import('@/pages/caring-community/MySupportRelationshipsPage'));
 const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-community/InviteRedemptionPage'));
+const OfferFavourPage = lazyWithRetry(() => import('@/pages/caring-community/OfferFavourPage'));
+const MarktPage = lazyWithRetry(() => import('@/pages/caring-community/MarktPage'));
+const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
@@ -504,6 +507,27 @@ function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
+
+        {/* Caring Community — Offer a Favour (AG11) */}
+        <Route path="caring-community/offer-favour" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <OfferFavourPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Unified Marktplatz (AG13) */}
+        <Route path="caring-community/markt" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MarktPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Clubs & Associations directory (AG15) — public, no feature gate */}
+        <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />
 
         {/* Public: Caring Community invite redemption — no auth, no feature gate needed */}
         <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />
