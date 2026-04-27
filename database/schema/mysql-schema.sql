@@ -5375,7 +5375,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=138 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10700,8 +10700,10 @@ CREATE TABLE `vol_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(10) unsigned NOT NULL DEFAULT 1,
   `user_id` int(11) NOT NULL,
-  `organization_id` int(11) NOT NULL,
+  `organization_id` int(11) DEFAULT NULL,
   `opportunity_id` int(11) DEFAULT NULL,
+  `caring_support_relationship_id` bigint(20) unsigned DEFAULT NULL,
+  `support_recipient_id` int(10) unsigned DEFAULT NULL,
   `date_logged` date NOT NULL,
   `hours` decimal(5,2) NOT NULL,
   `description` text DEFAULT NULL,
@@ -10720,6 +10722,8 @@ CREATE TABLE `vol_logs` (
   KEY `vol_logs_opportunity_id_foreign` (`opportunity_id`),
   KEY `vol_logs_assigned_to_index` (`assigned_to`),
   KEY `vol_logs_escalated_at_index` (`escalated_at`),
+  KEY `idx_vol_logs_caring_relationship` (`caring_support_relationship_id`),
+  KEY `idx_vol_logs_support_recipient` (`support_recipient_id`),
   CONSTRAINT `vol_logs_opportunity_id_foreign` FOREIGN KEY (`opportunity_id`) REFERENCES `vol_opportunities` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `vol_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -11448,7 +11452,8 @@ INSERT INTO `laravel_migrations` VALUES
 (133,'2026_04_27_080024_fix_broker_schema_fks_and_tenant_scoping',58),
 (134,'2026_04_27_084131_patch_agoris_supported_languages',59),
 (135,'2026_04_27_140000_add_listings_tenant_user_index',60),
-(136,'2026_04_27_100000_create_caring_support_relationships_table',61);
+(136,'2026_04_27_100000_create_caring_support_relationships_table',61),
+(137,'2026_04_27_110000_link_vol_logs_to_caring_support_relationships',62);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

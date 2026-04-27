@@ -1152,6 +1152,7 @@ Route::get('/v2/admin/caring-community/member-statements/{userId}', [\App\Http\C
 Route::get('/v2/admin/caring-community/support-relationships', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'supportRelationships']);
 Route::post('/v2/admin/caring-community/support-relationships', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'createSupportRelationship']);
 Route::put('/v2/admin/caring-community/support-relationships/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateSupportRelationship']);
+Route::post('/v2/admin/caring-community/support-relationships/{id}/hours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'logSupportRelationshipHours']);
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);

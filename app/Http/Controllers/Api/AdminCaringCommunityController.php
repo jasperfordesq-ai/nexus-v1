@@ -165,6 +165,27 @@ class AdminCaringCommunityController extends BaseApiController
         return $this->respondWithData($relationship);
     }
 
+    public function logSupportRelationshipHours(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $result = $this->supportRelationshipService->logHours(TenantContext::getId(), $id, $this->getAllInput(), (int) auth()->id());
+        if (($result['success'] ?? false) !== true) {
+            $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
+            $message = match ($code) {
+                'NOT_FOUND' => __('api.caring_support_relationship_not_found'),
+                'RELATIONSHIP_INACTIVE' => __('api.caring_support_relationship_inactive'),
+                'ALREADY_EXISTS' => __('api.caring_support_relationship_log_duplicate'),
+                default => __('api.caring_support_relationship_log_failed'),
+            };
+
+            return $this->respondWithError($code, $message, null, $code === 'NOT_FOUND' ? 404 : 422);
+        }
+
+        return $this->respondWithData($result, null, 201);
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();

@@ -203,7 +203,11 @@ export default function MunicipalImpactReportsPage() {
   }), [summary?.currency]);
 
   const metric = (key: string) => stats[key] ?? 0;
-  const formatHours = (value: number) => t('municipal_reports.values.hours', { count: value.toLocaleString(undefined, { maximumFractionDigits: 1 }) });
+  const formatHours = (value: number) => t('municipal_reports.values.hours', { count: Number(value.toFixed(1)) });
+  const templateOptions = useMemo(() => [
+    { id: 'default', label: t('municipal_reports.templates.default_policy') },
+    ...templates.map((template) => ({ id: String(template.id), label: template.name })),
+  ], [templates, t]);
 
   const handleExport = async (format: 'csv' | 'pdf') => {
     setExporting(format);
@@ -420,13 +424,9 @@ export default function MunicipalImpactReportsPage() {
                 const value = Array.from(keys)[0];
                 setSelectedTemplateId(value && value !== 'default' ? Number(value) : null);
               }}
+              items={templateOptions}
             >
-              <SelectItem key="default">{t('municipal_reports.templates.default_policy')}</SelectItem>
-              {templates.map((template) => (
-                <SelectItem key={String(template.id)}>
-                  {template.name}
-                </SelectItem>
-              ))}
+              {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
             </Select>
             <Button
               variant="flat"

@@ -230,6 +230,10 @@ export default function CaringCommunityWorkflowPage() {
   const [relationshipExpectedHours, setRelationshipExpectedHours] = useState('1');
   const [relationshipStartDate, setRelationshipStartDate] = useState('');
   const [updatingRelationshipId, setUpdatingRelationshipId] = useState<number | null>(null);
+  const [loggingRelationshipId, setLoggingRelationshipId] = useState<number | null>(null);
+  const [relationshipLogDate, setRelationshipLogDate] = useState('');
+  const [relationshipLogHours, setRelationshipLogHours] = useState('');
+  const [relationshipLogDescription, setRelationshipLogDescription] = useState('');
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -266,7 +270,7 @@ export default function CaringCommunityWorkflowPage() {
   const stats = summary?.stats;
   const signals = summary?.coordinator_signals;
   const rolePack = summary?.role_pack;
-  const formatHours = (value: number) => t('municipal_reports.values.hours', { count: value.toLocaleString(undefined, { maximumFractionDigits: 1 }) });
+  const formatHours = (value: number) => t('municipal_reports.values.hours', { count: Number(value.toFixed(1)) });
   const formatChf = (value: number) => t('caring_workflow.member_statement.chf_value', { value: value.toLocaleString(undefined, { maximumFractionDigits: 0 }) });
 
   const roleCountLabel = useMemo(() => (
@@ -279,6 +283,14 @@ export default function CaringCommunityWorkflowPage() {
     const statuses = rolePack?.presets ?? [];
     return new Map(statuses.map((status) => [status.key, status]));
   }, [rolePack]);
+  const coordinatorOptions = useMemo(() => [
+    { id: 'unassigned', label: t('caring_workflow.review_queue.unassigned_coordinator') },
+    ...(summary?.coordinators ?? []).map((coordinator) => ({ id: String(coordinator.id), label: coordinator.name })),
+  ], [summary?.coordinators, t]);
+  const frequencyOptions = useMemo(() => relationshipFrequencies.map((frequency) => ({
+    id: frequency,
+    label: t(`caring_workflow.support_relationships.frequencies.${frequency}`),
+  })), [t]);
 
   const replaceReview = useCallback((review: PendingReview) => {
     setSummary((current) => {
@@ -374,7 +386,7 @@ export default function CaringCommunityWorkflowPage() {
     setLoadingStatement(true);
     try {
       const res = await api.get<MemberStatement>(`/v2/admin/caring-community/member-statements/${memberId}${statementQuery()}`);
-      setMemberStatement(res.data);
+      setMemberStatement(res.data ?? null);
     } catch {
       toast.error(t('caring_workflow.member_statement.load_failed'));
     } finally {
@@ -392,6 +404,7 @@ export default function CaringCommunityWorkflowPage() {
     setLoadingStatement(true);
     try {
       const res = await api.get<MemberStatementCsv>(`/v2/admin/caring-community/member-statements/${memberId}${statementQuery('csv')}`);
+      if (!res.data) throw new Error('Missing member statement CSV payload');
       setMemberStatement(res.data.statement);
       const blob = new Blob([res.data.csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -462,6 +475,41 @@ export default function CaringCommunityWorkflowPage() {
       setUpdatingRelationshipId(null);
     }
   }, [loadSupportRelationships, t, toast]);
+
+  const logSupportRelationshipHours = useCallback(async (relationship: SupportRelationship) => {
+    const hours = Number(relationshipLogHours || relationship.expected_hours);
+    if (!relationshipLogDate || !Number.isFinite(hours) || hours <= 0 || hours > 24) {
+      toast.error(t('caring_workflow.support_relationships.invalid_log'));
+      return;
+    }
+
+    setLoggingRelationshipId(relationship.id);
+    try {
+      await api.post(`/v2/admin/caring-community/support-relationships/${relationship.id}/hours`, {
+        date: relationshipLogDate,
+        hours,
+        description: relationshipLogDescription || undefined,
+      });
+      toast.success(t('caring_workflow.support_relationships.log_success'));
+      setRelationshipLogDate('');
+      setRelationshipLogHours('');
+      setRelationshipLogDescription('');
+      loadSupportRelationships();
+      loadWorkflow();
+    } catch {
+      toast.error(t('caring_workflow.support_relationships.log_failed'));
+    } finally {
+      setLoggingRelationshipId(null);
+    }
+  }, [
+    loadSupportRelationships,
+    loadWorkflow,
+    relationshipLogDate,
+    relationshipLogDescription,
+    relationshipLogHours,
+    t,
+    toast,
+  ]);
 
   if (loading) {
     return (
@@ -570,11 +618,9 @@ export default function CaringCommunityWorkflowPage() {
                         const selected = Array.from(keys)[0];
                         assignReview(review.id, selected && selected !== 'unassigned' ? Number(selected) : null);
                       }}
+                      items={coordinatorOptions}
                     >
-                      <SelectItem key="unassigned">{t('caring_workflow.review_queue.unassigned_coordinator')}</SelectItem>
-                      {(summary?.coordinators ?? []).map((coordinator) => (
-                        <SelectItem key={String(coordinator.id)}>{coordinator.name}</SelectItem>
-                      ))}
+                      {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
                     </Select>
                     <Button
                       size="sm"
@@ -625,10 +671,9 @@ export default function CaringCommunityWorkflowPage() {
                     label={t('caring_workflow.support_relationships.frequency')}
                     selectedKeys={[relationshipFrequency]}
                     onSelectionChange={(keys) => setRelationshipFrequency((Array.from(keys)[0]?.toString() as SupportRelationship['frequency']) || 'weekly')}
+                    items={frequencyOptions}
                   >
-                    {relationshipFrequencies.map((frequency) => (
-                      <SelectItem key={frequency}>{t(`caring_workflow.support_relationships.frequencies.${frequency}`)}</SelectItem>
-                    ))}
+                    {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
                   </Select>
                   <Input type="number" min={0.25} step={0.25} label={t('caring_workflow.support_relationships.expected_hours_input')} value={relationshipExpectedHours} onValueChange={setRelationshipExpectedHours} />
                   <Input type="date" label={t('caring_workflow.support_relationships.start_date')} value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
@@ -668,7 +713,7 @@ export default function CaringCommunityWorkflowPage() {
                     {relationship.next_check_in_at && <span>{t('caring_workflow.support_relationships.next_check_in', { date: relationship.next_check_in_at })}</span>}
                     {relationship.organization_name && <span>{relationship.organization_name}</span>}
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant="flat"
@@ -680,6 +725,47 @@ export default function CaringCommunityWorkflowPage() {
                       {relationship.status === 'active' ? t('caring_workflow.support_relationships.pause') : t('caring_workflow.support_relationships.resume')}
                     </Button>
                   </div>
+                  {relationship.status === 'active' && (
+                    <div className="mt-4 rounded-lg bg-default-50 p-3">
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_2fr_auto]">
+                        <Input
+                          type="date"
+                          size="sm"
+                          label={t('caring_workflow.support_relationships.log_date')}
+                          value={relationshipLogDate}
+                          onValueChange={setRelationshipLogDate}
+                        />
+                        <Input
+                          type="number"
+                          size="sm"
+                          min={0.25}
+                          max={24}
+                          step={0.25}
+                          label={t('caring_workflow.support_relationships.log_hours')}
+                          placeholder={String(relationship.expected_hours)}
+                          value={relationshipLogHours}
+                          onValueChange={setRelationshipLogHours}
+                        />
+                        <Input
+                          size="sm"
+                          label={t('caring_workflow.support_relationships.log_note')}
+                          value={relationshipLogDescription}
+                          onValueChange={setRelationshipLogDescription}
+                        />
+                        <Button
+                          size="sm"
+                          color="primary"
+                          variant="flat"
+                          className="self-end"
+                          startContent={<ClipboardCheck size={16} />}
+                          isLoading={loggingRelationshipId === relationship.id}
+                          onPress={() => logSupportRelationshipHours(relationship)}
+                        >
+                          {t('caring_workflow.support_relationships.log_hours_action')}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </CardBody>

@@ -19,6 +19,11 @@ class CaringSupportRelationshipService
     private const FREQUENCIES = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'];
     private const STATUSES = ['active', 'paused', 'completed', 'cancelled'];
 
+    public function __construct(
+        private readonly CaringCommunityWorkflowPolicyService $policyService,
+    ) {
+    }
+
     public function list(int $tenantId, array $filters = []): array
     {
         if (!Schema::hasTable('caring_support_relationships')) {
@@ -257,6 +262,111 @@ class CaringSupportRelationshipService
         ];
     }
 
+    public function logHours(int $tenantId, int $relationshipId, array $input, int $coordinatorId): array
+    {
+        if (
+            !Schema::hasTable('caring_support_relationships')
+            || !Schema::hasTable('vol_logs')
+            || !Schema::hasColumn('vol_logs', 'caring_support_relationship_id')
+            || !Schema::hasColumn('vol_logs', 'support_recipient_id')
+        ) {
+            return ['success' => false, 'code' => 'SCHEMA_MISSING'];
+        }
+
+        $relationship = DB::table('caring_support_relationships')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $relationshipId)
+            ->first();
+        if (!$relationship) {
+            return ['success' => false, 'code' => 'NOT_FOUND'];
+        }
+        if ((string) $relationship->status !== 'active') {
+            return ['success' => false, 'code' => 'RELATIONSHIP_INACTIVE'];
+        }
+
+        $date = $this->normaliseDate($input['date'] ?? null);
+        $hours = (float) ($input['hours'] ?? 0);
+        if ($date === null || strtotime($date) > time() || $hours <= 0 || $hours > 24) {
+            return ['success' => false, 'code' => 'VALIDATION_ERROR'];
+        }
+
+        $duplicate = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', (int) $relationship->supporter_id)
+            ->where('caring_support_relationship_id', $relationshipId)
+            ->where('date_logged', $date)
+            ->whereNotIn('status', ['declined', 'rejected'])
+            ->exists();
+        if ($duplicate) {
+            return ['success' => false, 'code' => 'ALREADY_EXISTS'];
+        }
+
+        $status = $this->resolveLogStatus($tenantId, $coordinatorId);
+        $description = trim((string) ($input['description'] ?? ''));
+        if ($description === '') {
+            $description = (string) $relationship->title;
+        }
+
+        $logId = 0;
+        $paymentResult = null;
+        DB::transaction(function () use ($tenantId, $relationshipId, $relationship, $date, $hours, $description, $status, &$logId, &$paymentResult): void {
+            DB::table('vol_logs')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => (int) $relationship->supporter_id,
+                'organization_id' => $relationship->organization_id ? (int) $relationship->organization_id : null,
+                'opportunity_id' => null,
+                'caring_support_relationship_id' => $relationshipId,
+                'support_recipient_id' => (int) $relationship->recipient_id,
+                'date_logged' => $date,
+                'hours' => $hours,
+                'description' => mb_substr($description, 0, 2000),
+                'status' => $status,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $logId = (int) DB::getPdo()->lastInsertId();
+
+            if ($status === 'approved' && $relationship->organization_id) {
+                $org = DB::table('vol_organizations')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $relationship->organization_id)
+                    ->first();
+                if ($org && (bool) ($org->auto_pay_enabled ?? false)) {
+                    $paymentResult = $this->applyOrganizationPayment(
+                        $tenantId,
+                        (int) $org->id,
+                        (int) $org->user_id,
+                        (int) $relationship->supporter_id,
+                        $logId,
+                        $hours,
+                    );
+                }
+            }
+
+            DB::table('caring_support_relationships')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $relationshipId)
+                ->update([
+                    'last_logged_at' => now(),
+                    'next_check_in_at' => $this->nextCheckIn($date, (string) $relationship->frequency),
+                    'updated_at' => now(),
+                ]);
+        });
+
+        return [
+            'success' => true,
+            'log' => [
+                'id' => $logId,
+                'status' => $status,
+                'hours' => round($hours, 2),
+                'date_logged' => $date,
+                'payment_result' => $paymentResult,
+            ],
+            'relationship' => $this->find($tenantId, $relationshipId),
+        ];
+    }
+
     private function tenantUserExists(int $tenantId, int $userId): bool
     {
         return DB::table('users')->where('tenant_id', $tenantId)->where('id', $userId)->exists();
@@ -309,6 +419,111 @@ class CaringSupportRelationshipService
         };
 
         return date('Y-m-d 09:00:00', strtotime($startDate . ' ' . $modifier));
+    }
+
+    private function resolveLogStatus(int $tenantId, int $coordinatorId): string
+    {
+        $policy = $this->policyService->get($tenantId);
+        if (!($policy['approval_required'] ?? true)) {
+            return 'approved';
+        }
+
+        if (
+            $this->isTenantCoordinator($tenantId, $coordinatorId)
+            || (($policy['auto_approve_trusted_reviewers'] ?? false) && $this->hasCaringWorkflowPermission($tenantId, $coordinatorId, 'volunteering.hours.review'))
+        ) {
+            return 'approved';
+        }
+
+        return 'pending';
+    }
+
+    private function isTenantCoordinator(int $tenantId, int $userId): bool
+    {
+        $user = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $userId)
+            ->first(['role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        return $user && (
+            in_array((string) $user->role, ['admin', 'tenant_admin', 'super_admin', 'broker'], true)
+            || (int) ($user->is_admin ?? 0) === 1
+            || (int) ($user->is_super_admin ?? 0) === 1
+            || (int) ($user->is_tenant_super_admin ?? 0) === 1
+            || (int) ($user->is_god ?? 0) === 1
+        );
+    }
+
+    private function hasCaringWorkflowPermission(int $tenantId, int $userId, string $permission): bool
+    {
+        if (!Schema::hasTable('user_roles') || !Schema::hasTable('role_permissions') || !Schema::hasTable('permissions')) {
+            return false;
+        }
+
+        return DB::table('user_roles as ur')
+            ->join('role_permissions as rp', 'rp.role_id', '=', 'ur.role_id')
+            ->join('permissions as p', 'p.id', '=', 'rp.permission_id')
+            ->where('ur.tenant_id', $tenantId)
+            ->where('ur.user_id', $userId)
+            ->where('p.name', $permission)
+            ->exists();
+    }
+
+    private function applyOrganizationPayment(
+        int $tenantId,
+        int $organizationId,
+        int $organizationOwnerId,
+        int $supporterId,
+        int $logId,
+        float $hours,
+    ): string {
+        $orgLocked = DB::selectOne(
+            "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+            [$organizationId, $tenantId]
+        );
+        if (!$orgLocked || (float) $orgLocked->balance < $hours) {
+            return 'insufficient_balance';
+        }
+
+        DB::table('vol_organizations')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $organizationId)
+            ->update(['balance' => DB::raw('balance - ' . (float) $hours)]);
+
+        $wholeHours = (int) floor($hours);
+        if ($wholeHours > 0) {
+            DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $supporterId)
+                ->increment('balance', $wholeHours);
+        }
+
+        $description = __('api.caring_support_relationship_payment_description', ['hours' => $hours]);
+        DB::table('vol_org_transactions')->insert([
+            'tenant_id' => $tenantId,
+            'vol_organization_id' => $organizationId,
+            'user_id' => $supporterId,
+            'vol_log_id' => $logId,
+            'type' => 'volunteer_payment',
+            'amount' => -$hours,
+            'balance_after' => (float) $orgLocked->balance - $hours,
+            'description' => $description,
+            'created_at' => now(),
+        ]);
+
+        DB::table('transactions')->insert([
+            'tenant_id' => $tenantId,
+            'sender_id' => $organizationOwnerId,
+            'receiver_id' => $supporterId,
+            'amount' => $wholeHours,
+            'description' => $description,
+            'transaction_type' => 'volunteer',
+            'status' => 'completed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return 'paid';
     }
 
     private function displayName(object $row, string $prefix): string

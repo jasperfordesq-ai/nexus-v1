@@ -64,6 +64,10 @@ class AdminCaringCommunityControllerTest extends TestCase
             'support relationship update' => ['PUT', '/v2/admin/caring-community/support-relationships/999', [
                 'status' => 'paused',
             ]],
+            'support relationship hours' => ['POST', '/v2/admin/caring-community/support-relationships/999/hours', [
+                'date' => '2026-04-20',
+                'hours' => 1.5,
+            ]],
         ];
     }
 
@@ -228,5 +232,54 @@ class AdminCaringCommunityControllerTest extends TestCase
         $update->assertJsonPath('data.status', 'paused');
 
         $this->assertSame('paused', DB::table('caring_support_relationships')->where('id', $relationshipId)->value('status'));
+    }
+
+    public function test_support_relationship_hours_can_be_logged_without_partner_organisation(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $supporter = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $relationshipId = DB::table('caring_support_relationships')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'supporter_id' => $supporter->id,
+            'recipient_id' => $recipient->id,
+            'coordinator_id' => $admin->id,
+            'title' => 'Weekly neighbour check-in',
+            'frequency' => 'weekly',
+            'expected_hours' => 1.5,
+            'start_date' => '2026-04-01',
+            'status' => 'active',
+            'next_check_in_at' => '2026-04-08 09:00:00',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/admin/caring-community/support-relationships/{$relationshipId}/hours", [
+            'date' => '2026-04-20',
+            'hours' => 1.5,
+            'description' => 'Visit and medication reminder.',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.log.status', 'approved');
+        $response->assertJsonPath('data.relationship.last_logged_at', fn ($value) => is_string($value) && $value !== '');
+
+        $this->assertDatabaseHas('vol_logs', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $supporter->id,
+            'organization_id' => null,
+            'caring_support_relationship_id' => $relationshipId,
+            'support_recipient_id' => $recipient->id,
+            'date_logged' => '2026-04-20',
+            'status' => 'approved',
+        ]);
+
+        $this->assertSame(
+            '2026-04-27 09:00:00',
+            DB::table('caring_support_relationships')->where('id', $relationshipId)->value('next_check_in_at'),
+        );
     }
 }
