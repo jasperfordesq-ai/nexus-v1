@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Services\VolunteerService;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -29,6 +31,38 @@ class VolunteerControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function createVolunteerOrganisation(int $ownerId, float $balance, bool $autoPayEnabled): int
+    {
+        return (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'name' => 'KISS Partner ' . uniqid(),
+            'slug' => 'kiss-partner-' . uniqid(),
+            'description' => 'Neighbourhood caring community partner.',
+            'status' => 'active',
+            'auto_pay_enabled' => $autoPayEnabled,
+            'balance' => $balance,
+            'created_at' => now(),
+        ]);
+    }
+
+    private function setCaringWorkflowApprovalRequired(bool $approvalRequired): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $this->testTenantId,
+                'setting_key' => 'caring_community.workflow.approval_required',
+            ],
+            [
+                'setting_value' => $approvalRequired ? '1' : '0',
+                'setting_type' => 'boolean',
+                'category' => 'caring_community',
+                'description' => 'Caring community workflow policy setting.',
+                'updated_at' => now(),
+            ]
+        );
     }
 
     // ------------------------------------------------------------------
@@ -145,6 +179,64 @@ public function test_apply_requires_auth(): void
         ]);
 
         $response->assertStatus(401);
+    }
+
+    public function test_auto_approved_hours_with_auto_pay_credit_wallets_and_write_audit_entries(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3]);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 20.00, true);
+        $this->setCaringWorkflowApprovalRequired(false);
+
+        $logId = VolunteerService::logHours($volunteer->id, [
+            'organization_id' => $orgId,
+            'date' => now()->subDay()->toDateString(),
+            'hours' => 2.75,
+            'description' => 'Neighbour support visit.',
+        ]);
+
+        $this->assertNotNull($logId);
+        $this->assertSame('approved', VolunteerService::getLastLogStatus());
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+        $this->assertEquals(17.25, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(5, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+
+        $orgTransaction = DB::table('vol_org_transactions')->where('vol_log_id', $logId)->first();
+        $this->assertNotNull($orgTransaction);
+        $this->assertSame('volunteer_payment', $orgTransaction->type);
+        $this->assertEquals(-2.75, (float) $orgTransaction->amount);
+        $this->assertEquals(17.25, (float) $orgTransaction->balance_after);
+
+        $walletTransaction = DB::table('transactions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('sender_id', $owner->id)
+            ->where('receiver_id', $volunteer->id)
+            ->where('transaction_type', 'volunteer')
+            ->first();
+        $this->assertNotNull($walletTransaction);
+        $this->assertSame(2, (int) $walletTransaction->amount);
+    }
+
+    public function test_auto_approved_hours_with_insufficient_org_balance_stay_approved_without_wallet_credit(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 1]);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 1.00, true);
+        $this->setCaringWorkflowApprovalRequired(false);
+
+        $logId = VolunteerService::logHours($volunteer->id, [
+            'organization_id' => $orgId,
+            'date' => now()->subDays(2)->toDateString(),
+            'hours' => 3.00,
+            'description' => 'Escorted appointment support.',
+        ]);
+
+        $this->assertNotNull($logId);
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+        $this->assertEquals(1.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(1, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertSame(0, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->count());
+        $this->assertSame(0, DB::table('transactions')->where('receiver_id', $volunteer->id)->where('transaction_type', 'volunteer')->count());
     }
 
     // ------------------------------------------------------------------

@@ -998,7 +998,7 @@ class VolunteerService
         }
 
         // Verify organization exists
-        $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $data['organization_id'], $tenantId]);
+        $org = DB::selectOne("SELECT id, user_id, auto_pay_enabled FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $data['organization_id'], $tenantId]);
         if (!$org) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
             return null;
@@ -1036,24 +1036,41 @@ class VolunteerService
 
         try {
             $status = self::resolveCaringHourLogStatus($userId, $tenantId, $policy);
-            DB::insert(
-                "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                [
-                    $tenantId,
-                    $userId,
-                    (int) $data['organization_id'],
-                    $data['opportunity_id'] ?? null,
-                    $data['date'],
-                    (float) $data['hours'],
-                    $data['description'] ?? '',
-                    $status,
-                ]
-            );
+            $logId = null;
+
+            DB::transaction(function () use ($tenantId, $userId, $data, $status, $org, &$logId): void {
+                DB::insert(
+                    "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description, status, created_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                    [
+                        $tenantId,
+                        $userId,
+                        (int) $data['organization_id'],
+                        $data['opportunity_id'] ?? null,
+                        $data['date'],
+                        (float) $data['hours'],
+                        $data['description'] ?? '',
+                        $status,
+                    ]
+                );
+
+                $logId = (int) DB::getPdo()->lastInsertId();
+
+                if ($status === 'approved' && (bool) $org->auto_pay_enabled) {
+                    self::applyVolunteerAutoPayment(
+                        $tenantId,
+                        (int) $org->id,
+                        (int) $org->user_id,
+                        $userId,
+                        $logId,
+                        (float) $data['hours'],
+                    );
+                }
+            });
 
             self::$lastLogStatus = $status;
 
-            return (int) DB::getPdo()->lastInsertId();
+            return $logId;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::logHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
@@ -1729,6 +1746,51 @@ class VolunteerService
         }
 
         return 'pending';
+    }
+
+    private static function applyVolunteerAutoPayment(
+        int $tenantId,
+        int $organizationId,
+        int $organizationOwnerId,
+        int $volunteerId,
+        int $logId,
+        float $hours,
+    ): string {
+        $intHours = (int) floor($hours);
+        $orgLocked = DB::selectOne(
+            "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+            [$organizationId, $tenantId]
+        );
+
+        if (!$orgLocked || (float) $orgLocked->balance < $hours) {
+            return 'insufficient_balance';
+        }
+
+        DB::update(
+            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+            [$hours, $organizationId, $tenantId]
+        );
+        $newOrgBalance = (float) $orgLocked->balance - $hours;
+
+        if ($intHours > 0) {
+            DB::update(
+                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                [$intHours, $volunteerId, $tenantId]
+            );
+        }
+
+        $description = "Auto-payment for {$hours}h volunteered";
+        DB::insert("
+            INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
+            VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
+        ", [$tenantId, $organizationId, $volunteerId, $logId, -$hours, $newOrgBalance, $description]);
+
+        DB::insert("
+            INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
+        ", [$tenantId, $organizationOwnerId, $volunteerId, $intHours, $description]);
+
+        return 'paid';
     }
 
     private static function canBypassCaringWorkflowPolicy(int $userId, int $tenantId): bool
