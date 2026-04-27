@@ -564,5 +564,32 @@
     "errors": {
       "load_failed": "Could not load your support relationships."
     }
+  },
+  "request_help": {
+    "meta": {
+      "title": "Request Help",
+      "description": "Ask your community for support"
+    },
+    "form": {
+      "what_label": "What kind of help do you need?",
+      "what_placeholder": "e.g. Help with grocery shopping, a lift to a medical appointment, company for a walk...",
+      "when_label": "When do you need it?",
+      "when_placeholder": "e.g. Tuesday afternoons, as soon as possible...",
+      "contact_label": "How should we contact you?",
+      "contact_phone": "By phone",
+      "contact_message": "By message",
+      "contact_either": "Either is fine",
+      "submit": "Request Help",
+      "submitting": "Sending request..."
+    },
+    "success": {
+      "title": "Request Received",
+      "body": "Your request has been received. A coordinator will be in touch soon.",
+      "back": "Back to Community Hub"
+    },
+    "errors": {
+      "submit_failed": "Could not submit your request. Please try again."
+    },
+    "back": "Back to Community Hub"
   }
 }

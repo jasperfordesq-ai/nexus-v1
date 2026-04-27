@@ -10,6 +10,7 @@ import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Clock from 'lucide-react/icons/clock';
+import Copy from 'lucide-react/icons/copy';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
@@ -238,6 +239,15 @@ export default function CaringCommunityWorkflowPage() {
   const [relationshipLogDate, setRelationshipLogDate] = useState('');
   const [relationshipLogHours, setRelationshipLogHours] = useState('');
   const [relationshipLogDescription, setRelationshipLogDescription] = useState('');
+
+  // Assisted onboarding state
+  const [onboardingName, setOnboardingName] = useState('');
+  const [onboardingEmail, setOnboardingEmail] = useState('');
+  const [onboardingPhone, setOnboardingPhone] = useState('');
+  const [onboardingNote, setOnboardingNote] = useState('');
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
+  const [onboardingResult, setOnboardingResult] = useState<{ user: { id: number; name: string; email: string }; temp_password: string } | null>(null);
+  const [onboardingCopied, setOnboardingCopied] = useState(false);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -531,6 +541,45 @@ export default function CaringCommunityWorkflowPage() {
     t,
     toast,
   ]);
+
+  const submitAssistedOnboarding = useCallback(async () => {
+    if (!onboardingName.trim() || !onboardingEmail.trim()) {
+      toast.error('Name and email are required.');
+      return;
+    }
+    setOnboardingLoading(true);
+    setOnboardingResult(null);
+    try {
+      const res = await api.post<{ user: { id: number; name: string; email: string }; temp_password: string }>(
+        '/v2/admin/caring-community/assisted-onboarding',
+        {
+          name: onboardingName.trim(),
+          email: onboardingEmail.trim(),
+          phone: onboardingPhone.trim() || undefined,
+          note: onboardingNote.trim() || undefined,
+        },
+      );
+      if (res.data) {
+        setOnboardingResult(res.data);
+        setOnboardingName('');
+        setOnboardingEmail('');
+        setOnboardingPhone('');
+        setOnboardingNote('');
+        toast.success('Member account created successfully.');
+      }
+    } catch {
+      toast.error('Could not create member account. Please check the email is not already registered.');
+    } finally {
+      setOnboardingLoading(false);
+    }
+  }, [onboardingEmail, onboardingName, onboardingNote, onboardingPhone, toast]);
+
+  const copyTempPassword = useCallback(() => {
+    if (!onboardingResult) return;
+    void navigator.clipboard.writeText(onboardingResult.temp_password);
+    setOnboardingCopied(true);
+    setTimeout(() => setOnboardingCopied(false), 2000);
+  }, [onboardingResult]);
 
   if (loading) {
     return (
@@ -1087,6 +1136,83 @@ export default function CaringCommunityWorkflowPage() {
           </Card>
         </div>
       </div>
+
+      {/* Assisted Onboarding card */}
+      <Card className="mt-6" shadow="sm">
+        <CardHeader>
+          <div>
+            <h2 className="text-lg font-semibold">Assisted Onboarding</h2>
+            <p className="mt-1 text-sm text-default-500">
+              Create a member account on behalf of a participant who cannot self-register.
+            </p>
+          </div>
+        </CardHeader>
+        <Divider />
+        <CardBody className="gap-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <Input
+              label="Full name"
+              placeholder="e.g. Marie Curie"
+              value={onboardingName}
+              onValueChange={setOnboardingName}
+              isRequired
+            />
+            <Input
+              type="email"
+              label="Email address"
+              placeholder="member@example.com"
+              value={onboardingEmail}
+              onValueChange={setOnboardingEmail}
+              isRequired
+            />
+            <Input
+              label="Phone (optional)"
+              placeholder="+41 79 123 45 67"
+              value={onboardingPhone}
+              onValueChange={setOnboardingPhone}
+            />
+            <Input
+              label="Coordinator note (optional)"
+              placeholder="e.g. Met at Tuesday drop-in"
+              value={onboardingNote}
+              onValueChange={setOnboardingNote}
+            />
+          </div>
+          <Button
+            color="primary"
+            variant="flat"
+            startContent={<UserPlus size={16} />}
+            isLoading={onboardingLoading}
+            onPress={submitAssistedOnboarding}
+          >
+            Create Member Account
+          </Button>
+
+          {onboardingResult && (
+            <div className="rounded-lg border border-success-200 bg-success-50 p-4">
+              <p className="text-sm font-semibold text-success-700">
+                Account created for {onboardingResult.user.name} ({onboardingResult.user.email})
+              </p>
+              <p className="mt-2 text-xs text-default-500">
+                The member should change this password on first login.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <code className="flex-1 rounded bg-default-100 px-3 py-2 text-sm font-mono text-default-900">
+                  {onboardingResult.temp_password}
+                </code>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  startContent={<Copy size={14} />}
+                  onPress={copyTempPassword}
+                >
+                  {onboardingCopied ? 'Copied!' : 'Copy'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
       <Card className="mt-6" shadow="sm">
         <CardHeader>

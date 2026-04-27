@@ -8296,7 +8296,23 @@
       "submitted_on": "Submitted {{date}}",
       "escalated": "{{count}} escalated",
       "escalate_now": "Escalate now",
-      "age_days": "{{count}} days waiting"
+      "age_days": "{{count}} days waiting",
+      "assigned_to": "Assigned to {{name}}",
+      "escalated_on": "Escalated {{date}}",
+      "assign_label": "Assigned coordinator",
+      "unassigned_coordinator": "Unassigned",
+      "assign_success": "Review assignment updated.",
+      "assign_failed": "Failed to update the review assignment.",
+      "escalate": "Escalate",
+      "re_escalate": "Update escalation",
+      "manual_escalation_note": "Manual escalation after {{count}} days waiting.",
+      "escalate_success": "Review escalated.",
+      "escalate_failed": "Failed to escalate the review.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "approve_success": "Review approved.",
+      "decline_success": "Review declined.",
+      "decision_failed": "Failed to apply the review decision."
     },
     "signals": {
       "title": "Coordinator signals",
@@ -8392,6 +8408,74 @@
         "year_to_date": "Year to date",
         "previous_quarter": "Previous quarter"
       }
+    },
+    "member_statement": {
+      "title": "Member statements",
+      "description": "Preview or export a KISS-style member statement with support hours, wallet movement, and municipal value assumptions.",
+      "member_id": "Member ID",
+      "start_date": "From",
+      "end_date": "To",
+      "preview": "Preview",
+      "export_csv": "Export CSV",
+      "empty": "Enter a member ID to generate a statement.",
+      "approved_hours": "Approved",
+      "pending_hours": "Pending",
+      "earned": "Earned",
+      "spent": "Spent",
+      "chf_value": "Estimated social value: CHF {{value}}",
+      "invalid_member": "Enter a valid member ID.",
+      "load_failed": "Failed to load the member statement.",
+      "export_success": "Member statement CSV prepared.",
+      "export_failed": "Failed to export the member statement."
+    },
+    "support_relationships": {
+      "title": "Recurring support relationships",
+      "description": "Create and monitor ongoing supporter-recipient relationships for KISS-style recurring care.",
+      "active": "Active",
+      "paused": "Paused",
+      "check_ins_due": "Check-ins due",
+      "expected_hours": "Expected hours",
+      "supporter": "Supporter",
+      "supporter_placeholder": "Search by name or email",
+      "recipient": "Recipient",
+      "recipient_placeholder": "Search by name or email",
+      "no_members": "No members match that search.",
+      "relationship_title": "Relationship title",
+      "frequency": "Frequency",
+      "expected_hours_input": "Expected hours",
+      "start_date": "Start date",
+      "create": "Create relationship",
+      "empty": "No support relationships yet.",
+      "pair": "{{supporter}} supporting {{recipient}}",
+      "started": "Started {{date}}",
+      "next_check_in": "Next check-in {{date}}",
+      "pause": "Pause",
+      "resume": "Resume",
+      "log_date": "Log date",
+      "log_hours": "Hours",
+      "log_note": "Coordinator note",
+      "log_hours_action": "Log hours",
+      "invalid_members": "Choose two different valid members.",
+      "invalid_log": "Enter a valid date and hours between 0.25 and 24.",
+      "load_failed": "Failed to load support relationships.",
+      "create_success": "Support relationship created.",
+      "create_failed": "Failed to create the support relationship.",
+      "update_success": "Support relationship updated.",
+      "update_failed": "Failed to update the support relationship.",
+      "log_success": "Support hours logged.",
+      "log_failed": "Failed to log support hours.",
+      "frequencies": {
+        "weekly": "Weekly",
+        "fortnightly": "Fortnightly",
+        "monthly": "Monthly",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
     }
   },
   "municipal_reports": {
@@ -8426,7 +8510,8 @@
     "multiplier": "Social multiplier",
     "sections": {
       "categories": "Support categories",
-      "trends": "Verified activity trend"
+      "trends": "Verified activity trend",
+      "readiness": "Procurement readiness signals"
     },
     "empty": {
       "categories": "No completed support categories in this period.",
@@ -8441,7 +8526,12 @@
     "toast": {
       "load_failed": "Failed to load municipal impact data.",
       "export_started": "Report export started.",
-      "export_failed": "Failed to export the municipal report."
+      "export_failed": "Failed to export the municipal report.",
+      "templates_load_failed": "Failed to load report templates.",
+      "template_saved": "Report template saved.",
+      "template_save_failed": "Failed to save the report template.",
+      "template_deleted": "Report template deleted.",
+      "template_delete_failed": "Failed to delete the report template."
     },
     "cards": {
       "verified_hours": {
@@ -8473,6 +8563,52 @@
         "metric_3": "Audit trail"
       }
     },
-    "policy_default": "Policy default"
+    "policy_default": "Policy default",
+    "audience": "Audience",
+    "filters": {
+      "title": "Reporting window",
+      "description": "Use explicit dates when preparing canton, municipality, foundation, or cooperative packs.",
+      "date_from": "From",
+      "date_to": "To",
+      "apply": "Apply dates",
+      "clear": "Clear"
+    },
+    "readiness": {
+      "municipal_value": "Municipal value",
+      "participation": "Participation",
+      "partner_network": "Partner network",
+      "local_exchange": "Local exchange",
+      "status": {
+        "ready": "Ready",
+        "needs_data": "Needs data"
+      }
+    },
+    "templates": {
+      "title": "Saved report templates",
+      "description": "Prepare repeatable municipal, canton, cooperative, or foundation report packs with the right audience, period, and value assumptions.",
+      "create": "New template",
+      "select_label": "Report template",
+      "default_policy": "Use workflow policy defaults",
+      "apply": "Apply",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save template",
+      "modal_title": "Create report template",
+      "hour_value_chip": "CHF {{value}}/h",
+      "fields": {
+        "name": "Template name",
+        "description": "Description",
+        "audience": "Audience",
+        "period": "Reporting period",
+        "hour_value": "Hour value override (CHF)",
+        "include_social_value": "Include social value estimate"
+      },
+      "audiences": {
+        "municipality": "Municipality",
+        "canton": "Canton",
+        "cooperative": "Cooperative",
+        "foundation": "Foundation"
+      }
+    }
   }
 }

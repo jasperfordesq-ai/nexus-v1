@@ -368,4 +368,46 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertJsonPath('data.review.payment_result', null);
         $this->assertSame('declined', DB::table('vol_logs')->where('id', $logId)->value('status'));
     }
+
+    /**
+     * Kill-switch smoke test: verify the tenant bootstrap endpoint reflects the
+     * caring_community feature toggle so the React frontend can gate its UI
+     * without a dedicated round-trip.
+     *
+     * When disabled → bootstrap features.caring_community === false
+     * When enabled  → bootstrap features.caring_community === true
+     *
+     * The bootstrap endpoint caches responses in Redis (key: t{id}:tenant_bootstrap).
+     * We flush that key between assertions so each call fetches fresh data from DB.
+     */
+    public function test_caring_community_feature_disabled_reflects_in_tenant_config(): void
+    {
+        $cacheKey = 't' . $this->testTenantId . ':tenant_bootstrap';
+
+        // Disable the feature, flush stale cache, confirm bootstrap returns false.
+        $this->setCaringCommunityFeature(false);
+        try {
+            \Illuminate\Support\Facades\Cache::store('redis')->forget($cacheKey);
+        } catch (\Throwable) {
+            // Redis may be unavailable in some test environments — cache miss is fine.
+        }
+
+        $response = $this->apiGet('/v2/tenant/bootstrap');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.features.caring_community', false);
+
+        // Re-enable, flush cache again, confirm bootstrap now returns true.
+        $this->setCaringCommunityFeature(true);
+        try {
+            \Illuminate\Support\Facades\Cache::store('redis')->forget($cacheKey);
+        } catch (\Throwable) {
+            // Redis may be unavailable in some test environments — cache miss is fine.
+        }
+
+        $response = $this->apiGet('/v2/tenant/bootstrap');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.features.caring_community', true);
+    }
 }

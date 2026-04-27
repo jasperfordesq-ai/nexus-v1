@@ -8,13 +8,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
+use App\Models\ActivityLog;
+use App\Models\User;
 use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
 use App\Services\CaringSupportRelationshipService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class AdminCaringCommunityController extends BaseApiController
 {
@@ -205,6 +211,111 @@ class AdminCaringCommunityController extends BaseApiController
         }
 
         return $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/assisted-onboarding
+     *
+     * Coordinator creates a member account on behalf of a participant who
+     * cannot self-register (e.g. elderly, non-technical). Returns a temporary
+     * password the coordinator can share with the new member in person.
+     */
+    public function assistedOnboarding(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        $tenantId = TenantContext::getId();
+        $input = $this->getAllInput();
+
+        $fullName = trim((string) ($input['name'] ?? ''));
+        $email = strtolower(trim((string) ($input['email'] ?? '')));
+        $phone = trim((string) ($input['phone'] ?? ''));
+        $note = trim((string) ($input['note'] ?? ''));
+
+        // Validate
+        $errors = [];
+        if ($fullName === '') {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.first_name_required'), 'field' => 'name'];
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.valid_email_required'), 'field' => 'email'];
+        }
+        if (!empty($errors)) {
+            return $this->respondWithErrors($errors, 422);
+        }
+
+        // Duplicate email check
+        if (User::findByEmail($email)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.email_already_exists'), 'email', 422);
+        }
+
+        // Split name into first / last
+        $parts = explode(' ', $fullName, 2);
+        $firstName = $parts[0];
+        $lastName = $parts[1] ?? '';
+
+        // Generate a secure temporary password
+        $tempPassword = substr(bin2hex(random_bytes(12)), 0, 16);
+
+        $newUserId = User::createWithTenant([
+            'first_name'  => $firstName,
+            'last_name'   => $lastName,
+            'email'       => $email,
+            'password'    => $tempPassword,
+            'phone'       => $phone ?: null,
+            'role'        => 'member',
+            'is_approved' => 1,
+        ], $tenantId);
+
+        if (!$newUserId) {
+            return $this->respondWithError('SERVER_ERROR', __('api.user_created_failed'), null, 500);
+        }
+
+        ActivityLog::log($adminId, 'coordinator_assisted_onboarding', "Coordinator-assisted onboarding: {$email}" . ($note ? " — {$note}" : ''));
+
+        // Send welcome email if the email looks real (skip dummy placeholder addresses)
+        $isDummy = str_ends_with($email, '.invalid') || str_ends_with($email, '.placeholder');
+        if (!$isDummy) {
+            try {
+                $newUser = User::findById($newUserId, true);
+                LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $tempPassword) {
+                    $tenant = TenantContext::get();
+                    $tenantName = $tenant['name'] ?? 'Project NEXUS';
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/login';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.admin_actions.welcome_created_title'))
+                        ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
+                        ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                        ->infoCard([
+                            __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+                            __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($tempPassword, ENT_QUOTES, 'UTF-8'),
+                        ])
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
+                        ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
+                        ->render();
+
+                    $mailer = Mailer::forCurrentTenant();
+                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html);
+                });
+            } catch (\Throwable $e) {
+                Log::warning('[AdminCC] Assisted onboarding welcome email failed: ' . $e->getMessage());
+            }
+        }
+
+        return $this->respondWithData([
+            'success'       => true,
+            'user'          => [
+                'id'    => $newUserId,
+                'name'  => trim("{$firstName} {$lastName}"),
+                'email' => $email,
+            ],
+            'temp_password' => $tempPassword,
+        ], null, 201);
     }
 
     private function guardCaringCommunity(): ?JsonResponse

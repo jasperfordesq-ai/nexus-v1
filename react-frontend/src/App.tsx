@@ -486,6 +486,15 @@ function AppRoutes() {
           </FeatureGate>
         } />
 
+        {/* Member-facing: Low-friction help request (AG10) */}
+        <Route path="caring-community/request-help" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <RequestHelpPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
         {/* Member-facing: My Support Relationships (AG4) */}
         <Route path="caring-community/my-relationships" element={
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>

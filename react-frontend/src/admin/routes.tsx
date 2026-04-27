@@ -21,6 +21,25 @@ function TenantRedirect({ to }: { to: string }) {
   return <Navigate to={tenantPath(to)} replace />;
 }
 
+/**
+ * Route element that renders children only when a feature is enabled.
+ * When disabled, redirects to the admin 404 page so the URL resolves
+ * cleanly without leaking module UI to tenants that lack the feature.
+ */
+function FeatureGatedElement({
+  feature,
+  children,
+}: {
+  feature: string;
+  children: React.ReactNode;
+}) {
+  const { hasFeature, tenantPath } = useTenant();
+  if (!hasFeature(feature)) {
+    return <Navigate to={tenantPath('/admin/not-found')} replace />;
+  }
+  return <>{children}</>;
+}
+
 // Lazy-loaded admin pages
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
 const UserList = lazy(() => import('./modules/users/UserList'));
@@ -512,8 +531,23 @@ export function AdminRoutes() {
       <Route path="volunteering/consents" element={<Lazy><VolunteerConsents /></Lazy>} />
       <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
       <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
-      <Route path="caring-community" element={<Lazy><CaringCommunityAdmin /></Lazy>} />
-      <Route path="caring-community/workflow" element={<Lazy><CaringCommunityWorkflowPage /></Lazy>} />
+      {/* ─── CARING COMMUNITY (feature-gated) ─── */}
+      <Route
+        path="caring-community"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CaringCommunityAdmin /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+      <Route
+        path="caring-community/workflow"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CaringCommunityWorkflowPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
