@@ -22,6 +22,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Users from 'lucide-react/icons/users';
+import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -215,6 +216,7 @@ export default function CaringCommunityWorkflowPage() {
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [assigningReviewId, setAssigningReviewId] = useState<number | null>(null);
   const [escalatingReviewId, setEscalatingReviewId] = useState<number | null>(null);
+  const [decidingReviewId, setDecidingReviewId] = useState<number | null>(null);
   const [statementMemberId, setStatementMemberId] = useState('');
   const [statementStartDate, setStatementStartDate] = useState('');
   const [statementEndDate, setStatementEndDate] = useState('');
@@ -366,6 +368,21 @@ export default function CaringCommunityWorkflowPage() {
       setEscalatingReviewId(null);
     }
   }, [replaceReview, t, toast]);
+
+  const decideReview = useCallback(async (review: PendingReview, action: 'approve' | 'decline') => {
+    setDecidingReviewId(review.id);
+    try {
+      const res = await api.put<{ review: { summary: WorkflowSummary } }>(`/v2/admin/caring-community/workflow/reviews/${review.id}/decision`, {
+        action,
+      });
+      if (res.data?.review?.summary) setSummary(res.data.review.summary);
+      toast.success(t(action === 'approve' ? 'caring_workflow.review_queue.approve_success' : 'caring_workflow.review_queue.decline_success'));
+    } catch {
+      toast.error(t('caring_workflow.review_queue.decision_failed'));
+    } finally {
+      setDecidingReviewId(null);
+    }
+  }, [t, toast]);
 
   const statementQuery = useCallback((format?: 'csv') => {
     const params = new URLSearchParams();
@@ -608,12 +625,12 @@ export default function CaringCommunityWorkflowPage() {
                     {review.assigned_name && <span>{t('caring_workflow.review_queue.assigned_to', { name: review.assigned_name })}</span>}
                     {review.escalated_at && <span>{t('caring_workflow.review_queue.escalated_on', { date: review.escalated_at })}</span>}
                   </div>
-                  <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
                     <Select
                       size="sm"
                       label={t('caring_workflow.review_queue.assign_label')}
                       selectedKeys={[review.assigned_to ? String(review.assigned_to) : 'unassigned']}
-                      isDisabled={assigningReviewId === review.id}
+                      isDisabled={assigningReviewId === review.id || decidingReviewId === review.id}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0];
                         assignReview(review.id, selected && selected !== 'unassigned' ? Number(selected) : null);
@@ -628,9 +645,30 @@ export default function CaringCommunityWorkflowPage() {
                       color={review.is_escalated ? 'danger' : 'warning'}
                       startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
                       isLoading={escalatingReviewId === review.id}
+                      isDisabled={decidingReviewId === review.id}
                       onPress={() => escalateReview(review)}
                     >
                       {review.is_escalated ? t('caring_workflow.review_queue.re_escalate') : t('caring_workflow.review_queue.escalate')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="success"
+                      startContent={<CheckCircle2 size={16} />}
+                      isLoading={decidingReviewId === review.id}
+                      onPress={() => decideReview(review, 'approve')}
+                    >
+                      {t('caring_workflow.review_queue.approve')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="danger"
+                      startContent={<XCircle size={16} />}
+                      isDisabled={decidingReviewId === review.id}
+                      onPress={() => decideReview(review, 'decline')}
+                    >
+                      {t('caring_workflow.review_queue.decline')}
                     </Button>
                   </div>
                 </div>

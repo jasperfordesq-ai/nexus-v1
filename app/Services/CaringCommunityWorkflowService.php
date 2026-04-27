@@ -79,6 +79,63 @@ class CaringCommunityWorkflowService
         return $updated > 0 ? $this->reviewById($tenantId, $logId, $this->policyService->get($tenantId)) : null;
     }
 
+    public function decideReview(int $tenantId, int $logId, int $reviewerId, string $action): ?array
+    {
+        if (!Schema::hasTable('vol_logs') || !in_array($action, ['approve', 'decline'], true)) {
+            return null;
+        }
+
+        $log = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $logId)
+            ->first();
+        if (!$log || (string) $log->status !== 'pending' || (int) $log->user_id === $reviewerId) {
+            return null;
+        }
+
+        $status = $action === 'approve' ? 'approved' : 'declined';
+        $paymentResult = null;
+
+        DB::transaction(function () use ($tenantId, $logId, $log, $status, $action, &$paymentResult): void {
+            DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $logId)
+                ->where('status', 'pending')
+                ->update([
+                    'status' => $status,
+                    'updated_at' => now(),
+                ]);
+
+            if ($action !== 'approve' || empty($log->organization_id) || !Schema::hasTable('vol_organizations')) {
+                return;
+            }
+
+            $org = DB::table('vol_organizations')
+                ->where('tenant_id', $tenantId)
+                ->where('id', (int) $log->organization_id)
+                ->first();
+            if (!$org || !(bool) ($org->auto_pay_enabled ?? false)) {
+                return;
+            }
+
+            $paymentResult = $this->applyOrganizationPayment(
+                $tenantId,
+                (int) $org->id,
+                (int) $org->user_id,
+                (int) $log->user_id,
+                $logId,
+                (float) $log->hours,
+            );
+        });
+
+        return [
+            'id' => $logId,
+            'status' => $status,
+            'payment_result' => $paymentResult,
+            'summary' => $this->summary($tenantId),
+        ];
+    }
+
     private function stats(int $tenantId, array $policy): array
     {
         if (!Schema::hasTable('vol_logs')) {
@@ -356,5 +413,66 @@ class CaringCommunityWorkflowService
         );
 
         return $row !== null;
+    }
+
+    private function applyOrganizationPayment(
+        int $tenantId,
+        int $organizationId,
+        int $organizationOwnerId,
+        int $volunteerId,
+        int $logId,
+        float $hours,
+    ): string {
+        if (!Schema::hasTable('vol_org_transactions') || !Schema::hasTable('transactions')) {
+            return 'audit_schema_missing';
+        }
+
+        $orgLocked = DB::selectOne(
+            "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+            [$organizationId, $tenantId]
+        );
+        if (!$orgLocked || (float) $orgLocked->balance < $hours) {
+            return 'insufficient_balance';
+        }
+
+        DB::update(
+            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+            [$hours, $organizationId, $tenantId]
+        );
+
+        $wholeHours = (int) floor($hours);
+        if ($wholeHours > 0) {
+            DB::update(
+                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                [$wholeHours, $volunteerId, $tenantId]
+            );
+        }
+
+        $description = __('api.caring_review_payment_description', ['hours' => $hours]);
+        DB::table('vol_org_transactions')->insert([
+            'tenant_id' => $tenantId,
+            'vol_organization_id' => $organizationId,
+            'user_id' => $volunteerId,
+            'vol_log_id' => $logId,
+            'type' => 'volunteer_payment',
+            'amount' => -$hours,
+            'balance_after' => (float) $orgLocked->balance - $hours,
+            'description' => $description,
+            'created_at' => now(),
+        ]);
+
+        DB::table('transactions')->insert([
+            'tenant_id' => $tenantId,
+            'sender_id' => $organizationOwnerId,
+            'receiver_id' => $volunteerId,
+            'amount' => $wholeHours,
+            'description' => $description,
+            'transaction_type' => 'volunteer',
+            'status' => 'completed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return 'paid';
     }
 }

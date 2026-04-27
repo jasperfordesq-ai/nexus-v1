@@ -97,6 +97,27 @@ class AdminCaringCommunityController extends BaseApiController
         ]);
     }
 
+    public function decideReview(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $action = (string) request()->input('action', '');
+        if (!in_array($action, ['approve', 'decline'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.decision_required'), 'action', 400);
+        }
+
+        $result = $this->workflowService->decideReview(TenantContext::getId(), $id, (int) auth()->id(), $action);
+        if (!$result) {
+            return $this->respondWithError('NOT_FOUND', __('api.caring_review_decision_failed'), null, 404);
+        }
+
+        return $this->respondWithData([
+            'review' => $result,
+            'message' => $action === 'approve' ? __('api.caring_review_approved') : __('api.caring_review_declined'),
+        ]);
+    }
+
     public function memberStatement(int $userId): JsonResponse
     {
         $disabled = $this->guardCaringCommunity();

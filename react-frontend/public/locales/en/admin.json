@@ -96,7 +96,12 @@
       "re_escalate": "Update escalation",
       "manual_escalation_note": "Manual escalation after {{count}} days waiting.",
       "escalate_success": "Review escalated.",
-      "escalate_failed": "Failed to escalate the review."
+      "escalate_failed": "Failed to escalate the review.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "approve_success": "Review approved.",
+      "decline_success": "Review declined.",
+      "decision_failed": "Failed to apply the review decision."
     },
     "signals": {
       "title": "Coordinator signals",

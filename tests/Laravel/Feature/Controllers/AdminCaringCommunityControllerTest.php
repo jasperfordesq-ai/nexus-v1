@@ -51,6 +51,9 @@ class AdminCaringCommunityControllerTest extends TestCase
             'review escalation' => ['PUT', '/v2/admin/caring-community/workflow/reviews/999/escalate', [
                 'note' => 'Needs coordinator review.',
             ]],
+            'review decision' => ['PUT', '/v2/admin/caring-community/workflow/reviews/999/decision', [
+                'action' => 'approve',
+            ]],
             'role presets' => ['GET', '/v2/admin/caring-community/role-presets'],
             'role preset install' => ['POST', '/v2/admin/caring-community/role-presets/install', [
                 'preset' => 'municipality_admin',
@@ -281,5 +284,88 @@ class AdminCaringCommunityControllerTest extends TestCase
             '2026-04-27 09:00:00',
             DB::table('caring_support_relationships')->where('id', $relationshipId)->value('next_check_in_at'),
         );
+    }
+
+    public function test_kiss_review_decision_approves_and_pays_organisation_backed_hours(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $supporter = User::factory()->forTenant($this->testTenantId)->create(['balance' => 2]);
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'KISS Basel',
+            'slug' => 'kiss-basel-' . uniqid(),
+            'status' => 'active',
+            'balance' => 10,
+            'auto_pay_enabled' => 1,
+            'created_at' => now(),
+        ]);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $supporter->id,
+            'organization_id' => $orgId,
+            'date_logged' => '2026-04-20',
+            'hours' => 2.75,
+            'description' => 'Recurring support visit.',
+            'status' => 'pending',
+            'created_at' => '2026-04-20 09:00:00',
+            'updated_at' => null,
+        ]);
+
+        $response = $this->apiPut("/v2/admin/caring-community/workflow/reviews/{$logId}/decision", [
+            'action' => 'approve',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.review.status', 'approved');
+        $response->assertJsonPath('data.review.payment_result', 'paid');
+        $response->assertJsonPath('data.review.summary.stats.pending_count', 0);
+
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+        $this->assertEqualsWithDelta(7.25, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'), 0.001);
+        $this->assertSame(4, (int) DB::table('users')->where('id', $supporter->id)->value('balance'));
+        $this->assertDatabaseHas('vol_org_transactions', [
+            'tenant_id' => $this->testTenantId,
+            'vol_organization_id' => $orgId,
+            'user_id' => $supporter->id,
+            'vol_log_id' => $logId,
+            'type' => 'volunteer_payment',
+        ]);
+    }
+
+    public function test_kiss_review_decision_declines_relationship_hours_without_organisation(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $supporter = User::factory()->forTenant($this->testTenantId)->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $supporter->id,
+            'organization_id' => null,
+            'support_recipient_id' => $recipient->id,
+            'date_logged' => '2026-04-20',
+            'hours' => 1.25,
+            'description' => 'Unverified support visit.',
+            'status' => 'pending',
+            'created_at' => '2026-04-20 09:00:00',
+            'updated_at' => null,
+        ]);
+
+        $response = $this->apiPut("/v2/admin/caring-community/workflow/reviews/{$logId}/decision", [
+            'action' => 'decline',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.review.status', 'declined');
+        $response->assertJsonPath('data.review.payment_result', null);
+        $this->assertSame('declined', DB::table('vol_logs')->where('id', $logId)->value('status'));
     }
 }
