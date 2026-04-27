@@ -1739,4 +1739,8 @@ return [
     'municipal_report_template_created'          => 'Report template saved.',
     'municipal_report_template_updated'          => 'Report template updated.',
     'municipal_report_template_deleted'          => 'Report template deleted.',
+    'caring_review_assignment_failed'            => 'Review could not be assigned.',
+    'caring_review_assigned'                     => 'Review assignment updated.',
+    'caring_review_escalation_failed'            => 'Review could not be escalated.',
+    'caring_review_escalated'                    => 'Review escalated.',
 ];

@@ -85,7 +85,18 @@
       "unassigned": "Unassigned support activity",
       "logged_on": "Logged {{date}}",
       "submitted_on": "Submitted {{date}}",
-      "age_days": "{{count}} days waiting"
+      "age_days": "{{count}} days waiting",
+      "assigned_to": "Assigned to {{name}}",
+      "escalated_on": "Escalated {{date}}",
+      "assign_label": "Assigned coordinator",
+      "unassigned_coordinator": "Unassigned",
+      "assign_success": "Review assignment updated.",
+      "assign_failed": "Failed to update the review assignment.",
+      "escalate": "Escalate",
+      "re_escalate": "Update escalation",
+      "manual_escalation_note": "Manual escalation after {{count}} days waiting.",
+      "escalate_success": "Review escalated.",
+      "escalate_failed": "Failed to escalate the review."
     },
     "signals": {
       "title": "Coordinator signals",

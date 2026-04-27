@@ -60,6 +60,39 @@ class AdminCaringCommunityController extends BaseApiController
         return $this->respondWithData($this->policyService->update(TenantContext::getId(), $this->getAllInput()));
     }
 
+    public function assignReview(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $assigneeId = $this->inputInt('assigned_to', null, 1);
+        $review = $this->workflowService->assignReview(TenantContext::getId(), $id, $assigneeId);
+        if (!$review) {
+            return $this->respondWithError('NOT_FOUND', __('api.caring_review_assignment_failed'), null, 404);
+        }
+
+        return $this->respondWithData([
+            'review' => $review,
+            'message' => __('api.caring_review_assigned'),
+        ]);
+    }
+
+    public function escalateReview(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $review = $this->workflowService->escalateReview(TenantContext::getId(), $id, (string) request()->input('note', ''));
+        if (!$review) {
+            return $this->respondWithError('NOT_FOUND', __('api.caring_review_escalation_failed'), null, 404);
+        }
+
+        return $this->respondWithData([
+            'review' => $review,
+            'message' => __('api.caring_review_escalated'),
+        ]);
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();

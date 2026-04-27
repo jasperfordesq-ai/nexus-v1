@@ -31,9 +31,52 @@ class CaringCommunityWorkflowService
             'pending_reviews' => $this->pendingReviews($tenantId, $policy),
             'recent_decisions' => $this->recentDecisions($tenantId),
             'coordinator_signals' => $this->coordinatorSignals($tenantId),
+            'coordinators' => $this->coordinators($tenantId),
             'role_pack' => $this->rolePresetService->status($tenantId),
             'policy' => $policy,
         ];
+    }
+
+    public function assignReview(int $tenantId, int $logId, ?int $assigneeId): ?array
+    {
+        if (!Schema::hasTable('vol_logs') || !Schema::hasColumn('vol_logs', 'assigned_to')) {
+            return null;
+        }
+
+        if ($assigneeId !== null && !$this->isCoordinator($tenantId, $assigneeId)) {
+            return null;
+        }
+
+        $updated = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $logId)
+            ->where('status', 'pending')
+            ->update([
+                'assigned_to' => $assigneeId,
+                'assigned_at' => $assigneeId === null ? null : now(),
+                'updated_at' => now(),
+            ]);
+
+        return $updated > 0 ? $this->reviewById($tenantId, $logId, $this->policyService->get($tenantId)) : null;
+    }
+
+    public function escalateReview(int $tenantId, int $logId, string $note = ''): ?array
+    {
+        if (!Schema::hasTable('vol_logs') || !Schema::hasColumn('vol_logs', 'escalated_at')) {
+            return null;
+        }
+
+        $updated = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $logId)
+            ->where('status', 'pending')
+            ->update([
+                'escalated_at' => now(),
+                'escalation_note' => trim($note) === '' ? null : mb_substr(trim($note), 0, 1000),
+                'updated_at' => now(),
+            ]);
+
+        return $updated > 0 ? $this->reviewById($tenantId, $logId, $this->policyService->get($tenantId)) : null;
     }
 
     private function stats(int $tenantId, array $policy): array
@@ -52,13 +95,16 @@ class CaringCommunityWorkflowService
 
         $reviewSlaDays = (int) ($policy['review_sla_days'] ?? 7);
         $escalationSlaDays = (int) ($policy['escalation_sla_days'] ?? 14);
+        $escalatedExpression = Schema::hasColumn('vol_logs', 'escalated_at')
+            ? "status = 'pending' AND (escalated_at IS NOT NULL OR created_at < DATE_SUB(NOW(), INTERVAL ? DAY))"
+            : "status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY)";
 
         $row = DB::selectOne(
             "SELECT
                 COUNT(CASE WHEN status = 'pending' THEN 1 END) AS pending_count,
                 COALESCE(SUM(CASE WHEN status = 'pending' THEN hours ELSE 0 END), 0) AS pending_hours,
                 COUNT(CASE WHEN status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY) THEN 1 END) AS overdue_count,
-                COUNT(CASE WHEN status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY) THEN 1 END) AS escalated_count,
+                COUNT(CASE WHEN {$escalatedExpression} THEN 1 END) AS escalated_count,
                 COALESCE(SUM(CASE WHEN status = 'approved' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN hours ELSE 0 END), 0) AS approved_30d_hours,
                 COUNT(CASE WHEN status = 'declined' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) AS declined_30d_count
              FROM vol_logs
@@ -85,6 +131,8 @@ class CaringCommunityWorkflowService
 
         $reviewSlaDays = (int) ($policy['review_sla_days'] ?? 7);
         $escalationSlaDays = (int) ($policy['escalation_sla_days'] ?? 14);
+        $hasAssignmentColumns = Schema::hasColumn('vol_logs', 'assigned_to');
+        $hasEscalationColumns = Schema::hasColumn('vol_logs', 'escalated_at');
 
         $rows = DB::select(
             "SELECT
@@ -93,13 +141,17 @@ class CaringCommunityWorkflowService
                 vl.date_logged,
                 vl.created_at,
                 vl.description,
+                " . ($hasAssignmentColumns ? 'vl.assigned_to, vl.assigned_at,' : 'NULL AS assigned_to, NULL AS assigned_at,') . "
+                " . ($hasEscalationColumns ? 'vl.escalated_at, vl.escalation_note,' : 'NULL AS escalated_at, NULL AS escalation_note,') . "
                 u.name AS member_name,
                 u.first_name,
                 u.last_name,
+                assigned.name AS assigned_name,
                 vo.name AS organisation_name,
                 opp.title AS opportunity_title
              FROM vol_logs vl
              LEFT JOIN users u ON u.id = vl.user_id AND u.tenant_id = vl.tenant_id
+             " . ($hasAssignmentColumns ? 'LEFT JOIN users assigned ON assigned.id = vl.assigned_to AND assigned.tenant_id = vl.tenant_id' : 'LEFT JOIN users assigned ON 1 = 0') . "
              LEFT JOIN vol_organizations vo ON vo.id = vl.organization_id AND vo.tenant_id = vl.tenant_id
              LEFT JOIN vol_opportunities opp ON opp.id = vl.opportunity_id AND opp.tenant_id = vl.tenant_id
              WHERE vl.tenant_id = ? AND vl.status = 'pending'
@@ -109,6 +161,46 @@ class CaringCommunityWorkflowService
         );
 
         return array_map(function ($row) use ($reviewSlaDays, $escalationSlaDays) {
+            return $this->formatReviewRow($row, $reviewSlaDays, $escalationSlaDays);
+        }, $rows);
+    }
+
+    private function reviewById(int $tenantId, int $logId, array $policy): ?array
+    {
+        $reviewSlaDays = (int) ($policy['review_sla_days'] ?? 7);
+        $escalationSlaDays = (int) ($policy['escalation_sla_days'] ?? 14);
+        $hasAssignmentColumns = Schema::hasColumn('vol_logs', 'assigned_to');
+        $hasEscalationColumns = Schema::hasColumn('vol_logs', 'escalated_at');
+
+        $row = DB::selectOne(
+            "SELECT
+                vl.id,
+                vl.hours,
+                vl.date_logged,
+                vl.created_at,
+                vl.description,
+                " . ($hasAssignmentColumns ? 'vl.assigned_to, vl.assigned_at,' : 'NULL AS assigned_to, NULL AS assigned_at,') . "
+                " . ($hasEscalationColumns ? 'vl.escalated_at, vl.escalation_note,' : 'NULL AS escalated_at, NULL AS escalation_note,') . "
+                u.name AS member_name,
+                u.first_name,
+                u.last_name,
+                assigned.name AS assigned_name,
+                vo.name AS organisation_name,
+                opp.title AS opportunity_title
+             FROM vol_logs vl
+             LEFT JOIN users u ON u.id = vl.user_id AND u.tenant_id = vl.tenant_id
+             " . ($hasAssignmentColumns ? 'LEFT JOIN users assigned ON assigned.id = vl.assigned_to AND assigned.tenant_id = vl.tenant_id' : 'LEFT JOIN users assigned ON 1 = 0') . "
+             LEFT JOIN vol_organizations vo ON vo.id = vl.organization_id AND vo.tenant_id = vl.tenant_id
+             LEFT JOIN vol_opportunities opp ON opp.id = vl.opportunity_id AND opp.tenant_id = vl.tenant_id
+             WHERE vl.tenant_id = ? AND vl.id = ? AND vl.status = 'pending'",
+            [$tenantId, $logId]
+        );
+
+        return $row ? $this->formatReviewRow($row, $reviewSlaDays, $escalationSlaDays) : null;
+    }
+
+    private function formatReviewRow(object $row, int $reviewSlaDays, int $escalationSlaDays): array
+    {
             $fullName = trim((string) ($row->first_name ?? '') . ' ' . (string) ($row->last_name ?? ''));
             $createdAt = strtotime((string) $row->created_at) ?: time();
             $ageDays = max(0, (int) floor((time() - $createdAt) / 86400));
@@ -117,14 +209,18 @@ class CaringCommunityWorkflowService
                 'member_name' => $fullName !== '' ? $fullName : (string) ($row->member_name ?? ''),
                 'organisation_name' => (string) ($row->organisation_name ?? ''),
                 'opportunity_title' => (string) ($row->opportunity_title ?? ''),
+                'assigned_to' => $row->assigned_to === null ? null : (int) $row->assigned_to,
+                'assigned_name' => $row->assigned_name === null ? null : (string) $row->assigned_name,
+                'assigned_at' => $row->assigned_at === null ? null : (string) $row->assigned_at,
+                'escalated_at' => $row->escalated_at === null ? null : (string) $row->escalated_at,
+                'escalation_note' => $row->escalation_note === null ? null : (string) $row->escalation_note,
                 'hours' => round((float) $row->hours, 1),
                 'date_logged' => (string) $row->date_logged,
                 'created_at' => (string) $row->created_at,
                 'age_days' => $ageDays,
                 'is_overdue' => $ageDays >= $reviewSlaDays,
-                'is_escalated' => $ageDays >= $escalationSlaDays,
+                'is_escalated' => $row->escalated_at !== null || $ageDays >= $escalationSlaDays,
             ];
-        }, $rows);
     }
 
     private function recentDecisions(int $tenantId): array
@@ -216,5 +312,49 @@ class CaringCommunityWorkflowService
         );
 
         return (int) ($row->count ?? 0);
+    }
+
+    private function coordinators(int $tenantId): array
+    {
+        $rows = DB::select(
+            "SELECT id, name, first_name, last_name, role
+             FROM users
+             WHERE tenant_id = ?
+                AND status = 'active'
+                AND (
+                    role IN ('admin', 'tenant_admin', 'broker', 'super_admin')
+                    OR is_admin = 1
+                    OR is_tenant_super_admin = 1
+                )
+             ORDER BY name ASC
+             LIMIT 50",
+            [$tenantId]
+        );
+
+        return array_map(function ($row) {
+            $fullName = trim((string) ($row->first_name ?? '') . ' ' . (string) ($row->last_name ?? ''));
+            return [
+                'id' => (int) $row->id,
+                'name' => $fullName !== '' ? $fullName : (string) $row->name,
+                'role' => (string) ($row->role ?? 'member'),
+            ];
+        }, $rows);
+    }
+
+    private function isCoordinator(int $tenantId, int $userId): bool
+    {
+        $row = DB::selectOne(
+            "SELECT id
+             FROM users
+             WHERE tenant_id = ? AND id = ? AND status = 'active'
+                AND (
+                    role IN ('admin', 'tenant_admin', 'broker', 'super_admin')
+                    OR is_admin = 1
+                    OR is_tenant_super_admin = 1
+                )",
+            [$tenantId, $userId]
+        );
+
+        return $row !== null;
     }
 }

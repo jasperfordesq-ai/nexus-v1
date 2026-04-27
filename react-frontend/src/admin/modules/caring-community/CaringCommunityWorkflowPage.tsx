@@ -15,6 +15,8 @@ import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import TriangleAlert from 'lucide-react/icons/triangle-alert';
+import UserPlus from 'lucide-react/icons/user-plus';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -33,6 +35,11 @@ type PendingReview = {
   age_days: number;
   is_overdue: boolean;
   is_escalated: boolean;
+  assigned_to: number | null;
+  assigned_name: string | null;
+  assigned_at: string | null;
+  escalated_at: string | null;
+  escalation_note: string | null;
 };
 
 type RecentDecision = {
@@ -61,8 +68,15 @@ type WorkflowSummary = {
     active_offers: number;
     trusted_organisations: number;
   };
+  coordinators: Coordinator[];
   role_pack?: RolePack;
   policy?: WorkflowPolicy;
+};
+
+type Coordinator = {
+  id: number;
+  name: string;
+  role: string;
 };
 
 type RolePack = {
@@ -127,6 +141,8 @@ export default function CaringCommunityWorkflowPage() {
   const [loading, setLoading] = useState(true);
   const [installingRoles, setInstallingRoles] = useState(false);
   const [savingPolicy, setSavingPolicy] = useState(false);
+  const [assigningReviewId, setAssigningReviewId] = useState<number | null>(null);
+  const [escalatingReviewId, setEscalatingReviewId] = useState<number | null>(null);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -159,6 +175,16 @@ export default function CaringCommunityWorkflowPage() {
     const statuses = rolePack?.presets ?? [];
     return new Map(statuses.map((status) => [status.key, status]));
   }, [rolePack]);
+
+  const replaceReview = useCallback((review: PendingReview) => {
+    setSummary((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        pending_reviews: current.pending_reviews.map((item) => item.id === review.id ? review : item),
+      };
+    });
+  }, []);
 
   const updatePolicyField = useCallback(<K extends keyof WorkflowPolicy>(key: K, value: WorkflowPolicy[K]) => {
     setSummary((current) => {
@@ -194,6 +220,36 @@ export default function CaringCommunityWorkflowPage() {
       setSavingPolicy(false);
     }
   }, [summary?.policy, t, toast]);
+
+  const assignReview = useCallback(async (reviewId: number, assignedTo: number | null) => {
+    setAssigningReviewId(reviewId);
+    try {
+      const res = await api.put<{ review: PendingReview }>(`/v2/admin/caring-community/workflow/reviews/${reviewId}/assign`, {
+        assigned_to: assignedTo,
+      });
+      if (res.data?.review) replaceReview(res.data.review);
+      toast.success(t('caring_workflow.review_queue.assign_success'));
+    } catch {
+      toast.error(t('caring_workflow.review_queue.assign_failed'));
+    } finally {
+      setAssigningReviewId(null);
+    }
+  }, [replaceReview, t, toast]);
+
+  const escalateReview = useCallback(async (review: PendingReview) => {
+    setEscalatingReviewId(review.id);
+    try {
+      const res = await api.put<{ review: PendingReview }>(`/v2/admin/caring-community/workflow/reviews/${review.id}/escalate`, {
+        note: t('caring_workflow.review_queue.manual_escalation_note', { count: review.age_days }),
+      });
+      if (res.data?.review) replaceReview(res.data.review);
+      toast.success(t('caring_workflow.review_queue.escalate_success'));
+    } catch {
+      toast.error(t('caring_workflow.review_queue.escalate_failed'));
+    } finally {
+      setEscalatingReviewId(null);
+    }
+  }, [replaceReview, t, toast]);
 
   if (loading) {
     return (
@@ -288,6 +344,35 @@ export default function CaringCommunityWorkflowPage() {
                   <span>{t('caring_workflow.review_queue.logged_on', { date: review.date_logged })}</span>
                   <span>{t('caring_workflow.review_queue.submitted_on', { date: review.created_at })}</span>
                   <span>{t('caring_workflow.review_queue.age_days', { count: review.age_days })}</span>
+                  {review.assigned_name && <span>{t('caring_workflow.review_queue.assigned_to', { name: review.assigned_name })}</span>}
+                  {review.escalated_at && <span>{t('caring_workflow.review_queue.escalated_on', { date: review.escalated_at })}</span>}
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <Select
+                    size="sm"
+                    label={t('caring_workflow.review_queue.assign_label')}
+                    selectedKeys={[review.assigned_to ? String(review.assigned_to) : 'unassigned']}
+                    isDisabled={assigningReviewId === review.id}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0];
+                      assignReview(review.id, selected && selected !== 'unassigned' ? Number(selected) : null);
+                    }}
+                  >
+                    <SelectItem key="unassigned">{t('caring_workflow.review_queue.unassigned_coordinator')}</SelectItem>
+                    {(summary?.coordinators ?? []).map((coordinator) => (
+                      <SelectItem key={String(coordinator.id)}>{coordinator.name}</SelectItem>
+                    ))}
+                  </Select>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    color={review.is_escalated ? 'danger' : 'warning'}
+                    startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
+                    isLoading={escalatingReviewId === review.id}
+                    onPress={() => escalateReview(review)}
+                  >
+                    {review.is_escalated ? t('caring_workflow.review_queue.re_escalate') : t('caring_workflow.review_queue.escalate')}
+                  </Button>
                 </div>
               </div>
             ))}

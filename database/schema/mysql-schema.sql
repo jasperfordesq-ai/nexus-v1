@@ -5333,7 +5333,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10663,6 +10663,10 @@ CREATE TABLE `vol_logs` (
   `description` text DEFAULT NULL,
   `status` enum('pending','approved','declined') DEFAULT 'pending',
   `feedback` text DEFAULT NULL,
+  `assigned_to` int(10) unsigned DEFAULT NULL,
+  `assigned_at` timestamp NULL DEFAULT NULL,
+  `escalated_at` timestamp NULL DEFAULT NULL,
+  `escalation_note` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -10670,6 +10674,8 @@ CREATE TABLE `vol_logs` (
   KEY `organization_id` (`organization_id`),
   KEY `idx_tenant_id` (`tenant_id`),
   KEY `vol_logs_opportunity_id_foreign` (`opportunity_id`),
+  KEY `vol_logs_assigned_to_index` (`assigned_to`),
+  KEY `vol_logs_escalated_at_index` (`escalated_at`),
   CONSTRAINT `vol_logs_opportunity_id_foreign` FOREIGN KEY (`opportunity_id`) REFERENCES `vol_opportunities` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `vol_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -11392,7 +11398,8 @@ INSERT INTO `laravel_migrations` VALUES
 (127,'2026_04_21_200100_add_annual_review_to_user_safeguarding_preferences',52),
 (128,'2026_04_25_120000_add_tenant_id_to_password_resets',53),
 (129,'2026_04_26_120000_unique_broker_message_copies_per_message',54),
-(130,'2026_04_26_191500_create_municipal_report_templates_table',55);
+(130,'2026_04_26_191500_create_municipal_report_templates_table',55),
+(131,'2026_04_27_090000_add_assignment_to_vol_logs_table',56);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
