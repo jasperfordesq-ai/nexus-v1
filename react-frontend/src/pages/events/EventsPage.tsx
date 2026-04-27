@@ -40,6 +40,7 @@ import { logError } from '@/lib/logger';
 import { formatDateTime, formatDateValue, formatMonthShort, resolveAssetUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Event } from '@/types/api';
 
 type EventFilter = 'upcoming' | 'past' | 'all';
@@ -76,7 +77,7 @@ const EVENT_CATEGORY_IDS = [
 export function EventsPage() {
   const { t } = useTranslation('events');
   usePageTitle(t('title'));
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -104,23 +105,22 @@ export function EventsPage() {
   const [filter, setFilter] = useState<EventFilter>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [nearMeEnabled, setNearMeEnabled] = useState(false);
-  const [radiusKm, setRadiusKm] = useState(25);
+  const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(null);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (searchQuery.trim()) count += 1;
     if (filter !== 'upcoming') count += 1;
     if (selectedCategory !== 'all') count += 1;
-    if (nearMeEnabled) count += 1;
+    if (proximityParams) count += 1;
     return count;
-  }, [searchQuery, filter, selectedCategory, nearMeEnabled]);
+  }, [searchQuery, filter, selectedCategory, proximityParams]);
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');
     setFilter('upcoming');
     setSelectedCategory('all');
-    setNearMeEnabled(false);
+    setProximityParams(null);
   }, []);
 
   const tRef = useRef(t);
@@ -178,15 +178,13 @@ export function EventsPage() {
         params.set('category', selectedCategory);
       }
 
-      let endpoint = '/v2/events';
-      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
-        endpoint = '/v2/events/nearby';
-        params.set('lat', String(user.latitude));
-        params.set('lng', String(user.longitude));
-        params.set('radius_km', String(radiusKm));
+      if (proximityParams) {
+        params.set('near_lat', String(proximityParams.near_lat));
+        params.set('near_lng', String(proximityParams.near_lng));
+        params.set('radius_km', String(proximityParams.radius_km));
       }
 
-      const response = await api.get<Event[]>(`${endpoint}?${params}`);
+      const response = await api.get<Event[]>(`/v2/events?${params}`);
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (controller.signal.aborted) return;
@@ -213,9 +211,6 @@ export function EventsPage() {
       if (controller.signal.aborted) return;
       logError('Failed to load events', err);
       if (!append) {
-        if (nearMeEnabled) {
-          toastRef.current.error(tRef.current('nearby_error'));
-        }
         setError(tRef.current('unable_to_load'));
       } else {
         toastRef.current.error(tRef.current('error_load_more'));
@@ -226,7 +221,7 @@ export function EventsPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
+  }, [debouncedQuery, filter, selectedCategory, proximityParams]);
 
   const loadEventsRef = useRef(loadEvents);
   loadEventsRef.current = loadEvents;
@@ -241,7 +236,7 @@ export function EventsPage() {
         abortControllerRef.current.abort();
       }
     };
-  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
+  }, [debouncedQuery, filter, selectedCategory, proximityParams]);
 
   // Update URL params
   useEffect(() => {
@@ -255,18 +250,6 @@ export function EventsPage() {
     if (isLoadingMore || !hasMore) return;
     loadEvents(true);
   }, [isLoadingMore, hasMore, loadEvents]);
-
-  function handleNearMeToggle() {
-    if (nearMeEnabled) {
-      setNearMeEnabled(false);
-      return;
-    }
-    if (!user?.latitude || !user?.longitude) {
-      toast.error(t('near_me_no_location'));
-      return;
-    }
-    setNearMeEnabled(true);
-  }
 
   // Group events by month
   const groupedEvents = events.reduce((groups, event) => {
@@ -350,41 +333,7 @@ export function EventsPage() {
             <SelectItem key="all">{t('filter_all')}</SelectItem>
           </Select>
 
-          <Button
-            variant={nearMeEnabled ? 'solid' : 'flat'}
-            className={nearMeEnabled
-              ? 'bg-primary text-white min-h-[40px] w-full lg:w-auto'
-              : 'bg-theme-elevated text-theme-primary min-h-[40px] w-full lg:w-auto'}
-            startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
-            onPress={handleNearMeToggle}
-            aria-pressed={nearMeEnabled}
-            aria-label={t('near_me')}
-          >
-            {t('near_me')}
-          </Button>
-
-          {nearMeEnabled && (
-            <Select
-              aria-label={t('radius_label')}
-              selectedKeys={[String(radiusKm)]}
-              disallowEmptySelection
-              onSelectionChange={(keys) => {
-                const val = keys instanceof Set ? ([...keys][0] as string) : '25';
-                setRadiusKm(Number(val) || 25);
-              }}
-              className="w-full lg:w-36"
-              classNames={{
-                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                value: 'text-theme-primary',
-              }}
-            >
-              <SelectItem key="5">{t('radius_5')}</SelectItem>
-              <SelectItem key="10">{t('radius_10')}</SelectItem>
-              <SelectItem key="25">{t('radius_25')}</SelectItem>
-              <SelectItem key="50">{t('radius_50')}</SelectItem>
-              <SelectItem key="100">{t('radius_100')}</SelectItem>
-            </Select>
-          )}
+          <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
 
           {MAPS_ENABLED && (
             <div className="flex min-h-[40px] rounded-xl overflow-hidden border border-theme-default bg-theme-elevated" role="group" aria-label={t('view_mode_aria')}>
@@ -425,7 +374,7 @@ export function EventsPage() {
                   {EVENT_CATEGORIES.find((cat) => cat.id === selectedCategory)?.name ?? selectedCategory}
                 </Chip>
               )}
-              {nearMeEnabled && <Chip size="sm" variant="flat">{t('active_near_me', { radius: radiusKm })}</Chip>}
+              {proximityParams && <Chip size="sm" variant="flat">{t('active_near_me', { radius: proximityParams.radius_km })}</Chip>}
             </div>
             <Button
               size="sm"
@@ -713,6 +662,14 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                   <span className="flex min-w-0 items-center gap-1.5">
                     <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                     <span className="truncate">{event.location}</span>
+                  </span>
+                )}
+                {event.distance_km !== undefined && (
+                  <span className="flex items-center gap-1.5 text-primary font-medium">
+                    <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    {event.distance_km < 1
+                      ? `${Math.round(event.distance_km * 1000)} m`
+                      : `${event.distance_km.toFixed(1)} km`}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">

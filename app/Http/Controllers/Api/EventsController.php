@@ -62,6 +62,21 @@ class EventsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
+        // Proximity / radius filter (near_lat, near_lng, radius_km)
+        $nearLat = $this->query('near_lat');
+        $nearLng = $this->query('near_lng');
+        $radiusKm = $this->query('radius_km');
+        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+            $lat = (float) $nearLat;
+            $lng = (float) $nearLng;
+            $km  = max(0.1, min(500, (float) $radiusKm));
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                $filters['near_lat']  = $lat;
+                $filters['near_lng']  = $lng;
+                $filters['radius_km'] = $km;
+            }
+        }
+
         $result = $this->eventService->getAll($filters);
 
         // Batch-load user RSVP statuses (single query instead of N+1).

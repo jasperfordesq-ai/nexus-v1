@@ -67,6 +67,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import { RecommendedShiftsTab } from './RecommendedShiftsTab';
 import { EmergencyAlertsTab } from './EmergencyAlertsTab';
 import { CertificatesTab } from './CertificatesTab';
@@ -97,6 +98,7 @@ interface Opportunity {
   location: string;
   skills_needed: string;
   start_date: string | null;
+  distance_km?: number;
   end_date: string | null;
   is_active: boolean;
   is_remote: boolean;
@@ -347,6 +349,7 @@ function OpportunitiesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
   const cursorRef = useRef<string | undefined>(undefined);
@@ -375,6 +378,11 @@ function OpportunitiesTab() {
       params.set('per_page', '20');
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
+      if (proximityParams) {
+        params.set('near_lat', String(proximityParams.near_lat));
+        params.set('near_lng', String(proximityParams.near_lng));
+        params.set('radius_km', String(proximityParams.radius_km));
+      }
 
       const response = await api.get<Opportunity[]>(
         `/v2/volunteering/opportunities?${params}`
@@ -406,7 +414,7 @@ function OpportunitiesTab() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery]);
+  }, [searchQuery, proximityParams]);
 
   const loadOpportunitiesRef = useRef(loadOpportunities);
   loadOpportunitiesRef.current = loadOpportunities;
@@ -416,7 +424,7 @@ function OpportunitiesTab() {
     setCursor(undefined);
     loadOpportunitiesRef.current();
     return () => { abortOpportunitiesRef.current?.abort(); };
-  }, [searchQuery]);
+  }, [searchQuery, proximityParams]);
 
   const handleApply = async () => {
     if (!selectedOpportunity) return;
@@ -452,19 +460,22 @@ function OpportunitiesTab() {
 
   return (
     <>
-      {/* Search */}
-      <div className="w-full sm:max-w-md">
-        <Input
-          placeholder={t('search_placeholder')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-          aria-label={t('search_placeholder')}
-          classNames={{
-            input: 'bg-transparent text-theme-primary',
-            inputWrapper: 'bg-theme-elevated border-theme-default',
-          }}
-        />
+      {/* Search + Proximity */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-[200px] max-w-md">
+          <Input
+            placeholder={t('search_placeholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+            aria-label={t('search_placeholder')}
+            classNames={{
+              input: 'bg-transparent text-theme-primary',
+              inputWrapper: 'bg-theme-elevated border-theme-default',
+            }}
+          />
+        </div>
+        <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
       </div>
 
       {/* Error */}
@@ -501,7 +512,7 @@ function OpportunitiesTab() {
             <EmptyState
               icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
               title={t('no_opportunities_found')}
-              description={searchQuery ? t('try_different_search') : t('no_opportunities_available')}
+              description={(searchQuery || proximityParams) ? t('try_different_search') : t('no_opportunities_available')}
             />
           ) : (
             <div className="space-y-4">
@@ -624,6 +635,14 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
                 {opportunity.location}
+              </span>
+            )}
+            {opportunity.distance_km !== undefined && (
+              <span className="flex items-center gap-1 text-primary font-medium">
+                <MapPin className="w-3 h-3" aria-hidden="true" />
+                {opportunity.distance_km < 1
+                  ? `${Math.round(opportunity.distance_km * 1000)} m`
+                  : `${opportunity.distance_km.toFixed(1)} km`}
               </span>
             )}
             {opportunity.is_remote && (

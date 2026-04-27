@@ -302,6 +302,9 @@ export interface Listing {
     slug: string;
     color?: string;
   };
+
+  /** Distance from proximity filter origin, in km (set when near_lat/near_lng/radius_km params used) */
+  distance_km?: number;
 }
 
 export interface ListingDetail extends Listing {
@@ -752,6 +755,8 @@ export interface Event {
   }>;
   created_at: string;
   updated_at?: string;
+  /** Distance from proximity filter origin, in km (set when near_lat/near_lng/radius_km params used) */
+  distance_km?: number;
 }
 
 export interface EventCreateRequest {

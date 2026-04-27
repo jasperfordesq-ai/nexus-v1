@@ -53,6 +53,7 @@ import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
 
 type ListingType = 'all' | 'offer' | 'request';
@@ -62,7 +63,7 @@ type SortMode = 'recommended' | 'newest';
 export function ListingsPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { tenantPath, hasModule } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -87,11 +88,16 @@ export function ListingsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [hasMore, setHasMore] = useState(false);
   const [totalItems, setTotalItems] = useState<number | null>(null);
-  const [nearMeEnabled, setNearMeEnabled] = useState(searchParams.get('near_me') === '1');
-  const [radiusKm, setRadiusKm] = useState(() => {
-    const v = Number(searchParams.get('radius'));
-    return [5, 10, 25, 50, 100].includes(v) ? v : 25;
+  const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(() => {
+    if (searchParams.get('near_me') === '1') {
+      const lat = Number(searchParams.get('near_lat'));
+      const lng = Number(searchParams.get('near_lng'));
+      const km = Number(searchParams.get('radius_km')) || 2;
+      if (lat && lng) return { near_lat: lat, near_lng: lng, radius_km: km };
+    }
+    return null;
   });
+  const nearMeEnabled = proximityParams !== null;
   const [hoursRange, setHoursRange] = useState(() => {
     const v = searchParams.get('hours');
     return v && validHours.includes(v) ? v : 'any';
@@ -119,9 +125,8 @@ export function ListingsPage() {
     if (hoursRange !== 'any') count++;
     if (serviceMode !== 'any') count++;
     if (postedWithin !== 'any') count++;
-    if (nearMeEnabled) count++;
     return count;
-  }, [hoursRange, serviceMode, postedWithin, nearMeEnabled]);
+  }, [hoursRange, serviceMode, postedWithin]);
 
   // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
   const cursorRef = useRef<string | null>(null);
@@ -182,19 +187,13 @@ export function ListingsPage() {
         params.set('sort', 'newest');
       }
 
-      let endpoint = '/v2/listings';
-      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
-        const lat = Number(user.latitude);
-        const lon = Number(user.longitude);
-        if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-          endpoint = '/v2/listings/nearby';
-          params.set('lat', String(lat));
-          params.set('lon', String(lon));
-          params.set('radius_km', String(radiusKm));
-        }
+      if (proximityParams) {
+        params.set('near_lat', String(proximityParams.near_lat));
+        params.set('near_lng', String(proximityParams.near_lng));
+        params.set('radius_km', String(proximityParams.radius_km));
       }
 
-      const response = await api.get<Listing[]>(`${endpoint}?${params}`);
+      const response = await api.get<Listing[]>(`/v2/listings?${params}`);
 
       // If this request was aborted while awaiting, discard the result
       if (controller.signal.aborted) return;
@@ -233,7 +232,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin, sortMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -272,7 +271,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin, sortMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode]);
 
   // Restore scroll position on back-navigation; save on unmount
   useEffect(() => {
@@ -296,27 +295,19 @@ export function ListingsPage() {
     if (hoursRange !== 'any') params.set('hours', hoursRange);
     if (serviceMode !== 'any') params.set('service', serviceMode);
     if (postedWithin !== 'any') params.set('posted', postedWithin);
-    if (nearMeEnabled) params.set('near_me', '1');
-    if (nearMeEnabled && radiusKm !== 25) params.set('radius', String(radiusKm));
+    if (proximityParams) {
+      params.set('near_me', '1');
+      params.set('near_lat', String(proximityParams.near_lat));
+      params.set('near_lng', String(proximityParams.near_lng));
+      params.set('radius_km', String(proximityParams.radius_km));
+    }
     if (sortMode !== 'recommended') params.set('sort', sortMode);
     setSearchParams(params, { replace: true });
-  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, nearMeEnabled, radiusKm, sortMode, setSearchParams]);
+  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, proximityParams, sortMode, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setSearchQuery(searchInput); // Immediately apply (bypass debounce)
-  }
-
-  function handleNearMeToggle() {
-    if (nearMeEnabled) {
-      setNearMeEnabled(false);
-      return;
-    }
-    if (!user?.latitude || !user?.longitude) {
-      toast.warning(t('near_me_no_location'));
-      return;
-    }
-    setNearMeEnabled(true);
   }
 
   /**
@@ -609,42 +600,7 @@ export function ListingsPage() {
               <SelectItem key="30">{t('filter_this_month')}</SelectItem>
             </Select>
 
-            <Button
-              variant={nearMeEnabled ? 'solid' : 'flat'}
-              className={nearMeEnabled
-                ? 'bg-primary text-white min-h-[40px]'
-                : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
-              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
-              onPress={handleNearMeToggle}
-              aria-pressed={nearMeEnabled}
-              aria-label={t('near_me')}
-            >
-              {t('near_me')}
-            </Button>
-
-            {nearMeEnabled && (
-              <Select
-                aria-label={t('radius_label')}
-                placeholder={t('radius_label')}
-                selectedKeys={[String(radiusKm)]}
-                disallowEmptySelection
-                onSelectionChange={(keys) => {
-                  const val = keys instanceof Set ? ([...keys][0] as string) : '25';
-                  setRadiusKm(Number(val) || 25);
-                }}
-                className="w-full sm:w-32"
-                classNames={{
-                  trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                  value: 'text-theme-primary',
-                }}
-              >
-                <SelectItem key="5">{t('radius_5')}</SelectItem>
-                <SelectItem key="10">{t('radius_10')}</SelectItem>
-                <SelectItem key="25">{t('radius_25')}</SelectItem>
-                <SelectItem key="50">{t('radius_50')}</SelectItem>
-                <SelectItem key="100">{t('radius_100')}</SelectItem>
-              </Select>
-            )}
+            <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
 
             {activeFilterCount > 0 && (
               <Button
@@ -655,7 +611,6 @@ export function ListingsPage() {
                   setHoursRange('any');
                   setServiceMode('any');
                   setPostedWithin('any');
-                  setNearMeEnabled(false);
                 }}
                 aria-label={t('clear_filters')}
               >
@@ -695,7 +650,7 @@ export function ListingsPage() {
         </GlassCard>
       ) : listings.length === 0 ? (
         (() => {
-          const hasActiveFilters = !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || nearMeEnabled);
+          const hasActiveFilters = !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || proximityParams);
           return (
             <EmptyState
               icon={<Search className="w-12 h-12" />}
@@ -714,7 +669,7 @@ export function ListingsPage() {
                       setHoursRange('any');
                       setServiceMode('any');
                       setPostedWithin('any');
-                      setNearMeEnabled(false);
+                      setProximityParams(null);
                     }}
                   >
                     {t('clear_filters')}
@@ -936,6 +891,14 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   <span className="truncate max-w-[120px]">{listing.location}</span>
                 </span>
               )}
+              {listing.distance_km !== undefined && (
+                <span className="flex items-center gap-1 text-primary font-medium">
+                  <MapPin className="w-3 h-3" aria-hidden="true" />
+                  {listing.distance_km < 1
+                    ? `${Math.round(listing.distance_km * 1000)} m`
+                    : `${listing.distance_km.toFixed(1)} km`}
+                </span>
+              )}
               {onToggleSave && (
                 <span onClick={handleSaveContainerClick}>
                   <Button
@@ -1085,6 +1048,14 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               <span className="flex items-center gap-1 min-w-0" aria-label={t('aria_location', { location: listing.location })}>
                 <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{listing.location}</span>
+              </span>
+            )}
+            {listing.distance_km !== undefined && (
+              <span className="flex items-center gap-1 shrink-0 text-primary font-medium">
+                <MapPin className="w-3 h-3" aria-hidden="true" />
+                {listing.distance_km < 1
+                  ? `${Math.round(listing.distance_km * 1000)} m`
+                  : `${listing.distance_km.toFixed(1)} km`}
               </span>
             )}
           </div>
