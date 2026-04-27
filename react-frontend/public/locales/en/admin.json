@@ -134,6 +134,25 @@
         "previous_quarter": "Previous quarter"
       }
     },
+    "member_statement": {
+      "title": "Member statements",
+      "description": "Preview or export a KISS-style member statement with support hours, wallet movement, and municipal value assumptions.",
+      "member_id": "Member ID",
+      "start_date": "From",
+      "end_date": "To",
+      "preview": "Preview",
+      "export_csv": "Export CSV",
+      "empty": "Enter a member ID to generate a statement.",
+      "approved_hours": "Approved",
+      "pending_hours": "Pending",
+      "earned": "Earned",
+      "spent": "Spent",
+      "chf_value": "Estimated social value: CHF {{value}}",
+      "invalid_member": "Enter a valid member ID.",
+      "load_failed": "Failed to load the member statement.",
+      "export_success": "Member statement CSV prepared.",
+      "export_failed": "Failed to export the member statement."
+    },
     "roles": {
       "title": "Agoris/KISS role presets",
       "install_pack": "Install role pack",

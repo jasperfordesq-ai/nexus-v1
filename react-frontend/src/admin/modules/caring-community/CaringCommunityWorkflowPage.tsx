@@ -10,10 +10,12 @@ import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Clock from 'lucide-react/icons/clock';
+import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
+import Search from 'lucide-react/icons/search';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import UserPlus from 'lucide-react/icons/user-plus';
@@ -108,6 +110,41 @@ type WorkflowPolicy = {
   default_hour_value_chf: number;
 };
 
+type MemberStatement = {
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    current_balance: number;
+  };
+  period: {
+    start: string;
+    end: string;
+    statement_day: number;
+  };
+  summary: {
+    approved_support_hours: number;
+    pending_support_hours: number;
+    wallet_hours_earned: number;
+    wallet_hours_spent: number;
+    wallet_net_change: number;
+    current_balance: number;
+    estimated_social_value_chf: number;
+  };
+  support_hours_by_organisation: Array<{
+    organisation_name: string;
+    approved_hours: number;
+    pending_hours: number;
+    log_count: number;
+  }>;
+};
+
+type MemberStatementCsv = {
+  filename: string;
+  csv: string;
+  statement: MemberStatement;
+};
+
 const workflowStages = [
   { key: 'intake', icon: HeartHandshake },
   { key: 'match', icon: Users },
@@ -143,6 +180,11 @@ export default function CaringCommunityWorkflowPage() {
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [assigningReviewId, setAssigningReviewId] = useState<number | null>(null);
   const [escalatingReviewId, setEscalatingReviewId] = useState<number | null>(null);
+  const [statementMemberId, setStatementMemberId] = useState('');
+  const [statementStartDate, setStatementStartDate] = useState('');
+  const [statementEndDate, setStatementEndDate] = useState('');
+  const [memberStatement, setMemberStatement] = useState<MemberStatement | null>(null);
+  const [loadingStatement, setLoadingStatement] = useState(false);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -164,6 +206,7 @@ export default function CaringCommunityWorkflowPage() {
   const signals = summary?.coordinator_signals;
   const rolePack = summary?.role_pack;
   const formatHours = (value: number) => t('municipal_reports.values.hours', { count: value.toLocaleString(undefined, { maximumFractionDigits: 1 }) });
+  const formatChf = (value: number) => t('caring_workflow.member_statement.chf_value', { value: value.toLocaleString(undefined, { maximumFractionDigits: 0 }) });
 
   const roleCountLabel = useMemo(() => (
     rolePack
@@ -250,6 +293,59 @@ export default function CaringCommunityWorkflowPage() {
       setEscalatingReviewId(null);
     }
   }, [replaceReview, t, toast]);
+
+  const statementQuery = useCallback((format?: 'csv') => {
+    const params = new URLSearchParams();
+    if (statementStartDate) params.set('start_date', statementStartDate);
+    if (statementEndDate) params.set('end_date', statementEndDate);
+    if (format) params.set('format', format);
+    const query = params.toString();
+    return query ? `?${query}` : '';
+  }, [statementEndDate, statementStartDate]);
+
+  const loadMemberStatement = useCallback(async () => {
+    const memberId = Number(statementMemberId);
+    if (!Number.isInteger(memberId) || memberId <= 0) {
+      toast.error(t('caring_workflow.member_statement.invalid_member'));
+      return;
+    }
+
+    setLoadingStatement(true);
+    try {
+      const res = await api.get<MemberStatement>(`/v2/admin/caring-community/member-statements/${memberId}${statementQuery()}`);
+      setMemberStatement(res.data);
+    } catch {
+      toast.error(t('caring_workflow.member_statement.load_failed'));
+    } finally {
+      setLoadingStatement(false);
+    }
+  }, [statementMemberId, statementQuery, t, toast]);
+
+  const exportMemberStatement = useCallback(async () => {
+    const memberId = Number(statementMemberId);
+    if (!Number.isInteger(memberId) || memberId <= 0) {
+      toast.error(t('caring_workflow.member_statement.invalid_member'));
+      return;
+    }
+
+    setLoadingStatement(true);
+    try {
+      const res = await api.get<MemberStatementCsv>(`/v2/admin/caring-community/member-statements/${memberId}${statementQuery('csv')}`);
+      setMemberStatement(res.data.statement);
+      const blob = new Blob([res.data.csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = res.data.filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success(t('caring_workflow.member_statement.export_success'));
+    } catch {
+      toast.error(t('caring_workflow.member_statement.export_failed'));
+    } finally {
+      setLoadingStatement(false);
+    }
+  }, [statementMemberId, statementQuery, t, toast]);
 
   if (loading) {
     return (
@@ -477,6 +573,94 @@ export default function CaringCommunityWorkflowPage() {
               </CardBody>
             </Card>
           )}
+
+          <Card shadow="sm">
+            <CardHeader>
+              <div>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.member_statement.title')}</h2>
+                <p className="mt-1 text-sm text-default-500">{t('caring_workflow.member_statement.description')}</p>
+              </div>
+            </CardHeader>
+            <Divider />
+            <CardBody className="gap-4">
+              <Input
+                type="number"
+                min={1}
+                label={t('caring_workflow.member_statement.member_id')}
+                value={statementMemberId}
+                onValueChange={setStatementMemberId}
+              />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Input
+                  type="date"
+                  label={t('caring_workflow.member_statement.start_date')}
+                  value={statementStartDate}
+                  onValueChange={setStatementStartDate}
+                />
+                <Input
+                  type="date"
+                  label={t('caring_workflow.member_statement.end_date')}
+                  value={statementEndDate}
+                  onValueChange={setStatementEndDate}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  color="primary"
+                  variant="flat"
+                  startContent={<Search size={16} />}
+                  isLoading={loadingStatement}
+                  onPress={loadMemberStatement}
+                >
+                  {t('caring_workflow.member_statement.preview')}
+                </Button>
+                <Button
+                  variant="flat"
+                  startContent={<Download size={16} />}
+                  isLoading={loadingStatement}
+                  onPress={exportMemberStatement}
+                >
+                  {t('caring_workflow.member_statement.export_csv')}
+                </Button>
+              </div>
+              {memberStatement ? (
+                <div className="rounded-lg border border-default-200 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-default-900">{memberStatement.user.name}</p>
+                      <p className="text-xs text-default-500">{memberStatement.user.email}</p>
+                    </div>
+                    <Chip size="sm" color="success" variant="flat">
+                      {formatHours(memberStatement.summary.current_balance)}
+                    </Chip>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <SignalRow label={t('caring_workflow.member_statement.approved_hours')} value={memberStatement.summary.approved_support_hours} />
+                    <SignalRow label={t('caring_workflow.member_statement.pending_hours')} value={memberStatement.summary.pending_support_hours} />
+                    <SignalRow label={t('caring_workflow.member_statement.earned')} value={memberStatement.summary.wallet_hours_earned} />
+                    <SignalRow label={t('caring_workflow.member_statement.spent')} value={memberStatement.summary.wallet_hours_spent} />
+                  </div>
+                  <div className="mt-3 rounded-lg bg-default-100 px-3 py-2 text-sm text-default-700">
+                    {formatChf(memberStatement.summary.estimated_social_value_chf)}
+                  </div>
+                  {memberStatement.support_hours_by_organisation.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {memberStatement.support_hours_by_organisation.slice(0, 3).map((organisation) => (
+                        <div key={organisation.organisation_name} className="flex items-center justify-between gap-3 text-xs">
+                          <span className="truncate text-default-600">{organisation.organisation_name}</span>
+                          <span className="font-semibold text-default-900">{formatHours(organisation.approved_hours)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
+                  {t('caring_workflow.member_statement.empty')}
+                </div>
+              )}
+            </CardBody>
+          </Card>
 
           <Card shadow="sm">
             <CardHeader>
