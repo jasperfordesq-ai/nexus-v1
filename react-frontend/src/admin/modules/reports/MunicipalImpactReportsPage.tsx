@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
@@ -50,6 +51,39 @@ const reportCards = [
   { key: 'trust_pack', icon: ShieldCheck, href: '/admin/safeguarding', statKey: 'pending_hours' },
 ] as const;
 
+type CantonVariant = {
+  aggregate_municipalities_count: number;
+  multi_node_total_hours: number;
+  est_cost_avoidance_chf: number;
+  cost_avoidance_multiplier: number;
+  yoy_change_percent: number | null;
+  yoy_prior_period: { from: string; to: string };
+  yoy_prior_hours: number;
+};
+
+type MunicipalityVariant = {
+  partner_organisations: Array<{ id: number; name: string; hours: number; log_count: number }>;
+  partner_organisations_count: number;
+  recipients_reached_count: number;
+  geographic_distribution: Array<{ name: string; hours: number; count: number }>;
+  trusted_organisations_total: number;
+};
+
+type CooperativeVariant = {
+  member_retention_rate: number;
+  retained_members_count: number;
+  reciprocity_rate: number;
+  reciprocal_members_count: number;
+  tandem_count: number;
+  coordinator_load_avg: number;
+  pending_reviews_total: number;
+  coordinator_count: number;
+  future_care_credit_pool: number;
+  active_members_total: number;
+};
+
+type AudienceMode = 'canton' | 'municipality' | 'cooperative';
+
 type MunicipalImpactSummary = {
   period: { from: string; to: string };
   currency: string;
@@ -73,6 +107,9 @@ type MunicipalImpactSummary = {
     status: 'ready' | 'needs_data';
     value: number;
   }>;
+  canton_variant?: CantonVariant;
+  municipality_variant?: MunicipalityVariant;
+  cooperative_variant?: CooperativeVariant;
 };
 
 type ReportTemplate = {
@@ -109,22 +146,23 @@ type ReportDateFilters = {
   dateTo: string;
 };
 
-function municipalReportParams(templateId: number | null, filters: ReportDateFilters) {
+function municipalReportParams(templateId: number | null, filters: ReportDateFilters, audience?: AudienceMode | null) {
   const params = new URLSearchParams();
   if (templateId) params.set('template_id', String(templateId));
   if (filters.dateFrom) params.set('date_from', filters.dateFrom);
   if (filters.dateTo) params.set('date_to', filters.dateTo);
+  if (audience) params.set('audience', audience);
   return params;
 }
 
-async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, templateId: number | null, filters: ReportDateFilters) {
+async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, templateId: number | null, filters: ReportDateFilters, audience: AudienceMode) {
   const headers: Record<string, string> = {};
   const token = tokenManager.getAccessToken();
   const tenantId = tokenManager.getTenantId();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
 
-  const params = municipalReportParams(templateId, filters);
+  const params = municipalReportParams(templateId, filters, audience);
   params.set('format', format);
 
   const res = await fetch(`${API_BASE}/v2/admin/reports/municipal_impact/export?${params.toString()}`, {
@@ -158,22 +196,21 @@ export default function MunicipalImpactReportsPage() {
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [deletingTemplateId, setDeletingTemplateId] = useState<number | null>(null);
   const [exporting, setExporting] = useState<'csv' | 'pdf' | null>(null);
+  const [audienceMode, setAudienceMode] = useState<AudienceMode>('municipality');
 
   const loadSummary = useCallback(async () => {
     setLoading(true);
     try {
-      const endpoint = selectedTemplateId
-        ? `/v2/admin/reports/municipal-impact?${municipalReportParams(selectedTemplateId, dateFilters).toString()}`
-        : '/v2/admin/reports/municipal-impact';
-      const untemplatedEndpoint = `/v2/admin/reports/municipal-impact?${municipalReportParams(null, dateFilters).toString()}`;
-      const res = await api.get<MunicipalImpactSummary>(selectedTemplateId ? endpoint : untemplatedEndpoint);
+      const params = municipalReportParams(selectedTemplateId, dateFilters, audienceMode);
+      const endpoint = `/v2/admin/reports/municipal-impact?${params.toString()}`;
+      const res = await api.get<MunicipalImpactSummary>(endpoint);
       if (isMunicipalImpactSummary(res.data)) setSummary(res.data);
     } catch {
       toast.error(t('municipal_reports.toast.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [dateFilters, selectedTemplateId, t, toast]);
+  }, [audienceMode, dateFilters, selectedTemplateId, t, toast]);
 
   const loadTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -212,7 +249,13 @@ export default function MunicipalImpactReportsPage() {
   const handleExport = async (format: 'csv' | 'pdf') => {
     setExporting(format);
     try {
-      await downloadMunicipalExport(format, `municipal-impact-pack.${format}`, selectedTemplateId, dateFilters);
+      await downloadMunicipalExport(
+        format,
+        `municipal-impact-pack-${audienceMode}.${format}`,
+        selectedTemplateId,
+        dateFilters,
+        audienceMode,
+      );
       toast.success(t('municipal_reports.toast.export_started'));
     } catch {
       toast.error(t('municipal_reports.toast.export_failed'));
@@ -220,6 +263,14 @@ export default function MunicipalImpactReportsPage() {
       setExporting(null);
     }
   };
+
+  // Sync the audience mode with the selected template's audience when one is chosen.
+  useEffect(() => {
+    const tplAudience = templates.find((tpl) => tpl.id === selectedTemplateId)?.audience;
+    if (tplAudience === 'canton' || tplAudience === 'municipality' || tplAudience === 'cooperative') {
+      setAudienceMode(tplAudience);
+    }
+  }, [selectedTemplateId, templates]);
 
   const selectedTemplate = templates.find((template) => template.id === selectedTemplateId) ?? null;
   const reportAudience = summary?.report_context?.audience ?? selectedTemplate?.audience ?? 'municipality';
@@ -310,6 +361,38 @@ export default function MunicipalImpactReportsPage() {
           </div>
         }
       />
+
+      <Card className="mb-4" shadow="sm">
+        <CardBody className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase text-default-500">Audience</p>
+            <p className="text-sm text-default-600">
+              Switch the narrative framing. Only the selected audience section is included in the PDF/CSV export.
+            </p>
+          </div>
+          <div className="inline-flex rounded-lg border border-default-200 bg-default-50 p-1">
+            {(['canton', 'municipality', 'cooperative'] as const).map((mode) => {
+              const active = audienceMode === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setAudienceMode(mode)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition ${
+                    active
+                      ? 'bg-primary text-primary-foreground shadow'
+                      : 'text-default-600 hover:bg-default-100'
+                  }`}
+                >
+                  {mode === 'canton' && 'Canton'}
+                  {mode === 'municipality' && 'Municipality'}
+                  {mode === 'cooperative' && 'Cooperative'}
+                </button>
+              );
+            })}
+          </div>
+        </CardBody>
+      </Card>
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <StatCard label={t('municipal_reports.stats.verified_hours')} value={formatHours(metric('verified_hours'))} icon={Heart} color="success" />
@@ -578,6 +661,28 @@ export default function MunicipalImpactReportsPage() {
         </div>
       )}
 
+      {!loading && summary && (
+        <div className="mt-6 space-y-4">
+          <CantonNarrativeSection
+            isActive={audienceMode === 'canton'}
+            variant={summary.canton_variant}
+            currency={summary.currency}
+            tenantName={summary.report_context?.template_name ?? null}
+            period={summary.period}
+          />
+          <MunicipalityNarrativeSection
+            isActive={audienceMode === 'municipality'}
+            variant={summary.municipality_variant}
+            period={summary.period}
+          />
+          <CooperativeNarrativeSection
+            isActive={audienceMode === 'cooperative'}
+            variant={summary.cooperative_variant}
+            period={summary.period}
+          />
+        </div>
+      )}
+
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalContent>
           <ModalHeader>{t('municipal_reports.templates.modal_title')}</ModalHeader>
@@ -650,5 +755,296 @@ export default function MunicipalImpactReportsPage() {
         </ModalContent>
       </Modal>
     </div>
+  );
+}
+
+// ============================================================================
+// Audience-specific narrative sections (admin English-only)
+// ============================================================================
+
+type Period = { from: string; to: string };
+
+function NarrativeShell({
+  isActive,
+  title,
+  description,
+  children,
+}: {
+  isActive: boolean;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card shadow="sm" className={isActive ? 'border-2 border-primary/40' : 'opacity-70'}>
+      <CardHeader className="flex flex-col items-start gap-1">
+        <div className="flex items-center gap-2">
+          <h2 className="text-base font-semibold">{title}</h2>
+          {isActive && (
+            <Chip size="sm" color="primary" variant="flat">
+              In export
+            </Chip>
+          )}
+        </div>
+        <p className="text-sm text-default-500">{description}</p>
+      </CardHeader>
+      <Divider />
+      <CardBody className="gap-3">{children}</CardBody>
+    </Card>
+  );
+}
+
+function CantonNarrativeSection({
+  isActive,
+  variant,
+  currency,
+  tenantName,
+  period,
+}: {
+  isActive: boolean;
+  variant?: CantonVariant;
+  currency: string;
+  tenantName: string | null;
+  period: Period;
+}) {
+  const formatter = useMemo(
+    () => new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }),
+    [currency],
+  );
+
+  if (!variant) {
+    return (
+      <NarrativeShell
+        isActive={isActive}
+        title="Canton (Kantonsrat / regional government)"
+        description="Aggregate impact across municipalities, cost-avoidance, and year-over-year change."
+      >
+        <p className="text-sm text-default-500">
+          Switch to Canton mode to load the canton-level narrative.
+        </p>
+      </NarrativeShell>
+    );
+  }
+
+  const yoy = variant.yoy_change_percent;
+  const yoyChip =
+    yoy === null ? (
+      <Chip size="sm" variant="flat">No prior data</Chip>
+    ) : (
+      <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="flat">
+        {yoy >= 0 ? '+' : ''}
+        {yoy.toFixed(1)}% YoY
+      </Chip>
+    );
+
+  return (
+    <NarrativeShell
+      isActive={isActive}
+      title={`Verified support hours${tenantName ? ` - ${tenantName}` : ''} - ${period.from} to ${period.to}`}
+      description="Aggregate impact across municipalities, professional-care cost avoidance, year-over-year trend."
+    >
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Municipalities reporting</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.aggregate_municipalities_count.toLocaleString()}</p>
+          <p className="text-xs text-default-500 mt-1">
+            Aggregate node count contributing to this view.
+          </p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Multi-node total hours</p>
+          <p className="mt-1 text-2xl font-semibold">
+            {variant.multi_node_total_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+          </p>
+          <p className="text-xs text-default-500 mt-1">Verified across all opted-in nodes.</p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Estimated cost avoidance</p>
+          <p className="mt-1 text-2xl font-semibold">{formatter.format(variant.est_cost_avoidance_chf)}</p>
+          <p className="text-xs text-default-500 mt-1">
+            Hours x policy value x {variant.cost_avoidance_multiplier.toFixed(1)} (professional-care equivalency).
+          </p>
+        </div>
+      </div>
+      <div className="rounded-lg border border-default-200 p-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold">Year-over-year change</p>
+          {yoyChip}
+        </div>
+        <p className="mt-1 text-xs text-default-500">
+          Prior period: {variant.yoy_prior_period.from} to {variant.yoy_prior_period.to} -
+          {' '}
+          {variant.yoy_prior_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} verified hours.
+        </p>
+      </div>
+    </NarrativeShell>
+  );
+}
+
+function MunicipalityNarrativeSection({
+  isActive,
+  variant,
+  period,
+}: {
+  isActive: boolean;
+  variant?: MunicipalityVariant;
+  period: Period;
+}) {
+  if (!variant) {
+    return (
+      <NarrativeShell
+        isActive={isActive}
+        title="Municipality (Gemeinde)"
+        description="Local participation, named partner orgs, geographic / category split."
+      >
+        <p className="text-sm text-default-500">
+          Switch to Municipality mode to load the municipality-level narrative.
+        </p>
+      </NarrativeShell>
+    );
+  }
+
+  return (
+    <NarrativeShell
+      isActive={isActive}
+      title={`Community impact - ${period.from} to ${period.to}`}
+      description="Local participation, named partner organisations, geographic / category split, recipient reach."
+    >
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Partner organisations</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.partner_organisations_count}</p>
+          <p className="text-xs text-default-500 mt-1">
+            of {variant.trusted_organisations_total} trusted total.
+          </p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Recipients reached</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.recipients_reached_count.toLocaleString()}</p>
+          <p className="text-xs text-default-500 mt-1">Distinct receivers of completed exchanges.</p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Top categories</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.geographic_distribution.length}</p>
+          <p className="text-xs text-default-500 mt-1">Listed below by hours.</p>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold mb-2">Partner organisations (by hours)</p>
+        {variant.partner_organisations.length === 0 ? (
+          <p className="text-sm text-default-500">No partner activity in this period.</p>
+        ) : (
+          <div className="space-y-1">
+            {variant.partner_organisations.map((org) => (
+              <div key={org.id} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
+                <div>
+                  <p className="text-sm font-medium">{org.name}</p>
+                  <p className="text-xs text-default-500">{org.log_count} logs</p>
+                </div>
+                <Chip size="sm" variant="flat" color="success">
+                  {org.hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+                </Chip>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold mb-2">Top 5 categories (geographic / activity split)</p>
+        {variant.geographic_distribution.length === 0 ? (
+          <p className="text-sm text-default-500">No category data in this period.</p>
+        ) : (
+          <div className="space-y-1">
+            {variant.geographic_distribution.map((cat) => (
+              <div key={cat.name} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
+                <div>
+                  <p className="text-sm font-medium">{cat.name}</p>
+                  <p className="text-xs text-default-500">{cat.count} activities</p>
+                </div>
+                <Chip size="sm" variant="flat" color="primary">
+                  {cat.hours.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+                </Chip>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </NarrativeShell>
+  );
+}
+
+function CooperativeNarrativeSection({
+  isActive,
+  variant,
+  period,
+}: {
+  isActive: boolean;
+  variant?: CooperativeVariant;
+  period: Period;
+}) {
+  if (!variant) {
+    return (
+      <NarrativeShell
+        isActive={isActive}
+        title="Cooperative (KISS-Genossenschaft internal)"
+        description="Member retention, hour reciprocity, tandem relationships, coordinator workload, future-care credit pool."
+      >
+        <p className="text-sm text-default-500">
+          Switch to Cooperative mode to load the cooperative-internal narrative.
+        </p>
+      </NarrativeShell>
+    );
+  }
+
+  const retentionPct = (variant.member_retention_rate * 100).toFixed(1);
+  const reciprocityPct = (variant.reciprocity_rate * 100).toFixed(1);
+
+  return (
+    <NarrativeShell
+      isActive={isActive}
+      title={`Cooperative internal report - ${period.from} to ${period.to}`}
+      description="Internal cooperative health: retention, reciprocity, tandems, coordinator load, credit pool."
+    >
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Member retention</p>
+          <p className="mt-1 text-2xl font-semibold">{retentionPct}%</p>
+          <p className="text-xs text-default-500 mt-1">
+            {variant.retained_members_count} members active in both this period and the prior equivalent period.
+          </p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Reciprocity rate</p>
+          <p className="mt-1 text-2xl font-semibold">{reciprocityPct}%</p>
+          <p className="text-xs text-default-500 mt-1">
+            {variant.reciprocal_members_count} supporters also received hours in the period.
+          </p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Active tandems</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.tandem_count}</p>
+          <p className="text-xs text-default-500 mt-1">Recurring helper/recipient pairs (2+ exchanges).</p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3">
+          <p className="text-xs uppercase text-default-500">Coordinator load</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.coordinator_load_avg.toFixed(1)}</p>
+          <p className="text-xs text-default-500 mt-1">
+            {variant.pending_reviews_total} pending across {variant.coordinator_count} coordinators.
+          </p>
+        </div>
+        <div className="rounded-lg border border-default-200 p-3 md:col-span-2">
+          <p className="text-xs uppercase text-default-500">Future-care credit balance pool</p>
+          <p className="mt-1 text-2xl font-semibold">
+            {variant.future_care_credit_pool.toLocaleString(undefined, { maximumFractionDigits: 1 })} h
+          </p>
+          <p className="text-xs text-default-500 mt-1">
+            Sum of positive member balances - the cooperative's implicit future-care reserve.
+            Active member base: {variant.active_members_total.toLocaleString()}.
+          </p>
+        </div>
+      </div>
+    </NarrativeShell>
   );
 }

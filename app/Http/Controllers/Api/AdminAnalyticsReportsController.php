@@ -168,6 +168,9 @@ class AdminAnalyticsReportsController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
+        $audienceOverride = $this->query('audience');
+        $audienceOverride = is_string($audienceOverride) && $audienceOverride !== '' ? $audienceOverride : null;
+
         $templateId = $this->queryInt('template_id', 0, 0);
         if ($templateId > 0) {
             $template = $this->municipalReportTemplateService->get($tenantId, $templateId);
@@ -183,6 +186,11 @@ class AdminAnalyticsReportsController extends BaseApiController
                 'sections' => $template['sections'],
                 'template_name' => $template['name'],
             ]);
+        }
+
+        // Explicit audience query param wins over template audience.
+        if ($audienceOverride !== null) {
+            $filters['audience'] = $audienceOverride;
         }
 
         return $this->respondWithData(
@@ -387,6 +395,9 @@ class AdminAnalyticsReportsController extends BaseApiController
         ];
 
         if ($type === 'municipal_impact') {
+            $audienceOverride = $this->query('audience');
+            $audienceOverride = is_string($audienceOverride) && $audienceOverride !== '' ? $audienceOverride : null;
+
             $templateId = $this->queryInt('template_id', 0, 0);
             if ($templateId > 0) {
                 $template = $this->municipalReportTemplateService->get($tenantId, $templateId);
@@ -402,6 +413,10 @@ class AdminAnalyticsReportsController extends BaseApiController
                     'sections' => $template['sections'],
                     'template_name' => $template['name'],
                 ]);
+            }
+
+            if ($audienceOverride !== null) {
+                $filters['audience'] = $audienceOverride;
             }
         }
 

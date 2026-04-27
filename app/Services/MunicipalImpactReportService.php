@@ -44,7 +44,7 @@ class MunicipalImpactReportService
         $directValue = round($verifiedHours * $hourConfig['hour_value'], 2);
         $socialValue = round($directValue * $hourConfig['social_multiplier'], 2);
 
-        return [
+        $payload = [
             'period' => $range,
             'currency' => $hourConfig['currency'],
             'hour_value' => $hourConfig['hour_value'],
@@ -85,6 +85,324 @@ class MunicipalImpactReportService
                 ],
             ],
         ];
+
+        $audience = (string) ($reportContext['audience'] ?? 'municipality');
+        $payload = $this->attachNarrativeVariant($payload, $audience, $tenantId, $range, $hourConfig, $verifiedHours, $members, $organisations);
+
+        return $payload;
+    }
+
+    /**
+     * Compute and attach the audience-specific narrative variant to the report payload.
+     * The base payload always contains the same numeric stats; the variant adds extra
+     * fields tailored to canton-, municipality-, or cooperative-level readers.
+     */
+    private function attachNarrativeVariant(
+        array $payload,
+        string $audience,
+        int $tenantId,
+        array $range,
+        array $hourConfig,
+        float $verifiedHours,
+        array $members,
+        array $organisations,
+    ): array {
+        switch ($audience) {
+            case 'canton':
+                $payload['canton_variant'] = $this->cantonVariant($tenantId, $range, $hourConfig, $verifiedHours);
+                break;
+            case 'cooperative':
+                $payload['cooperative_variant'] = $this->cooperativeVariant($tenantId, $range, $members);
+                break;
+            case 'foundation':
+            case 'municipality':
+            default:
+                $payload['municipality_variant'] = $this->municipalityVariant($tenantId, $range, $organisations);
+                break;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Canton-level narrative: aggregate impact across multiple municipalities,
+     * estimated cost-avoidance vs professional care, and year-over-year change.
+     */
+    private function cantonVariant(int $tenantId, array $range, array $hourConfig, float $verifiedHours): array
+    {
+        // Cost-avoidance multiplier reflects the rough professional-care equivalency
+        // (e.g. paid Spitex visit + admin overhead) on top of the policy hour value.
+        $costAvoidanceMultiplier = 1.5;
+        $estCostAvoidance = round($verifiedHours * $hourConfig['hour_value'] * $costAvoidanceMultiplier, 2);
+
+        // Year-over-year: same period one year prior.
+        $priorRange = [
+            'from' => date('Y-m-d', strtotime($range['from'] . ' -1 year')),
+            'to' => date('Y-m-d', strtotime($range['to'] . ' -1 year')),
+        ];
+        $priorHours = $this->verifiedHoursTotal($tenantId, $priorRange);
+        $yoyChangePercent = $priorHours > 0
+            ? round((($verifiedHours - $priorHours) / $priorHours) * 100, 1)
+            : null;
+
+        // Multi-node total: when federation aggregates are available, this number sums
+        // across opted-in nodes. For now we surface this tenant's contribution under
+        // the same key so the canton-level UI has a stable shape.
+        $aggregateMunicipalities = 1;
+        $multiNodeTotalHours = round($verifiedHours, 1);
+
+        return [
+            'aggregate_municipalities_count' => $aggregateMunicipalities,
+            'multi_node_total_hours' => $multiNodeTotalHours,
+            'est_cost_avoidance_chf' => $estCostAvoidance,
+            'cost_avoidance_multiplier' => $costAvoidanceMultiplier,
+            'yoy_change_percent' => $yoyChangePercent,
+            'yoy_prior_period' => $priorRange,
+            'yoy_prior_hours' => round($priorHours, 1),
+        ];
+    }
+
+    /**
+     * Municipality-level narrative: who participated, named partner orgs, geographic
+     * (category) split, and recipient reach.
+     */
+    private function municipalityVariant(int $tenantId, array $range, array $organisations): array
+    {
+        $partnerOrgs = [];
+        if (Schema::hasTable('vol_organizations') && Schema::hasTable('vol_logs')) {
+            $rows = DB::select(
+                "SELECT o.id, o.name,
+                        COALESCE(SUM(l.hours), 0) AS hours,
+                        COUNT(l.id) AS log_count
+                 FROM vol_organizations o
+                 LEFT JOIN vol_logs l
+                        ON l.organization_id = o.id
+                       AND l.tenant_id = o.tenant_id
+                       AND l.status = 'approved'
+                       AND l.date_logged BETWEEN ? AND ?
+                 WHERE o.tenant_id = ? AND o.status IN ('approved', 'active')
+                 GROUP BY o.id, o.name
+                 ORDER BY hours DESC
+                 LIMIT 12",
+                [$range['from'], $range['to'], $tenantId]
+            );
+            foreach ($rows as $row) {
+                $partnerOrgs[] = [
+                    'id' => (int) $row->id,
+                    'name' => (string) $row->name,
+                    'hours' => round((float) $row->hours, 1),
+                    'log_count' => (int) $row->log_count,
+                ];
+            }
+        }
+
+        // Recipients reached: distinct receivers in completed transactions in the period.
+        $recipientsReached = 0;
+        if (Schema::hasTable('transactions')) {
+            $row = DB::selectOne(
+                "SELECT COUNT(DISTINCT receiver_id) AS count
+                 FROM transactions
+                 WHERE tenant_id = ? AND status = 'completed'
+                   AND DATE(created_at) BETWEEN ? AND ?",
+                [$tenantId, $range['from'], $range['to']]
+            );
+            $recipientsReached = (int) ($row->count ?? 0);
+        }
+
+        // Top 5 categories by hours (acts as our geographic-distribution proxy until
+        // structured location data is collected on every transaction).
+        $topCategories = [];
+        if (Schema::hasTable('transactions')) {
+            $rows = DB::select(
+                "SELECT COALESCE(c.name, 'Uncategorized') AS name,
+                        COALESCE(SUM(t.amount), 0) AS hours,
+                        COUNT(*) AS count
+                 FROM transactions t
+                 LEFT JOIN listings l ON l.id = t.listing_id AND l.tenant_id = t.tenant_id
+                 LEFT JOIN categories c ON c.id = l.category_id AND c.tenant_id = t.tenant_id
+                 WHERE t.tenant_id = ? AND t.status = 'completed'
+                   AND DATE(t.created_at) BETWEEN ? AND ?
+                 GROUP BY COALESCE(c.name, 'Uncategorized')
+                 ORDER BY hours DESC
+                 LIMIT 5",
+                [$tenantId, $range['from'], $range['to']]
+            );
+            foreach ($rows as $row) {
+                $topCategories[] = [
+                    'name' => (string) $row->name,
+                    'hours' => round((float) $row->hours, 1),
+                    'count' => (int) $row->count,
+                ];
+            }
+        }
+
+        return [
+            'partner_organisations' => $partnerOrgs,
+            'partner_organisations_count' => count($partnerOrgs),
+            'recipients_reached_count' => $recipientsReached,
+            'geographic_distribution' => $topCategories,
+            'trusted_organisations_total' => $organisations['trusted_organisations'],
+        ];
+    }
+
+    /**
+     * Cooperative-level narrative: member retention, hour reciprocity, tandem
+     * relationship count, and average coordinator load.
+     */
+    private function cooperativeVariant(int $tenantId, array $range, array $members): array
+    {
+        $periodLengthDays = max(1, (int) ((strtotime($range['to']) - strtotime($range['from'])) / 86400));
+        $priorRange = [
+            'from' => date('Y-m-d', strtotime($range['from'] . ' -' . $periodLengthDays . ' days')),
+            'to' => date('Y-m-d', strtotime($range['from'] . ' -1 day')),
+        ];
+
+        $currentParticipants = $this->participantIds($tenantId, $range);
+        $priorParticipants = $this->participantIds($tenantId, $priorRange);
+        $retainedCount = count(array_intersect_key($currentParticipants, $priorParticipants));
+        $retentionRate = count($priorParticipants) > 0
+            ? round($retainedCount / count($priorParticipants), 3)
+            : 0.0;
+
+        // Reciprocity: of distinct supporters (givers), how many were also receivers
+        // in the same period.
+        $supporters = [];
+        $receivers = [];
+        if (Schema::hasTable('vol_logs')) {
+            foreach (DB::select(
+                "SELECT DISTINCT user_id FROM vol_logs
+                 WHERE tenant_id = ? AND status = 'approved' AND date_logged BETWEEN ? AND ?",
+                [$tenantId, $range['from'], $range['to']]
+            ) as $row) {
+                if ($row->user_id) {
+                    $supporters[(int) $row->user_id] = true;
+                }
+            }
+        }
+        if (Schema::hasTable('transactions')) {
+            foreach (DB::select(
+                "SELECT DISTINCT sender_id, receiver_id FROM transactions
+                 WHERE tenant_id = ? AND status = 'completed' AND DATE(created_at) BETWEEN ? AND ?",
+                [$tenantId, $range['from'], $range['to']]
+            ) as $row) {
+                if ($row->sender_id) {
+                    $supporters[(int) $row->sender_id] = true;
+                }
+                if ($row->receiver_id) {
+                    $receivers[(int) $row->receiver_id] = true;
+                }
+            }
+        }
+        $bothCount = count(array_intersect_key($supporters, $receivers));
+        $reciprocityRate = count($supporters) > 0 ? round($bothCount / count($supporters), 3) : 0.0;
+
+        // Tandem count: recurring helper/recipient pairs (>=2 completed transactions
+        // in either direction within the period).
+        $tandemCount = 0;
+        if (Schema::hasTable('transactions')) {
+            $row = DB::selectOne(
+                "SELECT COUNT(*) AS pair_count FROM (
+                     SELECT LEAST(sender_id, receiver_id) AS a,
+                            GREATEST(sender_id, receiver_id) AS b,
+                            COUNT(*) AS c
+                     FROM transactions
+                     WHERE tenant_id = ? AND status = 'completed'
+                       AND DATE(created_at) BETWEEN ? AND ?
+                       AND sender_id IS NOT NULL AND receiver_id IS NOT NULL
+                     GROUP BY a, b
+                     HAVING c >= 2
+                 ) pairs",
+                [$tenantId, $range['from'], $range['to']]
+            );
+            $tandemCount = (int) ($row->pair_count ?? 0);
+        }
+
+        // Coordinator load: pending volunteer reviews divided by coordinator-role users.
+        $pendingReviews = 0;
+        if (Schema::hasTable('vol_logs')) {
+            $row = DB::selectOne(
+                "SELECT COUNT(*) AS count FROM vol_logs
+                 WHERE tenant_id = ? AND status = 'pending'",
+                [$tenantId]
+            );
+            $pendingReviews = (int) ($row->count ?? 0);
+        }
+        $coordinatorCount = (int) DB::selectOne(
+            "SELECT COUNT(*) AS count FROM users
+             WHERE tenant_id = ? AND is_approved = 1
+               AND role IN ('admin', 'super_admin', 'moderator', 'coordinator')",
+            [$tenantId]
+        )->count;
+        $coordinatorLoadAvg = $coordinatorCount > 0
+            ? round($pendingReviews / $coordinatorCount, 1)
+            : (float) $pendingReviews;
+
+        // Future-care credit balance pool: sum of positive balances held by approved
+        // members. This is the reserve the cooperative is implicitly insuring.
+        $futureCarePool = 0.0;
+        if (Schema::hasColumn('users', 'balance')) {
+            $row = DB::selectOne(
+                "SELECT COALESCE(SUM(GREATEST(balance, 0)), 0) AS total
+                 FROM users
+                 WHERE tenant_id = ? AND is_approved = 1",
+                [$tenantId]
+            );
+            $futureCarePool = round((float) ($row->total ?? 0), 1);
+        }
+
+        return [
+            'member_retention_rate' => $retentionRate,
+            'retained_members_count' => $retainedCount,
+            'reciprocity_rate' => $reciprocityRate,
+            'reciprocal_members_count' => $bothCount,
+            'tandem_count' => $tandemCount,
+            'coordinator_load_avg' => $coordinatorLoadAvg,
+            'pending_reviews_total' => $pendingReviews,
+            'coordinator_count' => $coordinatorCount,
+            'future_care_credit_pool' => $futureCarePool,
+            'active_members_total' => $members['active_members'],
+        ];
+    }
+
+    private function verifiedHoursTotal(int $tenantId, array $range): float
+    {
+        $timebank = $this->timebankSummary($tenantId, $range);
+        $volunteering = $this->volunteeringSummary($tenantId, $range);
+        return $timebank['completed_hours'] + $volunteering['approved_hours'];
+    }
+
+    /**
+     * @return array<int, true> Map of user IDs that participated in the period.
+     */
+    private function participantIds(int $tenantId, array $range): array
+    {
+        $ids = [];
+        if (Schema::hasTable('vol_logs')) {
+            foreach (DB::select(
+                "SELECT DISTINCT user_id FROM vol_logs
+                 WHERE tenant_id = ? AND status = 'approved' AND date_logged BETWEEN ? AND ?",
+                [$tenantId, $range['from'], $range['to']]
+            ) as $row) {
+                if ($row->user_id) {
+                    $ids[(int) $row->user_id] = true;
+                }
+            }
+        }
+        if (Schema::hasTable('transactions')) {
+            foreach (DB::select(
+                "SELECT DISTINCT sender_id, receiver_id FROM transactions
+                 WHERE tenant_id = ? AND status = 'completed' AND DATE(created_at) BETWEEN ? AND ?",
+                [$tenantId, $range['from'], $range['to']]
+            ) as $row) {
+                if ($row->sender_id) {
+                    $ids[(int) $row->sender_id] = true;
+                }
+                if ($row->receiver_id) {
+                    $ids[(int) $row->receiver_id] = true;
+                }
+            }
+        }
+        return $ids;
     }
 
     public function exportData(int $tenantId, array $filters = []): array

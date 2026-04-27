@@ -596,68 +596,177 @@ class ReportExportService
         $sections = implode(', ', $context['sections'] ?? []);
         $period = $summary['period']['from'] . ' to ' . $summary['period']['to'];
         $currency = (string) ($summary['currency'] ?? 'CHF');
+        $tenantName = $this->resolveTenantName();
 
-        $lines = [
-            __('api.municipal_pdf_title'),
-            __('api.municipal_pdf_generated', ['date' => now()->format('Y-m-d H:i')]),
-            __('api.municipal_pdf_audience', ['audience' => $audience]),
-            __('api.municipal_pdf_template', ['template' => $templateName]),
-            __('api.municipal_pdf_period', ['period' => $period]),
-            __('api.municipal_pdf_sections', ['sections' => $sections]),
-            '',
-            __('api.municipal_pdf_executive_summary'),
-            __('api.municipal_pdf_summary_line', [
-                'hours' => number_format((float) ($stats['verified_hours'] ?? 0), 1),
-                'members' => number_format((int) ($stats['participating_members'] ?? 0)),
-                'organisations' => number_format((int) ($stats['trusted_organisations'] ?? 0)),
-                'value' => $currency . ' ' . number_format((float) ($stats['total_value'] ?? 0), 0),
-            ]),
-            '',
-            __('api.municipal_pdf_core_metrics'),
-            __('api.municipal_pdf_metric_verified_hours', ['value' => number_format((float) ($stats['verified_hours'] ?? 0), 1)]),
-            __('api.municipal_pdf_metric_volunteer_hours', ['value' => number_format((float) ($stats['volunteer_hours'] ?? 0), 1)]),
-            __('api.municipal_pdf_metric_timebank_hours', ['value' => number_format((float) ($stats['timebank_hours'] ?? 0), 1)]),
-            __('api.municipal_pdf_metric_pending_hours', ['value' => number_format((float) ($stats['pending_hours'] ?? 0), 1)]),
-            __('api.municipal_pdf_metric_active_members', ['value' => number_format((int) ($stats['active_members'] ?? 0))]),
-            __('api.municipal_pdf_metric_new_members', ['value' => number_format((int) ($stats['new_members'] ?? 0))]),
-            __('api.municipal_pdf_metric_support_requests', ['value' => number_format((int) ($stats['support_requests'] ?? 0))]),
-            __('api.municipal_pdf_metric_support_offers', ['value' => number_format((int) ($stats['support_offers'] ?? 0))]),
-            __('api.municipal_pdf_metric_direct_value', ['value' => $currency . ' ' . number_format((float) ($stats['direct_value'] ?? 0), 0)]),
-            __('api.municipal_pdf_metric_social_value', ['value' => $currency . ' ' . number_format((float) ($stats['social_value'] ?? 0), 0)]),
-            '',
-            __('api.municipal_pdf_readiness'),
+        $rule = str_repeat('=', 92);
+        $thinRule = str_repeat('-', 92);
+
+        $lines = [];
+
+        // -- Header band -------------------------------------------------------
+        $lines[] = $rule;
+        $lines[] = strtoupper(__('api.municipal_pdf_title'));
+        if ($tenantName !== '') {
+            $lines[] = $tenantName;
+        }
+        $lines[] = __('api.municipal_pdf_period', ['period' => $period]);
+        $lines[] = __('api.municipal_pdf_audience', ['audience' => $audience]);
+        $lines[] = __('api.municipal_pdf_template', ['template' => $templateName]);
+        $lines[] = __('api.municipal_pdf_generated', ['date' => now()->format('Y-m-d H:i')]);
+        $lines[] = $rule;
+        $lines[] = '';
+
+        // -- Two-column metrics summary ---------------------------------------
+        $lines[] = strtoupper(__('api.municipal_pdf_executive_summary'));
+        $lines[] = $thinRule;
+        $left = [
+            [__('api.municipal_pdf_metric_verified_hours_label'), number_format((float) ($stats['verified_hours'] ?? 0), 1)],
+            [__('api.municipal_pdf_metric_volunteer_hours_label'), number_format((float) ($stats['volunteer_hours'] ?? 0), 1)],
+            [__('api.municipal_pdf_metric_timebank_hours_label'), number_format((float) ($stats['timebank_hours'] ?? 0), 1)],
+            [__('api.municipal_pdf_metric_pending_hours_label'), number_format((float) ($stats['pending_hours'] ?? 0), 1)],
+            [__('api.municipal_pdf_metric_active_members_label'), number_format((int) ($stats['active_members'] ?? 0))],
         ];
+        $right = [
+            [__('api.municipal_pdf_metric_new_members_label'), number_format((int) ($stats['new_members'] ?? 0))],
+            [__('api.municipal_pdf_metric_participating_members_label'), number_format((int) ($stats['participating_members'] ?? 0))],
+            [__('api.municipal_pdf_metric_trusted_organisations_label'), number_format((int) ($stats['trusted_organisations'] ?? 0))],
+            [__('api.municipal_pdf_metric_direct_value_label'), $currency . ' ' . number_format((float) ($stats['direct_value'] ?? 0), 0)],
+            [__('api.municipal_pdf_metric_total_value_label'), $currency . ' ' . number_format((float) ($stats['total_value'] ?? 0), 0)],
+        ];
+        $rowCount = max(count($left), count($right));
+        for ($i = 0; $i < $rowCount; $i++) {
+            $l = $left[$i] ?? ['', ''];
+            $r = $right[$i] ?? ['', ''];
+            $lines[] = sprintf('  %-28s %12s    |    %-28s %12s', $l[0], $l[1], $r[0], $r[1]);
+        }
+        $lines[] = $thinRule;
+        $lines[] = '';
 
+        // -- Audience-specific narrative section ------------------------------
+        $audienceLabel = __('api.municipal_pdf_audience_section_' . $audience);
+        // Fallback if no specific translation key.
+        if (str_starts_with($audienceLabel, 'api.')) {
+            $audienceLabel = __('api.municipal_pdf_audience', ['audience' => $audience]);
+        }
+        $lines[] = strtoupper($audienceLabel);
+        $lines[] = $thinRule;
+
+        if ($audience === 'canton' && isset($summary['canton_variant'])) {
+            $variant = $summary['canton_variant'];
+            $lines[] = '  ' . __('api.municipal_pdf_canton_municipalities', ['count' => (int) ($variant['aggregate_municipalities_count'] ?? 0)]);
+            $lines[] = '  ' . __('api.municipal_pdf_canton_total_hours', ['value' => number_format((float) ($variant['multi_node_total_hours'] ?? 0), 1)]);
+            $lines[] = '  ' . __('api.municipal_pdf_canton_cost_avoidance', ['value' => $currency . ' ' . number_format((float) ($variant['est_cost_avoidance_chf'] ?? 0), 0)]);
+            $yoy = $variant['yoy_change_percent'];
+            $lines[] = '  ' . __('api.municipal_pdf_canton_yoy', [
+                'value' => $yoy === null ? __('api.municipal_pdf_value_na') : number_format((float) $yoy, 1) . '%',
+                'prior' => number_format((float) ($variant['yoy_prior_hours'] ?? 0), 1),
+            ]);
+        } elseif ($audience === 'cooperative' && isset($summary['cooperative_variant'])) {
+            $variant = $summary['cooperative_variant'];
+            $lines[] = '  ' . __('api.municipal_pdf_coop_retention', [
+                'rate' => number_format(((float) ($variant['member_retention_rate'] ?? 0)) * 100, 1) . '%',
+                'count' => (int) ($variant['retained_members_count'] ?? 0),
+            ]);
+            $lines[] = '  ' . __('api.municipal_pdf_coop_reciprocity', [
+                'rate' => number_format(((float) ($variant['reciprocity_rate'] ?? 0)) * 100, 1) . '%',
+                'count' => (int) ($variant['reciprocal_members_count'] ?? 0),
+            ]);
+            $lines[] = '  ' . __('api.municipal_pdf_coop_tandems', ['count' => (int) ($variant['tandem_count'] ?? 0)]);
+            $lines[] = '  ' . __('api.municipal_pdf_coop_load', [
+                'avg' => number_format((float) ($variant['coordinator_load_avg'] ?? 0), 1),
+                'pending' => (int) ($variant['pending_reviews_total'] ?? 0),
+                'coordinators' => (int) ($variant['coordinator_count'] ?? 0),
+            ]);
+            $lines[] = '  ' . __('api.municipal_pdf_coop_pool', [
+                'value' => number_format((float) ($variant['future_care_credit_pool'] ?? 0), 1),
+            ]);
+        } elseif (isset($summary['municipality_variant'])) {
+            $variant = $summary['municipality_variant'];
+            $lines[] = '  ' . __('api.municipal_pdf_muni_partners', ['count' => (int) ($variant['partner_organisations_count'] ?? 0)]);
+            foreach (array_slice($variant['partner_organisations'] ?? [], 0, 8) as $org) {
+                $lines[] = sprintf(
+                    '    - %-50s %8s h   (%d)',
+                    mb_substr((string) $org['name'], 0, 50),
+                    number_format((float) $org['hours'], 1),
+                    (int) $org['log_count']
+                );
+            }
+            $lines[] = '  ' . __('api.municipal_pdf_muni_recipients', ['count' => (int) ($variant['recipients_reached_count'] ?? 0)]);
+            $lines[] = '  ' . __('api.municipal_pdf_muni_geographic');
+            foreach ($variant['geographic_distribution'] ?? [] as $cat) {
+                $lines[] = sprintf(
+                    '    - %-50s %8s h',
+                    mb_substr((string) $cat['name'], 0, 50),
+                    number_format((float) $cat['hours'], 1)
+                );
+            }
+        }
+        $lines[] = $thinRule;
+        $lines[] = '';
+
+        // -- Readiness signals ------------------------------------------------
+        $lines[] = strtoupper(__('api.municipal_pdf_readiness'));
+        $lines[] = $thinRule;
         foreach ($summary['readiness_signals'] ?? [] as $signal) {
-            $lines[] = __('api.municipal_pdf_readiness_line', [
+            $lines[] = '  ' . __('api.municipal_pdf_readiness_line', [
                 'label' => __('api.municipal_pdf_signal_' . $signal['key']),
                 'status' => __('api.municipal_pdf_status_' . $signal['status']),
                 'value' => number_format((float) ($signal['value'] ?? 0), 1),
             ]);
         }
-
+        $lines[] = $thinRule;
         $lines[] = '';
-        $lines[] = __('api.municipal_pdf_categories');
+
+        // -- Categories -------------------------------------------------------
+        $lines[] = strtoupper(__('api.municipal_pdf_categories'));
+        $lines[] = $thinRule;
         foreach (array_slice($summary['categories'] ?? [], 0, 8) as $category) {
-            $lines[] = __('api.municipal_pdf_category_line', [
+            $lines[] = '  ' . __('api.municipal_pdf_category_line', [
                 'name' => (string) $category['name'],
                 'hours' => number_format((float) $category['hours'], 1),
                 'count' => number_format((int) $category['count']),
             ]);
         }
-
+        $lines[] = $thinRule;
         $lines[] = '';
-        $lines[] = __('api.municipal_pdf_trends');
+
+        // -- Trends -----------------------------------------------------------
+        $lines[] = strtoupper(__('api.municipal_pdf_trends'));
+        $lines[] = $thinRule;
         foreach (array_slice($summary['trends'] ?? [], -8) as $trend) {
-            $lines[] = __('api.municipal_pdf_trend_line', [
+            $lines[] = '  ' . __('api.municipal_pdf_trend_line', [
                 'period' => (string) $trend['period'],
                 'hours' => number_format((float) $trend['verified_hours'], 1),
                 'participants' => number_format((int) $trend['participants']),
                 'activities' => number_format((int) $trend['activities']),
             ]);
         }
+        $lines[] = $thinRule;
+        $lines[] = '';
+
+        // -- Footer -----------------------------------------------------------
+        $lines[] = $rule;
+        $lines[] = '  ' . __('api.municipal_pdf_footer', [
+            'date' => now()->format('Y-m-d'),
+            'sections' => $sections,
+        ]);
+        $lines[] = $rule;
 
         return $this->buildMinimalPdf(implode("\n", $this->wrapPdfLines($lines)));
+    }
+
+    private function resolveTenantName(): string
+    {
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+            if (!$tenantId) {
+                return '';
+            }
+            $row = DB::selectOne("SELECT name FROM tenants WHERE id = ? LIMIT 1", [$tenantId]);
+            return (string) ($row->name ?? '');
+        } catch (\Throwable) {
+            return '';
+        }
     }
 
     private function wrapPdfLines(array $lines, int $width = 92): array
