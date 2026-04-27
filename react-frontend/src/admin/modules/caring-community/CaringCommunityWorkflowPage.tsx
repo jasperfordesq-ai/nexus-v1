@@ -13,6 +13,8 @@ import Clock from 'lucide-react/icons/clock';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import Pause from 'lucide-react/icons/pause';
+import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Search from 'lucide-react/icons/search';
@@ -145,6 +147,34 @@ type MemberStatementCsv = {
   statement: MemberStatement;
 };
 
+type SupportRelationship = {
+  id: number;
+  supporter: { id: number; name: string };
+  recipient: { id: number; name: string };
+  coordinator: { id: number; name: string } | null;
+  organization_name: string;
+  category_name: string;
+  title: string;
+  description: string;
+  frequency: 'weekly' | 'fortnightly' | 'monthly' | 'ad_hoc';
+  expected_hours: number;
+  start_date: string;
+  end_date: string | null;
+  status: 'active' | 'paused' | 'completed' | 'cancelled';
+  last_logged_at: string | null;
+  next_check_in_at: string | null;
+};
+
+type SupportRelationshipList = {
+  stats: {
+    active_count: number;
+    paused_count: number;
+    check_ins_due: number;
+    expected_active_hours: number;
+  };
+  items: SupportRelationship[];
+};
+
 const workflowStages = [
   { key: 'intake', icon: HeartHandshake },
   { key: 'match', icon: Users },
@@ -163,9 +193,14 @@ const rolePresets = [
 ] as const;
 
 const reportPeriods = ['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const;
+const relationshipFrequencies = ['weekly', 'fortnightly', 'monthly', 'ad_hoc'] as const;
 
 function isWorkflowSummary(value: unknown): value is WorkflowSummary {
   return Boolean(value && typeof value === 'object' && 'stats' in value && 'pending_reviews' in value);
+}
+
+function isSupportRelationshipList(value: unknown): value is SupportRelationshipList {
+  return Boolean(value && typeof value === 'object' && 'stats' in value && 'items' in value);
 }
 
 export default function CaringCommunityWorkflowPage() {
@@ -185,6 +220,16 @@ export default function CaringCommunityWorkflowPage() {
   const [statementEndDate, setStatementEndDate] = useState('');
   const [memberStatement, setMemberStatement] = useState<MemberStatement | null>(null);
   const [loadingStatement, setLoadingStatement] = useState(false);
+  const [relationships, setRelationships] = useState<SupportRelationshipList | null>(null);
+  const [loadingRelationships, setLoadingRelationships] = useState(false);
+  const [savingRelationship, setSavingRelationship] = useState(false);
+  const [relationshipSupporterId, setRelationshipSupporterId] = useState('');
+  const [relationshipRecipientId, setRelationshipRecipientId] = useState('');
+  const [relationshipTitle, setRelationshipTitle] = useState('');
+  const [relationshipFrequency, setRelationshipFrequency] = useState<SupportRelationship['frequency']>('weekly');
+  const [relationshipExpectedHours, setRelationshipExpectedHours] = useState('1');
+  const [relationshipStartDate, setRelationshipStartDate] = useState('');
+  const [updatingRelationshipId, setUpdatingRelationshipId] = useState<number | null>(null);
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -201,6 +246,22 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadWorkflow();
   }, [loadWorkflow]);
+
+  const loadSupportRelationships = useCallback(async () => {
+    setLoadingRelationships(true);
+    try {
+      const res = await api.get<SupportRelationshipList>('/v2/admin/caring-community/support-relationships?status=all');
+      if (isSupportRelationshipList(res.data)) setRelationships(res.data);
+    } catch {
+      toast.error(t('caring_workflow.support_relationships.load_failed'));
+    } finally {
+      setLoadingRelationships(false);
+    }
+  }, [t, toast]);
+
+  useEffect(() => {
+    loadSupportRelationships();
+  }, [loadSupportRelationships]);
 
   const stats = summary?.stats;
   const signals = summary?.coordinator_signals;
@@ -347,6 +408,61 @@ export default function CaringCommunityWorkflowPage() {
     }
   }, [statementMemberId, statementQuery, t, toast]);
 
+  const createSupportRelationship = useCallback(async () => {
+    const supporterId = Number(relationshipSupporterId);
+    const recipientId = Number(relationshipRecipientId);
+    if (!Number.isInteger(supporterId) || !Number.isInteger(recipientId) || supporterId <= 0 || recipientId <= 0 || supporterId === recipientId) {
+      toast.error(t('caring_workflow.support_relationships.invalid_members'));
+      return;
+    }
+
+    setSavingRelationship(true);
+    try {
+      await api.post<SupportRelationship>('/v2/admin/caring-community/support-relationships', {
+        supporter_id: supporterId,
+        recipient_id: recipientId,
+        title: relationshipTitle || undefined,
+        frequency: relationshipFrequency,
+        expected_hours: Number(relationshipExpectedHours || 1),
+        start_date: relationshipStartDate || undefined,
+      });
+      setRelationshipSupporterId('');
+      setRelationshipRecipientId('');
+      setRelationshipTitle('');
+      setRelationshipExpectedHours('1');
+      setRelationshipStartDate('');
+      toast.success(t('caring_workflow.support_relationships.create_success'));
+      loadSupportRelationships();
+    } catch {
+      toast.error(t('caring_workflow.support_relationships.create_failed'));
+    } finally {
+      setSavingRelationship(false);
+    }
+  }, [
+    loadSupportRelationships,
+    relationshipExpectedHours,
+    relationshipFrequency,
+    relationshipRecipientId,
+    relationshipStartDate,
+    relationshipSupporterId,
+    relationshipTitle,
+    t,
+    toast,
+  ]);
+
+  const updateSupportRelationshipStatus = useCallback(async (relationship: SupportRelationship, status: SupportRelationship['status']) => {
+    setUpdatingRelationshipId(relationship.id);
+    try {
+      await api.put<SupportRelationship>(`/v2/admin/caring-community/support-relationships/${relationship.id}`, { status });
+      toast.success(t('caring_workflow.support_relationships.update_success'));
+      loadSupportRelationships();
+    } catch {
+      toast.error(t('caring_workflow.support_relationships.update_failed'));
+    } finally {
+      setUpdatingRelationshipId(null);
+    }
+  }, [loadSupportRelationships, t, toast]);
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -400,80 +516,175 @@ export default function CaringCommunityWorkflowPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
-        <Card shadow="sm">
-          <CardHeader className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold">{t('caring_workflow.review_queue.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">{t('caring_workflow.review_queue.description')}</p>
-            </div>
-            {(stats?.overdue_count ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {(stats?.escalated_count ?? 0) > 0 && (
-                  <Chip color="danger" variant="flat">{t('caring_workflow.review_queue.escalated', { count: stats?.escalated_count ?? 0 })}</Chip>
-                )}
-                <Chip color="warning" variant="flat">{t('caring_workflow.review_queue.overdue', { count: stats?.overdue_count ?? 0 })}</Chip>
+        <div className="space-y-6">
+          <Card shadow="sm">
+            <CardHeader className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.review_queue.title')}</h2>
+                <p className="mt-1 text-sm text-default-500">{t('caring_workflow.review_queue.description')}</p>
               </div>
-            )}
-          </CardHeader>
-          <Divider />
-          <CardBody className="gap-3">
-            {summary?.pending_reviews.length === 0 ? (
-              <div className="rounded-lg bg-success/10 p-4 text-sm text-success-700">
-                {t('caring_workflow.review_queue.empty')}
-              </div>
-            ) : summary?.pending_reviews.map((review) => (
-              <div key={review.id} className="rounded-lg border border-default-200 p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-default-900">{review.member_name}</p>
-                    <p className="mt-1 text-sm text-default-500">
-                      {review.organisation_name || review.opportunity_title || t('caring_workflow.review_queue.unassigned')}
-                    </p>
+              {(stats?.overdue_count ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {(stats?.escalated_count ?? 0) > 0 && (
+                    <Chip color="danger" variant="flat">{t('caring_workflow.review_queue.escalated', { count: stats?.escalated_count ?? 0 })}</Chip>
+                  )}
+                  <Chip color="warning" variant="flat">{t('caring_workflow.review_queue.overdue', { count: stats?.overdue_count ?? 0 })}</Chip>
+                </div>
+              )}
+            </CardHeader>
+            <Divider />
+            <CardBody className="gap-3">
+              {summary?.pending_reviews.length === 0 ? (
+                <div className="rounded-lg bg-success/10 p-4 text-sm text-success-700">
+                  {t('caring_workflow.review_queue.empty')}
+                </div>
+              ) : summary?.pending_reviews.map((review) => (
+                <div key={review.id} className="rounded-lg border border-default-200 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-default-900">{review.member_name}</p>
+                      <p className="mt-1 text-sm text-default-500">
+                        {review.organisation_name || review.opportunity_title || t('caring_workflow.review_queue.unassigned')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {review.is_escalated && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.review_queue.escalate_now')}</Chip>}
+                      {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">{t('caring_workflow.review_queue.needs_review')}</Chip>}
+                      <Chip size="sm" color="primary" variant="flat">{formatHours(review.hours)}</Chip>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {review.is_escalated && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.review_queue.escalate_now')}</Chip>}
-                    {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">{t('caring_workflow.review_queue.needs_review')}</Chip>}
-                    <Chip size="sm" color="primary" variant="flat">{formatHours(review.hours)}</Chip>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-default-500">
+                    <span>{t('caring_workflow.review_queue.logged_on', { date: review.date_logged })}</span>
+                    <span>{t('caring_workflow.review_queue.submitted_on', { date: review.created_at })}</span>
+                    <span>{t('caring_workflow.review_queue.age_days', { count: review.age_days })}</span>
+                    {review.assigned_name && <span>{t('caring_workflow.review_queue.assigned_to', { name: review.assigned_name })}</span>}
+                    {review.escalated_at && <span>{t('caring_workflow.review_queue.escalated_on', { date: review.escalated_at })}</span>}
+                  </div>
+                  <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+                    <Select
+                      size="sm"
+                      label={t('caring_workflow.review_queue.assign_label')}
+                      selectedKeys={[review.assigned_to ? String(review.assigned_to) : 'unassigned']}
+                      isDisabled={assigningReviewId === review.id}
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0];
+                        assignReview(review.id, selected && selected !== 'unassigned' ? Number(selected) : null);
+                      }}
+                    >
+                      <SelectItem key="unassigned">{t('caring_workflow.review_queue.unassigned_coordinator')}</SelectItem>
+                      {(summary?.coordinators ?? []).map((coordinator) => (
+                        <SelectItem key={String(coordinator.id)}>{coordinator.name}</SelectItem>
+                      ))}
+                    </Select>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color={review.is_escalated ? 'danger' : 'warning'}
+                      startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
+                      isLoading={escalatingReviewId === review.id}
+                      onPress={() => escalateReview(review)}
+                    >
+                      {review.is_escalated ? t('caring_workflow.review_queue.re_escalate') : t('caring_workflow.review_queue.escalate')}
+                    </Button>
                   </div>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-default-500">
-                  <span>{t('caring_workflow.review_queue.logged_on', { date: review.date_logged })}</span>
-                  <span>{t('caring_workflow.review_queue.submitted_on', { date: review.created_at })}</span>
-                  <span>{t('caring_workflow.review_queue.age_days', { count: review.age_days })}</span>
-                  {review.assigned_name && <span>{t('caring_workflow.review_queue.assigned_to', { name: review.assigned_name })}</span>}
-                  {review.escalated_at && <span>{t('caring_workflow.review_queue.escalated_on', { date: review.escalated_at })}</span>}
-                </div>
-                <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+              ))}
+            </CardBody>
+          </Card>
+
+          <Card shadow="sm">
+            <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">{t('caring_workflow.support_relationships.title')}</h2>
+                <p className="mt-1 text-sm text-default-500">{t('caring_workflow.support_relationships.description')}</p>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<RefreshCw size={16} />}
+                isLoading={loadingRelationships}
+                onPress={loadSupportRelationships}
+              >
+                {t('caring_workflow.actions.refresh')}
+              </Button>
+            </CardHeader>
+            <Divider />
+            <CardBody className="gap-4">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <SignalRow label={t('caring_workflow.support_relationships.active')} value={relationships?.stats.active_count ?? 0} />
+                <SignalRow label={t('caring_workflow.support_relationships.paused')} value={relationships?.stats.paused_count ?? 0} />
+                <SignalRow label={t('caring_workflow.support_relationships.check_ins_due')} value={relationships?.stats.check_ins_due ?? 0} />
+                <SignalRow label={t('caring_workflow.support_relationships.expected_hours')} value={relationships?.stats.expected_active_hours ?? 0} />
+              </div>
+              <div className="rounded-lg border border-default-200 p-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  <Input type="number" min={1} label={t('caring_workflow.support_relationships.supporter_id')} value={relationshipSupporterId} onValueChange={setRelationshipSupporterId} />
+                  <Input type="number" min={1} label={t('caring_workflow.support_relationships.recipient_id')} value={relationshipRecipientId} onValueChange={setRelationshipRecipientId} />
+                  <Input label={t('caring_workflow.support_relationships.relationship_title')} value={relationshipTitle} onValueChange={setRelationshipTitle} />
                   <Select
-                    size="sm"
-                    label={t('caring_workflow.review_queue.assign_label')}
-                    selectedKeys={[review.assigned_to ? String(review.assigned_to) : 'unassigned']}
-                    isDisabled={assigningReviewId === review.id}
-                    onSelectionChange={(keys) => {
-                      const selected = Array.from(keys)[0];
-                      assignReview(review.id, selected && selected !== 'unassigned' ? Number(selected) : null);
-                    }}
+                    label={t('caring_workflow.support_relationships.frequency')}
+                    selectedKeys={[relationshipFrequency]}
+                    onSelectionChange={(keys) => setRelationshipFrequency((Array.from(keys)[0]?.toString() as SupportRelationship['frequency']) || 'weekly')}
                   >
-                    <SelectItem key="unassigned">{t('caring_workflow.review_queue.unassigned_coordinator')}</SelectItem>
-                    {(summary?.coordinators ?? []).map((coordinator) => (
-                      <SelectItem key={String(coordinator.id)}>{coordinator.name}</SelectItem>
+                    {relationshipFrequencies.map((frequency) => (
+                      <SelectItem key={frequency}>{t(`caring_workflow.support_relationships.frequencies.${frequency}`)}</SelectItem>
                     ))}
                   </Select>
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    color={review.is_escalated ? 'danger' : 'warning'}
-                    startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
-                    isLoading={escalatingReviewId === review.id}
-                    onPress={() => escalateReview(review)}
-                  >
-                    {review.is_escalated ? t('caring_workflow.review_queue.re_escalate') : t('caring_workflow.review_queue.escalate')}
+                  <Input type="number" min={0.25} step={0.25} label={t('caring_workflow.support_relationships.expected_hours_input')} value={relationshipExpectedHours} onValueChange={setRelationshipExpectedHours} />
+                  <Input type="date" label={t('caring_workflow.support_relationships.start_date')} value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
+                </div>
+                <div className="mt-3">
+                  <Button color="primary" variant="flat" startContent={<Plus size={16} />} isLoading={savingRelationship} onPress={createSupportRelationship}>
+                    {t('caring_workflow.support_relationships.create')}
                   </Button>
                 </div>
               </div>
-            ))}
-          </CardBody>
-        </Card>
+              {(relationships?.items.length ?? 0) === 0 ? (
+                <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+                  {t('caring_workflow.support_relationships.empty')}
+                </div>
+              ) : relationships?.items.map((relationship) => (
+                <div key={relationship.id} className="rounded-lg border border-default-200 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-default-900">{relationship.title}</p>
+                      <p className="mt-1 text-sm text-default-500">
+                        {t('caring_workflow.support_relationships.pair', {
+                          supporter: relationship.supporter.name,
+                          recipient: relationship.recipient.name,
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Chip size="sm" color={relationship.status === 'active' ? 'success' : 'warning'} variant="flat">
+                        {t(`caring_workflow.support_relationships.status.${relationship.status}`)}
+                      </Chip>
+                      <Chip size="sm" color="primary" variant="flat">{formatHours(relationship.expected_hours)}</Chip>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
+                    <span>{t(`caring_workflow.support_relationships.frequencies.${relationship.frequency}`)}</span>
+                    <span>{t('caring_workflow.support_relationships.started', { date: relationship.start_date })}</span>
+                    {relationship.next_check_in_at && <span>{t('caring_workflow.support_relationships.next_check_in', { date: relationship.next_check_in_at })}</span>}
+                    {relationship.organization_name && <span>{relationship.organization_name}</span>}
+                  </div>
+                  <div className="mt-3">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color={relationship.status === 'active' ? 'warning' : 'success'}
+                      startContent={relationship.status === 'active' ? <Pause size={16} /> : <CheckCircle2 size={16} />}
+                      isLoading={updatingRelationshipId === relationship.id}
+                      onPress={() => updateSupportRelationshipStatus(relationship, relationship.status === 'active' ? 'paused' : 'active')}
+                    >
+                      {relationship.status === 'active' ? t('caring_workflow.support_relationships.pause') : t('caring_workflow.support_relationships.resume')}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+        </div>
 
         <div className="space-y-6">
           {summary?.policy && (

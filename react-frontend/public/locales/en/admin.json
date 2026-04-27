@@ -153,6 +153,45 @@
       "export_success": "Member statement CSV prepared.",
       "export_failed": "Failed to export the member statement."
     },
+    "support_relationships": {
+      "title": "Recurring support relationships",
+      "description": "Create and monitor ongoing supporter-recipient relationships for KISS-style recurring care.",
+      "active": "Active",
+      "paused": "Paused",
+      "check_ins_due": "Check-ins due",
+      "expected_hours": "Expected hours",
+      "supporter_id": "Supporter ID",
+      "recipient_id": "Recipient ID",
+      "relationship_title": "Relationship title",
+      "frequency": "Frequency",
+      "expected_hours_input": "Expected hours",
+      "start_date": "Start date",
+      "create": "Create relationship",
+      "empty": "No support relationships yet.",
+      "pair": "{{supporter}} supporting {{recipient}}",
+      "started": "Started {{date}}",
+      "next_check_in": "Next check-in {{date}}",
+      "pause": "Pause",
+      "resume": "Resume",
+      "invalid_members": "Enter two different valid member IDs.",
+      "load_failed": "Failed to load support relationships.",
+      "create_success": "Support relationship created.",
+      "create_failed": "Failed to create the support relationship.",
+      "update_success": "Support relationship updated.",
+      "update_failed": "Failed to update the support relationship.",
+      "frequencies": {
+        "weekly": "Weekly",
+        "fortnightly": "Fortnightly",
+        "monthly": "Monthly",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
     "roles": {
       "title": "Agoris/KISS role presets",
       "install_pack": "Install role pack",
