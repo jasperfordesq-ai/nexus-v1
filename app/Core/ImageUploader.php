@@ -227,6 +227,10 @@ class ImageUploader
                 return;
         }
 
+        if ($image === false) {
+            return;
+        }
+
         // Fix EXIF orientation — phones store rotation as metadata, not pixels.
         // Without this, photos taken in portrait appear sideways.
         if ($mime === 'image/jpeg' && \function_exists('exif_read_data')) {

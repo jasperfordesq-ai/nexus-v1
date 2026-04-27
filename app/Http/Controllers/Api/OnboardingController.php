@@ -70,10 +70,10 @@ class OnboardingController extends BaseApiController
         $offers = $this->input('offers', []);
         $needs = $this->input('needs', []);
 
-        // Sanitize: ensure all IDs are integers
-        $interests = is_array($interests) ? array_filter(array_map('intval', $interests), fn ($id) => $id > 0) : [];
-        $offers = is_array($offers) ? array_filter(array_map('intval', $offers), fn ($id) => $id > 0) : [];
-        $needs = is_array($needs) ? array_filter(array_map('intval', $needs), fn ($id) => $id > 0) : [];
+        // Sanitize: ensure all IDs are positive integers with no duplicates
+        $interests = is_array($interests) ? array_values(array_unique(array_filter(array_map('intval', $interests), fn ($id) => $id > 0))) : [];
+        $offers    = is_array($offers)    ? array_values(array_unique(array_filter(array_map('intval', $offers),    fn ($id) => $id > 0))) : [];
+        $needs     = is_array($needs)     ? array_values(array_unique(array_filter(array_map('intval', $needs),     fn ($id) => $id > 0))) : [];
 
         // Validate category IDs belong to current tenant
         $tenantId = TenantContext::getId();
@@ -157,7 +157,11 @@ class OnboardingController extends BaseApiController
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollback();
-            throw $e;
+            \Illuminate\Support\Facades\Log::error('Onboarding complete() failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
 
         return $this->respondWithData([

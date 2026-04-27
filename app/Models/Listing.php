@@ -31,6 +31,7 @@ class Listing extends Model
         'longitude',
         'type',
         'status',
+        'moderation_status',
         'image_url',
         'sdg_goals',
         'price',
