@@ -126,11 +126,11 @@ CREATE TABLE `activity_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `action` varchar(255) NOT NULL,
+  `action` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `action_type` varchar(50) DEFAULT NULL,
   `entity_type` varchar(50) DEFAULT NULL,
   `entity_id` int(11) DEFAULT NULL,
-  `details` text DEFAULT NULL,
+  `details` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `is_public` tinyint(1) NOT NULL DEFAULT 0,
@@ -5333,7 +5333,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5716,7 +5716,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=35588 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35589 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11399,7 +11399,8 @@ INSERT INTO `laravel_migrations` VALUES
 (128,'2026_04_25_120000_add_tenant_id_to_password_resets',53),
 (129,'2026_04_26_120000_unique_broker_message_copies_per_message',54),
 (130,'2026_04_26_191500_create_municipal_report_templates_table',55),
-(131,'2026_04_27_090000_add_assignment_to_vol_logs_table',56);
+(131,'2026_04_27_090000_add_assignment_to_vol_logs_table',56),
+(132,'2026_04_27_080000_align_activity_log_collation_to_unicode',57);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
