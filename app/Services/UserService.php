@@ -13,6 +13,7 @@ use App\Events\MemberProfileUpdated;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Scopes\TenantScope;
 use App\Services\OnboardingConfigService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +70,9 @@ class UserService
      */
     public static function getMe(int $userId): ?array
     {
-        $user = User::query()
+        // Bypass tenant scope: $userId is from auth; user's record lives in
+        // their home tenant which may differ from the current TenantContext.
+        $user = User::withoutGlobalScope(TenantScope::class)
             ->with(['listings', 'badges'])
             ->find($userId);
 
@@ -169,11 +172,18 @@ class UserService
 
     /**
      * Update a user profile.
+     *
+     * Bypass HasTenantScope on the lookup: $id is always the authenticated
+     * user's id (from requireAuth()) and the user record lives in their HOME
+     * tenant. A super-admin acting on a different tenant has TenantContext set
+     * to the viewed tenant, but their own user row only exists in their home
+     * tenant — without bypassing the scope, findOrFail throws "No query
+     * results for model [User]".
      */
     public static function update(int $id, array $data): User
     {
         /** @var User $user */
-        $user = User::query()->findOrFail($id);
+        $user = User::withoutGlobalScope(TenantScope::class)->findOrFail($id);
 
         $allowed = [
             'first_name', 'last_name', 'email', 'bio', 'tagline', 'location', 'latitude', 'longitude',
@@ -498,7 +508,10 @@ class UserService
                 return null;
             }
 
-            $user = User::query()->findOrFail($userId);
+            // Bypass tenant scope: $userId is the authenticated user's id;
+            // their user record lives in their home tenant, which may differ
+            // from the current TenantContext (super-admin viewing another tenant).
+            $user = User::withoutGlobalScope(TenantScope::class)->findOrFail($userId);
             $oldAvatarUrl = $user->avatar_url;
             $user->avatar_url = $avatarUrl;
             $user->save();

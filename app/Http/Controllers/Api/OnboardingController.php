@@ -93,10 +93,13 @@ class OnboardingController extends BaseApiController
         // All-or-nothing: wrap in transaction with row-level lock to prevent double-completion
         DB::beginTransaction();
         try {
-            // Lock user row to prevent concurrent completion (TOCTOU race condition)
+            // Lock user row to prevent concurrent completion (TOCTOU race condition).
+            // Identity is from the auth token — do NOT scope by tenant_id, because a
+            // super-admin acting on a different tenant has their user record in their
+            // home tenant. The auth token is the source of truth for identity.
             $user = DB::selectOne(
-                "SELECT id, avatar_url, bio, onboarding_completed FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
-                [$userId, $tenantId]
+                "SELECT id, avatar_url, bio, onboarding_completed FROM users WHERE id = ? FOR UPDATE",
+                [$userId]
             );
 
             if (!empty($user->onboarding_completed)) {
