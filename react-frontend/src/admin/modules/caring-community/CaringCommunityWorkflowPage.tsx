@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, StatCard } from '../../components';
+import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
 
 type PendingReview = {
   id: number;
@@ -227,6 +227,8 @@ export default function CaringCommunityWorkflowPage() {
   const [savingRelationship, setSavingRelationship] = useState(false);
   const [relationshipSupporterId, setRelationshipSupporterId] = useState('');
   const [relationshipRecipientId, setRelationshipRecipientId] = useState('');
+  const [relationshipSupporter, setRelationshipSupporter] = useState<MemberSearchMember | null>(null);
+  const [relationshipRecipient, setRelationshipRecipient] = useState<MemberSearchMember | null>(null);
   const [relationshipTitle, setRelationshipTitle] = useState('');
   const [relationshipFrequency, setRelationshipFrequency] = useState<SupportRelationship['frequency']>('weekly');
   const [relationshipExpectedHours, setRelationshipExpectedHours] = useState('1');
@@ -458,6 +460,8 @@ export default function CaringCommunityWorkflowPage() {
       });
       setRelationshipSupporterId('');
       setRelationshipRecipientId('');
+      setRelationshipSupporter(null);
+      setRelationshipRecipient(null);
       setRelationshipTitle('');
       setRelationshipExpectedHours('1');
       setRelationshipStartDate('');
@@ -702,8 +706,28 @@ export default function CaringCommunityWorkflowPage() {
               </div>
               <div className="rounded-lg border border-default-200 p-3">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  <Input type="number" min={1} label={t('caring_workflow.support_relationships.supporter_id')} value={relationshipSupporterId} onValueChange={setRelationshipSupporterId} />
-                  <Input type="number" min={1} label={t('caring_workflow.support_relationships.recipient_id')} value={relationshipRecipientId} onValueChange={setRelationshipRecipientId} />
+                  <MemberSearchPicker
+                    value={relationshipSupporterId}
+                    onValueChange={setRelationshipSupporterId}
+                    selectedMember={relationshipSupporter}
+                    onSelectedMemberChange={setRelationshipSupporter}
+                    label={t('caring_workflow.support_relationships.supporter')}
+                    placeholder={t('caring_workflow.support_relationships.supporter_placeholder')}
+                    noResultsText={t('caring_workflow.support_relationships.no_members')}
+                    clearText={t('common.clear')}
+                    isRequired
+                  />
+                  <MemberSearchPicker
+                    value={relationshipRecipientId}
+                    onValueChange={setRelationshipRecipientId}
+                    selectedMember={relationshipRecipient}
+                    onSelectedMemberChange={setRelationshipRecipient}
+                    label={t('caring_workflow.support_relationships.recipient')}
+                    placeholder={t('caring_workflow.support_relationships.recipient_placeholder')}
+                    noResultsText={t('caring_workflow.support_relationships.no_members')}
+                    clearText={t('common.clear')}
+                    isRequired
+                  />
                   <Input label={t('caring_workflow.support_relationships.relationship_title')} value={relationshipTitle} onValueChange={setRelationshipTitle} />
                   <Select
                     label={t('caring_workflow.support_relationships.frequency')}

@@ -585,6 +585,7 @@ export default function CoordinatorTasks() {
                     label={"Search Member"}
                     placeholder={"Type a Name or Email to Search..."}
                     noResultsText={"No members found found"}
+                    clearText={t('common.clear')}
                     value={formUserId}
                     selectedMember={formMember}
                     onSelectedMemberChange={setFormMember}

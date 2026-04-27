@@ -318,6 +318,7 @@ export function MemberNotes() {
           label={"Search Member"}
           placeholder={"Type a Name or Email to Search..."}
           noResultsText={"No members found found"}
+          clearText={t('common.clear')}
           className="w-full sm:w-72"
           size="sm"
           value={filterUserId}
@@ -472,6 +473,7 @@ export function MemberNotes() {
                 label={"Search Member"}
                 placeholder={"Type a Name or Email to Search..."}
                 noResultsText={"No members found found"}
+                clearText={t('common.clear')}
                 isRequired
                 value={formUserId}
                 selectedMember={formMember}

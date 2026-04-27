@@ -26,6 +26,7 @@ interface MemberSearchPickerProps {
   label: string;
   placeholder: string;
   noResultsText: string;
+  clearText: string;
   isRequired?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -64,6 +65,7 @@ export function MemberSearchPicker({
   label,
   placeholder,
   noResultsText,
+  clearText,
   isRequired = false,
   size = 'md',
   className,
@@ -208,7 +210,7 @@ export function MemberSearchPicker({
             </div>
           </div>
           <Button size={size} variant="flat" onPress={handleClear}>
-            {"Clear"}
+            {clearText}
           </Button>
         </div>
       </div>

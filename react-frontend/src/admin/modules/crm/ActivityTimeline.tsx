@@ -217,6 +217,7 @@ export function ActivityTimeline() {
           label={"Search Member"}
           placeholder={"Type a Name or Email to Search..."}
           noResultsText={"No members found found"}
+          clearText={t('common.clear')}
           className="w-full sm:w-72"
           size="sm"
           value={filterUserId}

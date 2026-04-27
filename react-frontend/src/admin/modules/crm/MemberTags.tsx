@@ -23,6 +23,7 @@ import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
@@ -47,6 +48,7 @@ interface TagSummary {
 type ViewMode = 'summary' | 'members';
 
 export function MemberTags() {
+  const { t } = useTranslation('admin');
   usePageTitle("CRM");
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -444,6 +446,7 @@ export function MemberTags() {
               label={"Search Member"}
               placeholder={"Type a Name or Email to Search..."}
               noResultsText={"No members found found"}
+              clearText={t('common.clear')}
               isRequired
               value={formUserId}
               selectedMember={formMember}
