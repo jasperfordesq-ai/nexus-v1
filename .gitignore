@@ -33,6 +33,7 @@ composer.phar
 !/docs/DOCKER.md
 !/docs/database/
 !/docs/database/*.md
+!/docs/AGORIS_MARTIN_RESPONSE_PACK.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
