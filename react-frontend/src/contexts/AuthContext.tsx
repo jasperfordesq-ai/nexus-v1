@@ -25,7 +25,7 @@ import {
   type ReactNode,
 } from 'react';
 import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
-import { logWarn } from '@/lib/logger';
+import { logError, logWarn } from '@/lib/logger';
 import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
@@ -174,12 +174,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           twoFactorMethods: [],
         });
       }
-    } catch {
-      setState((prev) => ({
-        ...prev,
-        status: 'idle',
-        user: null,
-      }));
+    } catch (err) {
+      // Network or unexpected error — preserve existing user/token state so a
+      // transient connectivity blip doesn't silently log the user out.
+      logError('refreshUser failed', err);
+      setState((prev) => ({ ...prev, status: 'idle' }));
     }
   }, []);
 

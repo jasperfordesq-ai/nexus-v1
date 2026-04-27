@@ -14,7 +14,7 @@
  * All data is access-controlled and never visible in public profiles.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Button,
   Checkbox,
@@ -81,6 +81,10 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
   const [selections, setSelections] = useState<Record<number, boolean>>({});
   const [selectValues, setSelectValues] = useState<Record<number, string>>({});
   const [confirmationShown, setConfirmationShown] = useState(false);
+
+  const savingRef = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; }, []);
 
   // ── Aggregated triggers (OR-merge across selected options) ────────────────
 
@@ -149,6 +153,8 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
   // ── Save and proceed ─────────────────────────────────────────────────────
 
   const handleSaveAndProceed = useCallback(async () => {
+    if (savingRef.current) return;
+
     // Check required options
     const requiredOptions = options.filter(o => o.is_required);
     const unmetRequired = requiredOptions.filter(o => !selections[o.id]);
@@ -174,39 +180,41 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
     Object.entries(selectValues)
       .filter(([, value]) => value !== '')
       .forEach(([optionId, value]) => {
-        // Don't double-add if already in checkbox selections
         if (!selections[parseInt(optionId)]) {
           selectedPrefs.push({ option_id: parseInt(optionId), value });
         }
       });
 
     if (selectedPrefs.length === 0 && !isRequired) {
-      // Nothing selected and step is not required — just proceed
       onNext();
       return;
     }
 
     if (selectedPrefs.length > 0) {
+      savingRef.current = true;
       try {
         setSaving(true);
         const res = await api.post('/v2/onboarding/safeguarding', {
           preferences: selectedPrefs,
         });
 
+        if (!mountedRef.current) return;
+
         if (!res.success) {
           toast.error(t('safeguarding.save_failed'), res.error || t('safeguarding.try_again'));
           return;
         }
       } catch (error) {
+        if (!mountedRef.current) return;
         logError('Failed to save safeguarding preferences', error);
         toast.error(t('safeguarding.save_failed'), t('safeguarding.try_again'));
         return;
       } finally {
-        setSaving(false);
+        savingRef.current = false;
+        if (mountedRef.current) setSaving(false);
       }
 
-      // Show confirmation screen (Tier 3a) before advancing to the next step.
-      // Only when the user actually made selections — empty submits skip through.
+      if (!mountedRef.current) return;
       setConfirmationShown(true);
       return;
     }
