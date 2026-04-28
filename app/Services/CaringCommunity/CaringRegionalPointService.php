@@ -230,6 +230,192 @@ class CaringRegionalPointService
         return $this->debit($userId, abs($pointsDelta), 'admin_adjustment', $description, $actorId);
     }
 
+    public function awardForApprovedHours(
+        int $tenantId,
+        int $userId,
+        int $volLogId,
+        float $hours,
+        ?int $actorId = null
+    ): ?array {
+        $config = $this->getConfig($tenantId);
+        if (
+            !$this->isEnabled($tenantId)
+            || !(bool) $config['auto_issue_enabled']
+            || (float) $config['points_per_approved_hour'] <= 0
+            || $hours <= 0
+            || $volLogId <= 0
+        ) {
+            return null;
+        }
+
+        $points = $this->normalisePoints(round($hours * (float) $config['points_per_approved_hour'], 2));
+        $this->assertTenantUser($tenantId, $userId);
+
+        return DB::transaction(function () use ($tenantId, $userId, $volLogId, $hours, $points, $actorId): ?array {
+            $existing = DB::table('caring_regional_point_transactions')
+                ->where('tenant_id', $tenantId)
+                ->where('reference_type', 'vol_log')
+                ->where('reference_id', $volLogId)
+                ->where('type', 'earned_for_hours')
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                return [
+                    'transaction_id' => (int) $existing->id,
+                    'user_id' => $userId,
+                    'points' => round((float) $existing->points, 2),
+                    'balance' => round((float) $existing->balance_after, 2),
+                    'already_awarded' => true,
+                ];
+            }
+
+            $account = $this->lockAccount($tenantId, $userId);
+            $newBalance = round((float) $account->balance + $points, 2);
+
+            DB::table('caring_regional_point_accounts')
+                ->where('id', $account->id)
+                ->update([
+                    'balance' => $newBalance,
+                    'lifetime_earned' => round((float) $account->lifetime_earned + $points, 2),
+                    'updated_at' => now(),
+                ]);
+
+            $transactionId = $this->insertTransaction(
+                tenantId: $tenantId,
+                accountId: (int) $account->id,
+                userId: $userId,
+                actorId: $actorId,
+                type: 'earned_for_hours',
+                direction: 'credit',
+                points: $points,
+                balanceAfter: $newBalance,
+                description: __('api.caring_regional_points_hours_award', ['hours' => round($hours, 2)]),
+                referenceType: 'vol_log',
+                referenceId: $volLogId,
+                metadata: ['hours' => round($hours, 2)]
+            );
+
+            return [
+                'transaction_id' => $transactionId,
+                'user_id' => $userId,
+                'points' => $points,
+                'balance' => $newBalance,
+                'already_awarded' => false,
+            ];
+        });
+    }
+
+    public function transferBetweenMembers(int $senderId, int $recipientId, float $points, ?string $message = null): array
+    {
+        $tenantId = TenantContext::getId();
+        $config = $this->getConfig($tenantId);
+        $this->assertEnabled($tenantId);
+
+        if (!(bool) $config['member_transfers_enabled']) {
+            throw new RuntimeException(__('api.caring_regional_points_transfers_disabled'));
+        }
+        if ($senderId === $recipientId) {
+            throw new InvalidArgumentException(__('api.caring_regional_points_transfer_self'));
+        }
+
+        $points = $this->normalisePoints($points);
+        $this->assertTenantUser($tenantId, $senderId);
+        $this->assertTenantUser($tenantId, $recipientId);
+
+        return DB::transaction(function () use ($tenantId, $senderId, $recipientId, $points, $message): array {
+            $this->ensureAccount($tenantId, $senderId);
+            $this->ensureAccount($tenantId, $recipientId);
+
+            $lockedAccounts = DB::table('caring_regional_point_accounts')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('user_id', [$senderId, $recipientId])
+                ->orderBy('user_id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('user_id');
+
+            $senderAccount = $lockedAccounts->get($senderId);
+            $recipientAccount = $lockedAccounts->get($recipientId);
+            if (!$senderAccount || !$recipientAccount) {
+                throw new RuntimeException(__('api.user_not_found'));
+            }
+
+            $senderBalance = (float) $senderAccount->balance;
+            if ($senderBalance < $points) {
+                throw new RuntimeException(__('api.caring_regional_points_insufficient'));
+            }
+
+            $senderNewBalance = round($senderBalance - $points, 2);
+            $recipientNewBalance = round((float) $recipientAccount->balance + $points, 2);
+            $cleanMessage = trim((string) $message);
+            $description = $cleanMessage !== ''
+                ? mb_substr($cleanMessage, 0, 500)
+                : __('api.caring_regional_points_member_transfer');
+
+            DB::table('caring_regional_point_accounts')
+                ->where('id', $senderAccount->id)
+                ->update([
+                    'balance' => $senderNewBalance,
+                    'lifetime_spent' => round((float) $senderAccount->lifetime_spent + $points, 2),
+                    'updated_at' => now(),
+                ]);
+
+            DB::table('caring_regional_point_accounts')
+                ->where('id', $recipientAccount->id)
+                ->update([
+                    'balance' => $recipientNewBalance,
+                    'lifetime_earned' => round((float) $recipientAccount->lifetime_earned + $points, 2),
+                    'updated_at' => now(),
+                ]);
+
+            $debitId = $this->insertTransaction(
+                tenantId: $tenantId,
+                accountId: (int) $senderAccount->id,
+                userId: $senderId,
+                actorId: $senderId,
+                type: 'transfer_out',
+                direction: 'debit',
+                points: $points,
+                balanceAfter: $senderNewBalance,
+                description: $description,
+                metadata: ['recipient_user_id' => $recipientId]
+            );
+
+            $creditId = $this->insertTransaction(
+                tenantId: $tenantId,
+                accountId: (int) $recipientAccount->id,
+                userId: $recipientId,
+                actorId: $senderId,
+                type: 'transfer_in',
+                direction: 'credit',
+                points: $points,
+                balanceAfter: $recipientNewBalance,
+                description: $description,
+                referenceType: 'regional_point_transfer',
+                referenceId: $debitId,
+                metadata: ['sender_user_id' => $senderId]
+            );
+
+            DB::table('caring_regional_point_transactions')
+                ->where('id', $debitId)
+                ->update([
+                    'reference_type' => 'regional_point_transfer',
+                    'reference_id' => $creditId,
+                ]);
+
+            return [
+                'sender_transaction_id' => $debitId,
+                'recipient_transaction_id' => $creditId,
+                'sender_user_id' => $senderId,
+                'recipient_user_id' => $recipientId,
+                'points' => $points,
+                'sender_balance' => $senderNewBalance,
+                'recipient_balance' => $recipientNewBalance,
+            ];
+        });
+    }
+
     public function publicConfig(int $tenantId): array
     {
         $config = $this->getConfig($tenantId);
@@ -377,6 +563,9 @@ class CaringRegionalPointService
         float $points,
         float $balanceAfter,
         string $description,
+        ?string $referenceType = null,
+        ?int $referenceId = null,
+        ?array $metadata = null,
     ): int {
         return (int) DB::table('caring_regional_point_transactions')->insertGetId([
             'tenant_id' => $tenantId,
@@ -387,8 +576,10 @@ class CaringRegionalPointService
             'direction' => $direction,
             'points' => $points,
             'balance_after' => $balanceAfter,
+            'reference_type' => $referenceType,
+            'reference_id' => $referenceId,
             'description' => trim($description) !== '' ? mb_substr(trim($description), 0, 500) : null,
-            'metadata' => null,
+            'metadata' => $metadata !== null ? json_encode($metadata) : null,
             'created_at' => now(),
         ]);
     }

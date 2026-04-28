@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Services\CaringCommunity\CaringRegionalPointService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -21,6 +22,7 @@ class CaringSupportRelationshipService
 
     public function __construct(
         private readonly CaringCommunityWorkflowPolicyService $policyService,
+        private readonly CaringRegionalPointService $regionalPointService,
     ) {
     }
 
@@ -309,6 +311,7 @@ class CaringSupportRelationshipService
 
         $logId = 0;
         $paymentResult = null;
+        $regionalPointsResult = null;
         DB::transaction(function () use ($tenantId, $relationshipId, $relationship, $date, $hours, $description, $status, &$logId, &$paymentResult): void {
             DB::table('vol_logs')->insert([
                 'tenant_id' => $tenantId,
@@ -354,6 +357,20 @@ class CaringSupportRelationshipService
                 ]);
         });
 
+        if ($status === 'approved') {
+            try {
+                $regionalPointsResult = $this->regionalPointService->awardForApprovedHours(
+                    $tenantId,
+                    (int) $relationship->supporter_id,
+                    $logId,
+                    $hours,
+                    $coordinatorId
+                );
+            } catch (\Throwable) {
+                $regionalPointsResult = null;
+            }
+        }
+
         return [
             'success' => true,
             'log' => [
@@ -362,6 +379,7 @@ class CaringSupportRelationshipService
                 'hours' => round($hours, 2),
                 'date_logged' => $date,
                 'payment_result' => $paymentResult,
+                'regional_points_result' => $regionalPointsResult,
             ],
             'relationship' => $this->find($tenantId, $relationshipId),
         ];

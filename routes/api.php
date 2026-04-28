@@ -1199,6 +1199,7 @@ Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommun
 // Caring Community - regional points (A1), isolated and off by default
 Route::get('/v2/caring-community/regional-points/summary', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsSummary']);
 Route::get('/v2/caring-community/regional-points/history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsHistory']);
+Route::post('/v2/caring-community/regional-points/transfer', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsTransfer']);
 Route::get('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsConfig']);
 Route::put('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointsConfig']);
 Route::get('/v2/admin/caring-community/regional-points/ledger', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsLedger']);

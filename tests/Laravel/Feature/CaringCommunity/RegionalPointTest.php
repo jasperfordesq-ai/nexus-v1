@@ -58,6 +58,22 @@ class RegionalPointTest extends TestCase
         ]);
     }
 
+    private function makeApprovedVolLog(int $userId, float $hours = 2.5): int
+    {
+        return (int) DB::table('vol_logs')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'organization_id' => null,
+            'opportunity_id' => null,
+            'date_logged' => now()->toDateString(),
+            'hours' => $hours,
+            'description' => 'Approved caring support',
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     public function test_regional_points_are_disabled_by_default(): void
     {
         $userId = $this->makeUser('rp-disabled-' . uniqid() . '@example.test');
@@ -135,5 +151,117 @@ class RegionalPointTest extends TestCase
 
         $this->expectExceptionMessage('User not found');
         $service->issue($otherTenantUser, 10, 'Wrong tenant', $adminId);
+    }
+
+    public function test_approved_hour_awards_are_opt_in_and_idempotent(): void
+    {
+        $userId = $this->makeUser('rp-hours-' . uniqid() . '@example.test');
+        $adminId = $this->makeUser('rp-hours-admin-' . uniqid() . '@example.test');
+        $logId = $this->makeApprovedVolLog($userId, 3.5);
+        $service = app(CaringRegionalPointService::class);
+
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'auto_issue_enabled' => false,
+            'points_per_approved_hour' => 4,
+        ]);
+
+        $this->assertNull($service->awardForApprovedHours(self::TENANT_ID, $userId, $logId, 3.5, $adminId));
+
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'auto_issue_enabled' => true,
+            'points_per_approved_hour' => 4,
+        ]);
+
+        $award = $service->awardForApprovedHours(self::TENANT_ID, $userId, $logId, 3.5, $adminId);
+        $this->assertNotNull($award);
+        $this->assertEqualsWithDelta(14.0, $award['points'], 0.001);
+        $this->assertFalse($award['already_awarded']);
+
+        $duplicate = $service->awardForApprovedHours(self::TENANT_ID, $userId, $logId, 3.5, $adminId);
+        $this->assertNotNull($duplicate);
+        $this->assertTrue($duplicate['already_awarded']);
+        $this->assertSame($award['transaction_id'], $duplicate['transaction_id']);
+
+        $summary = $service->memberSummary($userId);
+        $this->assertEqualsWithDelta(14.0, $summary['account']['balance'], 0.001);
+
+        $transactionCount = DB::table('caring_regional_point_transactions')
+            ->where('tenant_id', self::TENANT_ID)
+            ->where('reference_type', 'vol_log')
+            ->where('reference_id', $logId)
+            ->where('type', 'earned_for_hours')
+            ->count();
+
+        $this->assertSame(1, $transactionCount);
+    }
+
+    public function test_member_transfers_require_toggle_and_move_only_regional_points(): void
+    {
+        $sender = $this->makeUser('rp-transfer-sender-' . uniqid() . '@example.test');
+        $recipient = $this->makeUser('rp-transfer-recipient-' . uniqid() . '@example.test');
+        $adminId = $this->makeUser('rp-transfer-admin-' . uniqid() . '@example.test');
+        DB::table('users')->where('id', $sender)->update(['balance' => 9]);
+        DB::table('users')->where('id', $recipient)->update(['balance' => 1]);
+
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'member_transfers_enabled' => false,
+        ]);
+        $service->issue($sender, 30, 'Seed sender', $adminId);
+
+        $this->expectExceptionMessage('Regional point transfers are not enabled for this community.');
+        $service->transferBetweenMembers($sender, $recipient, 7.5, 'Thanks');
+    }
+
+    public function test_member_transfer_creates_debit_and_credit_pair(): void
+    {
+        $sender = $this->makeUser('rp-transfer2-sender-' . uniqid() . '@example.test');
+        $recipient = $this->makeUser('rp-transfer2-recipient-' . uniqid() . '@example.test');
+        $adminId = $this->makeUser('rp-transfer2-admin-' . uniqid() . '@example.test');
+        DB::table('users')->where('id', $sender)->update(['balance' => 9]);
+        DB::table('users')->where('id', $recipient)->update(['balance' => 1]);
+
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'member_transfers_enabled' => true,
+        ]);
+        $service->issue($sender, 30, 'Seed sender', $adminId);
+
+        $transfer = $service->transferBetweenMembers($sender, $recipient, 7.5, 'Thanks');
+
+        $this->assertEqualsWithDelta(7.5, $transfer['points'], 0.001);
+        $this->assertEqualsWithDelta(22.5, $transfer['sender_balance'], 0.001);
+        $this->assertEqualsWithDelta(7.5, $transfer['recipient_balance'], 0.001);
+
+        $senderSummary = $service->memberSummary($sender);
+        $recipientSummary = $service->memberSummary($recipient);
+        $this->assertEqualsWithDelta(22.5, $senderSummary['account']['balance'], 0.001);
+        $this->assertEqualsWithDelta(7.5, $recipientSummary['account']['balance'], 0.001);
+
+        $this->assertEqualsWithDelta(9.0, (float) DB::table('users')->where('id', $sender)->value('balance'), 0.001);
+        $this->assertEqualsWithDelta(1.0, (float) DB::table('users')->where('id', $recipient)->value('balance'), 0.001);
+
+        $this->assertDatabaseHas('caring_regional_point_transactions', [
+            'id' => $transfer['sender_transaction_id'],
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $sender,
+            'type' => 'transfer_out',
+            'direction' => 'debit',
+            'reference_type' => 'regional_point_transfer',
+            'reference_id' => $transfer['recipient_transaction_id'],
+        ]);
+        $this->assertDatabaseHas('caring_regional_point_transactions', [
+            'id' => $transfer['recipient_transaction_id'],
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $recipient,
+            'type' => 'transfer_in',
+            'direction' => 'credit',
+            'reference_type' => 'regional_point_transfer',
+            'reference_id' => $transfer['sender_transaction_id'],
+        ]);
     }
 }

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Services\CaringCommunity\CaringRegionalPointService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -19,6 +20,7 @@ class CaringCommunityWorkflowService
     public function __construct(
         private readonly CaringCommunityRolePresetService $rolePresetService,
         private readonly CaringCommunityWorkflowPolicyService $policyService,
+        private readonly CaringRegionalPointService $regionalPointService,
     ) {
     }
 
@@ -95,6 +97,7 @@ class CaringCommunityWorkflowService
 
         $status = $action === 'approve' ? 'approved' : 'declined';
         $paymentResult = null;
+        $regionalPointsResult = null;
 
         DB::transaction(function () use ($tenantId, $logId, $log, $status, $action, &$paymentResult): void {
             DB::table('vol_logs')
@@ -128,10 +131,25 @@ class CaringCommunityWorkflowService
             );
         });
 
+        if ($action === 'approve') {
+            try {
+                $regionalPointsResult = $this->regionalPointService->awardForApprovedHours(
+                    $tenantId,
+                    (int) $log->user_id,
+                    $logId,
+                    (float) $log->hours,
+                    $reviewerId
+                );
+            } catch (\Throwable) {
+                $regionalPointsResult = null;
+            }
+        }
+
         return [
             'id' => $logId,
             'status' => $status,
             'payment_result' => $paymentResult,
+            'regional_points_result' => $regionalPointsResult,
             'summary' => $this->summary($tenantId),
         ];
     }

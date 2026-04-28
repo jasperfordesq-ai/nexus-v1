@@ -78,6 +78,36 @@ class CaringCommunityApiController extends BaseApiController
         }
     }
 
+    public function regionalPointsTransfer(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $recipientId = (int) ($input['recipient_user_id'] ?? 0);
+        $points = (float) ($input['points'] ?? 0);
+        $message = isset($input['message']) ? (string) $input['message'] : null;
+
+        if ($recipientId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'recipient_user_id', 422);
+        }
+
+        try {
+            return $this->respondWithData(
+                $this->regionalPointService->transferBetweenMembers($userId, $recipientId, $points, $message),
+                null,
+                201
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('REGIONAL_POINTS_TRANSFER_FAILED', $e->getMessage(), null, 422);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // K5 — Time-credit gifting (member-to-member, same-tenant)
     // -------------------------------------------------------------------------
