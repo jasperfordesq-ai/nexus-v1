@@ -1,0 +1,272 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Services\CaringCommunity;
+
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use RuntimeException;
+
+/**
+ * CareProviderDirectoryService — AG64 Unified Care-Provider Directory
+ *
+ * Manages the listing of care providers across types: Spitex, Tagesstätten,
+ * private services, Vereine, and volunteer groups. Scoped per tenant.
+ */
+class CareProviderDirectoryService
+{
+    private const TABLE = 'caring_care_providers';
+
+    private const PER_PAGE = 20;
+
+    // -------------------------------------------------------------------------
+    // Guards
+    // -------------------------------------------------------------------------
+
+    public function isAvailable(): bool
+    {
+        return Schema::hasTable(self::TABLE);
+    }
+
+    private function assertAvailable(): void
+    {
+        if (!$this->isAvailable()) {
+            throw new RuntimeException('Table not available');
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Member-facing read methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * List active providers for a tenant with optional filters.
+     *
+     * @param  int    $tenantId
+     * @param  array  $filters  Supported keys: type (string|null), search (string|null),
+     *                          verified_only (bool), page (int)
+     * @return array{data: array, total: int, per_page: int, current_page: int}
+     */
+    public function list(int $tenantId, array $filters = []): array
+    {
+        $this->assertAvailable();
+
+        $type         = isset($filters['type']) && $filters['type'] !== '' ? (string) $filters['type'] : null;
+        $search       = isset($filters['search']) && $filters['search'] !== '' ? (string) $filters['search'] : null;
+        $verifiedOnly = !empty($filters['verified_only']);
+        $page         = max(1, (int) ($filters['page'] ?? 1));
+        $offset       = ($page - 1) * self::PER_PAGE;
+
+        $query = DB::table(self::TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active');
+
+        if ($type !== null) {
+            $query->where('type', $type);
+        }
+
+        if ($search !== null) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', '%' . $search . '%')
+                  ->orWhere('description', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        if ($verifiedOnly) {
+            $query->where('is_verified', true);
+        }
+
+        $total = (clone $query)->count();
+
+        $rows = $query
+            ->orderByDesc('is_verified')
+            ->orderBy('name')
+            ->offset($offset)
+            ->limit(self::PER_PAGE)
+            ->get()
+            ->map(fn ($row) => $this->castRow((array) $row))
+            ->all();
+
+        return [
+            'data'         => $rows,
+            'total'        => $total,
+            'per_page'     => self::PER_PAGE,
+            'current_page' => $page,
+        ];
+    }
+
+    /**
+     * Get a single provider by id, scoped to tenant.
+     */
+    public function get(int $id, int $tenantId): ?array
+    {
+        $this->assertAvailable();
+
+        $row = DB::table(self::TABLE)
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        return $row ? $this->castRow((array) $row) : null;
+    }
+
+    // -------------------------------------------------------------------------
+    // Admin write methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a new care provider.
+     */
+    public function create(int $tenantId, array $data, int $adminUserId): array
+    {
+        $this->assertAvailable();
+
+        $id = DB::table(self::TABLE)->insertGetId([
+            'tenant_id'     => $tenantId,
+            'name'          => (string) ($data['name'] ?? ''),
+            'type'          => (string) ($data['type'] ?? ''),
+            'description'   => isset($data['description']) ? (string) $data['description'] : null,
+            'categories'    => isset($data['categories']) ? json_encode($data['categories']) : null,
+            'address'       => isset($data['address']) ? (string) $data['address'] : null,
+            'contact_phone' => isset($data['contact_phone']) ? (string) $data['contact_phone'] : null,
+            'contact_email' => isset($data['contact_email']) ? (string) $data['contact_email'] : null,
+            'website_url'   => isset($data['website_url']) ? (string) $data['website_url'] : null,
+            'opening_hours' => isset($data['opening_hours']) ? json_encode($data['opening_hours']) : null,
+            'is_verified'   => false,
+            'status'        => 'active',
+            'created_by'    => $adminUserId,
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
+
+        return $this->get($id, $tenantId) ?? [];
+    }
+
+    /**
+     * Update an existing provider. Returns the updated row.
+     */
+    public function update(int $id, int $tenantId, array $data): array
+    {
+        $this->assertAvailable();
+
+        $fillable = ['name', 'type', 'description', 'address', 'contact_phone',
+                     'contact_email', 'website_url', 'status'];
+
+        $payload = ['updated_at' => now()];
+
+        foreach ($fillable as $field) {
+            if (array_key_exists($field, $data)) {
+                $payload[$field] = $data[$field] !== null ? (string) $data[$field] : null;
+            }
+        }
+
+        if (array_key_exists('categories', $data)) {
+            $payload['categories'] = $data['categories'] !== null
+                ? json_encode($data['categories'])
+                : null;
+        }
+
+        if (array_key_exists('opening_hours', $data)) {
+            $payload['opening_hours'] = $data['opening_hours'] !== null
+                ? json_encode($data['opening_hours'])
+                : null;
+        }
+
+        DB::table(self::TABLE)
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($payload);
+
+        return $this->get($id, $tenantId) ?? [];
+    }
+
+    /**
+     * Soft-delete a provider (set status = inactive).
+     */
+    public function delete(int $id, int $tenantId): void
+    {
+        $this->assertAvailable();
+
+        DB::table(self::TABLE)
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update(['status' => 'inactive', 'updated_at' => now()]);
+    }
+
+    /**
+     * Mark a provider as verified.
+     */
+    public function verify(int $id, int $tenantId): void
+    {
+        $this->assertAvailable();
+
+        DB::table(self::TABLE)
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update(['is_verified' => true, 'updated_at' => now()]);
+    }
+
+    /**
+     * Admin-only listing — returns all statuses (for the admin panel).
+     *
+     * @return array{data: array, total: int, per_page: int, current_page: int}
+     */
+    public function adminList(int $tenantId, array $filters = []): array
+    {
+        $this->assertAvailable();
+
+        $page   = max(1, (int) ($filters['page'] ?? 1));
+        $offset = ($page - 1) * self::PER_PAGE;
+
+        $query = DB::table(self::TABLE)->where('tenant_id', $tenantId);
+
+        $total = (clone $query)->count();
+
+        $rows = $query
+            ->orderByDesc('created_at')
+            ->offset($offset)
+            ->limit(self::PER_PAGE)
+            ->get()
+            ->map(fn ($row) => $this->castRow((array) $row))
+            ->all();
+
+        return [
+            'data'         => $rows,
+            'total'        => $total,
+            'per_page'     => self::PER_PAGE,
+            'current_page' => $page,
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+
+    private function castRow(array $row): array
+    {
+        return [
+            'id'            => (int) $row['id'],
+            'tenant_id'     => (int) $row['tenant_id'],
+            'name'          => (string) $row['name'],
+            'type'          => (string) $row['type'],
+            'description'   => isset($row['description']) ? (string) $row['description'] : null,
+            'categories'    => isset($row['categories']) ? json_decode((string) $row['categories'], true) : null,
+            'address'       => isset($row['address']) ? (string) $row['address'] : null,
+            'contact_phone' => isset($row['contact_phone']) ? (string) $row['contact_phone'] : null,
+            'contact_email' => isset($row['contact_email']) ? (string) $row['contact_email'] : null,
+            'website_url'   => isset($row['website_url']) ? (string) $row['website_url'] : null,
+            'opening_hours' => isset($row['opening_hours']) ? json_decode((string) $row['opening_hours'], true) : null,
+            'is_verified'   => (bool) $row['is_verified'],
+            'status'        => (string) $row['status'],
+            'created_by'    => isset($row['created_by']) ? (int) $row['created_by'] : null,
+            'created_at'    => $row['created_at'] ?? null,
+            'updated_at'    => $row['updated_at'] ?? null,
+        ];
+    }
+}

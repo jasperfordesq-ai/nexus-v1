@@ -151,6 +151,9 @@ const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-communit
 const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
 const HourTransferAdminPage = lazy(() => import('./modules/caring-community/HourTransferAdminPage'));
 const SafeguardingReportsAdminPage = lazy(() => import('./modules/caring-community/SafeguardingReportsAdminPage'));
+const CareProviderAdminPage = lazy(() => import('./modules/caring-community/CareProviderAdminPage'));
+const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTierAdminPage'));
+const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBaselineAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -577,6 +580,36 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><SafeguardingReportsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG64 — Care-provider directory */}
+      <Route
+        path="caring-community/providers"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CareProviderAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG67 — Trust tier config */}
+      <Route
+        path="caring-community/trust-tier"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><TrustTierAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG66 — KPI baselines */}
+      <Route
+        path="caring-community/kpi-baselines"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><KpiBaselineAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

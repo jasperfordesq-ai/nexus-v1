@@ -165,6 +165,10 @@ const HourTransferPage = lazyWithRetry(() => import('@/pages/caring-community/Ho
 const HourGiftPage = lazyWithRetry(() => import('@/pages/caring-community/HourGiftPage'));
 const SafeguardingReportPage = lazyWithRetry(() => import('@/pages/caring-community/SafeguardingReportPage'));
 const MySafeguardingReportsPage = lazyWithRetry(() => import('@/pages/caring-community/MySafeguardingReportsPage'));
+const CareProviderDirectoryPage = lazyWithRetry(() => import('@/pages/caring-community/CareProviderDirectoryPage'));
+const MyTrustTierPage = lazyWithRetry(() => import('@/pages/caring-community/MyTrustTierPage'));
+const CaregiverDashboardPage = lazyWithRetry(() => import('@/pages/caring-community/CaregiverDashboardPage'));
+const LinkCareReceiverPage = lazyWithRetry(() => import('@/pages/caring-community/LinkCareReceiverPage'));
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
@@ -583,6 +587,40 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MySafeguardingReportsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG64 — Care-provider directory */}
+        <Route path="caring-community/providers" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <CareProviderDirectoryPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG67 — Trust tier */}
+        <Route path="caring-community/my-trust-tier" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MyTrustTierPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG68 — Caregiver dashboard + link flow */}
+        <Route path="caring-community/caregiver" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <CaregiverDashboardPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="caring-community/caregiver/link" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <LinkCareReceiverPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

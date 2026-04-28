@@ -19,6 +19,7 @@ use App\Services\CaringCommunity\CaringCommunityForecastService;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringNudgeService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
+use App\Services\CaringCommunity\KpiBaselineService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use App\Services\CaringCommunityMemberStatementService;
@@ -52,6 +53,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringRegionalPointService $regionalPointService,
         private readonly VereinMemberImportService $vereinMemberImportService,
         private readonly CaringNudgeService $nudgeService,
+        private readonly KpiBaselineService $kpiBaselineService,
     ) {
     }
 
@@ -1078,6 +1080,63 @@ class AdminCaringCommunityController extends BaseApiController
         } catch (\RuntimeException $e) {
             return $this->respondWithError('VEREIN_ADMIN_UNAVAILABLE', $e->getMessage(), null, 503);
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // AG66 — KPI Baseline methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/kpi-baselines
+     */
+    public function listKpiBaselines(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->kpiBaselineService->listBaselines(TenantContext::getId()));
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/kpi-baselines
+     * Body: { label?, period?: { start, end }, notes? }
+     */
+    public function captureKpiBaseline(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $userId   = (int) auth()->id();
+        $tenantId = TenantContext::getId();
+        $data     = $this->getAllInput();
+
+        $label  = trim((string) ($data['label'] ?? '')) ?: 'Baseline ' . now()->format('Y-m-d');
+        $period = is_array($data['period'] ?? null)
+            ? $data['period']
+            : ['start' => now()->subYear()->toDateString(), 'end' => now()->toDateString()];
+        $notes  = isset($data['notes']) && $data['notes'] !== '' ? (string) $data['notes'] : null;
+
+        return $this->respondWithData(
+            $this->kpiBaselineService->captureBaseline($tenantId, $label, $period, $notes, $userId),
+            null,
+            201,
+        );
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/kpi-baselines/{id}/compare
+     */
+    public function compareKpiBaseline(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $result = $this->kpiBaselineService->compareWithBaseline($id, TenantContext::getId());
+        if (isset($result['error']) && $result['error'] === 'baseline_not_found') {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
+        }
+
+        return $this->respondWithData($result);
     }
 
     private function guardCaringCommunity(): ?JsonResponse

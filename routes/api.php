@@ -1255,6 +1255,35 @@ Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/note', [\App\H
 Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
 Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getLoyaltySellerSettings']);
 Route::put('/v2/admin/caring-community/loyalty/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateLoyaltySellerSettings']);
+
+// AG64 — Care-Provider Directory
+Route::get('/v2/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'index']);
+Route::get('/v2/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'show']);
+Route::get('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminIndex']);
+Route::post('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'store']);
+Route::put('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminUpdate']);
+Route::delete('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminDelete']);
+Route::post('/v2/admin/caring-community/providers/{id}/verify', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminVerify']);
+
+// AG67 — Trust Tier System
+Route::get('/v2/caring-community/my-trust-tier', [\App\Http\Controllers\Api\TrustTierController::class, 'myTier']);
+Route::get('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'getTierConfig']);
+Route::put('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'updateTierConfig']);
+Route::post('/v2/admin/caring-community/trust-tier/recompute', [\App\Http\Controllers\Api\TrustTierController::class, 'recomputeTiers']);
+
+// AG68 — Caregiver/Angehörigen Support Flow
+Route::get('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'myLinks']);
+Route::post('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'addLink']);
+Route::delete('/v2/caring-community/caregiver/links/{id}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'removeLink']);
+Route::get('/v2/caring-community/caregiver/schedule/{caredForId}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'caregiverSchedule']);
+Route::get('/v2/caring-community/caregiver/burnout-check', [\App\Http\Controllers\Api\CaregiverApiController::class, 'burnoutCheck']);
+Route::post('/v2/caring-community/caregiver/request-on-behalf', [\App\Http\Controllers\Api\CaregiverApiController::class, 'requestOnBehalf']);
+
+// AG66 — KPI Baseline
+Route::get('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listKpiBaselines']);
+Route::post('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'captureKpiBaseline']);
+Route::get('/v2/admin/caring-community/kpi-baselines/{id}/compare', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'compareKpiBaseline']);
+
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);
