@@ -1796,6 +1796,7 @@ return [
     'verein_import_already_member'             => 'This member already belongs to the Verein.',
     'verein_import_has_errors'                 => 'Please fix import preview errors before importing members.',
     'verein_admin_role_unavailable'            => 'The Verein admin role is not installed.',
+    'caring_nudge_notification'                => ':name could be a good neighbour-help match for you. Take a look when you have a moment.',
     'municipal_pdf_title'                        => 'Municipal / KISS Impact Pack',
     'municipal_pdf_generated'                    => 'Generated: :date',
     'municipal_pdf_audience'                     => 'Audience: :audience',

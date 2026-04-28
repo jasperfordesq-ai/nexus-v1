@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\CaringCommunityAlertService;
 use App\Services\CaringCommunity\CaringCommunityForecastService;
 use App\Services\CaringCommunity\CaringHourTransferService;
+use App\Services\CaringCommunity\CaringNudgeService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
@@ -50,6 +51,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly SafeguardingService $safeguardingService,
         private readonly CaringRegionalPointService $regionalPointService,
         private readonly VereinMemberImportService $vereinMemberImportService,
+        private readonly CaringNudgeService $nudgeService,
     ) {
     }
 
@@ -534,6 +536,39 @@ class AdminCaringCommunityController extends BaseApiController
         );
 
         return $this->respondWithData(['success' => true]);
+    }
+
+    public function nudgeAnalytics(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->nudgeService->analytics(TenantContext::getId()));
+    }
+
+    public function updateNudgeConfig(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'config' => $this->nudgeService->updateConfig(TenantContext::getId(), $this->getAllInput()),
+        ]);
+    }
+
+    public function dispatchNudges(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $dryRun = filter_var($this->getAllInput()['dry_run'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $limit = $this->inputInt('limit', null, 1, 250);
+
+        return $this->respondWithData(
+            $this->nudgeService->dispatchDue(TenantContext::getId(), $limit, $dryRun),
+            null,
+            $dryRun ? 200 : 201,
+        );
     }
 
     public function updateSupportRelationship(int $id): JsonResponse

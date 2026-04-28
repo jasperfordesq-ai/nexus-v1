@@ -100,6 +100,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('listings-process-search-alerts');
 
+        $schedule->command('caring:nudges-dispatch')
+            ->dailyAt('07:30')
+            ->withoutOverlapping()
+            ->name('caring-nudges-dispatch');
+
         // Listings: auto-unfeature listings whose featured_until has passed
         $schedule->call(function () {
             app(\App\Services\ListingFeaturedService::class)->processExpiredFeatured();

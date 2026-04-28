@@ -332,6 +332,7 @@ class User extends Authenticatable
             'email_org_admin' => 1,
             'email_gamification_digest' => 1,
             'email_gamification_milestones' => 1,
+            'caring_smart_nudges' => 1,
         ];
 
         try {
@@ -365,6 +366,7 @@ class User extends Authenticatable
             'email_org_payments', 'email_org_transfers', 'email_org_membership',
             'email_org_admin', 'email_gamification_digest',
             'email_gamification_milestones',
+            'caring_smart_nudges',
         ];
 
         $sanitized = [];

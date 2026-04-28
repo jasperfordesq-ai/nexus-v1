@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -80,6 +81,13 @@ class AdminCaringCommunityControllerTest extends TestCase
             ]],
             'verein admin assign' => ['POST', '/v2/admin/caring-community/vereine/999/admins', [
                 'user_id' => 999,
+            ]],
+            'nudge analytics' => ['GET', '/v2/admin/caring-community/nudges/analytics'],
+            'nudge config' => ['PUT', '/v2/admin/caring-community/nudges/config', [
+                'enabled' => true,
+            ]],
+            'nudge dispatch' => ['POST', '/v2/admin/caring-community/nudges/dispatch', [
+                'dry_run' => true,
             ]],
         ];
     }
@@ -419,6 +427,168 @@ class AdminCaringCommunityControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.features.caring_community', true);
+    }
+
+    private function updateNudgeProfile(User $user, array $overrides = []): void
+    {
+        $defaults = [
+            'name' => 'Nudge Member ' . $user->id,
+            'preferred_language' => 'de',
+            'skills' => json_encode(['shopping', 'companionship']),
+            'interests' => json_encode(['shopping', 'companionship']),
+            'availability' => 'weekday flexible',
+            'latitude' => 47.3769,
+            'longitude' => 8.5417,
+            'date_of_birth' => '1960-01-01',
+            'status' => 'active',
+            'is_approved' => 1,
+        ];
+
+        $updates = [];
+        foreach (($overrides + $defaults) as $column => $value) {
+            if (Schema::hasColumn('users', $column)) {
+                $updates[$column] = $value;
+            }
+        }
+
+        if ($updates !== []) {
+            DB::table('users')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('id', $user->id)
+                ->update($updates);
+        }
+    }
+
+    private function isolateNudgeCandidates(array $allowedUserIds): void
+    {
+        $updates = [];
+        if (Schema::hasColumn('users', 'status')) {
+            $updates['status'] = 'inactive';
+        }
+        if (Schema::hasColumn('users', 'is_approved')) {
+            $updates['is_approved'] = 0;
+        }
+
+        if ($updates === []) {
+            return;
+        }
+
+        DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->whereNotIn('id', array_map('intval', $allowedUserIds))
+            ->update($updates);
+    }
+
+    public function test_smart_nudge_dispatch_is_opt_in_idempotent_and_notifies_candidate(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $supporter = User::factory()->forTenant($this->testTenantId)->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        $this->isolateNudgeCandidates([$supporter->id, $recipient->id]);
+        $this->updateNudgeProfile($supporter, [
+            'name' => 'Supporter Candidate',
+            'date_of_birth' => '1988-01-01',
+        ]);
+        $this->updateNudgeProfile($recipient, [
+            'name' => 'Recipient Match',
+            'latitude' => 47.3771,
+            'longitude' => 8.5420,
+            'date_of_birth' => '1938-01-01',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/caring-community/nudges/config', [
+            'enabled' => true,
+            'min_score' => 0.55,
+            'daily_limit' => 10,
+            'cooldown_days' => 30,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.config.enabled', true);
+
+        $dispatch = $this->apiPost('/v2/admin/caring-community/nudges/dispatch', [
+            'limit' => 10,
+        ]);
+
+        $dispatch->assertStatus(201)
+            ->assertJsonPath('data.enabled', true)
+            ->assertJsonPath('data.sent', 1);
+
+        $this->assertDatabaseHas('caring_smart_nudges', [
+            'tenant_id' => $this->testTenantId,
+            'status' => 'sent',
+        ]);
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('type', 'caring_smart_nudge')
+            ->count());
+
+        $again = $this->apiPost('/v2/admin/caring-community/nudges/dispatch', [
+            'limit' => 10,
+        ]);
+
+        $again->assertStatus(201)
+            ->assertJsonPath('data.sent', 0);
+
+        $nudge = DB::table('caring_smart_nudges')
+            ->where('tenant_id', $this->testTenantId)
+            ->first(['target_user_id', 'related_user_id']);
+        $this->assertNotNull($nudge);
+        DB::table('caring_support_relationships')->insert([
+            'tenant_id' => $this->testTenantId,
+            'supporter_id' => (int) $nudge->target_user_id,
+            'recipient_id' => (int) $nudge->related_user_id,
+            'coordinator_id' => $admin->id,
+            'title' => 'Nudge conversion',
+            'frequency' => 'weekly',
+            'expected_hours' => 1,
+            'start_date' => '2026-04-28',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->apiGet('/v2/admin/caring-community/nudges/analytics')
+            ->assertStatus(200)
+            ->assertJsonPath('data.stats.converted_total', 1)
+            ->assertJsonPath('data.stats.conversion_rate_30d', 1);
+    }
+
+    public function test_smart_nudges_respect_member_opt_out_and_report_analytics(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $optedOut = User::factory()->forTenant($this->testTenantId)->create([
+            'notification_preferences' => json_encode(['caring_smart_nudges' => 0]),
+        ]);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'notification_preferences' => json_encode(['caring_smart_nudges' => 0]),
+        ]);
+        $this->isolateNudgeCandidates([$optedOut->id, $recipient->id]);
+        $this->updateNudgeProfile($optedOut, ['name' => 'Opted Out Candidate']);
+        $this->updateNudgeProfile($recipient, [
+            'name' => 'Recipient Match',
+            'latitude' => 47.3771,
+            'longitude' => 8.5420,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/caring-community/nudges/config', [
+            'enabled' => true,
+            'min_score' => 0.55,
+        ])->assertStatus(200);
+
+        $dispatch = $this->apiPost('/v2/admin/caring-community/nudges/dispatch', [
+            'limit' => 10,
+        ]);
+        $dispatch->assertStatus(201)
+            ->assertJsonPath('data.sent', 0);
+
+        $analytics = $this->apiGet('/v2/admin/caring-community/nudges/analytics');
+
+        $analytics->assertStatus(200)
+            ->assertJsonPath('data.stats.sent_total', 0)
+            ->assertJsonPath('data.stats.opted_out_members', 2);
     }
 
     private function createVerein(int $ownerId): int

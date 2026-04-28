@@ -546,6 +546,7 @@ class UsersController extends BaseApiController
             'email_org_transfers'           => (bool) ($prefs['email_org_transfers'] ?? true),
             'email_org_membership'          => (bool) ($prefs['email_org_membership'] ?? true),
             'email_org_admin'               => (bool) ($prefs['email_org_admin'] ?? true),
+            'caring_smart_nudges'           => (bool) ($prefs['caring_smart_nudges'] ?? true),
             'push_enabled'                  => (bool) ($prefs['push_enabled'] ?? true),
         ]);
     }
@@ -566,6 +567,7 @@ class UsersController extends BaseApiController
             'email_connections', 'email_transactions', 'email_reviews',
             'email_gamification_digest', 'email_gamification_milestones',
             'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
+            'caring_smart_nudges',
             'push_enabled',
         ];
 

@@ -844,6 +844,29 @@ CREATE TABLE `caring_regional_point_transactions` (
   KEY `crpt_tenant_ref_idx` (`tenant_id`,`reference_type`,`reference_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_smart_nudges`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_smart_nudges` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `target_user_id` int(10) unsigned NOT NULL,
+  `related_user_id` int(10) unsigned DEFAULT NULL,
+  `source_type` varchar(64) NOT NULL DEFAULT 'tandem_candidate',
+  `score` decimal(5,3) NOT NULL DEFAULT 0.000,
+  `signals` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`signals`)),
+  `notification_id` bigint(20) unsigned DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'sent',
+  `sent_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `converted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caring_nudges_target_sent_idx` (`tenant_id`,`target_user_id`,`sent_at`),
+  KEY `caring_nudges_related_sent_idx` (`tenant_id`,`related_user_id`,`sent_at`),
+  KEY `caring_nudges_status_sent_idx` (`tenant_id`,`status`,`sent_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_support_relationships`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -5602,7 +5625,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=160 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11831,7 +11854,8 @@ INSERT INTO `laravel_migrations` VALUES
 (155,'2026_04_28_120000_create_caring_regional_points_tables',74),
 (156,'2026_04_28_130000_create_marketplace_seller_regional_point_settings_table',75),
 (157,'2026_04_28_140000_create_municipal_verifications_table',76),
-(158,'2026_04_28_150000_add_verein_admin_scope',77);
+(158,'2026_04_28_150000_add_verein_admin_scope',77),
+(159,'2026_04_28_160000_create_caring_smart_nudges_table',78);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
