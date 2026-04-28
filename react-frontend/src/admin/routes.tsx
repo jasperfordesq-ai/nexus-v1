@@ -156,6 +156,11 @@ const CareProviderAdminPage = lazy(() => import('./modules/caring-community/Care
 const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTierAdminPage'));
 const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBaselineAdminPage'));
 const EmergencyAlertAdminPage = lazy(() => import('./modules/caring-community/EmergencyAlertAdminPage'));
+const MunicipalSurveyAdminPage = lazy(() => import('./modules/caring-community/MunicipalSurveyAdminPage'));
+
+// Advertising module
+const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
+const PushCampaignAdminPage = lazy(() => import('./modules/advertising/PushCampaignAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -628,6 +633,22 @@ export function AdminRoutes() {
           </FeatureGatedElement>
         }
       />
+
+      {/* AG62 — Municipality surveys */}
+      <Route
+        path="caring-community/surveys"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><MunicipalSurveyAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG56 — Local advertising campaigns */}
+      <Route path="advertising/campaigns" element={<Lazy><AdCampaignAdminPage /></Lazy>} />
+
+      {/* AG57 — Paid push campaigns */}
+      <Route path="advertising/push-campaigns" element={<Lazy><PushCampaignAdminPage /></Lazy>} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />

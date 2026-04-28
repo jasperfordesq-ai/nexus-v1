@@ -2495,5 +2495,46 @@ Route::delete('/v2/admin/fadp/processing-activities/{id}', [\App\Http\Controller
 Route::get('/v2/admin/fadp/consent-ledger', [\App\Http\Controllers\Api\FadpComplianceController::class, 'exportConsentLedger']);
 Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegister']);
 
+// AG56 — Local Advertising Platform
+Route::get('/v2/ads/active', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getActiveAds']);
+Route::post('/v2/ads/impression', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'recordImpression']);
+Route::post('/v2/ads/impression/{impressionId}/click', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'recordClick']);
+Route::get('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'myAdCampaigns']);
+Route::post('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'createCampaign']);
+Route::get('/v2/me/ad-campaigns/{id}/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getMyCampaignStats']);
+Route::post('/v2/me/ad-campaigns/{campaignId}/creatives', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'addCreative']);
+Route::get('/v2/admin/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminListCampaigns']);
+Route::get('/v2/admin/ad-campaigns/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminOverviewStats']);
+Route::get('/v2/admin/ad-campaigns/{id}', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminGetCampaign']);
+Route::post('/v2/admin/ad-campaigns/{id}/approve', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminApproveCampaign']);
+Route::post('/v2/admin/ad-campaigns/{id}/reject', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminRejectCampaign']);
+Route::post('/v2/admin/ad-campaigns/{id}/pause', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminPauseCampaign']);
+
+// AG57 — Paid Push Campaign Management
+Route::get('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'myCampaigns']);
+Route::post('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'createCampaign']);
+Route::post('/v2/me/push-campaigns/estimate-audience', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'estimateAudience']);
+Route::put('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'updateCampaign']);
+Route::post('/v2/me/push-campaigns/{id}/submit', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'submitForReview']);
+Route::delete('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'cancelCampaign']);
+Route::get('/v2/admin/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminListCampaigns']);
+Route::get('/v2/admin/push-campaigns/stats', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminOverviewStats']);
+Route::get('/v2/admin/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminGetCampaign']);
+Route::post('/v2/admin/push-campaigns/{id}/approve', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminApproveCampaign']);
+Route::post('/v2/admin/push-campaigns/{id}/reject', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminRejectCampaign']);
+Route::post('/v2/admin/push-campaigns/{id}/dispatch', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminDispatchCampaign']);
+
+// AG62 — Municipality Survey & Feedback Tool
+Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'activeSurveys']);
+Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
+Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey']);
+Route::get('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminListSurveys']);
+Route::post('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCreateSurvey']);
+Route::get('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminGetSurvey']);
+Route::put('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminUpdateSurvey']);
+Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminPublishSurvey']);
+Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
+Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
+
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);
