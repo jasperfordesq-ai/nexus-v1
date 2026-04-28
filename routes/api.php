@@ -357,6 +357,9 @@ Route::get('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPre
 Route::put('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'update']);
 Route::get('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'list']);
 Route::post('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'upload']);
+// GDPR / FADP — member personal-data export (R3)
+Route::post('/v2/me/data-export', [\App\Http\Controllers\Api\MemberDataExportController::class, 'create']);
+Route::get('/v2/me/data-export/history', [\App\Http\Controllers\Api\MemberDataExportController::class, 'history']);
 // Block users
 Route::get('/v2/users/blocked', [\App\Http\Controllers\Api\BlockUserController::class, 'index']);
 Route::post('/v2/users/{id}/block', [\App\Http\Controllers\Api\BlockUserController::class, 'block']);
