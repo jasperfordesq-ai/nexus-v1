@@ -1190,10 +1190,17 @@ Route::post('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Ap
 Route::get('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listInviteCodes']);
 Route::get('/v2/admin/caring-community/favours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listFavours']);
 Route::get('/v2/admin/caring-community/forecast', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'forecast']);
+Route::post('/v2/admin/caring-community/vereine/{organizationId}/members/import/preview', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'previewVereinMemberImport']);
+Route::post('/v2/admin/caring-community/vereine/{organizationId}/members/import', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'importVereinMembers']);
+Route::post('/v2/admin/caring-community/vereine/{organizationId}/admins', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assignVereinAdmin']);
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
 Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
 Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
+Route::post('/v2/caring-community/vereine/{organizationId}/members/import/preview', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'previewVereinMemberImport'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/vereine/{organizationId}/members/import', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'importVereinMembers'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 
 // Caring loyalty bridge (time credits ↔ marketplace) — member-facing
 // Caring Community - regional points (A1), isolated and off by default

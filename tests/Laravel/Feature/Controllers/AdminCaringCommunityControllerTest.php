@@ -10,6 +10,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\CaringCommunity\VereinMemberImportService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -70,6 +71,15 @@ class AdminCaringCommunityControllerTest extends TestCase
             'support relationship hours' => ['POST', '/v2/admin/caring-community/support-relationships/999/hours', [
                 'date' => '2026-04-20',
                 'hours' => 1.5,
+            ]],
+            'verein import preview' => ['POST', '/v2/admin/caring-community/vereine/999/members/import/preview', [
+                'csv' => "email,first_name,last_name\nmember@example.test,Ada,Lovelace",
+            ]],
+            'verein import' => ['POST', '/v2/admin/caring-community/vereine/999/members/import', [
+                'csv' => "email,first_name,last_name\nmember@example.test,Ada,Lovelace",
+            ]],
+            'verein admin assign' => ['POST', '/v2/admin/caring-community/vereine/999/admins', [
+                'user_id' => 999,
             ]],
         ];
     }
@@ -409,5 +419,131 @@ class AdminCaringCommunityControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.features.caring_community', true);
+    }
+
+    private function createVerein(int $ownerId): int
+    {
+        return (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'name' => 'Turnverein Test',
+            'slug' => 'turnverein-test-' . uniqid(),
+            'description' => 'A local association used by tests.',
+            'contact_email' => 'verein-' . uniqid() . '@example.test',
+            'status' => 'approved',
+            'org_type' => 'club',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_verein_import_preview_detects_create_link_and_duplicates(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $existing = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'existing-' . uniqid() . '@example.test',
+        ]);
+        $vereinId = $this->createVerein($admin->id);
+        Sanctum::actingAs($admin);
+
+        $newEmail = 'new-' . uniqid() . '@example.test';
+        $csv = "email,first_name,last_name,role\n"
+            . "{$newEmail},Ada,Lovelace,member\n"
+            . "{$existing->email},Existing,Member,admin\n"
+            . "{$existing->email},Duplicate,Member,member\n";
+
+        $response = $this->apiPost("/v2/admin/caring-community/vereine/{$vereinId}/members/import/preview", [
+            'csv' => $csv,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.summary.total_rows', 3);
+        $response->assertJsonPath('data.summary.ready_to_create', 1);
+        $response->assertJsonPath('data.summary.ready_to_link', 1);
+        $response->assertJsonPath('data.summary.duplicates', 1);
+        $response->assertJsonPath('data.items.0.action', 'create');
+        $response->assertJsonPath('data.items.1.action', 'link_existing');
+        $response->assertJsonPath('data.items.2.action', 'invalid');
+    }
+
+    public function test_verein_import_creates_users_and_links_existing_members(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $existing = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'link-' . uniqid() . '@example.test',
+        ]);
+        $vereinId = $this->createVerein($admin->id);
+        Sanctum::actingAs($admin);
+
+        $newEmail = 'created-' . uniqid() . '@example.test';
+        $csv = "email,first_name,last_name,role\n"
+            . "{$newEmail},Mina,Muster,member\n"
+            . "{$existing->email},Existing,Member,admin\n";
+
+        $response = $this->apiPost("/v2/admin/caring-community/vereine/{$vereinId}/members/import", [
+            'csv' => $csv,
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.created', 1);
+        $response->assertJsonPath('data.linked', 1);
+
+        $createdId = (int) DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('email', $newEmail)
+            ->value('id');
+
+        $this->assertGreaterThan(0, $createdId);
+        $this->assertDatabaseHas('org_members', [
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $vereinId,
+            'user_id' => $createdId,
+            'role' => 'member',
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('org_members', [
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $vereinId,
+            'user_id' => $existing->id,
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_scoped_verein_admin_can_import_only_their_verein(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $vereinAdmin = User::factory()->forTenant($this->testTenantId)->create();
+        $vereinId = $this->createVerein($admin->id);
+        $otherVereinId = $this->createVerein($admin->id);
+        Sanctum::actingAs($admin);
+
+        $assign = $this->apiPost("/v2/admin/caring-community/vereine/{$vereinId}/admins", [
+            'user_id' => $vereinAdmin->id,
+        ]);
+        $assign->assertStatus(201);
+        $assign->assertJsonPath('data.scope_organization_id', $vereinId);
+        $this->assertTrue(app(VereinMemberImportService::class)->userHasPermissionInOrg(
+            $this->testTenantId,
+            $vereinAdmin->id,
+            $vereinId,
+            'verein.members.import'
+        ));
+
+        Sanctum::actingAs($vereinAdmin);
+        $csv = "email,first_name,last_name\nscoped-" . uniqid() . "@example.test,Scoped,Member\n";
+
+        $allowed = $this->apiPost("/v2/caring-community/vereine/{$vereinId}/members/import/preview", [
+            'csv' => $csv,
+        ]);
+        $allowed->assertStatus(200);
+
+        $blocked = $this->apiPost("/v2/caring-community/vereine/{$otherVereinId}/members/import/preview", [
+            'csv' => $csv,
+        ]);
+        $blocked->assertStatus(403);
     }
 }

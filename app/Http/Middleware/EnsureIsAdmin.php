@@ -7,6 +7,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -65,6 +67,10 @@ class EnsureIsAdmin
         $isAdmin = $hasAdminFlag || $hasAdminRole;
 
         if (!$isAdmin) {
+            if ($this->allowsScopedVereinAdmin($request, (int) $user->id, (int) ($user->tenant_id ?? 0))) {
+                return $next($request);
+            }
+
             return response()->json([
                 'errors' => [
                     ['code' => 'forbidden', 'message' => 'Admin access required'],
@@ -76,5 +82,50 @@ class EnsureIsAdmin
         }
 
         return $next($request);
+    }
+
+    private function allowsScopedVereinAdmin(Request $request, int $userId, int $tenantId): bool
+    {
+        if (
+            $tenantId <= 0
+            || (
+                !$request->is('api/v2/admin/caring-community/vereine/*/members/import*')
+                && !$request->is('v2/admin/caring-community/vereine/*/members/import*')
+                && !$request->is('api/v2/caring-community/vereine/*/members/import*')
+                && !$request->is('v2/caring-community/vereine/*/members/import*')
+            )
+        ) {
+            return false;
+        }
+        if (!Schema::hasTable('user_roles') || !Schema::hasColumn('user_roles', 'scope_organization_id')) {
+            return false;
+        }
+
+        $organizationId = (int) ($request->route('organizationId') ?? 0);
+        if ($organizationId <= 0) {
+            return false;
+        }
+
+        return DB::table('user_roles as ur')
+            ->join('role_permissions as rp', 'rp.role_id', '=', 'ur.role_id')
+            ->join('permissions as p', 'p.id', '=', 'rp.permission_id')
+            ->where('ur.user_id', $userId)
+            ->where('p.name', 'verein.members.import')
+            ->where(function ($query) use ($tenantId): void {
+                $query->where('ur.tenant_id', $tenantId)->orWhereNull('ur.tenant_id');
+            })
+            ->where(function ($query) use ($tenantId): void {
+                $query->where('rp.tenant_id', $tenantId)->orWhereNull('rp.tenant_id');
+            })
+            ->where(function ($query) use ($tenantId): void {
+                $query->where('p.tenant_id', $tenantId)->orWhereNull('p.tenant_id');
+            })
+            ->where(function ($query) use ($organizationId): void {
+                $query->where('ur.scope_organization_id', $organizationId)->orWhereNull('ur.scope_organization_id');
+            })
+            ->where(function ($query): void {
+                $query->whereNull('ur.expires_at')->orWhere('ur.expires_at', '>', now());
+            })
+            ->exists();
     }
 }

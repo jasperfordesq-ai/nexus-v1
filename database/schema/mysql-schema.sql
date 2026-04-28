@@ -5602,7 +5602,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8033,7 +8033,7 @@ CREATE TABLE `permissions` (
   UNIQUE KEY `name` (`name`),
   KEY `idx_category` (`category`),
   KEY `idx_tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `personal_access_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8609,7 +8609,7 @@ CREATE TABLE `role_permissions` (
   KEY `role_permissions_tenant_id_index` (`tenant_id`),
   CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
   CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=381 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=384 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8628,7 +8628,7 @@ CREATE TABLE `roles` (
   UNIQUE KEY `name` (`name`),
   KEY `idx_level` (`level`),
   KEY `idx_tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `safeguarding_assignments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10276,12 +10276,14 @@ CREATE TABLE `user_roles` (
   `assigned_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `expires_at` timestamp NULL DEFAULT NULL COMMENT 'Optional expiration for temporary access',
   `tenant_id` int(10) unsigned DEFAULT NULL COMMENT 'NULL = global, otherwise tenant-specific',
+  `scope_organization_id` int(10) unsigned DEFAULT NULL COMMENT 'Optional vol_organizations.id scope for Verein admins.',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_role` (`user_id`,`role_id`),
+  UNIQUE KEY `user_roles_user_role_tenant_scope_unique` (`user_id`,`role_id`,`tenant_id`,`scope_organization_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_role` (`role_id`),
   KEY `idx_expires` (`expires_at`),
   KEY `user_roles_tenant_id_index` (`tenant_id`),
+  KEY `user_roles_tenant_scope_org_idx` (`tenant_id`,`scope_organization_id`),
   CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -11828,7 +11830,8 @@ INSERT INTO `laravel_migrations` VALUES
 (154,'2026_04_28_050000_add_tenant_category_to_tenants_table',73),
 (155,'2026_04_28_120000_create_caring_regional_points_tables',74),
 (156,'2026_04_28_130000_create_marketplace_seller_regional_point_settings_table',75),
-(157,'2026_04_28_140000_create_municipal_verifications_table',76);
+(157,'2026_04_28_140000_create_municipal_verifications_table',76),
+(158,'2026_04_28_150000_add_verein_admin_scope',77);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

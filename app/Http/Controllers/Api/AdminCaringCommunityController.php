@@ -19,6 +19,7 @@ use App\Services\CaringCommunity\CaringCommunityForecastService;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
+use App\Services\CaringCommunity\VereinMemberImportService;
 use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
@@ -48,6 +49,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringHourTransferService $hourTransferService,
         private readonly SafeguardingService $safeguardingService,
         private readonly CaringRegionalPointService $regionalPointService,
+        private readonly VereinMemberImportService $vereinMemberImportService,
     ) {
     }
 
@@ -971,10 +973,87 @@ class AdminCaringCommunityController extends BaseApiController
         }
     }
 
+    public function previewVereinMemberImport(int $organizationId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunityFeature();
+        if ($disabled) return $disabled;
+
+        $actorId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        if (!$this->canManageVereinMembers($tenantId, $actorId, $organizationId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.admin_access_required'), null, 403);
+        }
+
+        $csv = (string) ($this->getAllInput()['csv'] ?? '');
+        try {
+            return $this->respondWithData(
+                $this->vereinMemberImportService->preview($tenantId, $organizationId, $csv)
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('VEREIN_IMPORT_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+    }
+
+    public function importVereinMembers(int $organizationId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunityFeature();
+        if ($disabled) return $disabled;
+
+        $actorId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        if (!$this->canManageVereinMembers($tenantId, $actorId, $organizationId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.admin_access_required'), null, 403);
+        }
+
+        $csv = (string) ($this->getAllInput()['csv'] ?? '');
+        try {
+            return $this->respondWithData(
+                $this->vereinMemberImportService->import($tenantId, $organizationId, $actorId, $csv),
+                null,
+                201
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('VEREIN_IMPORT_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+    }
+
+    public function assignVereinAdmin(int $organizationId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $actorId = $this->requireAdmin();
+        $userId = (int) (($this->getAllInput()['user_id'] ?? 0));
+        if ($userId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'user_id', 422);
+        }
+
+        try {
+            return $this->respondWithData(
+                $this->vereinMemberImportService->assignVereinAdmin(TenantContext::getId(), $organizationId, $userId, $actorId),
+                null,
+                201
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('VEREIN_ADMIN_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();
 
+        return $this->guardCaringCommunityFeature();
+    }
+
+    private function guardCaringCommunityFeature(): ?JsonResponse
+    {
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
@@ -992,5 +1071,30 @@ class AdminCaringCommunityController extends BaseApiController
         }
 
         return null;
+    }
+
+    private function canManageVereinMembers(int $tenantId, int $actorId, int $organizationId): bool
+    {
+        $actor = User::query()
+            ->where('tenant_id', $tenantId)
+            ->where('id', $actorId)
+            ->first(['role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($actor && (
+            in_array((string) $actor->role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (int) ($actor->is_admin ?? 0) === 1
+            || (int) ($actor->is_super_admin ?? 0) === 1
+            || (int) ($actor->is_tenant_super_admin ?? 0) === 1
+            || (int) ($actor->is_god ?? 0) === 1
+        )) {
+            return true;
+        }
+
+        return $this->vereinMemberImportService->userHasPermissionInOrg(
+            $tenantId,
+            $actorId,
+            $organizationId,
+            'verein.members.import'
+        );
     }
 }
