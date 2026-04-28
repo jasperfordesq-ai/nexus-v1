@@ -5602,7 +5602,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6490,6 +6490,23 @@ CREATE TABLE `marketplace_seller_ratings` (
   KEY `msr_ratee_id_idx` (`ratee_id`),
   KEY `marketplace_seller_ratings_tenant_id_index` (`tenant_id`),
   CONSTRAINT `marketplace_seller_ratings_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_seller_regional_point_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_seller_regional_point_settings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `seller_user_id` int(10) unsigned NOT NULL,
+  `accepts_regional_points` tinyint(1) NOT NULL DEFAULT 0,
+  `regional_points_per_chf` decimal(10,2) NOT NULL DEFAULT 10.00,
+  `regional_points_max_discount_pct` tinyint(3) unsigned NOT NULL DEFAULT 25,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `msrps_tenant_seller_unique` (`tenant_id`,`seller_user_id`),
+  KEY `msrps_tenant_accepts_idx` (`tenant_id`,`accepts_regional_points`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_shipping_options`;
@@ -11785,7 +11802,8 @@ INSERT INTO `laravel_migrations` VALUES
 (152,'2026_04_28_040001_create_safeguarding_report_actions_table',71),
 (153,'2026_04_28_060000_create_caring_hour_gifts_table',72),
 (154,'2026_04_28_050000_add_tenant_category_to_tenants_table',73),
-(155,'2026_04_28_120000_create_caring_regional_points_tables',74);
+(155,'2026_04_28_120000_create_caring_regional_points_tables',74),
+(156,'2026_04_28_130000_create_marketplace_seller_regional_point_settings_table',75);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

@@ -113,6 +113,73 @@ class CaringCommunityApiController extends BaseApiController
     // -------------------------------------------------------------------------
 
     /**
+     * GET /api/v2/caring-community/regional-points/marketplace/quote
+     *
+     * Query: seller_id, listing_id?, order_total_chf
+     */
+    public function regionalPointsMarketplaceQuote(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $sellerId = (int) ($this->query('seller_id') ?? 0);
+        $listingId = $this->query('listing_id') !== null ? (int) $this->query('listing_id') : null;
+        $orderTotalChf = (float) ($this->query('order_total_chf') ?? 0);
+
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
+        }
+        if ($orderTotalChf <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'order_total_chf', 422);
+        }
+
+        return $this->respondWithData(
+            $this->regionalPointService->calculateMarketplaceDiscount($userId, $sellerId, $listingId, $orderTotalChf)
+        );
+    }
+
+    public function regionalPointsMarketplaceRedeem(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $sellerId = (int) ($input['seller_id'] ?? 0);
+        $listingId = isset($input['listing_id']) && $input['listing_id'] !== '' ? (int) $input['listing_id'] : null;
+        $pointsToUse = (float) ($input['points_to_use'] ?? 0);
+        $orderTotalChf = (float) ($input['order_total_chf'] ?? 0);
+
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
+        }
+
+        try {
+            $result = $this->regionalPointService->redeemForMarketplaceDiscount(
+                memberId: $userId,
+                sellerId: $sellerId,
+                listingId: $listingId,
+                pointsToUse: $pointsToUse,
+                orderTotalChf: $orderTotalChf,
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $code = str_contains(strtolower($e->getMessage()), 'not enough')
+                ? 'INSUFFICIENT_REGIONAL_POINTS'
+                : 'REGIONAL_POINTS_REDEMPTION_FAILED';
+            return $this->respondWithError($code, $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true], null, 201);
+    }
+
+    /**
      * POST /api/v2/caring-community/hour-gifts/send
      *
      * Body: { recipient_user_id, hours, message? }

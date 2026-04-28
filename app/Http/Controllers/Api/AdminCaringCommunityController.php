@@ -849,6 +849,41 @@ class AdminCaringCommunityController extends BaseApiController
         return $this->respondWithData($result);
     }
 
+    public function getRegionalPointSellerSettings(int $userId): JsonResponse
+    {
+        $disabled = $this->guardRegionalPoints();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->regionalPointService->getMarketplaceSellerSettings($userId));
+    }
+
+    public function updateRegionalPointSellerSettings(): JsonResponse
+    {
+        $disabled = $this->guardRegionalPoints();
+        if ($disabled) return $disabled;
+
+        $input = $this->getAllInput();
+        $sellerId = (int) ($input['seller_user_id'] ?? 0);
+        if ($sellerId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_user_id', 422);
+        }
+
+        try {
+            $result = $this->regionalPointService->updateMarketplaceSellerSettings(
+                sellerId: $sellerId,
+                acceptsRegionalPoints: (bool) ($input['accepts_regional_points'] ?? false),
+                pointsPerChf: (float) ($input['regional_points_per_chf'] ?? 10.0),
+                maxDiscountPct: (int) ($input['regional_points_max_discount_pct'] ?? 25),
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('REGIONAL_POINTS_SELLER_SETTINGS_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData($result);
+    }
+
     public function regionalPointsConfig(): JsonResponse
     {
         $disabled = $this->guardCaringCommunity();

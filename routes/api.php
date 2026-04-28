@@ -1200,11 +1200,15 @@ Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommun
 Route::get('/v2/caring-community/regional-points/summary', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsSummary']);
 Route::get('/v2/caring-community/regional-points/history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsHistory']);
 Route::post('/v2/caring-community/regional-points/transfer', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsTransfer']);
+Route::get('/v2/caring-community/regional-points/marketplace/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceQuote']);
+Route::post('/v2/caring-community/regional-points/marketplace/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceRedeem']);
 Route::get('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsConfig']);
 Route::put('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointsConfig']);
 Route::get('/v2/admin/caring-community/regional-points/ledger', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsLedger']);
 Route::post('/v2/admin/caring-community/regional-points/issue', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'issueRegionalPoints']);
 Route::post('/v2/admin/caring-community/regional-points/adjust', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'adjustRegionalPoints']);
+Route::get('/v2/admin/caring-community/regional-points/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getRegionalPointSellerSettings']);
+Route::put('/v2/admin/caring-community/regional-points/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointSellerSettings']);
 
 Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
 Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);

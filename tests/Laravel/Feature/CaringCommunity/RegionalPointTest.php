@@ -74,6 +74,26 @@ class RegionalPointTest extends TestCase
         ]);
     }
 
+    private function makeMarketplaceListing(int $sellerId, float $price = 100.0): int
+    {
+        return (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $sellerId,
+            'title' => 'Regional point marketplace item',
+            'description' => 'Listing used by regional point redemption tests.',
+            'price' => $price,
+            'price_currency' => 'CHF',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     public function test_regional_points_are_disabled_by_default(): void
     {
         $userId = $this->makeUser('rp-disabled-' . uniqid() . '@example.test');
@@ -263,5 +283,110 @@ class RegionalPointTest extends TestCase
             'reference_type' => 'regional_point_transfer',
             'reference_id' => $transfer['sender_transaction_id'],
         ]);
+    }
+
+    public function test_marketplace_quote_requires_tenant_and_merchant_opt_in(): void
+    {
+        $member = $this->makeUser('rp-market-quote-member-' . uniqid() . '@example.test');
+        $seller = $this->makeUser('rp-market-quote-seller-' . uniqid() . '@example.test');
+        $admin = $this->makeUser('rp-market-quote-admin-' . uniqid() . '@example.test');
+        $listing = $this->makeMarketplaceListing($seller, 100);
+
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'marketplace_redemption_enabled' => false,
+        ]);
+        $service->issue($member, 500, 'Seed member', $admin);
+        $service->updateMarketplaceSellerSettings($seller, true, 10, 25);
+
+        $disabledQuote = $service->calculateMarketplaceDiscount($member, $seller, $listing, 100);
+        $this->assertFalse($disabledQuote['accepts']);
+        $this->assertSame('feature_disabled', $disabledQuote['reason']);
+
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'marketplace_redemption_enabled' => true,
+        ]);
+        $service->updateMarketplaceSellerSettings($seller, false, 10, 25);
+
+        $merchantDisabledQuote = $service->calculateMarketplaceDiscount($member, $seller, $listing, 100);
+        $this->assertFalse($merchantDisabledQuote['accepts']);
+        $this->assertSame('merchant_disabled', $merchantDisabledQuote['reason']);
+    }
+
+    public function test_marketplace_quote_caps_by_balance_and_seller_policy(): void
+    {
+        $member = $this->makeUser('rp-market-cap-member-' . uniqid() . '@example.test');
+        $seller = $this->makeUser('rp-market-cap-seller-' . uniqid() . '@example.test');
+        $admin = $this->makeUser('rp-market-cap-admin-' . uniqid() . '@example.test');
+        $listing = $this->makeMarketplaceListing($seller, 100);
+
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'marketplace_redemption_enabled' => true,
+        ]);
+        $service->issue($member, 80, 'Seed member', $admin);
+        $service->updateMarketplaceSellerSettings($seller, true, 10, 25);
+
+        $quote = $service->calculateMarketplaceDiscount($member, $seller, $listing, 100);
+
+        $this->assertTrue($quote['accepts']);
+        $this->assertEqualsWithDelta(80.0, $quote['member_points'], 0.001);
+        $this->assertEqualsWithDelta(80.0, $quote['max_points_usable'], 0.001);
+        $this->assertEqualsWithDelta(8.0, $quote['max_discount_chf'], 0.001);
+
+        $service->issue($member, 500, 'Top up member', $admin);
+        $policyQuote = $service->calculateMarketplaceDiscount($member, $seller, $listing, 100);
+        $this->assertEqualsWithDelta(250.0, $policyQuote['max_points_usable'], 0.001);
+        $this->assertEqualsWithDelta(25.0, $policyQuote['max_discount_chf'], 0.001);
+    }
+
+    public function test_marketplace_redemption_debits_only_regional_points(): void
+    {
+        $member = $this->makeUser('rp-market-redeem-member-' . uniqid() . '@example.test');
+        $seller = $this->makeUser('rp-market-redeem-seller-' . uniqid() . '@example.test');
+        $admin = $this->makeUser('rp-market-redeem-admin-' . uniqid() . '@example.test');
+        $listing = $this->makeMarketplaceListing($seller, 100);
+        DB::table('users')->where('id', $member)->update(['balance' => 12]);
+
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'marketplace_redemption_enabled' => true,
+        ]);
+        $service->issue($member, 300, 'Seed member', $admin);
+        $service->updateMarketplaceSellerSettings($seller, true, 10, 25);
+
+        $result = $service->redeemForMarketplaceDiscount($member, $seller, $listing, 200, 100);
+
+        $this->assertEqualsWithDelta(20.0, $result['discount_chf'], 0.001);
+        $this->assertEqualsWithDelta(100.0, $result['new_regional_point_balance'], 0.001);
+        $this->assertEqualsWithDelta(12.0, (float) DB::table('users')->where('id', $member)->value('balance'), 0.001);
+        $this->assertDatabaseHas('caring_regional_point_transactions', [
+            'id' => $result['transaction_id'],
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $member,
+            'type' => 'redemption',
+            'direction' => 'debit',
+            'reference_type' => 'marketplace_listing',
+            'reference_id' => $listing,
+        ]);
+    }
+
+    public function test_marketplace_redemption_rejects_own_listing(): void
+    {
+        $member = $this->makeUser('rp-market-own-member-' . uniqid() . '@example.test');
+        $listing = $this->makeMarketplaceListing($member, 100);
+        $service = app(CaringRegionalPointService::class);
+        $service->updateConfig(self::TENANT_ID, [
+            'enabled' => true,
+            'marketplace_redemption_enabled' => true,
+        ]);
+        $service->updateMarketplaceSellerSettings($member, true, 10, 25);
+
+        $this->expectExceptionMessage('You cannot redeem regional points at your own listing.');
+        $service->redeemForMarketplaceDiscount($member, $member, $listing, 10, 100);
     }
 }

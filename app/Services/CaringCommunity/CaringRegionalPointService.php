@@ -18,6 +18,7 @@ use RuntimeException;
 class CaringRegionalPointService
 {
     private const PREFIX = 'caring_community.regional_points.';
+    private const MAX_POINTS_PER_REDEMPTION = 100000.0;
 
     private const DEFAULTS = [
         'enabled' => false,
@@ -416,6 +417,245 @@ class CaringRegionalPointService
         });
     }
 
+    public function calculateMarketplaceDiscount(int $memberId, int $sellerId, ?int $listingId, float $orderTotalChf): array
+    {
+        $tenantId = TenantContext::getId();
+        $config = $this->getConfig($tenantId);
+
+        $base = [
+            'accepts' => false,
+            'member_points' => 0.0,
+            'regional_points_per_chf' => 0.0,
+            'max_discount_pct' => 0,
+            'max_points_usable' => 0.0,
+            'max_discount_chf' => 0.0,
+        ];
+
+        if (!$this->isEnabled($tenantId) || !(bool) $config['marketplace_redemption_enabled']) {
+            return $base + ['reason' => 'feature_disabled'];
+        }
+
+        if (!Schema::hasTable('marketplace_seller_regional_point_settings')) {
+            return $base + ['reason' => 'feature_unavailable'];
+        }
+
+        if ($orderTotalChf <= 0) {
+            return $base + ['reason' => 'invalid_order_total'];
+        }
+
+        if (!$this->tenantUserExists($tenantId, $memberId) || !$this->tenantUserExists($tenantId, $sellerId)) {
+            return $base + ['reason' => 'member_or_seller_unavailable'];
+        }
+
+        if ($listingId !== null && !$this->marketplaceListingBelongsToSeller($tenantId, $listingId, $sellerId)) {
+            return $base + ['reason' => 'listing_unavailable'];
+        }
+
+        $settings = DB::table('marketplace_seller_regional_point_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('seller_user_id', $sellerId)
+            ->first();
+
+        if (!$settings || !(int) $settings->accepts_regional_points) {
+            return $base + ['reason' => 'merchant_disabled'];
+        }
+
+        $pointsPerChf = (float) $settings->regional_points_per_chf;
+        $maxPct = (int) $settings->regional_points_max_discount_pct;
+        if ($pointsPerChf <= 0 || $maxPct <= 0) {
+            return $base + ['reason' => 'merchant_misconfigured'];
+        }
+
+        $account = $this->ensureAccount($tenantId, $memberId);
+        $memberPoints = round((float) $account->balance, 2);
+        $maxDiscountChf = round(($orderTotalChf * $maxPct) / 100, 2);
+        $maxPointsByPolicy = round($maxDiscountChf * $pointsPerChf, 2);
+        $maxPointsUsable = max(0.0, round(min($memberPoints, $maxPointsByPolicy, self::MAX_POINTS_PER_REDEMPTION), 2));
+        $effectiveDiscountChf = round($maxPointsUsable / $pointsPerChf, 2);
+
+        return [
+            'accepts' => true,
+            'member_points' => $memberPoints,
+            'regional_points_per_chf' => round($pointsPerChf, 2),
+            'max_discount_pct' => $maxPct,
+            'max_points_usable' => $maxPointsUsable,
+            'max_discount_chf' => $effectiveDiscountChf,
+        ];
+    }
+
+    public function redeemForMarketplaceDiscount(
+        int $memberId,
+        int $sellerId,
+        ?int $listingId,
+        float $pointsToUse,
+        float $orderTotalChf
+    ): array {
+        $tenantId = TenantContext::getId();
+        $config = $this->getConfig($tenantId);
+        $this->assertEnabled($tenantId);
+
+        if (!(bool) $config['marketplace_redemption_enabled']) {
+            throw new RuntimeException(__('api.caring_regional_points_marketplace_disabled'));
+        }
+        if (!Schema::hasTable('marketplace_seller_regional_point_settings')) {
+            throw new RuntimeException(__('api.caring_regional_points_marketplace_unavailable'));
+        }
+        if ($memberId === $sellerId) {
+            throw new RuntimeException(__('api.caring_regional_points_marketplace_self'));
+        }
+        if ($orderTotalChf <= 0) {
+            throw new InvalidArgumentException(__('api.caring_regional_points_order_total_positive'));
+        }
+
+        $pointsToUse = $this->normalisePoints($pointsToUse);
+        if ($pointsToUse > self::MAX_POINTS_PER_REDEMPTION) {
+            throw new InvalidArgumentException(__('api.caring_regional_points_redemption_too_many'));
+        }
+
+        $this->assertTenantUser($tenantId, $memberId);
+        $this->assertTenantUser($tenantId, $sellerId);
+        if ($listingId !== null && !$this->marketplaceListingBelongsToSeller($tenantId, $listingId, $sellerId)) {
+            throw new RuntimeException(__('api.caring_regional_points_listing_unavailable'));
+        }
+
+        return DB::transaction(function () use ($tenantId, $memberId, $sellerId, $listingId, $pointsToUse, $orderTotalChf): array {
+            $settings = DB::table('marketplace_seller_regional_point_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('seller_user_id', $sellerId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$settings || !(int) $settings->accepts_regional_points) {
+                throw new RuntimeException(__('api.caring_regional_points_merchant_disabled'));
+            }
+
+            $pointsPerChf = (float) $settings->regional_points_per_chf;
+            $maxPct = (int) $settings->regional_points_max_discount_pct;
+            if ($pointsPerChf <= 0 || $maxPct <= 0) {
+                throw new RuntimeException(__('api.caring_regional_points_merchant_invalid'));
+            }
+
+            $discountChf = round($pointsToUse / $pointsPerChf, 2);
+            $maxDiscountChf = round(($orderTotalChf * $maxPct) / 100, 2);
+            if ($discountChf > $maxDiscountChf + 0.005) {
+                throw new RuntimeException(__('api.caring_regional_points_discount_too_large'));
+            }
+
+            $account = $this->lockAccount($tenantId, $memberId);
+            $currentBalance = (float) $account->balance;
+            if ($currentBalance < $pointsToUse) {
+                throw new RuntimeException(__('api.caring_regional_points_insufficient'));
+            }
+
+            $newBalance = round($currentBalance - $pointsToUse, 2);
+            DB::table('caring_regional_point_accounts')
+                ->where('id', $account->id)
+                ->update([
+                    'balance' => $newBalance,
+                    'lifetime_spent' => round((float) $account->lifetime_spent + $pointsToUse, 2),
+                    'updated_at' => now(),
+                ]);
+
+            $transactionId = $this->insertTransaction(
+                tenantId: $tenantId,
+                accountId: (int) $account->id,
+                userId: $memberId,
+                actorId: $memberId,
+                type: 'redemption',
+                direction: 'debit',
+                points: $pointsToUse,
+                balanceAfter: $newBalance,
+                description: __('api.caring_regional_points_marketplace_redemption'),
+                referenceType: $listingId !== null ? 'marketplace_listing' : 'marketplace_seller',
+                referenceId: $listingId ?? $sellerId,
+                metadata: [
+                    'seller_user_id' => $sellerId,
+                    'marketplace_listing_id' => $listingId,
+                    'order_total_chf' => round($orderTotalChf, 2),
+                    'discount_chf' => $discountChf,
+                    'regional_points_per_chf' => round($pointsPerChf, 2),
+                    'max_discount_pct' => $maxPct,
+                ]
+            );
+
+            return [
+                'transaction_id' => $transactionId,
+                'seller_user_id' => $sellerId,
+                'marketplace_listing_id' => $listingId,
+                'points_used' => $pointsToUse,
+                'discount_chf' => $discountChf,
+                'new_regional_point_balance' => $newBalance,
+            ];
+        });
+    }
+
+    public function getMarketplaceSellerSettings(int $sellerId): array
+    {
+        $tenantId = TenantContext::getId();
+        $defaults = [
+            'seller_user_id' => $sellerId,
+            'accepts_regional_points' => false,
+            'regional_points_per_chf' => 10.0,
+            'regional_points_max_discount_pct' => 25,
+        ];
+
+        if (!Schema::hasTable('marketplace_seller_regional_point_settings')) {
+            return $defaults;
+        }
+
+        $row = DB::table('marketplace_seller_regional_point_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('seller_user_id', $sellerId)
+            ->first();
+
+        if (!$row) {
+            return $defaults;
+        }
+
+        return [
+            'seller_user_id' => (int) $row->seller_user_id,
+            'accepts_regional_points' => (bool) $row->accepts_regional_points,
+            'regional_points_per_chf' => round((float) $row->regional_points_per_chf, 2),
+            'regional_points_max_discount_pct' => (int) $row->regional_points_max_discount_pct,
+        ];
+    }
+
+    public function updateMarketplaceSellerSettings(
+        int $sellerId,
+        bool $acceptsRegionalPoints,
+        float $pointsPerChf,
+        int $maxDiscountPct
+    ): array {
+        $tenantId = TenantContext::getId();
+        $this->assertEnabled($tenantId);
+
+        if (!Schema::hasTable('marketplace_seller_regional_point_settings')) {
+            throw new RuntimeException(__('api.caring_regional_points_marketplace_unavailable'));
+        }
+
+        $this->assertTenantUser($tenantId, $sellerId);
+        $pointsPerChf = round($pointsPerChf, 2);
+        if ($pointsPerChf <= 0 || $pointsPerChf > 100000) {
+            throw new InvalidArgumentException(__('api.caring_regional_points_per_chf_invalid'));
+        }
+        if ($maxDiscountPct < 1 || $maxDiscountPct > 100) {
+            throw new InvalidArgumentException(__('api.caring_regional_points_discount_pct_invalid'));
+        }
+
+        DB::table('marketplace_seller_regional_point_settings')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'seller_user_id' => $sellerId],
+            [
+                'accepts_regional_points' => $acceptsRegionalPoints,
+                'regional_points_per_chf' => $pointsPerChf,
+                'regional_points_max_discount_pct' => $maxDiscountPct,
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        return $this->getMarketplaceSellerSettings($sellerId);
+    }
+
     public function publicConfig(int $tenantId): array
     {
         $config = $this->getConfig($tenantId);
@@ -613,14 +853,34 @@ class CaringRegionalPointService
             throw new InvalidArgumentException(__('api.user_not_found'));
         }
 
-        $exists = DB::table('users')
+        if (!$this->tenantUserExists($tenantId, $userId)) {
+            throw new InvalidArgumentException(__('api.user_not_found'));
+        }
+    }
+
+    private function tenantUserExists(int $tenantId, int $userId): bool
+    {
+        if ($userId <= 0) {
+            return false;
+        }
+
+        return DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('id', $userId)
             ->exists();
+    }
 
-        if (!$exists) {
-            throw new InvalidArgumentException(__('api.user_not_found'));
+    private function marketplaceListingBelongsToSeller(int $tenantId, int $listingId, int $sellerId): bool
+    {
+        if ($listingId <= 0 || !Schema::hasTable('marketplace_listings')) {
+            return false;
         }
+
+        return DB::table('marketplace_listings')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $listingId)
+            ->where('user_id', $sellerId)
+            ->exists();
     }
 
     private function normaliseConfig(array $config): array
