@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "title": "Gemeindeumfragen",
+    "description": "Teilen Sie Ihr Feedback zu lokalen Themen"
+  },
+  "empty": "Derzeit keine Umfragen verfügbar",
+  "already_responded": "Sie haben bereits an dieser Umfrage teilgenommen.",
+  "submit": "Antworten absenden",
+  "submitting": "Wird gesendet…",
+  "success_title": "Vielen Dank!",
+  "success_body": "Ihr Feedback wurde erfasst.",
+  "back": "Zurück zu Umfragen",
+  "required_error": "Bitte beantworten Sie alle Pflichtfragen.",
+  "take_survey": "Zur Umfrage",
+  "question_required": "Pflichtfeld",
+  "likert_options": {
+    "1": "Sehr unzufrieden",
+    "2": "Eher unzufrieden",
+    "3": "Neutral",
+    "4": "Eher zufrieden",
+    "5": "Sehr zufrieden"
+  }
+}

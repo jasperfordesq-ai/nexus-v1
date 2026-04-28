@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "title": "Community Surveys",
+    "description": "Share your feedback on local issues"
+  },
+  "empty": "No surveys available at this time",
+  "already_responded": "You have already participated in this survey.",
+  "submit": "Submit responses",
+  "submitting": "Submitting…",
+  "success_title": "Thank you!",
+  "success_body": "Your feedback has been recorded.",
+  "back": "Back to Surveys",
+  "required_error": "Please answer all required questions.",
+  "take_survey": "Take survey",
+  "question_required": "Required",
+  "likert_options": {
+    "1": "Very dissatisfied",
+    "2": "Dissatisfied",
+    "3": "Neutral",
+    "4": "Satisfied",
+    "5": "Very satisfied"
+  }
+}
