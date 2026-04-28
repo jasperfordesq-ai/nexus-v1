@@ -1196,6 +1196,15 @@ Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Ap
 Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
 
 // Caring loyalty bridge (time credits ↔ marketplace) — member-facing
+// Caring Community - regional points (A1), isolated and off by default
+Route::get('/v2/caring-community/regional-points/summary', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsSummary']);
+Route::get('/v2/caring-community/regional-points/history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsHistory']);
+Route::get('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsConfig']);
+Route::put('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointsConfig']);
+Route::get('/v2/admin/caring-community/regional-points/ledger', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsLedger']);
+Route::post('/v2/admin/caring-community/regional-points/issue', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'issueRegionalPoints']);
+Route::post('/v2/admin/caring-community/regional-points/adjust', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'adjustRegionalPoints']);
+
 Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
 Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
 Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);

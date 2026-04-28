@@ -803,6 +803,47 @@ CREATE TABLE `caring_loyalty_redemptions` (
   KEY `clr_tenant_listing_idx` (`tenant_id`,`marketplace_listing_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_regional_point_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_regional_point_accounts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `balance` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `lifetime_earned` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `lifetime_spent` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `crpa_tenant_user_unique` (`tenant_id`,`user_id`),
+  KEY `crpa_tenant_balance_idx` (`tenant_id`,`balance`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_regional_point_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_regional_point_transactions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `account_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `actor_user_id` int(10) unsigned DEFAULT NULL,
+  `type` enum('admin_issue','admin_adjustment','earned_for_hours','transfer_in','transfer_out','redemption','reversal') NOT NULL,
+  `direction` enum('credit','debit') NOT NULL,
+  `points` decimal(12,2) NOT NULL,
+  `balance_after` decimal(12,2) NOT NULL,
+  `reference_type` varchar(80) DEFAULT NULL,
+  `reference_id` bigint(20) unsigned DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `crpt_tenant_user_created_idx` (`tenant_id`,`user_id`,`created_at`),
+  KEY `crpt_tenant_type_created_idx` (`tenant_id`,`type`,`created_at`),
+  KEY `crpt_tenant_ref_idx` (`tenant_id`,`reference_type`,`reference_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_support_relationships`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -5561,7 +5602,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=155 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11743,7 +11784,8 @@ INSERT INTO `laravel_migrations` VALUES
 (151,'2026_04_28_040000_create_safeguarding_reports_table',71),
 (152,'2026_04_28_040001_create_safeguarding_report_actions_table',71),
 (153,'2026_04_28_060000_create_caring_hour_gifts_table',72),
-(154,'2026_04_28_050000_add_tenant_category_to_tenants_table',73);
+(154,'2026_04_28_050000_add_tenant_category_to_tenants_table',73),
+(155,'2026_04_28_120000_create_caring_regional_points_tables',74);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

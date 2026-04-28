@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\CaringCommunityAlertService;
 use App\Services\CaringCommunity\CaringCommunityForecastService;
 use App\Services\CaringCommunity\CaringHourTransferService;
+use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
@@ -46,6 +47,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityAlertService $alertService,
         private readonly CaringHourTransferService $hourTransferService,
         private readonly SafeguardingService $safeguardingService,
+        private readonly CaringRegionalPointService $regionalPointService,
     ) {
     }
 
@@ -847,12 +849,111 @@ class AdminCaringCommunityController extends BaseApiController
         return $this->respondWithData($result);
     }
 
+    public function regionalPointsConfig(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->regionalPointService->getConfig(TenantContext::getId()));
+    }
+
+    public function updateRegionalPointsConfig(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData(
+            $this->regionalPointService->updateConfig(TenantContext::getId(), $this->getAllInput())
+        );
+    }
+
+    public function regionalPointsLedger(): JsonResponse
+    {
+        $disabled = $this->guardRegionalPoints();
+        if ($disabled) return $disabled;
+
+        try {
+            return $this->respondWithData([
+                'stats' => $this->regionalPointService->tenantStats(),
+                'items' => $this->regionalPointService->tenantLedger((int) ($this->query('limit') ?? 100)),
+            ]);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
+        }
+    }
+
+    public function issueRegionalPoints(): JsonResponse
+    {
+        $disabled = $this->guardRegionalPoints();
+        if ($disabled) return $disabled;
+
+        $actorId = $this->requireAdmin();
+        $input = $this->getAllInput();
+        $userId = (int) ($input['user_id'] ?? 0);
+        $points = (float) ($input['points'] ?? 0);
+        $description = (string) ($input['description'] ?? '');
+
+        if ($userId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'user_id', 422);
+        }
+
+        try {
+            return $this->respondWithData(
+                $this->regionalPointService->issue($userId, $points, $description, $actorId),
+                null,
+                201
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
+        }
+    }
+
+    public function adjustRegionalPoints(): JsonResponse
+    {
+        $disabled = $this->guardRegionalPoints();
+        if ($disabled) return $disabled;
+
+        $actorId = $this->requireAdmin();
+        $input = $this->getAllInput();
+        $userId = (int) ($input['user_id'] ?? 0);
+        $pointsDelta = (float) ($input['points_delta'] ?? 0);
+        $description = (string) ($input['description'] ?? '');
+
+        if ($userId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'user_id', 422);
+        }
+
+        try {
+            return $this->respondWithData(
+                $this->regionalPointService->adjust($userId, $pointsDelta, $description, $actorId)
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('REGIONAL_POINTS_FAILED', $e->getMessage(), null, 422);
+        }
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return null;
+    }
+
+    private function guardRegionalPoints(): ?JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        if (!$this->regionalPointService->isEnabled(TenantContext::getId())) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.caring_regional_points_disabled'), null, 403);
         }
 
         return null;

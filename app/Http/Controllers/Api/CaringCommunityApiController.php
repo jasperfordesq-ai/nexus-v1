@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
+use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
@@ -37,7 +38,44 @@ class CaringCommunityApiController extends BaseApiController
         private readonly CaringHourTransferService $hourTransferService,
         private readonly SafeguardingService $safeguardingService,
         private readonly CaringHourGiftService $hourGiftService,
+        private readonly CaringRegionalPointService $regionalPointService,
     ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // A1 - Regional points (isolated third-currency wallet)
+    // -------------------------------------------------------------------------
+
+    public function regionalPointsSummary(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            return $this->respondWithData($this->regionalPointService->memberSummary($userId));
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
+        }
+    }
+
+    public function regionalPointsHistory(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            return $this->respondWithData([
+                'items' => $this->regionalPointService->memberHistory($userId, (int) ($this->query('limit') ?? 50)),
+            ]);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
+        }
     }
 
     // -------------------------------------------------------------------------
