@@ -768,5 +768,59 @@
         "body": "Sobald Sie Ihre Zeitgutschriften bei einem lokalen Händler einsetzen, erscheint die Einlösung hier."
       }
     }
+  },
+  "future_care_fund": {
+    "meta": {
+      "title": "Dein Zeitvorsorge-Fonds",
+      "description": "Stunden, die du für deine zukünftige Betreuung gespart hast"
+    },
+    "title": "Dein Zeitvorsorge-Fonds",
+    "subhead": "Im Wert von etwa CHF {{value}} — Betreuung, auf die du zählen kannst, wenn du sie brauchst",
+    "intro": "Das sind nicht nur Stunden. Das ist die Fürsorge, die du in deiner Gemeinschaft gespart hast — abrufbar für Einkäufe, Arztbesuche oder einfach Gesellschaft, wann immer du sie brauchst.",
+    "hours_short": "Stunden",
+    "stats": {
+      "lifetime_given": "Insgesamt geleistet",
+      "lifetime_received": "Insgesamt erhalten",
+      "active_months": "Aktive Monate",
+      "this_month_given": "Diesen Monat geleistet",
+      "this_month_received": "Diesen Monat erhalten",
+      "partner_orgs": "Partner­organisationen unterstützt"
+    },
+    "reciprocity": {
+      "title": "Deine Bilanz",
+      "given_label": "Geleistet",
+      "received_label": "Erhalten",
+      "strong_giver": "Du hast weit mehr gegeben als erhalten — dein Zeitvorsorge-Fonds steht stark da.",
+      "balanced": "Deine Bilanz ist im Gleichgewicht.",
+      "strong_receiver": "Du hast grosszügig Hilfe erhalten — wenn du bereit bist, gib deiner Gemeinschaft zurück."
+    },
+    "by_year": {
+      "title": "Jahr für Jahr",
+      "given": "Geleistet",
+      "received": "Erhalten"
+    },
+    "how_it_works": {
+      "title": "So funktioniert dein Zeitvorsorge-Fonds",
+      "step1": "Hilf deinen Nachbarinnen und Nachbarn und sammle Stunden",
+      "step2": "Deine Stunden werden sicher in deinem Gemeinschafts-Fonds gespart",
+      "step3": "Wenn du Hilfe brauchst, löst du Stunden aus deinem Fonds ein",
+      "cta_offer": "Jetzt Hilfe anbieten",
+      "cta_browse": "Anfragen entdecken",
+      "cta_relationships": "Meine Betreuungs­beziehungen ansehen"
+    },
+    "first_contribution": "Erster Beitrag: {{date}}",
+    "back": "Zurück zur Gemeinschafts-Übersicht",
+    "loading": "Dein Fonds wird berechnet …",
+    "errors": {
+      "load_failed": "Dein Zeitvorsorge-Fonds konnte nicht geladen werden."
+    }
+  },
+  "reciprocity": {
+    "title": "Deine gegenseitige Bilanz",
+    "given": "Du hast {{hours}} Stunden geleistet",
+    "received": "Du hast {{hours}} Stunden erhalten",
+    "net_positive": "Netto: +{{hours}} Stunden gespart",
+    "net_negative": "Netto: {{hours}} Stunden eingelöst",
+    "view_fund": "Zeitvorsorge-Fonds ansehen"
   }
 }

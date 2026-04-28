@@ -9,8 +9,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
+use App\Services\FutureCareFundService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -29,7 +31,95 @@ class CaringCommunityApiController extends BaseApiController
     public function __construct(
         private readonly CaringInviteCodeService $inviteCodeService,
         private readonly CaringLoyaltyService $loyaltyService,
+        private readonly FutureCareFundService $futureCareFundService,
+        private readonly CaringHourTransferService $hourTransferService,
     ) {
+    }
+
+    /**
+     * POST /api/v2/caring-community/hour-transfer/initiate
+     *
+     * Member initiates a banked-hour transfer to themselves at another
+     * cooperative tenant. Funds move only after a source-tenant admin approves.
+     *
+     * Body: { destination_tenant_slug, hours, reason? }
+     */
+    public function hourTransferInitiate(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $destinationSlug = trim((string) ($input['destination_tenant_slug'] ?? ''));
+        $hours = (float) ($input['hours'] ?? 0);
+        $reason = trim((string) ($input['reason'] ?? ''));
+
+        if ($destinationSlug === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'destination_tenant_slug', 422);
+        }
+        if ($hours <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'hours', 422);
+        }
+
+        try {
+            $result = $this->hourTransferService->initiate($userId, $destinationSlug, $hours, $reason);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $code = match (true) {
+                str_contains($msg, 'Insufficient')          => 'INSUFFICIENT_HOURS',
+                str_contains($msg, 'No matching member')    => 'NO_MATCHING_EMAIL',
+                str_contains($msg, 'Destination cooperative') => 'DESTINATION_NOT_FOUND',
+                default                                       => 'TRANSFER_FAILED',
+            };
+            return $this->respondWithError($code, $msg, null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true], null, 201);
+    }
+
+    /**
+     * GET /api/v2/caring-community/hour-transfer/my-history
+     *
+     * Returns transfers the authenticated member has initiated.
+     */
+    public function hourTransferMyHistory(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'items' => $this->hourTransferService->memberHistory($userId),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/caring-community/my-future-care-fund
+     *
+     * Returns the authenticated member's "Future Care Fund" (Zeitvorsorge)
+     * summary — banked hours framed as a 4th-pillar pension provision.
+     * Includes lifetime given/received, reciprocity ratio, by-year
+     * breakdown, and a CHF estimate of the net banked balance.
+     */
+    public function myFutureCareFund(): JsonResponse
+    {
+        $userId   = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData(
+            $this->futureCareFundService->summary($tenantId, $userId)
+        );
     }
 
     /**

@@ -470,6 +470,60 @@
       "load_failed": "Could not load your support relationships."
     }
   },
+  "future_care_fund": {
+    "meta": {
+      "title": "Your Future Care Fund",
+      "description": "Hours you've banked for future care"
+    },
+    "title": "Your Future Care Fund",
+    "subhead": "Worth approximately CHF {{value}} — care you can call on when you need it",
+    "intro": "These are not just hours. They are the care you've banked in your community — to be drawn on for grocery runs, doctor visits, or simply company, whenever you need it.",
+    "hours_short": "hours",
+    "stats": {
+      "lifetime_given": "Lifetime Given",
+      "lifetime_received": "Lifetime Received",
+      "active_months": "Active Months",
+      "this_month_given": "This Month Given",
+      "this_month_received": "This Month Received",
+      "partner_orgs": "Partner Organisations Helped"
+    },
+    "reciprocity": {
+      "title": "Your Balance",
+      "given_label": "Given",
+      "received_label": "Received",
+      "strong_giver": "You've given far more than you've received — your future fund is strong.",
+      "balanced": "Your balance is healthy.",
+      "strong_receiver": "You've received generously — when ready, give back to your community."
+    },
+    "by_year": {
+      "title": "Year by year",
+      "given": "Given",
+      "received": "Received"
+    },
+    "how_it_works": {
+      "title": "How your future care fund works",
+      "step1": "Help your neighbours and earn hours",
+      "step2": "Hours are banked safely in your community fund",
+      "step3": "When you need help, redeem hours from your fund",
+      "cta_offer": "Offer help now",
+      "cta_browse": "Browse what's needed",
+      "cta_relationships": "See my support relationships"
+    },
+    "first_contribution": "First contribution: {{date}}",
+    "back": "Back to Community Hub",
+    "loading": "Calculating your fund...",
+    "errors": {
+      "load_failed": "Could not load your future care fund."
+    }
+  },
+  "reciprocity": {
+    "title": "Your Reciprocal Balance",
+    "given": "You've given {{hours}} hours",
+    "received": "You've received {{hours}} hours",
+    "net_positive": "Net: +{{hours}} hours banked",
+    "net_negative": "Net: {{hours}} hours used",
+    "view_fund": "View your Future Care Fund"
+  },
   "gif": {
     "search_placeholder": "Search GIFs...",
     "trending": "Trending",
@@ -768,5 +822,9 @@
         "body": "When you use your time credits at a local merchant, the redemption will appear here."
       }
     }
+  },
+  "federation_aggregates": {
+    "consent_enabled": "Federation aggregates enabled",
+    "consent_disabled": "Federation aggregates disabled"
   }
 }

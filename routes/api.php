@@ -956,6 +956,14 @@ Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\Marketplac
 Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);
 
 // ============================================
+// Federation cross-node aggregates (R1+R2 — AGORIS architecture)
+// Public, no auth — but throttled. Returns 404 silently when the tenant
+// has not opted in. Each query is signed and logged for 12 months.
+// ============================================
+Route::get('/v2/federation/aggregates', [\App\Http\Controllers\Api\FederationAggregateController::class, 'show'])
+    ->middleware('throttle:60,1');
+
+// ============================================
 // Admin routes — Sanctum auth + admin middleware
 // Controllers also enforce auth via $this->requireAdmin() as a fallback
 // ============================================
@@ -1178,8 +1186,10 @@ Route::post('/v2/admin/caring-community/assisted-onboarding', [\App\Http\Control
 Route::post('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'generateInviteCode']);
 Route::get('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listInviteCodes']);
 Route::get('/v2/admin/caring-community/favours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listFavours']);
+Route::get('/v2/admin/caring-community/forecast', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'forecast']);
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
+Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
 Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
 
 // Caring loyalty bridge (time credits ↔ marketplace) — member-facing
@@ -1578,6 +1588,12 @@ Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFed
 Route::post('/v2/admin/federation/api-keys/{id}/revoke', [\App\Http\Controllers\Api\AdminFederationController::class, 'revokeApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
+// Federation cross-node aggregate consent (R1+R2 — AGORIS architecture)
+Route::get('/v2/admin/federation/aggregate-consent', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'consent']);
+Route::put('/v2/admin/federation/aggregate-consent', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'updateConsent']);
+Route::post('/v2/admin/federation/aggregate-consent/rotate-secret', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'rotateSecret']);
+Route::get('/v2/admin/federation/aggregate-consent/audit-log', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'auditLog']);
+Route::get('/v2/admin/federation/aggregate-consent/preview', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'preview']);
 // Enhanced federation analytics overview (KPIs + chart data)
 Route::get('/v2/admin/federation/analytics/overview', [\App\Http\Controllers\Api\AdminFederationAnalyticsController::class, 'overview']);
 // Federation data management: full export / import / purge
