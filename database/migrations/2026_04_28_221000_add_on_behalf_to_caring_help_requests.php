@@ -16,8 +16,8 @@ return new class extends Migration
     {
         if (Schema::hasTable('caring_help_requests') && !Schema::hasColumn('caring_help_requests', 'is_on_behalf')) {
             Schema::table('caring_help_requests', function (Blueprint $table) {
-                $table->boolean('is_on_behalf')->default(false)->after('category_id');
-                $table->unsignedInteger('requested_by_id')->nullable()->after('is_on_behalf');
+                $table->boolean('is_on_behalf')->default(false);
+                $table->unsignedInteger('requested_by_id')->nullable();
             });
         }
     }
