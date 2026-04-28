@@ -440,6 +440,13 @@
     "cta_body": "Si tiene alguna pregunta sobre este documento, por favor contáctenos.",
     "contact_us": "Contáctenos"
   },
+  "fadp": {
+    "fadp_banner_title": "Swiss Data Protection (nDSG)",
+    "fadp_banner_body": "Under the Swiss Federal Act on Data Protection, we need your explicit consent before using AI-powered features like smart matching and personalisation.",
+    "fadp_accept": "Accept AI features",
+    "fadp_decline": "Use basic features only",
+    "fadp_learn_more": "Learn more about your rights"
+  },
   "page_meta": {
     "platform_terms": {
       "title": "Términos de Servicio de la Plataforma",
