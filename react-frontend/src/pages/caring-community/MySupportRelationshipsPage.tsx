@@ -5,12 +5,13 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Chip, Skeleton } from '@heroui/react';
+import { Avatar, Chip, Skeleton, Tooltip } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Clock from 'lucide-react/icons/clock';
 import Heart from 'lucide-react/icons/heart';
+import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -47,6 +48,7 @@ interface SupportRelationship {
   last_logged_at: string | null;
   next_check_in_at: string | null;
   role: 'supporter' | 'recipient';
+  intergenerational?: boolean;
   partner: Partner;
   recent_logs: RecentLog[];
 }
@@ -127,6 +129,19 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
           <Chip size="sm" color={statusColor} variant="flat">
             {t(`my_support_relationships.status.${relationship.status}`)}
           </Chip>
+          {relationship.intergenerational && (
+            <Tooltip content={t('inter_gen.tooltip')} placement="top">
+              <Chip
+                size="sm"
+                color="secondary"
+                variant="flat"
+                startContent={<HeartHandshake className="h-3 w-3" aria-hidden="true" />}
+                classNames={{ base: 'bg-purple-500/15 text-purple-700 dark:text-purple-300' }}
+              >
+                {t('inter_gen.badge')}
+              </Chip>
+            </Tooltip>
+          )}
         </div>
       </div>
 

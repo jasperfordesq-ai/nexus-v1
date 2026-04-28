@@ -903,63 +903,63 @@
   },
   "hour_gift": {
     "meta": {
-      "title": "Gift Hours",
-      "description": "Gift your banked hours to another community member"
+      "title": "Stunden schenken",
+      "description": "Schenke deine angesparten Stunden einem anderen Genossenschaftsmitglied"
     },
-    "title": "Gift Your Hours",
-    "subtitle": "Banked hours can be gifted to family, friends, or anyone who needs them.",
+    "title": "Schenke deine Stunden",
+    "subtitle": "Angesparte Stunden lassen sich an Familie, Freunde oder jeden weitergeben, der sie braucht.",
     "tabs": {
-      "send": "Send",
-      "inbox": "Inbox",
-      "sent": "Sent"
+      "send": "Senden",
+      "inbox": "Posteingang",
+      "sent": "Gesendet"
     },
     "send": {
-      "recipient_label": "Who would you like to gift hours to?",
-      "recipient_placeholder": "Search by name...",
-      "hours_label": "How many hours?",
-      "hours_balance_helper": "You have {{balance}} hours available",
-      "message_label": "Add a personal message (optional)",
-      "message_placeholder": "Why you're gifting these hours...",
-      "submit": "Gift Hours",
-      "confirm_title": "Gift {{hours}} hours to {{name}}?",
-      "confirm_body": "Your hours will be debited now and credited to them once they accept.",
-      "confirm_button": "Yes, gift hours",
-      "cancel": "Cancel"
+      "recipient_label": "Wem möchtest du Stunden schenken?",
+      "recipient_placeholder": "Nach Name suchen...",
+      "hours_label": "Wie viele Stunden?",
+      "hours_balance_helper": "Du hast {{balance}} Stunden zur Verfügung",
+      "message_label": "Persönliche Nachricht hinzufügen (optional)",
+      "message_placeholder": "Warum du diese Stunden schenkst...",
+      "submit": "Stunden schenken",
+      "confirm_title": "{{hours}} Stunden an {{name}} schenken?",
+      "confirm_body": "Deine Stunden werden jetzt abgebucht und gutgeschrieben, sobald die Person das Geschenk annimmt.",
+      "confirm_button": "Ja, Stunden schenken",
+      "cancel": "Abbrechen"
     },
     "inbox": {
-      "empty": "No gifts to accept right now.",
-      "from": "From {{name}}",
-      "received_at": "Received {{date}}",
-      "accept": "Accept",
-      "decline": "Decline",
-      "decline_reason_label": "Reason for declining (optional)",
-      "decline_button": "Decline gift"
+      "empty": "Aktuell keine Geschenke zur Annahme.",
+      "from": "Von {{name}}",
+      "received_at": "Erhalten am {{date}}",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "decline_reason_label": "Grund für die Ablehnung (optional)",
+      "decline_button": "Geschenk ablehnen"
     },
     "sent": {
-      "empty": "You haven't sent any gifts yet.",
-      "to": "To {{name}}",
+      "empty": "Du hast noch keine Geschenke gesendet.",
+      "to": "An {{name}}",
       "status": {
-        "pending": "Awaiting acceptance",
-        "accepted": "Accepted",
-        "declined": "Declined",
-        "reverted": "Withdrawn"
+        "pending": "Wartet auf Annahme",
+        "accepted": "Angenommen",
+        "declined": "Abgelehnt",
+        "reverted": "Zurückgezogen"
       },
-      "revert": "Withdraw gift"
+      "revert": "Geschenk zurückziehen"
     },
     "success": {
-      "sent": "Gift sent. {{name}} will be notified.",
-      "accepted": "Gift accepted. The hours are now in your wallet.",
-      "declined": "Gift declined. Hours returned to the sender."
+      "sent": "Geschenk gesendet. {{name}} wird benachrichtigt.",
+      "accepted": "Geschenk angenommen. Die Stunden sind jetzt in deinem Konto.",
+      "declined": "Geschenk abgelehnt. Stunden wurden zurückerstattet."
     },
     "errors": {
-      "insufficient_balance": "Not enough hours in your wallet.",
-      "send_failed": "Could not send the gift. Please try again."
+      "insufficient_balance": "Du hast nicht genug Stunden in deinem Konto.",
+      "send_failed": "Das Geschenk konnte nicht gesendet werden. Bitte versuche es nochmals."
     },
-    "back": "Back to Community Hub"
+    "back": "Zurück zum Community-Hub"
   },
   "inter_gen": {
-    "badge": "Intergenerational",
-    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+    "badge": "Generationenübergreifend",
+    "tooltip": "Diese Tandem-Beziehung verbindet Generationen — ein Markenzeichen des KISS-Modells."
   },
   "safeguarding_reports": {
     "submit": {

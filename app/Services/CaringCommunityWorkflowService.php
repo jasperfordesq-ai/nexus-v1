@@ -147,6 +147,7 @@ class CaringCommunityWorkflowService
                 'approved_30d_hours' => 0.0,
                 'declined_30d_count' => 0,
                 'coordinator_count' => $this->coordinatorCount($tenantId),
+                'intergenerational_tandem_count' => $this->intergenerationalTandemCount($tenantId),
             ];
         }
 
@@ -177,7 +178,38 @@ class CaringCommunityWorkflowService
             'approved_30d_hours' => round((float) ($row->approved_30d_hours ?? 0), 1),
             'declined_30d_count' => (int) ($row->declined_30d_count ?? 0),
             'coordinator_count' => $this->coordinatorCount($tenantId),
+            'intergenerational_tandem_count' => $this->intergenerationalTandemCount($tenantId),
         ];
+    }
+
+    /**
+     * Count active support relationships where supporter and recipient have
+     * a date of birth and their age difference is >= 25 years.  KISS's
+     * hallmark is connecting old and young — this metric makes that visible.
+     */
+    public function intergenerationalTandemCount(int $tenantId): int
+    {
+        if (!Schema::hasTable('caring_support_relationships') || !Schema::hasTable('users')) {
+            return 0;
+        }
+        if (!Schema::hasColumn('users', 'date_of_birth')) {
+            return 0;
+        }
+
+        $row = DB::selectOne(
+            "SELECT COUNT(*) AS cnt
+             FROM caring_support_relationships csr
+             JOIN users sup ON sup.id = csr.supporter_id AND sup.tenant_id = csr.tenant_id
+             JOIN users rec ON rec.id = csr.recipient_id AND rec.tenant_id = csr.tenant_id
+             WHERE csr.tenant_id = ?
+               AND csr.status = 'active'
+               AND sup.date_of_birth IS NOT NULL
+               AND rec.date_of_birth IS NOT NULL
+               AND ABS(TIMESTAMPDIFF(YEAR, sup.date_of_birth, rec.date_of_birth)) >= ?",
+            [$tenantId, \App\Services\CaringTandemMatchingService::INTERGENERATIONAL_MIN_AGE_DIFF]
+        );
+
+        return (int) ($row->cnt ?? 0);
     }
 
     private function pendingReviews(int $tenantId, array $policy): array

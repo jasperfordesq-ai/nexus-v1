@@ -34,6 +34,16 @@ class CaringTandemMatchingService
     private const WEIGHT_INTEREST = 0.10;
 
     /**
+     * Additive boost for intergenerational pairs (age difference >= 25 years).
+     * Applied AFTER the weighted base score, capped at 1.0.  KISS's hallmark
+     * is connecting old and young — surfacing this in the score makes
+     * intergenerational suggestions rise naturally without skewing the base
+     * weight balance.
+     */
+    public const INTERGENERATIONAL_BOOST = 0.10;
+    public const INTERGENERATIONAL_MIN_AGE_DIFF = 25;
+
+    /**
      * @return list<array<string,mixed>>
      */
     public function suggestTandems(int $tenantId, ?int $limit = 20): array
@@ -48,8 +58,9 @@ class CaringTandemMatchingService
         $hasInterests = Schema::hasColumn('users', 'interests');
         $hasAvailability = Schema::hasColumn('users', 'availability');
         $hasLanguage = Schema::hasColumn('users', 'preferred_language');
+        $hasDob = Schema::hasColumn('users', 'date_of_birth');
 
-        $candidates = $this->loadCandidates($tenantId, $hasLat, $hasLng, $hasSkills, $hasInterests, $hasAvailability, $hasLanguage);
+        $candidates = $this->loadCandidates($tenantId, $hasLat, $hasLng, $hasSkills, $hasInterests, $hasAvailability, $hasLanguage, $hasDob);
         if (count($candidates) < 2) {
             return [];
         }
@@ -161,6 +172,7 @@ class CaringTandemMatchingService
         bool $hasInterests,
         bool $hasAvailability,
         bool $hasLanguage,
+        bool $hasDob = false,
     ): array {
         $columns = ['id', 'first_name', 'last_name', 'name', 'avatar_url'];
         if ($hasLat) $columns[] = 'latitude';
@@ -169,6 +181,7 @@ class CaringTandemMatchingService
         if ($hasInterests) $columns[] = 'interests';
         if ($hasAvailability) $columns[] = 'availability';
         if ($hasLanguage) $columns[] = 'preferred_language';
+        if ($hasDob) $columns[] = 'date_of_birth';
 
         $query = DB::table('users')
             ->where('tenant_id', $tenantId)
@@ -202,6 +215,7 @@ class CaringTandemMatchingService
                 'interests' => $this->splitTokens((string) ($row->interests ?? '')),
                 'availability' => trim(strtolower((string) ($row->availability ?? ''))),
                 'languages' => $this->normaliseLanguageList($row->preferred_language ?? null),
+                'dob' => isset($row->date_of_birth) && $row->date_of_birth !== null && $row->date_of_birth !== '' ? (string) $row->date_of_birth : null,
             ];
         }
 
@@ -307,7 +321,44 @@ class CaringTandemMatchingService
             + (self::WEIGHT_AVAILABILITY * $availabilityOverlap)
             + (self::WEIGHT_INTEREST * $interestOverlap);
 
+        // Intergenerational boost — additive on top of weighted base, capped at 1.0.
+        // KISS's hallmark is connecting old and young, so an explicit signal +
+        // small boost surfaces these pairs without unbalancing the base weights.
+        $intergenSignal = $this->computeIntergenerationalSignal($a, $b);
+        $signals['intergenerational'] = $intergenSignal >= 1.0;
+        $signals['intergenerational_signal'] = round($intergenSignal, 3);
+        if ($intergenSignal >= 1.0) {
+            $score += self::INTERGENERATIONAL_BOOST;
+        }
+
         return [$signals, max(0.0, min(1.0, $score))];
+    }
+
+    /**
+     * Returns 1.0 when both members have a DOB and are >= 25 years apart;
+     * 0.0 when they share a generation; 0.5 when DOB is unknown for either side.
+     *
+     * @param array<string,mixed> $a
+     * @param array<string,mixed> $b
+     */
+    public function computeIntergenerationalSignal(array $a, array $b): float
+    {
+        $dobA = $a['dob'] ?? null;
+        $dobB = $b['dob'] ?? null;
+        if (!is_string($dobA) || !is_string($dobB) || $dobA === '' || $dobB === '') {
+            return 0.5;
+        }
+
+        try {
+            $tA = (new \DateTimeImmutable($dobA))->getTimestamp();
+            $tB = (new \DateTimeImmutable($dobB))->getTimestamp();
+        } catch (\Throwable) {
+            return 0.5;
+        }
+
+        // Convert second-difference to years (approximate, leap-year safe enough).
+        $diffYears = abs($tA - $tB) / (365.25 * 24 * 3600);
+        return $diffYears >= self::INTERGENERATIONAL_MIN_AGE_DIFF ? 1.0 : 0.0;
     }
 
     private function haversineKm(float $lat1, float $lng1, float $lat2, float $lng2): float
@@ -414,6 +465,9 @@ class CaringTandemMatchingService
         }
         if (isset($signals['interest_overlap']) && (float) $signals['interest_overlap'] >= 0.5) {
             $parts[] = 'Shared interests';
+        }
+        if (!empty($signals['intergenerational'])) {
+            $parts[] = 'Intergenerational pairing';
         }
         return $parts === [] ? 'Reasonable overall fit' : implode(', ', $parts);
     }

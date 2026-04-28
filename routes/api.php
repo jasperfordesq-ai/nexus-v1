@@ -1208,6 +1208,25 @@ Route::post('/v2/admin/caring-community/hour-transfer/{id}/approve', [\App\Http\
 Route::post('/v2/admin/caring-community/hour-transfer/{id}/reject', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferReject']);
 Route::get('/v2/admin/caring-community/hour-transfer/inbound', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferInbound']);
 
+// Caring Community — K5: time-credit gifting (member-to-member, same-tenant)
+Route::post('/v2/caring-community/hour-gifts/send', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSend']);
+Route::post('/v2/caring-community/hour-gifts/{id}/accept', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftAccept']);
+Route::post('/v2/caring-community/hour-gifts/{id}/decline', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftDecline']);
+Route::post('/v2/caring-community/hour-gifts/{id}/revert', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftRevert']);
+Route::get('/v2/caring-community/hour-gifts/inbox', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftInbox']);
+Route::get('/v2/caring-community/hour-gifts/sent', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSent']);
+
+// Caring Community — Safeguarding reports (K9)
+Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
+Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
+Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
+Route::get('/v2/admin/caring-community/safeguarding/reports', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingList']);
+Route::get('/v2/admin/caring-community/safeguarding/reports/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingShow']);
+Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/assign', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingAssign']);
+Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/escalate', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingEscalate']);
+Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/status', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingStatus']);
+Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/note', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingNote']);
+
 // Caring loyalty bridge — admin
 Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
 Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getLoyaltySellerSettings']);
