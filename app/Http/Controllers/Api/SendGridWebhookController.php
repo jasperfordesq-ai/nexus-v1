@@ -54,6 +54,13 @@ class SendGridWebhookController extends BaseApiController
             return $this->respondWithError('CONFIGURATION_ERROR', __('api.webhook_auth_not_configured'), null, 500);
         }
 
+        // Accept raw base64 (single-line, Docker-friendly) or full PEM format.
+        // Docker env_file does not support multiline values, so the key is stored
+        // as a plain base64 string and wrapped in PEM headers here.
+        if (!str_starts_with(trim($verificationKey), '-----BEGIN')) {
+            $verificationKey = "-----BEGIN PUBLIC KEY-----\n" . trim($verificationKey) . "\n-----END PUBLIC KEY-----\n";
+        }
+
         $signature = request()->header('X-Twilio-Email-Event-Webhook-Signature');
         $timestamp = request()->header('X-Twilio-Email-Event-Webhook-Timestamp');
 
