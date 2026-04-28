@@ -169,13 +169,19 @@ class SendGridWebhookController extends BaseApiController
             ? NewsletterBounce::BOUNCE_SOFT
             : NewsletterBounce::BOUNCE_HARD;
 
+        if ($tenantId <= 0) {
+            $this->emailMonitorService->recordEmailSend('sendgrid', false, null);
+            return;
+        }
+
         NewsletterBounce::record(
+            $tenantId,
             $email,
-            $bounceType,
             null, // newsletter_id — not always available from transactional emails
             null, // queue_id
-            $reason,
-            $status
+            $bounceType,
+            (string) ($reason ?? ''),
+            (string) ($status ?? '')
         );
 
         $this->emailMonitorService->recordEmailSend('sendgrid', false, $tenantId ?: null);
@@ -188,13 +194,19 @@ class SendGridWebhookController extends BaseApiController
     {
         $email = $event['email'] ?? '';
 
+        if ($tenantId <= 0) {
+            $this->emailMonitorService->recordEmailSend('sendgrid', false, null);
+            return;
+        }
+
         NewsletterBounce::record(
+            $tenantId,
             $email,
+            null,
+            null,
             NewsletterBounce::BOUNCE_COMPLAINT,
-            null,
-            null,
             'SendGrid spam report',
-            null
+            ''
         );
 
         $this->emailMonitorService->recordEmailSend('sendgrid', false, $tenantId ?: null);
