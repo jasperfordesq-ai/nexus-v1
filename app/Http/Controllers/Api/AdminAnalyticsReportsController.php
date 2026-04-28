@@ -12,6 +12,7 @@ use App\Services\InactiveMemberService;
 use App\Services\ReportExportService;
 use App\Services\MunicipalImpactReportService;
 use App\Services\MunicipalReportTemplateService;
+use App\Services\MunicipalVerificationService;
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Services\MemberReportService;
@@ -34,6 +35,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         private readonly ReportExportService $reportExportService,
         private readonly MunicipalImpactReportService $municipalImpactReportService,
         private readonly MunicipalReportTemplateService $municipalReportTemplateService,
+        private readonly MunicipalVerificationService $municipalVerificationService,
         private readonly MemberReportService $memberReportService,
         private readonly ContentModerationService $contentModerationService,
     ) {}
@@ -196,6 +198,107 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $this->respondWithData(
             $this->municipalImpactReportService->summary($tenantId, $filters)
         );
+    }
+
+    /** GET /v2/admin/reports/municipal-impact/verification */
+    public function municipalVerification(): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            return $this->respondWithData(
+                $this->municipalVerificationService->current(TenantContext::getId())
+            );
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+    }
+
+    /** POST /v2/admin/reports/municipal-impact/verification/dns */
+    public function startMunicipalDnsVerification(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $domain = (string) $this->input('domain', '');
+        if (trim($domain) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'domain', 422);
+        }
+
+        try {
+            $verification = $this->municipalVerificationService->startDnsVerification(
+                TenantContext::getId(),
+                $adminId,
+                $domain
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'domain', 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+
+        return $this->respondWithData([
+            'message' => __('api.municipal_verification_dns_started'),
+            'verification' => $verification,
+        ], null, 201);
+    }
+
+    /** POST /v2/admin/reports/municipal-impact/verification/attest */
+    public function attestMunicipalVerification(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $domain = (string) $this->input('domain', '');
+        if (trim($domain) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'domain', 422);
+        }
+
+        try {
+            $verification = $this->municipalVerificationService->attest(
+                TenantContext::getId(),
+                $adminId,
+                $domain,
+                (string) $this->input('attestation_note', '')
+            );
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'domain', 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+
+        return $this->respondWithData([
+            'message' => __('api.municipal_verification_attested'),
+            'verification' => $verification,
+        ]);
+    }
+
+    /** POST /v2/admin/reports/municipal-impact/verification/{id}/revoke */
+    public function revokeMunicipalVerification(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $revoked = $this->municipalVerificationService->revoke(TenantContext::getId(), $id);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+
+        if (!$revoked) {
+            return $this->respondWithError('NOT_FOUND', __('api.municipal_verification_not_found'), null, 404);
+        }
+
+        return $this->respondWithData(['message' => __('api.municipal_verification_revoked')]);
     }
 
     /** GET /v2/admin/reports/municipal-impact/templates */

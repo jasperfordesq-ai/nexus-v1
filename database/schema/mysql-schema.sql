@@ -5602,7 +5602,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7113,6 +7113,30 @@ CREATE TABLE `municipal_report_templates` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `municipal_report_templates_tenant_name_unique` (`tenant_id`,`name`),
   KEY `municipal_report_templates_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `municipal_verifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `municipal_verifications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `domain` varchar(253) NOT NULL,
+  `method` enum('dns_txt','admin_attestation') NOT NULL DEFAULT 'dns_txt',
+  `status` enum('pending','verified','revoked') NOT NULL DEFAULT 'pending',
+  `dns_record_name` varchar(253) DEFAULT NULL,
+  `dns_record_value` varchar(255) DEFAULT NULL,
+  `requested_by` int(10) unsigned DEFAULT NULL,
+  `verified_by` int(10) unsigned DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `attestation_note` varchar(1000) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `municipal_verifications_tenant_domain_unique` (`tenant_id`,`domain`),
+  KEY `municipal_verifications_tenant_status_idx` (`tenant_id`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `news`;
@@ -11803,7 +11827,8 @@ INSERT INTO `laravel_migrations` VALUES
 (153,'2026_04_28_060000_create_caring_hour_gifts_table',72),
 (154,'2026_04_28_050000_add_tenant_category_to_tenants_table',73),
 (155,'2026_04_28_120000_create_caring_regional_points_tables',74),
-(156,'2026_04_28_130000_create_marketplace_seller_regional_point_settings_table',75);
+(156,'2026_04_28_130000_create_marketplace_seller_regional_point_settings_table',75),
+(157,'2026_04_28_140000_create_municipal_verifications_table',76);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

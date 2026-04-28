@@ -1252,6 +1252,10 @@ Route::put('/v2/admin/reports/social-value/config', [\App\Http\Controllers\Api\A
 Route::get('/v2/admin/reports/members', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'memberReports']);
 Route::get('/v2/admin/reports/hours', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'hoursReports']);
 Route::get('/v2/admin/reports/municipal-impact', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'municipalImpact']);
+Route::get('/v2/admin/reports/municipal-impact/verification', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'municipalVerification']);
+Route::post('/v2/admin/reports/municipal-impact/verification/dns', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'startMunicipalDnsVerification']);
+Route::post('/v2/admin/reports/municipal-impact/verification/attest', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'attestMunicipalVerification']);
+Route::post('/v2/admin/reports/municipal-impact/verification/{id}/revoke', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'revokeMunicipalVerification']);
 Route::get('/v2/admin/reports/municipal-impact/templates', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'municipalImpactTemplates']);
 Route::post('/v2/admin/reports/municipal-impact/templates', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'createMunicipalImpactTemplate']);
 Route::put('/v2/admin/reports/municipal-impact/templates/{id}', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateMunicipalImpactTemplate']);

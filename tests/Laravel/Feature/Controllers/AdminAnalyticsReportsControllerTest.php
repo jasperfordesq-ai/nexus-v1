@@ -215,6 +215,27 @@ class AdminAnalyticsReportsControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_municipal_impact_includes_sroi_methodology(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/reports/municipal-impact');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'sroi_methodology' => [
+                    'formula' => ['verified_hours', 'direct_value', 'social_value', 'total_value'],
+                    'inputs',
+                    'assumptions',
+                    'caveat',
+                ],
+            ],
+        ]);
+    }
+
     public function test_municipal_impact_returns_403_for_member(): void
     {
         $this->setCaringCommunityFeature(true);
@@ -240,6 +261,78 @@ class AdminAnalyticsReportsControllerTest extends TestCase
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/reports/municipal-impact');
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+    }
+
+    public function test_municipal_verification_dns_token_workflow(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $start = $this->apiPost('/v2/admin/reports/municipal-impact/verification/dns', [
+            'domain' => 'Gemeinde-Cham.ch',
+        ]);
+
+        $start->assertStatus(201);
+        $start->assertJsonPath('data.verification.domain', 'gemeinde-cham.ch');
+        $start->assertJsonPath('data.verification.method', 'dns_txt');
+        $start->assertJsonPath('data.verification.status', 'pending');
+        $this->assertStringStartsWith(
+            '_nexus-municipal.gemeinde-cham.ch',
+            $start->json('data.verification.dns_record_name')
+        );
+        $this->assertStringStartsWith(
+            'nexus-municipal-verify=',
+            $start->json('data.verification.dns_record_value')
+        );
+
+        $status = $this->apiGet('/v2/admin/reports/municipal-impact/verification');
+        $status->assertStatus(200);
+        $status->assertJsonPath('data.verified', false);
+        $status->assertJsonPath('data.items.0.domain', 'gemeinde-cham.ch');
+    }
+
+    public function test_municipal_verification_attestation_and_revoke(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $attest = $this->apiPost('/v2/admin/reports/municipal-impact/verification/attest', [
+            'domain' => 'cham.ch',
+            'attestation_note' => 'Verified by municipal administrator.',
+        ]);
+
+        $attest->assertStatus(200);
+        $attest->assertJsonPath('data.verification.domain', 'cham.ch');
+        $attest->assertJsonPath('data.verification.method', 'admin_attestation');
+        $attest->assertJsonPath('data.verification.status', 'verified');
+
+        $id = (int) $attest->json('data.verification.id');
+        $status = $this->apiGet('/v2/admin/reports/municipal-impact/verification');
+        $status->assertStatus(200);
+        $status->assertJsonPath('data.verified', true);
+        $status->assertJsonPath('data.active.domain', 'cham.ch');
+
+        $revoke = $this->apiPost('/v2/admin/reports/municipal-impact/verification/' . $id . '/revoke');
+        $revoke->assertStatus(200);
+
+        $after = $this->apiGet('/v2/admin/reports/municipal-impact/verification');
+        $after->assertStatus(200);
+        $after->assertJsonPath('data.verified', false);
+        $after->assertJsonPath('data.items.0.status', 'revoked');
+    }
+
+    public function test_municipal_verification_is_hidden_when_caring_community_disabled(): void
+    {
+        $this->setCaringCommunityFeature(false);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/reports/municipal-impact/verification');
 
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');

@@ -74,6 +74,7 @@ class MunicipalImpactReportService
             'categories' => $categories,
             'trends' => $trends,
             'readiness_signals' => $this->readinessSignals($verifiedHours, $members, $organisations, $requests),
+            'sroi_methodology' => $this->sroiMethodology($hourConfig, (bool) $policy['include_social_value_estimate']),
             'report_pack' => [
                 'csv_export' => '/api/v2/admin/reports/municipal_impact/export?format=csv',
                 'pdf_export' => '/api/v2/admin/reports/municipal_impact/export?format=pdf',
@@ -403,6 +404,55 @@ class MunicipalImpactReportService
             }
         }
         return $ids;
+    }
+
+    private function sroiMethodology(array $hourConfig, bool $includeSocialValue): array
+    {
+        return [
+            'formula' => [
+                'verified_hours' => __('api.municipal_sroi_formula_verified_hours'),
+                'direct_value' => __('api.municipal_sroi_formula_direct_value', [
+                    'currency' => $hourConfig['currency'],
+                    'hour_value' => $hourConfig['hour_value'],
+                ]),
+                'social_value' => $includeSocialValue
+                    ? __('api.municipal_sroi_formula_social_value', ['multiplier' => $hourConfig['social_multiplier']])
+                    : __('api.municipal_sroi_formula_social_value_disabled'),
+                'total_value' => __('api.municipal_sroi_formula_total_value'),
+            ],
+            'inputs' => [
+                [
+                    'key' => 'approved_volunteer_hours',
+                    'label' => __('api.municipal_sroi_input_approved_hours'),
+                    'source_table' => 'vol_logs',
+                    'filter' => 'status=approved',
+                ],
+                [
+                    'key' => 'completed_timebank_hours',
+                    'label' => __('api.municipal_sroi_input_timebank_hours'),
+                    'source_table' => 'transactions',
+                    'filter' => 'status=completed',
+                ],
+                [
+                    'key' => 'hour_value',
+                    'label' => __('api.municipal_sroi_input_hour_value'),
+                    'source_table' => 'social_value_config',
+                    'filter' => 'tenant scoped configuration',
+                ],
+                [
+                    'key' => 'social_multiplier',
+                    'label' => __('api.municipal_sroi_input_multiplier'),
+                    'source_table' => 'social_value_config',
+                    'filter' => 'tenant scoped configuration',
+                ],
+            ],
+            'assumptions' => [
+                __('api.municipal_sroi_assumption_verified_only'),
+                __('api.municipal_sroi_assumption_no_cash_transfer'),
+                __('api.municipal_sroi_assumption_multiplier_configurable'),
+            ],
+            'caveat' => __('api.municipal_sroi_caveat'),
+        ];
     }
 
     public function exportData(int $tenantId, array $filters = []): array
