@@ -1,31 +1,31 @@
 {
-  "set_your_availability": "Set Your Availability",
-  "available": "Available",
-  "unavailable": "Unavailable",
-  "failed_to_load": "Failed to load availability",
-  "retry": "Retry",
-  "save": "Save",
-  "save_success": "Availability saved",
-  "instructions": "Click on time slots to mark when you are available. Your availability helps other members find the best time to connect.",
-  "loading": "Loading availability",
-  "timezone_label": "Timezone",
-  "days": {
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat",
-    "sun": "Sun"
-  },
+  "set_your_availability": "Verfügbarkeit festlegen",
+  "available": "Verfügbar",
+  "unavailable": "Nicht verfügbar",
+  "failed_to_load": "Verfügbarkeit konnte nicht geladen werden",
+  "retry": "Erneut versuchen",
+  "save": "Speichern",
+  "save_success": "Verfügbarkeit gespeichert",
+  "instructions": "Klicken Sie auf Zeitfenster, um Ihre Verfügbarkeit anzugeben. Ihre Angaben helfen anderen Mitgliedern, den besten Zeitpunkt für eine Verbindung zu finden.",
+  "loading": "Verfügbarkeit wird geladen",
+  "timezone_label": "Zeitzone",
   "slot_status_label": "{{day}} {{time}}: {{status}}",
+  "days": {
+    "mon": "Mo",
+    "tue": "Di",
+    "wed": "Mi",
+    "thu": "Do",
+    "fri": "Fr",
+    "sat": "Sa",
+    "sun": "So"
+  },
   "full_days": {
-    "mon": "Monday",
-    "tue": "Tuesday",
-    "wed": "Wednesday",
-    "thu": "Thursday",
-    "fri": "Friday",
-    "sat": "Saturday",
-    "sun": "Sunday"
+    "mon": "Montag",
+    "tue": "Dienstag",
+    "wed": "Mittwoch",
+    "thu": "Donnerstag",
+    "fri": "Freitag",
+    "sat": "Samstag",
+    "sun": "Sonntag"
   }
 }

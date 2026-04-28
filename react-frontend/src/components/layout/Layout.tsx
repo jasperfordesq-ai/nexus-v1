@@ -18,6 +18,8 @@ import { Footer } from './Footer';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
+import { EmergencyAlertBanner } from '@/components/caring-community/EmergencyAlertBanner';
+import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -165,6 +167,12 @@ export function Layout({
 
       {/* Service worker update banner — user-controlled, never auto-reloads */}
       <UpdateAvailableBanner />
+
+      {/* AG70 — Emergency/safety alert banner (caring community tenants only) */}
+      <EmergencyAlertBanner />
+
+      {/* AG42 — Swiss FADP consent banner (fadp_compliance feature tenants only) */}
+      <FadpConsentBanner />
 
       {/* Navigation */}
       {showNavbar && (

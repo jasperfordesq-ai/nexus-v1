@@ -1,0 +1,189 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api;
+
+use App\Core\TenantContext;
+use App\Services\CaringCommunity\EmergencyAlertService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+/**
+ * AG70 — Emergency/Safety Alert Tier controller.
+ *
+ * Endpoints:
+ *   GET    /v2/caring-community/emergency-alerts          → activeAlerts()   (members, polled by banner)
+ *   POST   /v2/caring-community/emergency-alerts/{id}/dismiss → dismiss()   (members)
+ *   GET    /v2/admin/caring-community/emergency-alerts    → adminList()      (admin)
+ *   POST   /v2/admin/caring-community/emergency-alerts    → store()          (admin + municipality_announcer)
+ *   DELETE /v2/admin/caring-community/emergency-alerts/{id} → deactivate()  (admin + municipality_announcer)
+ */
+class EmergencyAlertController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly EmergencyAlertService $service,
+    ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // Member-facing
+    // -------------------------------------------------------------------------
+
+    /**
+     * Return all currently active alerts for the tenant.
+     * Polled every 5 minutes by the EmergencyAlertBanner component.
+     */
+    public function activeAlerts(): JsonResponse
+    {
+        $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $alerts = EmergencyAlertService::getActiveAlerts($tenantId);
+            return $this->respondWithData($alerts);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 503);
+        }
+    }
+
+    /**
+     * Record a banner dismissal for analytics (does NOT deactivate the alert).
+     */
+    public function dismiss(int $id): JsonResponse
+    {
+        $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        EmergencyAlertService::recordDismissal($id, $tenantId);
+
+        return $this->respondWithData(['ok' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Admin-facing
+    // -------------------------------------------------------------------------
+
+    /**
+     * List all alerts (any status) for the admin management page.
+     */
+    public function adminList(): JsonResponse
+    {
+        $this->requireAuth();
+        $this->requirePermission('admin');
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $alerts = EmergencyAlertService::getAllAlerts($tenantId);
+            return $this->respondWithData($alerts);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 503);
+        }
+    }
+
+    /**
+     * Create and immediately broadcast a new emergency alert.
+     * Requires admin role OR municipality_announcer role.
+     */
+    public function store(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        // Authorisation: admin OR municipality_announcer
+        if (!$this->hasAnnouncerAccess($userId, $tenantId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
+
+        $input = $this->getJsonInput();
+
+        $validator = Validator::make($input, [
+            'title'      => 'required|string|max:255',
+            'body'       => 'required|string|max:2000',
+            'severity'   => 'nullable|in:info,warning,danger',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.validation_failed'),
+                $validator->errors()->toArray(),
+                422
+            );
+        }
+
+        try {
+            $alert = EmergencyAlertService::createAndBroadcast($tenantId, $input, $userId);
+            return $this->respondWithData($alert, null, 201);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('SERVICE_ERROR', $e->getMessage(), null, 503);
+        }
+    }
+
+    /**
+     * Deactivate (soft-delete) an alert so it no longer shows on the banner.
+     * Requires admin role OR municipality_announcer role.
+     */
+    public function deactivate(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        if (!$this->hasAnnouncerAccess($userId, $tenantId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
+
+        try {
+            EmergencyAlertService::deactivate($id, $tenantId);
+            return $this->respondWithData(['ok' => true]);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('SERVICE_ERROR', $e->getMessage(), null, 503);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if the user is an admin OR has the municipality_announcer role
+     * for the current tenant.
+     */
+    private function hasAnnouncerAccess(int $userId, int $tenantId): bool
+    {
+        return (bool) DB::table('user_roles')
+            ->join('roles', 'roles.id', '=', 'user_roles.role_id')
+            ->where('user_roles.user_id', $userId)
+            ->where('user_roles.tenant_id', $tenantId)
+            ->whereIn('roles.name', ['admin', 'municipality_announcer'])
+            ->exists();
+    }
+}

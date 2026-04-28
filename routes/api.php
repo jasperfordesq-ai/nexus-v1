@@ -1284,6 +1284,13 @@ Route::get('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Ap
 Route::post('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'captureKpiBaseline']);
 Route::get('/v2/admin/caring-community/kpi-baselines/{id}/compare', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'compareKpiBaseline']);
 
+// AG70 — Emergency/Safety Alert Tier
+Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts']);
+Route::post('/v2/caring-community/emergency-alerts/{id}/dismiss', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'dismiss']);
+Route::get('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'adminList']);
+Route::post('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'store']);
+Route::delete('/v2/admin/caring-community/emergency-alerts/{id}', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'deactivate']);
+
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);
@@ -2476,6 +2483,17 @@ Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookContr
 
 // Marketplace Stripe webhook (separate endpoint for Connect events with marketplace-specific secret)
 Route::post('/v2/marketplace/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
+
+// AG42 — Swiss FADP Compliance Pack
+Route::get('/v2/me/fadp/consent-history', [\App\Http\Controllers\Api\FadpComplianceController::class, 'myConsentHistory']);
+Route::post('/v2/me/fadp/consent', [\App\Http\Controllers\Api\FadpComplianceController::class, 'recordConsent']);
+Route::get('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getRetentionConfig']);
+Route::put('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'updateRetentionConfig']);
+Route::get('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getProcessingActivities']);
+Route::post('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'upsertProcessingActivity']);
+Route::delete('/v2/admin/fadp/processing-activities/{id}', [\App\Http\Controllers\Api\FadpComplianceController::class, 'deleteProcessingActivity']);
+Route::get('/v2/admin/fadp/consent-ledger', [\App\Http\Controllers\Api\FadpComplianceController::class, 'exportConsentLedger']);
+Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegister']);
 
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);

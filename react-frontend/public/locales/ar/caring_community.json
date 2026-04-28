@@ -51,5 +51,11 @@
     "opening_hours": "Opening Hours",
     "no_providers": "No care providers found",
     "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   }
 }

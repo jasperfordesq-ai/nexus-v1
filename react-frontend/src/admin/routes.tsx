@@ -94,6 +94,7 @@ const RoleList = lazy(() => import('./modules/enterprise/RoleList'));
 const RoleForm = lazy(() => import('./modules/enterprise/RoleForm'));
 const PermissionBrowser = lazy(() => import('./modules/enterprise/PermissionBrowser'));
 const GdprDashboard = lazy(() => import('./modules/enterprise/GdprDashboard'));
+const FadpAdminPage = lazy(() => import('./modules/legal/FadpAdminPage'));
 const GdprRequests = lazy(() => import('./modules/enterprise/GdprRequests'));
 const GdprConsents = lazy(() => import('./modules/enterprise/GdprConsents'));
 const GdprBreaches = lazy(() => import('./modules/enterprise/GdprBreaches'));
@@ -154,6 +155,7 @@ const SafeguardingReportsAdminPage = lazy(() => import('./modules/caring-communi
 const CareProviderAdminPage = lazy(() => import('./modules/caring-community/CareProviderAdminPage'));
 const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTierAdminPage'));
 const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBaselineAdminPage'));
+const EmergencyAlertAdminPage = lazy(() => import('./modules/caring-community/EmergencyAlertAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -455,6 +457,9 @@ export function AdminRoutes() {
       <Route path="enterprise/gdpr/breaches" element={<Lazy><GdprBreaches /></Lazy>} />
       <Route path="enterprise/gdpr/breaches/:id" element={<Lazy><GdprBreachDetail /></Lazy>} />
       <Route path="enterprise/gdpr/audit" element={<Lazy><GdprAuditLog /></Lazy>} />
+
+      {/* AG42 — Swiss FADP compliance */}
+      <Route path="enterprise/fadp" element={<Lazy><FadpAdminPage /></Lazy>} />
       <Route path="enterprise/monitoring" element={<Lazy><SystemMonitoring /></Lazy>} />
       <Route path="enterprise/monitoring/health" element={<Lazy><HealthCheck /></Lazy>} />
       <Route path="enterprise/monitoring/logs" element={<Lazy><ErrorLogs /></Lazy>} />
@@ -610,6 +615,16 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><KpiBaselineAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG70 — Emergency alerts */}
+      <Route
+        path="caring-community/emergency-alerts"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><EmergencyAlertAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />
