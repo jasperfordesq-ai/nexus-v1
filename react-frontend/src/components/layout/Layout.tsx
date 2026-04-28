@@ -18,7 +18,7 @@ import { Footer } from './Footer';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
-import { EmergencyAlertBanner } from '@/components/caring-community/EmergencyAlertBanner';
+import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
 import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
