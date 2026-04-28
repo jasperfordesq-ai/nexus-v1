@@ -23,12 +23,27 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Search from 'lucide-react/icons/search';
 import Sparkles from 'lucide-react/icons/sparkles';
+import BrainCircuit from 'lucide-react/icons/brain-circuit';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import Minus from 'lucide-react/icons/minus';
+import Info from 'lucide-react/icons/info';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Users from 'lucide-react/icons/users';
 import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -259,6 +274,46 @@ type TandemSuggestionsResponse = {
   generated_at: string;
 };
 
+type ForecastTrend = 'growing' | 'stable' | 'declining';
+type ForecastConfidence = 'high' | 'medium' | 'low';
+
+type ForecastSeries = {
+  history: Array<{ month: string; hours: number }>;
+  forecast: Array<{ month: string; hours: number; lower: number; upper: number }>;
+  trend: ForecastTrend;
+  growth_rate_pct: number;
+  confidence: ForecastConfidence;
+};
+
+type ForecastAlert = {
+  id: string;
+  severity: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+  count: number;
+  action_label: string | null;
+  action_url: string | null;
+};
+
+type ForecastResponse = {
+  hours: ForecastSeries;
+  members: ForecastSeries;
+  recipients: ForecastSeries;
+  alerts: ForecastAlert[];
+  generated_at: string;
+};
+
+function isForecastResponse(value: unknown): value is ForecastResponse {
+  if (!value || typeof value !== 'object') return false;
+  const v = value as Partial<ForecastResponse>;
+  return (
+    typeof v.hours === 'object' && v.hours !== null && Array.isArray(v.hours.history) &&
+    typeof v.members === 'object' && v.members !== null && Array.isArray(v.members.history) &&
+    typeof v.recipients === 'object' && v.recipients !== null && Array.isArray(v.recipients.history) &&
+    Array.isArray(v.alerts)
+  );
+}
+
 function isTandemSuggestionsResponse(value: unknown): value is TandemSuggestionsResponse {
   return Boolean(value && typeof value === 'object' && 'suggestions' in value && Array.isArray((value as TandemSuggestionsResponse).suggestions));
 }
@@ -269,6 +324,247 @@ function isWorkflowSummary(value: unknown): value is WorkflowSummary {
 
 function isSupportRelationshipList(value: unknown): value is SupportRelationshipList {
   return Boolean(value && typeof value === 'object' && 'stats' in value && 'items' in value);
+}
+
+type PredictiveInsightsCardProps = {
+  forecast: ForecastResponse | null;
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+};
+
+type ForecastChartPoint = {
+  month: string;
+  history: number | null;
+  predicted: number | null;
+  band: [number, number] | null;
+};
+
+function buildChartData(series: ForecastSeries): ForecastChartPoint[] {
+  const points: ForecastChartPoint[] = series.history.map((h) => ({
+    month: h.month,
+    history: h.hours,
+    predicted: null,
+    band: null,
+  }));
+
+  // Bridge: last history point also feeds the predicted line so the series joins.
+  const lastHistory = series.history[series.history.length - 1];
+  const lastPoint = points[points.length - 1];
+  if (lastHistory && lastPoint) {
+    lastPoint.predicted = lastHistory.hours;
+    lastPoint.band = [lastHistory.hours, lastHistory.hours];
+  }
+
+  for (const f of series.forecast) {
+    points.push({
+      month: f.month,
+      history: null,
+      predicted: f.hours,
+      band: [f.lower, f.upper],
+    });
+  }
+  return points;
+}
+
+function trendChip(series: ForecastSeries): { label: string; color: 'success' | 'warning' | 'default'; icon: typeof TrendingUp } {
+  if (series.trend === 'growing') {
+    return { label: `Growing ${series.growth_rate_pct.toFixed(0)}%`, color: 'success', icon: TrendingUp };
+  }
+  if (series.trend === 'declining') {
+    return { label: `Declining ${Math.abs(series.growth_rate_pct).toFixed(0)}%`, color: 'warning', icon: TrendingDown };
+  }
+  return { label: 'Stable', color: 'default', icon: Minus };
+}
+
+function ForecastMiniChart({ title, series, valueSuffix }: { title: string; series: ForecastSeries; valueSuffix: string }): JSX.Element {
+  const data = buildChartData(series);
+  const chip = trendChip(series);
+  const ChipIcon = chip.icon;
+
+  if (series.history.every((p) => p.hours === 0) && series.forecast.length === 0) {
+    return (
+      <div className="rounded-lg border border-default-200 p-4">
+        <div className="text-sm font-semibold text-default-900">{title}</div>
+        <div className="mt-3 rounded-md bg-default-100 p-3 text-xs text-default-500">
+          Not enough activity yet to forecast. Come back in a few weeks.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-default-200 p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-sm font-semibold text-default-900">{title}</div>
+        <Chip size="sm" variant="flat" color={chip.color} startContent={<ChipIcon size={14} />}>
+          {chip.label}
+        </Chip>
+      </div>
+      <div className="mt-3 h-40 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-divider)" />
+            <XAxis dataKey="month" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+            <YAxis tick={{ fontSize: 10 }} />
+            <Tooltip
+              formatter={(value) => {
+                if (value === null || value === undefined) return '—';
+                const num = typeof value === 'number' ? value : Number(value);
+                return Number.isFinite(num) ? `${num.toFixed(1)} ${valueSuffix}`.trim() : '—';
+              }}
+              labelStyle={{ fontSize: 12 }}
+              contentStyle={{ fontSize: 12 }}
+            />
+            <Area
+              type="monotone"
+              dataKey="band"
+              stroke="none"
+              fill="hsl(var(--heroui-primary) / 0.15)"
+              connectNulls
+              isAnimationActive={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="history"
+              stroke="hsl(var(--heroui-primary))"
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              connectNulls={false}
+              isAnimationActive={false}
+              name="History"
+            />
+            <Line
+              type="monotone"
+              dataKey="predicted"
+              stroke="hsl(var(--heroui-primary))"
+              strokeDasharray="4 4"
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              connectNulls
+              isAnimationActive={false}
+              name="Forecast"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-1 text-[11px] text-default-400">
+        Confidence: <span className="capitalize">{series.confidence}</span>
+      </div>
+    </div>
+  );
+}
+
+function alertSeverityChipColor(severity: ForecastAlert['severity']): 'danger' | 'warning' | 'primary' {
+  if (severity === 'critical') return 'danger';
+  if (severity === 'warning') return 'warning';
+  return 'primary';
+}
+
+function alertSeverityLabel(severity: ForecastAlert['severity']): string {
+  if (severity === 'critical') return 'Critical';
+  if (severity === 'warning') return 'Warning';
+  return 'Info';
+}
+
+function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: PredictiveInsightsCardProps): JSX.Element {
+  const isInitialLoading = loading && !forecast;
+  const hasAnyHistory = forecast
+    ? [forecast.hours, forecast.members, forecast.recipients].some(
+        (s) => s.history.some((h) => h.hours > 0) || s.forecast.length > 0,
+      )
+    : false;
+
+  return (
+    <Card shadow="sm">
+      <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <BrainCircuit size={18} className="text-primary" />
+            Predictive Insights
+          </h2>
+          <p className="mt-1 text-sm text-default-500">
+            Forward-looking forecasts and proactive alerts. Spot regional care deficits before they become emergencies.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="flat"
+          startContent={<RefreshCw size={16} />}
+          isLoading={loading}
+          onPress={onRefresh}
+        >
+          Refresh
+        </Button>
+      </CardHeader>
+      <Divider />
+      <CardBody className="gap-4">
+        {isInitialLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <Spinner size="md" />
+          </div>
+        ) : error ? (
+          <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700 flex items-center justify-between gap-3">
+            <span>{error}</span>
+            <Button size="sm" variant="flat" color="danger" startContent={<RefreshCw size={14} />} onPress={onRefresh}>
+              Retry
+            </Button>
+          </div>
+        ) : !forecast ? (
+          <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+            No forecast data available yet.
+          </div>
+        ) : !hasAnyHistory ? (
+          <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+            Not enough activity yet to forecast. Come back in a few weeks.
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <ForecastMiniChart title="Hours forecast" series={forecast.hours} valueSuffix="h" />
+              <ForecastMiniChart title="Active members" series={forecast.members} valueSuffix="" />
+              <ForecastMiniChart title="Recipients reached" series={forecast.recipients} valueSuffix="" />
+            </div>
+            {forecast.alerts.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                  <Info size={14} />
+                  Proactive alerts
+                </div>
+                {forecast.alerts.map((alert) => (
+                  <div key={alert.id} className="rounded-lg border border-default-200 p-3 flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Chip size="sm" variant="flat" color={alertSeverityChipColor(alert.severity)}>
+                          {alertSeverityLabel(alert.severity)}
+                        </Chip>
+                        <span className="text-sm font-semibold text-default-900">{alert.title}</span>
+                        <Chip size="sm" variant="flat" color="default">
+                          {alert.count.toLocaleString()}
+                        </Chip>
+                      </div>
+                      <p className="mt-1 text-xs text-default-500">{alert.message}</p>
+                    </div>
+                    {alert.action_url && alert.action_label && (
+                      <Button
+                        as={Link}
+                        size="sm"
+                        variant="flat"
+                        color={alertSeverityChipColor(alert.severity)}
+                        to={alert.action_url}
+                      >
+                        {alert.action_label}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </CardBody>
+    </Card>
+  );
 }
 
 export default function CaringCommunityWorkflowPage() {
@@ -325,6 +621,11 @@ export default function CaringCommunityWorkflowPage() {
   const [tandemError, setTandemError] = useState<string | null>(null);
   const [dismissingTandemKey, setDismissingTandemKey] = useState<string | null>(null);
 
+  // Predictive insights state (admin English-only) — Tom Debus AI/Daten pillar
+  const [forecast, setForecast] = useState<ForecastResponse | null>(null);
+  const [loadingForecast, setLoadingForecast] = useState(false);
+  const [forecastError, setForecastError] = useState<string | null>(null);
+
   // Assisted onboarding state
   const [onboardingName, setOnboardingName] = useState('');
   const [onboardingEmail, setOnboardingEmail] = useState('');
@@ -365,6 +666,28 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadSupportRelationships();
   }, [loadSupportRelationships]);
+
+  const loadForecast = useCallback(async () => {
+    setLoadingForecast(true);
+    setForecastError(null);
+    try {
+      const res = await api.get<ForecastResponse>('/v2/admin/caring-community/forecast');
+      if (isForecastResponse(res.data)) {
+        setForecast(res.data);
+      } else {
+        setForecast(null);
+        setForecastError('Could not load predictive insights.');
+      }
+    } catch {
+      setForecastError('Could not load predictive insights.');
+    } finally {
+      setLoadingForecast(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadForecast();
+  }, [loadForecast]);
 
   const loadTandemSuggestions = useCallback(async () => {
     setLoadingTandems(true);
@@ -1094,6 +1417,13 @@ export default function CaringCommunityWorkflowPage() {
               ))}
             </CardBody>
           </Card>
+
+          <PredictiveInsightsCard
+            forecast={forecast}
+            loading={loadingForecast}
+            error={forecastError}
+            onRefresh={loadForecast}
+          />
 
           <Card shadow="sm">
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
