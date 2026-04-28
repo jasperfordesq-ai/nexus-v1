@@ -1787,6 +1787,20 @@ Route::post('/v2/admin/super/billing/grace-period', [\App\Http\Controllers\Api\A
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 
 // ============================================
+// National KISS Foundation Dashboard — Sanctum auth only
+// ============================================
+// Endpoint-level authorization (super-admin OR users with the
+// `national.kiss_dashboard.view` permission) is enforced inside the
+// controller. This keeps the route reachable for KISS national admins who
+// are NOT platform super-admins.
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/v2/admin/national/kiss/cooperatives', [\App\Http\Controllers\Api\Admin\NationalKissDashboardController::class, 'cooperatives']);
+    Route::get('/v2/admin/national/kiss/summary', [\App\Http\Controllers\Api\Admin\NationalKissDashboardController::class, 'summary']);
+    Route::get('/v2/admin/national/kiss/comparative', [\App\Http\Controllers\Api\Admin\NationalKissDashboardController::class, 'comparative']);
+    Route::get('/v2/admin/national/kiss/trend', [\App\Http\Controllers\Api\Admin\NationalKissDashboardController::class, 'trend']);
+});
+
+// ============================================
 // Admin CRM routes — Sanctum auth + admin middleware
 // ============================================
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {

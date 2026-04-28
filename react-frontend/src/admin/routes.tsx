@@ -150,6 +150,7 @@ const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/Carin
 const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
 const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
 const HourTransferAdminPage = lazy(() => import('./modules/caring-community/HourTransferAdminPage'));
+const SafeguardingReportsAdminPage = lazy(() => import('./modules/caring-community/SafeguardingReportsAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -261,6 +262,9 @@ const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage')
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
 const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
 const MunicipalImpactReportsPage = lazy(() => import('./modules/reports/MunicipalImpactReportsPage'));
+
+// National (KISS Foundation) module
+const NationalKissDashboardPage = lazy(() => import('./modules/national/NationalKissDashboardPage'));
 
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
@@ -568,6 +572,14 @@ export function AdminRoutes() {
           </FeatureGatedElement>
         }
       />
+      <Route
+        path="caring-community/safeguarding"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><SafeguardingReportsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
@@ -634,6 +646,9 @@ export function AdminRoutes() {
         <Route path="billing" element={<Lazy><BillingControl /></Lazy>} />
         <Route path="billing/revenue" element={<Lazy><RevenueDashboard /></Lazy>} />
       </Route>
+
+      {/* ─── NATIONAL KISS FOUNDATION DASHBOARD (super-admin / national_admin) ─── */}
+      <Route path="national/kiss" element={<Lazy><NationalKissDashboardPage /></Lazy>} />
 
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />

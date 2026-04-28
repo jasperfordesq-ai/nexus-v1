@@ -870,5 +870,159 @@
       "no_matching_email": "Deine E-Mail-Adresse ist bei der Ziel-Genossenschaft nicht registriert — bitte melde dich dort zuerst an.",
       "insufficient_hours": "Du hast nicht genug gutgeschriebene Stunden."
     }
+  },
+  "data_export": {
+    "meta": {
+      "title": "Deine Daten herunterladen",
+      "description": "Dein persönliches Datenarchiv exportieren"
+    },
+    "title": "Deine Daten herunterladen",
+    "subtitle": "Dein Recht, alle Daten einzusehen und zu exportieren, die wir über dich gespeichert haben.",
+    "intro": "Dieses Archiv enthält alle Daten, die wir in dieser Gemeinschaft über dich speichern: dein Profil, geleistete und erhaltene Stunden, Unterstützungsbeziehungen, Transaktionen, Gefallen, Inserate, Anlässe und mehr.",
+    "format": {
+      "label": "Format",
+      "json": "JSON (für Entwickler:innen)",
+      "json_help": "Eine einzelne strukturierte Datei mit all deinen Daten.",
+      "zip": "ZIP-Archiv (lesefreundlich)",
+      "zip_help": "Enthält die JSON-Datei plus ein README.md, das jeden Bereich erklärt."
+    },
+    "download_button": "Meine Daten herunterladen",
+    "downloading": "Dein Archiv wird vorbereitet...",
+    "warning": "Dein Archiv enthält persönliche Informationen. Bewahre es privat auf.",
+    "history": {
+      "title": "Letzte Exporte",
+      "date": "Angefragt",
+      "format": "Format",
+      "size": "Grösse",
+      "empty": "Du hast deine Daten noch nicht exportiert."
+    },
+    "errors": {
+      "rate_limit": "Du kannst pro Tag 5 Exporte anfordern. Bitte versuche es morgen wieder.",
+      "build_failed": "Dein Archiv konnte nicht erstellt werden. Bitte versuche es nochmals oder kontaktiere den Support."
+    }
+  },
+  "hour_gift": {
+    "meta": {
+      "title": "Gift Hours",
+      "description": "Gift your banked hours to another community member"
+    },
+    "title": "Gift Your Hours",
+    "subtitle": "Banked hours can be gifted to family, friends, or anyone who needs them.",
+    "tabs": {
+      "send": "Send",
+      "inbox": "Inbox",
+      "sent": "Sent"
+    },
+    "send": {
+      "recipient_label": "Who would you like to gift hours to?",
+      "recipient_placeholder": "Search by name...",
+      "hours_label": "How many hours?",
+      "hours_balance_helper": "You have {{balance}} hours available",
+      "message_label": "Add a personal message (optional)",
+      "message_placeholder": "Why you're gifting these hours...",
+      "submit": "Gift Hours",
+      "confirm_title": "Gift {{hours}} hours to {{name}}?",
+      "confirm_body": "Your hours will be debited now and credited to them once they accept.",
+      "confirm_button": "Yes, gift hours",
+      "cancel": "Cancel"
+    },
+    "inbox": {
+      "empty": "No gifts to accept right now.",
+      "from": "From {{name}}",
+      "received_at": "Received {{date}}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "decline_reason_label": "Reason for declining (optional)",
+      "decline_button": "Decline gift"
+    },
+    "sent": {
+      "empty": "You haven't sent any gifts yet.",
+      "to": "To {{name}}",
+      "status": {
+        "pending": "Awaiting acceptance",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "reverted": "Withdrawn"
+      },
+      "revert": "Withdraw gift"
+    },
+    "success": {
+      "sent": "Gift sent. {{name}} will be notified.",
+      "accepted": "Gift accepted. The hours are now in your wallet.",
+      "declined": "Gift declined. Hours returned to the sender."
+    },
+    "errors": {
+      "insufficient_balance": "Not enough hours in your wallet.",
+      "send_failed": "Could not send the gift. Please try again."
+    },
+    "back": "Back to Community Hub"
+  },
+  "inter_gen": {
+    "badge": "Intergenerational",
+    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+  },
+  "safeguarding_reports": {
+    "submit": {
+      "meta": {
+        "title": "Anliegen zur Schutz und Sicherheit melden",
+        "description": "Ein Anliegen über ein Mitglied, eine Koordinatorin oder eine Organisation melden"
+      },
+      "title": "Anliegen zur Schutz und Sicherheit melden",
+      "subtitle": "Solche Meldungen helfen uns, unsere Gemeinschaft zu schützen. Vielen Dank für Ihren Mut.",
+      "form": {
+        "category_label": "Um welche Art von Anliegen geht es?",
+        "categories": {
+          "inappropriate_behavior": "Unangebrachtes Verhalten",
+          "financial_concern": "Finanzielles Anliegen oder möglicher Betrug",
+          "exploitation": "Mögliche Ausnützung",
+          "neglect": "Vernachlässigung oder fehlende Betreuung",
+          "medical_concern": "Gesundheitliches Anliegen",
+          "other": "Anderes"
+        },
+        "severity_label": "Wie dringend ist Ihr Anliegen?",
+        "severities": {
+          "critical": "Kritisch (akute Gefahr für eine Person)",
+          "high": "Hoch (erheblicher Schaden möglich)",
+          "medium": "Mittel",
+          "low": "Niedrig (zur Kenntnis)"
+        },
+        "subject_user_label": "Betroffene Person (freiwillig)",
+        "subject_org_label": "Betroffene Organisation (freiwillig)",
+        "description_label": "Beschreiben Sie Ihr Anliegen",
+        "description_placeholder": "Bitte schildern Sie, was Sie beobachtet haben, wann es geschehen ist und welche weiteren Hinweise einer Koordinatorin helfen, angemessen zu reagieren.",
+        "evidence_label": "Beleg-Link (freiwillig)",
+        "evidence_placeholder": "https://...",
+        "submit": "Meldung absenden",
+        "submitting": "Wird gesendet …"
+      },
+      "confidentiality": "Ihre Meldung geht ausschliesslich an die beauftragten Schutz und Sicherheits-Koordinatorinnen Ihrer Gemeinschaft. Die gemeldete Person erfährt Ihren Namen nur, wenn Sie sich aktiv dafür entscheiden.",
+      "success": {
+        "title": "Meldung eingegangen",
+        "body": "Vielen Dank. Eine Koordinatorin meldet sich innerhalb von {{hours}} Stunden bei Ihnen.",
+        "view_my_reports": "Meine Meldungen ansehen"
+      },
+      "errors": {
+        "submit_failed": "Ihre Meldung konnte nicht abgesendet werden. Bitte versuchen Sie es erneut oder wenden Sie sich direkt an eine Koordinatorin."
+      }
+    },
+    "my_reports": {
+      "meta": {
+        "title": "Meine Schutz und Sicherheits-Meldungen",
+        "description": "Von Ihnen eingereichte Meldungen"
+      },
+      "title": "Meine Schutz und Sicherheits-Meldungen",
+      "subtitle": "Ihre eingereichten Meldungen und der jeweilige Bearbeitungsstand.",
+      "empty": "Sie haben bisher keine Meldungen eingereicht.",
+      "status": {
+        "submitted": "Eingereicht",
+        "triaged": "Vorgeprüft",
+        "investigating": "In Abklärung",
+        "resolved": "Erledigt",
+        "dismissed": "Abgewiesen"
+      },
+      "escalated": "Eskaliert",
+      "submitted_at": "Eingereicht am {{date}}"
+    },
+    "back": "Zurück zur Gemeinschaftsseite"
   }
 }

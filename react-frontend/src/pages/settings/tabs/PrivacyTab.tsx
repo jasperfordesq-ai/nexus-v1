@@ -257,6 +257,23 @@ export function PrivacyTab({
             variant="flat"
             className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
             startContent={
+              <div className="p-2 rounded-lg bg-indigo-500/20">
+                <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              </div>
+            }
+            endContent={<ChevronRight className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+            onPress={() => navigate(tenantPath('/settings/data-export'))}
+          >
+            <div className="text-left">
+              <p className="font-medium">{t('data_export.title', { ns: 'common' })}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('data_export.subtitle', { ns: 'common' })}</p>
+            </div>
+          </Button>
+
+          <Button
+            variant="flat"
+            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            startContent={
               <div className="p-2 rounded-lg bg-blue-500/20">
                 <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               </div>

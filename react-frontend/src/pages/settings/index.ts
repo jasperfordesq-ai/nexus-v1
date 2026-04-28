@@ -4,3 +4,4 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { SettingsPage } from './SettingsPage';
+export { DataExportPage } from './DataExportPage';

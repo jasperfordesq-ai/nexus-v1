@@ -870,5 +870,159 @@
       "no_matching_email": "Your email is not registered at the destination cooperative — register there first.",
       "insufficient_hours": "You don't have enough banked hours."
     }
+  },
+  "data_export": {
+    "meta": {
+      "title": "Download Your Data",
+      "description": "Export your personal data archive"
+    },
+    "title": "Download Your Data",
+    "subtitle": "Your right to access and export everything we hold about you.",
+    "intro": "This archive contains all data we hold about you in this community: your profile, hours given and received, support relationships, transactions, favours, listings, events, and more.",
+    "format": {
+      "label": "Format",
+      "json": "JSON (developer-friendly)",
+      "json_help": "A single structured file with all your data.",
+      "zip": "ZIP archive (human-friendly)",
+      "zip_help": "Includes the JSON plus a README.md explaining each section."
+    },
+    "download_button": "Download my data",
+    "downloading": "Preparing your archive...",
+    "warning": "Your archive contains personal information. Keep it private.",
+    "history": {
+      "title": "Recent exports",
+      "date": "Requested",
+      "format": "Format",
+      "size": "Size",
+      "empty": "You haven't exported your data yet."
+    },
+    "errors": {
+      "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
+      "build_failed": "We couldn't build your archive. Please try again or contact support."
+    }
+  },
+  "hour_gift": {
+    "meta": {
+      "title": "Gift Hours",
+      "description": "Gift your banked hours to another community member"
+    },
+    "title": "Gift Your Hours",
+    "subtitle": "Banked hours can be gifted to family, friends, or anyone who needs them.",
+    "tabs": {
+      "send": "Send",
+      "inbox": "Inbox",
+      "sent": "Sent"
+    },
+    "send": {
+      "recipient_label": "Who would you like to gift hours to?",
+      "recipient_placeholder": "Search by name...",
+      "hours_label": "How many hours?",
+      "hours_balance_helper": "You have {{balance}} hours available",
+      "message_label": "Add a personal message (optional)",
+      "message_placeholder": "Why you're gifting these hours...",
+      "submit": "Gift Hours",
+      "confirm_title": "Gift {{hours}} hours to {{name}}?",
+      "confirm_body": "Your hours will be debited now and credited to them once they accept.",
+      "confirm_button": "Yes, gift hours",
+      "cancel": "Cancel"
+    },
+    "inbox": {
+      "empty": "No gifts to accept right now.",
+      "from": "From {{name}}",
+      "received_at": "Received {{date}}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "decline_reason_label": "Reason for declining (optional)",
+      "decline_button": "Decline gift"
+    },
+    "sent": {
+      "empty": "You haven't sent any gifts yet.",
+      "to": "To {{name}}",
+      "status": {
+        "pending": "Awaiting acceptance",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "reverted": "Withdrawn"
+      },
+      "revert": "Withdraw gift"
+    },
+    "success": {
+      "sent": "Gift sent. {{name}} will be notified.",
+      "accepted": "Gift accepted. The hours are now in your wallet.",
+      "declined": "Gift declined. Hours returned to the sender."
+    },
+    "errors": {
+      "insufficient_balance": "Not enough hours in your wallet.",
+      "send_failed": "Could not send the gift. Please try again."
+    },
+    "back": "Back to Community Hub"
+  },
+  "inter_gen": {
+    "badge": "Intergenerational",
+    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+  },
+  "safeguarding_reports": {
+    "submit": {
+      "meta": {
+        "title": "Report a Safeguarding Concern",
+        "description": "Report a concern about a member, coordinator, or organisation"
+      },
+      "title": "Report a Safeguarding Concern",
+      "subtitle": "Reporting concerns helps keep our community safe. Thank you for your courage.",
+      "form": {
+        "category_label": "What kind of concern is this?",
+        "categories": {
+          "inappropriate_behavior": "Inappropriate behaviour",
+          "financial_concern": "Financial concern or possible fraud",
+          "exploitation": "Possible exploitation",
+          "neglect": "Neglect or unmet care",
+          "medical_concern": "Medical concern",
+          "other": "Other"
+        },
+        "severity_label": "How urgent is this?",
+        "severities": {
+          "critical": "Critical (immediate risk to a person)",
+          "high": "High (significant harm possible)",
+          "medium": "Medium",
+          "low": "Low (worth flagging)"
+        },
+        "subject_user_label": "Person involved (optional)",
+        "subject_org_label": "Organisation involved (optional)",
+        "description_label": "Describe your concern",
+        "description_placeholder": "Please describe what you observed, when, and any context that would help a coordinator respond.",
+        "evidence_label": "Evidence link (optional)",
+        "evidence_placeholder": "https://...",
+        "submit": "Submit Report",
+        "submitting": "Submitting..."
+      },
+      "confidentiality": "Your report is sent only to designated safeguarding coordinators in your community. The person you report will not see your identity unless you choose to disclose it.",
+      "success": {
+        "title": "Report Submitted",
+        "body": "Thank you. A safeguarding coordinator will review this within {{hours}} hours.",
+        "view_my_reports": "View my reports"
+      },
+      "errors": {
+        "submit_failed": "We couldn't submit your report. Please try again or contact a coordinator directly."
+      }
+    },
+    "my_reports": {
+      "meta": {
+        "title": "My Safeguarding Reports",
+        "description": "Reports you have submitted"
+      },
+      "title": "My Safeguarding Reports",
+      "subtitle": "Reports you have submitted and their current status.",
+      "empty": "You haven't submitted any reports.",
+      "status": {
+        "submitted": "Submitted",
+        "triaged": "Triaged",
+        "investigating": "Under investigation",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed"
+      },
+      "escalated": "Escalated",
+      "submitted_at": "Submitted {{date}}"
+    },
+    "back": "Back to Community Hub"
   }
 }

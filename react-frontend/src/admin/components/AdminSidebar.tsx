@@ -56,6 +56,7 @@ import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';
 import CreditCard from 'lucide-react/icons/credit-card';
 import Shield from 'lucide-react/icons/shield';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Key from 'lucide-react/icons/key';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Heart from 'lucide-react/icons/heart';
@@ -94,6 +95,7 @@ import Palette from 'lucide-react/icons/palette';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
 import Languages from 'lucide-react/icons/languages';
+import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import type { LucideIcon } from 'lucide-react';
 
@@ -255,6 +257,7 @@ function useAdminNav(): NavSection[] {
         { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
         { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
         { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
+        { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
@@ -563,6 +566,7 @@ function useAdminNav(): NavSection[] {
         icon: Crown,
         items: [
           { label: "Super Dashboard", href: '/admin/super', icon: Crown },
+          { label: "National KISS Dashboard", href: '/admin/national/kiss', icon: Landmark },
           { label: "All Tenants", href: '/admin/super/tenants', icon: Building2 },
           { label: "Tenant Hierarchy", href: '/admin/super/tenants/hierarchy', icon: Network },
           { label: "Cross-Tenant Users", href: '/admin/super/users', icon: Users },
