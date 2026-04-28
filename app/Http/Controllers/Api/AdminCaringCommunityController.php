@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\CaringCommunityAlertService;
 use App\Services\CaringCommunity\CaringCommunityForecastService;
 use App\Services\CaringCommunity\CaringHourTransferService;
+use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
@@ -44,7 +45,192 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringCommunityForecastService $forecastService,
         private readonly CaringCommunityAlertService $alertService,
         private readonly CaringHourTransferService $hourTransferService,
+        private readonly SafeguardingService $safeguardingService,
     ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // Safeguarding Reports
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/safeguarding/reports?status=&severity=
+     */
+    public function safeguardingList(): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('view');
+        if ($disabled) return $disabled;
+
+        $status = (string) ($this->query('status') ?? '');
+        $severity = (string) ($this->query('severity') ?? '');
+
+        return $this->respondWithData([
+            'items' => $this->safeguardingService->listReports(
+                $status !== '' ? $status : null,
+                $severity !== '' ? $severity : null,
+            ),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/safeguarding/reports/{id}
+     */
+    public function safeguardingShow(int $id): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('view');
+        if ($disabled) return $disabled;
+
+        $detail = $this->safeguardingService->reportDetail($id);
+        if ($detail === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
+        }
+
+        return $this->respondWithData($detail);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/safeguarding/reports/{id}/assign
+     * Body: { assignee_user_id }
+     */
+    public function safeguardingAssign(int $id): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('manage');
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $assigneeId = $this->inputInt('assignee_user_id', null, 1);
+        if ($assigneeId === null) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'assignee_user_id', 422);
+        }
+
+        try {
+            $this->safeguardingService->assignReport($id, $assigneeId, $actorId);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/safeguarding/reports/{id}/escalate
+     * Body: { note? }
+     */
+    public function safeguardingEscalate(int $id): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('manage');
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $note = trim((string) ($this->getAllInput()['note'] ?? ''));
+
+        try {
+            $this->safeguardingService->escalateReport($id, $actorId, $note !== '' ? $note : null);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/safeguarding/reports/{id}/status
+     * Body: { status, notes? }
+     */
+    public function safeguardingStatus(int $id): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('manage');
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $input = $this->getAllInput();
+        $status = (string) ($input['status'] ?? '');
+        $notes = trim((string) ($input['notes'] ?? ''));
+
+        try {
+            $this->safeguardingService->changeStatus($id, $status, $actorId, $notes !== '' ? $notes : null);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/safeguarding/reports/{id}/note
+     * Body: { note }
+     */
+    public function safeguardingNote(int $id): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('manage');
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $note = trim((string) ($this->getAllInput()['note'] ?? ''));
+
+        try {
+            $this->safeguardingService->addNote($id, $actorId, $note);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/safeguarding/dashboard
+     */
+    public function safeguardingDashboard(): JsonResponse
+    {
+        $disabled = $this->guardSafeguarding('view');
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData($this->safeguardingService->dashboardSummary());
+    }
+
+    /**
+     * Combined feature + permission guard for safeguarding endpoints.
+     *
+     * @param string $level 'view' or 'manage'
+     */
+    private function guardSafeguarding(string $level): ?JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        // Coordinators / admins / super-admins always pass. Otherwise check
+        // whether the user holds the safeguarding.view permission via RBAC.
+        $userId = (int) auth()->id();
+        $user = \DB::table('users')->where('id', $userId)->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
+        $role = $user ? (string) ($user->role ?? 'member') : 'member';
+
+        if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god', 'coordinator', 'broker'], true)) {
+            return null;
+        }
+        if ($user && (($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false))) {
+            return null;
+        }
+
+        // Check permission tables — schema may vary, do this defensively
+        try {
+            $perm = (string) ($level === 'manage' ? 'safeguarding.manage' : 'safeguarding.view');
+            $hasPerm = \DB::table('user_permissions as up')
+                ->join('permissions as p', 'p.id', '=', 'up.permission_id')
+                ->where('up.user_id', $userId)
+                ->whereIn('p.name', [$perm, 'safeguarding.view'])
+                ->exists();
+            if ($hasPerm) {
+                return null;
+            }
+        } catch (\Throwable $e) {
+            // If permission tables aren't shaped as expected, fall through to deny.
+        }
+
+        return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.admin_access_required'), null, 403);
     }
 
     /**

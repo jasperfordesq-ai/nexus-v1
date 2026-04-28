@@ -1,0 +1,590 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Services\CaringCommunity;
+
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
+use RuntimeException;
+
+/**
+ * SafeguardingService — formal safeguarding-concern escalation workflow.
+ *
+ * Members can submit reports about other members, coordinators, or
+ * organisations. Reports flow through a status lifecycle with a severity-
+ * driven SLA and a full audit trail of actions.
+ *
+ * Lifecycle:
+ *   submitted → triaged → investigating → resolved | dismissed
+ *
+ * All rows are tenant-scoped; permission checks are enforced at the
+ * controller layer.
+ */
+class SafeguardingService
+{
+    public const CATEGORIES = [
+        'inappropriate_behavior',
+        'financial_concern',
+        'exploitation',
+        'neglect',
+        'medical_concern',
+        'other',
+    ];
+
+    public const SEVERITIES = ['low', 'medium', 'high', 'critical'];
+
+    public const STATUSES = [
+        'submitted',
+        'triaged',
+        'investigating',
+        'resolved',
+        'dismissed',
+    ];
+
+    /** Severity → review SLA hours mapping */
+    private const REVIEW_SLA_HOURS = [
+        'critical' => 4,
+        'high'     => 24,
+        'medium'   => 72,
+        'low'      => 168,
+    ];
+
+    private const MAX_DESCRIPTION_LENGTH = 2000;
+
+    /**
+     * Member submits a report.
+     *
+     * @return array{report_id:int}
+     */
+    public function submitReport(int $reporterId, array $data): array
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        $category = (string) ($data['category'] ?? '');
+        $severity = (string) ($data['severity'] ?? 'medium');
+        $description = trim((string) ($data['description'] ?? ''));
+        $subjectUserId = isset($data['subject_user_id']) && $data['subject_user_id'] !== ''
+            ? (int) $data['subject_user_id'] : null;
+        $subjectOrganisationId = isset($data['subject_organisation_id']) && $data['subject_organisation_id'] !== ''
+            ? (int) $data['subject_organisation_id'] : null;
+        $evidenceUrl = trim((string) ($data['evidence_url'] ?? ''));
+
+        if (!in_array($category, self::CATEGORIES, true)) {
+            throw new InvalidArgumentException('Invalid category.');
+        }
+        if (!in_array($severity, self::SEVERITIES, true)) {
+            throw new InvalidArgumentException('Invalid severity.');
+        }
+        if ($description === '') {
+            throw new InvalidArgumentException('Description is required.');
+        }
+        if (mb_strlen($description) > self::MAX_DESCRIPTION_LENGTH) {
+            throw new InvalidArgumentException('Description is too long.');
+        }
+        if ($evidenceUrl !== '' && mb_strlen($evidenceUrl) > 500) {
+            throw new InvalidArgumentException('Evidence URL is too long.');
+        }
+
+        $reviewDueAt = now()->addHours(self::REVIEW_SLA_HOURS[$severity]);
+
+        $now = now();
+        $reportId = (int) DB::table('safeguarding_reports')->insertGetId([
+            'tenant_id'               => $tenantId,
+            'reporter_user_id'        => $reporterId,
+            'subject_user_id'         => $subjectUserId,
+            'subject_organisation_id' => $subjectOrganisationId,
+            'category'                => $category,
+            'severity'                => $severity,
+            'description'             => $description,
+            'evidence_url'            => $evidenceUrl !== '' ? $evidenceUrl : null,
+            'status'                  => 'submitted',
+            'review_due_at'           => $reviewDueAt,
+            'created_at'              => $now,
+            'updated_at'              => $now,
+        ]);
+
+        $this->logAction($reportId, $reporterId, 'created', null);
+
+        if ($severity === 'critical') {
+            try {
+                $this->fanOutCriticalNotification($reportId, $tenantId);
+            } catch (\Throwable $e) {
+                Log::warning('[Safeguarding] Critical fan-out failed: ' . $e->getMessage());
+            }
+        }
+
+        return ['report_id' => $reportId];
+    }
+
+    /**
+     * Coordinator assigns a report to a reviewer.
+     */
+    public function assignReport(int $reportId, int $assigneeUserId, int $actorId): void
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+        if (!$report) {
+            throw new RuntimeException('Report not found.');
+        }
+
+        $assignee = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $assigneeUserId)
+            ->first(['id']);
+        if (!$assignee) {
+            throw new RuntimeException('Assignee not found.');
+        }
+
+        DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->update([
+                'assigned_to_user_id' => $assigneeUserId,
+                'updated_at'          => now(),
+            ]);
+
+        $this->logAction($reportId, $actorId, 'assigned', 'Assigned to user #' . $assigneeUserId);
+    }
+
+    /**
+     * Mark a report escalated (overdue or coordinator judgement).
+     */
+    public function escalateReport(int $reportId, int $actorId, ?string $note = null): void
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+        if (!$report) {
+            throw new RuntimeException('Report not found.');
+        }
+
+        DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->update([
+                'escalated'    => 1,
+                'escalated_at' => now(),
+                'updated_at'   => now(),
+            ]);
+
+        $this->logAction($reportId, $actorId, 'escalated', $note);
+    }
+
+    /**
+     * Coordinator transitions status.
+     */
+    public function changeStatus(int $reportId, string $newStatus, int $actorId, ?string $notes = null): void
+    {
+        if (!in_array($newStatus, self::STATUSES, true)) {
+            throw new InvalidArgumentException('Invalid status.');
+        }
+
+        $tenantId = (int) TenantContext::getId();
+
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+        if (!$report) {
+            throw new RuntimeException('Report not found.');
+        }
+
+        $update = [
+            'status'     => $newStatus,
+            'updated_at' => now(),
+        ];
+
+        if (in_array($newStatus, ['resolved', 'dismissed'], true)) {
+            $update['resolved_at'] = now();
+            if ($notes !== null && trim($notes) !== '') {
+                $update['resolution_notes'] = $notes;
+            }
+        }
+
+        DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->update($update);
+
+        $action = match ($newStatus) {
+            'resolved'  => 'resolved',
+            'dismissed' => 'dismissed',
+            'triaged'   => 'triaged',
+            default     => 'status_changed',
+        };
+
+        $this->logAction($reportId, $actorId, $action, $notes);
+    }
+
+    /**
+     * Append a note action without changing status.
+     */
+    public function addNote(int $reportId, int $actorId, string $note): void
+    {
+        $note = trim($note);
+        if ($note === '') {
+            throw new InvalidArgumentException('Note is required.');
+        }
+
+        $tenantId = (int) TenantContext::getId();
+
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+        if (!$report) {
+            throw new RuntimeException('Report not found.');
+        }
+
+        $this->logAction($reportId, $actorId, 'note_added', $note);
+
+        DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->update(['updated_at' => now()]);
+    }
+
+    /**
+     * List reports for coordinators with optional filters.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function listReports(?string $status = null, ?string $severity = null): array
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        if (!Schema::hasTable('safeguarding_reports')) {
+            return [];
+        }
+
+        $q = DB::table('safeguarding_reports as r')
+            ->leftJoin('users as reporter', function ($j) {
+                $j->on('reporter.id', '=', 'r.reporter_user_id')
+                  ->on('reporter.tenant_id', '=', 'r.tenant_id');
+            })
+            ->leftJoin('users as subj', function ($j) {
+                $j->on('subj.id', '=', 'r.subject_user_id')
+                  ->on('subj.tenant_id', '=', 'r.tenant_id');
+            })
+            ->leftJoin('users as assignee', function ($j) {
+                $j->on('assignee.id', '=', 'r.assigned_to_user_id')
+                  ->on('assignee.tenant_id', '=', 'r.tenant_id');
+            })
+            ->where('r.tenant_id', $tenantId);
+
+        if ($status !== null && $status !== '' && in_array($status, self::STATUSES, true)) {
+            $q->where('r.status', $status);
+        }
+        if ($severity !== null && $severity !== '' && in_array($severity, self::SEVERITIES, true)) {
+            $q->where('r.severity', $severity);
+        }
+
+        $rows = $q->orderByRaw("FIELD(r.severity, 'critical', 'high', 'medium', 'low')")
+            ->orderByDesc('r.created_at')
+            ->limit(500)
+            ->get([
+                'r.id', 'r.reporter_user_id', 'r.subject_user_id', 'r.subject_organisation_id',
+                'r.category', 'r.severity', 'r.description', 'r.evidence_url', 'r.status',
+                'r.assigned_to_user_id', 'r.review_due_at', 'r.escalated', 'r.escalated_at',
+                'r.resolution_notes', 'r.resolved_at', 'r.created_at', 'r.updated_at',
+                'reporter.first_name as reporter_first', 'reporter.last_name as reporter_last',
+                'subj.first_name as subj_first', 'subj.last_name as subj_last',
+                'assignee.first_name as assignee_first', 'assignee.last_name as assignee_last',
+            ]);
+
+        return $rows->map(fn (object $r) => $this->formatRow($r))->all();
+    }
+
+    /**
+     * Return full detail for a single report including action history.
+     *
+     * @return array<string,mixed>|null
+     */
+    public function reportDetail(int $reportId): ?array
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        $row = DB::table('safeguarding_reports as r')
+            ->leftJoin('users as reporter', function ($j) {
+                $j->on('reporter.id', '=', 'r.reporter_user_id')
+                  ->on('reporter.tenant_id', '=', 'r.tenant_id');
+            })
+            ->leftJoin('users as subj', function ($j) {
+                $j->on('subj.id', '=', 'r.subject_user_id')
+                  ->on('subj.tenant_id', '=', 'r.tenant_id');
+            })
+            ->leftJoin('users as assignee', function ($j) {
+                $j->on('assignee.id', '=', 'r.assigned_to_user_id')
+                  ->on('assignee.tenant_id', '=', 'r.tenant_id');
+            })
+            ->where('r.tenant_id', $tenantId)
+            ->where('r.id', $reportId)
+            ->first([
+                'r.id', 'r.reporter_user_id', 'r.subject_user_id', 'r.subject_organisation_id',
+                'r.category', 'r.severity', 'r.description', 'r.evidence_url', 'r.status',
+                'r.assigned_to_user_id', 'r.review_due_at', 'r.escalated', 'r.escalated_at',
+                'r.resolution_notes', 'r.resolved_at', 'r.created_at', 'r.updated_at',
+                'reporter.first_name as reporter_first', 'reporter.last_name as reporter_last',
+                'subj.first_name as subj_first', 'subj.last_name as subj_last',
+                'assignee.first_name as assignee_first', 'assignee.last_name as assignee_last',
+            ]);
+
+        if (!$row) {
+            return null;
+        }
+
+        $detail = $this->formatRow($row);
+
+        $actions = DB::table('safeguarding_report_actions as a')
+            ->leftJoin('users as actor', function ($j) {
+                $j->on('actor.id', '=', 'a.actor_user_id')
+                  ->on('actor.tenant_id', '=', 'a.tenant_id');
+            })
+            ->where('a.tenant_id', $tenantId)
+            ->where('a.report_id', $reportId)
+            ->orderBy('a.created_at')
+            ->orderBy('a.id')
+            ->get([
+                'a.id', 'a.actor_user_id', 'a.action', 'a.notes', 'a.created_at',
+                'actor.first_name as actor_first', 'actor.last_name as actor_last',
+            ])
+            ->map(fn (object $a) => [
+                'id'         => (int) $a->id,
+                'actor_id'   => (int) $a->actor_user_id,
+                'actor_name' => $this->fullName((string) ($a->actor_first ?? ''), (string) ($a->actor_last ?? '')),
+                'action'     => (string) $a->action,
+                'notes'      => $a->notes ? (string) $a->notes : null,
+                'created_at' => (string) $a->created_at,
+            ])
+            ->all();
+
+        $detail['actions'] = $actions;
+        return $detail;
+    }
+
+    /**
+     * Coordinator dashboard summary: counts by status, severity, plus overdue.
+     *
+     * @return array<string,mixed>
+     */
+    public function dashboardSummary(): array
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        if (!Schema::hasTable('safeguarding_reports')) {
+            return [
+                'total'                 => 0,
+                'open_total'            => 0,
+                'open_by_severity'      => ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0],
+                'by_status'             => [],
+                'overdue'               => 0,
+                'recent'                => [],
+            ];
+        }
+
+        $openStatuses = ['submitted', 'triaged', 'investigating'];
+
+        $statusCounts = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('status, COUNT(*) as c')
+            ->groupBy('status')
+            ->pluck('c', 'status')
+            ->toArray();
+
+        $severityCounts = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', $openStatuses)
+            ->selectRaw('severity, COUNT(*) as c')
+            ->groupBy('severity')
+            ->pluck('c', 'severity')
+            ->toArray();
+
+        $overdue = (int) DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', $openStatuses)
+            ->whereNotNull('review_due_at')
+            ->where('review_due_at', '<', now())
+            ->count();
+
+        $total = (int) array_sum($statusCounts);
+        $openTotal = 0;
+        foreach ($openStatuses as $s) {
+            $openTotal += (int) ($statusCounts[$s] ?? 0);
+        }
+
+        $recent = $this->listReports();
+        $recent = array_slice($recent, 0, 10);
+
+        return [
+            'total'              => $total,
+            'open_total'         => $openTotal,
+            'open_by_severity'   => [
+                'critical' => (int) ($severityCounts['critical'] ?? 0),
+                'high'     => (int) ($severityCounts['high'] ?? 0),
+                'medium'   => (int) ($severityCounts['medium'] ?? 0),
+                'low'      => (int) ($severityCounts['low'] ?? 0),
+            ],
+            'by_status'          => array_map('intval', $statusCounts),
+            'overdue'            => $overdue,
+            'recent'             => $recent,
+        ];
+    }
+
+    /**
+     * Reports submitted by a given member.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function myReports(int $userId): array
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        if (!Schema::hasTable('safeguarding_reports')) {
+            return [];
+        }
+
+        $rows = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('reporter_user_id', $userId)
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get([
+                'id', 'category', 'severity', 'description', 'status',
+                'review_due_at', 'escalated', 'resolved_at', 'created_at',
+            ]);
+
+        return $rows->map(function (object $r): array {
+            $desc = (string) $r->description;
+            return [
+                'id'              => (int) $r->id,
+                'category'        => (string) $r->category,
+                'severity'        => (string) $r->severity,
+                'description_preview' => mb_strlen($desc) > 200 ? mb_substr($desc, 0, 200) . '…' : $desc,
+                'status'          => (string) $r->status,
+                'review_due_at'   => $r->review_due_at ? (string) $r->review_due_at : null,
+                'escalated'       => (bool) $r->escalated,
+                'resolved_at'     => $r->resolved_at ? (string) $r->resolved_at : null,
+                'created_at'      => (string) $r->created_at,
+            ];
+        })->all();
+    }
+
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+
+    private function logAction(int $reportId, int $actorId, string $action, ?string $notes): void
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        DB::table('safeguarding_report_actions')->insert([
+            'tenant_id'     => $tenantId,
+            'report_id'     => $reportId,
+            'actor_user_id' => $actorId,
+            'action'        => $action,
+            'notes'         => $notes !== null && trim($notes) !== '' ? $notes : null,
+            'created_at'    => now(),
+        ]);
+    }
+
+    /**
+     * Send a real-time notification to all users in this tenant who hold the
+     * `safeguarding.view` permission. Best-effort; failures are logged.
+     */
+    private function fanOutCriticalNotification(int $reportId, int $tenantId): void
+    {
+        if (!Schema::hasTable('notifications') || !Schema::hasTable('user_permissions')) {
+            return;
+        }
+
+        // Resolve user IDs that hold safeguarding.view in this tenant.
+        // Schema differs across installs; use a defensive query that only
+        // touches columns we know exist.
+        $reviewers = collect();
+        try {
+            $reviewers = DB::table('user_permissions as up')
+                ->join('permissions as p', 'p.id', '=', 'up.permission_id')
+                ->where('p.name', 'safeguarding.view')
+                ->where('up.tenant_id', $tenantId)
+                ->distinct()
+                ->pluck('up.user_id');
+        } catch (\Throwable $e) {
+            Log::info('[Safeguarding] Fan-out skipped — permissions table layout differs: ' . $e->getMessage());
+            return;
+        }
+
+        $now = now();
+        foreach ($reviewers as $userId) {
+            try {
+                DB::table('notifications')->insert([
+                    'tenant_id'  => $tenantId,
+                    'user_id'    => (int) $userId,
+                    'type'       => 'safeguarding_critical',
+                    'message'    => 'Critical safeguarding report submitted',
+                    'link'       => '/admin/caring-community/safeguarding/' . $reportId,
+                    'is_read'    => 0,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('[Safeguarding] Notification insert failed: ' . $e->getMessage());
+            }
+        }
+    }
+
+    private function formatRow(object $r): array
+    {
+        $reporterName = $this->fullName((string) ($r->reporter_first ?? ''), (string) ($r->reporter_last ?? ''));
+        $subjectName = $this->fullName((string) ($r->subj_first ?? ''), (string) ($r->subj_last ?? ''));
+        $assigneeName = $this->fullName((string) ($r->assignee_first ?? ''), (string) ($r->assignee_last ?? ''));
+
+        $now = now();
+        $reviewDue = $r->review_due_at ? (string) $r->review_due_at : null;
+        $isOpen = in_array((string) $r->status, ['submitted', 'triaged', 'investigating'], true);
+        $isOverdue = $isOpen && $reviewDue !== null && strtotime($reviewDue) < $now->timestamp;
+
+        return [
+            'id'                       => (int) $r->id,
+            'reporter_id'              => (int) $r->reporter_user_id,
+            'reporter_name'            => $reporterName,
+            'subject_user_id'          => $r->subject_user_id !== null ? (int) $r->subject_user_id : null,
+            'subject_user_name'        => $subjectName !== '' ? $subjectName : null,
+            'subject_organisation_id'  => $r->subject_organisation_id !== null ? (int) $r->subject_organisation_id : null,
+            'category'                 => (string) $r->category,
+            'severity'                 => (string) $r->severity,
+            'description'              => (string) $r->description,
+            'evidence_url'             => $r->evidence_url ? (string) $r->evidence_url : null,
+            'status'                   => (string) $r->status,
+            'assigned_to_user_id'      => $r->assigned_to_user_id !== null ? (int) $r->assigned_to_user_id : null,
+            'assigned_to_name'         => $assigneeName !== '' ? $assigneeName : null,
+            'review_due_at'            => $reviewDue,
+            'is_overdue'               => $isOverdue,
+            'escalated'                => (bool) $r->escalated,
+            'escalated_at'             => $r->escalated_at ? (string) $r->escalated_at : null,
+            'resolution_notes'         => $r->resolution_notes ? (string) $r->resolution_notes : null,
+            'resolved_at'              => $r->resolved_at ? (string) $r->resolved_at : null,
+            'created_at'               => (string) $r->created_at,
+            'updated_at'               => (string) $r->updated_at,
+        ];
+    }
+
+    private function fullName(string $first, string $last): string
+    {
+        return trim($first . ' ' . $last);
+    }
+}

@@ -626,6 +626,28 @@ export default function CaringCommunityWorkflowPage() {
   const [loadingForecast, setLoadingForecast] = useState(false);
   const [forecastError, setForecastError] = useState<string | null>(null);
 
+  // Safeguarding reports dashboard state (admin English-only) — K9
+  type SafeguardingDashboardSummary = {
+    total: number;
+    open_total: number;
+    open_by_severity: { critical: number; high: number; medium: number; low: number };
+    by_status: Record<string, number>;
+    overdue: number;
+    recent: Array<{
+      id: number;
+      reporter_name: string;
+      subject_user_name: string | null;
+      subject_organisation_id: number | null;
+      category: string;
+      severity: 'low' | 'medium' | 'high' | 'critical';
+      status: 'submitted' | 'triaged' | 'investigating' | 'resolved' | 'dismissed';
+      is_overdue: boolean;
+      created_at: string;
+    }>;
+  };
+  const [safeguardingSummary, setSafeguardingSummary] = useState<SafeguardingDashboardSummary | null>(null);
+  const [loadingSafeguarding, setLoadingSafeguarding] = useState(false);
+
   // Assisted onboarding state
   const [onboardingName, setOnboardingName] = useState('');
   const [onboardingEmail, setOnboardingEmail] = useState('');
@@ -688,6 +710,26 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadForecast();
   }, [loadForecast]);
+
+  const loadSafeguardingSummary = useCallback(async () => {
+    setLoadingSafeguarding(true);
+    try {
+      const res = await api.get<SafeguardingDashboardSummary>('/v2/admin/caring-community/safeguarding/dashboard');
+      if (res.success && res.data) {
+        setSafeguardingSummary(res.data);
+      } else {
+        setSafeguardingSummary(null);
+      }
+    } catch {
+      setSafeguardingSummary(null);
+    } finally {
+      setLoadingSafeguarding(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSafeguardingSummary();
+  }, [loadSafeguardingSummary]);
 
   const loadTandemSuggestions = useCallback(async () => {
     setLoadingTandems(true);
@@ -1415,6 +1457,153 @@ export default function CaringCommunityWorkflowPage() {
                   )}
                 </div>
               ))}
+            </CardBody>
+          </Card>
+
+          {/* Safeguarding Reports — K9 — admin English-only */}
+          <Card shadow="sm">
+            <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <TriangleAlert size={18} className="text-danger" />
+                  Safeguarding Reports
+                </h2>
+                <p className="mt-1 text-sm text-default-500">
+                  Member-raised concerns about other members, coordinators, or organisations.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  startContent={<RefreshCw size={16} />}
+                  isLoading={loadingSafeguarding}
+                  onPress={loadSafeguardingSummary}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  as={Link}
+                  to="/admin/caring-community/safeguarding"
+                  size="sm"
+                  color="primary"
+                  variant="flat"
+                >
+                  View all
+                </Button>
+              </div>
+            </CardHeader>
+            <Divider />
+            <CardBody className="space-y-4">
+              {loadingSafeguarding && !safeguardingSummary ? (
+                <div className="flex justify-center py-6">
+                  <Spinner size="sm" />
+                </div>
+              ) : !safeguardingSummary ? (
+                <p className="text-sm text-default-500 py-4 text-center">No safeguarding data available yet.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <div className="rounded-lg border border-rose-500/30 bg-rose-500/5 p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300">Critical</p>
+                      <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.critical}</p>
+                    </div>
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">High</p>
+                      <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.high}</p>
+                    </div>
+                    <div className="rounded-lg border border-default-200 p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-default-600">Medium</p>
+                      <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.medium}</p>
+                    </div>
+                    <div className="rounded-lg border border-default-200 p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-default-600">Low</p>
+                      <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.low}</p>
+                    </div>
+                    <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300 flex items-center justify-center gap-1">
+                        <TriangleAlert size={12} /> Overdue
+                      </p>
+                      <p className="text-2xl font-semibold">{safeguardingSummary.overdue}</p>
+                    </div>
+                  </div>
+
+                  {safeguardingSummary.recent.length === 0 ? (
+                    <p className="text-sm text-default-500 py-4 text-center">No reports yet.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-xs uppercase text-default-500">
+                          <tr>
+                            <th className="py-2 pr-3">Severity</th>
+                            <th className="py-2 pr-3">Category</th>
+                            <th className="py-2 pr-3">Subject</th>
+                            <th className="py-2 pr-3">Status</th>
+                            <th className="py-2 pr-3">Age</th>
+                            <th className="py-2 pr-3 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {safeguardingSummary.recent.slice(0, 10).map((r) => {
+                            const severityColor: Record<typeof r.severity, 'danger' | 'warning' | 'default' | 'success'> = {
+                              critical: 'danger',
+                              high: 'warning',
+                              medium: 'default',
+                              low: 'success',
+                            };
+                            const statusColor: Record<typeof r.status, 'default' | 'primary' | 'warning' | 'success'> = {
+                              submitted: 'primary',
+                              triaged: 'primary',
+                              investigating: 'warning',
+                              resolved: 'success',
+                              dismissed: 'default',
+                            };
+                            const ageHours = Math.max(
+                              0,
+                              Math.floor((Date.now() - new Date(r.created_at).getTime()) / (1000 * 60 * 60)),
+                            );
+                            const ageLabel = ageHours < 24 ? `${ageHours}h` : `${Math.floor(ageHours / 24)}d`;
+                            return (
+                              <tr key={r.id} className="border-t border-default-200">
+                                <td className="py-2 pr-3">
+                                  <Chip size="sm" color={severityColor[r.severity]} variant="flat">
+                                    {r.severity}
+                                  </Chip>
+                                </td>
+                                <td className="py-2 pr-3">{r.category}</td>
+                                <td className="py-2 pr-3">
+                                  {r.subject_user_name ?? (r.subject_organisation_id ? `Org #${r.subject_organisation_id}` : '—')}
+                                </td>
+                                <td className="py-2 pr-3">
+                                  <Chip size="sm" color={statusColor[r.status]} variant="flat">
+                                    {r.status}
+                                  </Chip>
+                                  {r.is_overdue && (
+                                    <Chip size="sm" color="danger" variant="bordered" className="ml-1">
+                                      Overdue
+                                    </Chip>
+                                  )}
+                                </td>
+                                <td className="py-2 pr-3">{ageLabel}</td>
+                                <td className="py-2 pr-3 text-right">
+                                  <Button
+                                    as={Link}
+                                    to={`/admin/caring-community/safeguarding`}
+                                    size="sm"
+                                    variant="flat"
+                                  >
+                                    Open
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              )}
             </CardBody>
           </Card>
 

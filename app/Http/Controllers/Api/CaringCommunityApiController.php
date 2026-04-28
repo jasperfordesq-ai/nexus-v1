@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
+use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
 use App\Services\FutureCareFundService;
@@ -33,7 +35,191 @@ class CaringCommunityApiController extends BaseApiController
         private readonly CaringLoyaltyService $loyaltyService,
         private readonly FutureCareFundService $futureCareFundService,
         private readonly CaringHourTransferService $hourTransferService,
+        private readonly SafeguardingService $safeguardingService,
+        private readonly CaringHourGiftService $hourGiftService,
     ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // K5 — Time-credit gifting (member-to-member, same-tenant)
+    // -------------------------------------------------------------------------
+
+    /**
+     * POST /api/v2/caring-community/hour-gifts/send
+     *
+     * Body: { recipient_user_id, hours, message? }
+     */
+    public function hourGiftSend(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $recipientId = (int) ($input['recipient_user_id'] ?? 0);
+        $hours = (float) ($input['hours'] ?? 0);
+        $message = isset($input['message']) ? (string) $input['message'] : null;
+
+        if ($recipientId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'recipient_user_id', 422);
+        }
+        if ($hours <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'hours', 422);
+        }
+
+        try {
+            $result = $this->hourGiftService->send($userId, $recipientId, $hours, $message);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $code = str_contains($msg, 'Insufficient') ? 'INSUFFICIENT_HOURS' : 'GIFT_FAILED';
+            return $this->respondWithError($code, $msg, null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true], null, 201);
+    }
+
+    /**
+     * POST /api/v2/caring-community/hour-gifts/{id}/accept
+     */
+    public function hourGiftAccept(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $this->hourGiftService->accept($id, $userId);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('GIFT_ACCEPT_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/caring-community/hour-gifts/{id}/decline
+     * Body: { reason? }
+     */
+    public function hourGiftDecline(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input = $this->getAllInput();
+        $reason = isset($input['reason']) ? (string) $input['reason'] : null;
+
+        try {
+            $this->hourGiftService->decline($id, $userId, $reason);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('GIFT_DECLINE_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/caring-community/hour-gifts/{id}/revert
+     */
+    public function hourGiftRevert(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $this->hourGiftService->revert($id, $userId);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('GIFT_REVERT_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/caring-community/hour-gifts/inbox
+     */
+    public function hourGiftInbox(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'items' => $this->hourGiftService->myInbox($userId),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/caring-community/hour-gifts/sent
+     */
+    public function hourGiftSent(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'items' => $this->hourGiftService->mySent($userId),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/caring-community/safeguarding/report
+     *
+     * Member submits a safeguarding concern about another member, coordinator,
+     * or organisation. Body: { category, severity, description, subject_user_id?,
+     * subject_organisation_id?, evidence_url? }
+     */
+    public function safeguardingReport(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $result = $this->safeguardingService->submitReport($userId, $this->getAllInput());
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('REPORT_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true], null, 201);
+    }
+
+    /**
+     * GET /api/v2/caring-community/safeguarding/my-reports
+     *
+     * Member's own submitted reports.
+     */
+    public function safeguardingMyReports(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData([
+            'items' => $this->safeguardingService->myReports($userId),
+        ]);
     }
 
     /**
@@ -297,6 +483,10 @@ class CaringCommunityApiController extends BaseApiController
             return $this->respondWithData([]);
         }
 
+        $hasDob = Schema::hasColumn('users', 'date_of_birth');
+        $dobSelectSupporter = $hasDob ? 'supporter.date_of_birth AS supporter_dob,' : 'NULL AS supporter_dob,';
+        $dobSelectRecipient = $hasDob ? 'recipient.date_of_birth AS recipient_dob,' : 'NULL AS recipient_dob,';
+
         $rows = DB::select(
             "SELECT
                 csr.id,
@@ -315,10 +505,13 @@ class CaringCommunityApiController extends BaseApiController
                 supporter.first_name      AS supporter_first_name,
                 supporter.last_name       AS supporter_last_name,
                 supporter.profile_photo   AS supporter_avatar,
+                {$dobSelectSupporter}
                 recipient.name            AS recipient_name,
                 recipient.first_name      AS recipient_first_name,
                 recipient.last_name       AS recipient_last_name,
-                recipient.profile_photo   AS recipient_avatar
+                recipient.profile_photo   AS recipient_avatar,
+                {$dobSelectRecipient}
+                1 AS _ok
              FROM caring_support_relationships csr
              LEFT JOIN users supporter
                     ON supporter.id = csr.supporter_id
@@ -698,6 +891,13 @@ class CaringCommunityApiController extends BaseApiController
             $partnerAvatar = $row->supporter_avatar ?? null;
         }
 
+        $supporterDob = $row->supporter_dob ?? null;
+        $recipientDob = $row->recipient_dob ?? null;
+        $intergenerational = $this->isIntergenerational(
+            is_string($supporterDob) ? $supporterDob : null,
+            is_string($recipientDob) ? $recipientDob : null,
+        );
+
         return [
             'id'              => (int) $row->id,
             'title'           => (string) $row->title,
@@ -710,6 +910,7 @@ class CaringCommunityApiController extends BaseApiController
             'last_logged_at'  => $row->last_logged_at ? (string) $row->last_logged_at : null,
             'next_check_in_at' => $row->next_check_in_at ? (string) $row->next_check_in_at : null,
             'role'            => $role,
+            'intergenerational' => $intergenerational,
             'partner'         => [
                 'id'         => $partnerId,
                 'name'       => $partnerName,
@@ -717,6 +918,21 @@ class CaringCommunityApiController extends BaseApiController
             ],
             'recent_logs'     => $recentLogs,
         ];
+    }
+
+    private function isIntergenerational(?string $dobA, ?string $dobB): bool
+    {
+        if ($dobA === null || $dobB === null || $dobA === '' || $dobB === '') {
+            return false;
+        }
+        try {
+            $tA = (new \DateTimeImmutable($dobA))->getTimestamp();
+            $tB = (new \DateTimeImmutable($dobB))->getTimestamp();
+        } catch (\Throwable) {
+            return false;
+        }
+        $diffYears = abs($tA - $tB) / (365.25 * 24 * 3600);
+        return $diffYears >= \App\Services\CaringTandemMatchingService::INTERGENERATIONAL_MIN_AGE_DIFF;
     }
 
     private function displayName(object $row, string $prefix): string
