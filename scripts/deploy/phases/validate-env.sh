@@ -18,11 +18,11 @@ validate_required_env_vars() {
         # Core
         APP_KEY
         JWT_SECRET
-        # Database
+        # Database (project uses DB_NAME/DB_USER/DB_PASS, not Laravel defaults)
         DB_HOST
-        DB_DATABASE
-        DB_USERNAME
-        DB_PASSWORD
+        DB_NAME
+        DB_USER
+        DB_PASS
         # Stripe — billing, donations, identity
         STRIPE_SECRET_KEY
         STRIPE_PUBLISHABLE_KEY
