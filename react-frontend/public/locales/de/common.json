@@ -822,5 +822,9 @@
     "net_positive": "Netto: +{{hours}} Stunden gespart",
     "net_negative": "Netto: {{hours}} Stunden eingelöst",
     "view_fund": "Zeitvorsorge-Fonds ansehen"
+  },
+  "federation_aggregates": {
+    "consent_enabled": "Federation aggregates enabled",
+    "consent_disabled": "Federation aggregates disabled"
   }
 }

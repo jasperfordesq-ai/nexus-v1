@@ -72,6 +72,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('federation-purge-external-logs');
 
+        // Prune federation aggregate query log (12-month retention) daily at 02:00.
+        $schedule->command('federation:prune-aggregate-logs')
+            ->dailyAt('02:00')
+            ->withoutOverlapping()
+            ->name('federation-prune-aggregate-logs');
+
         $schedule->command('federation:expire-cc-validations')
             ->everyMinute()
             ->withoutOverlapping(2)

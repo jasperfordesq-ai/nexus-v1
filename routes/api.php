@@ -1197,6 +1197,14 @@ Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\Cari
 Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
 Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);
 
+// Caring Community — cooperative-to-cooperative banked-hour transfer (K3)
+Route::post('/v2/caring-community/hour-transfer/initiate', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferInitiate']);
+Route::get('/v2/caring-community/hour-transfer/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferMyHistory']);
+Route::get('/v2/admin/caring-community/hour-transfer/pending', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferPending']);
+Route::post('/v2/admin/caring-community/hour-transfer/{id}/approve', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferApprove']);
+Route::post('/v2/admin/caring-community/hour-transfer/{id}/reject', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferReject']);
+Route::get('/v2/admin/caring-community/hour-transfer/inbound', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferInbound']);
+
 // Caring loyalty bridge — admin
 Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
 Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getLoyaltySellerSettings']);

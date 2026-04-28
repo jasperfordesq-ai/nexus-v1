@@ -149,6 +149,7 @@ const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfi
 const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/CaringCommunityAdmin'));
 const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
 const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
+const HourTransferAdminPage = lazy(() => import('./modules/caring-community/HourTransferAdminPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -184,6 +185,7 @@ const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
 
 // Federation module
 const FederationSettings = lazy(() => import('./modules/federation/FederationSettings'));
+const FederationAggregatesPage = lazy(() => import('./modules/federation/FederationAggregatesPage'));
 const Partnerships = lazy(() => import('./modules/federation/Partnerships'));
 const PartnerDirectory = lazy(() => import('./modules/federation/PartnerDirectory'));
 const MyProfile = lazy(() => import('./modules/federation/MyProfile'));
@@ -481,6 +483,7 @@ export function AdminRoutes() {
       <Route path="federation/api-docs" element={<Lazy><ApiDocumentation /></Lazy>} />
       <Route path="federation/activity" element={<Lazy><FederationActivityFeed /></Lazy>} />
       <Route path="federation/cc-config" element={<Lazy><CreditCommonsConfig /></Lazy>} />
+      <Route path="federation/aggregates" element={<Lazy><FederationAggregatesPage /></Lazy>} />
 
       {/* ─── SAFEGUARDING ─── */}
       <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />
@@ -554,6 +557,14 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><LoyaltyAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+      <Route
+        path="caring-community/hour-transfers"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><HourTransferAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

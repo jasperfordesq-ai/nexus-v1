@@ -29,6 +29,7 @@ import Trophy from 'lucide-react/icons/trophy';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Coins from 'lucide-react/icons/coins';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Building2 from 'lucide-react/icons/building-2';
 import Globe from 'lucide-react/icons/globe';
 import Settings from 'lucide-react/icons/settings';
@@ -253,6 +254,7 @@ function useAdminNav(): NavSection[] {
         { label: t('caring_community'), href: '/admin/caring-community', icon: Heart },
         { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
         { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
+        { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
@@ -548,6 +550,7 @@ function useAdminNav(): NavSection[] {
           { label: "Webhooks", href: '/admin/federation/webhooks', icon: Webhook },
           { label: "Activity Feed", href: '/admin/federation/activity', icon: Activity },
           { label: "Data Management", href: '/admin/federation/data', icon: Database },
+          { label: "Aggregates", href: '/admin/federation/aggregates', icon: ShieldCheck },
         ],
       });
     }

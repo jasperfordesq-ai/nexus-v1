@@ -1487,6 +1487,45 @@ export const adminFederation = {
 
   purgeFederationData: (days: number) =>
     api.post<{ deleted: number; cutoff: string; days: number }>('/v2/admin/federation/data/purge', { days }),
+
+  // Cross-node aggregate consent (R1+R2 — AGORIS architecture)
+  getAggregateConsent: () =>
+    api.get<{ enabled: boolean; has_secret: boolean; last_rotated_at: string | null }>(
+      '/v2/admin/federation/aggregate-consent'
+    ),
+
+  updateAggregateConsent: (enabled: boolean) =>
+    api.put<{ enabled: boolean; has_secret: boolean; last_rotated_at: string | null }>(
+      '/v2/admin/federation/aggregate-consent',
+      { enabled }
+    ),
+
+  rotateAggregateSecret: () =>
+    api.post<{
+      rotated: boolean;
+      consent: { enabled: boolean; has_secret: boolean; last_rotated_at: string | null };
+    }>('/v2/admin/federation/aggregate-consent/rotate-secret', {}),
+
+  getAggregateAuditLog: () =>
+    api.get<{
+      entries: Array<{
+        id: number;
+        requester_origin: string | null;
+        period_from: string;
+        period_to: string;
+        fields_returned: unknown;
+        signature_snippet: string;
+        created_at: string;
+      }>;
+    }>('/v2/admin/federation/aggregate-consent/audit-log'),
+
+  getAggregatePreview: (params?: { period_from?: string; period_to?: string }) => {
+    const qs = buildQuery(params || {});
+    return api.get<{
+      payload: Record<string, unknown>;
+      algorithm: string;
+    }>(`/v2/admin/federation/aggregate-consent/preview${qs}`);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

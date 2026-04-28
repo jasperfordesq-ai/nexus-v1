@@ -822,5 +822,9 @@
     "net_positive": "Net: +{{hours}} hours banked",
     "net_negative": "Net: {{hours}} hours used",
     "view_fund": "View your Future Care Fund"
+  },
+  "federation_aggregates": {
+    "consent_enabled": "Federation aggregates enabled",
+    "consent_disabled": "Federation aggregates disabled"
   }
 }
