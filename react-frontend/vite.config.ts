@@ -62,12 +62,10 @@ export default defineConfig(({ command }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
-        // Don't cache API calls — always network first
+        // Do not register API calls with Workbox. Leaving them unhandled lets
+        // the browser perform normal fetch/CORS handling and avoids Workbox
+        // wrapping transient API/CORS failures as uncaught "no-response" errors.
         runtimeCaching: [
-          {
-            urlPattern: /^https?.*\/api\//,
-            handler: 'NetworkOnly',
-          },
           {
             urlPattern: /^https?.*\/locales\//,
             handler: 'StaleWhileRevalidate',
