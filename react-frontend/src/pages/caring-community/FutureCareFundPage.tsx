@@ -235,7 +235,7 @@ export function FutureCareFundPage() {
   usePageTitle(t('future_care_fund.meta.title'));
 
   const { data: summary, isLoading, error } = useApi<FutureCareFundSummary>(
-    '/api/v2/caring-community/my-future-care-fund',
+    '/v2/caring-community/my-future-care-fund',
     { immediate: true },
   );
 

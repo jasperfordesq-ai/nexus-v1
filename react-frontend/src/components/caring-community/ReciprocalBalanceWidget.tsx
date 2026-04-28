@@ -50,7 +50,7 @@ export function ReciprocalBalanceWidget() {
   const { hasFeature, tenantPath } = useTenant();
 
   const { data, isLoading, error } = useApi<ReciprocalBalanceData>(
-    '/api/v2/caring-community/my-future-care-fund',
+    '/v2/caring-community/my-future-care-fund',
     { immediate: hasFeature('caring_community') },
   );
 

@@ -219,7 +219,7 @@ export function MySupportRelationshipsPage() {
   usePageTitle(t('my_support_relationships.meta.title'));
 
   const { data: relationships, isLoading, error } = useApi<SupportRelationship[]>(
-    '/api/v2/caring-community/my-relationships',
+    '/v2/caring-community/my-relationships',
     { immediate: true },
   );
 
