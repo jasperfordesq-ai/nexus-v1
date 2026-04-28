@@ -60,12 +60,12 @@ class RegistrationPolicyService
     public static function getPolicy(int $tenantId): ?array
     {
         try {
-            $row = DB::statement(
+            $row = DB::selectOne(
                 "SELECT * FROM tenant_registration_policies WHERE tenant_id = ? AND is_active = 1 LIMIT 1",
                 [$tenantId]
-            )->fetch();
+            );
 
-            return $row ?: null;
+            return $row ? (array) $row : null;
         } catch (\Throwable $e) {
             // Table may not exist yet during migration
             \Illuminate\Support\Facades\Log::warning("[RegistrationPolicyService] Failed to read policy for tenant {$tenantId}: " . $e->getMessage());

@@ -64,13 +64,14 @@ class InviteCodeService
     public static function validate(int $tenantId, string $code): array
     {
         $code = strtoupper(trim($code));
-        $row = DB::statement(
+        $codeRow = DB::selectOne(
             "SELECT id, max_uses, uses_count, expires_at, is_active
              FROM tenant_invite_codes
              WHERE tenant_id = ? AND code = ?
              LIMIT 1",
             [$tenantId, $code]
-        )->fetch();
+        );
+        $row = $codeRow ? (array) $codeRow : null;
 
         if (!$row) {
             return ['valid' => false, 'reason' => 'invalid_code'];
@@ -138,7 +139,7 @@ class InviteCodeService
         $limit = max(1, min($limit, 100));
         $offset = max(0, $offset);
 
-        $rows = DB::statement(
+        $rows = array_map(static fn ($row) => (array) $row, DB::select(
             "SELECT ic.*, u.first_name AS creator_name
              FROM tenant_invite_codes ic
              LEFT JOIN users u ON u.id = ic.created_by
@@ -146,12 +147,13 @@ class InviteCodeService
              ORDER BY ic.created_at DESC
              LIMIT ? OFFSET ?",
             [$tenantId, $limit, $offset]
-        )->fetchAll();
+        ));
 
-        $total = DB::statement(
+        $totalRow = DB::selectOne(
             "SELECT COUNT(*) AS cnt FROM tenant_invite_codes WHERE tenant_id = ?",
             [$tenantId]
-        )->fetch()['cnt'] ?? 0;
+        );
+        $total = $totalRow->cnt ?? 0;
 
         return [
             'items' => $rows,
@@ -187,10 +189,10 @@ class InviteCodeService
             }
 
             // Ensure uniqueness within tenant
-            $exists = DB::statement(
+            $exists = DB::selectOne(
                 "SELECT 1 FROM tenant_invite_codes WHERE tenant_id = ? AND code = ? LIMIT 1",
                 [$tenantId, $code]
-            )->fetch();
+            );
 
             if (!$exists) {
                 return $code;

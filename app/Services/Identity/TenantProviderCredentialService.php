@@ -25,12 +25,13 @@ class TenantProviderCredentialService
     public static function get(int $tenantId, string $providerSlug): ?array
     {
         try {
-            $row = DB::statement(
+            $credentialRow = DB::selectOne(
                 "SELECT credentials_encrypted FROM tenant_provider_credentials
                  WHERE tenant_id = ? AND provider_slug = ? AND is_active = 1
                  LIMIT 1",
                 [$tenantId, $providerSlug]
-            )->fetch();
+            );
+            $row = $credentialRow ? (array) $credentialRow : null;
 
             if (!$row || empty($row['credentials_encrypted'])) {
                 return null;
@@ -98,14 +99,14 @@ class TenantProviderCredentialService
     public static function hasCredentials(int $tenantId, string $providerSlug): bool
     {
         try {
-            $row = DB::statement(
+            $row = DB::selectOne(
                 "SELECT 1 FROM tenant_provider_credentials
                  WHERE tenant_id = ? AND provider_slug = ? AND is_active = 1
                  LIMIT 1",
                 [$tenantId, $providerSlug]
-            )->fetch();
+            );
 
-            return $row !== false;
+            return $row !== null;
         } catch (\Throwable $e) {
             Log::warning('[TenantProviderCredential] hasCredentials check failed: ' . $e->getMessage());
             return false;
