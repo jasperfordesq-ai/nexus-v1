@@ -504,12 +504,12 @@ class CaringCommunityApiController extends BaseApiController
                 supporter.name            AS supporter_name,
                 supporter.first_name      AS supporter_first_name,
                 supporter.last_name       AS supporter_last_name,
-                supporter.profile_photo   AS supporter_avatar,
+                supporter.avatar_url      AS supporter_avatar,
                 {$dobSelectSupporter}
                 recipient.name            AS recipient_name,
                 recipient.first_name      AS recipient_first_name,
                 recipient.last_name       AS recipient_last_name,
-                recipient.profile_photo   AS recipient_avatar,
+                recipient.avatar_url      AS recipient_avatar,
                 {$dobSelectRecipient}
                 1 AS _ok
              FROM caring_support_relationships csr
@@ -594,7 +594,7 @@ class CaringCommunityApiController extends BaseApiController
                     u.name            AS user_name,
                     u.first_name      AS user_first_name,
                     u.last_name       AS user_last_name,
-                    u.profile_photo   AS user_avatar,
+                    u.avatar_url      AS user_avatar,
                     c.name            AS category_name
                  FROM listings l
                  LEFT JOIN users u
@@ -650,7 +650,7 @@ class CaringCommunityApiController extends BaseApiController
                     u.name            AS user_name,
                     u.first_name      AS user_first_name,
                     u.last_name       AS user_last_name,
-                    u.profile_photo   AS user_avatar,
+                    u.avatar_url      AS user_avatar,
                     mc.name           AS category_name,
                     mi.image_url      AS primary_image_url
                  FROM marketplace_listings ml
