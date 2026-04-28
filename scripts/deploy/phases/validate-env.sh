@@ -7,10 +7,70 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../lib/common.sh
 . "$SCRIPT_DIR/../lib/common.sh"
 
+validate_required_env_vars() {
+    log_step "=== Required Env Var Check ==="
+
+    # These vars must be non-empty in .env before any deploy proceeds.
+    # If a var disappears (e.g. .env rebuilt from .env.example, manual edit error,
+    # partial restore from backup), the deploy fails here rather than silently
+    # breaking live integrations.
+    local REQUIRED_VARS=(
+        # Core
+        APP_KEY
+        JWT_SECRET
+        # Database
+        DB_HOST
+        DB_DATABASE
+        DB_USERNAME
+        DB_PASSWORD
+        # Stripe — billing, donations, identity
+        STRIPE_SECRET_KEY
+        STRIPE_PUBLISHABLE_KEY
+        STRIPE_WEBHOOK_SECRET
+        STRIPE_IDENTITY_SECRET_KEY
+        STRIPE_IDENTITY_WEBHOOK_SECRET
+        # SendGrid — email delivery + bounce/complaint webhooks
+        SENDGRID_API_KEY
+        SENDGRID_WEBHOOK_VERIFICATION_KEY
+        # Pusher — real-time WebSockets
+        PUSHER_APP_ID
+        PUSHER_KEY
+        PUSHER_SECRET
+        # Web Push (VAPID)
+        VAPID_PUBLIC_KEY
+        VAPID_PRIVATE_KEY
+        # Cron auth
+        CRON_KEY
+    )
+
+    local FAILED=0
+    local ENV_FILE="$DEPLOY_DIR/.env"
+
+    for var in "${REQUIRED_VARS[@]}"; do
+        # Strip quotes from the value when reading
+        value=$(grep "^${var}=" "$ENV_FILE" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"'"'" | xargs)
+        if [ -z "$value" ]; then
+            log_err "Required env var missing or empty: $var"
+            FAILED=1
+        fi
+    done
+
+    if [ $FAILED -eq 1 ]; then
+        log_err "One or more required env vars are missing — aborting deploy."
+        log_err "Edit $ENV_FILE and add the missing values, then re-run the deploy."
+        exit 1
+    fi
+
+    log_ok "All required env vars present"
+}
+
 validate_environment() {
     log_step "=== Pre-Deploy Validation ==="
 
     local VALIDATION_FAILED=0
+
+    # Check required env vars first — fail fast before touching containers
+    validate_required_env_vars
 
     # Check disk space
     AVAILABLE_MB=$(df -m "$DEPLOY_DIR" | tail -1 | awk '{print $4}')
