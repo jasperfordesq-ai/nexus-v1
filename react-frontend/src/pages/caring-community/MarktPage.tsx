@@ -24,10 +24,11 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { usePageTitle, useProximity } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { ProximityFilter } from '@/components/caring-community/ProximityFilter';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -236,6 +237,8 @@ export function MarktPage() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<MarktTab>('all');
+  const [radiusKm, setRadiusKm] = useState<number | null>(null);
+  const { position } = useProximity();
   const [items, setItems] = useState<MarktItem[]>([]);
   const [meta, setMeta] = useState<MarktMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -269,6 +272,12 @@ export function MarktPage() {
       params.set('page', String(reset ? 1 : page));
       params.set('per_page', '20');
 
+      if (radiusKm !== null && position !== null) {
+        params.set('radius_km', String(radiusKm));
+        params.set('lat', String(position.lat));
+        params.set('lng', String(position.lng));
+      }
+
       const response = await api.get<MarktItem[]>(`/v2/caring-community/markt?${params}`);
       if (controller.signal.aborted) return;
 
@@ -294,7 +303,7 @@ export function MarktPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [activeTab, page, t]);
+  }, [activeTab, page, radiusKm, position, t]);
 
   const loadRef = useRef(loadItems);
   loadRef.current = loadItems;
@@ -305,6 +314,12 @@ export function MarktPage() {
     loadRef.current(true);
     return () => { abortRef.current?.abort(); };
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reload when proximity filter changes
+  useEffect(() => {
+    setPage(1);
+    loadRef.current(true);
+  }, [radiusKm, position]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isAuthenticated) return null;
 
@@ -369,6 +384,13 @@ export function MarktPage() {
             </button>
           ))}
         </div>
+
+        {/* Proximity filter */}
+        <ProximityFilter
+          radiusKm={radiusKm}
+          onRadiusChange={setRadiusKm}
+          className="mb-4"
+        />
 
         {/* Marketplace unavailable notice */}
         {showMarketplaceNotice && (

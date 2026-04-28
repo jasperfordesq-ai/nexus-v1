@@ -1032,5 +1032,17 @@
       "submitted_at": "Submitted {{date}}"
     },
     "back": "Back to Community Hub"
+  },
+  "proximity": {
+    "label": "Près de moi",
+    "off": "Désactivé",
+    "radius_option": "{{km}} km",
+    "active_label": "Dans un rayon de {{km}} km",
+    "requesting": "Localisation en cours…",
+    "error": {
+      "unavailable": "Localisation non disponible sur cet appareil",
+      "denied": "Activez la localisation dans les paramètres de votre navigateur"
+    },
+    "clear": "Effacer la localisation"
   }
 }

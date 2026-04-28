@@ -709,6 +709,16 @@ class CaringCommunityApiController extends BaseApiController
         $page    = max(1, (int) ($this->query('page') ?? 1));
         $perPage = min(50, max(1, (int) ($this->query('per_page') ?? 20)));
 
+        // ── Optional proximity filter ───────────────────────────────────────
+        $lat      = is_numeric($this->query('lat'))       ? (float) $this->query('lat')       : null;
+        $lng      = is_numeric($this->query('lng'))       ? (float) $this->query('lng')       : null;
+        $radiusKm = is_numeric($this->query('radius_km')) ? (float) $this->query('radius_km') : null;
+
+        $useProximity = ($lat !== null && $lng !== null && $radiusKm !== null && $radiusKm > 0);
+
+        // Haversine SELECT expression (3 bindings: lat, lng, lat)
+        $haversineSelect = "(6371 * acos(LEAST(1.0, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))) AS distance_km";
+
         // When combining both sources each gets half the page budget
         $sourceLimit = (int) ceil($perPage / 2);
 
@@ -717,32 +727,66 @@ class CaringCommunityApiController extends BaseApiController
         // ── Time-credit listings ────────────────────────────────────────────
         if (in_array($type, ['all', 'listings'], true)) {
             $limit = $type === 'all' ? $sourceLimit : $perPage;
-            $listingRows = DB::select(
-                "SELECT
-                    l.id,
-                    l.title,
-                    l.description,
-                    l.type            AS listing_type,
-                    l.image_url,
-                    l.hours_estimate,
-                    l.created_at,
-                    u.name            AS user_name,
-                    u.first_name      AS user_first_name,
-                    u.last_name       AS user_last_name,
-                    u.avatar_url      AS user_avatar,
-                    c.name            AS category_name
-                 FROM listings l
-                 LEFT JOIN users u
-                        ON u.id = l.user_id AND u.tenant_id = l.tenant_id
-                 LEFT JOIN categories c
-                        ON c.id = l.category_id
-                 WHERE l.tenant_id = ?
-                   AND l.status = 'active'
-                   AND (l.deleted_at IS NULL OR l.deleted_at > NOW())
-                 ORDER BY l.created_at DESC
-                 LIMIT ?",
-                [$tenantId, $limit]
-            );
+
+            if ($useProximity) {
+                $listingRows = DB::select(
+                    "SELECT
+                        l.id,
+                        l.title,
+                        l.description,
+                        l.type            AS listing_type,
+                        l.image_url,
+                        l.hours_estimate,
+                        l.created_at,
+                        u.name            AS user_name,
+                        u.first_name      AS user_first_name,
+                        u.last_name       AS user_last_name,
+                        u.avatar_url      AS user_avatar,
+                        c.name            AS category_name,
+                        {$haversineSelect}
+                     FROM listings l
+                     LEFT JOIN users u
+                            ON u.id = l.user_id AND u.tenant_id = l.tenant_id
+                     LEFT JOIN categories c
+                            ON c.id = l.category_id
+                     WHERE l.tenant_id = ?
+                       AND l.status = 'active'
+                       AND (l.deleted_at IS NULL OR l.deleted_at > NOW())
+                       AND l.latitude IS NOT NULL
+                       AND l.longitude IS NOT NULL
+                     HAVING distance_km <= ?
+                     ORDER BY distance_km ASC, l.created_at DESC
+                     LIMIT ?",
+                    [$lat, $lng, $lat, $tenantId, $radiusKm, $limit]
+                );
+            } else {
+                $listingRows = DB::select(
+                    "SELECT
+                        l.id,
+                        l.title,
+                        l.description,
+                        l.type            AS listing_type,
+                        l.image_url,
+                        l.hours_estimate,
+                        l.created_at,
+                        u.name            AS user_name,
+                        u.first_name      AS user_first_name,
+                        u.last_name       AS user_last_name,
+                        u.avatar_url      AS user_avatar,
+                        c.name            AS category_name
+                     FROM listings l
+                     LEFT JOIN users u
+                            ON u.id = l.user_id AND u.tenant_id = l.tenant_id
+                     LEFT JOIN categories c
+                            ON c.id = l.category_id
+                     WHERE l.tenant_id = ?
+                       AND l.status = 'active'
+                       AND (l.deleted_at IS NULL OR l.deleted_at > NOW())
+                     ORDER BY l.created_at DESC
+                     LIMIT ?",
+                    [$tenantId, $limit]
+                );
+            }
 
             foreach ($listingRows as $row) {
                 $items[] = [
@@ -772,36 +816,77 @@ class CaringCommunityApiController extends BaseApiController
 
         if (in_array($type, ['all', 'marketplace'], true) && $marketplaceAvailable) {
             $limit = $type === 'all' ? $sourceLimit : $perPage;
-            $mktRows = DB::select(
-                "SELECT
-                    ml.id,
-                    ml.title,
-                    ml.description,
-                    ml.price,
-                    ml.price_type,
-                    ml.price_currency,
-                    ml.time_credit_price,
-                    ml.created_at,
-                    u.name            AS user_name,
-                    u.first_name      AS user_first_name,
-                    u.last_name       AS user_last_name,
-                    u.avatar_url      AS user_avatar,
-                    mc.name           AS category_name,
-                    mi.image_url      AS primary_image_url
-                 FROM marketplace_listings ml
-                 LEFT JOIN users u
-                        ON u.id = ml.user_id AND u.tenant_id = ml.tenant_id
-                 LEFT JOIN marketplace_categories mc
-                        ON mc.id = ml.category_id
-                 LEFT JOIN marketplace_images mi
-                        ON mi.marketplace_listing_id = ml.id AND mi.is_primary = 1
-                 WHERE ml.tenant_id = ?
-                   AND ml.status = 'active'
-                   AND ml.moderation_status = 'approved'
-                 ORDER BY ml.created_at DESC
-                 LIMIT ?",
-                [$tenantId, $limit]
-            );
+
+            // Haversine SELECT expression for marketplace_listings (column names same)
+            $haversineSelectMkt = "(6371 * acos(LEAST(1.0, cos(radians(?)) * cos(radians(ml.latitude)) * cos(radians(ml.longitude) - radians(?)) + sin(radians(?)) * sin(radians(ml.latitude))))) AS distance_km";
+
+            if ($useProximity) {
+                $mktRows = DB::select(
+                    "SELECT
+                        ml.id,
+                        ml.title,
+                        ml.description,
+                        ml.price,
+                        ml.price_type,
+                        ml.price_currency,
+                        ml.time_credit_price,
+                        ml.created_at,
+                        u.name            AS user_name,
+                        u.first_name      AS user_first_name,
+                        u.last_name       AS user_last_name,
+                        u.avatar_url      AS user_avatar,
+                        mc.name           AS category_name,
+                        mi.image_url      AS primary_image_url,
+                        {$haversineSelectMkt}
+                     FROM marketplace_listings ml
+                     LEFT JOIN users u
+                            ON u.id = ml.user_id AND u.tenant_id = ml.tenant_id
+                     LEFT JOIN marketplace_categories mc
+                            ON mc.id = ml.category_id
+                     LEFT JOIN marketplace_images mi
+                            ON mi.marketplace_listing_id = ml.id AND mi.is_primary = 1
+                     WHERE ml.tenant_id = ?
+                       AND ml.status = 'active'
+                       AND ml.moderation_status = 'approved'
+                       AND ml.latitude IS NOT NULL
+                       AND ml.longitude IS NOT NULL
+                     HAVING distance_km <= ?
+                     ORDER BY distance_km ASC, ml.created_at DESC
+                     LIMIT ?",
+                    [$lat, $lng, $lat, $tenantId, $radiusKm, $limit]
+                );
+            } else {
+                $mktRows = DB::select(
+                    "SELECT
+                        ml.id,
+                        ml.title,
+                        ml.description,
+                        ml.price,
+                        ml.price_type,
+                        ml.price_currency,
+                        ml.time_credit_price,
+                        ml.created_at,
+                        u.name            AS user_name,
+                        u.first_name      AS user_first_name,
+                        u.last_name       AS user_last_name,
+                        u.avatar_url      AS user_avatar,
+                        mc.name           AS category_name,
+                        mi.image_url      AS primary_image_url
+                     FROM marketplace_listings ml
+                     LEFT JOIN users u
+                            ON u.id = ml.user_id AND u.tenant_id = ml.tenant_id
+                     LEFT JOIN marketplace_categories mc
+                            ON mc.id = ml.category_id
+                     LEFT JOIN marketplace_images mi
+                            ON mi.marketplace_listing_id = ml.id AND mi.is_primary = 1
+                     WHERE ml.tenant_id = ?
+                       AND ml.status = 'active'
+                       AND ml.moderation_status = 'approved'
+                     ORDER BY ml.created_at DESC
+                     LIMIT ?",
+                    [$tenantId, $limit]
+                );
+            }
 
             foreach ($mktRows as $row) {
                 $priceCash = $row->price !== null ? (float) $row->price : null;

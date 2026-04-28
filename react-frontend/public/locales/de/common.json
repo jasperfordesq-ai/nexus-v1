@@ -1032,5 +1032,17 @@
       "submitted_at": "Eingereicht am {{date}}"
     },
     "back": "Zurück zur Gemeinschaftsseite"
+  },
+  "proximity": {
+    "label": "In meiner Nähe",
+    "off": "Aus",
+    "radius_option": "{{km}} km Umkreis",
+    "active_label": "Im Umkreis von {{km}} km",
+    "requesting": "Standort wird ermittelt…",
+    "error": {
+      "unavailable": "Standort auf diesem Gerät nicht verfügbar",
+      "denied": "Standort in Ihren Browsereinstellungen aktivieren"
+    },
+    "clear": "Standort löschen"
   }
 }
