@@ -356,11 +356,12 @@ class RegistrationOrchestrationService
      */
     public static function getRegistrationStatus(int $userId, int $tenantId): array
     {
-        $user = DB::statement(
+        $userRow = DB::selectOne(
             "SELECT id, status, is_approved, email_verified_at, verification_status, verification_provider, verification_completed_at
              FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array) $userRow : null;
 
         if (!$user) {
             return ['status' => 'not_found'];
@@ -544,12 +545,13 @@ class RegistrationOrchestrationService
         );
 
         // Calculate position on waitlist
-        $position = DB::statement(
+        $positionRow = DB::selectOne(
             "SELECT COUNT(*) AS pos FROM users
              WHERE tenant_id = ? AND verification_status = 'waitlisted' AND is_approved = 0
                AND created_at <= (SELECT created_at FROM users WHERE id = ? AND tenant_id = ?)",
             [$tenantId, $userId, $tenantId]
-        )->fetch()['pos'] ?? 0;
+        );
+        $position = (int) ($positionRow->pos ?? 0);
 
         IdentityVerificationEventService::log(
             $tenantId,
