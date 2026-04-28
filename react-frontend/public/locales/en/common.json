@@ -433,6 +433,50 @@
     },
     "back": "Back to Community Hub"
   },
+  "hour_transfer": {
+    "meta": {
+      "title": "Transfer Banked Hours",
+      "description": "Move your banked hours to another KISS cooperative"
+    },
+    "title": "Transfer Your Banked Hours",
+    "subtitle": "Moving to another community? Your banked hours go with you.",
+    "form": {
+      "destination_label": "Destination cooperative",
+      "destination_placeholder": "e.g. zug-kiss",
+      "destination_help": "The slug of the destination KISS cooperative or tenant",
+      "hours_label": "Hours to transfer",
+      "hours_placeholder": "e.g. 25.5",
+      "reason_label": "Reason (optional)",
+      "reason_placeholder": "e.g. Moved house from Cham to Zug",
+      "submit": "Request Transfer",
+      "submitting": "Requesting..."
+    },
+    "history": {
+      "title": "Your transfer history",
+      "date": "Date",
+      "destination": "Destination",
+      "hours": "Hours",
+      "status": "Status",
+      "reason": "Reason",
+      "empty": "No transfers yet."
+    },
+    "status": {
+      "pending": "Awaiting approval",
+      "approved_by_source": "Approved",
+      "sent": "Sent",
+      "received": "Received",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "disclaimer": "Hours will be debited from your wallet here when an admin approves. They will appear in your wallet at the destination cooperative once received.",
+    "back": "Back to Community Hub",
+    "errors": {
+      "submit_failed": "Could not request the transfer. Please try again.",
+      "destination_not_found": "We couldn't find that destination cooperative.",
+      "no_matching_email": "Your email is not registered at the destination cooperative — register there first.",
+      "insufficient_hours": "You don't have enough banked hours."
+    }
+  },
   "my_support_relationships": {
     "meta": {
       "title": "My Support Relationships",

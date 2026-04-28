@@ -1,0 +1,228 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace Tests\Laravel\Feature\CaringCommunity;
+
+use App\Core\TenantContext;
+use App\Models\User;
+use App\Services\CaringCommunity\CaringHourTransferService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
+
+class HourTransferTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private const SOURCE_TENANT_ID = 2; // hour-timebank
+    private int $destinationTenantId;
+    private string $destinationSlug = 'destination-test-coop';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Ensure caring_community is enabled on the source tenant
+        $this->setCaringCommunityFeature(self::SOURCE_TENANT_ID, true);
+
+        // Create a second tenant for cross-tenant transfers
+        $this->destinationTenantId = (int) DB::table('tenants')->insertGetId([
+            'name'      => 'Destination Test Coop',
+            'slug'      => $this->destinationSlug,
+            'features'  => json_encode(['caring_community' => true]),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function setCaringCommunityFeature(int $tenantId, bool $enabled): void
+    {
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first();
+        $features = [];
+        if ($tenant && !empty($tenant->features)) {
+            $decoded = is_string($tenant->features) ? json_decode($tenant->features, true) : $tenant->features;
+            $features = is_array($decoded) ? $decoded : [];
+        }
+        $features['caring_community'] = $enabled;
+        DB::table('tenants')
+            ->where('id', $tenantId)
+            ->update(['features' => json_encode($features)]);
+        TenantContext::setById($tenantId);
+    }
+
+    private function makeUser(int $tenantId, string $email, float $balance = 0): int
+    {
+        $userId = (int) DB::table('users')->insertGetId([
+            'tenant_id'  => $tenantId,
+            'first_name' => 'Test',
+            'last_name'  => 'User',
+            'email'      => $email,
+            'username'   => 'u_' . substr(md5($email . $tenantId), 0, 8),
+            'password'   => password_hash('password', PASSWORD_BCRYPT),
+            'balance'    => $balance,
+            'status'     => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return $userId;
+    }
+
+    public function test_initiate_validates_hours_positive_and_within_wallet(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'mover.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 10.0);
+        // Matching user must exist at destination tenant
+        $this->makeUser($this->destinationTenantId, $email, 0);
+
+        $service = app(CaringHourTransferService::class);
+
+        // Hours must be > 0
+        $this->expectExceptionMessage('Hours must be greater than zero.');
+        $service->initiate($sourceUser, $this->destinationSlug, 0, 'test');
+    }
+
+    public function test_initiate_fails_when_balance_insufficient(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'lowbal.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 1.0);
+        $this->makeUser($this->destinationTenantId, $email, 0);
+
+        $service = app(CaringHourTransferService::class);
+
+        $this->expectExceptionMessage('Insufficient banked hours.');
+        $service->initiate($sourceUser, $this->destinationSlug, 5.0, 'test');
+    }
+
+    public function test_initiate_fails_if_no_matching_email_at_destination(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'nomatch.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 10.0);
+        // intentionally no user at destination with this email
+
+        $service = app(CaringHourTransferService::class);
+
+        $this->expectExceptionMessage('No matching member');
+        $service->initiate($sourceUser, $this->destinationSlug, 5.0, 'moving');
+    }
+
+    public function test_approve_debits_source_credits_destination_atomically(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'happy.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 25);
+        $destUser = $this->makeUser($this->destinationTenantId, $email, 4);
+        $admin = $this->makeUser(self::SOURCE_TENANT_ID, 'admin.' . uniqid() . '@example.com', 0);
+
+        $service = app(CaringHourTransferService::class);
+
+        $init = $service->initiate($sourceUser, $this->destinationSlug, 10.0, 'Moved house');
+        $this->assertSame('pending', $init['status']);
+
+        $result = $service->approveAtSource($init['transfer_id'], $admin);
+        $this->assertSame('completed', $result['status']);
+
+        // Source debited (users.balance is integer-typed in legacy schema)
+        $newSourceBalance = (float) DB::table('users')->where('id', $sourceUser)->value('balance');
+        $this->assertEqualsWithDelta(15, $newSourceBalance, 0.001);
+
+        // Destination credited
+        $newDestBalance = (float) DB::table('users')->where('id', $destUser)->value('balance');
+        $this->assertEqualsWithDelta(14, $newDestBalance, 0.001);
+
+        // Both rows exist and are completed
+        $sourceRow = DB::table('caring_hour_transfers')->where('id', $init['transfer_id'])->first();
+        $this->assertSame('completed', $sourceRow->status);
+        $this->assertSame((int) $result['destination_transfer_id'], (int) $sourceRow->linked_transfer_id);
+
+        $destRow = DB::table('caring_hour_transfers')->where('id', $result['destination_transfer_id'])->first();
+        $this->assertSame('completed', $destRow->status);
+        $this->assertSame((int) $this->destinationTenantId, (int) $destRow->tenant_id);
+        $this->assertSame('destination', $destRow->role);
+    }
+
+    public function test_signature_verifies_with_shared_secret(): void
+    {
+        $service = app(CaringHourTransferService::class);
+        $payload = [
+            'source_tenant_slug'      => 'a',
+            'destination_tenant_slug' => 'b',
+            'source_member_email'     => 'x@y.z',
+            'hours'                   => 3.5,
+            'reason'                  => 'test',
+            'transfer_id'             => 42,
+            'generated_at'            => '2026-04-28T00:00:00+00:00',
+        ];
+        $secret = $service->sharedPlatformSecret();
+        $sig = $service->signPayload($payload, $secret);
+
+        $this->assertTrue($service->verifySignature($payload, $sig, $secret));
+
+        // Tampered payload
+        $tampered = $payload;
+        $tampered['hours'] = 99;
+        $this->assertFalse($service->verifySignature($tampered, $sig, $secret));
+
+        // Wrong secret
+        $this->assertFalse($service->verifySignature($payload, $sig, 'wrong-secret'));
+    }
+
+    public function test_reject_does_not_move_funds(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'reject.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 7.0);
+        $this->makeUser($this->destinationTenantId, $email, 2.0);
+        $admin = $this->makeUser(self::SOURCE_TENANT_ID, 'admin.' . uniqid() . '@example.com', 0);
+
+        $service = app(CaringHourTransferService::class);
+
+        $init = $service->initiate($sourceUser, $this->destinationSlug, 3.0, 'try');
+        $service->rejectAtSource($init['transfer_id'], $admin, 'no good');
+
+        $sourceBal = (float) DB::table('users')->where('id', $sourceUser)->value('balance');
+        $this->assertEqualsWithDelta(7.0, $sourceBal, 0.001);
+
+        $row = DB::table('caring_hour_transfers')->where('id', $init['transfer_id'])->first();
+        $this->assertSame('rejected', $row->status);
+
+        // No destination row should have been created
+        $destRows = DB::table('caring_hour_transfers')
+            ->where('tenant_id', $this->destinationTenantId)
+            ->where('counterpart_member_email', $email)
+            ->count();
+        $this->assertSame(0, (int) $destRows);
+    }
+
+    public function test_endpoints_403_when_feature_disabled(): void
+    {
+        // Disable caring_community on source tenant
+        $this->setCaringCommunityFeature(self::SOURCE_TENANT_ID, false);
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+
+        $sourceUser = $this->makeUser(
+            self::SOURCE_TENANT_ID,
+            'gated.' . uniqid() . '@example.com',
+            10.0
+        );
+        $userModel = User::query()->find($sourceUser);
+        $this->assertNotNull($userModel);
+        Sanctum::actingAs($userModel);
+
+        $resp = $this->postJson('/api/v2/caring-community/hour-transfer/initiate', [
+            'destination_tenant_slug' => $this->destinationSlug,
+            'hours'                   => 1,
+            'reason'                  => 'test',
+        ]);
+        $resp->assertStatus(403);
+    }
+}

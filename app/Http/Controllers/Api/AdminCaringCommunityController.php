@@ -14,6 +14,9 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\User;
+use App\Services\CaringCommunity\CaringCommunityAlertService;
+use App\Services\CaringCommunity\CaringCommunityForecastService;
+use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunityMemberStatementService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
@@ -38,7 +41,103 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringInviteCodeService $inviteCodeService,
         private readonly CaringTandemMatchingService $tandemMatchingService,
         private readonly CaringLoyaltyService $loyaltyService,
+        private readonly CaringCommunityForecastService $forecastService,
+        private readonly CaringCommunityAlertService $alertService,
+        private readonly CaringHourTransferService $hourTransferService,
     ) {
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/hour-transfer/pending
+     *
+     * Pending outbound transfers — initiated by members of THIS tenant
+     * awaiting admin approval before funds are debited.
+     */
+    public function hourTransferPending(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'items' => $this->hourTransferService->pendingAtSource(),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/hour-transfer/{id}/approve
+     */
+    public function hourTransferApprove(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $approverId = $this->requireAdmin();
+
+        try {
+            $result = $this->hourTransferService->approveAtSource($id, $approverId);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('TRANSFER_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData($result + ['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/hour-transfer/{id}/reject
+     * Body: { reason? }
+     */
+    public function hourTransferReject(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $approverId = $this->requireAdmin();
+        $reason = trim((string) ($this->getAllInput()['reason'] ?? ''));
+
+        try {
+            $this->hourTransferService->rejectAtSource($id, $approverId, $reason);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('TRANSFER_FAILED', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['success' => true, 'status' => 'rejected']);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/hour-transfer/inbound
+     *
+     * Recent inbound transfers — received from other cooperatives in the last 90 days.
+     */
+    public function hourTransferInbound(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'items' => $this->hourTransferService->recentAtDestination(),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/forecast
+     *
+     * Forward-looking coordinator dashboard — Tom Debus's AI/Daten pillar.
+     * Linear regression on the past 6 months projects the next 3 months
+     * of approved hours, distinct active members, and recipients reached.
+     * Proactive alerts surface signals the coordinator should act on now.
+     */
+    public function forecast(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'hours'        => $this->forecastService->forecastHours(3),
+            'members'      => $this->forecastService->forecastMembers(3),
+            'recipients'   => $this->forecastService->forecastRecipients(3),
+            'alerts'       => $this->alertService->activeAlerts(),
+            'generated_at' => now()->toIso8601String(),
+        ]);
     }
 
     public function workflow(): JsonResponse

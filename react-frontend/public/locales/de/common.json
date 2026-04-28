@@ -826,5 +826,49 @@
   "federation_aggregates": {
     "consent_enabled": "Federation aggregates enabled",
     "consent_disabled": "Federation aggregates disabled"
+  },
+  "hour_transfer": {
+    "meta": {
+      "title": "Gutgeschriebene Stunden übertragen",
+      "description": "Übertrag deiner gutgeschriebenen Stunden an eine andere KISS-Genossenschaft"
+    },
+    "title": "Deine gutgeschriebenen Stunden übertragen",
+    "subtitle": "Du ziehst in eine andere Gemeinde? Deine gutgeschriebenen Stunden gehen mit.",
+    "form": {
+      "destination_label": "Ziel-Genossenschaft",
+      "destination_placeholder": "z. B. zug-kiss",
+      "destination_help": "Der Slug der KISS-Genossenschaft oder Mandantin am neuen Wohnort",
+      "hours_label": "Zu übertragende Stunden",
+      "hours_placeholder": "z. B. 25.5",
+      "reason_label": "Grund (optional)",
+      "reason_placeholder": "z. B. Umzug von Cham nach Zug",
+      "submit": "Übertrag beantragen",
+      "submitting": "Wird beantragt..."
+    },
+    "history": {
+      "title": "Deine bisherigen Überträge",
+      "date": "Datum",
+      "destination": "Ziel",
+      "hours": "Stunden",
+      "status": "Status",
+      "reason": "Grund",
+      "empty": "Noch keine Überträge."
+    },
+    "status": {
+      "pending": "Wartet auf Freigabe",
+      "approved_by_source": "Freigegeben",
+      "sent": "Versendet",
+      "received": "Empfangen",
+      "completed": "Abgeschlossen",
+      "rejected": "Abgelehnt"
+    },
+    "disclaimer": "Sobald die Koordination den Übertrag freigibt, werden die Stunden hier von deinem Konto abgezogen. In der Ziel-Genossenschaft erscheinen sie unmittelbar danach.",
+    "back": "Zurück zur Gemeinschaftsseite",
+    "errors": {
+      "submit_failed": "Der Übertrag konnte nicht beantragt werden. Bitte versuche es erneut.",
+      "destination_not_found": "Diese Ziel-Genossenschaft konnten wir nicht finden.",
+      "no_matching_email": "Deine E-Mail-Adresse ist bei der Ziel-Genossenschaft nicht registriert — bitte melde dich dort zuerst an.",
+      "insufficient_hours": "Du hast nicht genug gutgeschriebene Stunden."
+    }
   }
 }
