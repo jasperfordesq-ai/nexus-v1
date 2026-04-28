@@ -2536,5 +2536,19 @@ Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Contro
 Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
 Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
 
+// ============================================
+// AG61 — KI-Agenten Autonomous Agent Framework
+// ============================================
+Route::get('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'getConfig']);
+Route::put('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'updateConfig']);
+Route::get('/v2/admin/ki-agents/runs', [\App\Http\Controllers\Api\KiAgentController::class, 'listRuns']);
+Route::get('/v2/admin/ki-agents/runs/{id}', [\App\Http\Controllers\Api\KiAgentController::class, 'getRun']);
+Route::post('/v2/admin/ki-agents/trigger', [\App\Http\Controllers\Api\KiAgentController::class, 'triggerRun']);
+Route::get('/v2/admin/ki-agents/proposals', [\App\Http\Controllers\Api\KiAgentController::class, 'listProposals']);
+Route::post('/v2/admin/ki-agents/proposals/{id}/approve', [\App\Http\Controllers\Api\KiAgentController::class, 'approveProposal']);
+Route::post('/v2/admin/ki-agents/proposals/{id}/reject', [\App\Http\Controllers\Api\KiAgentController::class, 'rejectProposal']);
+Route::post('/v2/admin/ki-agents/proposals/approve-eligible', [\App\Http\Controllers\Api\KiAgentController::class, 'approveAllEligible']);
+Route::get('/v2/admin/ki-agents/stats', [\App\Http\Controllers\Api\KiAgentController::class, 'getStats']);
+
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);

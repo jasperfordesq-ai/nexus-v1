@@ -194,6 +194,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->dailyAt('08:00')
             ->name('onboarding:nurture-sequence')
             ->withoutOverlapping(30);
+
+        // AG61 — KI-Agenten Autonomous Agent Framework
+        // Runs for all tenants that have agent_config.enabled=1
+        $schedule->command('agents:dispatch --tenant=all')
+            ->dailyAt('02:00')
+            ->withoutOverlapping(60)
+            ->runInBackground()
+            ->name('ki-agents-dispatch');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
