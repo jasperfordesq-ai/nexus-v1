@@ -2,7 +2,7 @@
 title: Project NEXUS — Response Pack for Martin Villiger, Roland Greber, and Christopher Mueller
 audience: Agoris AG / Fondation KISS leadership
 prepared_by: Jasper Ford, Project NEXUS
-date: 2026-04-27 (revised after live diligence)
+date: 2026-04-28 (revised after overnight build wave)
 status: Draft for review before sending
 ---
 
@@ -51,6 +51,12 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Marktplatz (unified time-credit + commercial) | `/caring-community/markt` | Live |
 | Time-credit ↔ merchant loyalty redemption (closed-loop economy) | Inline at marketplace checkout | Live |
 | My Loyalty Redemptions history | `/caring-community/loyalty/history` | Live |
+| Future Care Fund (Zeitvorsorge view) | `/caring-community/future-care-fund` | Live |
+| Cooperative-to-cooperative hour transfer | `/caring-community/hour-transfer` | Live |
+| Hour gifting (give banked hours to family/friends) | `/caring-community/hour-gift` | Live |
+| Safeguarding report submission | `/caring-community/safeguarding/report` | Live |
+| My safeguarding reports | `/caring-community/safeguarding/my-reports` | Live |
+| GDPR/FADP personal data export | `/settings/data-export` | Live |
 | Invite Redemption | `/join/:code` | Live |
 | Clubs & Associations directory | `/clubs` | Live |
 | Time-credit listings | `/listings` | Live |
@@ -74,8 +80,13 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Member statement preview + CSV export | Inside Workflow Console | Live |
 | Workflow policy controls (SLAs, CHF hour value, statement day) | Inside Workflow Console | Live |
 | KISS role-pack installer (six presets) | Inside Workflow Console | Live |
-| Tandem suggestion engine (location/language/skills/availability scoring) | Inside Workflow Console | Live |
+| Tandem suggestion engine (location/language/skills/availability/intergenerational) | Inside Workflow Console | Live |
 | Loyalty redemption ledger + per-merchant settings | `/admin/caring-community/loyalty` | Live |
+| Predictive Insights dashboard (3-month forecast + 7-signal alert engine) | Inside Workflow Console | Live |
+| Safeguarding Reports queue with severity-based SLA | `/admin/caring-community/safeguarding` | Live |
+| Cooperative-to-cooperative inbound/outbound transfer queue | `/admin/caring-community/hour-transfers` | Live |
+| Federation Aggregates (signed JSON, HMAC-SHA256, 12-month audit log) | `/admin/federation/aggregates` | Live |
+| National Fondation KISS Dashboard (cross-cooperative comparative) | `/admin/national/kiss` | Live |
 | Coordinator-assisted member onboarding (temp password) | Inside Workflow Console | Live |
 | Printable invite codes (6-char + print card) | Inside Workflow Console | Live |
 | Informal favours log | Inside Workflow Console | Live |

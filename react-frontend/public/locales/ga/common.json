@@ -477,7 +477,15 @@
       "markt": "Marktplatz",
       "markt_sub": "Browse local services, goods and time-credit offers.",
       "loyalty_history": "My Time Credit Redemptions",
-      "loyalty_history_sub": "See how you've used your earned hours at local merchants."
+      "loyalty_history_sub": "See how you've used your earned hours at local merchants.",
+      "future_care_fund": "Future Care Fund",
+      "future_care_fund_sub": "See your banked hours as future-care insurance.",
+      "hour_gift": "Gift Hours",
+      "hour_gift_sub": "Give your banked hours to family or friends.",
+      "hour_transfer": "Transfer Hours",
+      "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
+      "safeguarding_report": "Report a Concern",
+      "safeguarding_report_sub": "Report safeguarding concerns confidentially."
     },
     "operating_model": {
       "title": "Operating model",

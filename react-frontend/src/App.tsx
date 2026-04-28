@@ -160,6 +160,12 @@ const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-communit
 const OfferFavourPage = lazyWithRetry(() => import('@/pages/caring-community/OfferFavourPage'));
 const MarktPage = lazyWithRetry(() => import('@/pages/caring-community/MarktPage'));
 const LoyaltyHistoryPage = lazyWithRetry(() => import('@/pages/caring-community/LoyaltyHistoryPage'));
+const FutureCareFundPage = lazyWithRetry(() => import('@/pages/caring-community/FutureCareFundPage'));
+const HourTransferPage = lazyWithRetry(() => import('@/pages/caring-community/HourTransferPage'));
+const HourGiftPage = lazyWithRetry(() => import('@/pages/caring-community/HourGiftPage'));
+const SafeguardingReportPage = lazyWithRetry(() => import('@/pages/caring-community/SafeguardingReportPage'));
+const MySafeguardingReportsPage = lazyWithRetry(() => import('@/pages/caring-community/MySafeguardingReportsPage'));
+const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
@@ -535,6 +541,54 @@ function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
+
+        {/* Caring Community — Future Care Fund (Zeitvorsorge) (K1) */}
+        <Route path="caring-community/future-care-fund" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <FutureCareFundPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Cooperative-to-cooperative hour transfer (K3) */}
+        <Route path="caring-community/hour-transfer" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <HourTransferPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Time-credit gifting (K5) */}
+        <Route path="caring-community/hour-gift" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <HourGiftPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Safeguarding report submission (K9) */}
+        <Route path="caring-community/safeguarding/report" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <SafeguardingReportPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Caring Community — Member's own safeguarding reports (K9) */}
+        <Route path="caring-community/safeguarding/my-reports" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MySafeguardingReportsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* GDPR member data export (R3) */}
+        <Route path="settings/data-export" element={<ErrorBoundary><DataExportPage /></ErrorBoundary>} />
 
         {/* Clubs & Associations directory (AG15) — public, no feature gate */}
         <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />

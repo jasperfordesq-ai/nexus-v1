@@ -477,7 +477,15 @@
       "markt": "Marktplatz",
       "markt_sub": "Lokale Dienste, Waren und Zeitgutschrift-Angebote entdecken.",
       "loyalty_history": "Meine Einlösungen",
-      "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt."
+      "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt.",
+      "future_care_fund": "Zeitvorsorge-Fonds",
+      "future_care_fund_sub": "Deine gesparten Stunden als Zukunftsvorsorge sehen.",
+      "hour_gift": "Stunden schenken",
+      "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
+      "hour_transfer": "Stunden übertragen",
+      "hour_transfer_sub": "Gesparte Stunden zu einer anderen KISS-Genossenschaft übertragen.",
+      "safeguarding_report": "Anliegen melden",
+      "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden."
     },
     "operating_model": {
       "title": "Funktionsweise",
