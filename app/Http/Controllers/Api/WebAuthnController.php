@@ -66,10 +66,7 @@ class WebAuthnController extends BaseApiController
         );
 
         // Also store in session for backward compatibility
-        if (session_status() === PHP_SESSION_ACTIVE || session_status() === PHP_SESSION_NONE) {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
+        if ($this->startNativeSessionIfPossible()) {
             $_SESSION['webauthn_challenge'] = $challengeB64;
             $_SESSION['webauthn_challenge_expires'] = time() + 120;
         }
@@ -305,13 +302,12 @@ class WebAuthnController extends BaseApiController
         );
 
         // Session backup
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION['webauthn_auth_challenge'] = $challengeB64;
-        $_SESSION['webauthn_auth_challenge_expires'] = time() + 120;
-        if ($email) {
-            $_SESSION['webauthn_auth_email'] = $email;
+        if ($this->startNativeSessionIfPossible()) {
+            $_SESSION['webauthn_auth_challenge'] = $challengeB64;
+            $_SESSION['webauthn_auth_challenge_expires'] = time() + 120;
+            if ($email) {
+                $_SESSION['webauthn_auth_email'] = $email;
+            }
         }
 
         $options = [
@@ -438,25 +434,24 @@ class WebAuthnController extends BaseApiController
         $wantsStateless = $this->tokenService->isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
         if (!$wantsStateless) {
             // Ensure a PHP session is active before accessing $_SESSION
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-            $currentSessionUser = $_SESSION['user_id'] ?? null;
-            if ($currentSessionUser === null) {
-                $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-                if (session_status() === PHP_SESSION_ACTIVE) {
-                    session_regenerate_id(true);
+            if ($this->startNativeSessionIfPossible()) {
+                $currentSessionUser = $_SESSION['user_id'] ?? null;
+                if ($currentSessionUser === null) {
+                    $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
+                    if (session_status() === PHP_SESSION_ACTIVE) {
+                        session_regenerate_id(true);
+                    }
+                    if ($preservedLayout) {
+                        $_SESSION['nexus_active_layout'] = $preservedLayout;
+                        $_SESSION['nexus_layout'] = $preservedLayout;
+                    }
+                    $_SESSION['user_id'] = $credential['uid'];
+                    $_SESSION['user_name'] = trim($credential['first_name'] . ' ' . $credential['last_name']);
+                    $_SESSION['user_email'] = $credential['email'];
+                    $_SESSION['user_role'] = $credential['role'];
+                    $_SESSION['tenant_id'] = $credential['tenant_id'];
+                    $_SESSION['is_logged_in'] = true;
                 }
-                if ($preservedLayout) {
-                    $_SESSION['nexus_active_layout'] = $preservedLayout;
-                    $_SESSION['nexus_layout'] = $preservedLayout;
-                }
-                $_SESSION['user_id'] = $credential['uid'];
-                $_SESSION['user_name'] = trim($credential['first_name'] . ' ' . $credential['last_name']);
-                $_SESSION['user_email'] = $credential['email'];
-                $_SESSION['user_role'] = $credential['role'];
-                $_SESSION['tenant_id'] = $credential['tenant_id'];
-                $_SESSION['is_logged_in'] = true;
             }
         }
 
@@ -772,9 +767,7 @@ class WebAuthnController extends BaseApiController
         }
 
         // Session fallback
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        $this->startNativeSessionIfPossible();
         if (empty($_SESSION['webauthn_challenge']) ||
             empty($_SESSION['webauthn_challenge_expires']) ||
             time() > $_SESSION['webauthn_challenge_expires']) {
@@ -810,9 +803,7 @@ class WebAuthnController extends BaseApiController
         }
 
         // Session fallback
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        $this->startNativeSessionIfPossible();
         if (empty($_SESSION['webauthn_auth_challenge']) ||
             empty($_SESSION['webauthn_auth_challenge_expires']) ||
             time() > $_SESSION['webauthn_auth_challenge_expires']) {
@@ -831,5 +822,25 @@ class WebAuthnController extends BaseApiController
             $this->webAuthnChallengeStore->consume($challengeId);
         }
         unset($_SESSION['webauthn_challenge'], $_SESSION['webauthn_challenge_expires']);
+    }
+
+    private function startNativeSessionIfPossible(): bool
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        }
+
+        if (headers_sent()) {
+            return false;
+        }
+
+        set_error_handler(static fn () => true);
+        try {
+            session_start();
+        } finally {
+            restore_error_handler();
+        }
+
+        return session_status() === PHP_SESSION_ACTIVE;
     }
 }

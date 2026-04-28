@@ -43,6 +43,22 @@ class WebAuthnControllerTest extends TestCase
         $this->assertNotEquals(401, $response->getStatusCode());
     }
 
+    public function test_auth_challenge_returns_passkey_options(): void
+    {
+        $response = $this->apiPost('/webauthn/auth-challenge', []);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'challenge',
+                'challenge_id',
+                'rpId',
+                'timeout',
+                'userVerification',
+            ],
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  POST /webauthn/auth-verify (PUBLIC, rate-limited)
     // ------------------------------------------------------------------
