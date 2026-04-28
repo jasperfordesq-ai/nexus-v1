@@ -329,7 +329,7 @@ export default function PushCampaignAdminPage() {
       setCampaigns(list);
 
       const statsRaw = statsRes.data;
-      const statsData: OverviewStats = (statsRaw as { data?: OverviewStats }).data ?? (statsRaw as OverviewStats);
+      const statsData = ((statsRaw as unknown as { data?: OverviewStats }).data ?? statsRaw) as OverviewStats;
       setStats(statsData);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load campaigns');
@@ -404,7 +404,7 @@ export default function PushCampaignAdminPage() {
     try {
       const res = await api.get<{ data: Campaign }>(`/v2/admin/push-campaigns/${campaign.id}`);
       const raw = res.data;
-      const full: Campaign = (raw as { data?: Campaign }).data ?? (raw as Campaign);
+      const full = ((raw as unknown as { data?: Campaign }).data ?? raw) as Campaign;
       setDetailCampaign(full);
     } catch {
       // Keep the partial data already set

@@ -165,7 +165,7 @@ function agentTypeLabel(t: string): string {
 
 export default function KiAgentAdminPage() {
   usePageTitle('KI-Agenten');
-  const { showToast } = useToast();
+  const toast = useToast();
 
   const [config, setConfig] = useState<AgentConfig | null>(null);
   const [configDirty, setConfigDirty] = useState<Partial<AgentConfig>>({});
@@ -193,23 +193,23 @@ export default function KiAgentAdminPage() {
   const fetchConfig = useCallback(async () => {
     try {
       const res = await api.get<AgentConfig>('/v2/admin/ki-agents/config');
-      setConfig(res.data);
+      setConfig(res.data ?? null);
     } catch {
-      showToast('Failed to load agent config', 'error');
+      toast.error('Failed to load agent config');
     }
-  }, [showToast]);
+  }, [toast]);
 
   const fetchRuns = useCallback(async () => {
     setLoadingRuns(true);
     try {
       const res = await api.get<AgentRun[]>('/v2/admin/ki-agents/runs?limit=50');
-      setRuns(res.data);
+      setRuns(res.data ?? []);
     } catch {
-      showToast('Failed to load runs', 'error');
+      toast.error('Failed to load runs');
     } finally {
       setLoadingRuns(false);
     }
-  }, [showToast]);
+  }, [toast]);
 
   const fetchProposals = useCallback(async () => {
     setLoadingProposals(true);
@@ -218,18 +218,18 @@ export default function KiAgentAdminPage() {
         ? `/v2/admin/ki-agents/proposals?status=${proposalFilter}&limit=100`
         : '/v2/admin/ki-agents/proposals?limit=100';
       const res = await api.get<AgentProposal[]>(url);
-      setProposals(res.data);
+      setProposals(res.data ?? []);
     } catch {
-      showToast('Failed to load proposals', 'error');
+      toast.error('Failed to load proposals');
     } finally {
       setLoadingProposals(false);
     }
-  }, [showToast, proposalFilter]);
+  }, [proposalFilter, toast]);
 
   const fetchStats = useCallback(async () => {
     try {
       const res = await api.get<AgentStats>('/v2/admin/ki-agents/stats');
-      setStats(res.data);
+      setStats(res.data ?? null);
     } catch {
       // Non-critical — stats may not be available
     }
@@ -261,11 +261,11 @@ export default function KiAgentAdminPage() {
     setSavingConfig(true);
     try {
       const res = await api.put<AgentConfig>('/v2/admin/ki-agents/config', mergedConfig);
-      setConfig(res.data);
+      setConfig(res.data ?? null);
       setConfigDirty({});
-      showToast('Agent config saved', 'success');
+      toast.success('Agent config saved');
     } catch {
-      showToast('Failed to save config', 'error');
+      toast.error('Failed to save config');
     } finally {
       setSavingConfig(false);
     }
@@ -279,12 +279,12 @@ export default function KiAgentAdminPage() {
     setTriggering(true);
     try {
       const res = await api.post<AgentRun>('/v2/admin/ki-agents/trigger', { agent_type: triggerType });
-      showToast(`Run triggered: ${res.data.proposals_generated ?? 0} proposals generated`, 'success');
+      toast.success(`Run triggered: ${res.data?.proposals_generated ?? 0} proposals generated`);
       void fetchRuns();
       void fetchProposals();
       void fetchStats();
     } catch {
-      showToast('Failed to trigger run', 'error');
+      toast.error('Failed to trigger run');
     } finally {
       setTriggering(false);
     }
@@ -293,10 +293,10 @@ export default function KiAgentAdminPage() {
   async function handleOpenRunDetail(runId: number) {
     try {
       const res = await api.get<AgentRun>(`/v2/admin/ki-agents/runs/${runId}`);
-      setSelectedRun(res.data);
+      setSelectedRun(res.data ?? null);
       setRunModalOpen(true);
     } catch {
-      showToast('Failed to load run details', 'error');
+      toast.error('Failed to load run details');
     }
   }
 
@@ -307,20 +307,20 @@ export default function KiAgentAdminPage() {
   async function handleApprove(id: number) {
     try {
       await api.post(`/v2/admin/ki-agents/proposals/${id}/approve`, {});
-      showToast('Proposal approved and applied', 'success');
+      toast.success('Proposal approved and applied');
       void fetchProposals();
     } catch {
-      showToast('Failed to approve proposal', 'error');
+      toast.error('Failed to approve proposal');
     }
   }
 
   async function handleReject(id: number) {
     try {
       await api.post(`/v2/admin/ki-agents/proposals/${id}/reject`, {});
-      showToast('Proposal rejected', 'success');
+      toast.success('Proposal rejected');
       void fetchProposals();
     } catch {
-      showToast('Failed to reject proposal', 'error');
+      toast.error('Failed to reject proposal');
     }
   }
 
@@ -331,14 +331,13 @@ export default function KiAgentAdminPage() {
         '/v2/admin/ki-agents/proposals/approve-eligible',
         {},
       );
-      showToast(
-        `Approved ${res.data.approved} proposals (${res.data.failed} failed, threshold ${(res.data.threshold * 100).toFixed(0)}%)`,
-        'success',
+      toast.success(
+        `Approved ${res.data?.approved ?? 0} proposals (${res.data?.failed ?? 0} failed, threshold ${((res.data?.threshold ?? 0) * 100).toFixed(0)}%)`,
       );
       void fetchProposals();
       void fetchStats();
     } catch {
-      showToast('Failed to approve eligible proposals', 'error');
+      toast.error('Failed to approve eligible proposals');
     } finally {
       setApprovingAll(false);
     }
@@ -451,7 +450,7 @@ export default function KiAgentAdminPage() {
                     step={0.01}
                     value={mergedConfig.auto_apply_threshold}
                     onChange={(v) =>
-                      patchConfig('auto_apply_threshold', typeof v === 'number' ? v : v[0])
+                      patchConfig('auto_apply_threshold', typeof v === 'number' ? v : (v[0] ?? 0))
                     }
                     aria-label="Auto-apply threshold"
                     color="success"
@@ -558,7 +557,6 @@ export default function KiAgentAdminPage() {
               aria-label="Agent proposals"
               isStriped
               removeWrapper
-              isLoading={loadingProposals}
             >
               <TableHeader>
                 <TableColumn>Type</TableColumn>
@@ -677,7 +675,6 @@ export default function KiAgentAdminPage() {
               aria-label="Agent runs"
               isStriped
               removeWrapper
-              isLoading={loadingRuns}
             >
               <TableHeader>
                 <TableColumn>Agent Type</TableColumn>
@@ -793,7 +790,7 @@ export default function KiAgentAdminPage() {
                         <p className="font-semibold text-sm mb-2">
                           Proposals ({selectedRun.proposals.length})
                         </p>
-                        <Table aria-label="Run proposals" removeWrapper size="sm">
+                        <Table aria-label="Run proposals" removeWrapper>
                           <TableHeader>
                             <TableColumn>Type</TableColumn>
                             <TableColumn>Subject</TableColumn>

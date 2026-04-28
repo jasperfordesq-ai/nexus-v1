@@ -563,7 +563,7 @@ export default function RegionalAnalyticsPage() {
     setOverviewError(null);
     try {
       const res = await api.get(`${BASE}/overview`);
-      const data = res.data?.data ?? res.data;
+      const data = (res.data as Record<string, unknown>)?.data ?? res.data;
       if (isError(data)) {
         setOverviewError(data.error);
       } else {
@@ -597,8 +597,9 @@ export default function RegionalAnalyticsPage() {
     };
 
     try {
-      const res = await api.get(endpointMap[tabKey]);
-      const data = res.data?.data ?? res.data;
+      const endpoint = endpointMap[tabKey] ?? `${BASE}/${tabKey}`;
+      const res = await api.get(endpoint);
+      const data = (res.data as Record<string, unknown>)?.data ?? res.data;
       if (isError(data)) {
         setTabError((prev) => ({ ...prev, [tabKey]: data.error }));
       } else {
