@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Marktplatz-Partner werden",
+    "description": "Richten Sie Ihr lokales Unternehmen auf dem Marktplatz ein"
+  },
+  "hero_title": "Marktplatz-Partner werden",
+  "hero_subtitle": "Ihr Unternehmen in 4 einfachen Schritten einrichten und lokal verkaufen",
+  "step_of": "Schritt {{current}} von {{total}}",
+  "steps": {
+    "profile": "Unternehmensprofil",
+    "location": "Standort & Zeiten",
+    "photo": "Profilbild",
+    "complete": "Abschliessen"
+  },
+  "seller_type": "Verkäufertyp",
+  "private": "Privat",
+  "business": "Unternehmen",
+  "business_name": "Unternehmensname",
+  "display_name": "Anzeigename",
+  "bio": "Über Ihr Unternehmen",
+  "business_reg": "Handelsregisternummer (optional)",
+  "address_street": "Strassenadresse",
+  "address_city": "Ort",
+  "address_postal": "Postleitzahl",
+  "address_country": "Land",
+  "opening_hours": "Öffnungszeiten",
+  "days": {
+    "mon": "Montag",
+    "tue": "Dienstag",
+    "wed": "Mittwoch",
+    "thu": "Donnerstag",
+    "fri": "Freitag",
+    "sat": "Samstag",
+    "sun": "Sonntag"
+  },
+  "open": "Geöffnet",
+  "closed": "Geschlossen",
+  "upload_photo": "Profilbild hochladen",
+  "upload_cover": "Titelbild hochladen (optional)",
+  "next": "Weiter",
+  "back": "Zurück",
+  "saving": "Wird gespeichert …",
+  "complete_title": "Fast geschafft!",
+  "complete_summary": "Ihr Profil überprüfen",
+  "launch": "Shop eröffnen",
+  "launching": "Wird eröffnet …",
+  "success_title": "Willkommen beim Marktplatz!",
+  "badge_earned": "Marktplatz-Partner-Abzeichen erhalten",
+  "success_cta": "Erste Anzeige erstellen",
+  "errors": {
+    "save_failed": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "complete_failed": "Einrichtung konnte nicht abgeschlossen werden."
+  }
+}

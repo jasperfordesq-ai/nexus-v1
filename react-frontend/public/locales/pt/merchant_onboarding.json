@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Torne-se um parceiro Marktplatz",
+    "description": "Configure o seu negócio local no marketplace"
+  },
+  "hero_title": "Torne-se um parceiro Marktplatz",
+  "hero_subtitle": "Configure o seu negócio em 4 passos simples e comece a vender localmente",
+  "step_of": "Passo {{current}} de {{total}}",
+  "steps": {
+    "profile": "Perfil empresarial",
+    "location": "Localização e horários",
+    "photo": "Foto de perfil",
+    "complete": "Concluir"
+  },
+  "seller_type": "Tipo de vendedor",
+  "private": "Particular",
+  "business": "Empresa",
+  "business_name": "Nome da empresa",
+  "display_name": "Nome de exibição",
+  "bio": "Sobre o seu negócio",
+  "business_reg": "Registo comercial (opcional)",
+  "address_street": "Morada",
+  "address_city": "Cidade",
+  "address_postal": "Código postal",
+  "address_country": "País",
+  "opening_hours": "Horário de funcionamento",
+  "days": {
+    "mon": "Segunda-feira",
+    "tue": "Terça-feira",
+    "wed": "Quarta-feira",
+    "thu": "Quinta-feira",
+    "fri": "Sexta-feira",
+    "sat": "Sábado",
+    "sun": "Domingo"
+  },
+  "open": "Aberto",
+  "closed": "Fechado",
+  "upload_photo": "Carregar foto de perfil",
+  "upload_cover": "Carregar imagem de capa (opcional)",
+  "next": "Seguinte",
+  "back": "Voltar",
+  "saving": "A guardar…",
+  "complete_title": "Quase lá!",
+  "complete_summary": "Reveja o seu perfil",
+  "launch": "Lançar a sua loja",
+  "launching": "A lançar…",
+  "success_title": "Bem-vindo ao Marktplatz!",
+  "badge_earned": "Distintivo Marktplatz-Partner obtido",
+  "success_cta": "Criar o seu primeiro anúncio",
+  "errors": {
+    "save_failed": "Falha ao guardar. Por favor, tente novamente.",
+    "complete_failed": "Falha ao concluir a configuração."
+  }
+}

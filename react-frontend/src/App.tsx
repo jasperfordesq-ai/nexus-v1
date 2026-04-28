@@ -231,6 +231,7 @@ const MarketplaceMapSearchPage = lazyWithRetry(() => import('./pages/marketplace
 const BuyerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/BuyerOrdersPage'));
 const SellerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/SellerOrdersPage'));
 const StripeOnboardingPage = lazyWithRetry(() => import('./pages/marketplace/StripeOnboardingPage'));
+const MerchantOnboardingPage = lazyWithRetry(() => import('./pages/marketplace/MerchantOnboardingPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -246,6 +247,7 @@ const LegalHubPage = lazyWithRetry(() => import('@/pages/public/LegalHubPage'));
 const LegalVersionHistoryPage = lazyWithRetry(() => import('@/pages/public/LegalVersionHistoryPage'));
 const FaqPage = lazyWithRetry(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazyWithRetry(() => import('@/pages/help/HelpCenterPage'));
+const PilotInquiryPage = lazyWithRetry(() => import('@/pages/public/PilotInquiryPage'));
 
 // Platform Legal Pages (provider-level, distinct from tenant legal docs)
 const PlatformTermsPage = lazyWithRetry(() => import('@/pages/platform/PlatformTermsPage'));
@@ -299,6 +301,7 @@ function AppRoutes() {
         <Route path="about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
         <Route path="faq" element={<ErrorBoundary><FaqPage /></ErrorBoundary>} />
         <Route path="contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+        <Route path="pilot-inquiry" element={<ErrorBoundary><PilotInquiryPage /></ErrorBoundary>} />
         <Route path="help" element={<ErrorBoundary><HelpCenterPage /></ErrorBoundary>} />
         <Route path="terms" element={<ErrorBoundary><TermsPage /></ErrorBoundary>} />
         <Route path="terms/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
@@ -1083,6 +1086,13 @@ function AppRoutes() {
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <StripeOnboardingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/become-partner" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MerchantOnboardingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

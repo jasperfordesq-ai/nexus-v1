@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Marktplatzパートナーになる",
+    "description": "マーケットプレイスにローカルビジネスを登録する"
+  },
+  "hero_title": "Marktplatzパートナーになる",
+  "hero_subtitle": "4つの簡単なステップでビジネスを設定し、地域での販売を開始しましょう",
+  "step_of": "ステップ {{current}} / {{total}}",
+  "steps": {
+    "profile": "ビジネスプロフィール",
+    "location": "所在地と営業時間",
+    "photo": "プロフィール写真",
+    "complete": "完了"
+  },
+  "seller_type": "出品者タイプ",
+  "private": "個人",
+  "business": "法人",
+  "business_name": "会社名",
+  "display_name": "表示名",
+  "bio": "ビジネスについて",
+  "business_reg": "登録番号（任意）",
+  "address_street": "住所",
+  "address_city": "市区町村",
+  "address_postal": "郵便番号",
+  "address_country": "国",
+  "opening_hours": "営業時間",
+  "days": {
+    "mon": "月曜日",
+    "tue": "火曜日",
+    "wed": "水曜日",
+    "thu": "木曜日",
+    "fri": "金曜日",
+    "sat": "土曜日",
+    "sun": "日曜日"
+  },
+  "open": "営業中",
+  "closed": "休業",
+  "upload_photo": "プロフィール写真をアップロード",
+  "upload_cover": "カバー画像をアップロード（任意）",
+  "next": "次へ",
+  "back": "戻る",
+  "saving": "保存中…",
+  "complete_title": "もう少しです！",
+  "complete_summary": "プロフィールを確認する",
+  "launch": "ショップを開始する",
+  "launching": "開始中…",
+  "success_title": "Marktplatzへようこそ！",
+  "badge_earned": "Marktplatz-Partnerバッジを獲得しました",
+  "success_cta": "最初のリストを作成する",
+  "errors": {
+    "save_failed": "保存に失敗しました。もう一度お試しください。",
+    "complete_failed": "設定を完了できませんでした。"
+  }
+}

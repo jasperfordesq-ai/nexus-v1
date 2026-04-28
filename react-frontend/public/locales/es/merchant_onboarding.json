@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Conviértase en socio Marktplatz",
+    "description": "Configure su negocio local en el mercado"
+  },
+  "hero_title": "Conviértase en socio Marktplatz",
+  "hero_subtitle": "Configure su negocio en 4 sencillos pasos y comience a vender localmente",
+  "step_of": "Paso {{current}} de {{total}}",
+  "steps": {
+    "profile": "Perfil empresarial",
+    "location": "Ubicación y horarios",
+    "photo": "Foto de perfil",
+    "complete": "Completar"
+  },
+  "seller_type": "Tipo de vendedor",
+  "private": "Particular",
+  "business": "Empresa",
+  "business_name": "Nombre de la empresa",
+  "display_name": "Nombre para mostrar",
+  "bio": "Acerca de su negocio",
+  "business_reg": "Número de registro (opcional)",
+  "address_street": "Dirección",
+  "address_city": "Ciudad",
+  "address_postal": "Código postal",
+  "address_country": "País",
+  "opening_hours": "Horario de apertura",
+  "days": {
+    "mon": "Lunes",
+    "tue": "Martes",
+    "wed": "Miércoles",
+    "thu": "Jueves",
+    "fri": "Viernes",
+    "sat": "Sábado",
+    "sun": "Domingo"
+  },
+  "open": "Abierto",
+  "closed": "Cerrado",
+  "upload_photo": "Subir foto de perfil",
+  "upload_cover": "Subir imagen de portada (opcional)",
+  "next": "Siguiente",
+  "back": "Atrás",
+  "saving": "Guardando…",
+  "complete_title": "¡Casi listo!",
+  "complete_summary": "Revise su perfil",
+  "launch": "Lanzar su tienda",
+  "launching": "Lanzando…",
+  "success_title": "¡Bienvenido a Marktplatz!",
+  "badge_earned": "Insignia Marktplatz-Partner obtenida",
+  "success_cta": "Crear su primer anuncio",
+  "errors": {
+    "save_failed": "Error al guardar. Por favor, inténtelo de nuevo.",
+    "complete_failed": "No se pudo completar la configuración."
+  }
+}

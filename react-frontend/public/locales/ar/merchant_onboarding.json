@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "كن شريكاً في Marktplatz",
+    "description": "أنشئ نشاطك التجاري المحلي على السوق"
+  },
+  "hero_title": "كن شريكاً في Marktplatz",
+  "hero_subtitle": "أنشئ نشاطك التجاري في 4 خطوات بسيطة وابدأ البيع محلياً",
+  "step_of": "الخطوة {{current}} من {{total}}",
+  "steps": {
+    "profile": "الملف التجاري",
+    "location": "الموقع والأوقات",
+    "photo": "صورة الملف الشخصي",
+    "complete": "إتمام"
+  },
+  "seller_type": "نوع البائع",
+  "private": "فردي",
+  "business": "شركة",
+  "business_name": "اسم الشركة",
+  "display_name": "الاسم المعروض",
+  "bio": "نبذة عن نشاطك التجاري",
+  "business_reg": "رقم السجل التجاري (اختياري)",
+  "address_street": "عنوان الشارع",
+  "address_city": "المدينة",
+  "address_postal": "الرمز البريدي",
+  "address_country": "البلد",
+  "opening_hours": "ساعات العمل",
+  "days": {
+    "mon": "الاثنين",
+    "tue": "الثلاثاء",
+    "wed": "الأربعاء",
+    "thu": "الخميس",
+    "fri": "الجمعة",
+    "sat": "السبت",
+    "sun": "الأحد"
+  },
+  "open": "مفتوح",
+  "closed": "مغلق",
+  "upload_photo": "رفع صورة الملف الشخصي",
+  "upload_cover": "رفع صورة الغلاف (اختياري)",
+  "next": "التالي",
+  "back": "رجوع",
+  "saving": "جارٍ الحفظ…",
+  "complete_title": "اقتربنا من الانتهاء!",
+  "complete_summary": "مراجعة ملفك الشخصي",
+  "launch": "أطلق متجرك",
+  "launching": "جارٍ الإطلاق…",
+  "success_title": "مرحباً بك في Marktplatz!",
+  "badge_earned": "تم الحصول على شارة Marktplatz-Partner",
+  "success_cta": "أنشئ إعلانك الأول",
+  "errors": {
+    "save_failed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
+    "complete_failed": "تعذّر إكمال الإعداد."
+  }
+}

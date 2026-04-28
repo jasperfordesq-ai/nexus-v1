@@ -943,6 +943,13 @@ Route::post('/v2/marketplace/listings/bulk-action', [\App\Http\Controllers\Api\M
 Route::get('/v2/marketplace/listings/export-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'exportCsv']);
 Route::post('/v2/marketplace/listings/import-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'importCsv']);
 
+// AG48 — Merchant Onboarding Wizard (self-serve SME onboarding)
+Route::get('/v2/merchant-onboarding/status', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'status']);
+Route::post('/v2/merchant-onboarding/step-1', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep1']);
+Route::post('/v2/merchant-onboarding/step-2', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep2']);
+Route::post('/v2/merchant-onboarding/step-3', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep3']);
+Route::post('/v2/merchant-onboarding/complete', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'complete']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -2549,6 +2556,27 @@ Route::post('/v2/admin/ki-agents/proposals/{id}/approve', [\App\Http\Controllers
 Route::post('/v2/admin/ki-agents/proposals/{id}/reject', [\App\Http\Controllers\Api\KiAgentController::class, 'rejectProposal']);
 Route::post('/v2/admin/ki-agents/proposals/approve-eligible', [\App\Http\Controllers\Api\KiAgentController::class, 'approveAllEligible']);
 Route::get('/v2/admin/ki-agents/stats', [\App\Http\Controllers\Api\KiAgentController::class, 'getStats']);
+
+// AG59 — Regional Analytics Product
+Route::get('/v2/admin/regional-analytics/overview', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'overview']);
+Route::get('/v2/admin/regional-analytics/heatmap', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'heatmap']);
+Route::get('/v2/admin/regional-analytics/demand-supply', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demandSupply']);
+Route::get('/v2/admin/regional-analytics/demographics', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demographics']);
+Route::get('/v2/admin/regional-analytics/engagement-trends', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'engagementTrends']);
+Route::get('/v2/admin/regional-analytics/volunteer-breakdown', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'volunteerBreakdown']);
+Route::get('/v2/admin/regional-analytics/help-requests', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'helpRequests']);
+Route::get('/v2/admin/regional-analytics/export', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'exportReport']);
+Route::post('/v2/admin/regional-analytics/invalidate-cache', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'invalidateCache']);
+
+// AG71 — Pilot Region Inquiry & Qualification Funnel
+Route::post('/v2/pilot-inquiry', [\App\Http\Controllers\Api\PilotInquiryController::class, 'submitInquiry'])->middleware('throttle:5,1');
+Route::get('/v2/admin/pilot-inquiries', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminList']);
+Route::get('/v2/admin/pilot-inquiries/stats', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminPipelineStats']);
+Route::get('/v2/admin/pilot-inquiries/export', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminExportCsv']);
+Route::get('/v2/admin/pilot-inquiries/{id}', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminGet']);
+Route::post('/v2/admin/pilot-inquiries/{id}/stage', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateStage']);
+Route::post('/v2/admin/pilot-inquiries/{id}/assign', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminAssign']);
+Route::post('/v2/admin/pilot-inquiries/{id}/notes', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateNotes']);
 
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);

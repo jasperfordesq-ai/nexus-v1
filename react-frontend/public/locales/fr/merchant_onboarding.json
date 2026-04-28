@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Devenir partenaire Marktplatz",
+    "description": "Configurez votre entreprise locale sur la place de marché"
+  },
+  "hero_title": "Devenir partenaire Marktplatz",
+  "hero_subtitle": "Configurez votre entreprise en 4 étapes simples et commencez à vendre localement",
+  "step_of": "Étape {{current}} sur {{total}}",
+  "steps": {
+    "profile": "Profil professionnel",
+    "location": "Lieu & Horaires",
+    "photo": "Photo de profil",
+    "complete": "Terminer"
+  },
+  "seller_type": "Type de vendeur",
+  "private": "Particulier",
+  "business": "Professionnel",
+  "business_name": "Nom de l'entreprise",
+  "display_name": "Nom d'affichage",
+  "bio": "À propos de votre entreprise",
+  "business_reg": "Numéro d'immatriculation (optionnel)",
+  "address_street": "Adresse",
+  "address_city": "Ville",
+  "address_postal": "Code postal",
+  "address_country": "Pays",
+  "opening_hours": "Horaires d'ouverture",
+  "days": {
+    "mon": "Lundi",
+    "tue": "Mardi",
+    "wed": "Mercredi",
+    "thu": "Jeudi",
+    "fri": "Vendredi",
+    "sat": "Samedi",
+    "sun": "Dimanche"
+  },
+  "open": "Ouvert",
+  "closed": "Fermé",
+  "upload_photo": "Télécharger une photo de profil",
+  "upload_cover": "Télécharger une image de couverture (optionnel)",
+  "next": "Suivant",
+  "back": "Retour",
+  "saving": "Enregistrement…",
+  "complete_title": "Presque terminé !",
+  "complete_summary": "Vérifiez votre profil",
+  "launch": "Lancer votre boutique",
+  "launching": "Lancement…",
+  "success_title": "Bienvenue sur Marktplatz !",
+  "badge_earned": "Badge Marktplatz-Partner obtenu",
+  "success_cta": "Créer votre première annonce",
+  "errors": {
+    "save_failed": "Échec de l'enregistrement. Veuillez réessayer.",
+    "complete_failed": "Impossible de finaliser la configuration."
+  }
+}

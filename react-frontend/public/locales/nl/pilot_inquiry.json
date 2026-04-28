@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "title": "Become a Pilot Region",
+    "description": "Join the AGORIS caring community platform as a pilot region"
+  },
+  "hero_title": "Become a Pilot Region",
+  "hero_subtitle": "Jetzt Pilotregion werden — be among the first municipalities to offer a trusted digital community platform",
+  "step": "Step {{current}} of {{total}}",
+  "steps": {
+    "municipality": "Your Municipality",
+    "needs": "Your Needs",
+    "contact": "Contact Details"
+  },
+  "fields": {
+    "municipality_name": "Municipality name",
+    "region": "Region / Canton",
+    "country": "Country",
+    "population": "Population",
+    "has_kiss": "KISS cooperative present in your area",
+    "modules": "Modules of interest",
+    "has_existing_tool": "Already using a digital tool",
+    "existing_tool": "Which tool?",
+    "timeline": "Expected timeline",
+    "budget": "Budget indication",
+    "contact_name": "Your name",
+    "contact_email": "Email address",
+    "contact_phone": "Phone (optional)",
+    "contact_role": "Your role",
+    "notes": "Additional notes"
+  },
+  "timeline_options": {
+    "asap": "As soon as possible",
+    "6m": "Within 6 months",
+    "1y": "Within 1 year",
+    "2y": "Within 2 years",
+    "explore": "Just exploring"
+  },
+  "budget_options": {
+    "under_5k": "Under €5,000/year",
+    "5k_10k": "€5,000–10,000/year",
+    "10k_25k": "€10,000–25,000/year",
+    "25k_plus": "Over €25,000/year",
+    "unknown": "Not sure yet"
+  },
+  "modules": {
+    "time_banking": "Time banking",
+    "caring_community": "Caring community",
+    "local_marketplace": "Local marketplace",
+    "municipal_announcements": "Municipal announcements"
+  },
+  "next": "Next",
+  "back": "Back",
+  "submit": "Submit inquiry",
+  "submitting": "Submitting…",
+  "success_title": "Thank you for your interest!",
+  "success_excellent": "Excellent fit",
+  "success_good": "Good fit",
+  "success_interested": "Interesting inquiry",
+  "success_followup": "We will be in touch within 2 business days.",
+  "success_back": "Back to home"
+}

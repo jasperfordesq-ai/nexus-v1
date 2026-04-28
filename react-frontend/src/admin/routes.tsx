@@ -162,6 +162,15 @@ const MunicipalSurveyAdminPage = lazy(() => import('./modules/caring-community/M
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
 const PushCampaignAdminPage = lazy(() => import('./modules/advertising/PushCampaignAdminPage'));
 
+// AI / KI-Agents module
+const KiAgentAdminPage = lazy(() => import('./modules/ai/KiAgentAdminPage'));
+
+// Regional analytics
+const RegionalAnalyticsPage = lazy(() => import('./modules/analytics/RegionalAnalyticsPage'));
+
+// Platform — pilot inquiries (super-admin)
+const PilotInquiryAdminPage = lazy(() => import('./modules/super/PilotInquiryAdminPage'));
+
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
 
@@ -649,6 +658,15 @@ export function AdminRoutes() {
 
       {/* AG57 — Paid push campaigns */}
       <Route path="advertising/push-campaigns" element={<Lazy><PushCampaignAdminPage /></Lazy>} />
+
+      {/* AG61 — KI-Agenten autonomous framework */}
+      <Route path="ai/ki-agents" element={<Lazy><KiAgentAdminPage /></Lazy>} />
+
+      {/* AG59 — Regional analytics product */}
+      <Route path="analytics/regional" element={<Lazy><RegionalAnalyticsPage /></Lazy>} />
+
+      {/* AG71 — Pilot region inquiry funnel */}
+      <Route path="platform/pilot-inquiries" element={<Lazy><PilotInquiryAdminPage /></Lazy>} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />

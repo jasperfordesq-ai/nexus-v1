@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Become a Marktplatz Partner",
+    "description": "Set up your local business on the marketplace"
+  },
+  "hero_title": "Become a Marktplatz Partner",
+  "hero_subtitle": "Set up your business in 4 simple steps and start selling locally",
+  "step_of": "Step {{current}} of {{total}}",
+  "steps": {
+    "profile": "Business Profile",
+    "location": "Location & Hours",
+    "photo": "Profile Photo",
+    "complete": "Complete"
+  },
+  "seller_type": "Seller type",
+  "private": "Private",
+  "business": "Business",
+  "business_name": "Business name",
+  "display_name": "Display name",
+  "bio": "About your business",
+  "business_reg": "Business registration (optional)",
+  "address_street": "Street address",
+  "address_city": "City",
+  "address_postal": "Postal code",
+  "address_country": "Country",
+  "opening_hours": "Opening hours",
+  "days": {
+    "mon": "Monday",
+    "tue": "Tuesday",
+    "wed": "Wednesday",
+    "thu": "Thursday",
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday"
+  },
+  "open": "Open",
+  "closed": "Closed",
+  "upload_photo": "Upload profile photo",
+  "upload_cover": "Upload cover image (optional)",
+  "next": "Next",
+  "back": "Back",
+  "saving": "Saving…",
+  "complete_title": "Almost there!",
+  "complete_summary": "Review your profile",
+  "launch": "Launch your shop",
+  "launching": "Launching…",
+  "success_title": "Welcome to Marktplatz!",
+  "badge_earned": "Marktplatz-Partner badge earned",
+  "success_cta": "Create your first listing",
+  "errors": {
+    "save_failed": "Failed to save. Please try again.",
+    "complete_failed": "Failed to complete setup."
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Diventa partner Marktplatz",
+    "description": "Configura la tua attività locale sul marketplace"
+  },
+  "hero_title": "Diventa partner Marktplatz",
+  "hero_subtitle": "Configura la tua attività in 4 semplici passaggi e inizia a vendere localmente",
+  "step_of": "Passaggio {{current}} di {{total}}",
+  "steps": {
+    "profile": "Profilo aziendale",
+    "location": "Posizione & Orari",
+    "photo": "Foto profilo",
+    "complete": "Completa"
+  },
+  "seller_type": "Tipo di venditore",
+  "private": "Privato",
+  "business": "Azienda",
+  "business_name": "Nome dell'azienda",
+  "display_name": "Nome visualizzato",
+  "bio": "Informazioni sulla tua attività",
+  "business_reg": "Numero di registrazione (opzionale)",
+  "address_street": "Indirizzo",
+  "address_city": "Città",
+  "address_postal": "Codice postale",
+  "address_country": "Paese",
+  "opening_hours": "Orari di apertura",
+  "days": {
+    "mon": "Lunedì",
+    "tue": "Martedì",
+    "wed": "Mercoledì",
+    "thu": "Giovedì",
+    "fri": "Venerdì",
+    "sat": "Sabato",
+    "sun": "Domenica"
+  },
+  "open": "Aperto",
+  "closed": "Chiuso",
+  "upload_photo": "Carica foto profilo",
+  "upload_cover": "Carica immagine di copertina (opzionale)",
+  "next": "Avanti",
+  "back": "Indietro",
+  "saving": "Salvataggio…",
+  "complete_title": "Ci siamo quasi!",
+  "complete_summary": "Rivedi il tuo profilo",
+  "launch": "Lancia il tuo negozio",
+  "launching": "Lancio in corso…",
+  "success_title": "Benvenuto su Marktplatz!",
+  "badge_earned": "Badge Marktplatz-Partner ottenuto",
+  "success_cta": "Crea il tuo primo annuncio",
+  "errors": {
+    "save_failed": "Salvataggio non riuscito. Riprova.",
+    "complete_failed": "Impossibile completare la configurazione."
+  }
+}

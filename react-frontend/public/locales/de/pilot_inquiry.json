@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "title": "Pilotregion werden",
+    "description": "Werden Sie Teil der AGORIS Sorgegemeinschaft-Plattform als Pilotgemeinde"
+  },
+  "hero_title": "Pilotregion werden",
+  "hero_subtitle": "Jetzt Pilotregion werden — gehören Sie zu den ersten Gemeinden, die eine vertrauenswürdige digitale Gemeinschaftsplattform anbieten",
+  "step": "Schritt {{current}} von {{total}}",
+  "steps": {
+    "municipality": "Ihre Gemeinde",
+    "needs": "Ihre Bedürfnisse",
+    "contact": "Kontaktdaten"
+  },
+  "fields": {
+    "municipality_name": "Gemeindename",
+    "region": "Region / Kanton",
+    "country": "Land",
+    "population": "Einwohnerzahl",
+    "has_kiss": "KISS-Genossenschaft in Ihrer Region vorhanden",
+    "modules": "Interessierende Module",
+    "has_existing_tool": "Bereits ein digitales Tool im Einsatz",
+    "existing_tool": "Welches Tool?",
+    "timeline": "Gewünschter Zeitrahmen",
+    "budget": "Budgetrahmen",
+    "contact_name": "Ihr Name",
+    "contact_email": "E-Mail-Adresse",
+    "contact_phone": "Telefon (optional)",
+    "contact_role": "Ihre Funktion",
+    "notes": "Weitere Anmerkungen"
+  },
+  "timeline_options": {
+    "asap": "So bald wie möglich",
+    "6m": "Innerhalb von 6 Monaten",
+    "1y": "Innerhalb eines Jahres",
+    "2y": "Innerhalb von 2 Jahren",
+    "explore": "Erst erkunden"
+  },
+  "budget_options": {
+    "under_5k": "Unter CHF 5'000/Jahr",
+    "5k_10k": "CHF 5'000–10'000/Jahr",
+    "10k_25k": "CHF 10'000–25'000/Jahr",
+    "25k_plus": "Über CHF 25'000/Jahr",
+    "unknown": "Noch nicht bekannt"
+  },
+  "modules": {
+    "time_banking": "Zeitvorsorge",
+    "caring_community": "Sorgegemeinschaft",
+    "local_marketplace": "Lokaler Marktplatz",
+    "municipal_announcements": "Gemeindemitteilungen"
+  },
+  "next": "Weiter",
+  "back": "Zurück",
+  "submit": "Anfrage senden",
+  "submitting": "Wird gesendet…",
+  "success_title": "Herzlichen Dank für Ihr Interesse!",
+  "success_excellent": "Ausgezeichnete Eignung",
+  "success_good": "Gute Eignung",
+  "success_interested": "Interessante Anfrage",
+  "success_followup": "Wir werden uns innerhalb von 2 Werktagen bei Ihnen melden.",
+  "success_back": "Zurück zur Startseite"
+}

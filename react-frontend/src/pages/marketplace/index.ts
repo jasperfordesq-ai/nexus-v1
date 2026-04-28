@@ -15,3 +15,4 @@ export { MarketplaceCategoryPage } from './MarketplaceCategoryPage';
 export { BuyerOrdersPage } from './BuyerOrdersPage';
 export { SellerOrdersPage } from './SellerOrdersPage';
 export { StripeOnboardingPage } from './StripeOnboardingPage';
+export { MerchantOnboardingPage } from './MerchantOnboardingPage';

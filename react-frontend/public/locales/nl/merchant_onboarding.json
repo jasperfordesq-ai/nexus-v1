@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Word Marktplatz-partner",
+    "description": "Stel uw lokale bedrijf in op de marktplaats"
+  },
+  "hero_title": "Word Marktplatz-partner",
+  "hero_subtitle": "Stel uw bedrijf in 4 eenvoudige stappen in en begin lokaal te verkopen",
+  "step_of": "Stap {{current}} van {{total}}",
+  "steps": {
+    "profile": "Bedrijfsprofiel",
+    "location": "Locatie en openingstijden",
+    "photo": "Profielfoto",
+    "complete": "Voltooien"
+  },
+  "seller_type": "Verkoperstype",
+  "private": "Particulier",
+  "business": "Bedrijf",
+  "business_name": "Bedrijfsnaam",
+  "display_name": "Weergavenaam",
+  "bio": "Over uw bedrijf",
+  "business_reg": "KvK-nummer (optioneel)",
+  "address_street": "Adres",
+  "address_city": "Stad",
+  "address_postal": "Postcode",
+  "address_country": "Land",
+  "opening_hours": "Openingstijden",
+  "days": {
+    "mon": "Maandag",
+    "tue": "Dinsdag",
+    "wed": "Woensdag",
+    "thu": "Donderdag",
+    "fri": "Vrijdag",
+    "sat": "Zaterdag",
+    "sun": "Zondag"
+  },
+  "open": "Open",
+  "closed": "Gesloten",
+  "upload_photo": "Profielfoto uploaden",
+  "upload_cover": "Omslagafbeelding uploaden (optioneel)",
+  "next": "Volgende",
+  "back": "Terug",
+  "saving": "Opslaan…",
+  "complete_title": "Bijna klaar!",
+  "complete_summary": "Bekijk uw profiel",
+  "launch": "Winkel openen",
+  "launching": "Openen…",
+  "success_title": "Welkom bij Marktplatz!",
+  "badge_earned": "Marktplatz-Partner-badge verdiend",
+  "success_cta": "Maak uw eerste advertentie",
+  "errors": {
+    "save_failed": "Opslaan mislukt. Probeer het opnieuw.",
+    "complete_failed": "Installatie kon niet worden voltooid."
+  }
+}
