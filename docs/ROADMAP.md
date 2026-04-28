@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-28 (overnight wave AG20–AG27: federation aggregates IMPLEMENTATION, Future Care Fund + Reciprocal balance, predictive coordinator dashboard, cooperative-to-cooperative hour transfer, GDPR member data export, safeguarding escalation workflow, national KISS dashboard, hour gifting + intergenerational matching emphasis — 8 features shipped, 56 feature tests passing)
+> **Last updated:** 2026-04-28 (five-founder gap analysis formalised as AG32–AG55: 24 new items covering KISS sociological layer, Tom Debus AI pillar, Christopher Mueller UX/accessibility sprint, Roland Greber compliance pack, Agoris commercial layer, care/health integration Phase 4, Verein lifecycle. Platform coverage revised to ~78% of full five-founder vision)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -411,6 +411,7 @@ This section preserves the Agoris/KISS research, April 2026 email context, produ
 | `C:\Users\jaspe\Downloads\Researching Agoris' Business and Reputation.md` | Read 2026-04-26 | Strategic report frames Agoris as digital civic infrastructure for Caring Communities: time banking, municipal coordination, local commerce, data sovereignty, AI matching, and regional nodes of roughly 15,000-30,000 residents. Some claims in the report should be treated as strategic analysis rather than verified facts. |
 | Production `/agoris` tenant seed | Completed 2026-04-26 | Backed up production DB, downloaded the backup locally, seeded a professional Agoris Caring Community tenant, verified API bootstrap, verified frontend route, then deployed production. |
 | Live web research — agoris.ch, LinkedIn, RocketReach, Fondation KISS, caringcommunities.ch, Seniorweb | Completed 2026-04-27 | agoris.ch was returning database errors on the day of research so could not be read directly. Platform vision sourced from LinkedIn company page, RocketReach company description, and Agoris's own tagline material: "Marktplatz des Vertrauens", "Deine Region. Deine Community. Deine App." — connects all generations, regional orgs, businesses and institutions; supports neighbour help WITH and WITHOUT time tracking; combines commercial + voluntary marketplace in one product. KISS model confirmed: Fondation KISS founded 2011 by Susanna Fassbind (Zug), 20 Swiss cooperatives, 320 members in St Gallen alone with 80,000+ banked hours; hours function as "Zeitvorsorge" (4th pension pillar). The caringcommunities.ch national network confirms the Swiss caring-community ecosystem is government-supported and maps hundreds of active projects. Full gap analysis recorded in section below. |
+| Fresh research pass — 2026-04-28 | Completed 2026-04-28 | agoris.ch still returning "Database Error" — site has been down since at least 2026-04-27. **Investoren, Über uns, Gemeinden & Regionen pages remain inaccessible.** New confirmed findings: (1) Roland Greber is current CEO at Swiss Bankers Prepaid Services AG (Liechtenstein prepaid card issuer) — Agoris is a side/advisory role. (2) Dr. Christopher H. Mueller is founder/owner of Die Ergonomen Usability AG (Zurich, ETH PhD, 1000+ projects) — confirms UX/usability expertise. (3) Tom Debus is Founder/CTO of Ferris Labs AG (data mesh/real-time data platform) — advises Agoris personally, not full-time. (4) Martin Villiger — governance/risk/compliance, LinkedIn last indexed 2021. (5) **CRITICAL: "Agoris Smart POS & Inventory" (package `com.miderva.agoris`) is made by an unrelated company called Miderva** — the earlier Gemini citation was wrong. Agoris AG has no POS product. (6) Agoris Schweiz has 3 employees per RocketReach — early-stage/vision-phase, all founders hold primary roles elsewhere. (7) An unrelated 2008–2011 community project also named "Agoris" existed in Chablais (legacy noise, not connected). |
 
 ### Agoris/KISS Opportunity Summary
 
@@ -458,7 +459,7 @@ The most important product implication is that any Agoris/KISS work should be bu
 
 Based on the 2026-04-27 web research session, here is a precise assessment of NEXUS coverage against Agoris's five public platform layers.
 
-**Overall match: ~72%. KISS time-bank layer is production-ready and best-in-class. Gaps are on the regional commerce and municipal infrastructure layers, both of which Agoris describes as part of their full vision.**
+**Overall match: ~78% (updated 2026-04-28 after AG18–AG27 shipped). KISS time-bank layer is production-ready and best-in-class. Gaps are on the regional commerce and municipal infrastructure layers, both of which Agoris describes as part of their full vision. 24 additional items formalised as AG32–AG55 covering the full five-founder vision.**
 
 #### Layer 1: KISS Time-Banking (Zeitvorsorge)
 NEXUS coverage: **95% — stronger than anything Agoris has publicly described.**
@@ -487,9 +488,11 @@ Agoris's public materials emphasise an app that "delivers individual value witho
 
 ### Agoris Diligence Findings To Preserve
 
-The strongest positive signal is the leadership mix. Publicly named roles align with the opportunity: Roland Greber for banking/innovation and regulated commercial models; Martin Villiger for KISS, time banking, governance, privacy, and caring-community credibility; Dr. Christopher H. Mueller for UX and regional development; Tom Debus for technology, AI, and data. This is unusually well matched to a platform that must blend social infrastructure, municipal trust, local commerce, and technology.
+The leadership mix remains well matched to the opportunity: Roland Greber (CEO, Swiss Bankers Prepaid Services AG) for banking/innovation and regulated commercial models; Martin Villiger for KISS, time banking, governance, privacy, and caring-community credibility; Dr. Christopher H. Mueller (founder, Die Ergonomen Usability AG, ETH PhD) for UX and regional development; Tom Debus (founder/CTO, Ferris Labs AG) for technology, AI, and data. **However, the 2026-04-28 research confirms all four founders hold primary roles elsewhere.** Agoris Schweiz has 3 employees. This is consistent with a very early-stage or vision-phase company, not a commercial platform in active rollout. The posture should be: strong strategic alignment between our vision, but realistic about Agoris's current execution capacity.
 
-The main concern is public proof of execution. The research did not find enough visible evidence of live customers, public price sheets, quantified case studies, implementation metrics, certification pages, current app-store traction, or a fully verifiable public registry extract. This does not make the opportunity weak, but it means the next stage should be founder-led diligence and document-backed validation rather than assumption-led buildout.
+The main concern is public proof of execution. The research did not find enough visible evidence of live customers, public price sheets, quantified case studies, implementation metrics, certification pages, current app-store traction, or a fully verifiable public registry extract. agoris.ch has been returning a database error for at least 48 hours — itself a signal. This does not make the opportunity weak (KISS is real and politically credible), but it means the next stage should be founder-led diligence and document-backed validation rather than assumption-led buildout.
+
+**Correction from prior notes:** The "Agoris Smart POS & Inventory" App Store product cited in earlier research is made by Miderva (package `com.miderva.agoris`) — it has no connection to Agoris AG. Remove any assumptions about Agoris having a POS product or POS pricing tiers.
 
 Closest comparables to track: Crossiety, Localcities, My Local Services, Hoplr, nebenan.de, beUnity, and Locality. Crossiety and Localcities are the most important Swiss benchmarks because they already occupy municipal/community communication layers. Hoplr and nebenan.de prove neighborhood networks can scale. beUnity overlaps with trusted member/community spaces.
 
@@ -591,6 +594,75 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | AG30 | V1+V2 — Verein bulk member import + scoped admin role | Medium | 📋 **Not yet built** — out of agent quota. Planned: CSV bulk import with preview/validation/duplicate detection, `verein_admin` role with org-scoped permissions (`scope_organization_id` on `user_roles`), `userHasPermissionInOrg()` RBAC helper. |
 | AG31 | T3 — Smart member nudges | Medium | 📋 **Not yet built** — out of agent quota. Planned: `CaringNudgeService` that scores nearby candidates above 0.55 threshold and dispatches notifications when help is needed; member opt-out toggle; daily sweep cron; admin Nudge Analytics page with conversion-rate stats. |
 
+### Five-Founder Gap Analysis — AG32–AG55 (2026-04-28)
+
+> 24 items identified by systematic gap analysis against the five-founder vision. Items marked **Phase 4** are deferred — they are a separate product track and should not be scoped into the current Caring Community sprint.
+
+#### KISS Sociological Layer (Martin Villiger) — AG32–AG34
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG32 | K6 — Estate / legacy hours | Medium | When a member dies, what happens to banked hours? KISS cooperatives need a policy: nominate a beneficiary, donate to the cooperative solidarity fund, or expire after N months. `caring_hour_estates` table, coordinator workflow, Fondation KISS policy document reference. |
+| AG33 | K7 — KISS Treffen meetup sub-type | Low | KISS cooperatives have distinct ritual meeting formats (monthly Stamm, annual Jahresversammlung). Add a `kiss_treffen` event sub-type with RSVP-members-only, minutes-upload field, quorum tracking, and Fondation-style header. Separate from generic events. |
+| AG34 | K10 — AHV pension reporting export | Low | Switzerland is exploring whether KISS hours count toward AHV (Alters- und Hinterlassenenversicherung). Strategic/future-facing: export format mapping banked hours to an AHV-compatible contribution record. Dependent on official AHV digital interface specification (not yet publicly defined). |
+
+#### Tom Debus / AI Pillar — AG35–AG36
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG35 | T4 — AI feed and listings personalisation | Medium | Current feed sort is recency-only for new users; SmartMatchingEngine powers the Explore tab only. Extend interest-weighted ranking and collaborative filtering on engagement signals to the main feed and listings browse. Cold-start handling for new members. Tom Debus's AI/data pillar. |
+| AG36 | T5 — NLP intent extraction on help requests | Medium | "Drive me to my Arzttermin" → auto-categorise (Transport), detect date/time from natural language, suggest nearby drivers. OpenAI function-calling on `RequestHelpPage` submission. Prerequisite for AG37 (C1). Tom Debus's domain. |
+
+#### Christopher Mueller / UX Sprint — AG37–AG41
+
+> Christopher Mueller's entire UX pillar is currently **zero-of-five shipped**. Given he is a founder evaluating the platform, these five items should be treated as a dedicated sprint, not incremental polish.
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG37 | C1 — Audio-first request creation | High | Voice-driven help request: tap mic, speak, Whisper transcribes, NLP pre-fills form fields, member confirms before submitting. Christopher Mueller's professional speciality. Must work on mobile (Capacitor). Prerequisite: AG36 (T5 NLP intent). |
+| AG38 | C2 — User-generated content auto-translation | Medium | The UI is translated (11 languages); user-generated content (posts, listings, bios) is not. Add a per-item "Translate this" button calling `TranscriptionService::translate()` for UGC. Cache result in Redis per user locale. Per-user opt-in auto-translate preference. Distinct from INT1 (message translation) which already exists. |
+| AG39 | C3 — WCAG 2.1 AA accessibility audit on Caring Community pages | High | axe-core CI covers new components but no formal audit of Caring Community module pages has been run. Formal audit: screen-reader walkthrough, focus order, contrast ratios, skip-link coverage on `CaringCommunityPage`, `RequestHelpPage`, `MySupportRelationshipsPage`, `InviteRedemptionPage`. Document findings; fix all critical + serious violations. |
+| AG40 | C4 — Per-user accessibility profile | Medium | User-configurable accessibility preferences: large-font mode, high-contrast mode, reduced-motion toggle, simplified layout. CSS custom property overrides + `user_preferences` persistence. Complements SOC23 (accent colour/density theming) but specifically for accessibility needs. Critical for elderly Swiss residents. |
+| AG41 | C5 — Paper-form-to-digital onboarding | Medium | Coordinator photographs or scans a paper KISS consent form → OCR extracts name/DOB/address → provisional account created, member receives confirmation SMS/email to activate. Requires OCR service (Google Vision or Tesseract) and KISS consent-form template. Addresses the real onboarding gap for non-technical elderly members who will not use a phone to self-register. |
+
+#### Roland Greber / Compliance Pack — AG42–AG44
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG42 | R4 — Swiss FADP compliance pack | High | Full Swiss Federal Act on Data Protection documentation bundle: FADP-grade in-product consent banner (stricter than GDPR for automated profiling), configurable data-retention periods per data class, consent ledger (audit log of all consent grants and withdrawals), data-residency declaration (Switzerland option in isolated-node config), processing register export for DPA. Roland Greber's domain. Complements AG24 (GDPR data export) which is already shipped. |
+| AG43 | R7 — Citizen residency verification | Medium | Stripe Identity (AG — identity verification) proves who a person is but not that they live in the cooperative's catchment area. Add postcode/municipality self-declaration + coordinator attestation flow. Verified-residency badge distinct from identity badge. Needed for KISS cooperatives that are geographically bounded (Cham, St. Gallen, etc.). |
+| AG44 | R8 — Self-service regional node provisioning | Medium | A canton, cooperative, or municipality fills a form → a new isolated tenant is provisioned (Docker Compose variant, database, credentials) without requiring Jasper's admin access. Requires: provisioning API, automated seed pipeline, onboarding email with credentials, super-admin review queue. Roland Greber's commercialisation layer. |
+
+#### Agoris Commercial Layer — AG45–AG48
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG45 | A2 — Click-and-collect workflow | Medium | Reserve a marketplace item for in-store pickup at a specific merchant-defined time slot. Merchant sets available slots; buyer selects; both receive a confirmation with a QR pickup code. `marketplace_pickup_slots` + `marketplace_pickup_reservations` tables. Agoris POS App Store materials describe this workflow. |
+| AG46 | A3 — Merchant inventory tracking | Medium | Real-time stock count on marketplace listings: `inventory_count` column, low-stock alerts to seller, sold-out auto-deactivation, restock notifications for saved-search watchers. Needed for physical-goods merchants on the Agoris Marktplatz. |
+| AG47 | A4 — Tap-to-pay / physical POS bridge | Low | **NOTE (2026-04-28 research):** "Agoris Smart POS & Inventory" (package `com.miderva.agoris`) is a product by a separate company called Miderva — it has no connection to Agoris AG / agoris.ch. The earlier Gemini citation conflating them was incorrect. Agoris AG does not currently have a POS product. This item remains as a hypothetical future integration: NEXUS generates a per-transaction QR code that a physical POS partner app can scan to confirm time-credit redemption. Requires a POS partner agreement — do not build speculatively. |
+| AG48 | A5 — Local business merchant onboarding wizard | Medium | Self-serve SME onboarding: business name, category, description, logo upload, address, opening hours, Stripe Connect if selling. "Marktplatz-Partner" badge granted on first approved listing. Reduces coordinator effort for the Agoris commercial layer. |
+
+#### Care / Health Integration — AG49–AG53 (Phase 4 — Deferred)
+
+> This is a genuinely separate product track. None of these should be scoped into the current Caring Community sprint. Flag as Phase 4. Spitex Zug is in the Cham demo seed but formal integration has no current specification or data-sharing agreement.
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG49 | H1 — Spitex / professional homecare integration | Phase 4 | Spitex case manager creates a care plan in NEXUS, assigns KISS volunteer hours to supplement professional visits, tracks combined care hours. Requires Spitex data model definition and data-sharing agreement before any build. |
+| AG50 | H2 — GP care prescription mapping | Phase 4 | A GP recommends "5 hours/week companionship" → structured care request generated in NEXUS with dosage-style parameters. Requires clinical partner agreement and HL7/FHIR data model consideration. High regulatory complexity. |
+| AG51 | H3 — Medical appointment coordination | Phase 4 | Tandem-based "drive to Arzttermin": member posts appointment details, system suggests nearby drivers from active volunteers, iCal export. Builds on AG36 (T5 NLP intent). Can be partially delivered without H1/H2 if scoped narrowly as a transport tandem sub-type. |
+| AG52 | H4 — Pharmacy integration | Phase 4 | Medication delivery via community tandems. Requires pharmacy partner API for prescription status → delivery request. Future / requires pharmacy partner onboarding. |
+| AG53 | H5 — Emergency contact escalation | Phase 4 | Recipient missed check-in → escalation chain: (1) coordinator alert, (2) emergency contact notification, (3) safeguarding report auto-filed if no response within SLA window. Builds on AG25 (safeguarding escalation) and AG22 (predictive coordinator dashboard). High welfare value; Phase 4 scope because it requires safeguarding policy sign-off per deployment. |
+
+#### Verein Lifecycle — AG54–AG55
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG54 | V3 — Verein membership fee collection | Medium | Annual dues via Stripe: Verein admin sets annual fee, members receive payment request, payment tracked against membership status, late-payment reminder, renewal badge on member profile. Complements AG30 (V1+V2 bulk import + scoped admin role). |
+| AG55 | V4 — Verein-to-Verein federation within a Gemeinde | Low | Cross-Verein event sharing and member discovery within a single municipality. Vereine in the same tenant opt-in to share event listings, cross-invite members, and appear in a joint Verein calendar. Builds on FED2 (federation directory). |
+
+---
+
 ### Suggested Reply Themes For Martin
 
 - Yes, NEXUS can be adapted and extended with additional functionality.
@@ -598,8 +670,10 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 - Any added buttons, routes, dashboard widgets, admin links, or feature affordances are governed by tenant module configuration and disappear immediately when disabled — demonstrated by the kill-switch tests.
 - NEXUS covers ~72% of the full Agoris platform vision: time banking, volunteering, organizations, groups, events, resources, goals, polls, feed, messaging, multilingual support (de/fr/it/en), admin reporting, municipal impact reports with CHF social value, and federation. The KISS time-bank workflow layer is stronger in NEXUS than anything Agoris has publicly described.
 - Honest Phase 1 scope: KISS time-bank + Caring Community coordination + municipal reporting + multilingual Switzerland = production-ready today.
-- Honest Phase 2 scope: unified "Marktplatz" (commercial + time-credit), proximity/radius filtering, municipal announcement channel, Verein directory, and credit-free informal help (AG11–AG15). These are defined items, not unknowns.
-- Phase 3 scope: POS integration, banking/payment interfaces, self-service regional node creation.
+- Honest Phase 2 scope: unified "Marktplatz" (commercial + time-credit), proximity/radius filtering, municipal announcement channel, Verein directory, credit-free informal help, Christopher Mueller UX/accessibility sprint (AG11–AG16, AG37–AG41). These are defined items, not unknowns.
+- Phase 3 scope: FADP compliance pack, residency verification, merchant onboarding wizard, click-and-collect, inventory tracking, Verein lifecycle (AG42–AG48, AG54–AG55).
+- Phase 4 scope (separate product track): care/health integration (H1–H5, AG49–AG53). Do not commit to these without a clinical/Spitex data-sharing agreement and regulatory review.
+- Remaining strategic items: AHV pension export (AG34), self-service regional node provisioning (AG44), POS bridge (AG47). These are medium-term and depend on external partners or specifications.
 - The next step should be a guided evaluation with Roland and Christopher, followed by a focused diligence/product workshop on KISS workflows, municipal reports, data protection, and Swiss deployment expectations.
 
 ---
