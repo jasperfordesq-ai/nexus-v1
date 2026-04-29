@@ -50,6 +50,7 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Zap from 'lucide-react/icons/zap';
 import Target from 'lucide-react/icons/target';
 import Brain from 'lucide-react/icons/brain';
+import Bot from 'lucide-react/icons/bot';
 import Search from 'lucide-react/icons/search';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -353,6 +354,11 @@ function useAdminNav(): NavSection[] {
       ...(hasFeature('ai_chat') ? [
         { label: "AI Settings", href: '/admin/ai-settings', icon: Brain },
       ] : []),
+      ...(hasFeature('ai_agents') ? [
+        { label: "AI Agents", href: '/admin/agents', icon: Bot },
+        { label: "Agent Proposals", href: '/admin/agents/proposals', icon: Bot },
+        { label: "Agent Runs", href: '/admin/agents/runs', icon: Bot },
+      ] : []),
       { label: "Email Settings", href: '/admin/email-settings', icon: Mail },
       { label: "Algorithm Settings", href: '/admin/algorithm-settings', icon: Cpu },
       { label: "SEO Overview", href: '/admin/seo', icon: Search },
@@ -587,6 +593,7 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: "Super Dashboard", href: '/admin/super', icon: Crown },
           { label: "National KISS Dashboard", href: '/admin/national/kiss', icon: Landmark },
+          { label: "Provisioning Queue", href: '/admin/provisioning-requests', icon: Building2 },
           { label: "All Tenants", href: '/admin/super/tenants', icon: Building2 },
           { label: "Tenant Hierarchy", href: '/admin/super/tenants/hierarchy', icon: Network },
           { label: "Cross-Tenant Users", href: '/admin/super/users', icon: Users },

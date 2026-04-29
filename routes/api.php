@@ -973,6 +973,18 @@ Route::post('/v2/marketplace/listings/bulk-action', [\App\Http\Controllers\Api\M
 Route::get('/v2/marketplace/listings/export-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'exportCsv']);
 Route::post('/v2/marketplace/listings/import-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'importCsv']);
 
+// AG45 — Marketplace pickup slots (click-and-collect)
+Route::get('/v2/marketplace/seller/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'slotsIndex']);
+Route::post('/v2/marketplace/seller/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'slotsStore']);
+Route::put('/v2/marketplace/seller/pickup-slots/{id}', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'slotsUpdate']);
+Route::delete('/v2/marketplace/seller/pickup-slots/{id}', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'slotsDestroy']);
+Route::post('/v2/marketplace/seller/pickup-scan', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'scanQr']);
+Route::post('/v2/marketplace/orders/{id}/pickup-reservation', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'reserve']);
+Route::get('/v2/marketplace/me/pickups', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'myReservations']);
+
+// AG46 — Marketplace inventory
+Route::patch('/v2/marketplace/seller/listings/{id}/inventory', [\App\Http\Controllers\Api\MarketplaceInventoryController::class, 'updateInventory']);
+
 // AG48 — Merchant Onboarding Wizard (self-serve SME onboarding)
 Route::get('/v2/merchant-onboarding/status', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'status']);
 Route::post('/v2/merchant-onboarding/step-1', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep1']);
@@ -994,6 +1006,7 @@ Route::get('/v2/marketplace/categories', [\App\Http\Controllers\Api\MarketplaceL
 Route::get('/v2/marketplace/categories/{id}/template', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categoryTemplate']);
 Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'show']);
 Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);
+Route::get('/v2/marketplace/listings/{id}/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'listForListing']);
 
 // ============================================
 // Federation cross-node aggregates (R1+R2 — AGORIS architecture)

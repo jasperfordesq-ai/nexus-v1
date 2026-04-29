@@ -16,8 +16,8 @@
  * telling the buyer to contact the seller to arrange payment.
  */
 
-import { useState, useCallback } from 'react';
-import { Button, Input, useDisclosure } from '@heroui/react';
+import { useState, useCallback, useEffect } from 'react';
+import { Button, Input, useDisclosure, Select, SelectItem } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
@@ -50,6 +50,13 @@ interface CreateIntentResponse {
   client_secret?: string;
 }
 
+interface PickupSlotOption {
+  id: number;
+  slot_start: string | null;
+  slot_end: string | null;
+  remaining: number;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,6 +82,29 @@ export function BuyNowButton({
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
 
+  // AG45 — pickup slots
+  const [pickupSlots, setPickupSlots] = useState<PickupSlotOption[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get<PickupSlotOption[]>(
+          `/v2/marketplace/listings/${listingId}/pickup-slots`,
+        );
+        if (!cancelled && res.success && Array.isArray(res.data)) {
+          setPickupSlots(res.data);
+        }
+      } catch {
+        /* non-fatal — pickup is optional */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [listingId]);
+
   const couponsEnabled = hasFeature('merchant_coupons');
 
   const isOwnListing = user?.id === sellerId;
@@ -97,6 +127,18 @@ export function BuyNowButton({
       }
 
       const orderId = orderRes.data.id;
+
+      // AG45 — Reserve pickup slot if one was chosen
+      if (selectedSlotId) {
+        try {
+          await api.post(`/v2/marketplace/orders/${orderId}/pickup-reservation`, {
+            slot_id: parseInt(selectedSlotId, 10),
+          });
+        } catch (err) {
+          logError('BuyNowButton: pickup reservation failed', err);
+          // non-fatal — order proceeds, buyer can still arrange pickup later
+        }
+      }
 
       // Step 2: Create Stripe payment intent / checkout session
       const intentRes = await api.post<CreateIntentResponse>('/v2/marketplace/payments/create-intent', {
@@ -132,7 +174,7 @@ export function BuyNowButton({
     } finally {
       setIsProcessing(false);
     }
-  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t, couponApplied, couponCode])
+  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t, couponApplied, couponCode, selectedSlotId])
 
   // Format price for button label
   const priceLabel = new Intl.NumberFormat(undefined, {
@@ -161,8 +203,36 @@ export function BuyNowButton({
     }
   };
 
+  const formatSlotLabel = (s: PickupSlotOption) => {
+    try {
+      return s.slot_start ? new Date(s.slot_start).toLocaleString() : `Slot #${s.id}`;
+    } catch {
+      return `Slot #${s.id}`;
+    }
+  };
+
   return (
     <>
+      {pickupSlots.length > 0 && !isOwnListing && user && (
+        <div className="mb-2">
+          <Select
+            size="sm"
+            label={t('marketplace.pickup.choose_slot', 'Choose pickup slot')}
+            placeholder={t('marketplace.pickup.no_slot_selected', 'No pickup slot')}
+            selectedKeys={selectedSlotId ? [selectedSlotId] : []}
+            onSelectionChange={(keys) => {
+              const v = Array.from(keys)[0];
+              setSelectedSlotId(v ? String(v) : '');
+            }}
+          >
+            {pickupSlots.map((s) => (
+              <SelectItem key={String(s.id)} textValue={formatSlotLabel(s)}>
+                {formatSlotLabel(s)} ({s.remaining} {t('marketplace.pickup.left', 'left')})
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      )}
       {couponsEnabled && !isOwnListing && user && (
         <div className="flex gap-2 mb-2">
           <Input

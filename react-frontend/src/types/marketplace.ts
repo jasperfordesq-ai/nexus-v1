@@ -35,6 +35,10 @@ export interface MarketplaceListingItem {
   is_promoted: boolean;
   views_count: number;
   created_at: string;
+  // AG46 — inventory tracking (optional, server-supplied for own listings)
+  inventory_count?: number | null;
+  low_stock_threshold?: number | null;
+  is_oversold_protected?: boolean;
 }
 
 export interface MarketplaceListingDetail extends MarketplaceListingItem {

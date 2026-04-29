@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
+import { MarketplacePartnerBadge } from '@/components/marketplace/MarketplacePartnerBadge';
 import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -66,6 +67,7 @@ interface SellerProfile {
   is_verified?: boolean;
   is_community_endorsed?: boolean;
   business_verified?: boolean;
+  marketplace_partner_badge_at?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -278,6 +280,7 @@ export function SellerProfilePage() {
                     {seller.seller_type === 'business' ? t('seller.seller_type_business', 'Business') : t('seller.seller_type_private', 'Private Seller')}
                   </Chip>
                 )}
+                <MarketplacePartnerBadge grantedAt={seller.marketplace_partner_badge_at ?? null} />
               </div>
 
               {seller.bio && (

@@ -66,6 +66,11 @@ interface SellerDashboardStats {
   [key: string]: number | string;
 }
 
+interface OnboardingStatus {
+  onboarding_completed?: boolean;
+  current_step?: number | string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -112,6 +117,14 @@ export function MyListingsPage() {
   const [activeTab, setActiveTab] = useState<ListingTab>('active');
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [stats, setStats] = useState<SellerDashboardStats | null>(null);
+  const [onboardingDone, setOnboardingDone] = useState<boolean>(true);
+  const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('nx_merchant_onboarding_dismissed') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
@@ -150,6 +163,19 @@ export function MyListingsPage() {
     };
 
     load();
+
+    // AG48 — onboarding wizard prompt
+    (async () => {
+      try {
+        const res = await api.get<OnboardingStatus>('/v2/merchant-onboarding/status');
+        if (!cancelled && res.success && res.data) {
+          setOnboardingDone(Boolean(res.data.onboarding_completed));
+        }
+      } catch {
+        /* non-fatal */
+      }
+    })();
+
     return () => { cancelled = true; };
   }, [isAuthenticated]);
 
@@ -286,6 +312,44 @@ export function MyListingsPage() {
           </Button>
         </div>
 
+        {/* AG48 — Onboarding nudge */}
+        {!onboardingDone && !onboardingDismissed && (
+          <GlassCard className="p-4 flex items-center justify-between gap-4 flex-wrap border-l-4 border-primary">
+            <div>
+              <p className="font-semibold text-foreground">
+                {t('marketplace.onboarding.nudge_title', 'Complete your merchant onboarding')}
+              </p>
+              <p className="text-sm text-default-500">
+                {t('marketplace.onboarding.nudge_description', 'Add business details, branding and payouts to unlock the Marketplace Partner badge.')}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                color="primary"
+                as={Link}
+                to={tenantPath('/marketplace/seller/onboarding')}
+              >
+                {t('marketplace.onboarding.start_cta', 'Start onboarding')}
+              </Button>
+              <Button
+                size="sm"
+                variant="light"
+                onPress={() => {
+                  setOnboardingDismissed(true);
+                  try {
+                    localStorage.setItem('nx_merchant_onboarding_dismissed', '1');
+                  } catch {
+                    /* ignore */
+                  }
+                }}
+              >
+                {t('common.dismiss', 'Dismiss')}
+              </Button>
+            </div>
+          </GlassCard>
+        )}
+
         {/* Stats summary */}
         {!isLoadingStats && stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -407,6 +471,32 @@ export function MyListingsPage() {
                       <Eye className="w-3 h-3" />
                       <span>{listing.views_count}</span>
                     </div>
+
+                    {/* AG46 — Inventory chip */}
+                    {(() => {
+                      const inv = listing.inventory_count;
+                      const threshold = listing.low_stock_threshold;
+                      if (inv == null) return null;
+                      if (inv === 0) {
+                        return (
+                          <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-danger-100 text-danger-700">
+                            {t('marketplace.inventory.sold_out', 'Sold out')}
+                          </span>
+                        );
+                      }
+                      if (threshold != null && inv <= threshold) {
+                        return (
+                          <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-warning-100 text-warning-700">
+                            {t('marketplace.inventory.low_chip', 'Inventory: {{count}} (Low)', { count: inv })}
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded bg-default-100 text-default-600">
+                          {t('marketplace.inventory.count_chip', 'Inventory: {{count}}', { count: inv })}
+                        </span>
+                      );
+                    })()}
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-3">

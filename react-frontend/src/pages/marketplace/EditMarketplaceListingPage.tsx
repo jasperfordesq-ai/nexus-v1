@@ -31,6 +31,7 @@ import {
   Radio,
   Spinner,
   Chip,
+  Switch,
 } from '@heroui/react';
 import Camera from 'lucide-react/icons/camera';
 import X from 'lucide-react/icons/x';
@@ -137,6 +138,11 @@ export function EditMarketplaceListingPage() {
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
   const [templateFields, setTemplateFields] = useState<Record<string, string>>({});
+  // AG46 — inventory tracking
+  const [inventoryUnlimited, setInventoryUnlimited] = useState(true);
+  const [inventoryCount, setInventoryCount] = useState('0');
+  const [lowStockThreshold, setLowStockThreshold] = useState('5');
+  const [oversoldProtected, setOversoldProtected] = useState(true);
 
   // Data state
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -192,6 +198,26 @@ export function EditMarketplaceListingPage() {
         setLongitude(listing.longitude ?? undefined);
         setDeliveryMethod(listing.delivery_method || 'pickup');
         setQuantity(String(listing.quantity ?? 1));
+
+        // AG46 — load inventory tracking
+        const inv = (listing as unknown as {
+          inventory_count?: number | null;
+          low_stock_threshold?: number | null;
+          is_oversold_protected?: boolean;
+        });
+        if (inv.inventory_count == null) {
+          setInventoryUnlimited(true);
+          setInventoryCount('0');
+        } else {
+          setInventoryUnlimited(false);
+          setInventoryCount(String(inv.inventory_count));
+        }
+        if (inv.low_stock_threshold != null) {
+          setLowStockThreshold(String(inv.low_stock_threshold));
+        }
+        if (typeof inv.is_oversold_protected === 'boolean') {
+          setOversoldProtected(inv.is_oversold_protected);
+        }
 
         // Map existing images
         if (listing.images?.length) {
@@ -410,6 +436,10 @@ export function EditMarketplaceListingPage() {
         price_type: priceType,
         delivery_method: deliveryMethod,
         quantity: parseInt(quantity) || 1,
+        // AG46 inventory
+        inventory_count: inventoryUnlimited ? null : Math.max(0, parseInt(inventoryCount) || 0),
+        low_stock_threshold: Math.max(0, parseInt(lowStockThreshold) || 0),
+        is_oversold_protected: oversoldProtected,
       };
 
       if (categoryId) body.category_id = parseInt(categoryId);
@@ -446,8 +476,9 @@ export function EditMarketplaceListingPage() {
     }
   }, [
     id, title, description, categoryId, condition, price, currency, priceType,
-    location, deliveryMethod, quantity, images, removedImageIds, templateFields,
-    toast, navigate, tenantPath,
+    location, latitude, longitude, deliveryMethod, quantity, images, removedImageIds, templateFields,
+    inventoryUnlimited, inventoryCount, lowStockThreshold, oversoldProtected,
+    toast, navigate, tenantPath, t,
   ]);
 
   if (!isAuthenticated) return null;
@@ -666,6 +697,44 @@ export function EditMarketplaceListingPage() {
             onValueChange={setQuantity}
             className="max-w-[150px]"
           />
+
+          {/* AG46 — Inventory tracking */}
+          <div className="border-t border-default-200 pt-4 space-y-3">
+            <div>
+              <h3 className="text-base font-semibold text-foreground">
+                {t('marketplace.inventory.section_title', 'Inventory')}
+              </h3>
+              <p className="text-xs text-default-500">
+                {t('marketplace.inventory.section_subtitle', 'Track stock and prevent over-selling.')}
+              </p>
+            </div>
+            <Switch isSelected={inventoryUnlimited} onValueChange={setInventoryUnlimited}>
+              {t('marketplace.inventory.unlimited', 'Unlimited stock')}
+            </Switch>
+            {!inventoryUnlimited && (
+              <div className="flex flex-wrap gap-3">
+                <Input
+                  label={t('marketplace.inventory.count', 'Stock count')}
+                  type="number"
+                  min={0}
+                  value={inventoryCount}
+                  onValueChange={setInventoryCount}
+                  className="max-w-[180px]"
+                />
+                <Input
+                  label={t('marketplace.inventory.low_stock_threshold', 'Low-stock alert at')}
+                  type="number"
+                  min={0}
+                  value={lowStockThreshold}
+                  onValueChange={setLowStockThreshold}
+                  className="max-w-[180px]"
+                />
+              </div>
+            )}
+            <Switch isSelected={oversoldProtected} onValueChange={setOversoldProtected}>
+              {t('marketplace.inventory.oversold_protected', 'Reject orders that would oversell')}
+            </Switch>
+          </div>
 
           {/* Dynamic template fields */}
           {isLoadingTemplate && (
