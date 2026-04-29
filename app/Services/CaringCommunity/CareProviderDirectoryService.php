@@ -37,7 +37,7 @@ class CareProviderDirectoryService
     private function assertAvailable(): void
     {
         if (!$this->isAvailable()) {
-            throw new RuntimeException('Table not available');
+            throw new RuntimeException(__('api.caring_provider_directory_unavailable'));
         }
     }
 

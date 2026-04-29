@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardBody,
@@ -98,6 +98,20 @@ interface ProviderCardProps {
   t: (key: string) => string;
 }
 
+function providerTypeLabel(type: CareProvider['type'], t: (key: string) => string): string {
+  const key = type === 'spitex'
+    ? 'providers.filter_spitex'
+    : type === 'tagesstätte'
+      ? 'providers.filter_tagesstte'
+      : type === 'private'
+        ? 'providers.filter_private'
+        : type === 'verein'
+          ? 'providers.filter_verein'
+          : 'providers.filter_volunteer';
+
+  return t(key);
+}
+
 function ProviderCard({ provider, t }: ProviderCardProps) {
   return (
     <Card className="p-1 hover:shadow-md transition-shadow">
@@ -108,13 +122,13 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
             {provider.is_verified && (
               <BadgeCheck
                 className="h-4 w-4 shrink-0 text-primary"
-                aria-label={t('caring_community.providers.verified_badge')}
+                aria-label={t('providers.verified_badge')}
               />
             )}
             <h3 className="font-semibold text-theme-primary truncate">{provider.name}</h3>
           </div>
           <Chip size="sm" color={typeChipColor(provider.type)} variant="flat" className="shrink-0">
-            {provider.type}
+            {providerTypeLabel(provider.type, t)}
           </Chip>
         </div>
 
@@ -159,7 +173,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span>{t('caring_community.providers.website')}</span>
+              <span>{t('providers.website')}</span>
             </a>
           )}
         </div>
@@ -168,7 +182,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
         {provider.is_verified && (
           <div className="flex items-center gap-1.5 text-xs text-primary font-medium pt-0.5">
             <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            {t('caring_community.providers.verified_badge')}
+            {t('providers.verified_badge')}
           </div>
         )}
       </CardBody>
@@ -181,29 +195,27 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
 // ---------------------------------------------------------------------------
 
 const FILTER_TABS: { key: ProviderType; labelKey: string }[] = [
-  { key: 'all',          labelKey: 'caring_community.providers.filter_all' },
-  { key: 'spitex',       labelKey: 'caring_community.providers.filter_spitex' },
-  { key: 'tagesstätte',  labelKey: 'caring_community.providers.filter_tagesstte' },
-  { key: 'private',      labelKey: 'caring_community.providers.filter_private' },
-  { key: 'verein',       labelKey: 'caring_community.providers.filter_verein' },
-  { key: 'volunteer',    labelKey: 'caring_community.providers.filter_volunteer' },
+  { key: 'all',          labelKey: 'providers.filter_all' },
+  { key: 'spitex',       labelKey: 'providers.filter_spitex' },
+  { key: 'tagesstätte',  labelKey: 'providers.filter_tagesstte' },
+  { key: 'private',      labelKey: 'providers.filter_private' },
+  { key: 'verein',       labelKey: 'providers.filter_verein' },
+  { key: 'volunteer',    labelKey: 'providers.filter_volunteer' },
 ];
 
 export default function CareProviderDirectoryPage() {
   const { t } = useTranslation('caring_community');
   const { hasFeature } = useTenant();
-  usePageTitle(t('caring_community.providers.title'));
+  usePageTitle(t('providers.title'));
 
   const [activeType, setActiveType] = useState<ProviderType>('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // Debounce search input
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    const timer = setTimeout(() => setDebouncedSearch(value), 350);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 350);
     return () => clearTimeout(timer);
-  };
+  }, [search]);
 
   // Build query string
   const params = new URLSearchParams();
@@ -224,8 +236,8 @@ export default function CareProviderDirectoryPage() {
   return (
     <>
       <PageMeta
-        title={t('caring_community.providers.title')}
-        description={t('caring_community.providers.subtitle')}
+        title={t('providers.title')}
+        description={t('providers.subtitle')}
       />
 
       <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
@@ -233,16 +245,16 @@ export default function CareProviderDirectoryPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
             <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
-            {t('caring_community.providers.title')}
+            {t('providers.title')}
           </h1>
-          <p className="text-theme-muted">{t('caring_community.providers.subtitle')}</p>
+          <p className="text-theme-muted">{t('providers.subtitle')}</p>
         </div>
 
         {/* Search */}
         <Input
-          placeholder={t('caring_community.providers.search_placeholder')}
+          placeholder={t('providers.search_placeholder')}
           value={search}
-          onValueChange={handleSearchChange}
+          onValueChange={setSearch}
           startContent={<Search className="h-4 w-4 text-default-400" aria-hidden="true" />}
           variant="bordered"
           classNames={{ inputWrapper: 'max-w-md' }}
@@ -256,7 +268,7 @@ export default function CareProviderDirectoryPage() {
           onSelectionChange={(key) => setActiveType(key as ProviderType)}
           variant="underlined"
           classNames={{ tabList: 'gap-2 flex-wrap' }}
-          aria-label="Filter providers by type"
+          aria-label={t('providers.filter_aria')}
         >
           {FILTER_TABS.map(({ key, labelKey }) => (
             <Tab key={key} title={t(labelKey)} />
@@ -272,13 +284,13 @@ export default function CareProviderDirectoryPage() {
           </div>
         ) : error ? (
           <div className="rounded-xl border border-danger/30 bg-danger/5 p-6 text-center text-danger">
-            {t('caring_community.providers.no_providers')}
+            {t('providers.no_providers')}
           </div>
         ) : providers.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center text-theme-muted">
             <Heart className="h-12 w-12 opacity-30" aria-hidden="true" />
-            <p className="text-lg font-medium">{t('caring_community.providers.no_providers')}</p>
-            <p className="text-sm">{t('caring_community.providers.no_providers_hint')}</p>
+            <p className="text-lg font-medium">{t('providers.no_providers')}</p>
+            <p className="text-sm">{t('providers.no_providers_hint')}</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

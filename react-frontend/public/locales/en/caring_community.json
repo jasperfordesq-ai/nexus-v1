@@ -93,6 +93,7 @@
     "title": "Care Provider Directory",
     "subtitle": "Find care services, day centres, associations, and volunteers in your region",
     "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
     "filter_all": "All",
     "filter_spitex": "Spitex",
     "filter_tagesstte": "Day Centres",

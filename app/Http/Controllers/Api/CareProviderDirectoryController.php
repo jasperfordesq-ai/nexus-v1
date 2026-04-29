@@ -98,7 +98,7 @@ class CareProviderDirectoryController extends BaseApiController
     public function adminIndex(): JsonResponse
     {
         $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
@@ -124,7 +124,7 @@ class CareProviderDirectoryController extends BaseApiController
     public function store(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
@@ -169,7 +169,7 @@ class CareProviderDirectoryController extends BaseApiController
     public function adminUpdate(int $id): JsonResponse
     {
         $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
@@ -221,7 +221,7 @@ class CareProviderDirectoryController extends BaseApiController
     public function adminDelete(int $id): JsonResponse
     {
         $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
@@ -248,7 +248,7 @@ class CareProviderDirectoryController extends BaseApiController
     public function adminVerify(int $id): JsonResponse
     {
         $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);

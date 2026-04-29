@@ -1264,8 +1264,10 @@ Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\
 Route::put('/v2/admin/caring-community/loyalty/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateLoyaltySellerSettings']);
 
 // AG64 — Care-Provider Directory
-Route::get('/v2/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'index']);
-Route::get('/v2/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'show']);
+Route::get('/v2/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'index'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'show'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminIndex']);
 Route::post('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'store']);
 Route::put('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminUpdate']);

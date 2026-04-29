@@ -1815,6 +1815,7 @@ return [
     'caring_caregiver_active_link_required'    => 'You do not have an active caregiver link to this person.',
     'caring_caregiver_relationship_invalid'    => 'relationship_type must be one of: :values.',
     'caring_caregiver_when_needed_default'     => 'As soon as practical',
+    'caring_provider_directory_unavailable'    => 'Care provider directory is not available for this community.',
     'caring_emergency_alerts_unavailable'      => 'Emergency alerts are not available.',
     'caring_emergency_alert_not_found_after_update' => 'Emergency alert not found after update.',
     'pilot_inquiry_service_unavailable'        => 'Pilot inquiries are not available.',
