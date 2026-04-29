@@ -174,6 +174,8 @@ const MunicipalSurveyPage = lazyWithRetry(() => import('@/pages/caring-community
 const ProjectAnnouncementsPage = lazyWithRetry(() => import('@/pages/caring-community/ProjectAnnouncementsPage'));
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
+const MyAdCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyAdCampaignsPage'));
+const MyPushCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyPushCampaignsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/CreateOpportunityPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
@@ -671,6 +673,10 @@ function AppRoutes() {
 
         {/* Clubs & Associations directory (AG15) — public, no feature gate */}
         <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />
+
+        {/* Advertiser self-serve portal (AG56/AG57) */}
+        <Route path="advertise/campaigns" element={<ErrorBoundary><MyAdCampaignsPage /></ErrorBoundary>} />
+        <Route path="advertise/push-campaigns" element={<ErrorBoundary><MyPushCampaignsPage /></ErrorBoundary>} />
 
         {/* Public: Caring Community invite redemption — no auth, no feature gate needed */}
         <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />

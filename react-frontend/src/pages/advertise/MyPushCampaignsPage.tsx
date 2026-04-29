@@ -349,7 +349,8 @@ export function MyPushCampaignsPage() {
                 placeholder="25"
                 type="number"
                 min="1"
-                endContent={<span className="text-default-400 text-sm">km</span>}
+                /* eslint-disable-next-line i18next/no-literal-string */
+                endContent={<span className="text-default-400 text-sm" aria-hidden="true">km</span>}
                 value={form.audience_radius_km}
                 onValueChange={(v) => setForm((p) => ({ ...p, audience_radius_km: v }))}
                 variant="bordered"

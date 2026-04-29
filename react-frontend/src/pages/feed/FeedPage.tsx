@@ -65,6 +65,8 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { resetImpressions } from '@/hooks/useFeedTracking';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
+import { FeedAdCard } from '@/components/feed/FeedAdCard';
+import type { AdItem } from '@/components/feed/FeedAdCard';
 import { FeedEmptyIllustration } from '@/components/illustrations';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
@@ -189,6 +191,20 @@ export function FeedPage() {
 
   // Use a ref for cursor to avoid infinite re-render loop
   const cursorRef = useRef<string | undefined>();
+
+  // Active ad creatives — stored in a ref so ad injection never triggers re-renders
+  const adsRef = useRef<AdItem[]>([]);
+
+  // Fetch ads once on mount — failures are silently swallowed so the feed is unaffected
+  useEffect(() => {
+    api.get<AdItem[]>('/v2/ads/active?placement=feed&limit=3')
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          adsRef.current = res.data;
+        }
+      })
+      .catch((err) => logError('Failed to fetch feed ads', err));
+  }, []);
 
   // Separate AbortControllers: initial/filter loads vs load-more appends
   // This prevents a fresh load from aborting an in-flight append (or vice versa)
@@ -1071,6 +1087,27 @@ export function FeedPage() {
                         <ConnectionSuggestionsWidget layout="inline" />
                       </div>
                     )}
+                    {/* Inject an ad after every 8th real feed item (index 7, 15, 23...) */}
+                    {(index + 1) % 8 === 0 && (() => {
+                      try {
+                        const ads = adsRef.current;
+                        if (ads.length === 0) return null;
+                        const adIndex = Math.floor((index + 1) / 8) - 1;
+                        const ad = ads[adIndex % ads.length];
+                        return (
+                          <motion.div
+                            key={`ad-${ad.campaign_id}-${adIndex}`}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25 }}
+                          >
+                            <FeedAdCard ad={ad} />
+                          </motion.div>
+                        );
+                      } catch {
+                        return null;
+                      }
+                    })()}
                   </React.Fragment>
                 ))}
               </AnimatePresence>

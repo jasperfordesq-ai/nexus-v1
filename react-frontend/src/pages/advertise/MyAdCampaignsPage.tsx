@@ -31,7 +31,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Plus from 'lucide-react/icons/plus';
-import BarChart3 from 'lucide-react/icons/chart-column';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -364,7 +363,8 @@ export function MyAdCampaignsPage() {
                 placeholder="25"
                 type="number"
                 min="1"
-                endContent={<span className="text-default-400 text-sm">km</span>}
+                /* eslint-disable-next-line i18next/no-literal-string */
+                endContent={<span className="text-default-400 text-sm" aria-hidden="true">km</span>}
                 value={form.targeting_radius_km}
                 onValueChange={(v) => setForm((p) => ({ ...p, targeting_radius_km: v }))}
                 variant="bordered"
