@@ -11,7 +11,7 @@
  * - localStorage persistence
  * - Backend sync for authenticated users
  * - Smooth theme transitions
- * - Accent color, font size, density, and high contrast preferences
+ * - Accent color, font size, density, and accessibility preferences
  */
 
 import {
@@ -40,7 +40,10 @@ export interface ThemePreferences {
   accentColor: string;
   fontSize: FontSize;
   density: Density;
+  largeText: boolean;
   highContrast: boolean;
+  reducedMotion: boolean;
+  simplifiedLayout: boolean;
 }
 
 interface ThemeState {
@@ -55,7 +58,10 @@ interface ThemeContextValue extends ThemeState, ThemePreferences {
   setAccentColor: (color: string) => void;
   setFontSize: (size: FontSize) => void;
   setDensity: (density: Density) => void;
+  setLargeText: (enabled: boolean) => void;
   setHighContrast: (enabled: boolean) => void;
+  setReducedMotion: (enabled: boolean) => void;
+  setSimplifiedLayout: (enabled: boolean) => void;
   isLoading: boolean;
 }
 
@@ -71,7 +77,10 @@ const DEFAULT_PREFERENCES: ThemePreferences = {
   accentColor: '#6366f1',
   fontSize: 'medium',
   density: 'comfortable',
+  largeText: false,
   highContrast: false,
+  reducedMotion: false,
+  simplifiedLayout: false,
 };
 
 const FONT_SIZE_MAP: Record<FontSize, string> = {
@@ -130,9 +139,15 @@ function applyPreferencesToDOM(prefs: ThemePreferences): void {
   const html = document.documentElement;
 
   html.style.setProperty('--accent-color', prefs.accentColor);
-  html.style.setProperty('--font-size-base', FONT_SIZE_MAP[prefs.fontSize]);
+  html.style.setProperty(
+    '--font-size-base',
+    FONT_SIZE_MAP[prefs.largeText ? 'large' : prefs.fontSize]
+  );
   html.style.setProperty('--spacing-multiplier', SPACING_MULTIPLIER_MAP[prefs.density]);
+  html.setAttribute('data-large-text', String(prefs.largeText));
   html.setAttribute('data-high-contrast', String(prefs.highContrast));
+  html.setAttribute('data-reduced-motion', String(prefs.reducedMotion));
+  html.setAttribute('data-simplified-layout', String(prefs.simplifiedLayout));
 }
 
 function getStoredTheme(): ThemeMode | null {
@@ -159,7 +174,10 @@ function getStoredPreferences(): ThemePreferences | null {
         accentColor: parsed.accentColor ?? DEFAULT_PREFERENCES.accentColor,
         fontSize: parsed.fontSize ?? DEFAULT_PREFERENCES.fontSize,
         density: parsed.density ?? DEFAULT_PREFERENCES.density,
+        largeText: parsed.largeText ?? DEFAULT_PREFERENCES.largeText,
         highContrast: parsed.highContrast ?? DEFAULT_PREFERENCES.highContrast,
+        reducedMotion: parsed.reducedMotion ?? DEFAULT_PREFERENCES.reducedMotion,
+        simplifiedLayout: parsed.simplifiedLayout ?? DEFAULT_PREFERENCES.simplifiedLayout,
       };
     }
   } catch {
@@ -237,7 +255,10 @@ export function ThemeProvider({
             accentColor: (themePrefs.accent_color as string) ?? DEFAULT_PREFERENCES.accentColor,
             fontSize: (themePrefs.font_size as FontSize) ?? DEFAULT_PREFERENCES.fontSize,
             density: (themePrefs.density as Density) ?? DEFAULT_PREFERENCES.density,
+            largeText: (themePrefs.large_text as boolean) ?? DEFAULT_PREFERENCES.largeText,
             highContrast: (themePrefs.high_contrast as boolean) ?? DEFAULT_PREFERENCES.highContrast,
+            reducedMotion: (themePrefs.reduced_motion as boolean) ?? DEFAULT_PREFERENCES.reducedMotion,
+            simplifiedLayout: (themePrefs.simplified_layout as boolean) ?? DEFAULT_PREFERENCES.simplifiedLayout,
           };
           setPreferences(serverPrefs);
           storePreferences(serverPrefs);
@@ -282,7 +303,10 @@ export function ThemeProvider({
           accent_color: prefs.accentColor,
           font_size: prefs.fontSize,
           density: prefs.density,
+          large_text: prefs.largeText,
           high_contrast: prefs.highContrast,
+          reduced_motion: prefs.reducedMotion,
+          simplified_layout: prefs.simplifiedLayout,
         });
       } catch (error) {
         logWarn('Failed to persist theme preferences to backend:', error);
@@ -352,6 +376,33 @@ export function ThemeProvider({
     });
   }, [syncPreferencesToBackend]);
 
+  const setLargeText = useCallback((enabled: boolean) => {
+    setPreferences((prev) => {
+      const next = { ...prev, largeText: enabled };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
+  const setReducedMotion = useCallback((enabled: boolean) => {
+    setPreferences((prev) => {
+      const next = { ...prev, reducedMotion: enabled };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
+  const setSimplifiedLayout = useCallback((enabled: boolean) => {
+    setPreferences((prev) => {
+      const next = { ...prev, simplifiedLayout: enabled };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
   // Context value
   const value = useMemo<ThemeContextValue>(
     () => ({
@@ -364,14 +415,21 @@ export function ThemeProvider({
       accentColor: preferences.accentColor,
       fontSize: preferences.fontSize,
       density: preferences.density,
+      largeText: preferences.largeText,
       highContrast: preferences.highContrast,
+      reducedMotion: preferences.reducedMotion,
+      simplifiedLayout: preferences.simplifiedLayout,
       setAccentColor,
       setFontSize,
       setDensity,
+      setLargeText,
       setHighContrast,
+      setReducedMotion,
+      setSimplifiedLayout,
     }),
     [theme, resolvedTheme, isInitialized, setTheme, toggleTheme, isLoading,
-     preferences, setAccentColor, setFontSize, setDensity, setHighContrast]
+     preferences, setAccentColor, setFontSize, setDensity, setLargeText,
+     setHighContrast, setReducedMotion, setSimplifiedLayout]
   );
 
   return (

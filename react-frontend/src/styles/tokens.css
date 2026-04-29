@@ -350,3 +350,39 @@ html[data-high-contrast="true"] :focus-visible {
   outline-width: 3px !important;
   outline-offset: 2px !important;
 }
+
+/* Accessibility profile: large text gives controls a little more breathing room. */
+html[data-large-text="true"] {
+  line-height: 1.6;
+}
+
+/* Accessibility profile: reduce non-essential movement for members sensitive to motion. */
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Accessibility profile: simplify visual treatment without changing navigation structure. */
+html[data-simplified-layout="true"] {
+  --glass-bg: var(--surface-elevated);
+  --glass-bg-hover: var(--surface-hover);
+  --glass-bg-strong: var(--surface-elevated);
+  --glass-blur: 0px;
+  --shadow-glass: none;
+  --shadow-card: none;
+}
+
+html[data-simplified-layout="true"] .backdrop-blur,
+html[data-simplified-layout="true"] .backdrop-blur-sm,
+html[data-simplified-layout="true"] .backdrop-blur-md,
+html[data-simplified-layout="true"] .backdrop-blur-lg,
+html[data-simplified-layout="true"] .backdrop-blur-xl,
+html[data-simplified-layout="true"] .backdrop-blur-2xl,
+html[data-simplified-layout="true"] .backdrop-blur-3xl {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}

@@ -207,6 +207,14 @@ class UsersController extends BaseApiController
         $userId = $this->requireAuth();
 
         $profile = $this->userService->getOwnProfile($userId);
+        $themePreferences = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->value('theme_preferences');
+
+        $themePreferences = is_string($themePreferences)
+            ? (json_decode($themePreferences, true) ?: [])
+            : [];
 
         return $this->respondWithData([
             'privacy' => [
@@ -215,6 +223,12 @@ class UsersController extends BaseApiController
                 'privacy_contact' => (bool) ($profile['privacy_contact'] ?? true),
             ],
             'notifications' => $profile['notification_preferences'] ?? [],
+            'accessibility' => [
+                'large_text'        => (bool) ($themePreferences['large_text'] ?? false),
+                'high_contrast'     => (bool) ($themePreferences['high_contrast'] ?? false),
+                'reduced_motion'    => (bool) ($themePreferences['reduced_motion'] ?? false),
+                'simplified_layout' => (bool) ($themePreferences['simplified_layout'] ?? false),
+            ],
         ]);
     }
 
@@ -309,7 +323,7 @@ class UsersController extends BaseApiController
         if ($accentColor !== null && !preg_match('/^#[0-9a-fA-F]{6}$/', $accentColor)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid accent_color. Must be a valid hex color (e.g. #6366f1)',
+                __('api.user_invalid_accent_color'),
                 'accent_color',
                 400
             );
@@ -321,7 +335,7 @@ class UsersController extends BaseApiController
         if ($fontSize !== null && !in_array($fontSize, $validFontSizes, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid font_size. Must be one of: small, medium, large',
+                __('api.user_invalid_font_size'),
                 'font_size',
                 400
             );
@@ -333,34 +347,83 @@ class UsersController extends BaseApiController
         if ($density !== null && !in_array($density, $validDensities, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid density. Must be one of: compact, comfortable, spacious',
+                __('api.user_invalid_density'),
                 'density',
                 400
             );
         }
 
-        // Validate high_contrast
-        $highContrast = $data['high_contrast'] ?? null;
-        if ($highContrast !== null && !is_bool($highContrast)) {
-            // Accept truthy/falsy values
-            $highContrast = filter_var($highContrast, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if ($highContrast === null) {
+        $booleanPreferences = [
+            'large_text'        => 'large_text',
+            'high_contrast'     => 'high_contrast',
+            'reduced_motion'    => 'reduced_motion',
+            'simplified_layout' => 'simplified_layout',
+        ];
+        $booleanValues = [];
+
+        foreach ($booleanPreferences as $inputKey => $fieldName) {
+            if (!array_key_exists($inputKey, $data)) {
+                continue;
+            }
+
+            $value = $data[$inputKey];
+            if (!is_bool($value)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            }
+
+            if ($value === null) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    'Invalid high_contrast. Must be a boolean',
-                    'high_contrast',
+                    __('api.user_invalid_boolean_preference'),
+                    $fieldName,
                     400
                 );
             }
+
+            $booleanValues[$fieldName] = $value;
         }
 
-        // Build preferences JSON
-        $preferences = [
+        $existingPreferences = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->value('theme_preferences');
+
+        $existingPreferences = is_string($existingPreferences)
+            ? (json_decode($existingPreferences, true) ?: [])
+            : [];
+
+        // Build preferences JSON while preserving keys omitted by partial updates.
+        $preferences = array_merge([
             'accent_color'  => $accentColor ?? '#6366f1',
             'font_size'     => $fontSize ?? 'medium',
             'density'       => $density ?? 'comfortable',
-            'high_contrast' => (bool) ($highContrast ?? false),
-        ];
+            'large_text'    => false,
+            'high_contrast' => false,
+            'reduced_motion' => false,
+            'simplified_layout' => false,
+        ], array_intersect_key($existingPreferences, [
+            'accent_color'       => true,
+            'font_size'          => true,
+            'density'            => true,
+            'large_text'         => true,
+            'high_contrast'      => true,
+            'reduced_motion'     => true,
+            'simplified_layout'  => true,
+        ]));
+
+        if ($accentColor !== null) {
+            $preferences['accent_color'] = $accentColor;
+        }
+        if ($fontSize !== null) {
+            $preferences['font_size'] = $fontSize;
+        }
+        if ($density !== null) {
+            $preferences['density'] = $density;
+        }
+
+        foreach ($booleanValues as $fieldName => $value) {
+            $preferences[$fieldName] = $value;
+        }
 
         $success = DB::table('users')
             ->where('id', $userId)

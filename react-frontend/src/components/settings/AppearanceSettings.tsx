@@ -43,11 +43,17 @@ export function AppearanceSettings() {
     accentColor,
     fontSize,
     density,
+    largeText,
     highContrast,
+    reducedMotion,
+    simplifiedLayout,
     setAccentColor,
     setFontSize,
     setDensity,
+    setLargeText,
     setHighContrast,
+    setReducedMotion,
+    setSimplifiedLayout,
   } = useTheme();
 
   return (
@@ -135,21 +141,52 @@ export function AppearanceSettings() {
 
       {/* ── High Contrast ── */}
       <div className="pt-4 border-t border-theme-default">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-theme-primary">
-              {t('appearance_prefs.high_contrast')}
-            </p>
-            <p className="text-xs text-theme-muted mt-0.5">
-              {t('appearance_prefs.high_contrast_desc')}
-            </p>
-          </div>
-          <Switch
-            isSelected={highContrast}
-            onValueChange={setHighContrast}
-            aria-label={t('appearance_prefs.high_contrast')}
-            size="sm"
-          />
+        <p className="text-sm font-medium text-theme-primary mb-1">
+          {t('appearance_prefs.accessibility_profile')}
+        </p>
+        <p className="text-xs text-theme-muted mb-4">
+          {t('appearance_prefs.accessibility_profile_desc')}
+        </p>
+        <div className="space-y-4">
+          {[
+            {
+              key: 'large_text',
+              selected: largeText,
+              onChange: setLargeText,
+            },
+            {
+              key: 'high_contrast',
+              selected: highContrast,
+              onChange: setHighContrast,
+            },
+            {
+              key: 'reduced_motion',
+              selected: reducedMotion,
+              onChange: setReducedMotion,
+            },
+            {
+              key: 'simplified_layout',
+              selected: simplifiedLayout,
+              onChange: setSimplifiedLayout,
+            },
+          ].map(({ key, selected, onChange }) => (
+            <div key={key} className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-theme-primary">
+                  {t(`appearance_prefs.${key}`)}
+                </p>
+                <p className="text-xs text-theme-muted mt-0.5">
+                  {t(`appearance_prefs.${key}_desc`)}
+                </p>
+              </div>
+              <Switch
+                isSelected={selected}
+                onValueChange={onChange}
+                aria-label={t(`appearance_prefs.${key}`)}
+                size="sm"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>

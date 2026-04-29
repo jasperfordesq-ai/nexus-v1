@@ -490,8 +490,16 @@
     "density_compact": "Compact",
     "density_comfortable": "Comfortable",
     "density_spacious": "Spacious",
+    "accessibility_profile": "Accessibility Profile",
+    "accessibility_profile_desc": "Choose how the interface should adapt for easier reading, calmer motion, and simpler screens",
+    "large_text": "Large Text",
+    "large_text_desc": "Use the largest base text size across the interface",
     "high_contrast": "High Contrast",
-    "high_contrast_desc": "Increase borders, text contrast, and focus indicators for better accessibility"
+    "high_contrast_desc": "Increase borders, text contrast, and focus indicators for better accessibility",
+    "reduced_motion": "Reduced Motion",
+    "reduced_motion_desc": "Reduce animation and scrolling effects throughout the interface",
+    "simplified_layout": "Simplified Layout",
+    "simplified_layout_desc": "Reduce blur, shadows, and decorative depth while keeping the same navigation"
   },
   "blocked_users": {
     "title": "Blocked Users",

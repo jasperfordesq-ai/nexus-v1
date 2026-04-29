@@ -210,7 +210,7 @@ class UsersControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['privacy', 'notifications'],
+            'data' => ['privacy', 'notifications', 'accessibility'],
         ]);
     }
 
@@ -250,6 +250,40 @@ class UsersControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.theme', 'dark');
+    }
+
+    public function test_update_theme_preferences_persists_accessibility_profile(): void
+    {
+        $user = $this->authenticatedUser([
+            'theme_preferences' => json_encode([
+                'accent_color' => '#6366f1',
+                'font_size' => 'medium',
+                'density' => 'comfortable',
+                'high_contrast' => false,
+            ]),
+        ]);
+
+        $response = $this->apiPut('/v2/users/me/theme-preferences', [
+            'large_text' => true,
+            'high_contrast' => true,
+            'reduced_motion' => true,
+            'simplified_layout' => true,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.theme_preferences.accent_color', '#6366f1');
+        $response->assertJsonPath('data.theme_preferences.large_text', true);
+        $response->assertJsonPath('data.theme_preferences.high_contrast', true);
+        $response->assertJsonPath('data.theme_preferences.reduced_motion', true);
+        $response->assertJsonPath('data.theme_preferences.simplified_layout', true);
+
+        $stored = DB::table('users')->where('id', $user->id)->value('theme_preferences');
+        $stored = json_decode((string) $stored, true);
+
+        $this->assertTrue($stored['large_text']);
+        $this->assertTrue($stored['reduced_motion']);
+        $this->assertTrue($stored['simplified_layout']);
+        $this->assertSame('#6366f1', $stored['accent_color']);
     }
 
     public function test_update_theme_returns_401_without_auth(): void
