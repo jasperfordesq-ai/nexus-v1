@@ -38,6 +38,7 @@ export interface NotificationSettings {
   email_org_membership: boolean;
   email_org_admin: boolean;
   push_enabled: boolean;
+  push_campaigns_opted_in: boolean;
 }
 
 interface NotificationsTabProps {
@@ -311,6 +312,13 @@ export function NotificationsTab({
               description={t('notification_descriptions.enable_push')}
               checked={notifications.push_enabled}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, push_enabled: checked }))}
+            />
+
+            <SettingToggle
+              label={t('push_campaign_opt_in')}
+              description={t('push_campaign_opt_in_description')}
+              checked={notifications.push_campaigns_opted_in}
+              onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, push_campaigns_opted_in: checked }))}
             />
           </div>
 

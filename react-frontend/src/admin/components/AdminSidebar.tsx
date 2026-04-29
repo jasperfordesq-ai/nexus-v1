@@ -97,6 +97,7 @@ import Store from 'lucide-react/icons/store';
 import Languages from 'lucide-react/icons/languages';
 import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
+import BellRing from 'lucide-react/icons/bell-ring';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -149,7 +150,7 @@ const ZONES: NavZone[] = [
     // What your community does: content, activities, commerce
     key: 'content_commerce',
     label: 'zone_community',
-    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace'],
+    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
   },
   {
     // Keeping the platform safe: content + user safety together
@@ -452,6 +453,16 @@ function useAdminNav(): NavSection[] {
           { label: "Dashboard", href: '/admin/marketplace', icon: ShoppingBag as LucideIcon },
           { label: "Moderation", href: '/admin/marketplace/moderation', icon: ShieldCheck as LucideIcon },
           { label: "Sellers", href: '/admin/marketplace/sellers', icon: Store as LucideIcon },
+        ],
+      }] as NavSection[] : []),
+      // Advertising — gated by local_advertising feature
+      ...(hasFeature('local_advertising') ? [{
+        key: 'advertising',
+        label: "Advertising",
+        icon: Megaphone,
+        items: [
+          { label: "Ad Campaigns", href: '/admin/advertising/campaigns', icon: Megaphone },
+          { label: "Push Campaigns", href: '/admin/advertising/push-campaigns', icon: BellRing },
         ],
       }] as NavSection[] : []),
       {

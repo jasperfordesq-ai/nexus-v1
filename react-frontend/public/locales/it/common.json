@@ -485,7 +485,11 @@
       "hour_transfer": "Transfer Hours",
       "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
       "safeguarding_report": "Report a Concern",
-      "safeguarding_report_sub": "Report safeguarding concerns confidentially."
+      "safeguarding_report_sub": "Report safeguarding concerns confidentially.",
+      "cover_care": "Cover Care",
+      "cover_care_sub": "Arrange trusted substitute support when a caregiver needs backup.",
+      "projects": "Community Projects",
+      "projects_sub": "Follow staged municipality and neighbourhood updates."
     },
     "operating_model": {
       "title": "Operating model",
@@ -548,7 +552,11 @@
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       },
       "clubs": "Clubs & Associations",
-      "markt": "Marktplatz"
+      "markt": "Marktplatz",
+      "projects": {
+        "title": "Community projects",
+        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
+      }
     },
     "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger."
   },
@@ -587,7 +595,12 @@
       "load_failed": "Could not load your support relationships."
     },
     "subtitle": "Your support connections — the people you help and those who help you.",
-    "loading": "Getting your information..."
+    "loading": "Getting your information...",
+    "log_status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
+    }
   },
   "request_help": {
     "meta": {
@@ -604,7 +617,8 @@
       "contact_message": "By message",
       "contact_either": "Either is fine",
       "submit": "Request Help",
-      "submitting": "Sending request..."
+      "submitting": "Sending request...",
+      "what_too_long": "Please keep your request under 500 characters."
     },
     "success": {
       "title": "Request Received",
@@ -667,20 +681,16 @@
     }
   },
   "proximity": {
-    "near_me": "Near Me",
-    "radius": "Within {{radius}}",
-    "radii": {
-      "500m": "500 m",
-      "1km": "1 km",
-      "2km": "2 km",
-      "5km": "5 km",
-      "10km": "10 km"
+    "label": "Near me",
+    "off": "Off",
+    "radius_option": "{{km}} km",
+    "active_label": "Within {{km}} km",
+    "requesting": "Getting your location…",
+    "error": {
+      "unavailable": "Location not available on this device",
+      "denied": "Enable location in your browser settings"
     },
-    "distance_away": "{{distance}} km away",
-    "getting_location": "Getting your location...",
-    "location_denied": "Location access was denied. Please enable it in your browser settings.",
-    "location_error": "Could not get your location. Please try again.",
-    "clear": "Clear proximity filter"
+    "clear": "Clear location"
   },
   "offer_favour": {
     "meta": {
@@ -1033,16 +1043,175 @@
     },
     "back": "Back to Community Hub"
   },
-  "proximity": {
-    "label": "Near me",
-    "off": "Off",
-    "radius_option": "{{km}} km",
-    "active_label": "Within {{km}} km",
-    "requesting": "Getting your location…",
-    "error": {
-      "unavailable": "Location not available on this device",
-      "denied": "Enable location in your browser settings"
+  "feed_ad": {
+    "sponsored": "Sponsored",
+    "cta_default": "Learn more",
+    "aria_label": "Sponsored advertisement"
+  },
+  "advertise": {
+    "meta": {
+      "title": "My Ad Campaigns",
+      "description": "Create and manage your local advertising campaigns"
     },
-    "clear": "Clear location"
-  }
+    "subtitle": "Reach your local community with targeted advertising.",
+    "create": "Create Campaign",
+    "form": {
+      "name_label": "Campaign name",
+      "type_label": "Placement type",
+      "type_feed": "Community feed",
+      "type_discovery": "Discovery page",
+      "start_date_label": "Start date",
+      "end_date_label": "End date",
+      "budget_label": "Budget (€)",
+      "radius_label": "Targeting radius (km, optional)",
+      "submit": "Create campaign",
+      "submitting": "Creating..."
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_approval": "Pending approval",
+      "approved": "Approved",
+      "active": "Active",
+      "paused": "Paused",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "stats": {
+      "impressions": "Impressions",
+      "clicks": "Clicks",
+      "ctr": "CTR",
+      "budget": "Budget"
+    },
+    "empty": {
+      "title": "No campaigns yet",
+      "body": "Create your first campaign to start reaching your local community."
+    },
+    "errors": {
+      "load_failed": "Could not load campaigns. Please try again.",
+      "create_failed": "Could not create campaign. Please try again."
+    },
+    "page_title": "My Ad Campaigns",
+    "page_subtitle": "Create and manage your local advertising campaigns.",
+    "create_campaign": "Create Campaign",
+    "load_error": "Could not load campaigns. Please try again.",
+    "retry": "Try again",
+    "create_first": "Create your first campaign",
+    "col_name": "Name",
+    "col_type": "Type",
+    "col_status": "Status",
+    "col_budget": "Budget",
+    "col_dates": "Dates",
+    "col_impressions": "Impressions",
+    "col_clicks": "Clicks",
+    "col_ctr": "CTR",
+    "status_draft": "Draft",
+    "status_pending": "Pending",
+    "status_active": "Active",
+    "status_paused": "Paused",
+    "status_ended": "Ended",
+    "status_rejected": "Rejected",
+    "type_feed": "Feed",
+    "type_discovery": "Discovery",
+    "field_name": "Campaign name",
+    "field_name_placeholder": "e.g. Spring promotion",
+    "field_type": "Placement type",
+    "field_start_date": "Start date",
+    "field_end_date": "End date",
+    "field_budget": "Total budget",
+    "field_budget_desc": "Maximum total spend in euros.",
+    "field_radius": "Targeting radius (optional)",
+    "field_radius_desc": "Only show to members within this distance.",
+    "validation_required": "Please fill in all required fields.",
+    "created_success": "Campaign created successfully.",
+    "create_error": "Could not create campaign. Please try again.",
+    "submit_create": "Create campaign",
+    "feature_disabled": "Local advertising is not available for your account."
+  },
+  "push_campaign": {
+    "meta": {
+      "title": "My Push Campaigns",
+      "description": "Create and manage paid push notification campaigns"
+    },
+    "subtitle": "Send targeted push notifications directly to community members.",
+    "create": "New push campaign",
+    "form": {
+      "name_label": "Campaign name",
+      "title_label": "Notification title",
+      "body_label": "Notification message",
+      "schedule_label": "Schedule send time",
+      "radius_label": "Audience radius (km, optional)",
+      "tier_label": "Minimum trust tier",
+      "tier_any": "Any member",
+      "tier_member": "Member",
+      "tier_trusted": "Trusted",
+      "tier_verified": "Verified",
+      "estimate_audience": "Estimate audience",
+      "estimated_reach": "Estimated reach: {{count}} members",
+      "submit": "Create campaign",
+      "submitting": "Creating..."
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_approval": "Pending approval",
+      "approved": "Approved",
+      "scheduled": "Scheduled",
+      "sent": "Sent",
+      "cancelled": "Cancelled"
+    },
+    "empty": {
+      "title": "No push campaigns yet",
+      "body": "Create your first push campaign to reach opted-in community members."
+    },
+    "errors": {
+      "load_failed": "Could not load campaigns. Please try again.",
+      "create_failed": "Could not create campaign. Please try again.",
+      "estimate_failed": "Could not estimate audience."
+    },
+    "page_title": "My Push Campaigns",
+    "page_subtitle": "Send targeted push notifications to opted-in community members.",
+    "create_campaign": "New Push Campaign",
+    "load_error": "Could not load campaigns. Please try again.",
+    "retry": "Try again",
+    "create_first": "Create your first push campaign",
+    "col_name": "Name",
+    "col_title": "Notification title",
+    "col_status": "Status",
+    "col_scheduled": "Scheduled for",
+    "col_radius": "Radius",
+    "col_trust_tier": "Min. trust tier",
+    "status_draft": "Draft",
+    "status_scheduled": "Scheduled",
+    "status_sent": "Sent",
+    "status_cancelled": "Cancelled",
+    "status_failed": "Failed",
+    "tier_any": "Any member",
+    "tier_member": "Member",
+    "tier_trusted": "Trusted",
+    "tier_verified": "Verified",
+    "field_name": "Campaign name",
+    "field_name_placeholder": "e.g. Summer event alert",
+    "field_title": "Notification title",
+    "field_title_placeholder": "e.g. Special offer this weekend!",
+    "field_title_desc": "Short headline shown in the push notification.",
+    "field_body": "Message",
+    "field_body_placeholder": "e.g. Visit us this Saturday for 20% off all services.",
+    "field_body_desc": "The main body text of the push notification.",
+    "field_schedule_at": "Schedule send time (optional)",
+    "field_schedule_at_desc": "Leave blank to send immediately after approval.",
+    "field_radius": "Audience radius (optional)",
+    "field_radius_desc": "Only target members within this distance.",
+    "field_trust_tier": "Minimum trust tier",
+    "field_trust_tier_desc": "Only reach members at or above this trust level.",
+    "estimate_label": "Estimated audience",
+    "estimate_button": "Estimate reach",
+    "estimate_result": "Estimated reach: {{count}} members",
+    "estimate_error": "Could not estimate audience. Please try again.",
+    "validation_required": "Please fill in name, title and message.",
+    "created_success": "Push campaign created successfully.",
+    "create_error": "Could not create push campaign. Please try again.",
+    "submit_create": "Create campaign",
+    "feature_disabled": "Push campaigns are not available for your account."
+  },
+  "push_campaign_opt_in": "Receive promoted push notifications",
+  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
 }

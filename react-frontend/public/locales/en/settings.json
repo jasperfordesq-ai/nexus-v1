@@ -264,7 +264,6 @@
   "save_changes": "Save Changes",
   "save_preferences": "Save Preferences",
   "save_privacy": "Save Privacy Settings",
-  "cancel": "Cancel",
   "try_again": "Try Again",
   "notification_sections": {
     "title": "Notification Preferences",
@@ -536,5 +535,7 @@
     "message": "You have unsaved changes. If you leave, your changes will be lost.",
     "leave": "Leave Anyway",
     "stay": "Stay"
-  }
+  },
+  "push_campaign_opt_in": "Receive promoted push notifications",
+  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
 }

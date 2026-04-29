@@ -166,6 +166,7 @@ export function SettingsPage() {
     email_org_membership: true,
     email_org_admin: true,
     push_enabled: true,
+    push_campaigns_opted_in: true,
   });
 
   // Match digest frequency & preferences
