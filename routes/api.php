@@ -1300,8 +1300,10 @@ Route::post('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\A
 Route::get('/v2/admin/caring-community/kpi-baselines/{id}/compare', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'compareKpiBaseline']);
 
 // AG70 — Emergency/Safety Alert Tier
-Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts']);
-Route::post('/v2/caring-community/emergency-alerts/{id}/dismiss', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'dismiss']);
+Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/emergency-alerts/{id}/dismiss', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'dismiss'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'adminList']);
 Route::post('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'store']);
 Route::delete('/v2/admin/caring-community/emergency-alerts/{id}', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'deactivate']);

@@ -85,7 +85,7 @@ class EmergencyAlertController extends BaseApiController
     public function adminList(): JsonResponse
     {
         $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (!TenantContext::hasFeature('caring_community')) {
@@ -118,7 +118,7 @@ class EmergencyAlertController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
-        $input = $this->getJsonInput();
+        $input = request()->all();
 
         $validator = Validator::make($input, [
             'title'      => 'required|string|max:255',
@@ -179,6 +179,16 @@ class EmergencyAlertController extends BaseApiController
      */
     private function hasAnnouncerAccess(int $userId, int $tenantId): bool
     {
+        $hasAdminRole = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->whereIn('role', ['admin', 'tenant_admin', 'super_admin', 'god'])
+            ->exists();
+
+        if ($hasAdminRole) {
+            return true;
+        }
+
         return (bool) DB::table('user_roles')
             ->join('roles', 'roles.id', '=', 'user_roles.role_id')
             ->where('user_roles.user_id', $userId)

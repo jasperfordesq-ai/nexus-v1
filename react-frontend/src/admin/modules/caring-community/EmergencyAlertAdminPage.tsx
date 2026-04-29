@@ -7,8 +7,6 @@
  * EmergencyAlertAdminPage — AG70 Emergency/Safety Alert Tier
  *
  * Admin management console for emergency alerts.
- * English-only — NO t() calls (admin panel policy).
- *
  * Features:
  *  - Table of all alerts (title, severity, sent_at, expires_at, push stats, active/inactive)
  *  - "Send Emergency Alert" modal with title, body, severity, optional expires_at
@@ -17,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -87,21 +86,21 @@ function parsePushResult(raw: string | null): PushResult | null {
 }
 
 function formatDate(ts: string | null): string {
-  if (!ts) return '—';
+  if (!ts) return '-';
   return new Date(ts).toLocaleString();
 }
 
 const SEVERITY_OPTIONS = [
-  { key: 'info', label: 'Info', color: 'primary' as const },
-  { key: 'warning', label: 'Warning', color: 'warning' as const },
-  { key: 'danger', label: 'Emergency (Danger)', color: 'danger' as const },
+  { key: 'info', labelKey: 'caring_emergency.severity.info', color: 'primary' as const },
+  { key: 'warning', labelKey: 'caring_emergency.severity.warning', color: 'warning' as const },
+  { key: 'danger', labelKey: 'caring_emergency.severity.danger', color: 'danger' as const },
 ];
 
-function severityChip(severity: string) {
+function severityChip(severity: string, label: string) {
   const opt = SEVERITY_OPTIONS.find((o) => o.key === severity);
   return (
     <Chip size="sm" color={opt?.color ?? 'default'} variant="flat">
-      {opt?.label ?? severity}
+      {label}
     </Chip>
   );
 }
@@ -111,6 +110,7 @@ function severityChip(severity: string) {
 // ---------------------------------------------------------------------------
 
 export default function EmergencyAlertAdminPage() {
+  const { t } = useTranslation('admin');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
@@ -144,11 +144,11 @@ export default function EmergencyAlertAdminPage() {
             : []);
       setAlerts(list);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load alerts');
+      setError(e instanceof Error ? e.message : t('caring_emergency.errors.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void fetchAlerts();
@@ -178,7 +178,7 @@ export default function EmergencyAlertAdminPage() {
       onClose();
       await fetchAlerts();
     } catch (e: unknown) {
-      setSubmitError(e instanceof Error ? e.message : 'Failed to send alert');
+      setSubmitError(e instanceof Error ? e.message : t('caring_emergency.errors.send_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -194,20 +194,25 @@ export default function EmergencyAlertAdminPage() {
     }
   };
 
+  const severityLabel = useCallback((value: string) => {
+    const option = SEVERITY_OPTIONS.find((item) => item.key === value);
+    return option ? t(option.labelKey) : value;
+  }, [t]);
+
   return (
     <>
       <Card>
         <CardHeader className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-danger" />
-            <h2 className="text-lg font-semibold">Emergency Alerts (AG70)</h2>
+            <h2 className="text-lg font-semibold">{t('caring_emergency.title')}</h2>
           </div>
           <Button
             color="danger"
             startContent={<Send size={16} />}
             onPress={handleOpenModal}
           >
-            Send Emergency Alert
+            {t('caring_emergency.actions.open_send_modal')}
           </Button>
         </CardHeader>
         <Divider />
@@ -223,20 +228,20 @@ export default function EmergencyAlertAdminPage() {
           )}
 
           {!loading && !error && alerts.length === 0 && (
-            <p className="text-default-400 text-sm py-4">No emergency alerts yet.</p>
+            <p className="text-default-400 text-sm py-4">{t('caring_emergency.empty')}</p>
           )}
 
           {!loading && !error && alerts.length > 0 && (
-            <Table aria-label="Emergency alerts" removeWrapper>
+            <Table aria-label={t('caring_emergency.table.aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>Title</TableColumn>
-                <TableColumn>Severity</TableColumn>
-                <TableColumn>Sent</TableColumn>
-                <TableColumn>Expires</TableColumn>
-                <TableColumn>Push</TableColumn>
-                <TableColumn>Dismissed</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Actions</TableColumn>
+                <TableColumn>{t('caring_emergency.table.title')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.severity')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.sent')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.expires')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.push')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.dismissed')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.status')}</TableColumn>
+                <TableColumn>{t('caring_emergency.table.actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {alerts.map((alert) => {
@@ -252,7 +257,7 @@ export default function EmergencyAlertAdminPage() {
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell>{severityChip(alert.severity)}</TableCell>
+                      <TableCell>{severityChip(alert.severity, severityLabel(alert.severity))}</TableCell>
                       <TableCell>
                         <span className="text-xs">{formatDate(alert.sent_at)}</span>
                       </TableCell>
@@ -270,13 +275,13 @@ export default function EmergencyAlertAdminPage() {
                                 )}
                               </span>
                             ) : (
-                              <span className="text-xs text-success">Sent</span>
+                              <span className="text-xs text-success">{t('caring_emergency.push.sent')}</span>
                             )}
                           </div>
                         ) : (
                           <div className="flex items-center gap-1">
                             <BellOff size={14} className="text-default-400" />
-                            <span className="text-xs text-default-400">—</span>
+                            <span className="text-xs text-default-400">-</span>
                           </div>
                         )}
                       </TableCell>
@@ -289,7 +294,7 @@ export default function EmergencyAlertAdminPage() {
                           color={isActive ? 'success' : 'default'}
                           variant="flat"
                         >
-                          {isActive ? 'Active' : 'Inactive'}
+                          {isActive ? t('active') : t('caring_emergency.status.inactive')}
                         </Chip>
                       </TableCell>
                       <TableCell>
@@ -297,21 +302,21 @@ export default function EmergencyAlertAdminPage() {
                           <>
                             {deactivatingId === alert.id ? (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-warning">Confirm?</span>
+                                <span className="text-xs text-warning">{t('caring_emergency.actions.confirm_prompt')}</span>
                                 <Button
                                   size="sm"
                                   color="danger"
                                   variant="flat"
                                   onPress={() => void handleDeactivate(alert.id)}
                                 >
-                                  Yes, deactivate
+                                  {t('caring_emergency.actions.confirm_deactivate')}
                                 </Button>
                                 <Button
                                   size="sm"
                                   variant="flat"
                                   onPress={() => setDeactivatingId(null)}
                                 >
-                                  Cancel
+                                  {t('caring_emergency.actions.cancel')}
                                 </Button>
                               </div>
                             ) : (
@@ -321,7 +326,7 @@ export default function EmergencyAlertAdminPage() {
                                 variant="flat"
                                 onPress={() => setDeactivatingId(alert.id)}
                               >
-                                Deactivate
+                                {t('caring_emergency.actions.deactivate')}
                               </Button>
                             )}
                           </>
@@ -336,7 +341,6 @@ export default function EmergencyAlertAdminPage() {
         </CardBody>
       </Card>
 
-      {/* Send Emergency Alert Modal */}
       <Modal
         isOpen={isOpen}
         onClose={onClose}
@@ -346,12 +350,12 @@ export default function EmergencyAlertAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-danger" />
-            Send Emergency Alert
+            {t('caring_emergency.modal.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label="Title"
-              placeholder="e.g. Severe Weather Warning"
+              label={t('caring_emergency.form.title')}
+              placeholder={t('caring_emergency.form.title_placeholder')}
               value={title}
               onValueChange={setTitle}
               isRequired
@@ -359,8 +363,8 @@ export default function EmergencyAlertAdminPage() {
               maxLength={255}
             />
             <Textarea
-              label="Body"
-              placeholder="Describe the emergency and any actions members should take..."
+              label={t('caring_emergency.form.body')}
+              placeholder={t('caring_emergency.form.body_placeholder')}
               value={body}
               onValueChange={setBody}
               isRequired
@@ -370,7 +374,7 @@ export default function EmergencyAlertAdminPage() {
               maxLength={2000}
             />
             <Select
-              label="Severity"
+              label={t('caring_emergency.form.severity')}
               selectedKeys={[severity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'danger';
@@ -379,7 +383,7 @@ export default function EmergencyAlertAdminPage() {
               variant="bordered"
             >
               {SEVERITY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key} textValue={opt.label}>
+                <SelectItem key={opt.key} textValue={t(opt.labelKey)}>
                   <div className="flex items-center gap-2">
                     {opt.key === 'info' ? (
                       <Info size={14} className="text-primary" />
@@ -389,18 +393,18 @@ export default function EmergencyAlertAdminPage() {
                         className={opt.key === 'danger' ? 'text-danger' : 'text-warning'}
                       />
                     )}
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </div>
                 </SelectItem>
               ))}
             </Select>
             <Input
-              label="Expires At (optional)"
+              label={t('caring_emergency.form.expires_at')}
               type="datetime-local"
               value={expiresAt}
               onValueChange={setExpiresAt}
               variant="bordered"
-              description="Leave blank for no automatic expiry"
+              description={t('caring_emergency.form.expires_at_description')}
             />
             <Divider />
             <Checkbox
@@ -409,9 +413,9 @@ export default function EmergencyAlertAdminPage() {
               color="danger"
             >
               <span className="text-sm font-medium">
-                This will immediately push to <strong>all active members</strong> and
-                display a persistent banner on all pages. I confirm this is a genuine
-                emergency.
+                {t('caring_emergency.form.confirm_prefix')}{' '}
+                <strong>{t('caring_emergency.form.confirm_audience')}</strong>{' '}
+                {t('caring_emergency.form.confirm_suffix')}
               </span>
             </Checkbox>
             {submitError && (
@@ -420,7 +424,7 @@ export default function EmergencyAlertAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose} isDisabled={submitting}>
-              Cancel
+              {t('caring_emergency.actions.cancel')}
             </Button>
             <Button
               color="danger"
@@ -429,7 +433,7 @@ export default function EmergencyAlertAdminPage() {
               isLoading={submitting}
               isDisabled={!title.trim() || !body.trim() || !confirmed || submitting}
             >
-              Broadcast Alert
+              {t('caring_emergency.actions.broadcast')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -53,6 +53,59 @@
     },
     "config_route_note": "Dedicated admin configuration route: {{route}}"
   },
+  "caring_emergency": {
+    "title": "Emergency Alerts (AG70)",
+    "empty": "No emergency alerts yet.",
+    "actions": {
+      "open_send_modal": "Send emergency alert",
+      "confirm_prompt": "Confirm?",
+      "confirm_deactivate": "Yes, deactivate",
+      "cancel": "Cancel",
+      "deactivate": "Deactivate",
+      "broadcast": "Broadcast alert"
+    },
+    "errors": {
+      "load_failed": "Failed to load alerts",
+      "send_failed": "Failed to send alert"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warning",
+      "danger": "Emergency (danger)"
+    },
+    "table": {
+      "aria": "Emergency alerts",
+      "title": "Title",
+      "severity": "Severity",
+      "sent": "Sent",
+      "expires": "Expires",
+      "push": "Push",
+      "dismissed": "Dismissed",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "push": {
+      "sent": "Sent"
+    },
+    "status": {
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "title": "Send emergency alert"
+    },
+    "form": {
+      "title": "Title",
+      "title_placeholder": "e.g. Severe weather warning",
+      "body": "Body",
+      "body_placeholder": "Describe the emergency and any actions members should take...",
+      "severity": "Severity",
+      "expires_at": "Expires at (optional)",
+      "expires_at_description": "Leave blank for no automatic expiry",
+      "confirm_prefix": "This will immediately push to",
+      "confirm_audience": "all active members",
+      "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    }
+  },
   "caring_workflow": {
     "meta": {
       "title": "KISS Workflow Console",

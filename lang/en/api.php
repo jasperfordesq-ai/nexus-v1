@@ -1809,6 +1809,8 @@ return [
     'caring_cover_dates_invalid'               => 'Cover end date must be after the start date.',
     'caring_cover_not_found'                   => 'Cover-care request not found.',
     'caring_cover_candidate_invalid'           => 'This substitute is not available for the selected cover request.',
+    'caring_emergency_alerts_unavailable'      => 'Emergency alerts are not available.',
+    'caring_emergency_alert_not_found_after_update' => 'Emergency alert not found after update.',
     'pilot_inquiry_service_unavailable'        => 'Pilot inquiries are not available.',
     'pilot_inquiry_submit_failed'              => 'Failed to submit inquiry.',
     'pilot_inquiry_not_found'                  => 'Pilot inquiry not found.',

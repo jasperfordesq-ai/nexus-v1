@@ -1,0 +1,106 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace Tests\Laravel\Feature\Controllers;
+
+use App\Core\TenantContext;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
+
+class EmergencyAlertControllerTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private function setCaringCommunityFeature(bool $enabled): void
+    {
+        $tenant = DB::table('tenants')->where('id', $this->testTenantId)->first();
+        $features = [];
+        if ($tenant && ! empty($tenant->features)) {
+            $decoded = is_string($tenant->features) ? json_decode($tenant->features, true) : $tenant->features;
+            $features = is_array($decoded) ? $decoded : [];
+        }
+
+        $features['caring_community'] = $enabled;
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+        TenantContext::setById($this->testTenantId);
+    }
+
+    private function requireEmergencyAlertTable(): void
+    {
+        if (! Schema::hasTable('caring_emergency_alerts')) {
+            $this->markTestSkipped('Emergency alert table is not present in the test database.');
+        }
+    }
+
+    public function test_admin_can_broadcast_and_member_can_dismiss_active_safety_alert(): void
+    {
+        $this->requireEmergencyAlertTable();
+        $this->setCaringCommunityFeature(true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $create = $this->apiPost('/v2/admin/caring-community/emergency-alerts', [
+            'title' => 'Water safety notice',
+            'body' => 'Please boil tap water until the municipality issues an all-clear.',
+            'severity' => 'danger',
+            'expires_at' => now()->addHours(6)->toDateTimeString(),
+        ]);
+
+        $create->assertStatus(201);
+        $create->assertJsonPath('data.title', 'Water safety notice');
+        $create->assertJsonPath('data.severity', 'danger');
+
+        $alertId = (int) $create->json('data.id');
+
+        $this->assertDatabaseHas('caring_emergency_alerts', [
+            'id' => $alertId,
+            'tenant_id' => $this->testTenantId,
+            'is_active' => 1,
+            'push_sent' => 1,
+        ]);
+
+        Sanctum::actingAs($member);
+
+        $active = $this->apiGet('/v2/caring-community/emergency-alerts');
+        $active->assertStatus(200);
+        $active->assertJsonPath('data.0.id', $alertId);
+        $active->assertJsonPath('data.0.title', 'Water safety notice');
+
+        $dismiss = $this->apiPost("/v2/caring-community/emergency-alerts/{$alertId}/dismiss");
+        $dismiss->assertStatus(200);
+        $dismiss->assertJsonPath('data.ok', true);
+
+        $this->assertDatabaseHas('caring_emergency_alerts', [
+            'id' => $alertId,
+            'tenant_id' => $this->testTenantId,
+            'dismissed_count' => 1,
+        ]);
+    }
+
+    public function test_emergency_alert_routes_respect_caring_community_feature_gate(): void
+    {
+        $this->requireEmergencyAlertTable();
+        $this->setCaringCommunityFeature(false);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/caring-community/emergency-alerts');
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+    }
+}

@@ -46,7 +46,7 @@ class EmergencyAlertService
     public static function getActiveAlerts(int $tenantId): array
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         return DB::table(self::TABLE)
@@ -70,7 +70,7 @@ class EmergencyAlertService
     public static function getAlertById(int $id, int $tenantId): ?array
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         $row = DB::table(self::TABLE)
@@ -98,7 +98,7 @@ class EmergencyAlertService
     public static function createAndBroadcast(int $tenantId, array $data, int $createdBy): array
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         $now = Carbon::now();
@@ -168,7 +168,7 @@ class EmergencyAlertService
     public static function deactivate(int $id, int $tenantId): void
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         DB::table(self::TABLE)
@@ -189,7 +189,7 @@ class EmergencyAlertService
     public static function update(int $id, int $tenantId, array $data): array
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         $fields = ['updated_at' => Carbon::now()];
@@ -217,7 +217,7 @@ class EmergencyAlertService
         $row = self::getAlertById($id, $tenantId);
 
         if ($row === null) {
-            throw new \RuntimeException('Alert not found after update.');
+            throw new \RuntimeException(__('api.caring_emergency_alert_not_found_after_update'));
         }
 
         return $row;
@@ -246,7 +246,7 @@ class EmergencyAlertService
     public static function getAllAlerts(int $tenantId): array
     {
         if (!self::isAvailable()) {
-            throw new \RuntimeException('Emergency alerts table not available.');
+            throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
         }
 
         return DB::table(self::TABLE)
