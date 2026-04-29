@@ -44,7 +44,7 @@ class PilotInquiryController extends BaseApiController
     public function submitInquiry(): JsonResponse
     {
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         // IP-based rate limiting: max 5 submissions per minute
@@ -59,7 +59,7 @@ class PilotInquiryController extends BaseApiController
             if (empty($data[$field])) {
                 $errors[] = [
                     'code'    => 'VALIDATION_REQUIRED_FIELD',
-                    'message' => "The field {$field} is required",
+                    'message' => __('api.pilot_inquiry_field_required', ['field' => $field]),
                     'field'   => $field,
                 ];
             }
@@ -68,7 +68,7 @@ class PilotInquiryController extends BaseApiController
         if (! empty($data['contact_email']) && ! filter_var($data['contact_email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = [
                 'code'    => 'VALIDATION_INVALID_EMAIL',
-                'message' => 'Invalid email address',
+                'message' => __('api.pilot_inquiry_invalid_email'),
                 'field'   => 'contact_email',
             ];
         }
@@ -89,7 +89,7 @@ class PilotInquiryController extends BaseApiController
         } catch (InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
-            return $this->respondServerError('Failed to submit inquiry');
+            return $this->respondServerError(__('api.pilot_inquiry_submit_failed'));
         }
     }
 
@@ -105,7 +105,7 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $tenantId = $this->getTenantId();
@@ -126,13 +126,13 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $inquiry = PilotInquiryService::getInquiry($id, $this->getTenantId());
 
         if ($inquiry === null) {
-            return $this->respondNotFound('Inquiry not found');
+            return $this->respondNotFound(__('api.pilot_inquiry_not_found'));
         }
 
         return $this->respondWithData($inquiry);
@@ -149,12 +149,12 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $stage = $this->input('stage');
         if (empty($stage)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'The stage field is required', 'stage', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.pilot_inquiry_field_required', ['field' => 'stage']), 'stage', 422);
         }
 
         try {
@@ -182,12 +182,12 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $userId = $this->inputInt('user_id');
         if ($userId === null || $userId <= 0) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'The user_id field is required', 'user_id', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.pilot_inquiry_field_required', ['field' => 'user_id']), 'user_id', 422);
         }
 
         PilotInquiryService::assignTo($id, $this->getTenantId(), $userId);
@@ -206,7 +206,7 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $notes = $this->input('internal_notes', '');
@@ -226,7 +226,7 @@ class PilotInquiryController extends BaseApiController
         $this->requireAdmin();
 
         if (! PilotInquiryService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Service not available', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.pilot_inquiry_service_unavailable'), null, 503);
         }
 
         $stats = PilotInquiryService::getPipelineStats($this->getTenantId());

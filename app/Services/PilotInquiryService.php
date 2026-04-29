@@ -158,13 +158,13 @@ class PilotInquiryService
         $required = ['municipality_name', 'contact_name', 'contact_email', 'country'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
-                throw new InvalidArgumentException("Missing required field: {$field}");
+                throw new InvalidArgumentException(__('api.pilot_inquiry_missing_required_field', ['field' => $field]));
             }
         }
 
         // Validate e-mail format
         if (! filter_var($data['contact_email'], FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException('Invalid contact_email address');
+            throw new InvalidArgumentException(__('api.pilot_inquiry_invalid_email'));
         }
 
         // Normalise interest_modules to JSON string
@@ -277,7 +277,7 @@ class PilotInquiryService
         ?string $rejectionReason = null
     ): array {
         if (! in_array($stage, self::VALID_STAGES, true)) {
-            throw new InvalidArgumentException("Invalid stage: {$stage}");
+            throw new InvalidArgumentException(__('api.pilot_inquiry_invalid_stage', ['stage' => $stage]));
         }
 
         $updates = [
