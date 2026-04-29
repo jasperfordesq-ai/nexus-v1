@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Divider, Input, Select, SelectItem, Spinner, Switch } from '@heroui/react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { Button, Card, CardBody, CardHeader, Chip, Divider, Input, Select, SelectItem, Spinner, Switch, Textarea } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
@@ -214,6 +214,29 @@ type GeneratedCode = {
   label: string | null;
   expires_at: string;
   invite_url: string;
+};
+
+type PaperOnboardingFields = {
+  name?: string | null;
+  date_of_birth?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+};
+
+type PaperOnboardingIntake = {
+  id: number;
+  status: 'pending_review' | 'confirmed' | 'rejected';
+  original_filename: string;
+  extracted_fields: PaperOnboardingFields | null;
+  corrected_fields: PaperOnboardingFields | null;
+  ocr_provider: string;
+  created_at: string;
+};
+
+type PaperOnboardingList = {
+  count: number;
+  items: PaperOnboardingIntake[];
 };
 
 const workflowStages = [
@@ -656,6 +679,17 @@ export default function CaringCommunityWorkflowPage() {
   const [onboardingLoading, setOnboardingLoading] = useState(false);
   const [onboardingResult, setOnboardingResult] = useState<{ user: { id: number; name: string; email: string }; temp_password: string } | null>(null);
   const [onboardingCopied, setOnboardingCopied] = useState(false);
+  const [paperIntakes, setPaperIntakes] = useState<PaperOnboardingIntake[]>([]);
+  const [paperFile, setPaperFile] = useState<File | null>(null);
+  const [paperUploading, setPaperUploading] = useState(false);
+  const [paperLoading, setPaperLoading] = useState(false);
+  const [paperReviewingId, setPaperReviewingId] = useState<number | null>(null);
+  const [paperName, setPaperName] = useState('');
+  const [paperDateOfBirth, setPaperDateOfBirth] = useState('');
+  const [paperAddress, setPaperAddress] = useState('');
+  const [paperPhone, setPaperPhone] = useState('');
+  const [paperEmail, setPaperEmail] = useState('');
+  const [paperNote, setPaperNote] = useState('');
 
   const loadWorkflow = useCallback(async () => {
     setLoading(true);
@@ -730,6 +764,24 @@ export default function CaringCommunityWorkflowPage() {
   useEffect(() => {
     loadSafeguardingSummary();
   }, [loadSafeguardingSummary]);
+
+  const loadPaperIntakes = useCallback(async () => {
+    setPaperLoading(true);
+    try {
+      const res = await api.get<PaperOnboardingList>('/v2/admin/caring-community/paper-onboarding?status=pending_review');
+      if (res.data && Array.isArray(res.data.items)) {
+        setPaperIntakes(res.data.items);
+      }
+    } catch {
+      toast.error(t('caring_workflow.paper_onboarding.load_failed'));
+    } finally {
+      setPaperLoading(false);
+    }
+  }, [t, toast]);
+
+  useEffect(() => {
+    loadPaperIntakes();
+  }, [loadPaperIntakes]);
 
   const loadTandemSuggestions = useCallback(async () => {
     setLoadingTandems(true);
@@ -1120,9 +1172,94 @@ export default function CaringCommunityWorkflowPage() {
     }, 50);
   }, []);
 
+  const handlePaperFileChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setPaperFile(event.target.files?.[0] ?? null);
+  }, []);
+
+  const uploadPaperOnboarding = useCallback(async () => {
+    if (!paperFile) {
+      toast.error(t('caring_workflow.paper_onboarding.file_required'));
+      return;
+    }
+
+    setPaperUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', paperFile);
+      formData.append('name', paperName);
+      formData.append('date_of_birth', paperDateOfBirth);
+      formData.append('address', paperAddress);
+      formData.append('phone', paperPhone);
+      formData.append('email', paperEmail);
+
+      const res = await api.upload<PaperOnboardingIntake>('/v2/admin/caring-community/paper-onboarding', formData);
+      if (res.data) {
+        setPaperIntakes((current) => [res.data as PaperOnboardingIntake, ...current]);
+        setPaperReviewingId(res.data.id);
+        setPaperFile(null);
+        toast.success(t('caring_workflow.paper_onboarding.uploaded'));
+      }
+    } catch {
+      toast.error(t('caring_workflow.paper_onboarding.upload_failed'));
+    } finally {
+      setPaperUploading(false);
+    }
+  }, [paperAddress, paperDateOfBirth, paperEmail, paperFile, paperName, paperPhone, t, toast]);
+
+  const startPaperReview = useCallback((intake: PaperOnboardingIntake) => {
+    const fields = intake.corrected_fields ?? intake.extracted_fields ?? {};
+    setPaperReviewingId(intake.id);
+    setPaperName(fields.name ?? '');
+    setPaperDateOfBirth(fields.date_of_birth ?? '');
+    setPaperAddress(fields.address ?? '');
+    setPaperPhone(fields.phone ?? '');
+    setPaperEmail(fields.email ?? '');
+    setPaperNote('');
+  }, []);
+
+  const confirmPaperOnboarding = useCallback(async () => {
+    if (!paperReviewingId) return;
+    if (!paperName.trim() || !paperEmail.trim()) {
+      toast.error(t('caring_workflow.paper_onboarding.review_required'));
+      return;
+    }
+
+    setOnboardingLoading(true);
+    setOnboardingResult(null);
+    try {
+      const res = await api.post<{ success: boolean; user: { id: number; name: string; email: string }; temp_password: string }>(
+        `/v2/admin/caring-community/paper-onboarding/${paperReviewingId}/confirm`,
+        {
+          name: paperName.trim(),
+          date_of_birth: paperDateOfBirth.trim() || undefined,
+          address: paperAddress.trim() || undefined,
+          phone: paperPhone.trim() || undefined,
+          email: paperEmail.trim(),
+          note: paperNote.trim() || undefined,
+        },
+      );
+      if (res.data) {
+        setOnboardingResult({ user: res.data.user, temp_password: res.data.temp_password });
+        setPaperIntakes((current) => current.filter((item) => item.id !== paperReviewingId));
+        setPaperReviewingId(null);
+        setPaperName('');
+        setPaperDateOfBirth('');
+        setPaperAddress('');
+        setPaperPhone('');
+        setPaperEmail('');
+        setPaperNote('');
+        toast.success(t('caring_workflow.paper_onboarding.confirmed'));
+      }
+    } catch {
+      toast.error(t('caring_workflow.paper_onboarding.confirm_failed'));
+    } finally {
+      setOnboardingLoading(false);
+    }
+  }, [paperAddress, paperDateOfBirth, paperEmail, paperName, paperNote, paperPhone, paperReviewingId, t, toast]);
+
   const submitAssistedOnboarding = useCallback(async () => {
     if (!onboardingName.trim() || !onboardingEmail.trim()) {
-      toast.error('Name and email are required.');
+      toast.error(t('caring_workflow.assisted_onboarding.required'));
       return;
     }
     setOnboardingLoading(true);
@@ -1143,14 +1280,14 @@ export default function CaringCommunityWorkflowPage() {
         setOnboardingEmail('');
         setOnboardingPhone('');
         setOnboardingNote('');
-        toast.success('Member account created successfully.');
+        toast.success(t('caring_workflow.assisted_onboarding.created'));
       }
     } catch {
-      toast.error('Could not create member account. Please check the email is not already registered.');
+      toast.error(t('caring_workflow.assisted_onboarding.create_failed'));
     } finally {
       setOnboardingLoading(false);
     }
-  }, [onboardingEmail, onboardingName, onboardingNote, onboardingPhone, toast]);
+  }, [onboardingEmail, onboardingName, onboardingNote, onboardingPhone, t, toast]);
 
   const copyTempPassword = useCallback(() => {
     if (!onboardingResult) return;
@@ -2044,39 +2181,157 @@ export default function CaringCommunityWorkflowPage() {
       <Card className="mt-6" shadow="sm">
         <CardHeader>
           <div>
-            <h2 className="text-lg font-semibold">Assisted Onboarding</h2>
+            <h2 className="text-lg font-semibold">{t('caring_workflow.assisted_onboarding.title')}</h2>
             <p className="mt-1 text-sm text-default-500">
-              Create a member account on behalf of a participant who cannot self-register.
+              {t('caring_workflow.assisted_onboarding.description')}
             </p>
           </div>
         </CardHeader>
         <Divider />
         <CardBody className="gap-4">
+          <div className="rounded-lg border border-default-200 bg-default-50 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-default-900">
+                  {t('caring_workflow.paper_onboarding.title')}
+                </h3>
+                <p className="mt-1 text-xs text-default-500">
+                  {t('caring_workflow.paper_onboarding.description')}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<RefreshCw size={14} />}
+                isLoading={paperLoading}
+                onPress={loadPaperIntakes}
+              >
+                {t('caring_workflow.paper_onboarding.refresh')}
+              </Button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Input
+                type="file"
+                label={t('caring_workflow.paper_onboarding.file_label')}
+                accept="application/pdf,image/jpeg,image/png,image/webp"
+                onChange={handlePaperFileChange}
+              />
+              <Input
+                label={t('caring_workflow.paper_onboarding.name_label')}
+                placeholder={t('caring_workflow.paper_onboarding.name_placeholder')}
+                value={paperName}
+                onValueChange={setPaperName}
+              />
+              <Input
+                type="date"
+                label={t('caring_workflow.paper_onboarding.dob_label')}
+                value={paperDateOfBirth}
+                onValueChange={setPaperDateOfBirth}
+              />
+              <Input
+                type="email"
+                label={t('caring_workflow.paper_onboarding.email_label')}
+                placeholder={t('caring_workflow.paper_onboarding.email_placeholder')}
+                value={paperEmail}
+                onValueChange={setPaperEmail}
+              />
+              <Input
+                label={t('caring_workflow.paper_onboarding.phone_label')}
+                placeholder={t('caring_workflow.paper_onboarding.phone_placeholder')}
+                value={paperPhone}
+                onValueChange={setPaperPhone}
+              />
+              <Input
+                label={t('caring_workflow.paper_onboarding.address_label')}
+                placeholder={t('caring_workflow.paper_onboarding.address_placeholder')}
+                value={paperAddress}
+                onValueChange={setPaperAddress}
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                color="primary"
+                variant="flat"
+                startContent={<FileText size={16} />}
+                isLoading={paperUploading}
+                onPress={uploadPaperOnboarding}
+              >
+                {t('caring_workflow.paper_onboarding.upload_cta')}
+              </Button>
+              {paperReviewingId && (
+                <Button
+                  color="success"
+                  variant="flat"
+                  startContent={<CheckCircle2 size={16} />}
+                  isLoading={onboardingLoading}
+                  onPress={confirmPaperOnboarding}
+                >
+                  {t('caring_workflow.paper_onboarding.confirm_cta')}
+                </Button>
+              )}
+            </div>
+
+            {paperReviewingId && (
+              <Textarea
+                className="mt-3"
+                label={t('caring_workflow.paper_onboarding.note_label')}
+                placeholder={t('caring_workflow.paper_onboarding.note_placeholder')}
+                value={paperNote}
+                onValueChange={setPaperNote}
+              />
+            )}
+
+            {paperIntakes.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {paperIntakes.map((intake) => {
+                  const fields = intake.corrected_fields ?? intake.extracted_fields ?? {};
+                  return (
+                    <div key={intake.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-background px-3 py-2">
+                      <div>
+                        <p className="text-sm font-medium text-default-900">
+                          {fields.name || intake.original_filename}
+                        </p>
+                        <p className="text-xs text-default-500">
+                          {fields.email || t('caring_workflow.paper_onboarding.no_email')} · {intake.original_filename}
+                        </p>
+                      </div>
+                      <Button size="sm" variant="flat" onPress={() => startPaperReview(intake)}>
+                        {t('caring_workflow.paper_onboarding.review_cta')}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <Input
-              label="Full name"
-              placeholder="e.g. Marie Curie"
+              label={t('caring_workflow.assisted_onboarding.name_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.name_placeholder')}
               value={onboardingName}
               onValueChange={setOnboardingName}
               isRequired
             />
             <Input
               type="email"
-              label="Email address"
-              placeholder="member@example.com"
+              label={t('caring_workflow.assisted_onboarding.email_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.email_placeholder')}
               value={onboardingEmail}
               onValueChange={setOnboardingEmail}
               isRequired
             />
             <Input
-              label="Phone (optional)"
-              placeholder="+41 79 123 45 67"
+              label={t('caring_workflow.assisted_onboarding.phone_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.phone_placeholder')}
               value={onboardingPhone}
               onValueChange={setOnboardingPhone}
             />
             <Input
-              label="Coordinator note (optional)"
-              placeholder="e.g. Met at Tuesday drop-in"
+              label={t('caring_workflow.assisted_onboarding.note_label')}
+              placeholder={t('caring_workflow.assisted_onboarding.note_placeholder')}
               value={onboardingNote}
               onValueChange={setOnboardingNote}
             />
@@ -2088,16 +2343,19 @@ export default function CaringCommunityWorkflowPage() {
             isLoading={onboardingLoading}
             onPress={submitAssistedOnboarding}
           >
-            Create Member Account
+            {t('caring_workflow.assisted_onboarding.create_cta')}
           </Button>
 
           {onboardingResult && (
             <div className="rounded-lg border border-success-200 bg-success-50 p-4">
               <p className="text-sm font-semibold text-success-700">
-                Account created for {onboardingResult.user.name} ({onboardingResult.user.email})
+                {t('caring_workflow.assisted_onboarding.created_for', {
+                  name: onboardingResult.user.name,
+                  email: onboardingResult.user.email,
+                })}
               </p>
               <p className="mt-2 text-xs text-default-500">
-                The member should change this password on first login.
+                {t('caring_workflow.assisted_onboarding.password_note')}
               </p>
               <div className="mt-3 flex items-center gap-2">
                 <code className="flex-1 rounded bg-default-100 px-3 py-2 text-sm font-mono text-default-900">
@@ -2109,7 +2367,7 @@ export default function CaringCommunityWorkflowPage() {
                   startContent={<Copy size={14} />}
                   onPress={copyTempPassword}
                 >
-                  {onboardingCopied ? 'Copied!' : 'Copy'}
+                  {onboardingCopied ? t('caring_workflow.assisted_onboarding.copied') : t('caring_workflow.assisted_onboarding.copy')}
                 </Button>
               </div>
             </div>

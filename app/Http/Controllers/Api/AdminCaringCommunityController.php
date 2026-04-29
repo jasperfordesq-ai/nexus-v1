@@ -20,6 +20,7 @@ use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringNudgeService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\KpiBaselineService;
+use App\Services\CaringCommunity\PaperOnboardingIntakeService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use App\Services\CaringCommunityMemberStatementService;
@@ -54,6 +55,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly VereinMemberImportService $vereinMemberImportService,
         private readonly CaringNudgeService $nudgeService,
         private readonly KpiBaselineService $kpiBaselineService,
+        private readonly PaperOnboardingIntakeService $paperOnboardingIntakeService,
     ) {
     }
 
@@ -710,6 +712,101 @@ class AdminCaringCommunityController extends BaseApiController
             ],
             'temp_password' => $tempPassword,
         ], null, 201);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/paper-onboarding
+     */
+    public function paperOnboardingList(): JsonResponse
+    {
+        $this->requireAdmin();
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        $status = trim((string) request()->query('status', 'pending_review'));
+        $limit = max(1, min(100, (int) request()->query('limit', 20)));
+
+        return $this->respondWithData(
+            $this->paperOnboardingIntakeService->list(TenantContext::getId(), $status, $limit)
+        );
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/paper-onboarding
+     *
+     * Coordinator uploads a scanned KISS consent/onboarding form. OCR is
+     * intentionally behind PaperOnboardingIntakeService so this endpoint stays
+     * stable when a real OCR provider replaces the manual-review stub.
+     */
+    public function paperOnboardingUpload(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        $file = request()->file('file');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.caring_paper_onboarding_file_required'), 'file', 422);
+        }
+
+        $allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+        if (!in_array((string) $file->getMimeType(), $allowedMimeTypes, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.caring_paper_onboarding_invalid_file_type'), 'file', 422);
+        }
+
+        if ((int) $file->getSize() > 10 * 1024 * 1024) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.caring_paper_onboarding_file_too_large'), 'file', 422);
+        }
+
+        $input = $this->getAllInput();
+        $intake = $this->paperOnboardingIntakeService->createFromUpload(TenantContext::getId(), $adminId, $file, [
+            'name' => $input['name'] ?? null,
+            'date_of_birth' => $input['date_of_birth'] ?? null,
+            'address' => $input['address'] ?? null,
+            'phone' => $input['phone'] ?? null,
+            'email' => $input['email'] ?? null,
+        ]);
+
+        ActivityLog::log($adminId, 'caring_paper_onboarding_uploaded', 'Paper onboarding form uploaded for coordinator review');
+
+        return $this->respondWithData($intake, null, 201);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/paper-onboarding/{id}/confirm
+     */
+    public function paperOnboardingConfirm(int $id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $guard = $this->guardCaringCommunity();
+        if ($guard !== null) return $guard;
+
+        $result = $this->paperOnboardingIntakeService->confirm(
+            TenantContext::getId(),
+            $id,
+            $adminId,
+            $this->getAllInput()
+        );
+
+        if (($result['success'] ?? false) !== true) {
+            $code = (string) ($result['code'] ?? 'CREATE_FAILED');
+            $message = match ($code) {
+                'NOT_FOUND' => __('api.caring_paper_onboarding_not_found'),
+                'ALREADY_REVIEWED' => __('api.caring_paper_onboarding_already_reviewed'),
+                'EMAIL_EXISTS' => __('api.email_already_exists'),
+                'VALIDATION_ERROR' => __('api.caring_paper_onboarding_review_required'),
+                default => __('api.user_created_failed'),
+            };
+            $status = $code === 'NOT_FOUND' ? 404 : 422;
+
+            return $this->respondWithError($code, $message, null, $status);
+        }
+
+        $user = $result['user'] ?? [];
+        $email = is_array($user) ? (string) ($user['email'] ?? '') : '';
+        ActivityLog::log($adminId, 'caring_paper_onboarding_confirmed', "Paper onboarding confirmed: {$email}");
+
+        return $this->respondWithData($result, null, 201);
     }
 
     /**

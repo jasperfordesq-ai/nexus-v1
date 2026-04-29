@@ -12,8 +12,10 @@ use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -88,6 +90,11 @@ class AdminCaringCommunityControllerTest extends TestCase
             ]],
             'nudge dispatch' => ['POST', '/v2/admin/caring-community/nudges/dispatch', [
                 'dry_run' => true,
+            ]],
+            'paper onboarding list' => ['GET', '/v2/admin/caring-community/paper-onboarding'],
+            'paper onboarding confirm' => ['POST', '/v2/admin/caring-community/paper-onboarding/999/confirm', [
+                'name' => 'Ada Lovelace',
+                'email' => 'ada.paper@example.test',
             ]],
         ];
     }
@@ -215,6 +222,55 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertJsonPath('data.summary.wallet_hours_spent', 1);
         $response->assertJsonPath('data.summary.estimated_social_value_chf', 140);
         $response->assertJsonPath('data.support_hours_by_organisation.0.organisation_name', 'KISS Zurich');
+    }
+
+    public function test_paper_onboarding_upload_and_confirm_creates_reviewed_member(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        Storage::fake('local');
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $uploadResponse = $this->post('/api/v2/admin/caring-community/paper-onboarding', [
+            'file' => UploadedFile::fake()->create('kiss-consent.pdf', 100, 'application/pdf'),
+            'name' => 'Marie Curie',
+            'date_of_birth' => '1940-01-01',
+            'address' => 'Dorfstrasse 7, Cham',
+            'phone' => '+41 79 123 45 67',
+            'email' => 'marie.paper@example.test',
+        ], $this->withTenantHeader());
+
+        $uploadResponse->assertStatus(201);
+        $uploadResponse->assertJsonPath('data.status', 'pending_review');
+        $uploadResponse->assertJsonPath('data.extracted_fields.name', 'Marie Curie');
+
+        $intakeId = (int) $uploadResponse->json('data.id');
+
+        $confirmResponse = $this->apiPost("/v2/admin/caring-community/paper-onboarding/{$intakeId}/confirm", [
+            'name' => 'Marie Curie',
+            'date_of_birth' => '1940-01-01',
+            'address' => 'Dorfstrasse 7, Cham',
+            'phone' => '+41 79 123 45 67',
+            'email' => 'marie.paper@example.test',
+            'note' => 'Reviewed from signed paper form.',
+        ]);
+
+        $confirmResponse->assertStatus(201);
+        $confirmResponse->assertJsonPath('data.success', true);
+        $confirmResponse->assertJsonPath('data.intake.status', 'confirmed');
+        $confirmResponse->assertJsonPath('data.user.email', 'marie.paper@example.test');
+
+        $this->assertDatabaseHas('users', [
+            'tenant_id' => $this->testTenantId,
+            'email' => 'marie.paper@example.test',
+            'location' => 'Dorfstrasse 7, Cham',
+        ]);
+
+        $this->assertDatabaseHas('caring_paper_onboarding_intakes', [
+            'tenant_id' => $this->testTenantId,
+            'id' => $intakeId,
+            'status' => 'confirmed',
+        ]);
     }
 
     public function test_kpi_baseline_comparison_tracks_agoris_gemeinde_claim_targets(): void

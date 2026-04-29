@@ -1196,6 +1196,9 @@ Route::get('/v2/admin/caring-community/nudges/analytics', [\App\Http\Controllers
 Route::put('/v2/admin/caring-community/nudges/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateNudgeConfig']);
 Route::post('/v2/admin/caring-community/nudges/dispatch', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'dispatchNudges']);
 Route::post('/v2/admin/caring-community/assisted-onboarding', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assistedOnboarding']);
+Route::get('/v2/admin/caring-community/paper-onboarding', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'paperOnboardingList']);
+Route::post('/v2/admin/caring-community/paper-onboarding', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'paperOnboardingUpload']);
+Route::post('/v2/admin/caring-community/paper-onboarding/{id}/confirm', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'paperOnboardingConfirm']);
 Route::post('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'generateInviteCode']);
 Route::get('/v2/admin/caring-community/invite-codes', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listInviteCodes']);
 Route::get('/v2/admin/caring-community/favours', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listFavours']);

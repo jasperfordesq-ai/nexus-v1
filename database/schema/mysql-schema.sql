@@ -1,4 +1,4 @@
-﻿/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -1136,6 +1136,37 @@ CREATE TABLE `caring_loyalty_redemptions` (
   KEY `clr_tenant_merchant_idx` (`tenant_id`,`merchant_user_id`),
   KEY `clr_tenant_redeemed_idx` (`tenant_id`,`redeemed_at`),
   KEY `clr_tenant_listing_idx` (`tenant_id`,`marketplace_listing_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_paper_onboarding_intakes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_paper_onboarding_intakes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `uploaded_by` int(10) unsigned DEFAULT NULL,
+  `reviewed_by` int(10) unsigned DEFAULT NULL,
+  `created_user_id` int(10) unsigned DEFAULT NULL,
+  `status` enum('pending_review','confirmed','rejected') NOT NULL DEFAULT 'pending_review',
+  `original_filename` varchar(255) NOT NULL,
+  `stored_path` varchar(512) NOT NULL,
+  `mime_type` varchar(120) DEFAULT NULL,
+  `file_size` int(10) unsigned DEFAULT NULL,
+  `ocr_provider` varchar(60) NOT NULL DEFAULT 'manual_review_stub',
+  `extracted_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extracted_fields`)),
+  `corrected_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`corrected_fields`)),
+  `coordinator_notes` text DEFAULT NULL,
+  `confirmed_at` timestamp NULL DEFAULT NULL,
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caring_paper_onboarding_intakes_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `caring_paper_onboarding_intakes_tenant_id_created_at_index` (`tenant_id`,`created_at`),
+  KEY `caring_paper_onboarding_intakes_tenant_id_index` (`tenant_id`),
+  KEY `caring_paper_onboarding_intakes_uploaded_by_index` (`uploaded_by`),
+  KEY `caring_paper_onboarding_intakes_reviewed_by_index` (`reviewed_by`),
+  KEY `caring_paper_onboarding_intakes_created_user_id_index` (`created_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_project_announcements`;
@@ -6166,7 +6197,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12585,11 +12616,11 @@ INSERT INTO `laravel_migrations` VALUES
 (177,'2026_04_29_110000_create_caring_cover_requests_table',80),
 (178,'2026_04_29_120000_create_caring_research_partnership_tables',81),
 (179,'2026_04_29_130000_create_caring_hour_estates_table',82),
-(180,'2026_04_29_140000_create_caring_kiss_treffen_table',83);
+(180,'2026_04_29_140000_create_caring_kiss_treffen_table',83),
+(181,'2026_04_29_150000_create_caring_paper_onboarding_intakes_table',84);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
