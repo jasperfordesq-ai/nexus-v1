@@ -2571,6 +2571,12 @@ Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\Fadp
 Route::get('/v2/admin/fadp/processing-register.csv', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegisterCsv']);
 Route::get('/v2/admin/fadp/disclosure-pack', [\App\Http\Controllers\Api\FadpComplianceController::class, 'disclosurePack']);
 
+// AG43 — Citizen Residency Verification
+Route::get('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'myStatus']);
+Route::post('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'submitDeclaration']);
+Route::get('/v2/admin/residency-verifications', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminList']);
+Route::post('/v2/admin/residency-verifications/{id}/attest', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminAttest']);
+
 // AG56 — Local Advertising Platform
 Route::get('/v2/ads/active', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getActiveAds']);
 Route::post('/v2/ads/impression', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'recordImpression']);

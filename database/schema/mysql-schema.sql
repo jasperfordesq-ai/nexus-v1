@@ -6197,7 +6197,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=183 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7403,6 +7403,31 @@ CREATE TABLE `member_notes` (
   KEY `idx_member_notes_author` (`tenant_id`,`author_id`),
   KEY `idx_member_notes_category` (`tenant_id`,`category`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `member_residency_verifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `member_residency_verifications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `declared_municipality` varchar(120) NOT NULL,
+  `declared_postcode` varchar(24) NOT NULL,
+  `declared_address` varchar(255) DEFAULT NULL,
+  `evidence_note` text DEFAULT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `attested_by` int(10) unsigned DEFAULT NULL,
+  `attested_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `member_residency_verifications_tenant_id_user_id_status_index` (`tenant_id`,`user_id`,`status`),
+  KEY `member_residency_verifications_tenant_id_index` (`tenant_id`),
+  KEY `member_residency_verifications_user_id_index` (`user_id`),
+  KEY `member_residency_verifications_status_index` (`status`),
+  KEY `member_residency_verifications_attested_by_index` (`attested_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12427,7 +12452,6 @@ CREATE TABLE `xp_shop_items` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-
 -- Laravel migrations data (so fresh migrate knows what is already applied)
 /*M!999999\- enable the sandbox mode */ 
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
@@ -12617,7 +12641,8 @@ INSERT INTO `laravel_migrations` VALUES
 (178,'2026_04_29_120000_create_caring_research_partnership_tables',81),
 (179,'2026_04_29_130000_create_caring_hour_estates_table',82),
 (180,'2026_04_29_140000_create_caring_kiss_treffen_table',83),
-(181,'2026_04_29_150000_create_caring_paper_onboarding_intakes_table',84);
+(181,'2026_04_29_150000_create_caring_paper_onboarding_intakes_table',84),
+(182,'2026_04_29_160000_create_member_residency_verifications_table',85);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
