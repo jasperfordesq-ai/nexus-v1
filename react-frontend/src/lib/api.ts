@@ -127,6 +127,48 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// localStorage helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Keys that are safe to evict when localStorage is full — ordered cheapest first.
+// Auth tokens and tenant config are NOT in this list; they must always be stored.
+const EVICTABLE_PREFIXES = ['i18next_res_', 'nexus_connection_dismissed_'];
+const EVICTABLE_KEYS = [
+  'nexus_performance_metrics',
+  'nexus_recent_searches',
+  'nexus_recent_pages',
+  'nexus_proximity',
+];
+
+function evictNonCriticalStorage(): void {
+  const toRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    if (EVICTABLE_KEYS.includes(key) || EVICTABLE_PREFIXES.some((p) => key.startsWith(p))) {
+      toRemove.push(key);
+    }
+  }
+  toRemove.forEach((k) => localStorage.removeItem(k));
+}
+
+function safeLocalStorageSet(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      evictNonCriticalStorage();
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        // Still full after eviction — log but don't crash; user will be asked to log in again
+        console.error(`[NEXUS] localStorage quota exceeded storing "${key}" — cleared cache but still full.`);
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Token Management
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -136,7 +178,7 @@ export const tokenManager = {
   },
 
   setAccessToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
+    safeLocalStorageSet(TOKEN_KEY, token);
   },
 
   getRefreshToken(): string | null {
@@ -144,7 +186,7 @@ export const tokenManager = {
   },
 
   setRefreshToken(token: string): void {
-    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+    safeLocalStorageSet(REFRESH_TOKEN_KEY, token);
   },
 
   getTenantId(): string | null {
@@ -158,7 +200,7 @@ export const tokenManager = {
   },
 
   setTenantId(id: string | number): void {
-    localStorage.setItem(TENANT_ID_KEY, String(id));
+    safeLocalStorageSet(TENANT_ID_KEY, String(id));
   },
 
   getTenantSlug(): string | null {
@@ -166,7 +208,7 @@ export const tokenManager = {
   },
 
   setTenantSlug(slug: string): void {
-    localStorage.setItem(TENANT_SLUG_KEY, slug);
+    safeLocalStorageSet(TENANT_SLUG_KEY, slug);
   },
 
   clearTokens(): void {
@@ -183,7 +225,7 @@ export const tokenManager = {
   },
 
   setTrustedDeviceToken(token: string): void {
-    localStorage.setItem(TRUSTED_DEVICE_KEY, token);
+    safeLocalStorageSet(TRUSTED_DEVICE_KEY, token);
   },
 
   clearTrustedDeviceToken(): void {
@@ -212,7 +254,7 @@ export const tokenManager = {
   },
 
   setCsrfToken(token: string): void {
-    localStorage.setItem(CSRF_TOKEN_KEY, token);
+    safeLocalStorageSet(CSRF_TOKEN_KEY, token);
   },
 
   clearCsrfToken(): void {
@@ -410,7 +452,7 @@ class ApiClient {
         return false; // Another tab holds a valid lock
       }
     }
-    localStorage.setItem(ApiClient.REFRESH_LOCK_KEY, String(now));
+    safeLocalStorageSet(ApiClient.REFRESH_LOCK_KEY, String(now));
     return true;
   }
 
