@@ -1069,6 +1069,31 @@ CREATE TABLE `caring_invite_codes` (
   KEY `caring_invite_codes_created_by_user_id_index` (`created_by_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_kiss_treffen`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_kiss_treffen` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `treffen_type` enum('monthly_stamm','annual_general_assembly','governance_circle','cooperative_workshop','other') NOT NULL DEFAULT 'monthly_stamm',
+  `members_only` tinyint(1) NOT NULL DEFAULT 1,
+  `quorum_required` int(10) unsigned DEFAULT NULL,
+  `fondation_header` varchar(255) DEFAULT NULL,
+  `minutes_document_url` varchar(512) DEFAULT NULL,
+  `minutes_uploaded_at` timestamp NULL DEFAULT NULL,
+  `minutes_uploaded_by` int(10) unsigned DEFAULT NULL,
+  `coordinator_notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `caring_kiss_treffen_tenant_event_unique` (`tenant_id`,`event_id`),
+  KEY `caring_kiss_treffen_tenant_id_treffen_type_index` (`tenant_id`,`treffen_type`),
+  KEY `caring_kiss_treffen_event_id_foreign` (`event_id`),
+  KEY `caring_kiss_treffen_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `caring_kiss_treffen_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_kpi_baselines`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6141,7 +6166,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=180 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12559,7 +12584,8 @@ INSERT INTO `laravel_migrations` VALUES
 (176,'2026_04_29_100000_create_caring_project_announcement_tables',79),
 (177,'2026_04_29_110000_create_caring_cover_requests_table',80),
 (178,'2026_04_29_120000_create_caring_research_partnership_tables',81),
-(179,'2026_04_29_130000_create_caring_hour_estates_table',82);
+(179,'2026_04_29_130000_create_caring_hour_estates_table',82),
+(180,'2026_04_29_140000_create_caring_kiss_treffen_table',83);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

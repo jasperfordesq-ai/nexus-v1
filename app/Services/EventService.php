@@ -17,6 +17,7 @@ use App\Models\EventRsvp;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 /**
  * EventService — Laravel DI-based service for event operations.
  *
@@ -511,6 +512,11 @@ class EventService
             return false;
         }
 
+        if (!self::allowsKissTreffenRsvp($eventId, $userId, $tenantId)) {
+            self::$errors[] = ['code' => 'KISS_TREFFEN_MEMBERS_ONLY', 'message' => __('api.caring_kiss_treffen_members_only_rsvp')];
+            return false;
+        }
+
         // Block RSVP to past events (event has already ended, or started with no end time)
         if ($status === 'going' || $status === 'interested') {
             $eventEnd = $event->end_time ?? $event->start_time ?? null;
@@ -573,6 +579,29 @@ class EventService
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_rsvp_update_failed')];
             return false;
         }
+    }
+
+    private static function allowsKissTreffenRsvp(int $eventId, int $userId, int $tenantId): bool
+    {
+        if (!Schema::hasTable('caring_kiss_treffen')) {
+            return true;
+        }
+
+        $treffen = DB::table('caring_kiss_treffen')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->first(['members_only']);
+
+        if (!$treffen || !(bool) $treffen->members_only) {
+            return true;
+        }
+
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $userId)
+            ->where('status', 'active')
+            ->where('is_approved', true)
+            ->exists();
     }
 
     /**

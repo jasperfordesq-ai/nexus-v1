@@ -29,6 +29,7 @@ return [
     'no_fields_provided'           => 'No fields provided to update',
     'request_body_empty'           => 'Request body is empty',
     'invalid_id'                   => 'Invalid :resource ID',
+    'invalid_integer_field'        => ':field must be a non-negative integer',
     'slug_already_in_use'          => 'Slug already in use',
 
     // ============================================
@@ -1830,6 +1831,11 @@ return [
     'caring_hour_estate_not_found'             => 'Legacy hour estate record not found.',
     'caring_hour_estate_not_reportable'        => 'This legacy hour estate cannot be reported in its current status.',
     'caring_hour_estate_not_settleable'        => 'This legacy hour estate must be reported before it can be settled.',
+    'caring_kiss_treffen_unavailable'          => 'KISS Treffen meeting records are not available for this community.',
+    'caring_kiss_treffen_not_found'            => 'KISS Treffen meeting record not found.',
+    'caring_kiss_treffen_type_invalid'         => 'KISS Treffen type must be one of: monthly_stamm, annual_general_assembly, governance_circle, cooperative_workshop, other.',
+    'caring_kiss_treffen_minutes_required'     => 'A minutes document URL is required.',
+    'caring_kiss_treffen_members_only_rsvp'    => 'Only active approved members can RSVP to this KISS Treffen.',
     'caring_emergency_alerts_unavailable'      => 'Emergency alerts are not available.',
     'caring_emergency_alert_not_found_after_update' => 'Emergency alert not found after update.',
     'pilot_inquiry_service_unavailable'        => 'Pilot inquiries are not available.',

@@ -352,6 +352,10 @@ class EventsController extends BaseApiController
                     $httpStatus = 409;
                     break;
                 }
+                if ($error['code'] === 'KISS_TREFFEN_MEMBERS_ONLY') {
+                    $httpStatus = 403;
+                    break;
+                }
                 if ($error['code'] === 'EVENT_FULL') {
                     $isWaitlisted = true;
                     break;

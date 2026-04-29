@@ -1257,6 +1257,14 @@ Route::get('/v2/admin/caring-community/hour-estates', [\App\Http\Controllers\Api
 Route::post('/v2/admin/caring-community/hour-estates/{id}/report-deceased', [\App\Http\Controllers\Api\HourEstateController::class, 'reportDeceased']);
 Route::post('/v2/admin/caring-community/hour-estates/{id}/settle', [\App\Http\Controllers\Api\HourEstateController::class, 'settle']);
 
+// AG33 — KISS Treffen ritual meeting subtype
+Route::get('/v2/caring-community/kiss-treffen', [\App\Http\Controllers\Api\KissTreffenController::class, 'index'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/kiss-treffen/{eventId}', [\App\Http\Controllers\Api\KissTreffenController::class, 'show'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::put('/v2/admin/caring-community/kiss-treffen/{eventId}', [\App\Http\Controllers\Api\KissTreffenController::class, 'adminUpsert']);
+Route::post('/v2/admin/caring-community/kiss-treffen/{eventId}/minutes', [\App\Http\Controllers\Api\KissTreffenController::class, 'adminRecordMinutes']);
+
 Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
 Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
 Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
