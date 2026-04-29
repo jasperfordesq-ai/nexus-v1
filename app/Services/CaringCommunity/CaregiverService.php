@@ -116,7 +116,7 @@ class CaregiverService
         array $options = [],
     ): array {
         if ($caregiverId === $caredForId) {
-            throw new \RuntimeException('A caregiver cannot be linked to themselves.');
+            throw new \RuntimeException(__('api.caring_caregiver_self_link'));
         }
 
         $existing = DB::table('caring_caregiver_links')
@@ -127,7 +127,7 @@ class CaregiverService
             ->first();
 
         if ($existing !== null) {
-            throw new \RuntimeException('An active caregiver link already exists for this pair.');
+            throw new \RuntimeException(__('api.caring_caregiver_duplicate_link'));
         }
 
         $id = DB::table('caring_caregiver_links')->insertGetId([
@@ -166,7 +166,7 @@ class CaregiverService
             ]);
 
         if ($affected === 0) {
-            throw new \RuntimeException('Caregiver link not found or you do not own it.');
+            throw new \RuntimeException(__('api.caring_caregiver_link_not_found'));
         }
     }
 
@@ -305,7 +305,7 @@ class CaregiverService
             ->first();
 
         if ($link === null) {
-            throw new \RuntimeException('You do not have an active caregiver link to this person.');
+            throw new \RuntimeException(__('api.caring_caregiver_active_link_required'));
         }
 
         $id = DB::table('caring_help_requests')->insertGetId([
@@ -313,10 +313,10 @@ class CaregiverService
             'user_id'          => $caredForId,
             'requested_by_id'  => $caregiverId,
             'is_on_behalf'     => true,
-            'title'            => $requestData['title'],
-            'description'      => $requestData['description'] ?? null,
-            'category_id'      => $requestData['category_id'] ?? null,
-            'status'           => 'open',
+            'what'             => $this->buildOnBehalfRequestText($requestData),
+            'when_needed'      => (string) ($requestData['when_needed'] ?? __('api.caring_caregiver_when_needed_default')),
+            'contact_preference' => $this->normaliseContactPreference($requestData['contact_preference'] ?? null),
+            'status'           => 'pending',
             'created_at'       => now(),
             'updated_at'       => now(),
         ]);
@@ -325,6 +325,24 @@ class CaregiverService
         $row = (array) DB::table('caring_help_requests')->where('id', $id)->first();
 
         return $row;
+    }
+
+    /**
+     * @param array<string,mixed> $requestData
+     */
+    private function buildOnBehalfRequestText(array $requestData): string
+    {
+        $title = trim((string) ($requestData['title'] ?? ''));
+        $description = trim((string) ($requestData['description'] ?? ''));
+
+        return trim($title . ($description !== '' ? "\n\n" . $description : ''));
+    }
+
+    private function normaliseContactPreference(mixed $contactPreference): string
+    {
+        $value = (string) ($contactPreference ?? 'either');
+
+        return in_array($value, ['phone', 'message', 'either'], true) ? $value : 'either';
     }
 
     // -------------------------------------------------------------------------

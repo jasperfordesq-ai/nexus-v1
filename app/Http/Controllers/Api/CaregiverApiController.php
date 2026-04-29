@@ -85,7 +85,12 @@ class CaregiverApiController extends BaseApiController
         $relationshipType = (string) ($this->input('relationship_type') ?? '');
         $allowedTypes     = ['family', 'friend', 'neighbour', 'professional'];
         if (!in_array($relationshipType, $allowedTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'relationship_type must be one of: ' . implode(', ', $allowedTypes), 'relationship_type', 422);
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.caring_caregiver_relationship_invalid', ['values' => implode(', ', $allowedTypes)]),
+                'relationship_type',
+                422
+            );
         }
 
         $startDate = (string) ($this->input('start_date') ?? '');
@@ -163,7 +168,7 @@ class CaregiverApiController extends BaseApiController
         }
 
         if (!$hasLink) {
-            return $this->respondForbidden('You do not have an active caregiver link to this person.');
+            return $this->respondForbidden(__('api.caring_caregiver_active_link_required'));
         }
 
         return $this->respondWithData($this->service->getScheduleForCaredFor($caredForId, $tenantId));
@@ -221,9 +226,10 @@ class CaregiverApiController extends BaseApiController
                 $userId,
                 $caredForId,
                 [
-                    'title'       => $title,
-                    'description' => $this->input('description'),
-                    'category_id' => $this->inputInt('category_id'),
+                    'title'              => $title,
+                    'description'        => $this->input('description'),
+                    'when_needed'        => $this->input('when_needed'),
+                    'contact_preference' => $this->input('contact_preference'),
                 ],
                 $tenantId,
             );

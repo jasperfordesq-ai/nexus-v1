@@ -102,11 +102,11 @@ function BurnoutBanner({ burnout, t }: { burnout: BurnoutCheck; t: (key: string,
         <div>
           <p className={`font-semibold ${isHigh ? 'text-danger' : 'text-warning'}`}>
             {isHigh
-              ? t('caring_community.caregiver.burnout_high', { hours: burnout.weekly_hours.toFixed(1) })
-              : t('caring_community.caregiver.burnout_moderate', { hours: burnout.weekly_hours.toFixed(1) })}
+              ? t('caregiver.burnout_high', { hours: burnout.weekly_hours.toFixed(1) })
+              : t('caregiver.burnout_moderate', { hours: burnout.weekly_hours.toFixed(1) })}
           </p>
           <p className="mt-1 text-sm text-theme-muted">
-            {t('caring_community.caregiver.burnout_warning')}
+            {t('caregiver.burnout_warning')}
           </p>
         </div>
       </div>
@@ -155,10 +155,10 @@ function SchedulePanel({ caredForId, t }: SchedulePanelProps) {
       {/* Upcoming support relationships */}
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-theme-muted">
-          {t('caring_community.caregiver.upcoming_care')}
+          {t('caregiver.upcoming_care')}
         </p>
         {schedule.support_relationships.length === 0 ? (
-          <p className="text-sm text-theme-muted">{t('caring_community.caregiver.no_care_receivers')}</p>
+          <p className="text-sm text-theme-muted">{t('caregiver.no_upcoming_care')}</p>
         ) : (
           <ul className="space-y-2">
             {schedule.support_relationships.map((sr) => (
@@ -187,10 +187,10 @@ function SchedulePanel({ caredForId, t }: SchedulePanelProps) {
       {/* Recent care logs */}
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-theme-muted">
-          {t('caring_community.caregiver.recent_care')}
+          {t('caregiver.recent_care')}
         </p>
         {schedule.recent_logs.length === 0 ? (
-          <p className="text-sm text-theme-muted">{t('caring_community.caregiver.no_care_receivers')}</p>
+          <p className="text-sm text-theme-muted">{t('caregiver.no_recent_care')}</p>
         ) : (
           <ul className="space-y-1.5">
             {schedule.recent_logs.map((log) => (
@@ -236,7 +236,7 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
           <div>
             <p className="font-semibold text-theme-primary">{link.cared_for_name}</p>
             <Chip size="sm" variant="flat" color="secondary" className="mt-1">
-              {t(`caring_community.caregiver.relationship_${link.relationship_type}`)}
+              {t(`caregiver.relationship_${link.relationship_type}`)}
             </Chip>
           </div>
         </div>
@@ -244,10 +244,10 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
           <Accordion className="w-full sm:w-auto" variant="light">
             <AccordionItem
               key="schedule"
-              aria-label={t('caring_community.caregiver.view_schedule')}
+              aria-label={t('caregiver.view_schedule')}
               title={
                 <span className="text-sm font-medium text-[var(--color-primary)]">
-                  {t('caring_community.caregiver.view_schedule')}
+                  {t('caregiver.view_schedule')}
                 </span>
               }
             >
@@ -259,7 +259,7 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
             className="inline-flex items-center gap-1.5 rounded-lg border border-theme-default px-3 py-1.5 text-sm font-medium text-theme-primary hover:bg-theme-elevated transition-colors"
           >
             <HeartHandshake className="h-4 w-4" aria-hidden="true" />
-            {t('caring_community.caregiver.request_on_behalf')}
+            {t('caregiver.request_on_behalf')}
           </Link>
           <Link
             to={tenantPath('/caring-community/caregiver/cover')}

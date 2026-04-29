@@ -1279,12 +1279,18 @@ Route::put('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controller
 Route::post('/v2/admin/caring-community/trust-tier/recompute', [\App\Http\Controllers\Api\TrustTierController::class, 'recomputeTiers']);
 
 // AG68 — Caregiver/Angehörigen Support Flow
-Route::get('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'myLinks']);
-Route::post('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'addLink']);
-Route::delete('/v2/caring-community/caregiver/links/{id}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'removeLink']);
-Route::get('/v2/caring-community/caregiver/schedule/{caredForId}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'caregiverSchedule']);
-Route::get('/v2/caring-community/caregiver/burnout-check', [\App\Http\Controllers\Api\CaregiverApiController::class, 'burnoutCheck']);
-Route::post('/v2/caring-community/caregiver/request-on-behalf', [\App\Http\Controllers\Api\CaregiverApiController::class, 'requestOnBehalf']);
+Route::get('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'myLinks'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'addLink'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::delete('/v2/caring-community/caregiver/links/{id}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'removeLink'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/caregiver/schedule/{caredForId}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'caregiverSchedule'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/caregiver/burnout-check', [\App\Http\Controllers\Api\CaregiverApiController::class, 'burnoutCheck'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/caregiver/request-on-behalf', [\App\Http\Controllers\Api\CaregiverApiController::class, 'requestOnBehalf'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/caring-community/caregiver/cover-requests', [\App\Http\Controllers\Api\CaregiverApiController::class, 'coverRequests'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::post('/v2/caring-community/caregiver/cover-requests', [\App\Http\Controllers\Api\CaregiverApiController::class, 'createCoverRequest'])

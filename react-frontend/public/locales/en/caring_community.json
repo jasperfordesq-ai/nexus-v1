@@ -32,8 +32,20 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
+    "link_error": "Care receiver could not be linked",
+    "search_label": "Find member",
+    "search_placeholder": "Search by name",
+    "searching": "Searching members...",
+    "no_search_results": "No matching members found",
+    "relationship_label": "Relationship",
+    "start_date_label": "Care started",
+    "notes_label": "Notes",
+    "notes_placeholder": "Optional context for coordinators or trusted substitutes",
+    "cancel": "Cancel",
     "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care"
+    "recent_care": "Recent care",
+    "no_upcoming_care": "No scheduled support yet",
+    "no_recent_care": "No recent care logs yet"
   },
   "cover": {
     "title": "Cover Care",

@@ -72,7 +72,7 @@ export function LinkCareReceiverPage() {
       showToast(t('caregiver.link_success'), 'success');
       void navigate(tenantPath('/caring-community/caregiver'), { replace: true });
     } catch {
-      showToast(t('caregiver.no_care_receivers'), 'error');
+      showToast(t('caregiver.link_error'), 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -127,8 +127,8 @@ export function LinkCareReceiverPage() {
             {/* Member search */}
             <div className="space-y-2">
               <Input
-                label={t('caregiver.link_title')}
-                placeholder={t('caregiver.link_subtitle')}
+                label={t('caregiver.search_label')}
+                placeholder={t('caregiver.search_placeholder')}
                 value={searchQuery}
                 onValueChange={(v) => {
                   setSearchQuery(v);
@@ -145,7 +145,7 @@ export function LinkCareReceiverPage() {
               {!selectedUser && searchQuery.length >= 2 && (
                 <div className="rounded-lg border border-theme-default bg-theme-surface shadow-lg overflow-hidden">
                   {searching ? (
-                    <div className="p-3 text-sm text-theme-muted">{t('caregiver.upcoming_care')}</div>
+                    <div className="p-3 text-sm text-theme-muted">{t('caregiver.searching')}</div>
                   ) : searchResults && searchResults.length > 0 ? (
                     <ul className="divide-y divide-theme-default">
                       {searchResults.slice(0, 8).map((user) => (
@@ -166,7 +166,7 @@ export function LinkCareReceiverPage() {
                       ))}
                     </ul>
                   ) : (
-                    <div className="p-3 text-sm text-theme-muted">{t('caregiver.no_care_receivers')}</div>
+                    <div className="p-3 text-sm text-theme-muted">{t('caregiver.no_search_results')}</div>
                   )}
                 </div>
               )}
@@ -186,7 +186,7 @@ export function LinkCareReceiverPage() {
 
             {/* Relationship type */}
             <Select
-              label={t('caregiver.link_title')}
+              label={t('caregiver.relationship_label')}
               selectedKeys={[relationshipType]}
               onSelectionChange={(keys) => setRelationshipType(String([...keys][0] ?? 'family'))}
               variant="bordered"
@@ -199,7 +199,7 @@ export function LinkCareReceiverPage() {
 
             {/* Start date */}
             <Input
-              label={t('caregiver.link_title')}
+              label={t('caregiver.start_date_label')}
               type="date"
               value={startDate}
               onValueChange={setStartDate}
@@ -209,7 +209,8 @@ export function LinkCareReceiverPage() {
 
             {/* Notes */}
             <Textarea
-              label={t('caregiver.link_subtitle')}
+              label={t('caregiver.notes_label')}
+              placeholder={t('caregiver.notes_placeholder')}
               value={notes}
               onValueChange={setNotes}
               variant="bordered"
@@ -233,7 +234,7 @@ export function LinkCareReceiverPage() {
                 to={tenantPath('/caring-community/caregiver')}
                 isDisabled={isSubmitting}
               >
-                {t('caregiver.dashboard_title')}
+                {t('caregiver.cancel')}
               </Button>
             </div>
           </div>
