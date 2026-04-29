@@ -12,6 +12,7 @@ import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Heart from 'lucide-react/icons/heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Plus from 'lucide-react/icons/plus';
+import UserRoundCheck from 'lucide-react/icons/user-round-check';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -259,6 +260,13 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
           >
             <HeartHandshake className="h-4 w-4" aria-hidden="true" />
             {t('caring_community.caregiver.request_on_behalf')}
+          </Link>
+          <Link
+            to={tenantPath('/caring-community/caregiver/cover')}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-theme-default px-3 py-1.5 text-sm font-medium text-theme-primary hover:bg-theme-elevated transition-colors"
+          >
+            <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
+            {t('cover.title')}
           </Link>
         </div>
       </div>

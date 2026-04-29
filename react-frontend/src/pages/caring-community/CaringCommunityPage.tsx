@@ -24,6 +24,7 @@ import Coins from 'lucide-react/icons/coins';
 import PiggyBank from 'lucide-react/icons/piggy-bank';
 import Gift from 'lucide-react/icons/gift';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import UserRoundCheck from 'lucide-react/icons/user-round-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
@@ -54,6 +55,7 @@ const primaryActions: ActionDef[] = [
   { key: 'markt', href: '/caring-community/markt', icon: Store, feature: 'caring_community' },
   { key: 'loyalty_history', href: '/caring-community/loyalty/history', icon: Coins, feature: 'caring_community' },
   { key: 'future_care_fund', href: '/caring-community/future-care-fund', icon: PiggyBank, feature: 'caring_community' },
+  { key: 'cover_care', href: '/caring-community/caregiver/cover', icon: UserRoundCheck, feature: 'caring_community' },
   { key: 'hour_gift', href: '/caring-community/hour-gift', icon: Gift, feature: 'caring_community' },
   { key: 'hour_transfer', href: '/caring-community/hour-transfer', icon: ArrowRightLeft, feature: 'caring_community' },
   { key: 'safeguarding_report', href: '/caring-community/safeguarding/report', icon: ShieldAlert, feature: 'caring_community' },

@@ -233,4 +233,82 @@ class CaregiverApiController extends BaseApiController
 
         return $this->respondWithData($request, null, 201);
     }
+
+    // -------------------------------------------------------------------------
+    // AG73 — Substitute / cover-care services
+    // -------------------------------------------------------------------------
+
+    public function coverRequests(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if ($guard = $this->guardFeature()) {
+            return $guard;
+        }
+
+        try {
+            return $this->respondWithData($this->service->getCoverRequestsForCaregiver($userId, $tenantId));
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', $e->getMessage(), null, 503);
+        }
+    }
+
+    public function createCoverRequest(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if ($guard = $this->guardFeature()) {
+            return $guard;
+        }
+
+        try {
+            $coverRequest = $this->service->createCoverRequest($userId, $tenantId, $this->getAllInput());
+            return $this->respondWithData($coverRequest, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
+        }
+    }
+
+    public function coverCandidates(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if ($guard = $this->guardFeature()) {
+            return $guard;
+        }
+
+        try {
+            return $this->respondWithData($this->service->suggestCoverCandidates($id, $userId, $tenantId));
+        } catch (\RuntimeException $e) {
+            return $this->respondNotFound($e->getMessage());
+        }
+    }
+
+    public function assignCoverCandidate(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if ($guard = $this->guardFeature()) {
+            return $guard;
+        }
+
+        $supporterId = $this->inputInt('supporter_id');
+        if ($supporterId === null) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'supporter_id']), 'supporter_id', 422);
+        }
+
+        try {
+            return $this->respondWithData($this->service->assignCoverCandidate($id, $userId, $tenantId, $supporterId));
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondNotFound($e->getMessage());
+        }
+    }
 }

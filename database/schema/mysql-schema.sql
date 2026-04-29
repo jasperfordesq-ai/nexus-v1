@@ -867,6 +867,41 @@ CREATE TABLE `caring_caregiver_links` (
   KEY `caring_caregiver_links_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_cover_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_cover_requests` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `caregiver_link_id` bigint(20) unsigned NOT NULL,
+  `caregiver_id` int(10) unsigned NOT NULL,
+  `cared_for_id` int(10) unsigned NOT NULL,
+  `support_relationship_id` bigint(20) unsigned DEFAULT NULL,
+  `matched_supporter_id` int(10) unsigned DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `briefing` text DEFAULT NULL,
+  `required_skills` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`required_skills`)),
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL,
+  `expected_hours` decimal(5,2) DEFAULT NULL,
+  `minimum_trust_tier` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `urgency` enum('planned','soon','urgent') NOT NULL DEFAULT 'planned',
+  `status` enum('open','matched','accepted','cancelled','completed') NOT NULL DEFAULT 'open',
+  `matched_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caring_cover_requests_caregiver_link_id_foreign` (`caregiver_link_id`),
+  KEY `caring_cover_requests_tenant_id_caregiver_id_status_index` (`tenant_id`,`caregiver_id`,`status`),
+  KEY `caring_cover_requests_tenant_id_cared_for_id_starts_at_index` (`tenant_id`,`cared_for_id`,`starts_at`),
+  KEY `caring_cover_requests_tenant_id_status_starts_at_index` (`tenant_id`,`status`,`starts_at`),
+  KEY `caring_cover_requests_tenant_id_index` (`tenant_id`),
+  KEY `caring_cover_requests_caregiver_id_index` (`caregiver_id`),
+  KEY `caring_cover_requests_cared_for_id_index` (`cared_for_id`),
+  KEY `caring_cover_requests_matched_supporter_id_index` (`matched_supporter_id`),
+  CONSTRAINT `caring_cover_requests_caregiver_link_id_foreign` FOREIGN KEY (`caregiver_link_id`) REFERENCES `caring_caregiver_links` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_emergency_alerts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6008,7 +6043,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12423,7 +12458,8 @@ INSERT INTO `laravel_migrations` VALUES
 (173,'2026_04_28_305000_create_regional_analytics_cache_table',79),
 (174,'2026_04_28_310000_create_pilot_inquiries_table',79),
 (175,'2026_04_28_320000_add_onboarding_to_seller_profiles',79),
-(176,'2026_04_29_100000_create_caring_project_announcement_tables',79);
+(176,'2026_04_29_100000_create_caring_project_announcement_tables',79),
+(177,'2026_04_29_110000_create_caring_cover_requests_table',80);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

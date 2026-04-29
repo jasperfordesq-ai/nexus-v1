@@ -10,6 +10,7 @@ namespace App\Services\CaringCommunity;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
 
 /**
  * AG68 — Caregiver/Angehörigen Support Flow
@@ -28,6 +29,11 @@ class CaregiverService
     public function isAvailable(): bool
     {
         return Schema::hasTable('caring_caregiver_links');
+    }
+
+    public function coverRequestsAvailable(): bool
+    {
+        return $this->isAvailable() && Schema::hasTable('caring_cover_requests');
     }
 
     // -------------------------------------------------------------------------
@@ -319,5 +325,271 @@ class CaregiverService
         $row = (array) DB::table('caring_help_requests')->where('id', $id)->first();
 
         return $row;
+    }
+
+    // -------------------------------------------------------------------------
+    // AG73 — Substitute / cover-care services
+    // -------------------------------------------------------------------------
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function getCoverRequestsForCaregiver(int $caregiverId, int $tenantId): array
+    {
+        $this->ensureCoverRequestsAvailable();
+
+        return DB::table('caring_cover_requests as cr')
+            ->join('users as u', 'u.id', '=', 'cr.cared_for_id')
+            ->leftJoin('users as s', 's.id', '=', 'cr.matched_supporter_id')
+            ->where('cr.tenant_id', $tenantId)
+            ->where('cr.caregiver_id', $caregiverId)
+            ->select([
+                'cr.*',
+                'u.name as cared_for_name',
+                'u.avatar_url as cared_for_avatar_url',
+                's.name as matched_supporter_name',
+                's.avatar_url as matched_supporter_avatar_url',
+            ])
+            ->orderByRaw('CASE cr.status WHEN "open" THEN 0 WHEN "matched" THEN 1 WHEN "accepted" THEN 2 ELSE 3 END')
+            ->orderBy('cr.starts_at')
+            ->get()
+            ->map(fn (object $row): array => $this->coverRequestRowToArray($row))
+            ->all();
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     * @return array<string,mixed>
+     */
+    public function createCoverRequest(int $caregiverId, int $tenantId, array $data): array
+    {
+        $this->ensureCoverRequestsAvailable();
+
+        $caredForId = (int) ($data['cared_for_id'] ?? 0);
+        if ($caredForId <= 0) {
+            throw new InvalidArgumentException(__('api.missing_required_field', ['field' => 'cared_for_id']));
+        }
+
+        $link = DB::table('caring_caregiver_links')
+            ->where('tenant_id', $tenantId)
+            ->where('caregiver_id', $caregiverId)
+            ->where('cared_for_id', $caredForId)
+            ->where('status', 'active')
+            ->first();
+
+        if ($link === null) {
+            throw new \RuntimeException(__('api.caring_cover_link_required'));
+        }
+
+        $title = trim((string) ($data['title'] ?? ''));
+        if ($title === '') {
+            throw new InvalidArgumentException(__('api.missing_required_field', ['field' => 'title']));
+        }
+
+        $startsAt = trim((string) ($data['starts_at'] ?? ''));
+        $endsAt = trim((string) ($data['ends_at'] ?? ''));
+        if ($startsAt === '' || $endsAt === '') {
+            throw new InvalidArgumentException(__('api.caring_cover_dates_required'));
+        }
+
+        $starts = new \DateTimeImmutable($startsAt);
+        $ends = new \DateTimeImmutable($endsAt);
+        if ($ends <= $starts) {
+            throw new InvalidArgumentException(__('api.caring_cover_dates_invalid'));
+        }
+
+        $urgency = (string) ($data['urgency'] ?? 'planned');
+        if (! in_array($urgency, ['planned', 'soon', 'urgent'], true)) {
+            $urgency = 'planned';
+        }
+
+        $skills = $data['required_skills'] ?? [];
+        if (is_string($skills)) {
+            $skills = array_values(array_filter(array_map('trim', explode(',', $skills))));
+        }
+        if (! is_array($skills)) {
+            $skills = [];
+        }
+
+        $id = DB::table('caring_cover_requests')->insertGetId([
+            'tenant_id' => $tenantId,
+            'caregiver_link_id' => (int) $link->id,
+            'caregiver_id' => $caregiverId,
+            'cared_for_id' => $caredForId,
+            'support_relationship_id' => isset($data['support_relationship_id']) ? (int) $data['support_relationship_id'] : null,
+            'title' => mb_substr($title, 0, 255),
+            'briefing' => $this->nullableString($data['briefing'] ?? null),
+            'required_skills' => json_encode(array_values($skills)),
+            'starts_at' => $starts->format('Y-m-d H:i:s'),
+            'ends_at' => $ends->format('Y-m-d H:i:s'),
+            'expected_hours' => isset($data['expected_hours']) ? max(0.25, min(999.99, (float) $data['expected_hours'])) : null,
+            'minimum_trust_tier' => max(0, min(5, (int) ($data['minimum_trust_tier'] ?? 1))),
+            'urgency' => $urgency,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return $this->getCoverRequest((int) $id, $caregiverId, $tenantId) ?? [];
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function suggestCoverCandidates(int $coverRequestId, int $caregiverId, int $tenantId): array
+    {
+        $this->ensureCoverRequestsAvailable();
+
+        $request = DB::table('caring_cover_requests')
+            ->where('id', $coverRequestId)
+            ->where('tenant_id', $tenantId)
+            ->where('caregiver_id', $caregiverId)
+            ->first();
+
+        if ($request === null) {
+            throw new \RuntimeException(__('api.caring_cover_not_found'));
+        }
+
+        $requiredSkills = json_decode((string) ($request->required_skills ?? '[]'), true);
+        $requiredSkills = is_array($requiredSkills) ? array_map('mb_strtolower', $requiredSkills) : [];
+
+        $busySupporters = DB::table('caring_cover_requests')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['matched', 'accepted'])
+            ->whereNotNull('matched_supporter_id')
+            ->where('starts_at', '<', $request->ends_at)
+            ->where('ends_at', '>', $request->starts_at)
+            ->pluck('matched_supporter_id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('is_approved', 1)
+            ->where('id', '!=', (int) $request->caregiver_id)
+            ->where('id', '!=', (int) $request->cared_for_id)
+            ->where('trust_tier', '>=', (int) $request->minimum_trust_tier)
+            ->when($busySupporters !== [], fn ($query) => $query->whereNotIn('id', $busySupporters))
+            ->select(['id', 'name', 'avatar_url', 'location', 'trust_tier', 'verification_status', 'skills'])
+            ->orderByDesc('trust_tier')
+            ->orderByDesc('is_verified')
+            ->orderBy('name')
+            ->limit(12)
+            ->get()
+            ->map(function (object $row) use ($requiredSkills): array {
+                $skills = array_values(array_filter(array_map('trim', explode(',', (string) ($row->skills ?? '')))));
+                $lowerSkills = array_map('mb_strtolower', $skills);
+                $skillMatches = count(array_intersect($requiredSkills, $lowerSkills));
+
+                return [
+                    'id' => (int) $row->id,
+                    'name' => (string) $row->name,
+                    'avatar_url' => $row->avatar_url !== null ? (string) $row->avatar_url : null,
+                    'location' => $row->location !== null ? (string) $row->location : null,
+                    'trust_tier' => (int) $row->trust_tier,
+                    'verification_status' => (string) $row->verification_status,
+                    'skills' => $skills,
+                    'skill_matches' => $skillMatches,
+                    'match_score' => ((int) $row->trust_tier * 10) + ($skillMatches * 5) + ($row->verification_status === 'passed' ? 5 : 0),
+                ];
+            })
+            ->sortByDesc('match_score')
+            ->values()
+            ->all();
+    }
+
+    public function assignCoverCandidate(int $coverRequestId, int $caregiverId, int $tenantId, int $supporterId): array
+    {
+        $this->ensureCoverRequestsAvailable();
+
+        $candidateIds = array_column($this->suggestCoverCandidates($coverRequestId, $caregiverId, $tenantId), 'id');
+        if (! in_array($supporterId, $candidateIds, true)) {
+            throw new InvalidArgumentException(__('api.caring_cover_candidate_invalid'));
+        }
+
+        DB::table('caring_cover_requests')
+            ->where('id', $coverRequestId)
+            ->where('tenant_id', $tenantId)
+            ->where('caregiver_id', $caregiverId)
+            ->update([
+                'matched_supporter_id' => $supporterId,
+                'status' => 'matched',
+                'matched_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return $this->getCoverRequest($coverRequestId, $caregiverId, $tenantId) ?? [];
+    }
+
+    private function ensureCoverRequestsAvailable(): void
+    {
+        if (! $this->coverRequestsAvailable()) {
+            throw new \RuntimeException(__('api.caring_cover_unavailable'));
+        }
+    }
+
+    private function getCoverRequest(int $id, int $caregiverId, int $tenantId): ?array
+    {
+        $row = DB::table('caring_cover_requests as cr')
+            ->join('users as u', 'u.id', '=', 'cr.cared_for_id')
+            ->leftJoin('users as s', 's.id', '=', 'cr.matched_supporter_id')
+            ->where('cr.id', $id)
+            ->where('cr.tenant_id', $tenantId)
+            ->where('cr.caregiver_id', $caregiverId)
+            ->select([
+                'cr.*',
+                'u.name as cared_for_name',
+                'u.avatar_url as cared_for_avatar_url',
+                's.name as matched_supporter_name',
+                's.avatar_url as matched_supporter_avatar_url',
+            ])
+            ->first();
+
+        return $row ? $this->coverRequestRowToArray($row) : null;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function coverRequestRowToArray(object $row): array
+    {
+        $skills = json_decode((string) ($row->required_skills ?? '[]'), true);
+
+        return [
+            'id' => (int) $row->id,
+            'tenant_id' => (int) $row->tenant_id,
+            'caregiver_link_id' => (int) $row->caregiver_link_id,
+            'caregiver_id' => (int) $row->caregiver_id,
+            'cared_for_id' => (int) $row->cared_for_id,
+            'cared_for_name' => (string) $row->cared_for_name,
+            'cared_for_avatar_url' => $row->cared_for_avatar_url !== null ? (string) $row->cared_for_avatar_url : null,
+            'support_relationship_id' => $row->support_relationship_id !== null ? (int) $row->support_relationship_id : null,
+            'matched_supporter_id' => $row->matched_supporter_id !== null ? (int) $row->matched_supporter_id : null,
+            'matched_supporter_name' => $row->matched_supporter_name !== null ? (string) $row->matched_supporter_name : null,
+            'matched_supporter_avatar_url' => $row->matched_supporter_avatar_url !== null ? (string) $row->matched_supporter_avatar_url : null,
+            'title' => (string) $row->title,
+            'briefing' => $row->briefing !== null ? (string) $row->briefing : null,
+            'required_skills' => is_array($skills) ? $skills : [],
+            'starts_at' => (string) $row->starts_at,
+            'ends_at' => (string) $row->ends_at,
+            'expected_hours' => $row->expected_hours !== null ? (float) $row->expected_hours : null,
+            'minimum_trust_tier' => (int) $row->minimum_trust_tier,
+            'urgency' => (string) $row->urgency,
+            'status' => (string) $row->status,
+            'matched_at' => $row->matched_at !== null ? (string) $row->matched_at : null,
+            'created_at' => $row->created_at !== null ? (string) $row->created_at : null,
+            'updated_at' => $row->updated_at !== null ? (string) $row->updated_at : null,
+        ];
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        return $value === '' ? null : $value;
     }
 }

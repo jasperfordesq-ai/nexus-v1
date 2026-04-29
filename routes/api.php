@@ -1285,6 +1285,14 @@ Route::delete('/v2/caring-community/caregiver/links/{id}', [\App\Http\Controller
 Route::get('/v2/caring-community/caregiver/schedule/{caredForId}', [\App\Http\Controllers\Api\CaregiverApiController::class, 'caregiverSchedule']);
 Route::get('/v2/caring-community/caregiver/burnout-check', [\App\Http\Controllers\Api\CaregiverApiController::class, 'burnoutCheck']);
 Route::post('/v2/caring-community/caregiver/request-on-behalf', [\App\Http\Controllers\Api\CaregiverApiController::class, 'requestOnBehalf']);
+Route::get('/v2/caring-community/caregiver/cover-requests', [\App\Http\Controllers\Api\CaregiverApiController::class, 'coverRequests'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/caregiver/cover-requests', [\App\Http\Controllers\Api\CaregiverApiController::class, 'createCoverRequest'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/caregiver/cover-requests/{id}/candidates', [\App\Http\Controllers\Api\CaregiverApiController::class, 'coverCandidates'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/caregiver/cover-requests/{id}/assign', [\App\Http\Controllers\Api\CaregiverApiController::class, 'assignCoverCandidate'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 
 // AG66 — KPI Baseline
 Route::get('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listKpiBaselines']);
