@@ -40,6 +40,8 @@ class TenantFeatureConfig
         'merchant_coupons' => false,
         'message_translation' => true,
         'member_premium' => false,
+        'ai_agents' => false,
+        'partner_api' => false,
     ];
 
     /**

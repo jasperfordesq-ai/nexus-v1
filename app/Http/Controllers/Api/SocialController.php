@@ -11,9 +11,11 @@ use App\Services\FeedActivityService;
 use App\Services\FeedRankingService;
 use App\Services\FeedService;
 use App\Services\LinkPreviewService;
+use App\Services\PersonalisedFeedService;
 use App\Services\PollService;
 use App\Services\PostMediaService;
 use App\Services\SocialNotificationService;
+use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -43,6 +45,7 @@ class SocialController extends BaseApiController
         private readonly FeedActivityService $feedActivityService,
         private readonly PollService $pollService,
         private readonly PostMediaService $postMediaService,
+        private readonly PersonalisedFeedService $personalisedFeedService,
     ) {}
 
     /**
@@ -77,7 +80,20 @@ class SocialController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
+        // AG35 — personalised feed. Tenant + user toggles can opt out.
+        $personalised = $this->resolvePersonalisedFlag($userId);
+        if ($personalised) {
+            $filters['mode'] = 'ranked';
+        } else {
+            $filters['mode'] = 'chronological';
+        }
+
         $result = $this->feedService->getFeed($userId, $filters);
+
+        // AG35 — apply additional personalised re-ranking on top of FeedRankingService.
+        if ($personalised && $userId && !empty($result['items'])) {
+            $result['items'] = $this->personalisedFeedService->rank($userId, 'feed', $result['items']);
+        }
 
         // Collect post IDs for batch media loading
         $postIds = [];
@@ -110,6 +126,37 @@ class SocialController extends BaseApiController
             $userLimit,
             $result['has_more']
         );
+    }
+
+    /**
+     * AG35 — resolve whether the feed should be personalised for this request.
+     *
+     * Precedence: explicit ?personalised=true|false → user pref → tenant setting (default true).
+     * Anonymous requests always fall through to chronological recency.
+     */
+    private function resolvePersonalisedFlag(?int $userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+        $explicit = $this->query('personalised');
+        if ($explicit !== null) {
+            return filter_var($explicit, FILTER_VALIDATE_BOOLEAN);
+        }
+        // Per-user preference
+        try {
+            $prefersChrono = (bool) DB::table('users')
+                ->where('id', $userId)
+                ->value('prefers_chronological_feed');
+            if ($prefersChrono) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        // Tenant setting (default enabled)
+        $tenantEnabled = TenantContext::getSetting('feed.personalisation.enabled', true);
+        return (bool) $tenantEnabled;
     }
 
     // -----------------------------------------------------------------

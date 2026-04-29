@@ -2697,3 +2697,52 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v2/admin/member-premium/tiers/{id}/sync-stripe', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'syncStripe'])->whereNumber('id');
     Route::get('/v2/admin/member-premium/subscribers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'listSubscribers']);
 });
+
+// AG60 — Partner API (banking / payment / admin integrations)
+// OAuth2 client_credentials grant — public; no auth middleware.
+Route::post('/partner/v1/oauth/token', [\App\Http\Controllers\Api\PartnerApi\PartnerOAuthController::class, 'token'])
+    ->withoutMiddleware('auth:sanctum');
+Route::post('/partner/v1/oauth/revoke', [\App\Http\Controllers\Api\PartnerApi\PartnerOAuthController::class, 'revoke'])
+    ->withoutMiddleware('auth:sanctum');
+
+// Partner API endpoints — guarded by partner.api:<scope> middleware.
+Route::middleware('partner.api:users.read')->group(function () {
+    Route::get('/partner/v1/users', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'listUsers'])
+        ->withoutMiddleware('auth:sanctum');
+    Route::get('/partner/v1/users/{id}', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'showUser'])
+        ->whereNumber('id')->withoutMiddleware('auth:sanctum');
+});
+Route::middleware('partner.api:listings.read')->group(function () {
+    Route::get('/partner/v1/listings', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'listListings'])
+        ->withoutMiddleware('auth:sanctum');
+});
+Route::middleware('partner.api:wallet.read')->group(function () {
+    Route::get('/partner/v1/wallet/balance/{userId}', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'walletBalance'])
+        ->whereNumber('userId')->withoutMiddleware('auth:sanctum');
+});
+Route::middleware('partner.api:wallet.write')->group(function () {
+    Route::post('/partner/v1/wallet/credit', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'walletCredit'])
+        ->withoutMiddleware('auth:sanctum');
+});
+Route::middleware('partner.api:aggregates.read')->group(function () {
+    Route::get('/partner/v1/aggregates/community', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'communityAggregates'])
+        ->withoutMiddleware('auth:sanctum');
+});
+Route::middleware('partner.api:webhooks.manage')->group(function () {
+    Route::get('/partner/v1/webhooks/subscriptions', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'listWebhookSubscriptions'])
+        ->withoutMiddleware('auth:sanctum');
+    Route::post('/partner/v1/webhooks/subscriptions', [\App\Http\Controllers\Api\PartnerApi\PartnerV1Controller::class, 'createWebhookSubscription'])
+        ->withoutMiddleware('auth:sanctum');
+});
+
+// Admin: Partner CRUD + credential rotation + call log
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/admin/api-partners', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'index']);
+    Route::post('/v2/admin/api-partners', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'store']);
+    Route::get('/v2/admin/api-partners/{id}', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'show'])->whereNumber('id');
+    Route::put('/v2/admin/api-partners/{id}', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'update'])->whereNumber('id');
+    Route::post('/v2/admin/api-partners/{id}/activate', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'activate'])->whereNumber('id');
+    Route::post('/v2/admin/api-partners/{id}/suspend', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'suspend'])->whereNumber('id');
+    Route::post('/v2/admin/api-partners/{id}/regenerate-credentials', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'regenerateCredentials'])->whereNumber('id');
+    Route::get('/v2/admin/api-partners/{id}/call-log', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'callLog'])->whereNumber('id');
+});

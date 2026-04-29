@@ -22,6 +22,7 @@ use App\Services\ListingExpiryService;
 use App\Services\ListingRankingService;
 use App\Services\ListingSkillTagService;
 use App\Services\ListingFeaturedService;
+use App\Services\PersonalisedFeedService;
 use App\Models\ListingReport;
 
 /**
@@ -42,6 +43,7 @@ class ListingsController extends BaseApiController
         private readonly ListingRankingService $listingRankingService,
         private readonly ListingService $listingService,
         private readonly ListingSkillTagService $listingSkillTagService,
+        private readonly PersonalisedFeedService $personalisedFeedService,
     ) {}
 
     // -----------------------------------------------------------------
@@ -130,9 +132,12 @@ class ListingsController extends BaseApiController
         // Count total matching listings (without cursor/limit)
         $totalCount = $this->listingService->countAll($filters);
 
+        // AG35 — resolve personalised flag (explicit param > user pref > tenant setting > default true)
+        $personalised = $this->resolveListingsPersonalisedFlag($userId);
+
         // Apply MatchRank unless the user has explicitly chosen newest-first sort.
         // featured listings get FEATURED_BOOST (5×) inside the ranker so they always pin to top.
-        $sortNewest = $this->query('sort') === 'newest';
+        $sortNewest = $this->query('sort') === 'newest' || !$personalised;
         if ($this->listingRankingService->isEnabled() && !empty($result['items']) && !$sortNewest) {
             $result['items'] = $this->listingRankingService->rankListings(
                 $result['items'],
@@ -147,6 +152,11 @@ class ListingsController extends BaseApiController
             }, $result['items']);
         }
 
+        // AG35 — additional personalisation pass (interest/CF/social/proximity blend)
+        if ($personalised && $userId && !empty($result['items'])) {
+            $result['items'] = $this->personalisedFeedService->rank($userId, 'listings', $result['items']);
+        }
+
         return $this->respondWithCollection(
             $result['items'],
             $result['cursor'],
@@ -154,6 +164,33 @@ class ListingsController extends BaseApiController
             $result['has_more'],
             ['total_items' => $totalCount]
         );
+    }
+
+    /**
+     * AG35 — resolve whether the listings index should be personalised.
+     *
+     * Precedence: explicit ?personalised=true|false → user pref → tenant setting (default true).
+     */
+    private function resolveListingsPersonalisedFlag(?int $userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+        $explicit = $this->query('personalised');
+        if ($explicit !== null) {
+            return filter_var($explicit, FILTER_VALIDATE_BOOLEAN);
+        }
+        try {
+            $prefersChrono = (bool) DB::table('users')
+                ->where('id', $userId)
+                ->value('prefers_chronological_feed');
+            if ($prefersChrono) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        return (bool) TenantContext::getSetting('listings.personalisation.enabled', true);
     }
 
     // -----------------------------------------------------------------
