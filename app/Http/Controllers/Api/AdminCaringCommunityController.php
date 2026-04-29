@@ -1115,9 +1115,10 @@ class AdminCaringCommunityController extends BaseApiController
             ? $data['period']
             : ['start' => now()->subYear()->toDateString(), 'end' => now()->toDateString()];
         $notes  = isset($data['notes']) && $data['notes'] !== '' ? (string) $data['notes'] : null;
+        $metricOverrides = is_array($data['metrics'] ?? null) ? $data['metrics'] : [];
 
         return $this->respondWithData(
-            $this->kpiBaselineService->captureBaseline($tenantId, $label, $period, $notes, $userId),
+            $this->kpiBaselineService->captureBaseline($tenantId, $label, $period, $notes, $userId, $metricOverrides),
             null,
             201,
         );

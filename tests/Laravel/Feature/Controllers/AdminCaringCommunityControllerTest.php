@@ -217,6 +217,110 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertJsonPath('data.support_hours_by_organisation.0.organisation_name', 'KISS Zurich');
     }
 
+    public function test_kpi_baseline_comparison_tracks_agoris_gemeinde_claim_targets(): void
+    {
+        if (! Schema::hasTable('caring_kpi_baselines') || ! Schema::hasTable('vol_logs')) {
+            $this->markTestSkipped('KPI baseline or volunteer hour tables are not present in the test database.');
+        }
+
+        $this->setCaringCommunityFeature(true);
+        DB::table('users')->where('tenant_id', $this->testTenantId)->update(['status' => 'inactive']);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+        $supporters = [];
+        for ($i = 0; $i < 4; $i++) {
+            $supporters[] = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        }
+        Sanctum::actingAs($admin);
+
+        DB::table('vol_logs')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $supporters[0]->id,
+                'organization_id' => null,
+                'date_logged' => now()->subDays(3)->toDateString(),
+                'hours' => 2.00,
+                'description' => 'Neighbour visit.',
+                'status' => 'approved',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $supporters[1]->id,
+                'organization_id' => null,
+                'date_logged' => now()->subDays(2)->toDateString(),
+                'hours' => 1.50,
+                'description' => 'Shopping accompaniment.',
+                'status' => 'approved',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        if (Schema::hasTable('municipality_surveys')
+            && Schema::hasTable('municipality_survey_questions')
+            && Schema::hasTable('municipality_survey_responses')) {
+            $surveyId = DB::table('municipality_surveys')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'created_by' => $admin->id,
+                'title' => 'Gemeinde satisfaction pulse',
+                'description' => null,
+                'status' => 'closed',
+                'is_anonymous' => 1,
+                'target_audience' => null,
+                'starts_at' => now()->subMonth(),
+                'ends_at' => now(),
+                'response_count' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $questionId = DB::table('municipality_survey_questions')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'survey_id' => $surveyId,
+                'question_text' => 'How satisfied are you with community support?',
+                'question_type' => 'likert',
+                'options' => json_encode(['1', '2', '3', '4', '5']),
+                'is_required' => 1,
+                'sort_order' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            DB::table('municipality_survey_responses')->insert([
+                'tenant_id' => $this->testTenantId,
+                'survey_id' => $surveyId,
+                'user_id' => null,
+                'session_token' => hash('sha256', uniqid('survey', true)),
+                'answers' => json_encode([(string) $questionId => '4']),
+                'submitted_at' => now(),
+                'ip_hash' => hash('sha256', '127.0.0.1'),
+            ]);
+        }
+
+        $capture = $this->apiPost('/v2/admin/caring-community/kpi-baselines', [
+            'label' => 'Before Gemeinde rollout',
+            'period' => ['start' => '2026-01-01', 'end' => '2026-03-31'],
+            'metrics' => [
+                'engagement_rate_pct' => 30,
+                'satisfaction_score' => 3.5,
+                'information_distribution_effort_hours' => 10,
+            ],
+        ]);
+
+        $capture->assertStatus(201);
+        $capture->assertJsonPath('data.metrics.engagement_rate_pct', 30);
+        $baselineId = (int) $capture->json('data.id');
+
+        $compare = $this->apiGet("/v2/admin/caring-community/kpi-baselines/{$baselineId}/compare");
+
+        $compare->assertStatus(200);
+        $compare->assertJsonPath('data.comparison.volunteer_hours.current', 3.5);
+        $compare->assertJsonPath('data.agoris_claim_targets.1.key', 'volunteer_engagement');
+        $compare->assertJsonPath('data.agoris_claim_targets.1.achieved', true);
+        $compare->assertJsonPath('data.agoris_claim_targets.2.key', 'satisfaction');
+        $compare->assertJsonPath('data.agoris_claim_targets.2.achieved', true);
+    }
+
     public function test_support_relationships_can_be_created_listed_and_paused(): void
     {
         $this->setCaringCommunityFeature(true);
