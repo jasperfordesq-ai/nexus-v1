@@ -128,6 +128,33 @@ class FadpComplianceService
             ->all();
     }
 
+    /**
+     * Summarise the consent ledger for a regulator-facing disclosure pack.
+     *
+     * @return array<string,mixed>
+     */
+    public static function consentLedgerSummary(int $tenantId): array
+    {
+        $rows = DB::table('fadp_consent_records')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('consent_type, action, COUNT(*) as total, MAX(created_at) as latest_at')
+            ->groupBy('consent_type', 'action')
+            ->orderBy('consent_type')
+            ->orderBy('action')
+            ->get();
+
+        return [
+            'total' => (int) DB::table('fadp_consent_records')->where('tenant_id', $tenantId)->count(),
+            'latest_at' => DB::table('fadp_consent_records')->where('tenant_id', $tenantId)->max('created_at'),
+            'by_type_and_action' => $rows->map(fn ($row) => [
+                'consent_type' => (string) $row->consent_type,
+                'action' => (string) $row->action,
+                'total' => (int) $row->total,
+                'latest_at' => $row->latest_at,
+            ])->all(),
+        ];
+    }
+
     // =========================================================================
     // RETENTION CONFIGURATION
     // =========================================================================
@@ -275,7 +302,14 @@ class FadpComplianceService
             $id = (int) DB::table('fadp_processing_activities')->insertGetId($payload);
         }
 
-        $row = DB::table('fadp_processing_activities')->find($id);
+        $row = DB::table('fadp_processing_activities')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->first();
+        if (! $row) {
+            return [];
+        }
+
         $result = (array) $row;
         $result['data_categories'] = json_decode($result['data_categories'], true) ?? [];
         $result['recipients']      = isset($result['recipients']) ? (json_decode($result['recipients'], true) ?? []) : [];
@@ -325,6 +359,95 @@ class FadpComplianceService
                 fn ($a) => (bool) ($a['is_automated_profiling'] ?? false)
             )),
         ];
+    }
+
+    /**
+     * Generate the AG42 FADP disclosure pack used for DPA/canton diligence.
+     *
+     * @return array<string,mixed>
+     */
+    public static function generateDisclosurePack(int $tenantId): array
+    {
+        $register = self::generateProcessingRegister($tenantId);
+
+        return [
+            'pack_name' => __('api.fadp_disclosure_pack_name'),
+            'generated_at' => Carbon::now()->toIso8601String(),
+            'tenant' => [
+                'id' => $register['tenant_id'],
+                'name' => $register['tenant_name'],
+            ],
+            'data_residency_declaration' => [
+                'declared_residency' => $register['data_residency'],
+                'dpa_contact_email' => $register['dpa_contact_email'],
+                'isolated_node_supported' => $register['data_residency'] === 'Switzerland',
+            ],
+            'retention_config' => $register['retention_config'],
+            'processing_register' => [
+                'total_activities' => $register['total_activities'],
+                'automated_profiling_count' => $register['automated_profiling_count'],
+                'activities' => $register['processing_activities'],
+            ],
+            'consent_ledger_summary' => self::consentLedgerSummary($tenantId),
+            'member_rights' => [
+                'access',
+                'rectification',
+                'erasure_or_restriction_where_applicable',
+                'data_portability',
+                'withdrawal_of_consent',
+            ],
+            'operator_controls' => [
+                'tenant_scoped_storage',
+                'auditable_consent_ledger',
+                'configurable_retention_periods',
+                'processing_register_export',
+                'data_residency_declaration',
+            ],
+        ];
+    }
+
+    public static function processingRegisterCsv(int $tenantId): string
+    {
+        $register = self::generateProcessingRegister($tenantId);
+        $rows = [[
+            'tenant_name',
+            'data_residency',
+            'dpa_contact_email',
+            'activity_name',
+            'purpose',
+            'data_categories',
+            'recipients',
+            'retention_period',
+            'legal_basis',
+            'automated_profiling',
+        ]];
+
+        foreach ($register['processing_activities'] as $activity) {
+            $rows[] = [
+                (string) $register['tenant_name'],
+                (string) $register['data_residency'],
+                (string) ($register['dpa_contact_email'] ?? ''),
+                (string) $activity['activity_name'],
+                (string) $activity['purpose'],
+                implode('; ', $activity['data_categories'] ?? []),
+                implode('; ', $activity['recipients'] ?? []),
+                (string) $activity['retention_period'],
+                (string) $activity['legal_basis'],
+                (bool) ($activity['is_automated_profiling'] ?? false) ? 'yes' : 'no',
+            ];
+        }
+
+        return implode("\n", array_map(
+            fn (array $row) => implode(',', array_map([self::class, 'csvCell'], $row)),
+            $rows
+        )) . "\n";
+    }
+
+    private static function csvCell(mixed $value): string
+    {
+        $cell = str_replace('"', '""', (string) $value);
+
+        return '"' . $cell . '"';
     }
 
     // =========================================================================

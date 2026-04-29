@@ -2568,6 +2568,8 @@ Route::post('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\F
 Route::delete('/v2/admin/fadp/processing-activities/{id}', [\App\Http\Controllers\Api\FadpComplianceController::class, 'deleteProcessingActivity']);
 Route::get('/v2/admin/fadp/consent-ledger', [\App\Http\Controllers\Api\FadpComplianceController::class, 'exportConsentLedger']);
 Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegister']);
+Route::get('/v2/admin/fadp/processing-register.csv', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegisterCsv']);
+Route::get('/v2/admin/fadp/disclosure-pack', [\App\Http\Controllers\Api\FadpComplianceController::class, 'disclosurePack']);
 
 // AG56 — Local Advertising Platform
 Route::get('/v2/ads/active', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getActiveAds']);

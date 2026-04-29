@@ -78,14 +78,14 @@ class FadpComplianceController extends BaseApiController
         if (! in_array($action, ['granted', 'withdrawn'], true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'action must be one of: granted, withdrawn',
+                __('api.fadp_invalid_consent_action'),
                 'action',
                 400
             );
         }
 
         if (! FadpComplianceService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'FADP compliance tables not yet migrated.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.fadp_tables_unavailable'), null, 503);
         }
 
         $request = app('request');
@@ -113,8 +113,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function getRetentionConfig(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (! FadpComplianceService::isAvailable()) {
@@ -134,8 +133,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function updateRetentionConfig(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         $config          = $this->input('config');
@@ -145,14 +143,14 @@ class FadpComplianceController extends BaseApiController
         if (! in_array($dataResidency, ['Switzerland', 'EU', 'International'], true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'data_residency must be Switzerland, EU, or International',
+                __('api.fadp_invalid_data_residency'),
                 'data_residency',
                 400
             );
         }
 
         if (! FadpComplianceService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'FADP compliance tables not yet migrated.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.fadp_tables_unavailable'), null, 503);
         }
 
         FadpComplianceService::updateRetentionConfig($tenantId, [
@@ -173,8 +171,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function getProcessingActivities(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (! FadpComplianceService::isAvailable()) {
@@ -200,8 +197,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function upsertProcessingActivity(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         $activityName = trim((string) ($this->input('activity_name') ?? ''));
@@ -209,24 +205,24 @@ class FadpComplianceController extends BaseApiController
         $legalBasis   = trim((string) ($this->input('legal_basis') ?? ''));
 
         if ($activityName === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'activity_name is required', 'activity_name', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'activity_name']), 'activity_name', 400);
         }
         if ($purpose === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'purpose is required', 'purpose', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'purpose']), 'purpose', 400);
         }
 
         $validBases = ['consent', 'contract', 'legal_obligation', 'legitimate_interest'];
         if (! in_array($legalBasis, $validBases, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'legal_basis must be one of: ' . implode(', ', $validBases),
+                __('api.fadp_invalid_legal_basis'),
                 'legal_basis',
                 400
             );
         }
 
         if (! FadpComplianceService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'FADP compliance tables not yet migrated.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.fadp_tables_unavailable'), null, 503);
         }
 
         $data = [
@@ -251,12 +247,11 @@ class FadpComplianceController extends BaseApiController
      */
     public function deleteProcessingActivity(int $id): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (! FadpComplianceService::isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'FADP compliance tables not yet migrated.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.fadp_tables_unavailable'), null, 503);
         }
 
         FadpComplianceService::deleteProcessingActivity($id, $tenantId);
@@ -275,8 +270,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function exportConsentLedger(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (! FadpComplianceService::isAvailable()) {
@@ -293,8 +287,7 @@ class FadpComplianceController extends BaseApiController
      */
     public function processingRegister(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if (! FadpComplianceService::isAvailable()) {
@@ -302,5 +295,41 @@ class FadpComplianceController extends BaseApiController
         }
 
         return $this->respondWithData(FadpComplianceService::generateProcessingRegister($tenantId));
+    }
+
+    /**
+     * GET /v2/admin/fadp/disclosure-pack
+     *
+     * Returns the DPA/canton diligence pack: residency declaration, retention
+     * settings, processing register, consent ledger summary, and rights summary.
+     */
+    public function disclosurePack(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (! FadpComplianceService::isAvailable()) {
+            return $this->respondWithData([]);
+        }
+
+        return $this->respondWithData(FadpComplianceService::generateDisclosurePack($tenantId));
+    }
+
+    /**
+     * GET /v2/admin/fadp/processing-register.csv
+     */
+    public function processingRegisterCsv(): \Illuminate\Http\Response
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (! FadpComplianceService::isAvailable()) {
+            return response(__('api.fadp_tables_unavailable'), 503, ['Content-Type' => 'text/plain; charset=UTF-8']);
+        }
+
+        return response(FadpComplianceService::processingRegisterCsv($tenantId), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="fadp-processing-register.csv"',
+        ]);
     }
 }
