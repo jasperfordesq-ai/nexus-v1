@@ -195,13 +195,19 @@ class FeedController extends BaseApiController
         }
 
         // Fix 1: verify the post belongs to this tenant before hiding (IDOR prevention)
-        $postExists = DB::table('feed_posts')
+        $post = DB::table('feed_posts')
             ->where('id', $postId)
             ->where('tenant_id', $tenantId)
-            ->exists();
+            ->select(['id', 'is_official'])
+            ->first();
 
-        if (!$postExists) {
+        if (!$post) {
             return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        }
+
+        // AG14: official municipality announcements cannot be hidden by members
+        if (!empty($post->is_official)) {
+            return $this->respondWithError('FORBIDDEN', __('api.cannot_hide_official_post'), null, 403);
         }
 
         try {

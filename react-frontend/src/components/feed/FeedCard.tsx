@@ -959,13 +959,15 @@ const FeedCard = React.memo(function FeedCard({
                       </>
                     ) : (
                       <>
-                        <DropdownItem
-                          key="hide"
-                          startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
-                          onPress={() => onHidePost(item)}
-                        >
-                          {t('card.hide_post')}
-                        </DropdownItem>
+                        {!item.is_official && (
+                          <DropdownItem
+                            key="hide"
+                            startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
+                            onPress={() => onHidePost(item)}
+                          >
+                            {t('card.hide_post')}
+                          </DropdownItem>
+                        )}
                         {onNotInterested && (
                           <DropdownItem
                             key="not-interested"
@@ -1065,14 +1067,16 @@ const FeedCard = React.memo(function FeedCard({
                     </>
                   ) : (
                     <>
-                      <Button
-                        variant="light"
-                        className="justify-start text-theme-primary"
-                        startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => { setIsOptionsSheetOpen(false); onHidePost(item); }}
-                      >
-                        {t('card.hide_post')}
-                      </Button>
+                      {!item.is_official && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-theme-primary"
+                          startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onHidePost(item); }}
+                        >
+                          {t('card.hide_post')}
+                        </Button>
+                      )}
                       {onNotInterested && (
                         <Button
                           variant="light"
