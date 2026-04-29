@@ -266,10 +266,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         // built-in XHR POST hits the backend without proper CORS headers.
         authorizer: (channel) => ({
           authorize: (socketId, callback) => {
+            // Use user.tenant_id (from JWT) so X-Tenant-ID matches the channel name.
+            // localStorage tenant may point to a different tenant when admins navigate cross-tenant.
+            const authTenantId = user?.tenant_id ? String(user.tenant_id) : (tokenManager.getTenantId() ?? '');
             api.post<{ auth: string; channel_data?: string }>('/pusher/auth', {
               socket_id: socketId,
               channel_name: channel.name,
-            })
+            }, { skipTenant: true, headers: { ...(authTenantId ? { 'X-Tenant-ID': authTenantId } : {}) } })
               .then((response) => {
                 if (response.success && response.data) {
                   callback(null, response.data as { auth: string });

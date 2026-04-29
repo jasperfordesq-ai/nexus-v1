@@ -156,7 +156,9 @@ export function PusherProvider({ children }: PusherProviderProps) {
           // on Pusher auth 401s — a transient Pusher auth failure during a network blip
           // should NOT log the user out of the entire application.
           const token = tokenManager.getAccessToken();
-          const tenantId = tokenManager.getTenantId?.() ?? '';
+          // Use user.tenant_id (from JWT) to match the channel name, not localStorage
+          // which may point to a different tenant when admins navigate cross-tenant.
+          const tenantId = user?.tenant_id ? String(user.tenant_id) : (tokenManager.getTenantId?.() ?? '');
           const csrfToken = tokenManager.getCsrfToken?.() ?? '';
           fetch(`${import.meta.env.VITE_API_BASE || '/api'}/pusher/auth`, {
             method: 'POST',
