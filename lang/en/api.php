@@ -258,6 +258,8 @@ return [
     'no_recognized_native_app_settings'    => 'No recognized native app settings provided',
     'invalid_display_mode'                 => 'Invalid display mode. Must be one of: :modes',
     'invalid_orientation'                  => 'Invalid orientation. Must be one of: :orientations',
+    'invalid_native_app_store_mode'        => 'Invalid native app store mode. Must be one of: :modes',
+    'invalid_native_app_build_profile'     => 'Invalid native app build profile. Must be one of: :profiles',
     'algorithm_area_invalid'               => 'Area must be: feed, listings, or members',
     'algorithm_value_range'                => ':key must be between 0 and 10',
     'no_recognized_algorithm_settings'     => 'No recognized algorithm settings provided',

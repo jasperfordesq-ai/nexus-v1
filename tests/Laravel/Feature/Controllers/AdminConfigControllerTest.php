@@ -272,6 +272,42 @@ class AdminConfigControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_native_app_config_tracks_tenant_branded_store_readiness(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $update = $this->apiPut('/v2/admin/config/native-app', [
+            'native_app_name' => 'KISS Musterstadt',
+            'native_app_short_name' => 'KISS',
+            'native_app_bundle_id' => 'ch.kiss.musterstadt',
+            'native_app_package_name' => 'ch.kiss.musterstadt',
+            'native_app_push_enabled' => true,
+            'native_app_store_mode' => 'tenant_branded',
+            'native_app_build_profile' => 'production',
+            'native_app_ios_app_store_id' => '1234567890',
+            'native_app_android_play_store_id' => 'ch.kiss.musterstadt',
+            'native_app_marketing_url' => 'https://example.test/app',
+            'native_app_privacy_url' => 'https://example.test/privacy',
+            'native_app_support_url' => 'https://example.test/support',
+            'native_app_push_sender_id' => 'kiss-musterstadt',
+            'native_app_tenant_channel_prefix' => 'tenant-2-kiss',
+        ]);
+
+        $update->assertStatus(200);
+        $update->assertJsonPath('data.updated', true);
+
+        $response = $this->apiGet('/v2/admin/config/native-app');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.native_app.native_app_store_mode', 'tenant_branded');
+        $response->assertJsonPath('data.deployment_readiness.has_ios_identity', true);
+        $response->assertJsonPath('data.deployment_readiness.has_android_identity', true);
+        $response->assertJsonPath('data.deployment_readiness.has_store_metadata', true);
+        $response->assertJsonPath('data.deployment_readiness.push_routing_configured', true);
+        $response->assertJsonPath('data.deployment_readiness.tenant_branded_ready', true);
+    }
+
     // ================================================================
     // CRON JOBS — GET /v2/admin/system/cron-jobs
     // ================================================================

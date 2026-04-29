@@ -122,6 +122,15 @@ class AdminConfigController extends BaseApiController
         'native_app_background_color' => '#ffffff',
         'native_app_display' => 'standalone',
         'native_app_orientation' => 'portrait',
+        'native_app_store_mode' => 'shared',
+        'native_app_build_profile' => 'preview',
+        'native_app_ios_app_store_id' => '',
+        'native_app_android_play_store_id' => '',
+        'native_app_marketing_url' => '',
+        'native_app_privacy_url' => '',
+        'native_app_support_url' => '',
+        'native_app_push_sender_id' => '',
+        'native_app_tenant_channel_prefix' => '',
     ];
 
     private const NATIVE_APP_SENSITIVE_KEYS = ['native_app_fcm_server_key', 'native_app_apns_key_id'];
@@ -1213,7 +1222,11 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        return $this->respondWithData(['tenant_id' => $tenantId, 'native_app' => $config]);
+        return $this->respondWithData([
+            'tenant_id' => $tenantId,
+            'native_app' => $config,
+            'deployment_readiness' => $this->nativeAppReadiness($config),
+        ]);
     }
 
     /** PUT /api/v2/admin/config/native-app */
@@ -1247,6 +1260,20 @@ class AdminConfigController extends BaseApiController
                 }
             }
 
+            if ($key === 'native_app_store_mode') {
+                $valid = ['shared', 'tenant_branded'];
+                if (!in_array($value, $valid, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_native_app_store_mode', ['modes' => implode(', ', $valid)]), $key, 422);
+                }
+            }
+
+            if ($key === 'native_app_build_profile') {
+                $valid = ['preview', 'production'];
+                if (!in_array($value, $valid, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_native_app_build_profile', ['profiles' => implode(', ', $valid)]), $key, 422);
+                }
+            }
+
             $storeValue = is_bool($value) ? ($value ? '1' : '0') : (string) $value;
             $this->upsertSetting($tenantId, $key, $storeValue, $adminId, is_bool($value) ? 'boolean' : 'string');
             $updated[] = $key;
@@ -1259,6 +1286,34 @@ class AdminConfigController extends BaseApiController
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
+    }
+
+    private function nativeAppReadiness(array $config): array
+    {
+        $storeMode = (string) ($config['native_app_store_mode'] ?? 'shared');
+        $hasIosIdentity = trim((string) ($config['native_app_bundle_id'] ?? '')) !== ''
+            && trim((string) ($config['native_app_ios_app_store_id'] ?? '')) !== '';
+        $hasAndroidIdentity = trim((string) ($config['native_app_package_name'] ?? '')) !== ''
+            && trim((string) ($config['native_app_android_play_store_id'] ?? '')) !== '';
+        $hasStoreMetadata = trim((string) ($config['native_app_marketing_url'] ?? '')) !== ''
+            && trim((string) ($config['native_app_privacy_url'] ?? '')) !== ''
+            && trim((string) ($config['native_app_support_url'] ?? '')) !== '';
+        $pushRoutingConfigured = (bool) ($config['native_app_push_enabled'] ?? false)
+            && trim((string) ($config['native_app_push_sender_id'] ?? '')) !== ''
+            && trim((string) ($config['native_app_tenant_channel_prefix'] ?? '')) !== '';
+
+        return [
+            'store_mode' => $storeMode,
+            'has_ios_identity' => $hasIosIdentity,
+            'has_android_identity' => $hasAndroidIdentity,
+            'has_store_metadata' => $hasStoreMetadata,
+            'push_routing_configured' => $pushRoutingConfigured,
+            'tenant_branded_ready' => $storeMode === 'tenant_branded'
+                && $hasIosIdentity
+                && $hasAndroidIdentity
+                && $hasStoreMetadata
+                && $pushRoutingConfigured,
+        ];
     }
 
     // =========================================================================
