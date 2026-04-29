@@ -247,6 +247,9 @@ const MySubscriptionPage = lazyWithRetry(() => import('./pages/premium/MySubscri
 const CouponDetailPage = lazyWithRetry(() => import('./pages/coupons/CouponDetailPage'));
 const SellerCouponsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponsPage'));
 const SellerCouponEditPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponEditPage'));
+const SellerPickupSlotsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerPickupSlotsPage'));
+const SellerPickupScanPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerPickupScanPage'));
+const MyPickupsPage = lazyWithRetry(() => import('./pages/marketplace/MyPickupsPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -263,6 +266,8 @@ const LegalVersionHistoryPage = lazyWithRetry(() => import('@/pages/public/Legal
 const FaqPage = lazyWithRetry(() => import('@/pages/public/FaqPage'));
 const HelpCenterPage = lazyWithRetry(() => import('@/pages/help/HelpCenterPage'));
 const PilotInquiryPage = lazyWithRetry(() => import('@/pages/public/PilotInquiryPage'));
+const PilotApplyPage = lazyWithRetry(() => import('@/pages/public/PilotApplyPage'));
+const PilotApplyStatusPage = lazyWithRetry(() => import('@/pages/public/PilotApplyStatusPage'));
 
 // Platform Legal Pages (provider-level, distinct from tenant legal docs)
 const PlatformTermsPage = lazyWithRetry(() => import('@/pages/platform/PlatformTermsPage'));
@@ -272,6 +277,11 @@ const CustomPage = lazyWithRetry(() => import('@/pages/public/CustomPage'));
 
 // About Sub-Pages
 const TimebankingGuidePage = lazyWithRetry(() => import('@/pages/about/TimebankingGuidePage'));
+// AG60 — Developers portal (Partner API docs)
+const DevelopersHomePage = lazyWithRetry(() => import('@/pages/developers/DevelopersHomePage'));
+const DevelopersAuthPage = lazyWithRetry(() => import('@/pages/developers/DevelopersAuthPage'));
+const DevelopersEndpointsPage = lazyWithRetry(() => import('@/pages/developers/DevelopersEndpointsPage'));
+const DevelopersWebhooksPage = lazyWithRetry(() => import('@/pages/developers/DevelopersWebhooksPage'));
 const PartnerPage = lazyWithRetry(() => import('@/pages/about/PartnerPage'));
 const SocialPrescribingPage = lazyWithRetry(() => import('@/pages/about/SocialPrescribingPage'));
 const ImpactSummaryPage = lazyWithRetry(() => import('@/pages/about/ImpactSummaryPage'));
@@ -317,6 +327,8 @@ function AppRoutes() {
         <Route path="faq" element={<ErrorBoundary><FaqPage /></ErrorBoundary>} />
         <Route path="contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
         <Route path="pilot-inquiry" element={<ErrorBoundary><PilotInquiryPage /></ErrorBoundary>} />
+        <Route path="pilot-apply" element={<ErrorBoundary><PilotApplyPage /></ErrorBoundary>} />
+        <Route path="pilot-apply/status/:token" element={<ErrorBoundary><PilotApplyStatusPage /></ErrorBoundary>} />
         <Route path="help" element={<ErrorBoundary><HelpCenterPage /></ErrorBoundary>} />
         <Route path="terms" element={<ErrorBoundary><TermsPage /></ErrorBoundary>} />
         <Route path="terms/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
@@ -335,6 +347,12 @@ function AppRoutes() {
         <Route path="platform/privacy" element={<ErrorBoundary><PlatformPrivacyPage /></ErrorBoundary>} />
         <Route path="platform/disclaimer" element={<ErrorBoundary><PlatformDisclaimerPage /></ErrorBoundary>} />
         <Route path="timebanking-guide" element={<ErrorBoundary><TimebankingGuidePage /></ErrorBoundary>} />
+
+        {/* AG60 — Developers portal (public docs for the Partner API) */}
+        <Route path="developers" element={<ErrorBoundary><DevelopersHomePage /></ErrorBoundary>} />
+        <Route path="developers/auth" element={<ErrorBoundary><DevelopersAuthPage /></ErrorBoundary>} />
+        <Route path="developers/endpoints" element={<ErrorBoundary><DevelopersEndpointsPage /></ErrorBoundary>} />
+        <Route path="developers/webhooks" element={<ErrorBoundary><DevelopersWebhooksPage /></ErrorBoundary>} />
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
@@ -1182,6 +1200,36 @@ function AppRoutes() {
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <MerchantOnboardingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          {/* AG48 — alternate canonical path for the wizard */}
+          <Route path="marketplace/seller/onboarding" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MerchantOnboardingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          {/* AG45 — Click-and-collect */}
+          <Route path="marketplace/seller/pickup-slots" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <SellerPickupSlotsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/pickup-scan" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <SellerPickupScanPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/me/pickups" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MyPickupsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -21,10 +21,27 @@ return [
     'rate_limit_exceeded'          => 'Rate limit exceeded. Please try again later.',
 
     // ============================================
+    // AG44 — TENANT PROVISIONING
+    // ============================================
+    'provisioning_field_required'      => 'The :field field is required.',
+    'provisioning_invalid_email'       => 'Please enter a valid email address.',
+    'provisioning_invalid_category'    => 'Please choose a valid community type.',
+    'provisioning_slug_unavailable'    => 'That community URL is unavailable (:reason). Please choose another.',
+    'provisioning_subdomain_unavailable' => 'That subdomain is already requested. Please choose another.',
+    'provisioning_too_recent'          => 'You have already submitted a request in the last 24 hours. We will be in touch soon.',
+    'provisioning_request_not_found'   => 'Provisioning request not found.',
+    'provisioning_form_disabled'       => 'New community applications are temporarily paused. Please check back soon.',
+    'provisioning_service_unavailable' => 'The provisioning service is temporarily unavailable.',
+    'provisioning_submit_failed'       => 'We could not submit your application right now. Please try again shortly.',
+    'provisioning_reject_reason_required' => 'A rejection reason is required.',
+    'provisioning_captcha_failed'      => 'Please answer the security question correctly.',
+
+    // ============================================
     // VALIDATION — GENERIC
     // ============================================
     'validation_failed'            => 'Validation failed',
     'missing_required_field'       => 'Missing required field: :field',
+    'text_too_long'                => 'Text is too long.',
     'no_fields_to_update'          => 'No fields to update',
     'no_fields_provided'           => 'No fields provided to update',
     'request_body_empty'           => 'Request body is empty',

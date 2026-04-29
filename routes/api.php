@@ -951,6 +951,17 @@ Route::get('/v2/admin/marketplace/coupons', [\App\Http\Controllers\Api\Admin\Mer
 Route::post('/v2/admin/marketplace/coupons/{id}/suspend', [\App\Http\Controllers\Api\Admin\MerchantCouponAdminController::class, 'suspend']);
 Route::delete('/v2/admin/marketplace/coupons/{id}', [\App\Http\Controllers\Api\Admin\MerchantCouponAdminController::class, 'destroy']);
 
+// AG61 — KI-Agenten (admin oversight: definitions, runs, proposals)
+Route::get('/v2/admin/agents', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'index']);
+Route::patch('/v2/admin/agents/{id}', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'update'])->whereNumber('id');
+Route::post('/v2/admin/agents/{id}/toggle', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'toggle'])->whereNumber('id');
+Route::post('/v2/admin/agents/{id}/run-now', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'runNow'])->whereNumber('id');
+Route::get('/v2/admin/agents/runs', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'runs']);
+Route::get('/v2/admin/agents/proposals', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'proposals']);
+Route::post('/v2/admin/agents/proposals/{id}/approve', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'approve'])->whereNumber('id');
+Route::post('/v2/admin/agents/proposals/{id}/reject', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'reject'])->whereNumber('id');
+Route::post('/v2/admin/agents/proposals/{id}/edit-approve', [\App\Http\Controllers\Api\Admin\AgentAdminController::class, 'editAndApprove'])->whereNumber('id');
+
 // Marketplace Shipping Options — Seller shipping management (MKT31)
 Route::get('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'shippingOptions']);
 Route::post('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'createShippingOption']);

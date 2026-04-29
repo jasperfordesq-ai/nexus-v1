@@ -169,11 +169,19 @@ const PushCampaignAdminPage = lazy(() => import('./modules/advertising/PushCampa
 // AI / KI-Agents module
 const KiAgentAdminPage = lazy(() => import('./modules/ai/KiAgentAdminPage'));
 
+// AG61 — KI-Agenten new framework (definitions, proposals, runs)
+const AgentsAdminPage = lazy(() => import('./modules/agents/AgentsAdminPage'));
+const AgentProposalsPage = lazy(() => import('./modules/agents/AgentProposalsPage'));
+const AgentRunsPage = lazy(() => import('./modules/agents/AgentRunsPage'));
+
 // Regional analytics
 const RegionalAnalyticsPage = lazy(() => import('./modules/analytics/RegionalAnalyticsPage'));
 
 // Platform — pilot inquiries (super-admin)
 const PilotInquiryAdminPage = lazy(() => import('./modules/super/PilotInquiryAdminPage'));
+
+// AG44 — Tenant provisioning queue (super-admin)
+const ProvisioningRequestsPage = lazy(() => import('./modules/provisioning/ProvisioningRequestsPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -338,6 +346,8 @@ const PlansAdmin = lazy(() => import('./modules/content/PlansAdmin'));
 const PlanForm = lazy(() => import('./modules/content/PlanForm'));
 const SubscriptionsAdmin = lazy(() => import('./modules/content/Subscriptions'));
 const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuilder'));
+// AG60 — API Partners admin (Partner API integration management)
+const ApiPartnersAdminPage = lazy(() => import('./modules/api-partners/ApiPartnersAdminPage'));
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
@@ -721,11 +731,21 @@ export function AdminRoutes() {
       {/* AG61 — KI-Agenten autonomous framework */}
       <Route path="ai/ki-agents" element={<Lazy><KiAgentAdminPage /></Lazy>} />
 
+      {/* AG61 — new KI-Agenten admin (definitions, proposals, runs) */}
+      <Route path="agents" element={<Lazy><AgentsAdminPage /></Lazy>} />
+      <Route path="agents/proposals" element={<Lazy><AgentProposalsPage /></Lazy>} />
+      <Route path="agents/runs" element={<Lazy><AgentRunsPage /></Lazy>} />
+
       {/* AG59 — Regional analytics product */}
       <Route path="analytics/regional" element={<Lazy><RegionalAnalyticsPage /></Lazy>} />
 
       {/* AG71 — Pilot region inquiry funnel */}
       <Route path="platform/pilot-inquiries" element={<Lazy><PilotInquiryAdminPage /></Lazy>} />
+
+      {/* AG44 — Self-service tenant provisioning queue (super-admin) */}
+      <Route element={<SuperAdminRoute />}>
+        <Route path="provisioning-requests" element={<Lazy><ProvisioningRequestsPage /></Lazy>} />
+      </Route>
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
@@ -806,6 +826,16 @@ export function AdminRoutes() {
       <Route path="reports/municipal-impact" element={<Lazy><MunicipalImpactReportsPage /></Lazy>} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
+
+      {/* ─── INTEGRATIONS — API Partners (AG60) ─── */}
+      <Route
+        path="api-partners"
+        element={
+          <FeatureGatedElement feature="partner_api">
+            <Lazy><ApiPartnersAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
 
       {/* ─── REDIRECT: /admin/login → main login page ─── */}
       <Route path="login" element={<TenantRedirect to="/login" />} />

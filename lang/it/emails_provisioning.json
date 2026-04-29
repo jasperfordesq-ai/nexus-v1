@@ -1,0 +1,22 @@
+{
+  "welcome": {
+    "subject": "Your community {name} is ready",
+    "title": "Welcome to Project NEXUS",
+    "preview": "Your community {name} is ready to launch",
+    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
+    "tenant_url_label": "Community URL",
+    "login_url_label": "Admin login",
+    "admin_email_label": "Admin email",
+    "temp_password_label": "Temporary password",
+    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
+    "cta": "Open your admin panel"
+  },
+  "rejection": {
+    "subject": "Update on your Project NEXUS application",
+    "title": "Application update",
+    "preview": "An update on your community application",
+    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
+    "reason_label": "Reason",
+    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+  }
+}

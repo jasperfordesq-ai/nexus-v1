@@ -759,7 +759,14 @@
     }
   },
   "feed": {
-    "official_badge": "Official"
+    "official_badge": "Official",
+    "personalisation": {
+      "label": "Feed mode",
+      "personalised": "Personalised",
+      "latest": "Latest",
+      "personalised_hint": "Ranked for you based on your activity.",
+      "latest_hint": "Newest posts first."
+    }
   },
   "loyalty": {
     "section_title": "Use Your Time Credits",
@@ -1427,5 +1434,194 @@
       "advanced_search": "Advanced search",
       "ad_free": "Ad-free experience"
     }
+  },
+  "developers": {
+    "page_title": "Developers",
+    "hero_title": "Build with NEXUS",
+    "hero_subtitle": "A curated REST API for banking, payment, and municipal admin partners. OAuth2 client credentials, signed webhooks, and a sandbox you can hit in five minutes.",
+    "request_access_cta": "Request access",
+    "request_access_body": "Partner API access is provisioned by your community administrator. Contact them to get a client_id / client_secret pair.",
+    "nav": {
+      "overview": "Overview",
+      "auth": "Authentication",
+      "endpoints": "Endpoints",
+      "webhooks": "Webhooks"
+    },
+    "feature_oauth_title": "OAuth2 client credentials",
+    "feature_oauth_body": "Server-to-server authentication. Short-lived bearer tokens, scoped per partner.",
+    "feature_curated_title": "Curated endpoint set",
+    "feature_curated_body": "Only what banks and admin systems actually need: users, listings, wallet, aggregates.",
+    "feature_webhooks_title": "Signed webhooks",
+    "feature_webhooks_body": "HMAC-SHA256 signatures, automatic retries, delivery health in your dashboard.",
+    "feature_rate_limit_title": "Per-partner rate limits",
+    "feature_rate_limit_body": "Configurable per-minute quotas. 429 responses include Retry-After.",
+    "auth_intro": "Exchange your client credentials for a short-lived bearer token, then attach it to every request as Authorization: Bearer <token>.",
+    "auth_step1_title": "1. Get client credentials",
+    "auth_step1_body": "Your community admin provisions a client_id and client_secret in the admin console. The secret is shown only once at creation time.",
+    "auth_step2_title": "2. Exchange for a token",
+    "auth_step2_body": "POST your credentials to /api/partner/v1/oauth/token. The response includes access_token, expires_in (3600s), and granted scope.",
+    "auth_step3_title": "3. Call the API",
+    "auth_step3_body": "Attach the token to the Authorization header. Tokens are scoped — the API will return 403 insufficient_scope if you exceed your grant.",
+    "curl_example": "curl example",
+    "js_example": "JavaScript example",
+    "endpoints_intro": "Hand-picked REST endpoints. All paths are prefixed with /api/partner/v1. All responses are JSON with API-Version: 2.0 header.",
+    "scope_label": "Scope",
+    "method_label": "Method",
+    "path_label": "Path",
+    "description_label": "Description",
+    "webhooks_intro": "Subscribe to events with HTTPS callback URLs. Each delivery includes an X-Partner-Signature header — an HMAC-SHA256 of the raw body, keyed by the subscription secret returned at creation time.",
+    "webhook_events_title": "Available events",
+    "webhook_event_wallet_credited": "wallet.credited — fires when a partner credits time hours via /wallet/credit",
+    "webhook_signing_title": "Verifying signatures",
+    "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
+    "webhook_create_title": "Create a subscription",
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+  },
+  "provisioning": {
+    "meta": {
+      "title": "Apply for a Pilot Community",
+      "description": "Set up a regional Project NEXUS community for your canton, cooperative, or municipality."
+    },
+    "hero_title": "Apply to host a Pilot Community",
+    "hero_subtitle": "Tell us about your region. We review every application and reply by email within 5 working days.",
+    "intro": "Project NEXUS provisions one community per region. Pick a URL slug, choose your languages, and tell us a bit about how you intend to use the platform.",
+    "fields": {
+      "applicant_name": "Your name",
+      "applicant_email": "Your email",
+      "applicant_phone": "Phone (optional)",
+      "org_name": "Organisation / community name",
+      "country_code": "Country",
+      "region_or_canton": "Region or canton",
+      "requested_slug": "Community URL slug",
+      "requested_slug_help": "Lowercase letters, numbers and hyphens. Example: zurich-care, glarus.",
+      "requested_subdomain": "Preferred subdomain (optional)",
+      "tenant_category": "Community type",
+      "languages": "Languages",
+      "default_language": "Primary language",
+      "expected_member_count_bucket": "Expected member count",
+      "intended_use": "How will you use Project NEXUS?",
+      "intended_use_placeholder": "A short description of your community goals, target audience, and any partner organisations.",
+      "captcha": "Security check"
+    },
+    "categories": {
+      "kiss_cooperative": "KISS cooperative",
+      "caring_community": "Caring community",
+      "agoris_node": "AGORIS regional node",
+      "community": "General community / timebank"
+    },
+    "buckets": {
+      "under_50": "Under 50 members",
+      "50_250": "50 – 250 members",
+      "250_1000": "250 – 1,000 members",
+      "1000_5000": "1,000 – 5,000 members",
+      "5000_plus": "Over 5,000 members"
+    },
+    "slug_status": {
+      "checking": "Checking availability…",
+      "available": "Available",
+      "taken": "Already taken — please choose another",
+      "reserved": "Reserved by the platform — please choose another",
+      "pending": "A pending application already requested this URL",
+      "invalid_format": "Use 3–50 lowercase letters, numbers, or hyphens",
+      "service_unavailable": "Cannot check availability right now"
+    },
+    "submit": "Submit application",
+    "submitting": "Submitting…",
+    "back": "Back",
+    "success_title": "Application received",
+    "success_body": "Thank you — we have received your application and will review it within 5 working days. Please check your email for updates.",
+    "success_back": "Back to home",
+    "status_title": "Application status",
+    "status_check_email": "Please check your email for updates on your application.",
+    "status_lookup_failed": "We could not find an application for that link.",
+    "status_labels": {
+      "pending": "Received — awaiting review",
+      "under_review": "Under review",
+      "approved": "Approved — provisioning in progress",
+      "provisioned": "Provisioned — your community is live",
+      "rejected": "Not approved",
+      "failed": "A technical issue occurred — our team has been notified"
+    },
+    "errors": {
+      "submit_failed": "We could not submit your application. Please try again.",
+      "captcha_failed": "Please answer the security question correctly.",
+      "required": "Please complete all required fields.",
+      "slug_warning_reserved": "That URL is reserved by the platform. Please pick another."
+    }
+  },
+  "translate": {
+    "translate": "Translate",
+    "show_original": "Show original",
+    "translating": "Translating…",
+    "failed": "Translation failed. Please try again.",
+    "translated_label": "Translated"
+  },
+  "settings_translation": {
+    "section_title": "Translation",
+    "auto_translate_label": "Auto-translate posts and listings to my language",
+    "auto_translate_help": "When enabled, content already translated to your language is shown automatically.",
+    "target_locale_label": "Translate into",
+    "saved": "Translation preferences saved.",
+    "save_failed": "Could not save translation preferences."
+  },
+  "marketplace": {
+    "pickup": {
+      "slots_title": "Pickup Slots",
+      "slots_subtitle": "Offer click-and-collect pickup windows for buyers.",
+      "scan_title": "Pickup Scan",
+      "scan_subtitle": "Enter the buyer's pickup code to confirm collection.",
+      "my_pickups_title": "My Pickups",
+      "my_pickups_subtitle": "Show this code at the seller's location to collect your order.",
+      "no_slots": "No pickup slots yet. Create one to enable click-and-collect.",
+      "no_pickups": "No upcoming pickups.",
+      "new_slot": "New Pickup Slot",
+      "slot_start": "Start",
+      "slot_end": "End",
+      "slot_times_required": "Start and end times are required",
+      "slot_created": "Pickup slot created",
+      "slot_create_failed": "Failed to create slot",
+      "slot_deleted": "Slot deleted",
+      "capacity": "Capacity",
+      "recurring": "Recurring",
+      "recurring_weekly": "Repeat weekly",
+      "inactive": "Inactive",
+      "qr_code": "Pickup Code",
+      "confirm_pickup": "Confirm Pickup",
+      "scan_success": "Pickup confirmed",
+      "scan_failed": "Scan failed",
+      "last_scan": "Last scan",
+      "order_n": "Order #{{id}}",
+      "status_picked_up": "Picked up",
+      "status_reserved": "Reserved",
+      "status_cancelled": "Cancelled",
+      "status_no_show": "No show",
+      "show_this_code": "Show this code to the seller",
+      "window": "Pickup window",
+      "choose_slot": "Choose pickup slot",
+      "no_slot_selected": "No pickup slot",
+      "left": "left"
+    },
+    "inventory": {
+      "section_title": "Inventory",
+      "section_subtitle": "Track stock and prevent over-selling.",
+      "unlimited": "Unlimited stock",
+      "count": "Stock count",
+      "low_stock_threshold": "Low-stock alert at",
+      "oversold_protected": "Reject orders that would oversell",
+      "sold_out": "Sold out",
+      "low_chip": "Inventory: {{count}} (Low)",
+      "count_chip": "Inventory: {{count}}"
+    },
+    "onboarding": {
+      "partner_badge": "Marketplace Partner",
+      "nudge_title": "Complete your merchant onboarding",
+      "nudge_description": "Add business details, branding and payouts to unlock the Marketplace Partner badge.",
+      "start_cta": "Start onboarding"
+    }
+  },
+  "common": {
+    "dismiss": "Dismiss",
+    "create": "Create",
+    "delete": "Delete"
   }
 }
