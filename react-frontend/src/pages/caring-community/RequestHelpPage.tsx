@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Textarea, Input, Radio, RadioGroup } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -38,7 +38,8 @@ export function RequestHelpPage() {
   const charCount = what.length;
   const charLimit = 500;
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
     setError(null);
     if (!what.trim() || !when.trim()) return;
 
@@ -121,7 +122,7 @@ export function RequestHelpPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)} noValidate>
             <div>
               <Textarea
                 label={t('request_help.form.what_label')}
@@ -135,6 +136,7 @@ export function RequestHelpPage() {
                 isRequired
                 description={`${charCount} / ${charLimit}`}
                 isInvalid={charCount > charLimit}
+                errorMessage={charCount > charLimit ? t('request_help.form.what_too_long') : undefined}
               />
             </div>
 
@@ -160,20 +162,22 @@ export function RequestHelpPage() {
             </RadioGroup>
 
             {error && (
-              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
+              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+                {error}
+              </p>
             )}
 
             <Button
+              type="submit"
               color="primary"
               size="lg"
               className="w-full text-base"
               isLoading={submitting}
               isDisabled={!what.trim() || !when.trim() || charCount > charLimit}
-              onPress={handleSubmit}
             >
               {submitting ? t('request_help.form.submitting') : t('request_help.form.submit')}
             </Button>
-          </div>
+          </form>
         </GlassCard>
       </div>
     </>

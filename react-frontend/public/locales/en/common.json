@@ -437,7 +437,8 @@
       "contact_message": "By message",
       "contact_either": "Either is fine",
       "submit": "Request Help",
-      "submitting": "Sending request..."
+      "submitting": "Sending request...",
+      "what_too_long": "Please keep your request under 500 characters."
     },
     "success": {
       "title": "Request Received",
@@ -579,6 +580,11 @@
       "paused": "Paused",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    },
+    "log_status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
     },
     "next_check_in": "Next check-in",
     "overdue": "Overdue",

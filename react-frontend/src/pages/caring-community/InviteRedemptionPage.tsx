@@ -88,7 +88,7 @@ export default function InviteRedemptionPage() {
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-background)]">
-        <div className="flex flex-col items-center gap-5">
+        <div className="flex flex-col items-center gap-5" role="status" aria-live="polite" aria-busy="true">
           <Spinner size="lg" color="primary" />
           <p className="text-base text-default-600">{t('invite.loading')}</p>
         </div>
@@ -102,7 +102,7 @@ export default function InviteRedemptionPage() {
         <Card className="w-full max-w-md" shadow="md">
           <CardBody className="flex flex-col items-center gap-7 p-8 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <HeartHandshake size={32} />
+              <HeartHandshake size={32} aria-hidden="true" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-default-900 sm:text-3xl">{t('invite.valid.title')}</h1>
@@ -142,7 +142,7 @@ export default function InviteRedemptionPage() {
       <Card className="w-full max-w-md" shadow="md">
         <CardBody className="flex flex-col items-center gap-7 p-8 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-warning/10 text-warning">
-            <AlertCircle size={32} />
+            <AlertCircle size={32} aria-hidden="true" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-default-900 sm:text-3xl">{t(titleKey)}</h1>

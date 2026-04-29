@@ -134,22 +134,23 @@ export function CaringCommunityPage() {
                 {visibleActions.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <Link key={item.key} to={tenantPath(item.href)}>
-                      <Button
-                        className="h-full min-h-24 w-full flex-col items-start justify-start gap-1 bg-theme-elevated px-4 py-4 text-theme-primary"
-                        variant="flat"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                          <span className="text-left text-sm font-semibold">
-                            {t(`caring_community.actions.${item.key}`)}
-                          </span>
+                    <Button
+                      key={item.key}
+                      as={Link}
+                      to={tenantPath(item.href)}
+                      className="h-full min-h-24 w-full flex-col items-start justify-start gap-1 bg-theme-elevated px-4 py-4 text-theme-primary"
+                      variant="flat"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                        <span className="text-left text-sm font-semibold">
+                          {t(`caring_community.actions.${item.key}`)}
                         </span>
-                        <span className="text-left text-xs font-normal leading-5 text-theme-muted">
-                          {t(`caring_community.actions.${item.key}_sub`)}
-                        </span>
-                      </Button>
-                    </Link>
+                      </span>
+                      <span className="text-left text-xs font-normal leading-5 text-theme-muted">
+                        {t(`caring_community.actions.${item.key}_sub`)}
+                      </span>
+                    </Button>
                   );
                 })}
               </div>
@@ -197,7 +198,12 @@ export function CaringCommunityPage() {
             {visibleCards.map((item) => {
               const Icon = item.icon;
               return (
-                <Link key={item.key} to={tenantPath(item.href)} className="group">
+                <Link
+                  key={item.key}
+                  to={tenantPath(item.href)}
+                  className="group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]"
+                  aria-label={t(`caring_community.modules.${item.key}.title`)}
+                >
                   <GlassCard className="h-full p-5 transition-transform group-hover:-translate-y-0.5">
                     <div className="flex items-start gap-4">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-teal-500/15">

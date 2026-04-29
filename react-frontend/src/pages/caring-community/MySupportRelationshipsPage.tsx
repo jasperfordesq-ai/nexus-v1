@@ -107,7 +107,7 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
   const roleColor = relationship.role === 'supporter' ? 'primary' : 'secondary';
 
   return (
-    <GlassCard className="p-5">
+    <GlassCard className="p-5" role="article" aria-labelledby={`support-relationship-${relationship.id}`}>
       {/* Header row */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
             className="shrink-0"
           />
           <div>
-            <p className="font-semibold text-theme-primary">{relationship.partner.name}</p>
+            <p id={`support-relationship-${relationship.id}`} className="font-semibold text-theme-primary">{relationship.partner.name}</p>
             <p className="text-sm text-theme-muted">{relationship.title}</p>
           </div>
         </div>
@@ -197,7 +197,7 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
                   }
                   variant="flat"
                 >
-                  {log.status}
+                  {t(`my_support_relationships.log_status.${log.status}`, { defaultValue: log.status })}
                 </Chip>
               </li>
             ))}
@@ -267,7 +267,7 @@ export function MySupportRelationshipsPage() {
 
         {/* Error state */}
         {error && !isLoading && (
-          <GlassCard className="p-6">
+          <GlassCard className="p-6" role="alert">
             <div className="flex items-center gap-3 text-danger">
               <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
               <p className="font-medium">{t('my_support_relationships.errors.load_failed')}</p>
@@ -277,7 +277,7 @@ export function MySupportRelationshipsPage() {
 
         {/* Loading skeletons */}
         {isLoading && (
-          <div className="space-y-4">
+          <div className="space-y-4" role="status" aria-live="polite" aria-busy="true">
             <p className="text-center text-base text-theme-muted">{t('my_support_relationships.loading')}</p>
             {[0, 1, 2].map((i) => (
               <RelationshipCardSkeleton key={i} />
