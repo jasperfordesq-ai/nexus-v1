@@ -347,7 +347,9 @@
       "hour_transfer": "Transfer Hours",
       "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
       "safeguarding_report": "Report a Concern",
-      "safeguarding_report_sub": "Report safeguarding concerns confidentially."
+      "safeguarding_report_sub": "Report safeguarding concerns confidentially.",
+      "projects": "Community Projects",
+      "projects_sub": "Follow staged municipality and neighbourhood updates."
     },
     "operating_model": {
       "title": "Operating model",
@@ -410,7 +412,11 @@
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       },
       "clubs": "Clubs & Associations",
-      "markt": "Marktplatz"
+      "markt": "Marktplatz",
+      "projects": {
+        "title": "Community projects",
+        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
+      }
     }
   },
   "request_help": {

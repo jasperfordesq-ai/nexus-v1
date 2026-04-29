@@ -1298,6 +1298,23 @@ Route::get('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers
 Route::post('/v2/admin/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'store']);
 Route::delete('/v2/admin/caring-community/emergency-alerts/{id}', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'deactivate']);
 
+// AG69 — Multi-stage project announcement tracking
+Route::get('/v2/caring-community/projects', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'index'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/projects/{id}', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'show'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/caring-community/projects/{id}/subscribe', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'subscribe'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::delete('/v2/caring-community/projects/{id}/subscribe', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'unsubscribe'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/projects', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminIndex']);
+Route::post('/v2/admin/caring-community/projects', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminStore']);
+Route::get('/v2/admin/caring-community/projects/{id}', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminShow']);
+Route::put('/v2/admin/caring-community/projects/{id}', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminUpdate']);
+Route::post('/v2/admin/caring-community/projects/{id}/publish', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminPublish']);
+Route::post('/v2/admin/caring-community/projects/{id}/updates', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminCreateUpdate']);
+Route::post('/v2/admin/caring-community/project-updates/{id}/publish', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminPublishUpdate']);
+
 Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
 Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);

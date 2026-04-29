@@ -170,6 +170,7 @@ const MyTrustTierPage = lazyWithRetry(() => import('@/pages/caring-community/MyT
 const CaregiverDashboardPage = lazyWithRetry(() => import('@/pages/caring-community/CaregiverDashboardPage'));
 const LinkCareReceiverPage = lazyWithRetry(() => import('@/pages/caring-community/LinkCareReceiverPage'));
 const MunicipalSurveyPage = lazyWithRetry(() => import('@/pages/caring-community/MunicipalSurveyPage'));
+const ProjectAnnouncementsPage = lazyWithRetry(() => import('@/pages/caring-community/ProjectAnnouncementsPage'));
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
@@ -639,6 +640,20 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MunicipalSurveyPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="caring-community/projects" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <ProjectAnnouncementsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="caring-community/projects/:id" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <ProjectAnnouncementsPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

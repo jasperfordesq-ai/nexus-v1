@@ -15,6 +15,7 @@ import Handshake from 'lucide-react/icons/handshake';
 import Heart from 'lucide-react/icons/heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import ListChecks from 'lucide-react/icons/list-checks';
+import Megaphone from 'lucide-react/icons/megaphone';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
@@ -56,6 +57,7 @@ const primaryActions: ActionDef[] = [
   { key: 'hour_gift', href: '/caring-community/hour-gift', icon: Gift, feature: 'caring_community' },
   { key: 'hour_transfer', href: '/caring-community/hour-transfer', icon: ArrowRightLeft, feature: 'caring_community' },
   { key: 'safeguarding_report', href: '/caring-community/safeguarding/report', icon: ShieldAlert, feature: 'caring_community' },
+  { key: 'projects', href: '/caring-community/projects', icon: Megaphone, feature: 'caring_community' },
 ];
 
 const moduleCards: ActionDef[] = [
@@ -68,6 +70,7 @@ const moduleCards: ActionDef[] = [
   { key: 'goals', href: '/goals', icon: Target, feature: 'goals' },
   { key: 'federation', href: '/federation', icon: Globe, feature: 'federation' },
   { key: 'clubs', href: '/clubs', icon: ShoppingBag },
+  { key: 'projects', href: '/caring-community/projects', icon: Megaphone, feature: 'caring_community' },
   { key: 'messages', href: '/messages', icon: MessageSquare, module: 'messages' },
   { key: 'trust', href: '/verify-identity', icon: ShieldCheck },
 ];

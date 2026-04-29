@@ -258,6 +258,7 @@ function useAdminNav(): NavSection[] {
         { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
         { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
         { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
+        { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

@@ -157,6 +157,7 @@ const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTi
 const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBaselineAdminPage'));
 const EmergencyAlertAdminPage = lazy(() => import('./modules/caring-community/EmergencyAlertAdminPage'));
 const MunicipalSurveyAdminPage = lazy(() => import('./modules/caring-community/MunicipalSurveyAdminPage'));
+const ProjectAnnouncementsAdminPage = lazy(() => import('./modules/caring-community/ProjectAnnouncementsAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -649,6 +650,16 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><MunicipalSurveyAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG69 — Multi-stage project announcements */}
+      <Route
+        path="caring-community/projects"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><ProjectAnnouncementsAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />
