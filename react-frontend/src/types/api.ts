@@ -1136,6 +1136,7 @@ export interface TenantFeatures {
   ai_chat: boolean;
   marketplace: boolean;
   message_translation: boolean;
+  member_premium: boolean;
 }
 
 export interface TenantModules {

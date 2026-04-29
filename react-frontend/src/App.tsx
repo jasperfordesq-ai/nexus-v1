@@ -174,6 +174,8 @@ const MunicipalSurveyPage = lazyWithRetry(() => import('@/pages/caring-community
 const ProjectAnnouncementsPage = lazyWithRetry(() => import('@/pages/caring-community/ProjectAnnouncementsPage'));
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
+const VereinMembersImportPage = lazyWithRetry(() => import('@/pages/clubs/VereinMembersImportPage'));
+const RegionalPointsPage = lazyWithRetry(() => import('@/pages/wallet/RegionalPointsPage'));
 const MyAdCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyAdCampaignsPage'));
 const MyPushCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyPushCampaignsPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
@@ -236,6 +238,15 @@ const BuyerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/BuyerOrd
 const SellerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/SellerOrdersPage'));
 const StripeOnboardingPage = lazyWithRetry(() => import('./pages/marketplace/StripeOnboardingPage'));
 const MerchantOnboardingPage = lazyWithRetry(() => import('./pages/marketplace/MerchantOnboardingPage'));
+const CouponsPage = lazyWithRetry(() => import('./pages/coupons/CouponsPage'));
+
+// Premium (member tiers — AG58)
+const PricingPage = lazyWithRetry(() => import('./pages/premium/PricingPage'));
+const SubscriptionReturnPage = lazyWithRetry(() => import('./pages/premium/SubscriptionReturnPage'));
+const MySubscriptionPage = lazyWithRetry(() => import('./pages/premium/MySubscriptionPage'));
+const CouponDetailPage = lazyWithRetry(() => import('./pages/coupons/CouponDetailPage'));
+const SellerCouponsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponsPage'));
+const SellerCouponEditPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponEditPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -485,6 +496,41 @@ function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
+        <Route path="marketplace/seller/coupons" element={
+          <FeatureGate feature="merchant_coupons" redirect="/">
+            <FeatureErrorBoundary featureName="Merchant Coupons">
+              <SellerCouponsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/seller/coupons/new" element={
+          <FeatureGate feature="merchant_coupons" redirect="/">
+            <FeatureErrorBoundary featureName="Merchant Coupons">
+              <SellerCouponEditPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/seller/coupons/:id/edit" element={
+          <FeatureGate feature="merchant_coupons" redirect="/">
+            <FeatureErrorBoundary featureName="Merchant Coupons">
+              <SellerCouponEditPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="coupons" element={
+          <FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature="Coupons" />}>
+            <FeatureErrorBoundary featureName="Coupons">
+              <CouponsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="coupons/:id" element={
+          <FeatureGate feature="merchant_coupons" redirect="/coupons">
+            <FeatureErrorBoundary featureName="Coupons">
+              <CouponDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
         <Route path="marketplace/:id/edit" element={
           <FeatureGate feature="marketplace" redirect="/">
             <FeatureErrorBoundary featureName="Marketplace">
@@ -673,6 +719,13 @@ function AppRoutes() {
 
         {/* Clubs & Associations directory (AG15) — public, no feature gate */}
         <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />
+        <Route path="clubs/:id/admin/import" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Verein Import">
+              <VereinMembersImportPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
 
         {/* Advertiser self-serve portal (AG56/AG57) */}
         <Route path="advertise/campaigns" element={<ErrorBoundary><MyAdCampaignsPage /></ErrorBoundary>} />
@@ -810,6 +863,13 @@ function AppRoutes() {
             <FeatureGate module="wallet" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Wallet">
                 <WalletPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="wallet/regional-points" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Regional Points" />}>
+              <FeatureErrorBoundary featureName="Regional Points">
+                <RegionalPointsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -1122,6 +1182,29 @@ function AppRoutes() {
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <MerchantOnboardingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* AG58 — Member Premium Tiers */}
+          <Route path="premium" element={
+            <FeatureGate feature="member_premium" redirect="/">
+              <FeatureErrorBoundary featureName="Premium">
+                <PricingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="premium/return" element={
+            <FeatureGate feature="member_premium" redirect="/">
+              <FeatureErrorBoundary featureName="Premium">
+                <SubscriptionReturnPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="premium/manage" element={
+            <FeatureGate feature="member_premium" redirect="/">
+              <FeatureErrorBoundary featureName="Premium">
+                <MySubscriptionPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -3,12 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Textarea, Input, Radio, RadioGroup } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import Heart from 'lucide-react/icons/heart';
+import Mic from 'lucide-react/icons/mic';
+import Square from 'lucide-react/icons/square';
+import Loader from 'lucide-react/icons/loader-circle';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -17,9 +20,38 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
 type ContactPreference = 'phone' | 'message' | 'either';
+type VoiceStatus = 'idle' | 'recording' | 'processing';
+
+const MAX_RECORD_SECONDS = 60;
+
+interface VoiceIntentResponse {
+  transcript: string;
+  detected_language?: string;
+  suggested_category: string | null;
+  suggested_when: string | null;
+  suggested_contact_preference: ContactPreference | null;
+  raw_text: string;
+}
+
+function formatSuggestedWhen(iso: string | null, locale: string): string {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(d);
+  } catch {
+    return '';
+  }
+}
 
 export function RequestHelpPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
   usePageTitle(t('request_help.meta.title'));
 
@@ -30,6 +62,26 @@ export function RequestHelpPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Voice state
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('idle');
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [voiceTranscript, setVoiceTranscript] = useState<string | null>(null);
+  const [voiceFilledHint, setVoiceFilledHint] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordTimerRef = useRef<number | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      if (recordTimerRef.current !== null) {
+        window.clearInterval(recordTimerRef.current);
+      }
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
+
   // Redirect if feature is off
   if (!hasFeature('caring_community')) {
     return <Navigate to={tenantPath('/caring-community')} replace />;
@@ -37,6 +89,119 @@ export function RequestHelpPage() {
 
   const charCount = what.length;
   const charLimit = 500;
+
+  const supportsVoice =
+    typeof window !== 'undefined' &&
+    typeof window.MediaRecorder !== 'undefined' &&
+    !!navigator.mediaDevices?.getUserMedia;
+
+  const stopTracks = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  };
+
+  const stopTimer = () => {
+    if (recordTimerRef.current !== null) {
+      window.clearInterval(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+  };
+
+  const startRecording = async () => {
+    setError(null);
+    setVoiceFilledHint(false);
+    if (!supportsVoice) {
+      setError(t('request_help.errors.voice_unsupported'));
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        stopTracks();
+        stopTimer();
+        const blob = new Blob(audioChunksRef.current, {
+          type: recorder.mimeType || 'audio/webm',
+        });
+        void uploadAudio(blob);
+      };
+
+      recorder.start();
+      setVoiceStatus('recording');
+      setRecordSeconds(0);
+      recordTimerRef.current = window.setInterval(() => {
+        setRecordSeconds((prev) => {
+          const next = prev + 1;
+          if (next >= MAX_RECORD_SECONDS) {
+            stopRecording();
+          }
+          return next;
+        });
+      }, 1000);
+    } catch {
+      setError(t('request_help.errors.voice_permission_denied'));
+      setVoiceStatus('idle');
+      stopTracks();
+    }
+  };
+
+  const stopRecording = () => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop();
+    }
+    stopTimer();
+    setVoiceStatus('processing');
+  };
+
+  const uploadAudio = async (blob: Blob) => {
+    try {
+      const formData = new FormData();
+      const ext = blob.type.includes('mp4')
+        ? 'm4a'
+        : blob.type.includes('ogg')
+          ? 'ogg'
+          : 'webm';
+      formData.append('audio', blob, `voice.${ext}`);
+      formData.append('locale', i18n.language || 'en');
+
+      const response = await api.upload<VoiceIntentResponse>(
+        '/v2/caring-community/request-help/voice',
+        formData,
+        'audio'
+      );
+
+      const data = response.data;
+      if (!data || !data.transcript) {
+        setError(t('request_help.errors.voice_failed'));
+        setVoiceStatus('idle');
+        return;
+      }
+
+      // Pre-fill form fields with suggestions; member can edit before submit.
+      if (!what.trim()) setWhat(data.transcript.slice(0, charLimit));
+      if (!when.trim() && data.suggested_when) {
+        const formatted = formatSuggestedWhen(data.suggested_when, i18n.language || 'en');
+        if (formatted) setWhen(formatted);
+      }
+      if (data.suggested_contact_preference) {
+        setContactPref(data.suggested_contact_preference);
+      }
+      setVoiceTranscript(data.transcript);
+      setVoiceFilledHint(true);
+      setVoiceStatus('idle');
+    } catch {
+      setError(t('request_help.errors.voice_failed'));
+      setVoiceStatus('idle');
+    }
+  };
 
   const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -121,6 +286,47 @@ export function RequestHelpPage() {
               <p className="mt-1 text-base leading-7 text-theme-muted">{t('request_help.subtitle')}</p>
             </div>
           </div>
+
+          {supportsVoice && (
+            <div className="mb-6">
+              <Button
+                type="button"
+                color={voiceStatus === 'recording' ? 'danger' : 'secondary'}
+                variant="flat"
+                size="lg"
+                className="w-full text-base"
+                onPress={voiceStatus === 'recording' ? stopRecording : startRecording}
+                isDisabled={voiceStatus === 'processing'}
+                startContent={
+                  voiceStatus === 'processing' ? (
+                    <Loader className="h-5 w-5 animate-spin" />
+                  ) : voiceStatus === 'recording' ? (
+                    <Square className="h-5 w-5" />
+                  ) : (
+                    <Mic className="h-5 w-5" />
+                  )
+                }
+              >
+                {voiceStatus === 'recording'
+                  ? t('request_help.voice.recording', { seconds: recordSeconds })
+                  : voiceStatus === 'processing'
+                    ? t('request_help.voice.processing')
+                    : t('request_help.voice.start')}
+              </Button>
+
+              {voiceFilledHint && (
+                <p className="mt-3 rounded-lg bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
+                  {t('request_help.voice.filled_hint')}
+                </p>
+              )}
+              {voiceTranscript && voiceFilledHint && (
+                <details className="mt-2 text-sm text-theme-muted">
+                  <summary className="cursor-pointer">{t('request_help.voice.transcript_label')}</summary>
+                  <p className="mt-1 italic">{voiceTranscript}</p>
+                </details>
+              )}
+            </div>
+          )}
 
           <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)} noValidate>
             <div>

@@ -932,6 +932,25 @@ Route::post('/v2/marketplace/listings/{id}/auto-reply', [\App\Http\Controllers\A
 // Marketplace DSA Reports — User reporting (MKT6)
 Route::post('/v2/marketplace/listings/{id}/report', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'store']);
 
+// AG63 — Merchant Coupons (member-facing)
+Route::get('/v2/coupons', [\App\Http\Controllers\Api\MerchantCouponController::class, 'index']);
+Route::get('/v2/coupons/{id}', [\App\Http\Controllers\Api\MerchantCouponController::class, 'show']);
+Route::post('/v2/coupons/{id}/qr', [\App\Http\Controllers\Api\MerchantCouponController::class, 'generateQr']);
+Route::post('/v2/coupons/redeem-qr', [\App\Http\Controllers\Api\MerchantCouponController::class, 'redeemQr']);
+Route::post('/v2/coupons/validate', [\App\Http\Controllers\Api\MerchantCouponController::class, 'validateCode']);
+
+// AG63 — Merchant Coupons (seller-side CRUD)
+Route::get('/v2/marketplace/seller/coupons', [\App\Http\Controllers\Api\MerchantCouponSellerController::class, 'index']);
+Route::post('/v2/marketplace/seller/coupons', [\App\Http\Controllers\Api\MerchantCouponSellerController::class, 'store']);
+Route::put('/v2/marketplace/seller/coupons/{id}', [\App\Http\Controllers\Api\MerchantCouponSellerController::class, 'update']);
+Route::delete('/v2/marketplace/seller/coupons/{id}', [\App\Http\Controllers\Api\MerchantCouponSellerController::class, 'destroy']);
+Route::get('/v2/marketplace/seller/coupons/{id}/redemptions', [\App\Http\Controllers\Api\MerchantCouponSellerController::class, 'redemptions']);
+
+// AG63 — Merchant Coupons (admin oversight)
+Route::get('/v2/admin/marketplace/coupons', [\App\Http\Controllers\Api\Admin\MerchantCouponAdminController::class, 'index']);
+Route::post('/v2/admin/marketplace/coupons/{id}/suspend', [\App\Http\Controllers\Api\Admin\MerchantCouponAdminController::class, 'suspend']);
+Route::delete('/v2/admin/marketplace/coupons/{id}', [\App\Http\Controllers\Api\Admin\MerchantCouponAdminController::class, 'destroy']);
+
 // Marketplace Shipping Options — Seller shipping management (MKT31)
 Route::get('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'shippingOptions']);
 Route::post('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'createShippingOption']);
@@ -1176,6 +1195,8 @@ Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\Cari
 
 // Member-facing caring community endpoints (auth:sanctum via global middleware)
 Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp']);
+Route::post('/v2/caring-community/request-help/voice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelpVoice'])
+    ->middleware('throttle:20,1');
 Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour']);
 
 Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);
@@ -2655,3 +2676,24 @@ Route::post('/v2/admin/pilot-inquiries/{id}/notes', [\App\Http\Controllers\Api\P
 
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);
+
+// AG58 — Member Premium Tier paywall framework
+// Public list of tiers (pricing page accessible to logged-out visitors)
+Route::get('/v2/member-premium/tiers', [\App\Http\Controllers\Api\MemberPremiumController::class, 'listTiers'])->withoutMiddleware('auth:sanctum');
+
+// Member-authenticated endpoints
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/member-premium/me', [\App\Http\Controllers\Api\MemberPremiumController::class, 'me']);
+    Route::post('/v2/member-premium/checkout', [\App\Http\Controllers\Api\MemberPremiumController::class, 'checkout']);
+    Route::post('/v2/member-premium/cancel', [\App\Http\Controllers\Api\MemberPremiumController::class, 'cancel']);
+    Route::post('/v2/member-premium/billing-portal', [\App\Http\Controllers\Api\MemberPremiumController::class, 'billingPortal']);
+
+    // Admin: tier CRUD + subscriber view
+    Route::get('/v2/admin/member-premium/tiers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'listTiers']);
+    Route::post('/v2/admin/member-premium/tiers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'createTier']);
+    Route::get('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'showTier'])->whereNumber('id');
+    Route::put('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'updateTier'])->whereNumber('id');
+    Route::delete('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'deleteTier'])->whereNumber('id');
+    Route::post('/v2/admin/member-premium/tiers/{id}/sync-stripe', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'syncStripe'])->whereNumber('id');
+    Route::get('/v2/admin/member-premium/subscribers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'listSubscribers']);
+});

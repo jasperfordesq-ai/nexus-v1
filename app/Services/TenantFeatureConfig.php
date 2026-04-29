@@ -37,7 +37,9 @@ class TenantFeatureConfig
         'search' => true,
         'ai_chat' => true,
         'marketplace' => false,
+        'merchant_coupons' => false,
         'message_translation' => true,
+        'member_premium' => false,
     ];
 
     /**

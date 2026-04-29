@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\MemberPremiumService;
 use App\Services\StripeDonationService;
 use App\Services\MarketplacePaymentService;
 use App\Services\StripeService;
@@ -110,18 +111,35 @@ class StripeWebhookController extends BaseApiController
 
         // Dispatch to the appropriate handler
         try {
-            match ($event->type) {
-                'checkout.session.completed' => $this->handleCheckoutCompleted($event->data->object),
-                'customer.subscription.updated' => $this->handleSubscriptionUpdated($event->data->object),
-                'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->data->object),
-                'invoice.paid' => $this->handleInvoicePaid($event->data->object),
-                'invoice.payment_failed' => $this->handleInvoicePaymentFailed($event->data->object),
-                'payment_intent.succeeded' => $this->handlePaymentSucceeded($event->data->object),
-                'payment_intent.payment_failed' => $this->handlePaymentFailed($event->data->object),
-                'charge.refunded' => $this->handleChargeRefunded($event->data->object),
-                'account.updated' => $this->handleAccountUpdated($event->data->object),
-                default => Log::info("Stripe webhook: unhandled event type {$event->type}"),
-            };
+            // AG58 — Member Premium: route subscription/invoice/checkout events
+            // tagged with nexus_kind=member_premium to the member service first.
+            // (Tenant billing events lack that metadata and continue to the
+            // existing StripeSubscriptionService handlers below.)
+            $isMemberPremium = in_array($event->type, [
+                'checkout.session.completed',
+                'customer.subscription.created',
+                'customer.subscription.updated',
+                'customer.subscription.deleted',
+                'invoice.paid',
+                'invoice.payment_failed',
+            ], true) && MemberPremiumService::eventBelongsHere($event);
+
+            if ($isMemberPremium) {
+                MemberPremiumService::applyWebhookEvent($event);
+            } else {
+                match ($event->type) {
+                    'checkout.session.completed' => $this->handleCheckoutCompleted($event->data->object),
+                    'customer.subscription.updated' => $this->handleSubscriptionUpdated($event->data->object),
+                    'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->data->object),
+                    'invoice.paid' => $this->handleInvoicePaid($event->data->object),
+                    'invoice.payment_failed' => $this->handleInvoicePaymentFailed($event->data->object),
+                    'payment_intent.succeeded' => $this->handlePaymentSucceeded($event->data->object),
+                    'payment_intent.payment_failed' => $this->handlePaymentFailed($event->data->object),
+                    'charge.refunded' => $this->handleChargeRefunded($event->data->object),
+                    'account.updated' => $this->handleAccountUpdated($event->data->object),
+                    default => Log::info("Stripe webhook: unhandled event type {$event->type}"),
+                };
+            }
         } catch (\Exception $e) {
             // Mark as failed so Stripe retries can be re-processed
             DB::table('stripe_webhook_events')

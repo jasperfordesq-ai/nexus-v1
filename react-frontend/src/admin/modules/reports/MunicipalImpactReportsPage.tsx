@@ -43,6 +43,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { PageHeader, StatCard } from '../../components';
+import { VerifiedMunicipalityBadge } from '@/components/badges/VerifiedMunicipalityBadge';
 
 const reportCards = [
   { key: 'verified_hours', icon: Clock, href: '/admin/reports/hours', statKey: 'verified_hours' },
@@ -197,6 +198,28 @@ export default function MunicipalImpactReportsPage() {
   const [deletingTemplateId, setDeletingTemplateId] = useState<number | null>(null);
   const [exporting, setExporting] = useState<'csv' | 'pdf' | null>(null);
   const [audienceMode, setAudienceMode] = useState<AudienceMode>('municipality');
+  const [verification, setVerification] = useState<{
+    verified: boolean;
+    active: { domain: string | null; verified_at: string | null } | null;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get<{ verified: boolean; active: { domain: string | null; verified_at: string | null } | null }>(
+        '/v2/admin/reports/municipal-impact/verification',
+      )
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success && res.data) setVerification(res.data);
+      })
+      .catch(() => {
+        // 503 = service unavailable; treat as not verified
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const loadSummary = useCallback(async () => {
     setLoading(true);
@@ -316,6 +339,14 @@ export default function MunicipalImpactReportsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-8">
+      {verification?.verified && (
+        <div className="mb-3">
+          <VerifiedMunicipalityBadge
+            domain={verification.active?.domain ?? null}
+            verifiedAt={verification.active?.verified_at ?? null}
+          />
+        </div>
+      )}
       <PageHeader
         title={t('municipal_reports.meta.title')}
         description={t('municipal_reports.meta.description')}

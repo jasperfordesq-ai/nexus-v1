@@ -17,10 +17,10 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Button, useDisclosure } from '@heroui/react';
+import { Button, Input, useDisclosure } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { StripeCheckoutModal } from './StripeCheckoutModal';
@@ -64,12 +64,18 @@ export function BuyNowButton({
   className,
 }: BuyNowButtonProps) {
   const { t } = useTranslation('marketplace');
+  const { t: tCommon } = useTranslation('common');
   const { user } = useAuth();
+  const { hasFeature } = useTenant();
   const toast = useToast();
   const checkoutModal = useDisclosure();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+
+  const couponsEnabled = hasFeature('merchant_coupons');
 
   const isOwnListing = user?.id === sellerId;
 
@@ -78,10 +84,12 @@ export function BuyNowButton({
 
     setIsProcessing(true);
     try {
-      // Step 1: Create the order
-      const orderRes = await api.post<CreateOrderResponse>('/v2/marketplace/orders', {
-        listing_id: listingId,
-      });
+      // Step 1: Create the order (include coupon code if applied)
+      const orderPayload: Record<string, unknown> = { listing_id: listingId };
+      if (couponApplied && couponCode.trim()) {
+        orderPayload.coupon_code = couponCode.trim().toUpperCase();
+      }
+      const orderRes = await api.post<CreateOrderResponse>('/v2/marketplace/orders', orderPayload);
 
       if (!orderRes.success || !orderRes.data?.id) {
         toast.error(orderRes.error || t('orders.buy.create_order_failed', 'Failed to create order'));
@@ -124,7 +132,7 @@ export function BuyNowButton({
     } finally {
       setIsProcessing(false);
     }
-  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t])
+  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t, couponApplied, couponCode])
 
   // Format price for button label
   const priceLabel = new Intl.NumberFormat(undefined, {
@@ -134,8 +142,49 @@ export function BuyNowButton({
     maximumFractionDigits: 2,
   }).format(price);
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    try {
+      const res = await api.post<{ discount_cents: number }>('/v2/coupons/validate', {
+        code: couponCode.trim().toUpperCase(),
+        order_total_cents: Math.round(price * 100),
+        listing_id: listingId,
+      });
+      if (res.success) {
+        setCouponApplied(true);
+        toast.success(tCommon('coupon.applied'));
+      } else {
+        toast.error(tCommon('coupon.invalid_code'));
+      }
+    } catch {
+      toast.error(tCommon('coupon.invalid_code'));
+    }
+  };
+
   return (
     <>
+      {couponsEnabled && !isOwnListing && user && (
+        <div className="flex gap-2 mb-2">
+          <Input
+            size="sm"
+            placeholder={tCommon('coupon.enter_code')}
+            value={couponCode}
+            onValueChange={(v) => {
+              setCouponCode(v);
+              if (couponApplied) setCouponApplied(false);
+            }}
+            isDisabled={couponApplied}
+          />
+          <Button
+            size="sm"
+            variant="flat"
+            onPress={handleApplyCoupon}
+            isDisabled={!couponCode.trim() || couponApplied}
+          >
+            {couponApplied ? tCommon('coupon.applied') : tCommon('coupon.apply')}
+          </Button>
+        </div>
+      )}
       <Button
         color="success"
         variant="solid"

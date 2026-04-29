@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Community Projects",
+    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone."
+  },
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "progress_label": "Project progress",
+  "progress_value": "{{value}}% complete",
+  "subscriber_count_one": "{{count}} follower",
+  "subscriber_count_other": "{{count}} followers",
+  "date_unknown": "Date pending",
+  "back_to_projects": "Back to projects",
+  "subscribe": "Follow updates",
+  "unsubscribe": "Following",
+  "updates_title": "Updates and milestones",
+  "milestone": "Milestone",
+  "no_updates": "No updates have been published yet.",
+  "empty": "There are no active community projects right now.",
+  "errors": {
+    "load": "Could not load community projects.",
+    "subscribe": "Could not update your project notifications."
+  }
+}

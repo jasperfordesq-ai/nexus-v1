@@ -33,7 +33,19 @@
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
     "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care"
+    "recent_care": "Recent care",
+    "link_error": "Care receiver could not be linked",
+    "search_label": "Find member",
+    "search_placeholder": "Search by name",
+    "searching": "Searching members...",
+    "no_search_results": "No matching members found",
+    "relationship_label": "Relationship",
+    "start_date_label": "Care started",
+    "notes_label": "Notes",
+    "notes_placeholder": "Optional context for coordinators or trusted substitutes",
+    "cancel": "Cancel",
+    "no_upcoming_care": "No scheduled support yet",
+    "no_recent_care": "No recent care logs yet"
   },
   "providers": {
     "title": "Care Provider Directory",
@@ -50,12 +62,55 @@
     "website": "Website",
     "opening_hours": "Opening Hours",
     "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search"
+    "no_providers_hint": "Try adjusting your filters or search",
+    "filter_aria": "Filter providers by type"
   },
   "emergency_alert": {
     "dismiss": "Dismiss",
     "severity_info": "Information",
     "severity_warning": "Warning",
     "severity_danger": "Emergency"
+  },
+  "cover": {
+    "title": "Cover Care",
+    "subtitle": "Arrange temporary substitute support for someone you care for when you need respite, travel cover, or backup.",
+    "create": "Request cover",
+    "created": "Cover request created",
+    "assigned": "Substitute matched",
+    "empty": "No cover requests yet",
+    "find_candidates": "Find substitutes",
+    "assign": "Match substitute",
+    "matched_with": "Matched with {{name}}",
+    "location_unknown": "Location not set",
+    "skill_matches": "{{count}} matching skills",
+    "trust_tier": "Trust tier {{tier}}",
+    "fields": {
+      "cared_for": "Care receiver",
+      "title": "Cover need",
+      "starts_at": "Starts",
+      "ends_at": "Ends",
+      "skills": "Useful skills",
+      "trust_tier": "Minimum trust tier",
+      "urgency": "Urgency",
+      "briefing": "Handoff briefing"
+    },
+    "urgency": {
+      "planned": "Planned",
+      "soon": "Soon",
+      "urgent": "Urgent"
+    },
+    "status": {
+      "open": "Open",
+      "matched": "Matched",
+      "accepted": "Accepted",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "errors": {
+      "load": "Cover requests could not be loaded",
+      "create": "Cover request could not be created",
+      "candidates": "Substitute candidates could not be loaded",
+      "assign": "Substitute could not be matched"
+    }
   }
 }

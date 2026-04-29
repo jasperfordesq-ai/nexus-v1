@@ -89,11 +89,35 @@ class MarketplaceOrderService
         $quantity = max(1, (int) ($data['quantity'] ?? 1));
         $unitPrice = (float) $listing->price;
         $shippingCost = isset($data['shipping_cost']) ? (float) $data['shipping_cost'] : null;
-        $totalPrice = ($unitPrice * $quantity) + ($shippingCost ?? 0);
+        $subtotal = ($unitPrice * $quantity) + ($shippingCost ?? 0);
+
+        // AG63 — apply merchant coupon if supplied (validation only; redemption inside txn).
+        $couponCode = isset($data['coupon_code']) ? trim((string) $data['coupon_code']) : '';
+        $couponDiscount = 0.0;
+        $coupon = null;
+        if ($couponCode !== '') {
+            try {
+                $coupon = \App\Services\MerchantCouponService::validateCoupon(
+                    $couponCode,
+                    $buyerId,
+                    (int) round($subtotal * 100),
+                    (int) $listing->id,
+                    isset($listing->category_id) ? (int) $listing->category_id : null
+                );
+                $discountCents = \App\Services\MerchantCouponService::calculateDiscountCents(
+                    $coupon,
+                    (int) round($subtotal * 100)
+                );
+                $couponDiscount = $discountCents / 100.0;
+            } catch (\InvalidArgumentException $e) {
+                throw $e;
+            }
+        }
+        $totalPrice = max(0.0, $subtotal - $couponDiscount);
 
         $order = DB::transaction(function () use (
             $buyerId, $listing, $tenantId, $quantity,
-            $unitPrice, $totalPrice, $shippingCost, $data
+            $unitPrice, $totalPrice, $shippingCost, $data, $coupon
         ) {
             // Lock listing row to prevent race condition on simultaneous purchases
             $lockedListing = MarketplaceListing::where('id', $listing->id)
@@ -125,6 +149,16 @@ class MarketplaceOrderService
 
             // Mark listing as sold (or reduce quantity in future)
             $lockedListing->update(['status' => 'sold']);
+
+            // AG63 — atomically redeem coupon (locks coupon row, increments usage_count).
+            if ($coupon) {
+                \App\Services\MerchantCouponService::redeemForOrder(
+                    (int) $coupon->id,
+                    (int) $order->id,
+                    (int) $buyerId,
+                    'online'
+                );
+            }
 
             return $order;
         });

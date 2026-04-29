@@ -28,6 +28,7 @@ import Newspaper from 'lucide-react/icons/newspaper';
 import Trophy from 'lucide-react/icons/trophy';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Sparkles from 'lucide-react/icons/sparkles';
+import Bell from 'lucide-react/icons/bell';
 import Coins from 'lucide-react/icons/coins';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Building2 from 'lucide-react/icons/building-2';
@@ -260,6 +261,9 @@ function useAdminNav(): NavSection[] {
         { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
         { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
         { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
+        { label: 'Regional Points', href: '/admin/regional-points', icon: Coins },
+        { label: 'Municipal Verification', href: '/admin/caring-community/verification', icon: ShieldCheck },
+        { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
@@ -338,6 +342,10 @@ function useAdminNav(): NavSection[] {
       ] : []),
       { label: "Plans & Pricing", href: '/admin/plans', icon: CreditCard },
       { label: "Billing", href: '/admin/billing', icon: CreditCard },
+      ...(hasFeature('member_premium') ? [
+        { label: "Member Premium", href: '/admin/member-premium', icon: Crown },
+        { label: "Premium Subscribers", href: '/admin/member-premium/subscribers', icon: Users },
+      ] : []),
     ];
 
     // ── Advanced items — AI settings gated ───────────────────────────────

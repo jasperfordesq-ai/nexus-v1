@@ -14,9 +14,11 @@ use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\AhvPensionExportService;
+use App\Services\CaringHelpRequestNlpService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
 use App\Services\FutureCareFundService;
+use App\Services\TranscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -544,6 +546,77 @@ class CaringCommunityApiController extends BaseApiController
             'success' => true,
             'message' => 'caring_community.requests.submitted',
         ], null, 201);
+    }
+
+    /**
+     * POST /api/v2/caring-community/request-help/voice
+     *
+     * Audio-first help-request flow (AG36/AG37):
+     *   1. Member uploads a short voice clip (multipart `audio` field).
+     *   2. Server transcribes via Whisper.
+     *   3. Server extracts intent (category / when / contact preference) via gpt-4o-mini.
+     *   4. Returns suggestions for the React form to pre-fill before normal submit.
+     *
+     * Body (multipart): audio (required), locale (optional, ISO 639-1).
+     */
+    public function requestHelpVoice(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $file = request()->file('audio');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'audio', 422);
+        }
+
+        // Cap at ~10 MB (≈ 60s of typical browser-recorded audio)
+        if ((int) $file->getSize() > 10 * 1024 * 1024) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_too_long'), 'audio', 422);
+        }
+
+        $allowedMimePrefix = 'audio/';
+        $mime = (string) $file->getMimeType();
+        if (!str_starts_with($mime, $allowedMimePrefix) && $mime !== 'video/webm') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_file_type') ?? 'Invalid file type', 'audio', 422);
+        }
+
+        $locale = (string) (request()->input('locale') ?? app()->getLocale() ?? 'en');
+        $locale = preg_replace('/[^a-zA-Z\-]/', '', $locale) ?: 'en';
+
+        $tmpPath = $file->getRealPath();
+        if (!is_string($tmpPath) || $tmpPath === '') {
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        try {
+            $transcript = TranscriptionService::transcribe($tmpPath);
+        } catch (\Throwable $e) {
+            Log::error('[CaringCommunity] requestHelpVoice transcribe failed', [
+                'tenant_id' => TenantContext::getId(),
+                'user_id'   => $userId,
+                'error'     => $e->getMessage(),
+            ]);
+            return $this->respondWithError('TRANSCRIPTION_FAILED', __('api.server_error'), null, 502);
+        }
+
+        if ($transcript === null || empty(trim((string) ($transcript['text'] ?? '')))) {
+            return $this->respondWithError('TRANSCRIPTION_FAILED', __('api.server_error'), null, 502);
+        }
+
+        $detectedLocale = (string) ($transcript['language'] ?? $locale);
+        $extracted = CaringHelpRequestNlpService::extract($transcript['text'], $detectedLocale);
+
+        return $this->respondWithData([
+            'transcript'                  => $transcript['text'],
+            'detected_language'           => $detectedLocale,
+            'suggested_category'          => $extracted['category'],
+            'suggested_when'              => $extracted['when'],
+            'suggested_contact_preference' => $extracted['contact_preference'],
+            'raw_text'                    => $extracted['raw_text'],
+        ]);
     }
 
     /**

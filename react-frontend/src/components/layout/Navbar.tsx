@@ -65,6 +65,7 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Bookmark from 'lucide-react/icons/bookmark';
+import Crown from 'lucide-react/icons/crown';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -270,6 +271,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.marketplace', 'Marketplace'), desc: t('nav_desc.marketplace', 'Buy & sell in your community'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
+    { label: t('nav.premium', 'Premium'), desc: t('nav_desc.premium', 'Premium membership tiers'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
   ], [t, tenantPath]);
   const visibleCommunityItems = useMemo(
     () => getVisibleCommunityItems(communityItems, hasFeature),

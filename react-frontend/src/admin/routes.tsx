@@ -158,6 +158,9 @@ const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBa
 const EmergencyAlertAdminPage = lazy(() => import('./modules/caring-community/EmergencyAlertAdminPage'));
 const MunicipalSurveyAdminPage = lazy(() => import('./modules/caring-community/MunicipalSurveyAdminPage'));
 const ProjectAnnouncementsAdminPage = lazy(() => import('./modules/caring-community/ProjectAnnouncementsAdminPage'));
+const RegionalPointsAdminPage = lazy(() => import('./modules/caring-community/RegionalPointsAdminPage'));
+const MunicipalVerificationAdminPage = lazy(() => import('./modules/caring-community/MunicipalVerificationAdminPage'));
+const SmartNudgesAdminPage = lazy(() => import('./modules/caring-community/SmartNudgesAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -200,6 +203,7 @@ const TranslationConfig = lazy(() => import('./modules/config/TranslationConfig'
 const MarketplaceAdmin = lazy(() => import('./modules/marketplace/MarketplaceAdmin'));
 const MarketplaceModerationPage = lazy(() => import('./modules/marketplace/MarketplaceModerationPage'));
 const MarketplaceSellerAdmin = lazy(() => import('./modules/marketplace/MarketplaceSellerAdmin'));
+const AdminCouponsPage = lazy(() => import('./modules/marketplace/AdminCouponsPage'));
 
 // Ideation / Challenges module
 const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
@@ -311,6 +315,10 @@ const FederationWhitelist = lazy(() => import('./modules/super/FederationWhiteli
 const SuperPartnerships = lazy(() => import('./modules/super/SuperPartnerships'));
 const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
 const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
+
+// AG58 — Member Premium admin
+const MemberPremiumAdminPage = lazy(() => import('./modules/premium/MemberPremiumAdminPage'));
+const MemberPremiumSubscribersPage = lazy(() => import('./modules/premium/MemberPremiumSubscribersPage'));
 
 // Billing module
 const BillingPage = lazy(() => import('./modules/billing/BillingPage'));
@@ -436,6 +444,16 @@ export function AdminRoutes() {
       <Route path="match-debug" element={<Lazy><MatchDebugPanel /></Lazy>} />
 
       {/* ─── BILLING ─── */}
+      <Route path="member-premium" element={
+        <FeatureGatedElement feature="member_premium">
+          <Lazy><MemberPremiumAdminPage /></Lazy>
+        </FeatureGatedElement>
+      } />
+      <Route path="member-premium/subscribers" element={
+        <FeatureGatedElement feature="member_premium">
+          <Lazy><MemberPremiumSubscribersPage /></Lazy>
+        </FeatureGatedElement>
+      } />
       <Route path="billing" element={<Lazy><BillingPage /></Lazy>} />
       <Route path="billing/plans" element={<Lazy><PlanSelector /></Lazy>} />
       <Route path="billing/invoices" element={<Lazy><InvoiceHistory /></Lazy>} />
@@ -664,6 +682,36 @@ export function AdminRoutes() {
         }
       />
 
+      {/* AG28 — Regional points (third currency) */}
+      <Route
+        path="regional-points"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><RegionalPointsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG29 — Municipal verification */}
+      <Route
+        path="caring-community/verification"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><MunicipalVerificationAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG31 — Smart member nudges */}
+      <Route
+        path="caring-community/nudges"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><SmartNudgesAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
       {/* AG56 — Local advertising campaigns */}
       <Route path="advertising/campaigns" element={<Lazy><AdCampaignAdminPage /></Lazy>} />
 
@@ -705,6 +753,7 @@ export function AdminRoutes() {
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />
       <Route path="marketplace/moderation" element={<Lazy><MarketplaceModerationPage /></Lazy>} />
       <Route path="marketplace/sellers" element={<Lazy><MarketplaceSellerAdmin /></Lazy>} />
+      <Route path="marketplace/coupons" element={<Lazy><AdminCouponsPage /></Lazy>} />
 
       {/* ─── IDEATION / CHALLENGES ─── */}
       <Route path="ideation" element={<Lazy><IdeationAdmin /></Lazy>} />

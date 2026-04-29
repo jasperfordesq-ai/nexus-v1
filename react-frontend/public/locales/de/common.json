@@ -626,10 +626,21 @@
       "back": "Zurück zur Caring Community"
     },
     "errors": {
-      "submit_failed": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es erneut."
+      "submit_failed": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.",
+      "voice_unsupported": "Voice recording is not supported in this browser.",
+      "voice_permission_denied": "Microphone permission was denied.",
+      "voice_failed": "We could not understand your recording. Please try again or fill in the form."
     },
     "back": "Zurück zur Caring Community",
-    "subtitle": "Deine Nachbarinnen und Nachbarn sind für dich da. Sag uns, was du brauchst – wir geben unser Bestes."
+    "subtitle": "Deine Nachbarinnen und Nachbarn sind für dich da. Sag uns, was du brauchst – wir geben unser Bestes.",
+    "voice": {
+      "start": "Tap to speak your request",
+      "stop": "Stop recording",
+      "recording": "Recording... {{seconds}}s",
+      "processing": "Listening...",
+      "filled_hint": "We've filled in the form from your recording. Please review before sending.",
+      "transcript_label": "What we heard"
+    }
   },
   "invite": {
     "valid": {
@@ -1213,5 +1224,141 @@
     "feature_disabled": "Push campaigns are not available for your account."
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
-  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
+  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
+  "coupon": {
+    "page_title": "Discount Coupons",
+    "page_subtitle": "Browse merchant discounts available in your community",
+    "code": "Code",
+    "title": "Title",
+    "description": "Description",
+    "discount": "Discount",
+    "valid_until": "Valid until",
+    "min_order": "Minimum order",
+    "use_online": "Use online",
+    "redeem_in_store": "Redeem in store",
+    "show_qr": "Show QR code",
+    "qr_expires_in": "QR expires in",
+    "code_copied": "Coupon code copied",
+    "copy_code": "Copy code",
+    "no_coupons": "No active coupons available",
+    "no_coupons_subtitle": "Check back soon for new offers from local merchants.",
+    "type_percent": "% off",
+    "type_fixed": "off",
+    "type_bogo": "Buy one get one",
+    "details": "Coupon details",
+    "back_to_coupons": "Back to coupons",
+    "scan_at_checkout": "Show this QR to staff at checkout",
+    "redeemed_success": "Coupon redeemed successfully",
+    "apply": "Apply",
+    "applied": "Coupon applied",
+    "remove": "Remove",
+    "invalid_code": "Invalid coupon code",
+    "discount_applied": "Discount applied",
+    "enter_code": "Enter coupon code",
+    "seller": {
+      "page_title": "My Coupons",
+      "create_button": "Create coupon",
+      "edit_title": "Edit coupon",
+      "create_title": "Create coupon",
+      "code_help": "Leave blank to auto-generate",
+      "discount_type": "Discount type",
+      "discount_value": "Discount value",
+      "discount_value_help_percent": "Percentage off (0-100)",
+      "discount_value_help_fixed": "Fixed amount in cents",
+      "max_uses": "Maximum total uses",
+      "max_uses_per_member": "Maximum uses per member",
+      "valid_from": "Valid from",
+      "valid_until": "Valid until",
+      "status": "Status",
+      "applies_to": "Applies to",
+      "all_listings": "All my listings",
+      "specific_listings": "Specific listings",
+      "specific_categories": "Specific categories",
+      "save": "Save",
+      "delete_confirm": "Delete this coupon? This cannot be undone.",
+      "no_coupons": "You have not created any coupons yet.",
+      "redemptions": "Redemptions",
+      "view_redemptions": "View redemptions",
+      "usage_count": "Used {{count}} times",
+      "saved": "Coupon saved",
+      "deleted": "Coupon deleted"
+    }
+  },
+  "regional_points": {
+    "title": "Regional Points",
+    "subtitle": "A regional currency you can earn and spend with neighbours and local merchants.",
+    "balance": "Balance",
+    "lifetime_earned": "Lifetime earned",
+    "lifetime_spent": "Lifetime spent",
+    "unavailable": {
+      "title": "Regional points are not enabled here",
+      "description": "This community has not turned on the regional points programme yet."
+    },
+    "transfer": {
+      "title": "Send points to another member",
+      "recipient_id": "Recipient member ID",
+      "amount": "Amount",
+      "message": "Message (optional)",
+      "submit": "Send transfer",
+      "success": "Transfer sent",
+      "errors": {
+        "invalid_recipient": "Enter a valid recipient member ID",
+        "invalid_amount": "Enter a positive amount"
+      }
+    },
+    "history": {
+      "title": "Recent activity",
+      "empty": "No transactions yet.",
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Amount",
+      "balance_after": "Balance"
+    },
+    "errors": {
+      "load_failed": "Failed to load regional points",
+      "transfer_failed": "Transfer failed"
+    }
+  },
+  "verein_import": {
+    "title": "Import club members",
+    "subtitle": "Bulk-add members from a CSV. Preview before confirming — no users are created until you click Import.",
+    "step1": "1. Upload CSV",
+    "step2": "2. Review and confirm",
+    "csv_format": "Required header row: email,first_name,last_name,phone,role",
+    "file_label": "CSV file",
+    "csv_label": "Or paste CSV",
+    "preview": "Preview",
+    "confirm": "Import members",
+    "success": "Import complete: {{created}} created, {{linked}} linked",
+    "summary": {
+      "total": "Total",
+      "create": "Create",
+      "link": "Link",
+      "duplicates": "Duplicates",
+      "invalid": "Invalid"
+    },
+    "row": {
+      "row": "Row",
+      "action": "Action",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "errors": "Errors"
+    },
+    "result": {
+      "title": "Import complete",
+      "summary": "Created {{created}} new members, linked {{linked}} existing, skipped {{skipped}}",
+      "passwords_title": "Temporary passwords (share securely):",
+      "passwords_warning": "These will not be shown again. Share securely; members will be prompted to change on first login."
+    },
+    "errors": {
+      "read_failed": "Could not read file",
+      "empty_csv": "Paste or upload a CSV first",
+      "preview_failed": "Preview failed",
+      "import_failed": "Import failed",
+      "has_invalid": "Fix invalid rows before importing",
+      "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    }
+  }
 }

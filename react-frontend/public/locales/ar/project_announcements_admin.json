@@ -1,0 +1,62 @@
+{
+  "title": "Community Projects",
+  "subtitle": "Track staged municipality and cooperative announcements.",
+  "create_project": "Create project",
+  "empty": "No projects match this view.",
+  "date_unknown": "Not set",
+  "progress_value": "{{value}}%",
+  "filters": {
+    "status": "Status",
+    "all": "All statuses"
+  },
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "table": {
+    "aria": "Community projects",
+    "project": "Project",
+    "status": "Status",
+    "progress": "Progress",
+    "subscribers": "Followers",
+    "updated": "Updated",
+    "actions": "Actions"
+  },
+  "actions": {
+    "publish": "Publish",
+    "add_update": "Add update",
+    "pause": "Pause",
+    "complete": "Complete",
+    "cancel": "Cancel"
+  },
+  "fields": {
+    "title": "Title",
+    "summary": "Summary",
+    "location": "Location",
+    "stage": "Stage",
+    "progress": "Progress percent",
+    "publish_now": "Publish now",
+    "update_title": "Update title",
+    "update_body": "Update body",
+    "milestone": "Milestone",
+    "publish_update_now": "Publish update now"
+  },
+  "create_modal": {
+    "title": "Create community project",
+    "submit": "Create"
+  },
+  "update_modal": {
+    "title": "Add project update",
+    "submit": "Save update"
+  },
+  "errors": {
+    "load": "Could not load community projects.",
+    "create": "Could not create the project.",
+    "update": "Could not save the update.",
+    "publish": "Could not publish the project.",
+    "status": "Could not change project status."
+  }
+}

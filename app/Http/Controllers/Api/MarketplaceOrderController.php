@@ -46,6 +46,7 @@ class MarketplaceOrderController extends BaseApiController
             'shipping_method' => 'nullable|string|max:100',
             'delivery_address' => 'nullable|array',
             'delivery_notes' => 'nullable|string|max:500',
+            'coupon_code' => 'nullable|string|max:64',
         ]);
 
         try {
