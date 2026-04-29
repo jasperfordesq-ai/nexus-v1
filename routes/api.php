@@ -1206,6 +1206,8 @@ Route::post('/v2/admin/caring-community/vereine/{organizationId}/admins', [\App\
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
 Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
+Route::get('/v2/caring-community/my-ahv-pension-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myAhvPensionExport'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
 Route::post('/v2/caring-community/vereine/{organizationId}/members/import/preview', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'previewVereinMemberImport'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

@@ -13,6 +13,7 @@ use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\SafeguardingService;
+use App\Services\AhvPensionExportService;
 use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
 use App\Services\FutureCareFundService;
@@ -35,6 +36,7 @@ class CaringCommunityApiController extends BaseApiController
         private readonly CaringInviteCodeService $inviteCodeService,
         private readonly CaringLoyaltyService $loyaltyService,
         private readonly FutureCareFundService $futureCareFundService,
+        private readonly AhvPensionExportService $ahvPensionExportService,
         private readonly CaringHourTransferService $hourTransferService,
         private readonly SafeguardingService $safeguardingService,
         private readonly CaringHourGiftService $hourGiftService,
@@ -440,6 +442,25 @@ class CaringCommunityApiController extends BaseApiController
 
         return $this->respondWithData(
             $this->futureCareFundService->summary($tenantId, $userId)
+        );
+    }
+
+    public function myAhvPensionExport(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return $this->respondWithData(
+            $this->ahvPensionExportService->build(
+                $tenantId,
+                $userId,
+                $this->query('from'),
+                $this->query('to')
+            )
         );
     }
 
