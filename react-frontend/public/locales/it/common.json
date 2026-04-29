@@ -52,7 +52,8 @@
     "saved": "Saved",
     "marketplace": "Marketplace",
     "verify_identity": "Verify Your Identity",
-    "caring_community": "Caring Community"
+    "caring_community": "Caring Community",
+    "premium": "Premium"
   },
   "nav_desc": {
     "feed": "Feed della comunità",
@@ -99,7 +100,8 @@
     "timebanking_listings": "Offerte e richieste",
     "messages": "I tuoi messaggi",
     "marketplace": "Compra e vendi nella tua comunità",
-    "caring_community": "Time banking, care support, organisations, and impact"
+    "caring_community": "Time banking, care support, organisations, and impact",
+    "premium": "Premium membership tiers"
   },
   "user_menu": {
     "my_profile": "Il Mio Profilo",
@@ -1359,6 +1361,71 @@
       "import_failed": "Import failed",
       "has_invalid": "Fix invalid rows before importing",
       "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    }
+  },
+  "premium": {
+    "pricing_title": "Premium",
+    "pricing_subtitle": "Unlock premium features to get more out of your community.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "toggle_billing": "Toggle billing interval",
+    "free": "Free",
+    "per_month": "per month",
+    "per_year": "per year",
+    "subscribe_cta": "Subscribe",
+    "no_tiers": "No premium tiers are available yet.",
+    "no_features_listed": "No features listed yet",
+    "cancel_anytime": "Cancel anytime",
+    "checkout_no_url": "Checkout could not be started",
+    "checkout_failed": "Checkout failed",
+    "unavailable_title": "Premium tiers are not available in this community yet",
+    "return_title": "Activating Subscription",
+    "return_pending": "Activating your subscription…",
+    "return_pending_body": "This usually takes a few seconds.",
+    "return_success_title": "You are all set!",
+    "return_success_body": "Your subscription is now active.",
+    "return_success_with_tier": "You are now subscribed to {{tier}}.",
+    "return_cancelled_title": "Checkout cancelled",
+    "return_cancelled_body": "You can try again whenever you are ready.",
+    "back_to_pricing": "Back to pricing",
+    "return_timeout_title": "Still processing…",
+    "return_timeout_body": "Your payment is going through. It may take a moment for your subscription to appear.",
+    "check_status": "Check status",
+    "manage_cta": "Manage subscription",
+    "go_to_dashboard": "Go to dashboard",
+    "manage_title": "My Subscription",
+    "billed_yearly": "Billed yearly",
+    "billed_monthly": "Billed monthly",
+    "status_label": "Status",
+    "ends_on": "Ends on",
+    "next_billing": "Next billing",
+    "manage_in_stripe": "Manage in Stripe",
+    "cancel_subscription": "Cancel Subscription",
+    "cancel_confirm": "Cancel subscription at the end of the current billing period?",
+    "cancel_scheduled": "Subscription will end at the period end",
+    "cancel_failed": "Cancel failed",
+    "change_plan": "Change plan",
+    "no_subscription_title": "No active subscription",
+    "no_subscription_body": "Browse premium tiers to find one that fits your needs.",
+    "view_pricing_cta": "View Pricing",
+    "portal_failed": "Could not open billing portal",
+    "grace_period_notice": "Payment failed — please update your card before {{date}} to keep premium active.",
+    "gate_title": "Premium feature",
+    "gate_body": "Subscribe to a premium tier to unlock this feature.",
+    "gate_cta": "View Premium Tiers",
+    "status": {
+      "active": "Active",
+      "trialing": "Trial",
+      "past_due": "Past Due",
+      "grace": "Grace Period",
+      "canceled": "Cancelled",
+      "incomplete": "Incomplete"
+    },
+    "feature": {
+      "verified_badge": "Verified badge",
+      "priority_matching": "Priority matching",
+      "advanced_search": "Advanced search",
+      "ad_free": "Ad-free experience"
     }
   }
 }
