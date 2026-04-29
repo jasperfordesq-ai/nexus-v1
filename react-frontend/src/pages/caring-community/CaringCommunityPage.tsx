@@ -130,7 +130,7 @@ export function CaringCommunityPage() {
                   {t('caring_community.subtitle')}
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {visibleActions.map((item) => {
                   const Icon = item.icon;
                   return (
@@ -138,16 +138,16 @@ export function CaringCommunityPage() {
                       key={item.key}
                       as={Link}
                       to={tenantPath(item.href)}
-                      className="h-full min-h-24 w-full flex-col items-start justify-start gap-1 bg-theme-elevated px-4 py-4 text-theme-primary"
+                      className="h-auto min-h-28 w-full min-w-0 flex-col items-start justify-start gap-2 whitespace-normal bg-theme-elevated px-4 py-4 text-theme-primary"
                       variant="flat"
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex w-full min-w-0 items-start gap-2">
                         <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                        <span className="text-left text-sm font-semibold">
+                        <span className="min-w-0 text-left text-sm font-semibold leading-5 break-words">
                           {t(`caring_community.actions.${item.key}`)}
                         </span>
                       </span>
-                      <span className="text-left text-xs font-normal leading-5 text-theme-muted">
+                      <span className="block w-full min-w-0 text-left text-xs font-normal leading-5 break-words text-theme-muted">
                         {t(`caring_community.actions.${item.key}_sub`)}
                       </span>
                     </Button>
@@ -210,10 +210,10 @@ export function CaringCommunityPage() {
                         <Icon className="h-5 w-5 text-teal-600 dark:text-teal-400" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-theme-primary">
+                        <h3 className="break-words font-semibold text-theme-primary">
                           {t(`caring_community.modules.${item.key}.title`)}
                         </h3>
-                        <p className="mt-1 text-sm leading-6 text-theme-muted">
+                        <p className="mt-1 text-sm leading-6 break-words text-theme-muted">
                           {t(`caring_community.modules.${item.key}.description`)}
                         </p>
                         <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[var(--color-primary)]">

@@ -553,7 +553,10 @@
         "title": "Vertrauen und Verifizierung",
         "description": "Identitätsprüfung, Bewertungen und Compliance-Signale für sensible Sorge-Prozesse nutzen."
       },
-      "clubs": "Vereine",
+      "clubs": {
+        "title": "Vereine",
+        "description": "Vereine, Clubs und Mitgliedergruppen mit dem Sorge-Netzwerk verbinden."
+      },
       "markt": "Marktplatz",
       "projects": {
         "title": "Community projects",

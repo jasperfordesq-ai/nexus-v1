@@ -415,7 +415,10 @@
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       },
-      "clubs": "Clubs & Associations",
+      "clubs": {
+        "title": "Clubs & Associations",
+        "description": "Connect Verein-style associations, clubs, and member groups with the care network."
+      },
       "markt": "Marktplatz",
       "projects": {
         "title": "Community projects",
