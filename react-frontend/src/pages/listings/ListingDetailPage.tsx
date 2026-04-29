@@ -41,6 +41,7 @@ import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
 import { ListingAnalyticsPanel } from '@/components/listings/ListingAnalyticsPanel';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
+import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
@@ -69,6 +70,7 @@ export function ListingDetailPage() {
   const [isRenewing, setIsRenewing] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [translatedDesc, setTranslatedDesc] = useState<string | null>(null);
   const [isReported, setIsReported] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -514,8 +516,18 @@ export function ListingDetailPage() {
               return (
                 <>
                   <div className={isLongDesc && !showFullDesc ? 'line-clamp-6 overflow-hidden' : ''}>
-                    <SafeHtml content={listing.description} className="text-theme-muted whitespace-pre-wrap wrap-break-word" as="div" />
+                    <SafeHtml content={translatedDesc ?? listing.description} className="text-theme-muted whitespace-pre-wrap wrap-break-word" as="div" />
                   </div>
+                  {listing.description && (
+                    <TranslateButton
+                      contentType="listing"
+                      contentId={listing.id}
+                      sourceText={listing.description}
+                      sourceLocale={(listing as { locale?: string | null }).locale ?? null}
+                      onTextChange={(text, isTranslated) => setTranslatedDesc(isTranslated ? text : null)}
+                      className="mt-1"
+                    />
+                  )}
                   {isLongDesc && (
                     <Button
                       variant="light"

@@ -1,0 +1,83 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api;
+
+use App\Services\UgcTranslationService;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * AG38 — POST /api/v2/ugc-translate
+ *
+ * Translates a piece of UGC text on demand and caches the result so
+ * repeat requests for the same (text, source, target) tuple are free.
+ */
+class UgcTranslationController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly UgcTranslationService $ugcTranslationService,
+    ) {}
+
+    /**
+     * POST /api/v2/ugc-translate
+     *
+     * Body: {
+     *   content_type: string,
+     *   content_id: int|string,
+     *   source_text: string,
+     *   source_locale?: string,
+     *   target_locale: string
+     * }
+     */
+    public function translate(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('ugc_translate', 30, 60);
+
+        $data = $this->getAllInput();
+
+        $contentType = (string) ($data['content_type'] ?? '');
+        $contentId = $data['content_id'] ?? null;
+        $sourceText = (string) ($data['source_text'] ?? '');
+        $sourceLocale = isset($data['source_locale']) && is_string($data['source_locale'])
+            ? $data['source_locale']
+            : null;
+        $targetLocale = (string) ($data['target_locale'] ?? '');
+
+        if ($contentType === '' || $contentId === null || $sourceText === '' || $targetLocale === '') {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.missing_required_field', ['field' => 'content_type|content_id|source_text|target_locale']),
+                null,
+                422,
+            );
+        }
+
+        // Hard cap — protect against abuse / OpenAI cost runaway.
+        if (strlen($sourceText) > 8000) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.text_too_long'),
+                'source_text',
+                422,
+            );
+        }
+
+        $result = $this->ugcTranslationService->translate(
+            $contentType,
+            is_int($contentId) ? $contentId : (string) $contentId,
+            $sourceText,
+            $sourceLocale,
+            $targetLocale,
+        );
+
+        return $this->respondWithData($result);
+    }
+}

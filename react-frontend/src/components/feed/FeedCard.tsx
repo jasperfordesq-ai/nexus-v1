@@ -70,6 +70,7 @@ import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { WhyShown } from './WhyShown';
 import { FeedContentRenderer } from './FeedContentRenderer';
+import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
 import { VideoPlayer } from './VideoPlayer';
@@ -544,6 +545,12 @@ const FeedCard = React.memo(function FeedCard({
   const [pollData, setPollData] = useState<PollData | null>(item.poll_data ?? null);
   const [isLoadingPoll, setIsLoadingPoll] = useState(false);
   const [pollLoadError, setPollLoadError] = useState(false);
+
+  // AG38 — swap original text with translated text in place
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const itemLocale = (item as { locale?: string | null; content_locale?: string | null }).locale
+    ?? (item as { content_locale?: string | null }).content_locale
+    ?? null;
 
   // Double-tap to like
   const [showHeartOverlay, setShowHeartOverlay] = useState(false);
@@ -1142,10 +1149,23 @@ const FeedCard = React.memo(function FeedCard({
             )
           )}
           <FeedContentRenderer
-            content={item.content}
+            content={translatedContent ?? item.content}
             truncated={item.content_truncated}
             detailPath={detailPath ? tenantPath(detailPath) : undefined}
           />
+          {item.content && (
+            <div className="mt-1">
+              <TranslateButton
+                contentType={`feed_${item.type ?? 'post'}`}
+                contentId={item.id}
+                sourceText={item.content}
+                sourceLocale={itemLocale}
+                onTextChange={(_text, isTranslated) => {
+                  setTranslatedContent(isTranslated ? _text : null);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Link Previews */}

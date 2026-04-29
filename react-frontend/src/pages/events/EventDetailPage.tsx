@@ -58,6 +58,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
+import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -104,6 +105,7 @@ export function EventDetailPage() {
   const toast = useToast();
 
   const [event, setEvent] = useState<Event | null>(null);
+  const [translatedEventDesc, setTranslatedEventDesc] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<AttendeeWithCheckIn[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpOption | null>(null);
@@ -879,8 +881,18 @@ export function EventDetailPage() {
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.about')}</h2>
                 <div className="prose prose-invert max-w-none">
-                  <SafeHtml content={event.description} className="text-theme-muted whitespace-pre-wrap" as="div" />
+                  <SafeHtml content={translatedEventDesc ?? event.description} className="text-theme-muted whitespace-pre-wrap" as="div" />
                 </div>
+                {event.description && (
+                  <TranslateButton
+                    contentType="event"
+                    contentId={event.id}
+                    sourceText={event.description}
+                    sourceLocale={(event as { locale?: string | null }).locale ?? null}
+                    onTextChange={(text, isTranslated) => setTranslatedEventDesc(isTranslated ? text : null)}
+                    className="mt-1"
+                  />
+                )}
               </div>
 
               {/* Organizer */}

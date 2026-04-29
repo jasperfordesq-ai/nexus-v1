@@ -287,6 +287,9 @@ export function FeedPage() {
       const params = new URLSearchParams();
       params.set('per_page', '20');
       params.set('mode', feedMode === 'ranking' ? 'ranked' : 'chronological');
+      // AG35 — explicit personalised flag mirrors the toggle so the backend
+      // PersonalisedFeedService re-ranker is bypassed in "Recent" mode.
+      params.set('personalised', feedMode === 'ranking' ? 'true' : 'false');
       params.set('tz', Intl.DateTimeFormat().resolvedOptions().timeZone);
       if (filter !== 'all') params.set('type', filter);
       if (subFilter) params.set('subtype', subFilter);

@@ -37,6 +37,7 @@ import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
+import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { TransferModal } from '@/components/wallet';
 import { ProfileFeed } from '@/components/profile/ProfileFeed';
 import { VerificationBadgeRow, VerificationBadgeSummary } from '@/components/verification/VerificationBadge';
@@ -158,6 +159,7 @@ export function ProfilePage() {
   const [isLoadingEndorsements, setIsLoadingEndorsements] = useState(true);
   const [showAllSkills, setShowAllSkills] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [translatedBio, setTranslatedBio] = useState<string | null>(null);
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -907,7 +909,7 @@ export function ProfilePage() {
               {profile.bio ? (
                 <div>
                   <SafeHtml
-                    content={profile.bio}
+                    content={translatedBio ?? profile.bio}
                     as="div"
                     className={`text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert${!isOwnProfile && !bioExpanded && profile.bio.length > 300 ? ' line-clamp-4' : ''}`}
                   />
@@ -920,6 +922,14 @@ export function ProfilePage() {
                       {bioExpanded ? t('read_less') : t('read_more')}
                     </button>
                   )}
+                  <TranslateButton
+                    contentType="profile_bio"
+                    contentId={profile.id ?? 0}
+                    sourceText={profile.bio}
+                    sourceLocale={(profile as { preferred_language?: string | null }).preferred_language ?? null}
+                    onTextChange={(text, isTranslated) => setTranslatedBio(isTranslated ? text : null)}
+                    className="mt-1"
+                  />
                 </div>
               ) : (
                 <p className="text-theme-subtle italic">{t('about.no_bio')}</p>

@@ -186,6 +186,8 @@ export function ListingsPage() {
       if (sortMode === 'newest') {
         params.set('sort', 'newest');
       }
+      // AG35 — explicit personalised flag mirrors the sort toggle.
+      params.set('personalised', sortMode === 'recommended' ? 'true' : 'false');
 
       if (proximityParams) {
         params.set('near_lat', String(proximityParams.near_lat));

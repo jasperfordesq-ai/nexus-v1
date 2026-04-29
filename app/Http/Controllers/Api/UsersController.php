@@ -207,13 +207,14 @@ class UsersController extends BaseApiController
         $userId = $this->requireAuth();
 
         $profile = $this->userService->getOwnProfile($userId);
-        $themePreferences = DB::table('users')
+        $row = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', TenantContext::getId())
-            ->value('theme_preferences');
+            ->select(['theme_preferences', 'prefers_chronological_feed', 'auto_translate_ugc', 'auto_translate_target_locale', 'preferred_language'])
+            ->first();
 
-        $themePreferences = is_string($themePreferences)
-            ? (json_decode($themePreferences, true) ?: [])
+        $themePreferences = is_string($row->theme_preferences ?? null)
+            ? (json_decode((string) $row->theme_preferences, true) ?: [])
             : [];
 
         return $this->respondWithData([
@@ -228,6 +229,14 @@ class UsersController extends BaseApiController
                 'high_contrast'     => (bool) ($themePreferences['high_contrast'] ?? false),
                 'reduced_motion'    => (bool) ($themePreferences['reduced_motion'] ?? false),
                 'simplified_layout' => (bool) ($themePreferences['simplified_layout'] ?? false),
+            ],
+            'feed' => [
+                'prefers_chronological' => (bool) ($row->prefers_chronological_feed ?? false),
+            ],
+            'translation' => [
+                'auto_translate_ugc'           => (bool) ($row->auto_translate_ugc ?? false),
+                'auto_translate_target_locale' => $row->auto_translate_target_locale
+                    ?? ($row->preferred_language ?? null),
             ],
         ]);
     }
@@ -256,7 +265,37 @@ class UsersController extends BaseApiController
             $this->userService->updateNotificationPreferences($userId, $data['notifications']);
         }
 
+        // AG35 — feed personalisation toggle (per-user)
+        // AG38 — UGC auto-translate prefs (per-user)
+        $userColumnUpdates = [];
+        if (isset($data['feed']) && is_array($data['feed']) && array_key_exists('prefers_chronological', $data['feed'])) {
+            $userColumnUpdates['prefers_chronological_feed'] = (bool) $data['feed']['prefers_chronological'];
+        }
+        if (isset($data['translation']) && is_array($data['translation'])) {
+            if (array_key_exists('auto_translate_ugc', $data['translation'])) {
+                $userColumnUpdates['auto_translate_ugc'] = (bool) $data['translation']['auto_translate_ugc'];
+            }
+            if (array_key_exists('auto_translate_target_locale', $data['translation'])) {
+                $loc = $data['translation']['auto_translate_target_locale'];
+                $userColumnUpdates['auto_translate_target_locale'] = is_string($loc) && $loc !== ''
+                    ? substr($loc, 0, 5)
+                    : null;
+            }
+        }
+        if (!empty($userColumnUpdates)) {
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->update($userColumnUpdates);
+        }
+
         $profile = $this->userService->getOwnProfile($userId);
+
+        $row = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select(['prefers_chronological_feed', 'auto_translate_ugc', 'auto_translate_target_locale', 'preferred_language'])
+            ->first();
 
         return $this->respondWithData([
             'privacy' => [
@@ -265,6 +304,14 @@ class UsersController extends BaseApiController
                 'privacy_contact' => $profile['privacy_contact'] ?? true,
             ],
             'notifications' => $profile['notification_preferences'] ?? [],
+            'feed' => [
+                'prefers_chronological' => (bool) ($row->prefers_chronological_feed ?? false),
+            ],
+            'translation' => [
+                'auto_translate_ugc'           => (bool) ($row->auto_translate_ugc ?? false),
+                'auto_translate_target_locale' => $row->auto_translate_target_locale
+                    ?? ($row->preferred_language ?? null),
+            ],
         ]);
     }
 

@@ -39,6 +39,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
 import Info from 'lucide-react/icons/info';
+import Languages from 'lucide-react/icons/languages';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
@@ -62,6 +63,7 @@ import type { SessionInfo, TwoFactorSetup } from './tabs/SecurityTab';
 import { SkillsTab } from './tabs/SkillsTab';
 import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
 import { SafeguardingTab } from './tabs/SafeguardingTab';
+import { TranslationTab } from './tabs/TranslationTab';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -75,7 +77,7 @@ export function SettingsPage() {
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
   const toast = useToast();
-  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'safeguarding'];
+  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'safeguarding', 'translation'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isDirty, setIsDirty] = useState(false);
@@ -916,6 +918,15 @@ export function SettingsPage() {
               </span>
             }
           />
+          <Tab
+            key="translation"
+            title={
+              <span className="flex items-center gap-2">
+                <Languages className="w-4 h-4" aria-hidden="true" />
+                {t("tabs.translation", "Translation")}
+              </span>
+            }
+          />
         </Tabs>
       </motion.div>
 
@@ -1059,6 +1070,7 @@ export function SettingsPage() {
 
         {/* SAFEGUARDING TAB */}
         {activeTab === 'safeguarding' && <SafeguardingTab />}
+        {activeTab === 'translation' && <TranslationTab />}
       </motion.div>
 
       {/* Marketing Consent Confirmation Modal */}
