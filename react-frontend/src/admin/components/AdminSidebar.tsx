@@ -170,7 +170,7 @@ const ZONES: NavZone[] = [
     // Running the platform: config, finance, infrastructure
     key: 'ops',
     label: 'zone_platform',
-    sectionKeys: ['financial', 'enterprise', 'advanced', 'federation', 'system'],
+    sectionKeys: ['financial', 'enterprise', 'advanced', 'federation', 'integrations', 'system'],
   },
 ];
 
@@ -580,6 +580,18 @@ function useAdminNav(): NavSection[] {
           { label: "Activity Feed", href: '/admin/federation/activity', icon: Activity },
           { label: "Data Management", href: '/admin/federation/data', icon: Database },
           { label: "Aggregates", href: '/admin/federation/aggregates', icon: ShieldCheck },
+        ],
+      });
+    }
+
+    // AG60 — Integrations zone — currently houses the API Partners admin
+    if (hasFeature('partner_api')) {
+      sections.splice(sections.length - 1, 0, {
+        key: 'integrations',
+        label: "Integrations",
+        icon: Webhook,
+        items: [
+          { label: "API Partners", href: '/admin/api-partners', icon: Key },
         ],
       });
     }

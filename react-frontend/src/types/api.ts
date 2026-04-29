@@ -1137,6 +1137,7 @@ export interface TenantFeatures {
   marketplace: boolean;
   message_translation: boolean;
   member_premium: boolean;
+  partner_api: boolean;
 }
 
 export interface TenantModules {
