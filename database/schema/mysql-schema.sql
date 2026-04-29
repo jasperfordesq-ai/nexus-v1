@@ -969,6 +969,36 @@ CREATE TABLE `caring_help_requests` (
   KEY `caring_help_requests_user_id_index` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_hour_estates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_hour_estates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `member_user_id` int(10) unsigned NOT NULL,
+  `beneficiary_user_id` int(10) unsigned DEFAULT NULL,
+  `policy_action` enum('transfer_to_beneficiary','donate_to_solidarity','expire') NOT NULL DEFAULT 'donate_to_solidarity',
+  `status` enum('nominated','reported','settled','cancelled') NOT NULL DEFAULT 'nominated',
+  `reported_balance_hours` decimal(8,2) DEFAULT NULL,
+  `settled_hours` decimal(8,2) DEFAULT NULL,
+  `policy_document_reference` varchar(255) DEFAULT NULL,
+  `member_notes` text DEFAULT NULL,
+  `coordinator_notes` text DEFAULT NULL,
+  `nominated_at` timestamp NULL DEFAULT NULL,
+  `reported_deceased_at` timestamp NULL DEFAULT NULL,
+  `settled_at` timestamp NULL DEFAULT NULL,
+  `reported_by` int(10) unsigned DEFAULT NULL,
+  `settled_by` int(10) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `caring_hour_estates_tenant_member_unique` (`tenant_id`,`member_user_id`),
+  KEY `caring_hour_estates_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `caring_hour_estates_tenant_id_index` (`tenant_id`),
+  KEY `caring_hour_estates_member_user_id_index` (`member_user_id`),
+  KEY `caring_hour_estates_beneficiary_user_id_index` (`beneficiary_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_hour_gifts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6111,7 +6141,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=179 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=180 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12528,7 +12558,8 @@ INSERT INTO `laravel_migrations` VALUES
 (175,'2026_04_28_320000_add_onboarding_to_seller_profiles',79),
 (176,'2026_04_29_100000_create_caring_project_announcement_tables',79),
 (177,'2026_04_29_110000_create_caring_cover_requests_table',80),
-(178,'2026_04_29_120000_create_caring_research_partnership_tables',81);
+(178,'2026_04_29_120000_create_caring_research_partnership_tables',81),
+(179,'2026_04_29_130000_create_caring_hour_estates_table',82);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

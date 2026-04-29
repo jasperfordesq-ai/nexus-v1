@@ -1248,6 +1248,15 @@ Route::get('/v2/caring-community/hour-gifts/inbox', [\App\Http\Controllers\Api\C
 Route::get('/v2/caring-community/hour-gifts/sent', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSent']);
 
 // Caring Community — Safeguarding reports (K9)
+// AG32 — KISS estate / legacy hours
+Route::get('/v2/caring-community/hour-estate', [\App\Http\Controllers\Api\HourEstateController::class, 'myEstate'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::put('/v2/caring-community/hour-estate', [\App\Http\Controllers\Api\HourEstateController::class, 'nominate'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/hour-estates', [\App\Http\Controllers\Api\HourEstateController::class, 'adminIndex']);
+Route::post('/v2/admin/caring-community/hour-estates/{id}/report-deceased', [\App\Http\Controllers\Api\HourEstateController::class, 'reportDeceased']);
+Route::post('/v2/admin/caring-community/hour-estates/{id}/settle', [\App\Http\Controllers\Api\HourEstateController::class, 'settle']);
+
 Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
 Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
 Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);

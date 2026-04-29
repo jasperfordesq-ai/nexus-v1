@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-29 (AG64–AG73 implementations added or foundationed: unified care-provider directory, research partnership framework, before/after Gemeinde KPI claim tracking, trust tiers, caregiver/Angehörigen support, project announcement tracking, emergency safety alerts, pilot-region inquiry hardening, tenant-branded native-app readiness, and caregiver substitute / cover-care requests with trusted candidate matching. Prior sweep added AG32–AG73 from founder/agoris.ch/KISS claim analysis. Platform coverage of full five-founder vision: ~69%; KISS-only deployment: ~98%)
+> **Last updated:** 2026-04-29 (AG32 and AG64–AG73 implementations added or foundationed: legacy-hour estate workflow, unified care-provider directory, research partnership framework, before/after Gemeinde KPI claim tracking, trust tiers, caregiver/Angehörigen support, project announcement tracking, emergency safety alerts, pilot-region inquiry hardening, tenant-branded native-app readiness, and caregiver substitute / cover-care requests with trusted candidate matching. Prior sweep added AG32–AG73 from founder/agoris.ch/KISS claim analysis. Platform coverage of full five-founder vision: ~70%; KISS-only deployment: ~98%)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -618,7 +618,7 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 
 | # | Item | Priority | Notes |
 |---|---|---|---|
-| AG32 | K6 — Estate / legacy hours | Medium | When a member dies, what happens to banked hours? KISS cooperatives need a policy: nominate a beneficiary, donate to the cooperative solidarity fund, or expire after N months. `caring_hour_estates` table, coordinator workflow, Fondation KISS policy document reference. |
+| AG32 | ✅ K6 — Estate / legacy hours | Done 2026-04-29 | Implemented the KISS legacy-hour workflow for banked Zeitvorsorge hours: member nomination endpoint with beneficiary transfer, solidarity donation, or expiry policy; `caring_hour_estates` audit table with Fondation/KISS policy reference; coordinator/admin list, report-deceased, and settle endpoints; atomic settlement that moves remaining hours to the nominated beneficiary or removes them for solidarity/expiry; feature gating, translations, schema dump, and focused regression coverage. |
 | AG33 | K7 — KISS Treffen meetup sub-type | Low | KISS cooperatives have distinct ritual meeting formats (monthly Stamm, annual Jahresversammlung). Add a `kiss_treffen` event sub-type with RSVP-members-only, minutes-upload field, quorum tracking, and Fondation-style header. Separate from generic events. |
 | AG34 | K10 — AHV pension reporting export | Low | Switzerland is exploring whether KISS hours count toward AHV (Alters- und Hinterlassenenversicherung). Strategic/future-facing: export format mapping banked hours to an AHV-compatible contribution record. Dependent on official AHV digital interface specification (not yet publicly defined). |
 
