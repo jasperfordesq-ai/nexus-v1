@@ -236,7 +236,7 @@ class TrustTierService
             ->where('user_id', $userId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
-            ->count();
+            ->sum('hours');
     }
 
     private function countReviewsReceived(int $userId, int $tenantId): int
@@ -245,31 +245,40 @@ class TrustTierService
             return 0;
         }
 
-        // Use reviewed_id if present, else reviewee_id (legacy column name)
-        $hasReviewedId = Schema::hasColumn('reviews', 'reviewed_id');
-        $column        = $hasReviewedId ? 'reviewed_id' : 'reviewee_id';
+        $column = 'receiver_id';
+        if (! Schema::hasColumn('reviews', $column)) {
+            // Older exports used reviewed_id/reviewee_id.
+            $column = Schema::hasColumn('reviews', 'reviewed_id') ? 'reviewed_id' : 'reviewee_id';
+        }
 
         if (!Schema::hasColumn('reviews', $column)) {
             return 0;
         }
 
-        return (int) DB::table('reviews')
+        $query = DB::table('reviews')
             ->where($column, $userId)
-            ->where('tenant_id', $tenantId)
-            ->count();
+            ->where('tenant_id', $tenantId);
+
+        if (Schema::hasColumn('reviews', 'status')) {
+            $query->where('status', 'approved');
+        }
+
+        return (int) $query->count();
     }
 
     private function isIdentityVerified(int $userId, int $tenantId): bool
     {
-        if (!Schema::hasColumn('users', 'identity_verified_at')) {
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['is_verified', 'verification_status', 'verification_completed_at']);
+
+        if ($user === null) {
             return false;
         }
 
-        $verifiedAt = DB::table('users')
-            ->where('id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->value('identity_verified_at');
-
-        return $verifiedAt !== null;
+        return (bool) ($user->is_verified ?? false)
+            || (string) ($user->verification_status ?? '') === 'passed'
+            || ! empty($user->verification_completed_at);
     }
 }

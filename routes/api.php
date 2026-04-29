@@ -1273,7 +1273,8 @@ Route::delete('/v2/admin/caring-community/providers/{id}', [\App\Http\Controller
 Route::post('/v2/admin/caring-community/providers/{id}/verify', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminVerify']);
 
 // AG67 — Trust Tier System
-Route::get('/v2/caring-community/my-trust-tier', [\App\Http\Controllers\Api\TrustTierController::class, 'myTier']);
+Route::get('/v2/caring-community/my-trust-tier', [\App\Http\Controllers\Api\TrustTierController::class, 'myTier'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'getTierConfig']);
 Route::put('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'updateTierConfig']);
 Route::post('/v2/admin/caring-community/trust-tier/recompute', [\App\Http\Controllers\Api\TrustTierController::class, 'recomputeTiers']);

@@ -46,7 +46,7 @@ class TrustTierController extends BaseApiController
             return $this->respondWithError('FEATURE_UNAVAILABLE', __('api.service_unavailable'), null, 503);
         }
 
-        $tier      = $this->service->getTier($userId, $tenantId);
+        $tier      = $this->service->recomputeForUser($userId, $tenantId);
         $label     = $this->service->getTierLabel($tier);
         $nextTier  = $tier < TrustTierService::TIER_COORDINATOR ? $tier + 1 : null;
         $nextLabel = $nextTier !== null ? $this->service->getTierLabel($nextTier) : null;
