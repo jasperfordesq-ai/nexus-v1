@@ -72,7 +72,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const onboardingSettings = tenant?.settings as Record<string, unknown> | undefined;
   const onboardingEnabled = onboardingSettings?.onboarding_enabled !== false;
   const onboardingMandatory = onboardingSettings?.onboarding_mandatory !== false;
-  const needsOnboarding = user && !user.onboarding_completed && onboardingEnabled && onboardingMandatory;
+  const isGodOrSuperAdmin = user?.is_god || user?.is_super_admin;
+  const needsOnboarding = user && !user.onboarding_completed && onboardingEnabled && onboardingMandatory && !isGodOrSuperAdmin;
   if (needsOnboarding && lastSegment !== 'onboarding') {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }
