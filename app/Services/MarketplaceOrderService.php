@@ -147,8 +147,17 @@ class MarketplaceOrderService
             $order->status = 'pending_payment';
             $order->save();
 
-            // Mark listing as sold (or reduce quantity in future)
-            $lockedListing->update(['status' => 'sold']);
+            // AG46 — atomic inventory decrement (under same DB transaction).
+            // If inventory_count is NULL the listing is unlimited and we mark
+            // it sold like before; otherwise let inventory drive status.
+            if ($lockedListing->inventory_count === null) {
+                $lockedListing->update(['status' => 'sold']);
+            } else {
+                \App\Services\MarketplaceInventoryService::decrementForOrder(
+                    (int) $lockedListing->id,
+                    (int) $quantity
+                );
+            }
 
             // AG63 — atomically redeem coupon (locks coupon row, increments usage_count).
             if ($coupon) {
@@ -286,7 +295,19 @@ class MarketplaceOrderService
             $order->cancellation_reason = $reason;
             $order->save();
 
-            MarketplaceListing::where('id', $order->marketplace_listing_id)->update(['status' => 'active']);
+            // AG46 — restore inventory on cancellation.
+            $listing = MarketplaceListing::where('id', $order->marketplace_listing_id)->lockForUpdate()->first();
+            if ($listing) {
+                if ($listing->inventory_count === null) {
+                    $listing->status = 'active';
+                    $listing->save();
+                } else {
+                    \App\Services\MarketplaceInventoryService::incrementForCancellation(
+                        (int) $listing->id,
+                        (int) ($order->quantity ?? 1)
+                    );
+                }
+            }
 
             return $order;
         });

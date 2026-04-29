@@ -422,6 +422,16 @@ class MarketplaceListingService
         $listing->category_id = $data['category_id'] ?? null;
         $listing->condition = $data['condition'] ?? null;
         $listing->quantity = $data['quantity'] ?? 1;
+        // AG46 — inventory tracking columns
+        if (array_key_exists('inventory_count', $data)) {
+            $listing->inventory_count = $data['inventory_count'];
+        }
+        if (array_key_exists('low_stock_threshold', $data)) {
+            $listing->low_stock_threshold = $data['low_stock_threshold'];
+        }
+        if (array_key_exists('is_oversold_protected', $data)) {
+            $listing->is_oversold_protected = (bool) $data['is_oversold_protected'];
+        }
         $listing->location = $data['location'] ?? null;
         $listing->latitude = $data['latitude'] ?? null;
         $listing->longitude = $data['longitude'] ?? null;
@@ -461,7 +471,8 @@ class MarketplaceListingService
         $fillable = [
             'title', 'description', 'tagline', 'price', 'price_currency',
             'price_type', 'time_credit_price', 'category_id', 'condition',
-            'quantity', 'location', 'latitude', 'longitude',
+            'quantity', 'inventory_count', 'low_stock_threshold', 'is_oversold_protected',
+            'location', 'latitude', 'longitude',
             'shipping_available', 'local_pickup', 'delivery_method',
             'seller_type', 'status', 'template_data',
         ];
