@@ -62,6 +62,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-review-flags');
 
+        // AG59 — Regional analytics monthly PDF reports for paid subscriptions.
+        $schedule->command('regional-analytics:generate-monthly')
+            ->monthlyOn(1, '06:00')
+            ->withoutOverlapping()
+            ->name('regional-analytics-generate-monthly');
+
         $schedule->command('federation:sync-partners')
             ->hourly()
             ->withoutOverlapping()
@@ -82,6 +88,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->everyMinute()
             ->withoutOverlapping(2)
             ->name('federation-expire-cc-validations');
+
+        // AG55 — daily expiry of Verein cross-invitations (30-day window)
+        $schedule->command('verein-federation:expire-invitations')
+            ->daily()
+            ->withoutOverlapping()
+            ->name('verein-federation-expire-invitations');
 
         $schedule->command('sitemap:generate')
             ->dailyAt('04:00')

@@ -2088,6 +2088,16 @@ Route::middleware('throttle:60,1')->group(function () {
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
 Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
 
+// SOC13 — Social login (OAuth). Redirect/callback are public so anonymous
+// visitors can start a sign-in flow. Link/unlink/identities live inside
+// auth:sanctum below.
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/v2/auth/oauth/{provider}/redirect', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
+        ->where('provider', 'google|apple|facebook');
+    Route::match(['get', 'post'], '/v2/auth/oauth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
+        ->where('provider', 'google|apple|facebook');
+});
+
 // ============================================
 // Public routes — No auth required
 // These were incorrectly inside auth:sanctum but must be accessible
@@ -2155,6 +2165,14 @@ Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\Registration
 // /auth/resend-verification, /auth/resend-verification-by-email are public routes (registered above auth group)
 // NOTE: /totp/verify moved to public routes section (user has no token during 2FA login)
 Route::get('/totp/status', [\App\Http\Controllers\Api\TotpController::class, 'status']);
+// SOC13 — Social login (OAuth) authenticated routes
+Route::post('/v2/auth/oauth/{provider}/link', [\App\Http\Controllers\Auth\SocialAuthController::class, 'link'])
+    ->where('provider', 'google|apple|facebook')->middleware('throttle:10,1');
+Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\SocialAuthController::class, 'unlink'])
+    ->where('provider', 'google|apple|facebook')->middleware('throttle:10,1');
+Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities'])
+    ->middleware('throttle:30,1');
+
 Route::get('/v2/auth/2fa/status', [\App\Http\Controllers\Api\TwoFactorController::class, 'status'])->middleware('throttle:30,1');
 Route::post('/v2/auth/2fa/setup', [\App\Http\Controllers\Api\TwoFactorController::class, 'setup'])->middleware('throttle:5,1');
 Route::post('/v2/auth/2fa/verify', [\App\Http\Controllers\Api\TwoFactorController::class, 'verify'])->middleware('throttle:5,1');
