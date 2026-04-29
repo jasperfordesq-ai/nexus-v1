@@ -1308,6 +1308,15 @@ Route::get('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Ap
 Route::post('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'captureKpiBaseline']);
 Route::get('/v2/admin/caring-community/kpi-baselines/{id}/compare', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'compareKpiBaseline']);
 
+// AG65 — Academic / research partnership framework
+Route::get('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'myConsent'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::put('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'updateMyConsent'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminIndex']);
+Route::post('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminStore']);
+Route::post('/v2/admin/caring-community/research/partners/{partnerId}/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminGenerateDataset']);
+
 // AG70 — Emergency/Safety Alert Tier
 Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

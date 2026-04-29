@@ -1195,6 +1195,74 @@ CREATE TABLE `caring_regional_point_transactions` (
   KEY `crpt_tenant_ref_idx` (`tenant_id`,`reference_type`,`reference_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_research_consents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_research_consents` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `consent_status` enum('opted_in','opted_out','revoked') NOT NULL DEFAULT 'opted_out',
+  `consent_version` varchar(255) NOT NULL DEFAULT 'research-v1',
+  `consented_at` timestamp NULL DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `caring_research_consents_tenant_user_unique` (`tenant_id`,`user_id`),
+  KEY `caring_research_consents_tenant_id_index` (`tenant_id`),
+  KEY `caring_research_consents_user_id_index` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_research_dataset_exports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_research_dataset_exports` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `partner_id` bigint(20) unsigned NOT NULL,
+  `requested_by` int(10) unsigned DEFAULT NULL,
+  `dataset_key` varchar(255) NOT NULL DEFAULT 'caring_community_aggregate_v1',
+  `period_start` date NOT NULL,
+  `period_end` date NOT NULL,
+  `status` enum('generated','superseded','revoked') NOT NULL DEFAULT 'generated',
+  `row_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `anonymization_version` varchar(255) NOT NULL DEFAULT 'aggregate-v1',
+  `data_hash` varchar(64) NOT NULL,
+  `generated_at` timestamp NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caring_research_exports_partner_generated_idx` (`tenant_id`,`partner_id`,`generated_at`),
+  KEY `caring_research_dataset_exports_tenant_id_index` (`tenant_id`),
+  KEY `caring_research_dataset_exports_partner_id_index` (`partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `caring_research_partners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `caring_research_partners` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `institution` varchar(255) NOT NULL,
+  `contact_email` varchar(255) DEFAULT NULL,
+  `agreement_reference` varchar(255) DEFAULT NULL,
+  `methodology_url` varchar(255) DEFAULT NULL,
+  `status` enum('draft','active','paused','ended') NOT NULL DEFAULT 'draft',
+  `data_scope` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data_scope`)),
+  `starts_at` date DEFAULT NULL,
+  `ends_at` date DEFAULT NULL,
+  `created_by` int(10) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caring_research_partners_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `caring_research_partners_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_smart_nudges`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6043,7 +6111,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=179 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12459,7 +12527,8 @@ INSERT INTO `laravel_migrations` VALUES
 (174,'2026_04_28_310000_create_pilot_inquiries_table',79),
 (175,'2026_04_28_320000_add_onboarding_to_seller_profiles',79),
 (176,'2026_04_29_100000_create_caring_project_announcement_tables',79),
-(177,'2026_04_29_110000_create_caring_cover_requests_table',80);
+(177,'2026_04_29_110000_create_caring_cover_requests_table',80),
+(178,'2026_04_29_120000_create_caring_research_partnership_tables',81);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
