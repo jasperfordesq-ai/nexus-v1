@@ -35,14 +35,12 @@ import {
   SelectItem,
   Spinner,
   Switch,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-  Tabs,
   Textarea,
   useDisclosure,
 } from '@heroui/react';
@@ -476,7 +474,7 @@ export default function MunicipalSurveyAdminPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {Boolean(survey.is_anonymous) ? (
+                      {survey.is_anonymous ? (
                         <Chip size="sm" color="default" variant="flat">Yes</Chip>
                       ) : (
                         <span className="text-xs text-default-400">No</span>
