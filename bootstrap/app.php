@@ -202,6 +202,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping(60)
             ->runInBackground()
             ->name('ki-agents-dispatch');
+
+        // AG61 — KI-Agenten new framework: hourly run of every enabled
+        // `agent_definitions` row across tenants. Idempotent — disabled
+        // definitions are skipped automatically by AgentRunner.
+        $schedule->command('agents:run')
+            ->hourly()
+            ->withoutOverlapping(15)
+            ->runInBackground()
+            ->name('ag61-agents-run');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
