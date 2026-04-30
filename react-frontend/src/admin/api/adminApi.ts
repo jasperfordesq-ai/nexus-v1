@@ -1488,7 +1488,7 @@ export const adminFederation = {
   purgeFederationData: (days: number) =>
     api.post<{ deleted: number; cutoff: string; days: number }>('/v2/admin/federation/data/purge', { days }),
 
-  // Cross-node aggregate consent (R1+R2 — AGORIS architecture)
+  // Cross-node aggregate consent (R1+R2 — Caring Community federation)
   getAggregateConsent: () =>
     api.get<{ enabled: boolean; has_secret: boolean; last_rotated_at: string | null }>(
       '/v2/admin/federation/aggregate-consent'

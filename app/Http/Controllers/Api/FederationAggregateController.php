@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\DB;
  *  - Response is signed with the tenant's HMAC-SHA256 secret so consumers
  *    can detect tampering.
  *
- * Architecture document: docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md
+ * Architecture document: docs/CARING_COMMUNITY_ARCHITECTURE.md
  *   sections "Cross-Node Aggregate Reporting Policy" and
  *   "Isolated-Node Deployment Option".
  */

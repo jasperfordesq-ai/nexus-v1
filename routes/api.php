@@ -1016,7 +1016,7 @@ Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\M
 Route::get('/v2/marketplace/listings/{id}/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'listForListing']);
 
 // ============================================
-// Federation cross-node aggregates (R1+R2 — AGORIS architecture)
+// Federation cross-node aggregates (R1+R2 — Caring Community federation)
 // Public, no auth — but throttled. Returns 404 silently when the tenant
 // has not opted in. Each query is signed and logged for 12 months.
 // ============================================
@@ -1870,7 +1870,7 @@ Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFed
 Route::post('/v2/admin/federation/api-keys/{id}/revoke', [\App\Http\Controllers\Api\AdminFederationController::class, 'revokeApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
-// Federation cross-node aggregate consent (R1+R2 — AGORIS architecture)
+// Federation cross-node aggregate consent (R1+R2 — Caring Community federation)
 Route::get('/v2/admin/federation/aggregate-consent', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'consent']);
 Route::put('/v2/admin/federation/aggregate-consent', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'updateConsent']);
 Route::post('/v2/admin/federation/aggregate-consent/rotate-secret', [\App\Http\Controllers\Api\AdminFederationAggregateController::class, 'rotateSecret']);

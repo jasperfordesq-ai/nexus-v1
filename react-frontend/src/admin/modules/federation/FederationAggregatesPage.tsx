@@ -11,7 +11,7 @@
  * exposed, and inspect the audit trail of recent queries.
  *
  * Implements the consent surface described in
- * docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md (R1+R2).
+ * docs/CARING_COMMUNITY_ARCHITECTURE.md (R1+R2).
  *
  * Admin English-only — no t() calls per project convention.
  */

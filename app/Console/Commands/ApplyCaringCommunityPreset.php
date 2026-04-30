@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  * Apply the "Caring Community / Timebank" feature preset to a tenant.
  *
  * This preset is tuned for evaluators in the Swiss caring-community space
- * (KISS / AGORIS AG / Sorgende Gemeinschaft / regional time-bank cooperatives).
+ * (KISS / Sorgende Gemeinschaft / regional time-bank cooperatives).
  * It enables features that map directly onto a regional caring-community model
  * (volunteering, time-bank exchange, organisations, federation, resources,
  * reviews, gamification, polls, AI chat, translation) and disables features
@@ -65,7 +65,7 @@ class ApplyCaringCommunityPreset extends Command
         'resources'           => true,  // Info points / regional resource directory
         'reviews'             => true,  // Trust signals on the marketplace of trust
         'polls'               => true,  // Community decision-making
-        'gamification'        => true,  // XP / badges / engagement (Agoris "points" pillar)
+        'gamification'        => true,  // XP / badges / engagement
         'goals'               => true,  // Personal & community goals
         'search'              => true,
         'ai_chat'             => true,  // AI assistant

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * AG83 — Pilot Success Scoreboard.
  *
- * Aggregates the 10 pilot metrics defined in the AGORIS/KISS evaluation roadmap,
+ * Aggregates the 10 pilot metrics defined in the Caring Community evaluation roadmap,
  * with explicit pre-pilot baseline support and quarterly review cadence.
  * Reads only existing tenant-scoped data — never touches another tenant.
  *

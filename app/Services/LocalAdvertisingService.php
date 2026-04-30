@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Schema;
  *
  * Manages ad campaigns, creatives, impressions, and click tracking for
  * tenant-scoped local advertising. Primary revenue driver for the
- * Agoris/KISS deployment.
+ * Caring Community deployment.
  *
  * All methods are static and guard against the tables not yet existing
  * (isAvailable() check) to allow graceful degradation during migrations.

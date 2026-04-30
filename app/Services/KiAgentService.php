@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Schema;
  * route requests, and summarise community activity — all with human-in-the-
  * loop approval before anything is acted upon.
  *
- * Tom Debus's (Agoris CTO) AI pillar for Project NEXUS.
+ * The community intelligence AI pillar for Project NEXUS.
  */
 class KiAgentService
 {

@@ -7,7 +7,7 @@
  * AG71 — Pilot Region Inquiry & Qualification Funnel
  *
  * Public multi-step form for municipalities to express interest in
- * becoming an AGORIS pilot region.  Converts the "Jetzt Pilotregion
+ * becoming a Caring Community pilot region.  Converts the "Jetzt Pilotregion
  * werden!" CTA into a real intake pipeline.
  *
  * Steps:

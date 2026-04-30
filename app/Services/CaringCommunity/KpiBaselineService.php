@@ -188,7 +188,7 @@ class KpiBaselineService
             'baseline' => $baseline,
             'current' => $currentMetrics,
             'comparison' => $comparison,
-            'agoris_claim_targets' => $this->agorisClaimTargets($comparison),
+            'pilot_claim_targets' => $this->pilotClaimTargets($comparison),
         ];
     }
 
@@ -333,7 +333,7 @@ class KpiBaselineService
         };
     }
 
-    private function agorisClaimTargets(array $comparison): array
+    private function pilotClaimTargets(array $comparison): array
     {
         return [
             [
