@@ -708,6 +708,15 @@
     },
     "clear": "Standort löschen"
   },
+  "sub_region": {
+    "label": "Region",
+    "all_areas": "Alle Regionen",
+    "type_quartier": "Quartier",
+    "type_ortsteil": "Ortsteil",
+    "type_municipality": "Gemeinde",
+    "type_canton": "Kanton",
+    "type_other": "Gebiet"
+  },
   "offer_favour": {
     "meta": {
       "title": "Gefälligkeit erfassen",
@@ -1847,5 +1856,9 @@
     "reaction_clap": "Clap",
     "reaction_star": "Star",
     "say_thanks": "Say thanks"
+  },
+  "landing_links": {
+    "title": "Explore this community",
+    "aria_label": "Explore community sections"
   }
 }

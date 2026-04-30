@@ -29,6 +29,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import { ProximityFilter } from '@/components/caring-community/ProximityFilter';
+import { SubRegionFilter } from '@/components/caring-community/SubRegionFilter';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -238,6 +239,7 @@ export function MarktPage() {
 
   const [activeTab, setActiveTab] = useState<MarktTab>('all');
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
+  const [subRegionId, setSubRegionId] = useState<number | null>(null);
   const { position } = useProximity();
   const [items, setItems] = useState<MarktItem[]>([]);
   const [meta, setMeta] = useState<MarktMeta | null>(null);
@@ -278,6 +280,10 @@ export function MarktPage() {
         params.set('lng', String(position.lng));
       }
 
+      if (subRegionId !== null) {
+        params.set('sub_region_id', String(subRegionId));
+      }
+
       const response = await api.get<MarktItem[]>(`/v2/caring-community/markt?${params}`);
       if (controller.signal.aborted) return;
 
@@ -303,7 +309,7 @@ export function MarktPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [activeTab, page, radiusKm, position, t]);
+  }, [activeTab, page, radiusKm, position, subRegionId, t]);
 
   const loadRef = useRef(loadItems);
   loadRef.current = loadItems;
@@ -315,11 +321,11 @@ export function MarktPage() {
     return () => { abortRef.current?.abort(); };
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reload when proximity filter changes
+  // Reload when proximity or sub-region filter changes
   useEffect(() => {
     setPage(1);
     loadRef.current(true);
-  }, [radiusKm, position]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [radiusKm, position, subRegionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isAuthenticated) return null;
 
@@ -385,12 +391,14 @@ export function MarktPage() {
           ))}
         </div>
 
-        {/* Proximity filter */}
-        <ProximityFilter
-          radiusKm={radiusKm}
-          onRadiusChange={setRadiusKm}
-          className="mb-4"
-        />
+        {/* Locality filters: sub-region + proximity */}
+        <div className="flex flex-col gap-3 mb-4">
+          <SubRegionFilter selectedId={subRegionId} onChange={setSubRegionId} />
+          <ProximityFilter
+            radiusKm={radiusKm}
+            onRadiusChange={setRadiusKm}
+          />
+        </div>
 
         {/* Marketplace unavailable notice */}
         {showMarketplaceNotice && (

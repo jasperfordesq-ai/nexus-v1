@@ -48,6 +48,7 @@
     "reaction_thumbs_up": "Gefällt mir",
     "reaction_thumbs_down": "Gefällt mir nicht",
     "reaction_laugh": "Haha",
-    "reaction_angry": "Wütend"
+    "reaction_angry": "Wütend",
+    "unknown_author": "Unknown author"
   }
 }

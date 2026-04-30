@@ -808,6 +808,37 @@ class CaringCommunityApiController extends BaseApiController
         $lng      = is_numeric($this->query('lng'))       ? (float) $this->query('lng')       : null;
         $radiusKm = is_numeric($this->query('radius_km')) ? (float) $this->query('radius_km') : null;
 
+        // ── AG77: optional sub-region filter — resolves to centre + default radius
+        // when no explicit proximity has been applied. Listings/marketplace items
+        // do not carry a sub_region_id column, so we use the sub-region's centre
+        // coordinates with a type-derived radius as a practical first version.
+        $subRegionId = is_numeric($this->query('sub_region_id'))
+            ? (int) $this->query('sub_region_id')
+            : null;
+
+        if ($subRegionId !== null && $subRegionId > 0 && Schema::hasTable('caring_sub_regions')) {
+            $sr = DB::table('caring_sub_regions')
+                ->where('id', $subRegionId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->first();
+            if ($sr && $sr->center_latitude !== null && $sr->center_longitude !== null) {
+                if ($lat === null || $lng === null) {
+                    $lat = (float) $sr->center_latitude;
+                    $lng = (float) $sr->center_longitude;
+                }
+                if ($radiusKm === null || $radiusKm <= 0) {
+                    $radiusKm = match ((string) $sr->type) {
+                        'quartier'     => 2.0,
+                        'ortsteil'     => 5.0,
+                        'municipality' => 10.0,
+                        'canton'       => 50.0,
+                        default        => 5.0,
+                    };
+                }
+            }
+        }
+
         $useProximity = ($lat !== null && $lng !== null && $radiusKm !== null && $radiusKm > 0);
 
         // Haversine SELECT expression (3 bindings: lat, lng, lat)

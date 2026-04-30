@@ -267,6 +267,7 @@ function useAdminNav(): NavSection[] {
         { label: 'Municipal Verification', href: '/admin/caring-community/verification', icon: ShieldCheck },
         { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell },
         { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical },
+        { label: 'Sub-Regions', href: '/admin/caring-community/sub-regions', icon: MapPin },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

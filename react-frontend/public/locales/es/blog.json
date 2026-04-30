@@ -48,6 +48,7 @@
     "reaction_thumbs_up": "Me gusta",
     "reaction_thumbs_down": "No me gusta",
     "reaction_laugh": "Jaja",
-    "reaction_angry": "Enojado"
+    "reaction_angry": "Enojado",
+    "unknown_author": "Unknown author"
   }
 }

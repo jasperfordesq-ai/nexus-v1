@@ -553,7 +553,10 @@
         "title": "Trust and verification",
         "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
       },
-      "clubs": "Clubs & Associations",
+      "clubs": {
+        "title": "Clubs & Associations",
+        "description": "Connect Verein-style associations, clubs, and member groups with the care network."
+      },
       "markt": "Marktplatz",
       "projects": {
         "title": "Community projects",
@@ -1844,5 +1847,18 @@
     "reaction_clap": "Clap",
     "reaction_star": "Star",
     "say_thanks": "Say thanks"
+  },
+  "landing_links": {
+    "title": "Explore this community",
+    "aria_label": "Explore community sections"
+  },
+  "sub_region": {
+    "label": "Area",
+    "all_areas": "All areas",
+    "type_quartier": "Neighbourhood",
+    "type_ortsteil": "District",
+    "type_municipality": "Municipality",
+    "type_canton": "Canton",
+    "type_other": "Area"
   }
 }

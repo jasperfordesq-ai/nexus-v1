@@ -905,6 +905,15 @@
     },
     "clear": "Clear location"
   },
+  "sub_region": {
+    "label": "Area",
+    "all_areas": "All areas",
+    "type_quartier": "Neighbourhood",
+    "type_ortsteil": "District",
+    "type_municipality": "Municipality",
+    "type_canton": "Canton",
+    "type_other": "Area"
+  },
   "clubs": {
     "meta": {
       "title": "Clubs & Associations",
@@ -930,7 +939,8 @@
       "latest": "Latest",
       "personalised_hint": "Ranked for you based on your activity.",
       "latest_hint": "Newest posts first."
-    }
+    },
+    "official_badge": "Official"
   },
   "loyalty": {
     "section_title": "Use Your Time Credits",

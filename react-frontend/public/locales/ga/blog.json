@@ -48,6 +48,7 @@
     "reaction_thumbs_up": "Maith",
     "reaction_thumbs_down": "Ní maith",
     "reaction_laugh": "Gáire",
-    "reaction_angry": "Fearg"
+    "reaction_angry": "Fearg",
+    "unknown_author": "Unknown author"
   }
 }

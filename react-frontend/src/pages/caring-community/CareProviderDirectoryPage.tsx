@@ -25,6 +25,7 @@ import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';
 import { usePageTitle } from '@/hooks';
+import { SubRegionFilter } from '@/components/caring-community/SubRegionFilter';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -211,6 +212,7 @@ export default function CareProviderDirectoryPage() {
   const [activeType, setActiveType] = useState<ProviderType>('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [subRegionId, setSubRegionId] = useState<number | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 350);
@@ -221,6 +223,7 @@ export default function CareProviderDirectoryPage() {
   const params = new URLSearchParams();
   if (activeType !== 'all') params.set('type', activeType);
   if (debouncedSearch) params.set('search', debouncedSearch);
+  if (subRegionId !== null) params.set('sub_region_id', String(subRegionId));
 
   const queryString = params.toString();
   const apiPath = `/v2/caring-community/providers${queryString ? `?${queryString}` : ''}`;
@@ -250,17 +253,20 @@ export default function CareProviderDirectoryPage() {
           <p className="text-theme-muted">{t('providers.subtitle')}</p>
         </div>
 
-        {/* Search */}
-        <Input
-          placeholder={t('providers.search_placeholder')}
-          value={search}
-          onValueChange={setSearch}
-          startContent={<Search className="h-4 w-4 text-default-400" aria-hidden="true" />}
-          variant="bordered"
-          classNames={{ inputWrapper: 'max-w-md' }}
-          isClearable
-          onClear={() => { setSearch(''); setDebouncedSearch(''); }}
-        />
+        {/* Search + sub-region filter */}
+        <div className="flex flex-col gap-3">
+          <Input
+            placeholder={t('providers.search_placeholder')}
+            value={search}
+            onValueChange={setSearch}
+            startContent={<Search className="h-4 w-4 text-default-400" aria-hidden="true" />}
+            variant="bordered"
+            classNames={{ inputWrapper: 'max-w-md' }}
+            isClearable
+            onClear={() => { setSearch(''); setDebouncedSearch(''); }}
+          />
+          <SubRegionFilter selectedId={subRegionId} onChange={setSubRegionId} />
+        </div>
 
         {/* Type filter tabs */}
         <Tabs

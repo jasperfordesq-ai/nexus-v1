@@ -166,6 +166,7 @@ const ResearchPartnershipsAdminPage = lazy(() => import('./modules/caring-commun
 const WarmthPassAdminPage = lazy(() => import('./modules/caring-community/WarmthPassAdminPage'));
 const CareRecipientCirclePage = lazy(() => import('./modules/caring-community/CareRecipientCirclePage'));
 const MunicipalRoiAdminPage = lazy(() => import('./modules/caring-community/MunicipalRoiAdminPage'));
+const SubRegionsAdminPage = lazy(() => import('./modules/caring-community/SubRegionsAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -773,6 +774,16 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><MunicipalRoiAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG77 — Sub-regional geographic units */}
+      <Route
+        path="caring-community/sub-regions"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><SubRegionsAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />
