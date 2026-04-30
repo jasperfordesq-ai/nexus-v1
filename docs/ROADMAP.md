@@ -58,7 +58,7 @@ Interim solution: pre-render public pages at build time so nginx serves real HTM
 | SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. Self-hosted Playwright prerender (no Prerender.io). |
 | SEO12 | Structured data on listings | ✅ Done | High | `ListingDetailPage` now emits richer Service JSON-LD with canonical URL, category/service type, posted/modified dates, location + geo coordinates, author profile/rating, time-credit Offer metadata, and offer/request action hints. |
 | SEO13 | Article schema completion | ✅ Done | High | `BlogPostPage` Article JSON-LD now includes canonical `@id`/`mainEntityOfPage`, `description`, `dateModified`, article section, reading time, resolved image/logo URLs, and `author.url` profile links. |
-| SEO14 | Homepage internal linking | 📋 Planned | High | Add discoverable links to blog, listings, events, groups in `LandingPageRenderer` for crawlers. |
+| SEO14 | Homepage internal linking | ✅ Done | High | `LandingPageRenderer` now appends a tenant-aware public discovery nav with translated, crawler-visible links to listings, events, groups, and blog when those modules/features are enabled. |
 | SEO15 | Remove test blog posts | 📋 Planned | Medium | 4 lorem ipsum posts in sitemap (`aenean-sed-pulvinar-et-diam`, etc.) — unpublish from admin. |
 
 ### Phase C — Next.js Migration (Planned)

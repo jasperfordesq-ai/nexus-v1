@@ -55,6 +55,10 @@
     "premium": "Premium",
     "verify_identity": "Verify Your Identity"
   },
+  "landing_links": {
+    "title": "Explore this community",
+    "aria_label": "Explore community sections"
+  },
   "nav_desc": {
     "feed": "Community feed",
     "explore": "Discover trending content & people",
