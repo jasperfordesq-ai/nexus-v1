@@ -261,3 +261,20 @@ This means a canton can run an isolated node in canton-controlled infrastructure
 | Hosted tenant on `app.project-nexus.ie` | Central NEXUS infra | Shared MariaDB | Auto-deploy | Opt-in shared aggregates |
 | Hosted with custom domain | Central NEXUS infra | Shared MariaDB | Auto-deploy | Opt-in shared aggregates |
 | Isolated node (canton-controlled) | Canton infra | Canton-managed | Manual via release tags | Opt-in via signed federation API |
+
+## Website Completeness Extension Layer
+
+The 2026-04-30 live scrape of `agoris.ch` did not reveal hidden public app, login, customer, pricing, or API pages. It did, however, surface a few remaining demo promises that should be treated as an extension layer on top of the completed Caring Community foundation rather than as changes to completed modules.
+
+Reference document: `docs/AGORIS_WEBSITE_COMPLETENESS_AUDIT.md`.
+
+| Roadmap ID | Architectural implication |
+|---|---|
+| AG89 municipal AI communication/moderation copilot | Add a municipality-specific agent definition and proposal workflow that can draft, target, moderate, translate-check, and queue official communications before publication. It should reuse the existing KI-Agenten proposal/decision model where possible, but expose a municipality-admin workflow rather than hiding inside generic agent runs. |
+| AG90 personalised civic information filter/digest | Compose an aggregated resident digest from existing feed, project announcements, safety alerts, events, Vereine, care providers, marketplace/time-credit offers, and sub-region metadata. This should remain a read/composition layer over completed modules, not a new duplicate content store. |
+| AG91 success-story proof cards | Package selected KPI/ROI/pilot-scoreboard signals into exportable narrative cards. The data source should remain AG66/AG76/AG83 metrics; the new layer is presentation, caveats, and evidence provenance. |
+| AG92 two-way municipality feedback inbox | Add a lightweight inbound civic feedback workflow distinct from formal surveys. Feedback should be tenant-scoped, optionally sub-region-scoped, routable to municipality/coordinator roles, and aggregateable without exposing unnecessary personal data. |
+| AG93 open-standards and integration showcase | Make existing federation/API/webhook/OpenAPI/partner API capabilities visible to evaluators through docs and, if useful, a sandbox screen. Do not create a second integration system. |
+| AG94 newsletter and pilot-region lead nurture | Extend pilot inquiry/contact capture into segmented follow-up for municipalities, investors, local businesses, residents, and partners, with explicit consent and locale handling. This is demo/evaluation support, not a core KISS time-bank dependency. |
+
+These items are the recommended next "best demo ever" layer because together they show the full Agoris promise: AI-assisted municipal work, filtered resident relevance, two-way dialogue, measurable proof, open integration, and follow-up pipeline.

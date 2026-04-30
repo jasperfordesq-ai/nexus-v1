@@ -1442,6 +1442,25 @@ Route::get('/v2/admin/caring-community/disclosure-pack', [\App\Http\Controllers\
 Route::put('/v2/admin/caring-community/disclosure-pack', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'disclosurePackUpdate']);
 Route::get('/v2/admin/caring-community/disclosure-pack/export', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'disclosurePackExport']);
 
+// AG84 — Pilot Data Quality
+Route::get('/v2/admin/caring-community/data-quality/dashboard', [\App\Http\Controllers\Api\Admin\TenantDataQualityController::class, 'dashboard']);
+Route::get('/v2/admin/caring-community/data-quality/checks/{checkKey}/rows', [\App\Http\Controllers\Api\Admin\TenantDataQualityController::class, 'affectedRows']);
+
+// AG82 — Commercial Boundary Map
+Route::get('/v2/admin/caring-community/commercial-boundary', [\App\Http\Controllers\Api\Admin\CommercialBoundaryController::class, 'matrix']);
+Route::put('/v2/admin/caring-community/commercial-boundary/override', [\App\Http\Controllers\Api\Admin\CommercialBoundaryController::class, 'setOverride']);
+
+// AG85 — Isolated-Node Decision Gate
+Route::get('/v2/admin/caring-community/isolated-node', [\App\Http\Controllers\Api\Admin\IsolatedNodeController::class, 'index']);
+Route::put('/v2/admin/caring-community/isolated-node/items/{itemKey}', [\App\Http\Controllers\Api\Admin\IsolatedNodeController::class, 'update']);
+
+// AG87 — External Integration Backlog
+Route::get('/v2/admin/caring-community/external-integrations', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'index']);
+Route::post('/v2/admin/caring-community/external-integrations/seed-defaults', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'seedDefaults']);
+Route::post('/v2/admin/caring-community/external-integrations', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'store']);
+Route::put('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'update']);
+Route::delete('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'destroy']);
+
 // AG65 — Academic / research partnership framework
 Route::get('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'myConsent'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

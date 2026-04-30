@@ -81,6 +81,9 @@ import MessageCircle from 'lucide-react/icons/message-circle';
 import Star from 'lucide-react/icons/star';
 import Flag from 'lucide-react/icons/flag';
 import UserX from 'lucide-react/icons/user-x';
+import Server from 'lucide-react/icons/server';
+import Scale from 'lucide-react/icons/scale';
+import PlugZap from 'lucide-react/icons/plug-zap';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
 import Lightbulb from 'lucide-react/icons/lightbulb';
@@ -269,8 +272,12 @@ function useAdminNav(): NavSection[] {
         { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical },
         { label: 'Sub-Regions', href: '/admin/caring-community/sub-regions', icon: MapPin },
         { label: 'Pilot Scoreboard', href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
+        { label: 'Pilot Data Quality', href: '/admin/caring-community/data-quality', icon: ClipboardCheck },
         { label: 'Operating Policy', href: '/admin/caring-community/operating-policy', icon: ScrollText },
         { label: 'Disclosure Pack', href: '/admin/caring-community/disclosure-pack', icon: ShieldCheck },
+        { label: 'Commercial Boundary', href: '/admin/caring-community/commercial-boundary', icon: Scale },
+        { label: 'Isolated-Node Gate', href: '/admin/caring-community/isolated-node', icon: Server },
+        { label: 'External Integrations', href: '/admin/caring-community/external-integrations', icon: PlugZap },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

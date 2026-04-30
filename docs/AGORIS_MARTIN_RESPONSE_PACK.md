@@ -245,6 +245,23 @@ For technical evaluation, the relevant facts:
 
 ## 6. Suggested next steps
 
+### Website completeness addendum
+
+A fresh live scrape of `agoris.ch` on 2026-04-30 found no hidden public product, login, pricing, customer, demo, or API pages beyond the sitemap-listed marketing pages and three blog posts. The main platform vision is still covered by the existing NEXUS Caring Community buildout. The remaining website-derived demo opportunities are now tracked as AG89-AG94 in `docs/ROADMAP.md`, with source mapping in `docs/AGORIS_WEBSITE_COMPLETENESS_AUDIT.md`.
+
+The most important additions for a "best demo ever" are:
+
+| New roadmap item | Why it matters for the walkthrough |
+|---|---|
+| AG89 municipal AI communication/moderation copilot | Demonstrates Agoris's claim that AI supports municipal communication and moderation, not only matching or summaries. |
+| AG90 personalised civic information filter/digest | Demonstrates the resident-side promise that relevant regional information becomes simple and filtered by locality/interests. |
+| AG91 success-story proof cards | Turns KPI/ROI data into the "Erfolgsgeschichten" proof layer Agoris points to publicly. |
+| AG92 two-way municipality feedback inbox | Covers feedback/dialogue beyond formal surveys and one-way announcements. |
+| AG93 open-standards and integration showcase | Makes the modular/open/payment/admin-interface claims easy for Tom/Roland to inspect. |
+| AG94 newsletter and pilot-region lead nurture | Covers the website's newsletter/contact funnel and gives follow-up structure after the demo. |
+
+These items should be built as incremental layers on completed NEXUS modules, not as rewrites. The roadmap now includes an appendix showing which completed modules they extend.
+
 I propose this sequence:
 
 1. **Roland and Christopher review the `/agoris` tenant.** They can look around asynchronously before a walkthrough and note what feels aligned, wrong, missing, or strategically sensitive.

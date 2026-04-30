@@ -92,3 +92,14 @@ Before any deeper buildout, ask AGORIS/KISS to confirm:
 3. Whether AGPL is acceptable for the shared foundation.
 4. Whether a separately licensed/private route should be explored.
 5. The exact scope of the first Nördlich Lägern platform experience.
+
+## 11. Website Completeness Questions
+
+The 2026-04-30 live scrape of `agoris.ch` added AG89-AG94 to the roadmap. Use these questions to validate whether the remaining public website promises are truly in scope for the demo or only later marketing/product strategy.
+
+1. For the claimed AI support in municipal communication and moderation, should AGORIS expect an admin copilot that drafts, reviews, targets, translates, and queues official posts before publication?
+2. For "Informationsfilter" and direct communication, should residents receive a personalised regional digest combining municipality posts, project updates, Vereine, care providers, safety alerts, marketplace offers, and help needs?
+3. For "Erfolgsgeschichten", may the demo use clearly labelled fictional proof cards generated from seeded KPI/ROI data until real pilot data exists?
+4. For feedback/dialogue, is a lightweight municipality inbox enough, or must feedback be routed into formal survey/project/CRM workflows?
+5. For open standards and integrations, what does Tom/Roland need to see: OpenAPI, webhook signatures, federation aggregate payload, OAuth/client credentials, a sample partner app, or all of these?
+6. For newsletter/contact capture, should NEXUS demonstrate lead nurture for municipalities, investors, businesses, residents, and partners, or leave this in HubSpot/AGORIS CRM?

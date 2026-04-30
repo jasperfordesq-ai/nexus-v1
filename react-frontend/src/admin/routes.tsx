@@ -170,6 +170,10 @@ const SubRegionsAdminPage = lazy(() => import('./modules/caring-community/SubReg
 const PilotScoreboardAdminPage = lazy(() => import('./modules/caring-community/PilotScoreboardAdminPage'));
 const OperatingPolicyAdminPage = lazy(() => import('./modules/caring-community/OperatingPolicyAdminPage'));
 const DisclosurePackAdminPage = lazy(() => import('./modules/caring-community/DisclosurePackAdminPage'));
+const DataQualityAdminPage = lazy(() => import('./modules/caring-community/DataQualityAdminPage'));
+const CommercialBoundaryAdminPage = lazy(() => import('./modules/caring-community/CommercialBoundaryAdminPage'));
+const IsolatedNodeAdminPage = lazy(() => import('./modules/caring-community/IsolatedNodeAdminPage'));
+const ExternalIntegrationsAdminPage = lazy(() => import('./modules/caring-community/ExternalIntegrationsAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -817,6 +821,46 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><DisclosurePackAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG84 — Pilot Data Quality */}
+      <Route
+        path="caring-community/data-quality"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><DataQualityAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG82 — Commercial Boundary Map */}
+      <Route
+        path="caring-community/commercial-boundary"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CommercialBoundaryAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG85 — Isolated-Node Decision Gate */}
+      <Route
+        path="caring-community/isolated-node"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><IsolatedNodeAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG87 — External Integration Backlog */}
+      <Route
+        path="caring-community/external-integrations"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><ExternalIntegrationsAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />
