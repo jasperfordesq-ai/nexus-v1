@@ -276,4 +276,5 @@ Please reply to jasper@hour-timebank.ie with your findings, or use the shared no
 | Full roadmap (gap analysis) | `docs/ROADMAP.md` § 10 |
 | Response pack | `docs/AGORIS_MARTIN_RESPONSE_PACK.md` |
 | Agoris/KISS architecture | `docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md` |
+| Diligence question pack | `docs/AGORIS_DILIGENCE_QUESTION_PACK.md` |
 | German i18n audit | `docs/GERMAN_AUDIT_REPORT.md` |
