@@ -42,6 +42,7 @@
     "reply_count": "{{count}} replies",
     "hide": "Hide",
     "you": "You",
+    "unknown_author": "Unknown author",
     "aria_add_reaction": "Add reaction",
     "aria_send_reply": "Send reply",
     "reaction_heart": "Love",

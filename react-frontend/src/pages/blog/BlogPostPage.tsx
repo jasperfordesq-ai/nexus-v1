@@ -63,6 +63,7 @@ interface BlogPostDetail {
   featured_image: string | null;
   published_at: string;
   created_at: string;
+  updated_at: string | null;
   views: number;
   reading_time: number;
   meta_title: string | null;
@@ -95,6 +96,48 @@ interface BlogComment {
   reactions: Record<string, number>;
   user_reactions: string[];
   replies: BlogComment[];
+}
+
+interface ArticleStructuredDataOptions {
+  origin: string;
+  pathname: string;
+  profileUrl: (path: string) => string;
+  publisherName: string;
+  publisherLogo?: string | null;
+  fallbackAuthorName: string;
+}
+
+function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStructuredDataOptions) {
+  const canonicalUrl = `${options.origin}${options.pathname}`;
+  const authorName = post.author?.name || options.fallbackAuthorName;
+  const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : undefined;
+  const publisherLogo = options.publisherLogo ? resolveAssetUrl(options.publisherLogo) : undefined;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${canonicalUrl}#article`,
+    mainEntityOfPage: canonicalUrl,
+    headline: post.meta_title || post.title,
+    name: post.title,
+    description: post.meta_description || post.excerpt || undefined,
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
+    ...(post.category?.name ? { articleSection: post.category.name } : {}),
+    ...(post.reading_time ? { timeRequired: `PT${post.reading_time}M` } : {}),
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      ...(post.author?.id ? { url: `${options.origin}${options.profileUrl(`/profile/${post.author.id}`)}` } : {}),
+      ...(post.author?.avatar ? { image: resolveAvatarUrl(post.author.avatar) } : {}),
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: options.publisherName,
+      ...(publisherLogo ? { logo: { '@type': 'ImageObject', url: publisherLogo } } : {}),
+    },
+  };
 }
 
 /* ───────────────────────── Emoji Picker ───────────────────────── */
@@ -330,6 +373,14 @@ export function BlogPostPage() {
   }
 
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
+  const articleStructuredData = buildArticleStructuredData(post, {
+    origin: window.location.origin,
+    pathname: window.location.pathname,
+    profileUrl: tenantPath,
+    publisherName: branding.name || 'NEXUS',
+    publisherLogo: branding.logo,
+    fallbackAuthorName: t('post.unknown_author'),
+  });
 
   return (
     <>
@@ -344,23 +395,7 @@ export function BlogPostPage() {
       {/* Article JSON-LD structured data */}
       <Helmet>
         <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: post.title,
-            ...(post.featured_image ? { image: post.featured_image } : {}),
-            datePublished: post.published_at || post.created_at,
-            author: {
-              '@type': 'Person',
-              name: post.author?.name || 'Unknown',
-            },
-            publisher: {
-              '@type': 'Organization',
-              name: branding.name || 'NEXUS',
-              ...(branding.logo ? { logo: { '@type': 'ImageObject', url: branding.logo } } : {}),
-            },
-            description: post.meta_description || post.excerpt || '',
-          })}
+          {JSON.stringify(articleStructuredData)}
         </script>
       </Helmet>
 
