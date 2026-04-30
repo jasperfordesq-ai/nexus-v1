@@ -1,6 +1,6 @@
-# Agoris / KISS Caring Community Architecture
+# Caring Community Architecture (Agoris / KISS reference)
 
-> Last updated: 2026-04-30
+> Last updated: 2026-04-30 — refreshed after pilot-evaluation batch shipped (AG78/AG80/AG81/AG82/AG83/AG84/AG85/AG86/AG87/AG88).
 
 This note preserves the implementation and product architecture for the Agoris / KISS evaluation work. It should be read with `docs/ROADMAP.md`, especially the strategic partnership section.
 
@@ -40,6 +40,13 @@ The Caring Community cluster currently includes these switch-aware surfaces:
 | Research partnerships admin | Available only when `caring_community` is enabled |
 | Research consent / aggregate export APIs | Return `FEATURE_DISABLED` when disabled |
 | Tenant-branded native app config | Tenant-scoped system setting, with build-manifest export for later mobile build pipeline |
+| AG80 FADP/nDSG pilot disclosure pack admin | Available only when `caring_community` is enabled; editable JSON envelope under `caring.disclosure_pack`; Markdown export endpoint |
+| AG81 KISS operating-policy tenant settings | 11 discrete settings under `caring.operating_policy.*`; admin form with schema-driven validation |
+| AG82 commercial boundary map | 31-capability matrix under `CommercialBoundaryService`; per-tenant overrides under `caring.commercial_boundary`; classifies AGPL public / tenant config / private deployment / commercial |
+| AG83 pilot success scoreboard | 10-metric 90-day rolling window using only existing tenant data; baselines persisted to `caring_kpi_baselines` with `pilot_scoreboard` envelope; pre-pilot label + quarterly review cadence |
+| AG84 pilot data-quality dashboard | 10 read-only checks; 6 with row-level drill-down; surfaces seed-marker users, duplicate emails/phones, missing language, organisation verification gaps |
+| AG85 isolated-node decision gate | 11 ownership decisions under `caring.isolated_node.*`; gate `closed=true` only when every item has status `decided` |
+| AG87 external integration backlog | Single JSON envelope under `caring.external_integrations`; tracks partner-dependent integrations (banking, payment, AHV, Spitex, municipal master-data, postal); seed defaults available |
 
 ## Current Operational Model
 
@@ -80,13 +87,14 @@ For the Agoris/KISS path, the default rule is tenant-local first:
 
 ## Current Follow-Up Priorities
 
-The original build priorities in this note have mostly moved from implementation gaps to validation and governance questions. The near-term priorities are now:
+The original build priorities in this note have mostly moved from implementation gaps to validation and governance questions. With the 2026-04-30 pilot-evaluation batch (AG78/AG80–AG88, all shipped except AG79), the platform now has admin surfaces for every governance and pilot-readiness question that was previously hand-waved. The near-term priorities are now:
 
-1. Run a guided walkthrough with Martin, Roland, and Christopher to identify any AGORIS-specific product assumptions that are wrong or sensitive.
-2. Separate KISS non-profit workflow needs from AGORIS commercial product strategy, including brand, UX, monetisation, and licensing boundaries.
-3. Get Swiss-native UX/content review for KISS, municipality, canton, cooperative, care, and research-governance terminology.
-4. Decide whether any AGORIS-proprietary ideas should remain outside the public AGPL repository and instead live in a separately licensed or private deployment layer.
-5. Validate the research-governance, FADP/nDSG, isolated-node, and tenant-branded mobile handoff paths with the appropriate legal/technical reviewers before a public Swiss pilot.
+1. Run the AG78 guided walkthrough (`docs/CARING_COMMUNITY_PILOT_EVALUATION.md`) with prospective pilot stakeholders to produce the AG88 decision memo.
+2. Commission the AG79 Swiss German/French/Italian terminology review — only remaining AG78–AG88 item not yet shipped, requires a native speaker rather than a code change.
+3. Capture pre-pilot baselines (AG83) on every prospective tenant before resident onboarding begins.
+4. Run AG84 data-quality checks before any tenant transitions from demo seed to real residents.
+5. Resolve AG87 external integration ownership before building any feature that depends on a partner integration that is not yet in `live` status.
+6. Close the AG85 isolated-node gate before any canton with strict data-sovereignty rules goes live.
 
 ## Cross-Node Aggregate Reporting Policy
 
