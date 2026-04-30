@@ -147,6 +147,11 @@ async function prerenderRoute(page, route) {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {
+  if (process.env.NEXUS_SKIP_PRERENDER === '1' || process.env.NEXUS_SKIP_PRERENDER === 'true') {
+    console.log('Skipping pre-render because NEXUS_SKIP_PRERENDER is set.');
+    return;
+  }
+
   // Parse --routes flag for selective pre-rendering
   const args = process.argv.slice(2);
   const routesIdx = args.indexOf('--routes');

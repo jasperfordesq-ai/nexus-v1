@@ -54,7 +54,7 @@ Interim solution: pre-render public pages at build time so nginx serves real HTM
 
 | # | Item | Status | Priority | Notes |
 |---|------|--------|----------|-------|
-| SEO10 | Playwright pre-render script | ⚙️ In Progress | Critical | `react-frontend/scripts/prerender.mjs` + `scripts/prerender-worker.mjs` exist and cover ~19 static public routes. Not yet wired as a `postbuild` step in `react-frontend/package.json` — currently invoked separately. |
+| SEO10 | Playwright pre-render script | ✅ Done | Critical | `react-frontend/scripts/prerender.mjs` covers ~19 static public routes and is now wired as both `npm run prerender` and the `postbuild` step in `react-frontend/package.json`. Emergency builds can set `NEXUS_SKIP_PRERENDER=1` to bypass prerendering explicitly. |
 | SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. Self-hosted Playwright prerender (no Prerender.io). |
 | SEO12 | Structured data on listings | 📋 Planned | High | Product/Service JSON-LD schema on `ListingDetailPage`. Enables rich snippets. |
 | SEO13 | Article schema completion | 📋 Planned | High | Blog posts: add `dateModified`, `description`, `author.url` to Article JSON-LD. |
@@ -455,10 +455,10 @@ The most important product implication is that any Agoris/KISS work should be bu
 | Swiss trust/compliance pack | High | 📋 Pending — FADP/GDPR documentation, in-product consent settings, retention controls, audit log export, data-residency statement. |
 | Data sovereignty / regional node story | High | ⚠️ Partial — architecture doc written (`docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md`); cross-node aggregate reporting policy and isolated-node deployment option still undefined. |
 | Onboarding for older/nontechnical users | High | ✅ Done — low-friction Request Help page, coordinator-assisted member creation (temp password), printable invite codes with member join page (`/join/:code`). |
-| Evidence and demo polish | High | ⚠️ Partial — `/agoris` tenant seeded with realistic data; demo script (AG2) not yet written. |
+| Evidence and demo polish | High | ✅ Done — `/agoris` tenant seeded with realistic data; guided walkthrough script committed at `docs/DEMO_SCRIPT.md`, response pack refreshed, and architecture notes aligned for the evaluation. |
 | Local commerce / POS integrations | Medium | 📋 Phase 2 — Agoris has a separate POS & Inventory App Store app. NEXUS marketplace exists but is not bridged to time credits in a single "Markt" view. See AG13. |
 | Banking/payment/admin interfaces | Medium | 📋 Phase 3 — Roland Greber's domain. Not day-one. |
-| Public proof and diligence | High | ⚠️ Ongoing — diligence question pack (AG3) not yet written; agoris.ch was returning DB errors on 2026-04-27. |
+| Public proof and diligence | High | ✅ Done for first evaluation — diligence question pack committed at `docs/AGORIS_DILIGENCE_QUESTION_PACK.md`; public proof limitations remain flagged as risk items for the AGORIS/KISS discussion. |
 
 ### Live Research Gap Analysis — 2026-04-27
 
@@ -577,8 +577,8 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | # | Item | Priority | Notes |
 |---|---|---|---|
 | AG1 | Provide admin access to Roland Greber and Christopher Mueller | High | User-facing request from Martin. Use real emails only after Jasper confirms addresses. Grant least-privilege admin/coordinator access appropriate for evaluation. |
-| AG2 | Create Agoris/KISS demo script and walkthrough | High | 20-30 minute flow: dashboard, member onboarding, request/offer exchange, verified hours, organization opportunity, event, report, module kill switch. |
-| AG3 | Write diligence question pack | High | Registry/UID, live deployments, pricing, KPIs, security/privacy docs, hosting, integrations, roadmap, data ownership, procurement expectations. |
+| AG2 | Create Agoris/KISS demo script and walkthrough | High | ✅ Done 2026-04-30 — `docs/DEMO_SCRIPT.md` now covers member onboarding, request/offer exchange, verified hours, provider directory, Verein federation target discovery, municipal impact, kill switch, research governance, native-app build-manifest handoff, and technical evaluation. |
+| AG3 | Write diligence question pack | High | ✅ Done 2026-04-30 — `docs/AGORIS_DILIGENCE_QUESTION_PACK.md` covers strategy, KISS/non-profit boundary, product scope, commercial model, AGPL/open-source licensing, data protection, architecture/integrations, pilot definition, and walkthrough output mapping. |
 | AG4 | Build formal Caring Community module profile | Critical | ✅ Complete (2026-04-27): Member-facing support relationships page (`MySupportRelationshipsPage.tsx`) added at `/caring-community/my-relationships` — shows role (supporter/recipient), partner info, check-in status with overdue highlight, and recent hours timeline. `GET /api/v2/caring-community/my-relationships` endpoint scoped, feature-gated, schema-guarded. Admin routes now feature-gated at route level (`FeatureGatedElement` in `admin/routes.tsx`) in addition to API guards. |
 | AG5 | Add kill-switch regression tests | Critical | ✅ Complete (2026-04-27): `test_caring_community_feature_disabled_reflects_in_tenant_config` added to `AdminCaringCommunityControllerTest` — verifies bootstrap endpoint reflects toggle state (with Redis cache flush). All 12 admin endpoints tested for 403 when feature off, all nav/route/dashboard/export affordances covered. |
 | AG6 | Create municipal impact report exports | High | ✅ Complete (2026-04-27): `MunicipalImpactReportService` now produces three audience-specific narrative variants (canton / municipality / cooperative) with audience-specific extra fields. Canton: aggregate municipalities count, multi-node hours, est. cost avoidance with 1.5x professional-care multiplier, YoY change. Municipality: top 12 partner orgs with hours, recipients reached, geographic distribution. Cooperative: member retention rate, reciprocity rate, tandem count, coordinator load avg, future-care credit pool. PDF template polished with header band + two-column metric summary + audience narrative section. |

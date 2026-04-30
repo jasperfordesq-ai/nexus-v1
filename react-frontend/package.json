@@ -13,6 +13,8 @@
     "i18n:types": "i18next-cli types",
     "prebuild": "npm run copy-locales",
     "build": "vite build",
+    "postbuild": "node scripts/prerender.mjs",
+    "prerender": "node scripts/prerender.mjs",
     "build:check": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint src --max-warnings 1000 && cross-env NODE_OPTIONS=\"--max-old-space-size=20480\" tsc --noEmit",
