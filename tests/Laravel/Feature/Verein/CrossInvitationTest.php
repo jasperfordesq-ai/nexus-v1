@@ -9,9 +9,11 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Verein;
 
 use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\Verein\VereinFederationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
 class CrossInvitationTest extends TestCase
@@ -93,6 +95,62 @@ class CrossInvitationTest extends TestCase
             ->where('type', 'verein_cross_invitation')
             ->first();
         $this->assertNotNull($notif);
+    }
+
+    public function test_cross_invite_targets_returns_shared_source_and_inviteable_network(): void
+    {
+        $svc = app(VereinFederationService::class);
+
+        $source = $this->makeVerein('Verein Source');
+        $target = $this->makeVerein('Verein Target');
+        $eventOnly = $this->makeVerein('Verein EventOnly');
+        $differentMunicipality = $this->makeVerein('Verein FarAway');
+        $svc->setConsent($source, 'both', '8001');
+        $svc->setConsent($target, 'members', '8001');
+        $svc->setConsent($eventOnly, 'events', '8001');
+        $svc->setConsent($differentMunicipality, 'both', '9000');
+
+        $viewer = $this->makeUser();
+        $invitee = $this->makeUser();
+        $this->joinOrg($source, $viewer);
+        $this->joinOrg($source, $invitee);
+        $this->joinOrg($target, $viewer);
+
+        $targets = $svc->getCrossInviteTargets($viewer, $invitee);
+
+        $this->assertCount(1, $targets);
+        $this->assertSame($source, $targets[0]['source_organization_id']);
+        $this->assertSame([[
+            'organization_id' => $target,
+            'name' => 'Verein Target',
+        ]], $targets[0]['network']);
+    }
+
+    public function test_cross_invite_targets_endpoint_matches_frontend_contract(): void
+    {
+        $svc = app(VereinFederationService::class);
+
+        $source = $this->makeVerein('Verein Route Source');
+        $target = $this->makeVerein('Verein Route Target');
+        $svc->setConsent($source, 'both', '8001');
+        $svc->setConsent($target, 'members', '8001');
+
+        $viewer = $this->makeUser();
+        $invitee = $this->makeUser();
+        $this->joinOrg($source, $viewer);
+        $this->joinOrg($source, $invitee);
+
+        $userModel = User::query()->find($viewer);
+        $this->assertNotNull($userModel);
+        Sanctum::actingAs($userModel);
+
+        $response = $this->getJson("/api/v2/vereine/cross-invite-targets/{$invitee}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.source_organization_id', $source)
+            ->assertJsonPath('data.0.source_name', 'Verein Route Source')
+            ->assertJsonPath('data.0.network.0.organization_id', $target)
+            ->assertJsonPath('data.0.network.0.name', 'Verein Route Target');
     }
 
     public function test_invitee_must_be_member_of_source(): void

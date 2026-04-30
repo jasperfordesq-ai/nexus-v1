@@ -113,6 +113,24 @@ class ResearchPartnershipControllerTest extends TestCase
             'partner_id' => $partnerId,
             'dataset_key' => 'caring_community_aggregate_v1',
         ]);
+
+        $exportId = (int) $export->json('data.export.id');
+
+        $exports = $this->apiGet('/v2/admin/caring-community/research/dataset-exports?partner_id=' . $partnerId);
+        $exports->assertStatus(200);
+        $exports->assertJsonPath('data.exports.0.id', $exportId);
+        $exports->assertJsonPath('data.exports.0.partner_id', $partnerId);
+        $exports->assertJsonPath('data.exports.0.partner_name', 'Pilot Evaluation 2026');
+
+        $revoked = $this->apiPost("/v2/admin/caring-community/research/dataset-exports/{$exportId}/revoke");
+        $revoked->assertStatus(200);
+        $revoked->assertJsonPath('data.id', $exportId);
+        $revoked->assertJsonPath('data.status', 'revoked');
+        $this->assertDatabaseHas('caring_research_dataset_exports', [
+            'id' => $exportId,
+            'tenant_id' => $this->testTenantId,
+            'status' => 'revoked',
+        ]);
     }
 
     public function test_research_routes_respect_caring_community_feature_gate(): void

@@ -1667,6 +1667,7 @@ export const adminSettings = {
 
   getNativeAppSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/native-app'),
   updateNativeAppSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/native-app', data),
+  getNativeAppBuildManifest: () => api.get<Record<string, unknown>>('/v2/admin/config/native-app/build-manifest'),
 
   getEmailConfig: () => api.get<Record<string, unknown>>('/v2/admin/email/config'),
   updateEmailConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/email/config', data),

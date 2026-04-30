@@ -1147,6 +1147,7 @@ Route::get('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigC
 Route::put('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateLanguageConfig']);
 Route::get('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'getNativeAppConfig']);
 Route::put('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateNativeAppConfig']);
+Route::get('/v2/admin/config/native-app/build-manifest', [\App\Http\Controllers\Api\AdminConfigController::class, 'getNativeAppBuildManifest']);
 // ── Admin: Landing Page Configuration ──────────────────────────────────────
 Route::get('/v2/admin/config/landing-page', [\App\Http\Controllers\Api\AdminConfigController::class, 'getLandingPageConfig']);
 Route::put('/v2/admin/config/landing-page', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateLandingPageConfig']);
@@ -1326,6 +1327,8 @@ Route::get('/v2/vereine/{organizationId}/cross-invitations', [\App\Http\Controll
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::post('/v2/vereine/{organizationId}/cross-invitations', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'create'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/vereine/cross-invite-targets/{userId}', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'crossInviteTargets'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/me/verein-invitations', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'listMine'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::post('/v2/me/verein-invitations/{id}/respond', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'respond'])
@@ -1417,6 +1420,8 @@ Route::put('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\R
 Route::get('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminIndex']);
 Route::post('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminStore']);
 Route::post('/v2/admin/caring-community/research/partners/{partnerId}/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminGenerateDataset']);
+Route::get('/v2/admin/caring-community/research/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminDatasetExports']);
+Route::post('/v2/admin/caring-community/research/dataset-exports/{exportId}/revoke', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminRevokeDatasetExport']);
 
 // AG70 — Emergency/Safety Alert Tier
 Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts'])

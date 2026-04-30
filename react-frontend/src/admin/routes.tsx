@@ -161,6 +161,7 @@ const ProjectAnnouncementsAdminPage = lazy(() => import('./modules/caring-commun
 const RegionalPointsAdminPage = lazy(() => import('./modules/caring-community/RegionalPointsAdminPage'));
 const MunicipalVerificationAdminPage = lazy(() => import('./modules/caring-community/MunicipalVerificationAdminPage'));
 const SmartNudgesAdminPage = lazy(() => import('./modules/caring-community/SmartNudgesAdminPage'));
+const ResearchPartnershipsAdminPage = lazy(() => import('./modules/caring-community/ResearchPartnershipsAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -720,6 +721,16 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><SmartNudgesAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG65 — Research partnerships */}
+      <Route
+        path="caring-community/research"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><ResearchPartnershipsAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

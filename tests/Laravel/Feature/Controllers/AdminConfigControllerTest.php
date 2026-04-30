@@ -306,6 +306,16 @@ class AdminConfigControllerTest extends TestCase
         $response->assertJsonPath('data.deployment_readiness.has_store_metadata', true);
         $response->assertJsonPath('data.deployment_readiness.push_routing_configured', true);
         $response->assertJsonPath('data.deployment_readiness.tenant_branded_ready', true);
+
+        $manifest = $this->apiGet('/v2/admin/config/native-app/build-manifest');
+
+        $manifest->assertStatus(200);
+        $manifest->assertJsonPath('data.manifest_version', 'native-app-build-manifest-v1');
+        $manifest->assertJsonPath('data.app.name', 'KISS Musterstadt');
+        $manifest->assertJsonPath('data.app.bundle_id', 'ch.kiss.musterstadt');
+        $manifest->assertJsonPath('data.store.mode', 'tenant_branded');
+        $manifest->assertJsonPath('data.push.enabled', true);
+        $manifest->assertJsonPath('data.deployment_readiness.tenant_branded_ready', true);
     }
 
     // ================================================================

@@ -1862,6 +1862,7 @@ return [
     'caring_research_partner_not_found'        => 'Research partner not found.',
     'caring_research_partner_inactive'         => 'Research partner must be active before a dataset export can be generated.',
     'caring_research_consent_status_invalid'   => 'Research consent status must be one of: opted_in, opted_out, revoked.',
+    'caring_research_export_not_found'         => 'Research dataset export not found.',
     'caring_hour_estates_unavailable'          => 'Legacy hour estate planning is not available for this community.',
     'caring_hour_estate_policy_invalid'        => 'Legacy hour policy must be one of: transfer_to_beneficiary, donate_to_solidarity, expire.',
     'caring_hour_estate_beneficiary_required'  => 'A beneficiary is required when transferring legacy hours.',

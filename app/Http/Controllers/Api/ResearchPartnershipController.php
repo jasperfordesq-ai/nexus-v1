@@ -102,6 +102,41 @@ class ResearchPartnershipController extends BaseApiController
         return $this->respondWithData($result, null, 201);
     }
 
+    public function adminDatasetExports(): JsonResponse
+    {
+        $disabled = $this->guardAdminResearch();
+        if ($disabled) {
+            return $disabled;
+        }
+
+        $partnerId = request()->query('partner_id');
+        $partnerId = is_numeric($partnerId) ? (int) $partnerId : null;
+
+        return $this->respondWithData([
+            'exports' => $this->service->listDatasetExports(TenantContext::getId(), $partnerId),
+        ]);
+    }
+
+    public function adminRevokeDatasetExport(int $exportId): JsonResponse
+    {
+        $disabled = $this->guardAdminResearch();
+        if ($disabled) {
+            return $disabled;
+        }
+
+        try {
+            $export = $this->service->revokeDatasetExport(
+                TenantContext::getId(),
+                $exportId,
+                (int) auth()->id(),
+            );
+        } catch (RuntimeException $e) {
+            return $this->respondWithError('RESEARCH_EXPORT_NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData($export);
+    }
+
     public function myConsent(): JsonResponse
     {
         $disabled = $this->guardMemberResearch();

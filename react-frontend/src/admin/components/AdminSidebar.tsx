@@ -100,6 +100,7 @@ import Languages from 'lucide-react/icons/languages';
 import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
+import FlaskConical from 'lucide-react/icons/flask-conical';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -265,6 +266,7 @@ function useAdminNav(): NavSection[] {
         { label: 'Regional Points', href: '/admin/regional-points', icon: Coins },
         { label: 'Municipal Verification', href: '/admin/caring-community/verification', icon: ShieldCheck },
         { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell },
+        { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

@@ -1200,31 +1200,66 @@ class AdminConfigController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $stored = $this->readSettingsByPrefix($tenantId, 'native_app_');
-
-        $config = [];
-        foreach (self::NATIVE_APP_DEFAULTS as $key => $defaultValue) {
-            $rawValue = $stored[$key] ?? $defaultValue;
-
-            if (in_array($key, self::NATIVE_APP_SENSITIVE_KEYS, true) && !empty($rawValue)) {
-                $config[$key] = str_repeat('*', max(0, strlen($rawValue) - 4)) . substr($rawValue, -4);
-                $config[$key . '_set'] = true;
-            } elseif (in_array($key, ['native_app_push_enabled', 'native_app_service_worker', 'native_app_install_prompt'], true)) {
-                $config[$key] = (bool) (int) $rawValue;
-            } else {
-                $config[$key] = $rawValue;
-            }
-        }
-
-        foreach (self::NATIVE_APP_SENSITIVE_KEYS as $sensitiveKey) {
-            if (!isset($config[$sensitiveKey . '_set'])) {
-                $config[$sensitiveKey . '_set'] = false;
-            }
-        }
+        $config = $this->nativeAppConfig($tenantId);
 
         return $this->respondWithData([
             'tenant_id' => $tenantId,
             'native_app' => $config,
+            'deployment_readiness' => $this->nativeAppReadiness($config),
+        ]);
+    }
+
+    /** GET /api/v2/admin/config/native-app/build-manifest */
+    public function getNativeAppBuildManifest(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $config = $this->nativeAppConfig($tenantId);
+        $tenant = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->select(['id', 'name', 'slug', 'domain'])
+            ->first();
+
+        return $this->respondWithData([
+            'manifest_version' => 'native-app-build-manifest-v1',
+            'generated_at' => now()->toIso8601String(),
+            'tenant' => [
+                'id' => $tenantId,
+                'name' => (string) ($tenant->name ?? ''),
+                'slug' => (string) ($tenant->slug ?? ''),
+                'domain' => (string) ($tenant->domain ?? ''),
+            ],
+            'app' => [
+                'name' => (string) ($config['native_app_name'] ?? ''),
+                'short_name' => (string) ($config['native_app_short_name'] ?? ''),
+                'version' => (string) ($config['native_app_version'] ?? ''),
+                'bundle_id' => (string) ($config['native_app_bundle_id'] ?? ''),
+                'package_name' => (string) ($config['native_app_package_name'] ?? ''),
+                'theme_color' => (string) ($config['native_app_theme_color'] ?? ''),
+                'background_color' => (string) ($config['native_app_background_color'] ?? ''),
+                'display' => (string) ($config['native_app_display'] ?? ''),
+                'orientation' => (string) ($config['native_app_orientation'] ?? ''),
+            ],
+            'store' => [
+                'mode' => (string) ($config['native_app_store_mode'] ?? 'shared'),
+                'build_profile' => (string) ($config['native_app_build_profile'] ?? 'preview'),
+                'ios_app_store_id' => (string) ($config['native_app_ios_app_store_id'] ?? ''),
+                'android_play_store_id' => (string) ($config['native_app_android_play_store_id'] ?? ''),
+                'marketing_url' => (string) ($config['native_app_marketing_url'] ?? ''),
+                'privacy_url' => (string) ($config['native_app_privacy_url'] ?? ''),
+                'support_url' => (string) ($config['native_app_support_url'] ?? ''),
+            ],
+            'push' => [
+                'enabled' => (bool) ($config['native_app_push_enabled'] ?? false),
+                'sender_id' => (string) ($config['native_app_push_sender_id'] ?? ''),
+                'tenant_channel_prefix' => (string) ($config['native_app_tenant_channel_prefix'] ?? ''),
+                'fcm_secret_set' => (bool) ($config['native_app_fcm_server_key_set'] ?? false),
+                'apns_key_set' => (bool) ($config['native_app_apns_key_id_set'] ?? false),
+            ],
+            'pwa' => [
+                'service_worker' => (bool) ($config['native_app_service_worker'] ?? true),
+                'install_prompt' => (bool) ($config['native_app_install_prompt'] ?? true),
+            ],
             'deployment_readiness' => $this->nativeAppReadiness($config),
         ]);
     }
@@ -1314,6 +1349,33 @@ class AdminConfigController extends BaseApiController
                 && $hasStoreMetadata
                 && $pushRoutingConfigured,
         ];
+    }
+
+    private function nativeAppConfig(int $tenantId): array
+    {
+        $stored = $this->readSettingsByPrefix($tenantId, 'native_app_');
+
+        $config = [];
+        foreach (self::NATIVE_APP_DEFAULTS as $key => $defaultValue) {
+            $rawValue = $stored[$key] ?? $defaultValue;
+
+            if (in_array($key, self::NATIVE_APP_SENSITIVE_KEYS, true) && !empty($rawValue)) {
+                $config[$key] = str_repeat('*', max(0, strlen($rawValue) - 4)) . substr($rawValue, -4);
+                $config[$key . '_set'] = true;
+            } elseif (in_array($key, ['native_app_push_enabled', 'native_app_service_worker', 'native_app_install_prompt'], true)) {
+                $config[$key] = (bool) (int) $rawValue;
+            } else {
+                $config[$key] = $rawValue;
+            }
+        }
+
+        foreach (self::NATIVE_APP_SENSITIVE_KEYS as $sensitiveKey) {
+            if (!isset($config[$sensitiveKey . '_set'])) {
+                $config[$sensitiveKey . '_set'] = false;
+            }
+        }
+
+        return $config;
     }
 
     // =========================================================================

@@ -175,6 +175,64 @@ class ResearchPartnershipService
         ];
     }
 
+    public function listDatasetExports(int $tenantId, ?int $partnerId = null): array
+    {
+        $this->assertAvailable();
+
+        $query = DB::table(self::TABLE_EXPORTS . ' as exports')
+            ->leftJoin(self::TABLE_PARTNERS . ' as partners', 'partners.id', '=', 'exports.partner_id')
+            ->where('exports.tenant_id', $tenantId);
+
+        if ($partnerId !== null) {
+            $query->where('exports.partner_id', $partnerId);
+        }
+
+        return $query
+            ->orderByDesc('exports.generated_at')
+            ->select([
+                'exports.*',
+                'partners.name as partner_name',
+                'partners.institution as partner_institution',
+            ])
+            ->get()
+            ->map(fn ($row) => $this->exportRow($row))
+            ->all();
+    }
+
+    public function revokeDatasetExport(int $tenantId, int $exportId, int $actorId): array
+    {
+        $this->assertAvailable();
+
+        $row = DB::table(self::TABLE_EXPORTS)
+            ->where('tenant_id', $tenantId)
+            ->where('id', $exportId)
+            ->first();
+
+        if (!$row) {
+            throw new RuntimeException(__('api.caring_research_export_not_found'));
+        }
+
+        $metadata = json_decode((string) ($row->metadata ?? '{}'), true) ?: [];
+        $metadata['revoked_by'] = $actorId;
+        $metadata['revoked_at'] = now()->toIso8601String();
+
+        DB::table(self::TABLE_EXPORTS)
+            ->where('tenant_id', $tenantId)
+            ->where('id', $exportId)
+            ->update([
+                'status' => 'revoked',
+                'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE),
+                'updated_at' => now(),
+            ]);
+
+        return $this->exportRow(
+            DB::table(self::TABLE_EXPORTS)
+                ->where('tenant_id', $tenantId)
+                ->where('id', $exportId)
+                ->first()
+        );
+    }
+
     private function aggregateDataset(int $tenantId, string $periodStart, string $periodEnd): array
     {
         $rows = [];
@@ -286,6 +344,8 @@ class ResearchPartnershipService
             'data_hash' => (string) $row->data_hash,
             'generated_at' => (string) $row->generated_at,
             'metadata' => json_decode((string) ($row->metadata ?? '{}'), true) ?: [],
+            'partner_name' => $row->partner_name ?? null,
+            'partner_institution' => $row->partner_institution ?? null,
         ];
     }
 }

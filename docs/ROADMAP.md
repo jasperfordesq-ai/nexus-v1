@@ -740,6 +740,18 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 
 ## Contributing
 
+### 2026-04-30 AG55 Follow-Up
+
+The AG55 cross-invite target-discovery gap is now closed. `/v2/vereine/cross-invite-targets/{userId}` returns shared source Vereine and eligible member-sharing network Vereine, so the profile invite button no longer silently no-ops.
+
+### 2026-04-30 AG65 Follow-Up
+
+Research dataset governance is stronger: admins can now list generated dataset exports, filter by research partner, and revoke an export. Revocation preserves the audit row, flips status to `revoked`, and stamps revocation metadata for later diligence. The admin UI is now available at `/admin/caring-community/research` for partner creation, export generation, export history, and revocation.
+
+### 2026-04-30 AG72 Follow-Up
+
+The tenant-branded native app settings screen now writes the real `native_app_*` backend keys, exposes the store metadata and push-routing readiness contract, and can export `/v2/admin/config/native-app/build-manifest` as the JSON handoff for a later signed iOS/Android build pipeline.
+
 When adding to this roadmap:
 1. Use the correct section (Tech Debt, Federation, Social, Media, Admin, Infrastructure)
 2. Assign a unique ID prefix (TD, INT, FED, SOC, MED, ADM, INF)

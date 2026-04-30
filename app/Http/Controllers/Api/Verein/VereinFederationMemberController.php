@@ -94,6 +94,19 @@ class VereinFederationMemberController extends BaseApiController
     }
 
     /**
+     * GET /v2/vereine/cross-invite-targets/{userId}
+     *
+     * Returns inviteable federated Vereine for the profile being viewed.
+     */
+    public function crossInviteTargets(int $userId): JsonResponse
+    {
+        if ($guard = $this->guardCaringCommunity()) return $guard;
+        $viewerUserId = $this->requireAuth();
+
+        return $this->respondWithData($this->service->getCrossInviteTargets($viewerUserId, $userId));
+    }
+
+    /**
      * POST /v2/me/verein-invitations/{id}/respond
      */
     public function respond(Request $request, int $id): JsonResponse

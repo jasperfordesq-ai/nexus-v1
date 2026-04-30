@@ -129,6 +129,104 @@ class VereinFederationService
     }
 
     /**
+     * Return the source Vereine the viewer shares with the target user, plus
+     * eligible federated target Vereine that accept member sharing.
+     *
+     * @return array<int,array{source_organization_id:int,source_name:string,network:array<int,array{organization_id:int,name:string}>}>
+     */
+    public function getCrossInviteTargets(int $viewerUserId, int $targetUserId): array
+    {
+        if ($viewerUserId === $targetUserId) {
+            return [];
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $targetExists = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $targetUserId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$targetExists) {
+            return [];
+        }
+
+        $sharedSources = DB::table('org_members as viewer_member')
+            ->join('org_members as target_member', function ($join) use ($targetUserId) {
+                $join->on('target_member.organization_id', '=', 'viewer_member.organization_id')
+                    ->where('target_member.user_id', '=', $targetUserId)
+                    ->where('target_member.status', '=', 'active');
+            })
+            ->join('vol_organizations as source_org', 'source_org.id', '=', 'viewer_member.organization_id')
+            ->join('verein_federation_consents as source_consent', 'source_consent.organization_id', '=', 'source_org.id')
+            ->where('viewer_member.tenant_id', $tenantId)
+            ->where('target_member.tenant_id', $tenantId)
+            ->where('source_org.tenant_id', $tenantId)
+            ->where('source_consent.tenant_id', $tenantId)
+            ->where('viewer_member.user_id', $viewerUserId)
+            ->where('viewer_member.status', 'active')
+            ->where('source_org.org_type', 'club')
+            ->where('source_consent.is_active', 1)
+            ->whereIn('source_consent.sharing_scope', ['members', 'both'])
+            ->whereNotNull('source_consent.municipality_code')
+            ->select([
+                'source_org.id as source_organization_id',
+                'source_org.name as source_name',
+                'source_consent.municipality_code',
+            ])
+            ->distinct()
+            ->orderBy('source_org.name')
+            ->get();
+
+        $results = [];
+
+        foreach ($sharedSources as $source) {
+            $network = DB::table('verein_federation_consents as target_consent')
+                ->join('vol_organizations as target_org', 'target_org.id', '=', 'target_consent.organization_id')
+                ->leftJoin('org_members as target_existing_member', function ($join) use ($targetUserId, $tenantId) {
+                    $join->on('target_existing_member.organization_id', '=', 'target_org.id')
+                        ->where('target_existing_member.user_id', '=', $targetUserId)
+                        ->where('target_existing_member.tenant_id', '=', $tenantId)
+                        ->where('target_existing_member.status', '=', 'active');
+                })
+                ->where('target_consent.tenant_id', $tenantId)
+                ->where('target_org.tenant_id', $tenantId)
+                ->where('target_consent.is_active', 1)
+                ->whereIn('target_consent.sharing_scope', ['members', 'both'])
+                ->where('target_consent.municipality_code', $source->municipality_code)
+                ->where('target_org.org_type', 'club')
+                ->where('target_org.id', '<>', (int) $source->source_organization_id)
+                ->whereNull('target_existing_member.id')
+                ->select([
+                    'target_org.id as organization_id',
+                    'target_org.name',
+                ])
+                ->distinct()
+                ->orderBy('target_org.name')
+                ->get()
+                ->map(fn ($target) => [
+                    'organization_id' => (int) $target->organization_id,
+                    'name' => (string) $target->name,
+                ])
+                ->values()
+                ->all();
+
+            if ($network === []) {
+                continue;
+            }
+
+            $results[] = [
+                'source_organization_id' => (int) $source->source_organization_id,
+                'source_name' => (string) $source->source_name,
+                'network' => $network,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
      * Share an event with the listed target Vereine. Respects target consent.
      *
      * @return array{shared:int,skipped:int}
