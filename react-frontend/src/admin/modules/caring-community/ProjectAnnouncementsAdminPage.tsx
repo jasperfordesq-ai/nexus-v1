@@ -3,8 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -76,8 +75,24 @@ function statusColor(status: ProjectStatus): 'primary' | 'warning' | 'success' |
   return 'default';
 }
 
+const STATUS_LABELS: Record<ProjectStatus, string> = {
+  draft: 'Draft',
+  active: 'Active',
+  paused: 'Paused',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+const STATUS_FILTER_ITEMS: Array<{ key: string; label: string }> = [
+  { key: '', label: 'All' },
+  { key: 'draft', label: 'Draft' },
+  { key: 'active', label: 'Active' },
+  { key: 'paused', label: 'Paused' },
+  { key: 'completed', label: 'Completed' },
+  { key: 'cancelled', label: 'Cancelled' },
+];
+
 export default function ProjectAnnouncementsAdminPage() {
-  const { t } = useTranslation('project_announcements_admin');
   const createModal = useDisclosure();
   const updateModal = useDisclosure();
 
@@ -103,15 +118,6 @@ export default function ProjectAnnouncementsAdminPage() {
   const [isMilestone, setIsMilestone] = useState(true);
   const [publishUpdateNow, setPublishUpdateNow] = useState(true);
 
-  const statusItems = useMemo(() => [
-    { key: '', label: t('filters.all') },
-    { key: 'draft', label: t('status.draft') },
-    { key: 'active', label: t('status.active') },
-    { key: 'paused', label: t('status.paused') },
-    { key: 'completed', label: t('status.completed') },
-    { key: 'cancelled', label: t('status.cancelled') },
-  ], [t]);
-
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -121,17 +127,17 @@ export default function ProjectAnnouncementsAdminPage() {
         `/v2/admin/caring-community/projects${suffix}`,
       );
       if (!res.success) {
-        setError(res.error ?? t('errors.load'));
+        setError(res.error ?? 'Failed to load projects');
         return;
       }
       setProjects(unwrapData<ProjectAnnouncement[]>(res.data ?? []) ?? []);
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.fetchProjects', err);
-      setError(err instanceof Error ? err.message : t('errors.load'));
+      setError(err instanceof Error ? err.message : 'Failed to load projects');
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, t]);
+  }, [statusFilter]);
 
   useEffect(() => {
     void fetchProjects();
@@ -161,14 +167,14 @@ export default function ProjectAnnouncementsAdminPage() {
         status: publishNow ? 'active' : 'draft',
       });
       if (!res.success) {
-        setError(res.error ?? t('errors.create'));
+        setError(res.error ?? 'Failed to create project');
         return;
       }
       createModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.createProject', err);
-      setError(err instanceof Error ? err.message : t('errors.create'));
+      setError(err instanceof Error ? err.message : 'Failed to create project');
     } finally {
       setSubmitting(false);
     }
@@ -198,14 +204,14 @@ export default function ProjectAnnouncementsAdminPage() {
         status: publishUpdateNow ? 'published' : 'draft',
       });
       if (!res.success) {
-        setError(res.error ?? t('errors.update'));
+        setError(res.error ?? 'Failed to post update');
         return;
       }
       updateModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.createUpdate', err);
-      setError(err instanceof Error ? err.message : t('errors.update'));
+      setError(err instanceof Error ? err.message : 'Failed to post update');
     } finally {
       setSubmitting(false);
     }
@@ -216,13 +222,13 @@ export default function ProjectAnnouncementsAdminPage() {
     try {
       const res = await api.post(`/v2/admin/caring-community/projects/${projectId}/publish`);
       if (!res.success) {
-        setError(res.error ?? t('errors.publish'));
+        setError(res.error ?? 'Failed to publish project');
         return;
       }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.publishProject', err);
-      setError(err instanceof Error ? err.message : t('errors.publish'));
+      setError(err instanceof Error ? err.message : 'Failed to publish project');
     } finally {
       setActionId(null);
     }
@@ -233,13 +239,13 @@ export default function ProjectAnnouncementsAdminPage() {
     try {
       const res = await api.put(`/v2/admin/caring-community/projects/${project.id}`, { status });
       if (!res.success) {
-        setError(res.error ?? t('errors.status'));
+        setError(res.error ?? 'Failed to update project status');
         return;
       }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.setProjectStatus', err);
-      setError(err instanceof Error ? err.message : t('errors.status'));
+      setError(err instanceof Error ? err.message : 'Failed to update project status');
     } finally {
       setActionId(null);
     }
@@ -252,8 +258,10 @@ export default function ProjectAnnouncementsAdminPage() {
           <div className="flex items-center gap-2">
             <Megaphone className="h-5 w-5 text-primary" aria-hidden="true" />
             <div>
-              <h1 className="text-lg font-semibold">{t('title')}</h1>
-              <p className="text-sm text-default-500">{t('subtitle')}</p>
+              <h1 className="text-lg font-semibold">Project announcements</h1>
+              <p className="text-sm text-default-500">
+                Publish initiatives and milestone updates that members can subscribe to.
+              </p>
             </div>
           </div>
           <Button
@@ -261,20 +269,20 @@ export default function ProjectAnnouncementsAdminPage() {
             startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
             onPress={resetCreate}
           >
-            {t('create_project')}
+            Create project
           </Button>
         </CardHeader>
         <Divider />
         <CardBody className="gap-4">
           <div className="flex max-w-xs">
             <Select
-              aria-label={t('filters.status')}
+              aria-label="Filter by status"
               selectedKeys={[statusFilter]}
               onSelectionChange={(keys) => setStatusFilter(String(Array.from(keys)[0] ?? ''))}
               size="sm"
               variant="bordered"
             >
-              {statusItems.map((item) => (
+              {STATUS_FILTER_ITEMS.map((item) => (
                 <SelectItem key={item.key}>{item.label}</SelectItem>
               ))}
             </Select>
@@ -289,18 +297,18 @@ export default function ProjectAnnouncementsAdminPage() {
           {!loading && error && <p className="text-sm text-danger">{error}</p>}
 
           {!loading && !error && projects.length === 0 && (
-            <p className="py-6 text-center text-sm text-default-500">{t('empty')}</p>
+            <p className="py-6 text-center text-sm text-default-500">No projects yet.</p>
           )}
 
           {!loading && projects.length > 0 && (
-            <Table aria-label={t('table.aria')} removeWrapper>
+            <Table aria-label="Project announcements" removeWrapper>
               <TableHeader>
-                <TableColumn>{t('table.project')}</TableColumn>
-                <TableColumn>{t('table.status')}</TableColumn>
-                <TableColumn>{t('table.progress')}</TableColumn>
-                <TableColumn>{t('table.subscribers')}</TableColumn>
-                <TableColumn>{t('table.updated')}</TableColumn>
-                <TableColumn>{t('table.actions')}</TableColumn>
+                <TableColumn>Project</TableColumn>
+                <TableColumn>Status</TableColumn>
+                <TableColumn>Progress</TableColumn>
+                <TableColumn>Subscribers</TableColumn>
+                <TableColumn>Updated</TableColumn>
+                <TableColumn>Actions</TableColumn>
               </TableHeader>
               <TableBody>
                 {projects.map((project) => (
@@ -318,24 +326,24 @@ export default function ProjectAnnouncementsAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Chip color={statusColor(project.status)} size="sm" variant="flat">
-                        {t(`status.${project.status}`)}
+                        {STATUS_LABELS[project.status]}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <div className="min-w-28">
                         <Progress
-                          aria-label={t('table.progress')}
+                          aria-label="Progress"
                           value={project.progress_percent}
                           size="sm"
                         />
                         <p className="mt-1 text-xs text-default-500">
-                          {t('progress_value', { value: project.progress_percent })}
+                          {project.progress_percent}%
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>{project.subscriber_count}</TableCell>
                     <TableCell>
-                      {formatDate(project.last_update_at ?? project.published_at ?? project.created_at, t('date_unknown'))}
+                      {formatDate(project.last_update_at ?? project.published_at ?? project.created_at, '—')}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
@@ -348,7 +356,7 @@ export default function ProjectAnnouncementsAdminPage() {
                             startContent={<Rocket className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void publishProject(project.id)}
                           >
-                            {t('actions.publish')}
+                            Publish
                           </Button>
                         )}
                         <Button
@@ -357,7 +365,7 @@ export default function ProjectAnnouncementsAdminPage() {
                           startContent={<Milestone className="h-3.5 w-3.5" aria-hidden="true" />}
                           onPress={() => openUpdate(project)}
                         >
-                          {t('actions.add_update')}
+                          Add update
                         </Button>
                         {project.status === 'active' && (
                           <Button
@@ -368,7 +376,7 @@ export default function ProjectAnnouncementsAdminPage() {
                             startContent={<PauseCircle className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void setProjectStatus(project, 'paused')}
                           >
-                            {t('actions.pause')}
+                            Pause
                           </Button>
                         )}
                         {project.status !== 'completed' && project.status !== 'cancelled' && (
@@ -380,7 +388,7 @@ export default function ProjectAnnouncementsAdminPage() {
                             startContent={<CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void setProjectStatus(project, 'completed')}
                           >
-                            {t('actions.complete')}
+                            Complete
                           </Button>
                         )}
                       </div>
@@ -395,17 +403,17 @@ export default function ProjectAnnouncementsAdminPage() {
 
       <Modal isOpen={createModal.isOpen} onClose={createModal.onClose} size="2xl">
         <ModalContent>
-          <ModalHeader>{t('create_modal.title')}</ModalHeader>
+          <ModalHeader>Create a project</ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('fields.title')}
+              label="Title"
               value={title}
               onValueChange={setTitle}
               variant="bordered"
               isRequired
             />
             <Textarea
-              label={t('fields.summary')}
+              label="Summary"
               value={summary}
               onValueChange={setSummary}
               variant="bordered"
@@ -413,20 +421,20 @@ export default function ProjectAnnouncementsAdminPage() {
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <Input
-                label={t('fields.location')}
+                label="Location"
                 value={location}
                 onValueChange={setLocation}
                 variant="bordered"
               />
               <Input
-                label={t('fields.stage')}
+                label="Current stage"
                 value={currentStage}
                 onValueChange={setCurrentStage}
                 variant="bordered"
               />
             </div>
             <Input
-              label={t('fields.progress')}
+              label="Progress (%)"
               type="number"
               min={0}
               max={100}
@@ -435,15 +443,15 @@ export default function ProjectAnnouncementsAdminPage() {
               variant="bordered"
             />
             <Switch isSelected={publishNow} onValueChange={setPublishNow}>
-              {t('fields.publish_now')}
+              Publish immediately
             </Switch>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={createModal.onClose}>
-              {t('actions.cancel')}
+              Cancel
             </Button>
             <Button color="primary" isLoading={submitting} onPress={() => void createProject()}>
-              {t('create_modal.submit')}
+              Create project
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -451,17 +459,17 @@ export default function ProjectAnnouncementsAdminPage() {
 
       <Modal isOpen={updateModal.isOpen} onClose={updateModal.onClose} size="2xl">
         <ModalContent>
-          <ModalHeader>{t('update_modal.title')}</ModalHeader>
+          <ModalHeader>Post a project update</ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('fields.update_title')}
+              label="Update title"
               value={updateTitle}
               onValueChange={setUpdateTitle}
               variant="bordered"
               isRequired
             />
             <Textarea
-              label={t('fields.update_body')}
+              label="Update body"
               value={updateBody}
               onValueChange={setUpdateBody}
               variant="bordered"
@@ -469,13 +477,13 @@ export default function ProjectAnnouncementsAdminPage() {
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <Input
-                label={t('fields.stage')}
+                label="Stage"
                 value={updateStage}
                 onValueChange={setUpdateStage}
                 variant="bordered"
               />
               <Input
-                label={t('fields.progress')}
+                label="Progress (%)"
                 type="number"
                 min={0}
                 max={100}
@@ -486,16 +494,16 @@ export default function ProjectAnnouncementsAdminPage() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Switch isSelected={isMilestone} onValueChange={setIsMilestone}>
-                {t('fields.milestone')}
+                Mark as milestone
               </Switch>
               <Switch isSelected={publishUpdateNow} onValueChange={setPublishUpdateNow}>
-                {t('fields.publish_update_now')}
+                Publish update now
               </Switch>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={updateModal.onClose}>
-              {t('actions.cancel')}
+              Cancel
             </Button>
             <Button
               color="primary"
@@ -503,7 +511,7 @@ export default function ProjectAnnouncementsAdminPage() {
               startContent={<Send className="h-4 w-4" aria-hidden="true" />}
               onPress={() => void createUpdate()}
             >
-              {t('update_modal.submit')}
+              Publish update
             </Button>
           </ModalFooter>
         </ModalContent>

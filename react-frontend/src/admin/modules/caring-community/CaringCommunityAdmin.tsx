@@ -14,7 +14,6 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import FileText from 'lucide-react/icons/file-text';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { PageHeader, StatCard } from '../../components';
@@ -23,17 +22,19 @@ import type { TenantConfig } from '../../api/types';
 import { CARING_COMMUNITY_ADMIN_ROUTE, CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 
 const dependentCapabilities = [
-  { key: 'listings', type: 'module', icon: ListChecks, labelKey: 'admin.caring_community.capabilities.timebank' },
-  { key: 'volunteering', type: 'feature', icon: Heart, labelKey: 'admin.caring_community.capabilities.volunteering' },
-  { key: 'organisations', type: 'feature', icon: Building2, labelKey: 'admin.caring_community.capabilities.organisations' },
-  { key: 'groups', type: 'feature', icon: Users, labelKey: 'admin.caring_community.capabilities.groups' },
-  { key: 'resources', type: 'feature', icon: FileText, labelKey: 'admin.caring_community.capabilities.resources' },
-  { key: 'reviews', type: 'feature', icon: ShieldCheck, labelKey: 'admin.caring_community.capabilities.trust' },
+  { key: 'listings', type: 'module', icon: ListChecks, label: 'Timebank' },
+  { key: 'volunteering', type: 'feature', icon: Heart, label: 'Volunteering' },
+  { key: 'organisations', type: 'feature', icon: Building2, label: 'Organisations' },
+  { key: 'groups', type: 'feature', icon: Users, label: 'Groups' },
+  { key: 'resources', type: 'feature', icon: FileText, label: 'Resources' },
+  { key: 'reviews', type: 'feature', icon: ShieldCheck, label: 'Reviews & Trust' },
 ] as const;
 
+const capabilityTypeLabel = (type: 'module' | 'feature') =>
+  type === 'module' ? 'Module' : 'Feature';
+
 export default function CaringCommunityAdmin() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('caring_community.meta.title'));
+  usePageTitle('Caring Community');
   const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();
   const [config, setConfig] = useState<TenantConfig | null>(null);
@@ -48,11 +49,11 @@ export default function CaringCommunityAdmin() {
         setConfig(res.data);
       }
     } catch {
-      toast.error(t('caring_community.errors.load_failed'));
+      toast.error('Failed to load Caring Community configuration');
     } finally {
       setLoading(false);
     }
-  }, [t, toast]);
+  }, [toast]);
 
   useEffect(() => {
     loadConfig();
@@ -77,12 +78,12 @@ export default function CaringCommunityAdmin() {
           features: { ...prev.features, [CARING_COMMUNITY_ROUTE.feature]: value },
         } : prev);
         refreshTenant();
-        toast.success(t(value ? 'caring_community.messages.enabled' : 'caring_community.messages.disabled'));
+        toast.success(value ? 'Caring Community enabled' : 'Caring Community disabled');
       } else {
-        toast.error(t('caring_community.errors.save_failed'));
+        toast.error('Failed to save Caring Community configuration');
       }
     } catch {
-      toast.error(t('caring_community.errors.save_failed'));
+      toast.error('Failed to save Caring Community configuration');
     } finally {
       setSaving(false);
     }
@@ -99,8 +100,8 @@ export default function CaringCommunityAdmin() {
   return (
     <div className="mx-auto max-w-7xl px-4 pb-8">
       <PageHeader
-        title={t('caring_community.meta.title')}
-        description={t('caring_community.meta.description')}
+        title="Caring Community"
+        description="Configure the integrated care hub, dependent capabilities, and municipal reporting surfaces."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -110,7 +111,7 @@ export default function CaringCommunityAdmin() {
               size="sm"
               startContent={<Heart size={16} />}
             >
-              {t('caring_community.actions.open_member_hub')}
+              Open Member Hub
             </Button>
             <Button
               as={Link}
@@ -119,7 +120,7 @@ export default function CaringCommunityAdmin() {
               size="sm"
               startContent={<ListChecks size={16} />}
             >
-              {t('caring_community.actions.open_workflow')}
+              Open Workflow
             </Button>
             <Button
               variant="flat"
@@ -127,7 +128,7 @@ export default function CaringCommunityAdmin() {
               startContent={<RefreshCw size={16} />}
               onPress={loadConfig}
             >
-              {t('caring_community.actions.refresh')}
+              Refresh
             </Button>
           </div>
         }
@@ -135,20 +136,20 @@ export default function CaringCommunityAdmin() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         <StatCard
-          label={t('caring_community.stats.master_switch')}
-          value={enabled ? t('enabled') : t('disabled')}
+          label="Master switch"
+          value={enabled ? 'Enabled' : 'Disabled'}
           icon={Heart}
           color={enabled ? 'success' : 'default'}
         />
         <StatCard
-          label={t('caring_community.stats.connected_capabilities')}
+          label="Connected capabilities"
           value={`${activeCapabilityCount}/${dependentCapabilities.length}`}
           icon={ListChecks}
           color="primary"
         />
         <StatCard
-          label={t('caring_community.stats.reporting_pack')}
-          value={t('caring_community.stats.reporting_ready')}
+          label="Reporting pack"
+          value="Ready"
           icon={BarChart3}
           color="secondary"
         />
@@ -158,14 +159,16 @@ export default function CaringCommunityAdmin() {
         <Card shadow="sm">
           <CardHeader className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold">{t('caring_community.switch.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">{t('caring_community.switch.description')}</p>
+              <h2 className="text-lg font-semibold">Module kill switch</h2>
+              <p className="mt-1 text-sm text-default-500">
+                When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.
+              </p>
             </div>
             <Switch
               isSelected={enabled}
               isDisabled={saving}
               onValueChange={toggleMasterSwitch}
-              aria-label={t('caring_community.switch.aria')}
+              aria-label="Toggle Caring Community module"
             />
           </CardHeader>
           <Divider />
@@ -182,12 +185,12 @@ export default function CaringCommunityAdmin() {
                         <Icon size={18} />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{t(capability.labelKey)}</p>
-                        <p className="text-xs text-default-500">{t(`caring_community.capability_type.${capability.type}`)}</p>
+                        <p className="truncate text-sm font-medium">{capability.label}</p>
+                        <p className="text-xs text-default-500">{capabilityTypeLabel(capability.type)}</p>
                       </div>
                     </div>
                     <Chip color={isActive ? 'success' : 'default'} variant="flat" size="sm">
-                      {isActive ? t('active') : t('disabled')}
+                      {isActive ? 'Active' : 'Disabled'}
                     </Chip>
                   </div>
                 );
@@ -199,8 +202,10 @@ export default function CaringCommunityAdmin() {
         <Card shadow="sm">
           <CardHeader>
             <div>
-              <h2 className="text-lg font-semibold">{t('caring_community.reporting.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">{t('caring_community.reporting.description')}</p>
+              <h2 className="text-lg font-semibold">Municipal reporting</h2>
+              <p className="mt-1 text-sm text-default-500">
+                Jump into the reporting surfaces needed for canton, municipality, and cooperative conversations.
+              </p>
             </div>
           </CardHeader>
           <Divider />
@@ -212,7 +217,7 @@ export default function CaringCommunityAdmin() {
               className="justify-start"
               startContent={<BarChart3 size={16} />}
             >
-              {t('caring_community.reporting.community_analytics')}
+              Community analytics
             </Button>
             <Button
               as={Link}
@@ -221,7 +226,7 @@ export default function CaringCommunityAdmin() {
               className="justify-start"
               startContent={<FileText size={16} />}
             >
-              {t('caring_community.reporting.impact_report')}
+              Impact report
             </Button>
             <Button
               as={Link}
@@ -230,18 +235,18 @@ export default function CaringCommunityAdmin() {
               className="justify-start"
               startContent={<ListChecks size={16} />}
             >
-              {t('caring_community.reporting.municipal_pack')}
+              Municipal impact pack
             </Button>
             <Divider />
             <div className="rounded-lg bg-default-100 p-3 text-sm text-default-600">
-              {t('caring_community.reporting.note')}
+              These surfaces use existing NEXUS reporting today and are ready for KISS-specific exports next.
             </div>
           </CardBody>
         </Card>
       </div>
 
       <div className="mt-6 rounded-lg border border-default-200 p-4 text-sm text-default-500">
-        {t('caring_community.config_route_note', { route: CARING_COMMUNITY_ADMIN_ROUTE.href })}
+        Dedicated admin configuration route: {CARING_COMMUNITY_ADMIN_ROUTE.href}
       </div>
     </div>
   );
