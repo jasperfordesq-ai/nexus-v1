@@ -2,7 +2,7 @@
 title: Project NEXUS — Response Pack for Martin Villiger, Roland Greber, and Christopher Mueller
 audience: Agoris AG / Fondation KISS leadership
 prepared_by: Jasper Ford, Project NEXUS
-date: 2026-04-28 (revised after overnight build wave)
+date: 2026-04-30 (revised after AG55 / AG65 / AG72 follow-up buildout)
 status: Draft for review before sending
 ---
 
@@ -16,7 +16,7 @@ It is intended as a single-page-able executive summary plus deeper supporting se
 
 ## 1. Executive summary (one paragraph)
 
-**Yes, NEXUS can be adapted and extended for KISS and Agoris.** A switchable Caring Community module cluster is already built and live on the production tenant `https://app.project-nexus.ie/agoris`. It covers the full KISS time-bank workflow (verified hour logging, coordinator review, escalation, member statements, recurring support relationships, organisation auto-payment), the Caring Community member experience (request help, offer favour, my support relationships, invite codes), the municipal/canton/cooperative impact reporting layer with CHF social-value estimates, and the supporting infrastructure (multilingual de/fr/it/en, federation between regional nodes, kill-switch tested at API and route level). The module is built once and reusable for KISS, Swiss cantons, Irish/UK timebanks, and international federation partners — not an Agoris-specific fork. NEXUS covers approximately 72 percent of the broader Agoris platform vision today, with defined roadmap items for the remaining gaps (unified Marktplatz combining commercial and time-credit offers, "near me" proximity filtering, municipal announcement channels, Verein directory, credit-free informal help). The next concrete step is a guided 30-minute walkthrough with you, Roland, and Christopher, after which we can scope a focused product workshop on KISS workflows, municipal reports, data protection, and Swiss deployment expectations.
+**Yes, NEXUS can be adapted and extended for KISS and Agoris.** A switchable Caring Community module cluster is already built and live on the production tenant `https://app.project-nexus.ie/agoris`. It covers the full KISS time-bank workflow (verified hour logging, coordinator review, escalation, member statements, recurring support relationships, organisation auto-payment), the Caring Community member experience (request help, offer favour, my support relationships, invite codes), the municipal/canton/cooperative impact reporting layer with CHF social-value estimates, and the supporting infrastructure (multilingual de/fr/it/en, federation between regional nodes, kill-switch tested at API and route level). The module is built once and reusable for KISS, Swiss cantons, Irish/UK timebanks, and international federation partners — not an Agoris-specific fork. NEXUS now covers approximately 88 percent of the broader Agoris platform vision, and approximately 99 percent of a KISS-only time-bank deployment. The remaining gaps are no longer basic workflow gaps; they are mostly strategic/commercial decisions, external-partner integrations, legal/commercial structuring, Swiss-native content review, and later isolated-node/mobile build operations. The next concrete step is a careful guided walkthrough with you, Roland, and Christopher, followed by a focused product/legal/commercial workshop on KISS workflows, municipal reports, data protection, open-source/commercial boundaries, and Swiss deployment expectations.
 
 ---
 
@@ -28,7 +28,7 @@ Yes. The platform is multi-tenant and feature-gated: every Caring Community capa
 
 ### "Can Roland Greber and Christopher Mueller have administration access?"
 
-Yes, once you confirm their preferred email addresses I can provision least-privilege coordinator-level admin access on the production `agoris` tenant. The coordinator role is one of the six KISS role presets shipped in the platform (national admin, canton admin, municipality admin, cooperative coordinator, organisation coordinator, trusted reviewer). They will be able to evaluate the full KISS workflow without needing super-admin privileges. If you would prefer, we can also stand up a private staging tenant for evaluation.
+Yes. Roland and Christopher can be provisioned with least-privilege coordinator/admin access on the production `agoris` tenant. The coordinator role is one of the six KISS role presets shipped in the platform (national admin, canton admin, municipality admin, cooperative coordinator, organisation coordinator, trusted reviewer). They can evaluate the full KISS workflow without needing super-admin privileges. If preferred, we can also stand up a private staging tenant for evaluation.
 
 ### "Can the module disappear cleanly when turned off?"
 
@@ -93,6 +93,9 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Municipal Impact Report with audience variants (canton / municipality / cooperative) | `/admin/reports/municipal-impact` | Live |
 | Saved report templates with date filters and CSV/PDF export | `/admin/reports/municipal-impact` | Live |
 | Municipality Announcer role + official feed badges | Admin user edit | Live |
+| Research partnership governance | `/admin/caring-community/research` | Live |
+| Research partner registry + aggregate dataset export/revocation | `/admin/caring-community/research` | Live |
+| Tenant-branded native app readiness + build manifest export | `/admin/native-app` | Live foundation |
 
 ### Backend services and storage
 
@@ -102,9 +105,12 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Feature flags | `tenant_features` JSON + Laravel middleware enforcement |
 | RBAC | `roles` + `permissions` + `user_roles` tables, KISS preset installer, audit log |
 | Federation | Signed `/federation/aggregates` endpoint, opt-in cross-node discovery, audit trail |
+| Verein federation | Cross-invite target discovery, event sharing, member-sharing consent, municipality calendar |
 | Authentication | Email/password + WebAuthn passkeys + Google/Apple OIDC |
 | Identity verification | Stripe Identity + DOB matching, badge surfaced on profile |
 | Email i18n | LocaleContext::withLocale renders every notification in the recipient's `preferred_language` |
+| Research data governance | Partner registry, member consent state, anonymised aggregate export, export revocation audit |
+| Native app handoff | Tenant-branded readiness booleans and `/v2/admin/config/native-app/build-manifest` JSON export |
 | Wallets | Member + organisation balances with audit trail, atomic claiming, lockForUpdate |
 | Backups | Encrypted full-stack snapshots to private repo |
 
@@ -116,11 +122,13 @@ I have read the public Agoris materials (LinkedIn, RocketReach, the live agoris.
 
 | Agoris platform layer | NEXUS coverage | Notes |
 |----------------------|---------------|-------|
-| KISS time-banking (Zeitvorsorge) | **95%** | Production-ready. Tandem matching, member statements, CHF social value, and policy-driven approval flows all in place. |
-| Voluntary help without time tracking | **70%** | Offer a Favour flow now live (no wallet, no credits). Could go further with category-based browsing of recent favours. |
-| Unified Marktplatz (commercial + voluntary) + closed-loop loyalty | **90%** | `/caring-community/markt` aggregator live, AND time-credit ↔ merchant loyalty bridge live (members earn hours via care, spend them as discounts at participating merchants). This closed-loop is the Agoris vision in working form. Future polish: shared category taxonomy, regional-points third currency type. |
-| Regional infrastructure (Vereine, municipality, proximity) | **80%** | Verein directory live, municipality announcer role live, proximity filter live. Future polish: verified municipality identity and Verein membership management. |
-| Modern UX hiding complexity for elderly users | **80%** | Warmth pass complete; native German pass complete. Future polish: assisted onboarding flow refinement based on real user testing. |
+| KISS time-banking (Zeitvorsorge) | **99%** | Production-ready. Tandem matching, member statements, CHF social value, legacy-hour handling, KISS Treffen support, and policy-driven approval flows are all in place. |
+| Voluntary help without time tracking | **85%** | Offer a Favour flow is live without wallet/credits. Further polish would come from real resident testing and category-led browsing. |
+| Unified Marktplatz (commercial + voluntary) + closed-loop loyalty | **92%** | `/caring-community/markt` aggregator live, time-credit ↔ merchant loyalty bridge live, regional points layer live, advertising/push/premium/commercial analytics foundations live. Remaining work depends on commercial model decisions. |
+| Regional infrastructure (Vereine, municipality, proximity) | **90%** | Verein directory, municipality announcer role, proximity filtering, municipal verification, Verein dues, Verein-to-Verein federation, cross-invite target discovery, and joint municipality calendar are live. Remaining work is mostly operating policy and Swiss field validation. |
+| Modern UX hiding complexity for elderly users | **82%** | Warmth pass and native German pass complete; assisted onboarding and paper-form intake foundations exist. Remaining polish should be driven by Christopher/real-user UX testing. |
+| Research / evidence / data governance | **85%** | Research partner registry, member consent, aggregate dataset export, suppression, export audit log, and export revocation are live. Richer agreement templates and formal external research workflows remain future polish. |
+| Tenant-branded mobile / regional app layer | **Foundation** | Tenant-branded app configuration, store metadata readiness, push-routing readiness, and build-manifest export are live. Separate signed App Store / Play Store builds and CI/CD remain a later operational track. |
 
 ### Where the platform is genuinely best-in-class
 
@@ -128,11 +136,11 @@ The KISS workflow layer is more detailed than anything Agoris has publicly descr
 
 ### Where the platform has defined Phase 2 work
 
-Six items are scoped on the roadmap as AG11 through AG16: credit-free favour flow, proximity filter, unified Marktplatz, municipal announcement channel, Verein directory, and UX warmth pass. **All six are now shipped to production.** The remaining items are AG6 (canton/municipality/cooperative report variants — done), AG7 (native German review — done), and AG8 (this document — done).
+The original Phase 2 product gaps are now largely shipped: credit-free favour flow, proximity filtering, unified Marktplatz, municipal announcement channel, Verein directory, UX warmth pass, canton/municipality/cooperative report variants, native German review, regional points, research governance, and Verein federation follow-up are all in place. What remains is less about "can the platform do this?" and more about fit: which parts should be open-source NEXUS, which parts should remain an AGORIS-branded commercial layer, which deployment model is acceptable, and which claims need Swiss legal/UX validation before a public pilot.
 
 ### Where Phase 3 and beyond live
 
-POS / inventory / merchant-side integrations (Agoris has a separate App Store app) are not in NEXUS today. Banking and payment integrations are not in NEXUS today. These are explicitly Phase 3, after KISS time-bank fit is proven and the regional commerce layer is decided.
+Physical POS bridge work should not be built speculatively. Earlier research conflated an unrelated Miderva "Agoris Smart POS & Inventory" app with AGORIS AG; the roadmap now treats POS as a hypothetical partner integration requiring a real POS partner agreement. Banking/payment/admin integrations are also partner-dependent and should sit after KISS fit, licensing, and commercial boundaries are agreed.
 
 ---
 
@@ -159,7 +167,7 @@ I have done structured diligence using the public agoris.ch site, two independen
 - Mainstream press coverage or analyst writeups of the current company (as opposed to the historical Chablais AGORIS regional-integration project from 2008–2015, which appears to be brand/domain heritage rather than confirmed corporate lineage).
 - A stable agoris.ch — the site was returning database errors during my research.
 
-This is the normal profile of an early-stage or early-commercialisation Swiss platform with a strong founding narrative and limited public proof. Nothing about it is disqualifying. But it does mean that, in any partnership or evaluation conversation, **NEXUS's working production tenant with 19 commits of polished, audited features is genuinely the most concrete, demonstrable Caring Community implementation in the room**. That asymmetry should shape how we approach the engagement.
+This is the normal profile of an early-stage or early-commercialisation Swiss platform with a strong founding narrative and limited public proof. Nothing about it is disqualifying. But it does mean that, in any partnership or evaluation conversation, **NEXUS's working production tenant and active Caring Community buildout are genuinely concrete, demonstrable assets in the room**. That asymmetry should shape how we approach the engagement.
 
 ---
 
@@ -228,7 +236,9 @@ For technical evaluation, the relevant facts:
   3. **Isolated-node deployment** — canton-controlled hosting, canton-managed DB, canton-managed backups, opt-in federation via signed API. This is the route a Swiss canton or KISS cooperative would take if data sovereignty is a hard requirement.
 - **Federation between nodes**: each tenant exposes a read-only signed aggregate endpoint. Cross-node reporting at canton level rolls up federated aggregates without exposing raw member identities.
 - **Open source**: AGPL-3.0-or-later, public repository at `https://github.com/jasperfordesq-ai/nexus-v1`. Source code is auditable; canton-specific modifications must remain AGPL-compliant.
-- **Data protection**: tenant-scoped storage, opt-in federation, audit trail of cross-node queries, GDPR-style data export and deletion endpoints. A formal Swiss FADP audit pack is on the roadmap and depends on canton procurement requirements.
+- **Data protection**: tenant-scoped storage, opt-in federation, audit trail of cross-node queries, GDPR-style data export and deletion endpoints, FADP/nDSG disclosure-pack foundation, research-consent ledger, and anonymised aggregate export/revocation controls. Formal certification or canton-specific audit sign-off remains a separate procurement/legal workstream.
+- **Research governance**: research partners can be registered with agreement/methodology references; members can opt in/out/revoke consent; admins can generate suppressed aggregate datasets and revoke exports while preserving audit history.
+- **Native app handoff**: tenant-branded app readiness is represented as store metadata, iOS/Android identity, push-routing fields, and a downloadable build-manifest JSON for a later signed App Store / Play Store pipeline.
 - **Email locale**: every notification renders in the recipient's `preferred_language` via LocaleContext::withLocale, validated by integration tests. A KISS member who chose Italian will receive Italian notifications even when the email was triggered by a German-speaking coordinator.
 
 ---
@@ -237,11 +247,11 @@ For technical evaluation, the relevant facts:
 
 I propose this sequence:
 
-1. **You confirm Roland and Christopher's preferred email addresses.** I provision coordinator-level access on the `/agoris` production tenant.
+1. **Roland and Christopher review the `/agoris` tenant.** They can look around asynchronously before a walkthrough and note what feels aligned, wrong, missing, or strategically sensitive.
 2. **30-minute guided walkthrough.** I demonstrate the KISS workflow end-to-end: a member requests help, a coordinator pairs them via tandem suggestion, the supporter logs hours, a trusted reviewer approves, the supporter's wallet credits, the recipient receives a member statement, and the canton-level municipal impact report aggregates the activity. Followed by a kill-switch demo (toggle the feature off, watch all UI disappear).
-3. **Diligence document exchange.** You share Agoris's public registry, current customer list, pricing and licensing, security and privacy posture, and architecture overview. I share NEXUS's open-source repo, deployment guide, security checklist, integration test results, and architecture document.
-4. **Focused product workshop, half day.** Working session with you, Roland, Christopher, and Tom Debus to align on KISS workflow specifics, municipal report format, FADP requirements, and Swiss deployment expectations. Output: a shortlist of any KISS-specific extensions that are not yet in NEXUS.
-5. **Pilot agreement.** Choose one KISS cooperative or canton for a controlled pilot. Define success metrics (members onboarded, hours logged, retention rate, coordinator workload). Set a 90-day evaluation window.
+3. **Boundary and diligence discussion.** We explicitly separate KISS non-profit workflow needs, AGORIS commercial product strategy, open-source NEXUS reuse, private/commercial licensing options, data protection, and any confidential/proprietary AGORIS material that should not be implemented in the public AGPL repository.
+4. **Focused product workshop, half day.** Working session with you, Roland, Christopher, and Tom Debus to align on KISS workflow specifics, municipal report format, FADP requirements, Swiss deployment expectations, UX testing, and commercial model assumptions. Output: a shortlist of gaps that are truly not yet in NEXUS.
+5. **Pilot agreement or collaboration structure.** Choose whether the next step is a KISS cooperative pilot, an AGORIS/NEXUS integration, a private deployment, a separately licensed commercial copy, or a looser reference-implementation relationship. Define success metrics and a 90-day evaluation window only after that structure is clear.
 
 I am ready to start step 2 immediately when you are.
 
@@ -253,9 +263,9 @@ So we go in clear-eyed:
 
 - **Agoris public proof is thin.** The agoris.ch website was returning database errors during my 2026-04-27 research session. I would value seeing live deployments, current customers, and KPIs before scoping any custom build that would only make sense for Agoris specifically. The Caring Community module cluster as built today does not depend on Agoris for its value — it serves any KISS cooperative, Swiss canton, or international time-bank federation partner.
 - **KISS is non-profit; Agoris is commercial.** The relationship between Fondation KISS and Agoris AG should be clearly documented for procurement and compliance. I would expect different licensing terms for non-profit KISS cooperatives versus commercial Agoris node operators.
-- **Swiss FADP certification.** Not free. If a canton requires audited FADP compliance, that is a separate workstream with its own timeline and budget.
+- **Swiss FADP certification.** The FADP/nDSG compliance foundation is now implemented, but certification or formal legal audit is not free. If a canton requires audited FADP compliance, that is a separate workstream with its own timeline and budget.
 - **Native-speaker content review.** The German UI is now KISS-canonical (Zeitvorsorge, Sorgende Gemeinschaft, Vertrauensperson, Unterstützungsbeziehung) but a Swiss German native review is still needed before public launch. Christopher Mueller could lead this if appropriate.
-- **No commitment yet on commercial terms.** Anything built so far is open-source. Commercial backing, support SLAs, hosted tenant pricing, or canton-specific extension contracts are all open and sit ahead of any pilot agreement.
+- **Open-source versus commercial boundary.** Anything committed to the public NEXUS repository is open-source under AGPL-3.0-or-later. Commercial backing, support SLAs, hosted tenant pricing, canton-specific extension contracts, a separately licensed copy, or private AGORIS layers are all open questions that need explicit legal/commercial structuring before either side relies on them.
 
 ---
 
@@ -267,6 +277,7 @@ If you want to evaluate the platform yourself before scheduling the walkthrough:
 - Browse the public Caring Community hub at `/caring-community`.
 - Browse the public Clubs directory at `/clubs` — populated with realistic Cham Vereine (Männerturnverein, Frauenchor Cham-Hagendorn, Velo-Club Cham, Quartierverein Lorzenhof, and others).
 - Browse the public Marktplatz at `/caring-community/markt`.
+- In admin, review `/admin/caring-community/research` for research partner governance and `/admin/native-app` for tenant-branded app readiness.
 - Check the listings, events, organisations, federation, and member directories — populated with realistic Cham/Zug content: KISS Genossenschaft Cham as primary partner, Spitex Zug, Pro Senectute Zug, Tafel Zug, Bibliothek Cham, plus a 15-member fictional Caring Community with 50+ logged hours over 30 days, 5 active recurring tandems, and an upcoming KISS Cham Mitgliederversammlung.
 - Review the open-source code at `https://github.com/jasperfordesq-ai/nexus-v1`.
 - Read the architecture note at `docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md` in the repo.
@@ -287,4 +298,4 @@ I will hold the walkthrough slot open and respond same-day to any technical or c
 
 ---
 
-*This document was prepared on 2026-04-27. The state of the platform, the gap analysis, and the roadmap items referenced are accurate to that date. The supporting source code, integration tests, and architecture notes referenced live in the public repository above.*
+*This document was originally prepared on 2026-04-27 and revised on 2026-04-30 after the AG55, AG65, and AG72 follow-up buildout. The state of the platform, the gap analysis, and the roadmap items referenced are accurate to 2026-04-30. The supporting source code, integration tests, and architecture notes referenced live in the public repository above.*

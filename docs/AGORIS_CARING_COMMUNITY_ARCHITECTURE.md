@@ -1,6 +1,6 @@
 # Agoris / KISS Caring Community Architecture
 
-> Last updated: 2026-04-27
+> Last updated: 2026-04-30
 
 This note preserves the implementation and product architecture for the Agoris / KISS evaluation work. It should be read with `docs/ROADMAP.md`, especially the strategic partnership section.
 
@@ -17,11 +17,11 @@ The Agoris research briefs describe regional nodes of roughly 15,000-30,000 citi
 | Agoris concept | NEXUS mapping | Current status |
 |---|---|---|
 | Regional node | Tenant, tenant domain, tenant feature/module config | Available |
-| Canton / municipality / cooperative | Tenant hierarchy or federation relationship | Strong foundation; needs formal operating model |
+| Canton / municipality / cooperative | Tenant hierarchy or federation relationship | Strong foundation; formal operating model still needed |
 | Isolated local node | Separate tenant with tenant-local tables and optional custom domain | Available at application layer |
-| Shared regional network | Federation with opt-in discovery and controlled cross-tenant exchange | Available; needs Agoris policy mapping |
+| Shared regional network | Federation with opt-in discovery, Verein-to-Verein sharing, cross-invite target discovery, and controlled cross-tenant exchange | Available; needs Agoris policy mapping |
 | Local data sovereignty | Tenant-scoped storage, exports, audit logs, and per-tenant configuration | Strong foundation |
-| KISS national/foundation oversight | Role preset plus aggregate reporting pattern | Partial; needs cross-node reporting policy |
+| KISS national/foundation oversight | Role preset plus aggregate reporting pattern | Strong foundation; cross-node reporting policy documented below |
 
 ## Module Boundaries
 
@@ -37,6 +37,9 @@ The Caring Community cluster currently includes these switch-aware surfaces:
 | Municipal impact reports | Backend returns `FEATURE_DISABLED` when disabled |
 | Municipal impact export type | Hidden from export-type list when disabled |
 | Municipal impact PDF/CSV export | Returns `FEATURE_DISABLED` when disabled |
+| Research partnerships admin | Available only when `caring_community` is enabled |
+| Research consent / aggregate export APIs | Return `FEATURE_DISABLED` when disabled |
+| Tenant-branded native app config | Tenant-scoped system setting, with build-manifest export for later mobile build pipeline |
 
 ## Current Operational Model
 
@@ -48,6 +51,7 @@ The module now supports the KISS-style operating loop:
 4. Tenant workflow policy decides whether the log is approved immediately or sent to trusted review.
 5. Pending reviews can be assigned to coordinators and escalated.
 6. Accepted hours feed member statements and municipal/KISS evidence packs.
+7. Optional research partners can receive suppressed aggregate datasets only where the tenant has configured a research partner and members have an explicit consent state.
 
 ## Reporting Model
 
@@ -60,6 +64,7 @@ Municipal reporting is designed to answer procurement and public-value questions
 | Is there a partner network? | Trusted organisations and active opportunities |
 | Is local exchange happening? | Support requests, support offers, categories, monthly trend |
 | Is the evidence pack repeatable? | Saved report templates by audience and period |
+| Can external research be governed? | Research partner registry, member consent state, anonymised aggregate dataset export, export audit and revocation |
 
 Saved report templates support municipality, canton, cooperative, and foundation audiences. Exports carry the template assumptions into the municipal impact pack.
 
@@ -71,15 +76,17 @@ For the Agoris/KISS path, the default rule is tenant-local first:
 - Cross-node discovery must be opt-in and should never expose sensitive support details by default.
 - Municipal exports should be generated from the tenant or authorised aggregate node only.
 - Any national/foundation aggregate reporting should use explicit sharing policy and aggregate metrics before personal data.
-- Future isolated-node deployments should reuse the same module keys and migrations to avoid a forked product line.
+- Future isolated-node deployments should reuse the same module keys, migrations, and build-manifest contracts to avoid a forked product line.
 
-## Next Build Priorities
+## Current Follow-Up Priorities
 
-1. Add admin toggle end-to-end coverage and API affordance checks for every Caring Community route.
-2. Define a cross-node reporting policy for canton/foundation aggregate views.
-3. Add assisted onboarding for older/nontechnical users, including coordinator-created profiles and printable invite flows.
-4. Add native German glossary review for KISS, municipality, canton, cooperative, and care terms.
-5. Decide whether partner-led hour logs may be valid without an organisation and adjust schema/policy accordingly.
+The original build priorities in this note have mostly moved from implementation gaps to validation and governance questions. The near-term priorities are now:
+
+1. Run a guided walkthrough with Martin, Roland, and Christopher to identify any AGORIS-specific product assumptions that are wrong or sensitive.
+2. Separate KISS non-profit workflow needs from AGORIS commercial product strategy, including brand, UX, monetisation, and licensing boundaries.
+3. Get Swiss-native UX/content review for KISS, municipality, canton, cooperative, care, and research-governance terminology.
+4. Decide whether any AGORIS-proprietary ideas should remain outside the public AGPL repository and instead live in a separately licensed or private deployment layer.
+5. Validate the research-governance, FADP/nDSG, isolated-node, and tenant-branded mobile handoff paths with the appropriate legal/technical reviewers before a public Swiss pilot.
 
 ## Cross-Node Aggregate Reporting Policy
 
@@ -153,6 +160,44 @@ Audit records are stored for at least 12 months and are queryable from the super
 
 Any tenant may disable federation aggregate sharing entirely from tenant settings (`Caring Community > Federation > Share aggregates: off`). When disabled, `/federation/aggregates` returns `403 FEDERATION_DISABLED` and the tenant simply will not appear in canton-level rollups. The opt-out is immediate and does not require a deploy.
 
+## Research Partnership Governance
+
+The AG65 research layer is now implemented as a tenant-scoped governance surface rather than an informal export process.
+
+| Concern | Current implementation |
+|---|---|
+| Research partner record | `caring_research_partners`, including institution, contact email, agreement reference, methodology URL, status, and data scope |
+| Member consent | Member endpoint stores `opted_in`, `opted_out`, or `revoked` state for research participation |
+| Dataset generation | Admin endpoint generates anonymised aggregate data for an active partner and reporting period |
+| Suppression | Aggregate export applies suppression thresholds before release |
+| Auditability | Every export is recorded in `caring_research_dataset_exports` with hash, row count, status, period, metadata, and partner |
+| Revocation | Admins can revoke an export; revocation preserves the row and stamps `revoked_by` / `revoked_at` metadata |
+| Admin UI | `/admin/caring-community/research` supports partner creation, export generation, export history, and revocation |
+
+This is sufficient for a pilot-level "wissenschaftlich begleitet" claim, provided the actual research agreement, methodology, and legal review are supplied by the partner institution. It is not a substitute for a signed DPA, ethics review, or canton-specific legal assessment.
+
+## Tenant-Branded Native App Handoff
+
+AG72 is a readiness and handoff layer, not a completed white-label mobile release pipeline.
+
+The admin UI at `/admin/native-app` stores the real `native_app_*` tenant settings used by the backend:
+
+- Store mode: shared NEXUS app or tenant-branded app.
+- iOS identity: bundle ID and App Store ID.
+- Android identity: package name and Play Store ID.
+- Store metadata: marketing, privacy, and support URLs.
+- Push routing: sender ID and tenant channel prefix.
+- PWA configuration: service worker, install prompt, display mode, orientation, theme/background colour.
+
+The build handoff endpoint `/v2/admin/config/native-app/build-manifest` returns a JSON manifest containing tenant, app, store, push, PWA, and readiness data. A later signed iOS/Android build pipeline can consume that manifest without needing to scrape tenant settings directly.
+
+What is not yet built:
+
+- Separate signed App Store / Play Store binaries per tenant.
+- CI/CD automation for tenant-branded mobile builds.
+- Apple/Google developer-account ownership workflow.
+- Store submission, screenshots, review responses, and release management.
+
 ## Isolated-Node Deployment Option
 
 Some Swiss cantons and KISS cooperatives have strict data-sovereignty requirements that prevent them using a hosted multi-tenant deployment, even one configured for tenant-local storage. The platform supports an "isolated node" deployment as a first-class option.
@@ -205,8 +250,9 @@ This means a canton can run an isolated node in canton-controlled infrastructure
 ### Open questions
 
 - **Licence audit**: any canton-specific modifications to the source must remain AGPL-3.0 compliant (Section 13 / network-use clause). A licence audit before deployment is recommended.
-- **Support model**: if a canton wants commercial support, billing, and SLA backing for an isolated deployment, that needs a separate commercial agreement; AGPL alone does not provide it.
-- **Certification**: if a Swiss FADP audit (or canton-specific equivalent) is required, the certification path needs to be agreed - the platform itself does not currently carry FADP certification.
+- **Support model**: if a canton or AGORIS wants commercial support, billing, private deployment operations, SLA backing, or a separately licensed copy, that needs a separate commercial agreement; AGPL alone does not provide it.
+- **Certification**: the platform has an FADP/nDSG disclosure-pack foundation, but if a Swiss FADP audit (or canton-specific equivalent) is required, the certification path still needs to be agreed - the platform itself does not currently carry formal FADP certification.
+- **Commercial independence**: AGORIS-specific brand, UX, advertising, monetisation, or proprietary product layers should be explicitly classified before implementation so the parties know whether they belong in public AGPL NEXUS, a private deployment, or a separate commercial layer.
 
 ## Deployment Modes Summary
 
