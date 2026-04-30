@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-30 (Three swarm batches shipped: batch 2 — AG28–31 frontends, AG36/37 audio-first help, AG56/57 advertising, AG58 premium tier, AG62 surveys, AG63 coupons, AG35/38 personalisation+UGC translation, AG44 self-serve provisioning, AG45/46/48 marketplace pickup/inventory/onboarding, AG60 partner API, AG61 KI-Agenten. Batch 3 — AG54 Verein dues, AG55 Verein-to-Verein federation, AG59 paid regional analytics, SOC10 bookmarks, SOC13 social login (with global OAUTH_ENABLED kill switch), SOC14 thank-you appreciations. **Pilot evaluation batch (2026-04-30): AG78 walkthrough doc, AG80 FADP/nDSG disclosure pack, AG81 operating-policy tenant settings, AG82 commercial boundary map (31 capabilities), AG83 pilot success scoreboard with pre-pilot baseline + quarterly cadence, AG84 data-quality dashboard (10 checks), AG85 isolated-node decision gate (11 items), AG86 mobile build plan doc, AG87 external integration backlog, AG88 decision memo template — all shipped.** Only AG79 (Swiss-native terminology review, requires native speaker) remains in the AG78–AG88 set. AG89-AG94 added from a fresh live agoris.ch completeness pass. ~30 unpushed commits on `main`. Platform coverage of full five-founder vision: ~90%; KISS-only deployment: ~100%)
+> **Last updated:** 2026-04-30 (Three swarm batches shipped: batch 2 — AG28–31 frontends, AG36/37 audio-first help, AG56/57 advertising, AG58 premium tier, AG62 surveys, AG63 coupons, AG35/38 personalisation+UGC translation, AG44 self-serve provisioning, AG45/46/48 marketplace pickup/inventory/onboarding, AG60 partner API, AG61 KI-Agenten. Batch 3 — AG54 Verein dues, AG55 Verein-to-Verein federation, AG59 paid regional analytics, SOC10 bookmarks, SOC13 social login (with global OAUTH_ENABLED kill switch), SOC14 thank-you appreciations. **Pilot evaluation batch (2026-04-30): AG78 walkthrough doc, AG80 FADP/nDSG disclosure pack, AG81 operating-policy tenant settings, AG82 commercial boundary map (31 capabilities), AG83 pilot success scoreboard with pre-pilot baseline + quarterly cadence, AG84 data-quality dashboard (10 checks), AG85 isolated-node decision gate (11 items), AG86 mobile build plan doc, AG87 external integration backlog, AG88 decision memo template — all shipped.** Only AG79 (Swiss-native terminology review, requires native speaker) remains in the AG78–AG88 set. **Website completeness batch (2026-04-30): AG89 municipal communication copilot, AG90 personalised civic digest, AG91 success-story proof cards, AG92 two-way feedback inbox, AG93 integration showcase, AG94 lead nurture — all shipped.** **Pilot-operations polish batch (2026-04-30): AG95 launch-readiness dashboard (consolidates AG80–AG87), AG96 help-request SLA breach dashboard (uses AG81 SLA windows), AG97 civic-digest tenant cadence admin UI (closes AG90 admin gap) — all shipped.** ~30 unpushed commits on `main`. Platform coverage of full five-founder vision: ~92%; KISS-only deployment: ~100%)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -756,12 +756,12 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 
 | # | Item | Priority | Notes |
 |---|---|---|---|
-| AG89 | Municipal AI communication and moderation copilot | Critical | Agoris explicitly says municipalities get AI-supported communication and moderation, while the blog lists AI support for push communication, information filtering, need/supply matching, and admin simplification. Build a municipality-admin copilot that drafts/rewrites announcements, checks tone and clarity, suggests target audience/sub-region, flags safety/moderation issues, and produces an auditable proposal before any message is sent. Builds on AG61 agents and AG14/AG57 messaging surfaces, but is a distinct municipality workflow. |
-| AG90 | Personalised civic information filter and regional digest | Critical | Add a resident-facing "what matters near me" digest that filters municipality posts, project updates, events, Vereine, care-provider updates, marketplace/time-credit offers, safety alerts, and help needs by sub-region, interests, language, trust/safety relevance, and notification preferences. This should be demoed as the resident counterpart to AG89 and should work as in-app feed section plus optional weekly/push digest. Builds on AG35 personalisation, AG57 push, AG69 project updates, AG70 safety alerts, and AG77 sub-regions without changing their completed status. |
-| AG91 | Success-story proof cards tied to live metrics | High | The public home page includes an "Erfolgsgeschichten" CTA and the municipality page claims 30% lower information-distribution effort, 25% higher volunteering engagement, and higher satisfaction. Add demo-ready success-story cards that can be generated from pilot-scoreboard/KPI data: before/after metric, narrative, affected audience, method caveat, export/share link, and evidence source. Seed the Agoris demo with 2-3 clearly fictional/labelled examples until real pilot data exists. |
-| AG92 | Two-way municipality feedback inbox | High | Agoris promises feedback and dialogue, not only one-way announcements or formal surveys. Add a lightweight resident-to-municipality inbox for questions, ideas, issue reports, and sentiment tags, with routing to municipality/coordinator roles, status tracking, privacy-safe export, and aggregation into the municipal dashboard. This complements AG62 surveys and AG14 announcements rather than replacing them. |
-| AG93 | Open-standards and integration showcase | Medium | Agoris names modular architecture, open standards, AI functions, payment integrations, and banking/payment/administration interfaces. NEXUS has the underlying API, webhook, federation, OAuth/client-credentials, OpenAPI, and partner API foundations, but the demo needs a visible evaluator-facing showcase: sample partner app, signed webhook example, federation aggregate payload, OpenAPI link, and "what an integration partner would receive" checklist. Documentation-first; code only if a live sandbox screen materially improves Tom/Roland's evaluation. |
-| AG94 | Newsletter and pilot-region lead nurture flow | Medium | Agoris foregrounds newsletter signup and contact capture on the home/contact pages. NEXUS already has pilot-inquiry and notification/newsletter primitives; add an Agoris-style lead nurture path for pilot regions, investors, municipalities, local businesses, and residents: source attribution, consent, language, interest segment, follow-up stage, and export to CRM/email provider. Keep this as evaluation/demo support, not core KISS workflow. |
+| AG89 | ✅ Municipal AI communication and moderation copilot | Done 2026-04-30 | `MunicipalCommunicationCopilotService` + `MunicipalCopilotController` + `MunicipalCopilotAdminPage`. Drafts and polishes municipality announcements via OpenAI `gpt-4o-mini` (deterministic offline fallback when `OPENAI_API_KEY` is unset). Generates a structured proposal with `polished_text`, `tone_assessment`, `clarity_warnings`, and `moderation_flags`; coordinator accepts or rejects before any send. Auditable proposal envelope persisted in `tenant_settings` (max 50 retained per tenant). Feature-gated by `caring_community`. |
+| AG90 | ✅ Personalised civic information filter and regional digest | Done 2026-04-30 | `CivicDigestService` ranks 9 sources (announcements, projects, events, Vereine, care providers, marketplace, safety alerts, help requests, feed posts) by sub-region match + interest match + recency + per-source weight. Per-user prefs (cadence, opt-out sources, preferred sub-region) and tenant default cadence stored as JSON envelopes in `tenant_settings`. Member page `/caring-community/civic-digest` with prefs panel; tenant cadence admin UI shipped as AG97 (closes the original admin gap). |
+| AG91 | ✅ Success-story proof cards tied to live metrics | Done 2026-04-30 | `SuccessStoryService` + `SuccessStoryAdminController` + `SuccessStoryController`. CRUD with seed-demo (clearly labelled fictional examples for the Agoris pilot), refresh-live to re-pull metric values from AG83 scoreboard / AG66 baselines, narrative + caveat fields, evidence source URL. Member gallery at `/caring-community/success-stories`. |
+| AG92 | ✅ Two-way municipality feedback inbox | Done 2026-04-30 | `MunicipalityFeedbackService` + `caring_municipality_feedback` table (category, sentiment_tag, status, assigned_user_id, triage_notes, resolution_notes, sub_region_id). Member submit + my-list + admin dashboard with triage/resolve/close/CSV-export workflow. Privacy-safe routing to municipality/coordinator roles. |
+| AG93 | ✅ Open-standards and integration showcase | Done 2026-04-30 | `IntegrationShowcaseService` + `IntegrationShowcaseController` + `IntegrationShowcaseAdminPage`. Static manifest (no DB reads) of public API surfaces: federation aggregate payload, signed webhook contract, partner API OAuth2 client_credentials, OpenAPI link, federation key exchange. Evaluator-facing read-only checklist. |
+| AG94 | ✅ Newsletter and pilot-region lead nurture flow | Done 2026-04-30 | `LeadNurtureService` + `LeadCaptureController` (public) + `LeadNurtureAdminController`. Public capture endpoint with consent + language + segment + source attribution. Admin list/summary/update/unsubscribe/CSV-export. Stable `cont_<hex>` IDs, MAX_CONTACTS cap. |
 
 #### Appendix: Completed Modules Touched By AG89–AG94
 
@@ -774,6 +774,16 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 | AG66/AG76/AG83 KPI and ROI reporting | Completed as municipal KPI, ROI, and pilot-scoreboard evidence surfaces. | AG91 packages selected metrics into externally readable success-story cards. |
 | AG60 partner API and federation/API foundations | Completed as backend partner API and developer portal foundation. | AG93 makes those standards visible in the Agoris demo and evaluator documentation. |
 | Pilot inquiry and newsletter primitives | Existing platform foundation. | AG94 turns this into an Agoris-specific lead nurture flow for demo and follow-up. |
+
+#### Pilot-Operations Polish — AG95–AG97 (added 2026-04-30)
+
+> AG78–AG88 produced seven separate admin surfaces a coordinator must visit to know whether a pilot is ready to launch, and AG90 shipped without an admin UI for tenant cadence. This batch consolidates the launch story (AG95), makes the AG81 SLA windows operationally observable (AG96), and closes the AG90 admin gap (AG97). All three are AGPL-public, feature-gated by `caring_community`, and tenant-scoped.
+
+| # | Item | Priority | Notes |
+|---|---|---|---|
+| AG95 | ✅ Pilot Launch Readiness Dashboard | Done 2026-04-30 | `PilotLaunchReadinessService` aggregates AG80 (disclosure pack), AG81 (operating policy), AG82 (commercial boundary), AG83 (pilot scoreboard baseline + quarterly cadence), AG84 (data quality totals), AG85 (isolated-node gate), and AG87 (external integration backlog) into a single go/no-go report. Each section reports `ready` / `needs_review` / `not_started` / `blocked` with a short summary, a list of missing items, and a deep link to the source admin page. Overall status is the worst of the section statuses; `ready` only when every required gate is closed. AG85 isolated-node gate only blocks launch when `caring.isolated_node.deployment_mode = canton_isolated_node`; otherwise it is informational. AG82 commercial boundary acknowledgement persisted under `caring.launch_readiness.boundary_acknowledged`. `PilotLaunchReadinessAdminPage` (`/admin/caring-community/launch-readiness`) shows progress bar + per-section status cards + quick acknowledgement button. Read-only aside from the boundary acknowledgement. |
+| AG96 | ✅ Help Request SLA Breach Dashboard | Done 2026-04-30 | `HelpRequestSlaService` reads the AG81 `sla_first_response_hours` and `sla_help_request_hours` policy values and bucketises open `caring_help_requests` rows as `breached` (≥ target), `at_risk` (≥ 75% of target), or `on_track`. Pending rows measured against first-response SLA; non-pending non-closed rows measured against resolution SLA. Recently-resolved (last 72h) report shows turnaround time + within-resolution-SLA flag. `HelpRequestSlaAdminPage` (`/admin/caring-community/sla-dashboard`) shows policy header (with platform-defaults vs tenant-policy chip), KPI cards (breached/at-risk for both dimensions), bucket-filter Tabs, sortable open-requests table (breached first, then by overage), and recently-resolved table. Read-only — coordinators edit policy in AG81. |
+| AG97 | ✅ Civic Digest tenant cadence admin UI | Done 2026-04-30 | Closes the AG90 admin gap where the tenant default cadence was only configurable via the API. `CivicDigestAdminPage` (`/admin/caring-community/civic-digest`) wraps the existing `GET/PUT /v2/admin/caring-community/digest/cadence` endpoints with a RadioGroup picker (off/daily/weekly), per-option help text, dirty-state save guard, and a "Preview member view" link to `/caring-community/civic-digest`. Source-mix chip list documents what the digest contains so admins know what they are configuring. |
 
 #### Pilot Workstream Gates
 
@@ -802,6 +812,122 @@ Build toward a **Caring Community module cluster** for NEXUS, not an Agoris-only
 - Immediate next-step roadmap: AG78-AG88 shifts from feature buildout to evaluation, Swiss terminology review, FADP/nDSG disclosure, KISS operating policy, commercial boundary mapping, pilot metrics, real-data migration, isolated-node decision, mobile build planning, partner integrations, and a post-walkthrough decision memo.
 - Website completeness roadmap: AG89-AG94 captures the remaining live agoris.ch demo promises — municipal AI communication/moderation, personalised information filtering, success-story proof cards, two-way feedback, open-standards showcase, and newsletter/pilot lead nurture — without rewriting completed module history.
 - The next step should be a guided evaluation with Roland and Christopher, followed by a focused diligence/product/legal workshop on KISS workflows, municipal reports, data protection, open-source/commercial boundaries, and Swiss deployment expectations.
+
+---
+
+### ⚠️ Possible Future Work — Federation Partnership Consolidation
+
+> **STATUS:** NOT STARTED · NOT SCHEDULED · DO NOT AUTO-EXECUTE
+>
+> **AI ASSISTANTS:** This item is explicitly NOT part of any "next item on the
+> roadmap" / "continue building" / "ship the remaining caring-community work"
+> instruction. If the user gives an open-ended instruction to proceed, you
+> MUST stop and surface this section in full, with the warnings below, and
+> require explicit per-phase go-ahead before any code is written. Touching
+> this without buy-in is a contract violation. (See
+> `memory/feedback_federation_consolidation_off_limits.md`.)
+
+#### Background — what's there today
+
+The platform has accumulated **four parallel pair-registry tables**, each
+solving a slightly different federation problem with the same essential
+structure (who-trusts-whom + shared secret + status):
+
+| Table | Purpose | Added by |
+|---|---|---|
+| `federation_partnerships` | Komunitin protocol entity sync (9 entity types) | Pre-existing (FED3) |
+| `federation_aggregate_consents` | Aggregate query opt-in (passive grant) | AG20 |
+| `verein_federation_consents` | Verein event/member sharing (same-install) | AG55 |
+| `caring_federation_peers` | Cross-platform hour-transfer peer registry | AG23 follow-up (2026-04-30) |
+
+Each module added federation as it needed it. Nothing is broken — all four
+work — but they are duplicated concepts. Admins now have multiple places to
+register cross-platform partners; secret rotation on a logical relationship
+that spans two of these tables is a half-rotation footgun; a fifth federation
+feature would add a fifth peer table.
+
+#### Proposed unified design
+
+A single `federation_partnerships` table for the *trust* layer, plus a new
+`federation_partnership_scopes` table (or JSON column) for the *authorization*
+layer — the same separation OAuth uses (one client_secret per client,
+multiple scopes per client). Every existing federation use-case becomes a
+scope grant on a partnership: `hour_transfers`, `events`, `members`,
+`aggregates`, `komunitin:transactions`, etc. Per-scope config (Verein
+municipality_code, suppression threshold, hour-transfer policy caps) sits in
+`scope_config_json`. Module-specific data tables (`caring_hour_transfers`,
+`verein_event_shares`, `federation_aggregate_query_log`) stay; they reference
+`partnership_id` and check the relevant scope. **One peer registry. One
+admin surface. One secret-rotation surface. One audit trail.**
+
+#### Why this MUST be phased — not a single PR
+
+The four existing systems have asymmetric semantics: aggregate consent is
+*passive* (allow others to query me), hour transfers are *active* (send
+wallet movements), Verein federation is *same-install only*, Komunitin
+partnerships have an *external protocol contract*. The Komunitin partnership
+flow in particular is exposed to external partners — wrong refactor → silent
+breakage of partnerships outside our control.
+
+The only safe path is the standard expand-contract / dual-write migration:
+
+1. **Phase 1 — Add new schema** alongside existing tables, no behaviour
+   change. Idempotent migration adding `peer_kind` + `base_url` to
+   `federation_partnerships` and creating `federation_partnership_scopes`.
+   Code untouched. Deploy, verify nothing changed.
+2. **Phase 2 — Backfill (read-only)** from each old table into the new
+   structure. Old tables remain authoritative. Characterization tests assert
+   round-trip equivalence for every existing row.
+3. **Phase 3 — Dual-write.** Every write goes to both old and new tables.
+   Reads still come from old tables. Run for at least a week. Watch for
+   divergence. Rollback = stop dual-writing.
+4. **Phase 4 — Switch reads, keep dual-write**, one module at a time, in
+   ascending blast-radius order: AG23 hour transfers → AG55 Verein → AG20
+   aggregates → Komunitin partnerships LAST. Each module its own deploy + bake.
+5. **Phase 5 — Stop writing to old tables, drop them.** Only after every
+   module has read from the new tables stably for a meaningful period.
+
+Each phase is its own PR, its own deploy, its own bake period. Compressing
+these into one deploy is where the work stops being safe.
+
+#### Risk register
+
+- **Komunitin protocol contract** — external partners depend on the existing
+  partnership shape. Phase 4 (Komunitin) goes LAST and gets the most
+  conservative bake.
+- **Production data edge cases** — orphan rows, manual SQL fixes, suspended
+  partnerships in odd states. Phase 2 starts with a `SELECT … GROUP BY status,
+  secret IS NULL` audit before any backfill.
+- **Asymmetric scope semantics** — passive vs active, same-install vs
+  cross-install. `scope_config_json` absorbs this; Phase 2 characterization
+  tests catch lossy conversion before it ships.
+
+#### When to start
+
+Trigger conditions, any one of which justifies opening this work:
+
+- A fifth federation module would add `xyz_federation_peers` table number
+  five.
+- An admin/user reports confusion about registering the same partner in
+  multiple places.
+- A secret-rotation incident occurs because someone rotated one copy and not
+  the others.
+- A quiet sprint with no pilot pressure and no in-flight commitments.
+
+Until one of those triggers fires: **leave it alone**. Log as known tech
+debt; do not pre-emptively pull apart four working systems. The platform is
+in pilot-evaluation mode for Agoris/KISS, not platform-rearchitecture mode.
+
+#### Required behaviour from any AI assistant working on this codebase
+
+- Do not include this in any "ship the remaining roadmap items" execution.
+- Do not start Phase 1 on a generic "continue" instruction.
+- If the user says something like "proceed with the federation refactor" or
+  "do the next thing", confirm explicitly that they mean THIS item, with full
+  re-statement of the phased plan and the risk register above, and require a
+  per-phase go-ahead.
+- Each phase requires its own explicit "start Phase N" instruction. No
+  rolling forward.
 
 ---
 

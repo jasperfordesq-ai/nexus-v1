@@ -15,7 +15,7 @@
  * - Recent pages: last 5 visited admin pages tracked in localStorage
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Fragment, useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@heroui/react';
@@ -105,6 +105,7 @@ import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
 import FlaskConical from 'lucide-react/icons/flask-conical';
+import Rocket from 'lucide-react/icons/rocket';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -116,6 +117,10 @@ interface NavItem {
   href: string;
   icon: LucideIcon;
   badge?: string;
+  // Optional faint heading rendered ABOVE this item to visually group long
+  // dropdowns (used by the Caring Community section). Tag the FIRST item of
+  // each group; subsequent items inherit the grouping until the next tag.
+  group?: string;
 }
 
 interface NavSection {
@@ -157,7 +162,7 @@ const ZONES: NavZone[] = [
     // What your community does: content, activities, commerce
     key: 'content_commerce',
     label: 'zone_community',
-    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
+    sectionKeys: ['caring_community', 'community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
   },
   {
     // Keeping the platform safe: content + user safety together
@@ -258,34 +263,40 @@ function useAdminNav(): NavSection[] {
     userRecord?.is_super_admin === true;
 
   return useMemo(() => {
+    // ── Caring Community Module — all items grouped under one dedicated dropdown ───
+    const caringCommunityItems = hasFeature('caring_community') ? [
+      { label: t('caring_community'), href: '/admin/caring-community', icon: Heart, group: 'Overview' },
+      { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
+      { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
+      { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins, group: 'Operations' },
+      { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
+      { label: 'Regional Points', href: '/admin/regional-points', icon: Coins },
+      { label: 'Sub-Regions', href: '/admin/caring-community/sub-regions', icon: MapPin },
+      { label: 'Federation Peers', href: '/admin/caring-community/federation-peers', icon: Network },
+      { label: 'SLA Dashboard', href: '/admin/caring-community/sla-dashboard', icon: Timer },
+      { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell, group: 'Engagement' },
+      { label: 'Communication Copilot', href: '/admin/caring-community/copilot', icon: Bot },
+      { label: 'Civic Digest', href: '/admin/caring-community/civic-digest', icon: Newspaper },
+      { label: 'Lead Nurture', href: '/admin/caring-community/lead-nurture', icon: Filter },
+      { label: 'Success Stories', href: '/admin/caring-community/success-stories', icon: Star },
+      { label: 'Feedback Inbox', href: '/admin/caring-community/feedback', icon: MessageSquare },
+      { label: 'Municipal Verification', href: '/admin/caring-community/verification', icon: ShieldCheck, group: 'Trust & Safety' },
+      { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
+      { label: 'Launch Readiness', href: '/admin/caring-community/launch-readiness', icon: Rocket, group: 'Pilot Governance' },
+      { label: 'Pilot Scoreboard', href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
+      { label: 'Pilot Data Quality', href: '/admin/caring-community/data-quality', icon: ClipboardCheck },
+      { label: 'Operating Policy', href: '/admin/caring-community/operating-policy', icon: ScrollText },
+      { label: 'Disclosure Pack', href: '/admin/caring-community/disclosure-pack', icon: ShieldCheck },
+      { label: 'Commercial Boundary', href: '/admin/caring-community/commercial-boundary', icon: Scale },
+      { label: 'Isolated-Node Gate', href: '/admin/caring-community/isolated-node', icon: Server },
+      { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical, group: 'Partnerships' },
+      { label: 'External Integrations', href: '/admin/caring-community/external-integrations', icon: PlugZap },
+      { label: 'Integration Showcase', href: '/admin/caring-community/integration-showcase', icon: Layers },
+      { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: BarChart3, group: 'Reporting' },
+    ] : [];
+
     // ── Community items — each sub-feature gated independently ───────────
     const communityItems = [
-      ...(hasFeature('caring_community') ? [
-        { label: t('caring_community'), href: '/admin/caring-community', icon: Heart },
-        { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
-        { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
-        { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
-        { label: 'Federation Peers', href: '/admin/caring-community/federation-peers', icon: Network },
-        { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
-        { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
-        { label: 'Regional Points', href: '/admin/regional-points', icon: Coins },
-        { label: 'Municipal Verification', href: '/admin/caring-community/verification', icon: ShieldCheck },
-        { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell },
-        { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical },
-        { label: 'Sub-Regions', href: '/admin/caring-community/sub-regions', icon: MapPin },
-        { label: 'Pilot Scoreboard', href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
-        { label: 'Pilot Data Quality', href: '/admin/caring-community/data-quality', icon: ClipboardCheck },
-        { label: 'Operating Policy', href: '/admin/caring-community/operating-policy', icon: ScrollText },
-        { label: 'Disclosure Pack', href: '/admin/caring-community/disclosure-pack', icon: ShieldCheck },
-        { label: 'Commercial Boundary', href: '/admin/caring-community/commercial-boundary', icon: Scale },
-        { label: 'Isolated-Node Gate', href: '/admin/caring-community/isolated-node', icon: Server },
-        { label: 'External Integrations', href: '/admin/caring-community/external-integrations', icon: PlugZap },
-        { label: 'Communication Copilot', href: '/admin/caring-community/copilot', icon: Bot },
-        { label: 'Success Stories', href: '/admin/caring-community/success-stories', icon: Star },
-        { label: 'Feedback Inbox', href: '/admin/caring-community/feedback', icon: MessageSquare },
-        { label: 'Integration Showcase', href: '/admin/caring-community/integration-showcase', icon: Layers },
-        { label: 'Lead Nurture', href: '/admin/caring-community/lead-nurture', icon: Filter },
-      ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
         { label: "Group Types", href: '/admin/groups/types', icon: FolderTree },
@@ -458,6 +469,13 @@ function useAdminNav(): NavSection[] {
         icon: Shield,
         items: moderationItems,
       },
+      // Caring Community Module — own dropdown, gated by caring_community feature
+      ...(caringCommunityItems.length > 0 ? [{
+        key: 'caring_community',
+        label: "Caring Community",
+        icon: Heart,
+        items: caringCommunityItems,
+      }] as NavSection[] : []),
       // Community — hidden entirely if all sub-features are disabled
       ...(communityItems.length > 0 ? [{
         key: 'community',
@@ -520,9 +538,6 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: "Community Analytics", href: '/admin/community-analytics', icon: BarChart3 },
           { label: "Impact Report", href: '/admin/impact-report', icon: FileText },
-          ...(hasFeature('caring_community') ? [
-            { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: Heart },
-          ] : []),
           { label: "Member Reports", href: '/admin/reports/members', icon: Users },
           ...(hasModule('wallet') ? [
             { label: "Hours Reports", href: '/admin/reports/hours', icon: Clock },
@@ -925,7 +940,20 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           </Button>
           {!collapsed && isExpanded && section.items && (
             <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
-              {section.items.map((item) => renderNavItem(item))}
+              {section.items.map((item, idx) => (
+                <Fragment key={item.href}>
+                  {item.group && (
+                    <li
+                      className={`px-3 text-[10px] font-semibold uppercase tracking-wider text-default-400 select-none ${
+                        idx === 0 ? 'pb-0.5' : 'pt-2 pb-0.5'
+                      }`}
+                    >
+                      {item.group}
+                    </li>
+                  )}
+                  {renderNavItem(item)}
+                </Fragment>
+              ))}
             </ul>
           )}
         </div>

@@ -180,6 +180,9 @@ const SuccessStoryAdminPage = lazy(() => import('./modules/caring-community/Succ
 const MunicipalityFeedbackAdminPage = lazy(() => import('./modules/caring-community/MunicipalityFeedbackAdminPage'));
 const IntegrationShowcaseAdminPage = lazy(() => import('./modules/caring-community/IntegrationShowcaseAdminPage'));
 const LeadNurtureAdminPage = lazy(() => import('./modules/caring-community/LeadNurtureAdminPage'));
+const PilotLaunchReadinessAdminPage = lazy(() => import('./modules/caring-community/PilotLaunchReadinessAdminPage'));
+const HelpRequestSlaAdminPage = lazy(() => import('./modules/caring-community/HelpRequestSlaAdminPage'));
+const CivicDigestAdminPage = lazy(() => import('./modules/caring-community/CivicDigestAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -925,6 +928,36 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><LeadNurtureAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG95 — Pilot Launch Readiness Dashboard */}
+      <Route
+        path="caring-community/launch-readiness"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><PilotLaunchReadinessAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG96 — Help Request SLA Dashboard */}
+      <Route
+        path="caring-community/sla-dashboard"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><HelpRequestSlaAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG97 — Civic Digest Cadence */}
+      <Route
+        path="caring-community/civic-digest"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CivicDigestAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

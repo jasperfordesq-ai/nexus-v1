@@ -1462,6 +1462,13 @@ Route::post('/v2/admin/caring-community/external-integrations', [\App\Http\Contr
 Route::put('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'update']);
 Route::delete('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'destroy']);
 
+// AG95 — Pilot Launch Readiness Dashboard
+Route::get('/v2/admin/caring-community/launch-readiness', [\App\Http\Controllers\Api\Admin\PilotLaunchReadinessController::class, 'index']);
+Route::post('/v2/admin/caring-community/launch-readiness/acknowledge-boundary', [\App\Http\Controllers\Api\Admin\PilotLaunchReadinessController::class, 'acknowledgeBoundary']);
+
+// AG96 — Help Request SLA Breach Dashboard
+Route::get('/v2/admin/caring-community/sla-dashboard', [\App\Http\Controllers\Api\Admin\HelpRequestSlaController::class, 'dashboard']);
+
 // AG89 — Municipal Communication & Moderation Copilot
 Route::get('/v2/admin/caring-community/copilot/proposals', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'index']);
 Route::post('/v2/admin/caring-community/copilot/proposals', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'generate']);
