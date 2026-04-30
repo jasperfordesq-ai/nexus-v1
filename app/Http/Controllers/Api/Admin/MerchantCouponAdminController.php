@@ -19,12 +19,6 @@ class MerchantCouponAdminController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    private function requireAdmin(): int
-    {
-        // Admin auth is enforced at the route/middleware layer (admin route group).
-        return $this->requireAuth();
-    }
-
     /**
      * GET /v2/admin/marketplace/coupons
      */
