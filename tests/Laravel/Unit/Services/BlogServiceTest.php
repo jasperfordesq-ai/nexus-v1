@@ -31,6 +31,8 @@ class BlogServiceTest extends TestCase
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
+        $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
+        $mockQuery->shouldReceive('whereRaw')->andReturnSelf();
         $mockQuery->shouldReceive('where')->andReturnSelf();
         $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
         $mockQuery->shouldReceive('limit')->andReturnSelf();
@@ -54,6 +56,8 @@ class BlogServiceTest extends TestCase
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
+        $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
+        $mockQuery->shouldReceive('whereRaw')->andReturnSelf();
         $mockQuery->shouldReceive('where')->andReturnSelf();
         $mockQuery->shouldReceive('first')->andReturnNull();
 
@@ -68,6 +72,8 @@ class BlogServiceTest extends TestCase
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
+        $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
+        $mockQuery->shouldReceive('whereRaw')->andReturnSelf();
         $mockQuery->shouldReceive('where')->andReturnSelf();
         $mockQuery->shouldReceive('count')->andReturn(0);
         $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();

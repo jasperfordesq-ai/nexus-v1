@@ -173,6 +173,40 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString('draft-post-sitemap', $xml);
     }
 
+    public function test_generateForTenant_excludes_placeholder_blog_posts(): void
+    {
+        DB::table('posts')->insertOrIgnore([
+            [
+                'id' => 90003,
+                'tenant_id' => $this->testTenantId,
+                'author_id' => $this->userId,
+                'title' => 'Aenean sed pulvinar et diam',
+                'slug' => 'aenean-sed-pulvinar-et-diam',
+                'content' => 'Real-looking title with placeholder body.',
+                'status' => 'published',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 90004,
+                'tenant_id' => $this->testTenantId,
+                'author_id' => $this->userId,
+                'title' => 'Placeholder Ipsum',
+                'slug' => 'placeholder-ipsum-sitemap',
+                'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                'status' => 'published',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        Cache::flush();
+        $xml = $this->service->generateForTenant($this->testTenantId);
+
+        $this->assertStringNotContainsString('aenean-sed-pulvinar-et-diam', $xml);
+        $this->assertStringNotContainsString('placeholder-ipsum-sitemap', $xml);
+    }
+
     public function test_generateForTenant_includes_active_listings(): void
     {
         $id = DB::table('listings')->insertGetId([

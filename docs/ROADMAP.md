@@ -59,7 +59,7 @@ Interim solution: pre-render public pages at build time so nginx serves real HTM
 | SEO12 | Structured data on listings | ✅ Done | High | `ListingDetailPage` now emits richer Service JSON-LD with canonical URL, category/service type, posted/modified dates, location + geo coordinates, author profile/rating, time-credit Offer metadata, and offer/request action hints. |
 | SEO13 | Article schema completion | ✅ Done | High | `BlogPostPage` Article JSON-LD now includes canonical `@id`/`mainEntityOfPage`, `description`, `dateModified`, article section, reading time, resolved image/logo URLs, and `author.url` profile links. |
 | SEO14 | Homepage internal linking | ✅ Done | High | `LandingPageRenderer` now appends a tenant-aware public discovery nav with translated, crawler-visible links to listings, events, groups, and blog when those modules/features are enabled. |
-| SEO15 | Remove test blog posts | 📋 Planned | Medium | 4 lorem ipsum posts in sitemap (`aenean-sed-pulvinar-et-diam`, etc.) — unpublish from admin. |
+| SEO15 | Remove test blog posts | ✅ Done | Medium | Public blog queries and `SitemapService` now suppress obvious placeholder posts by known lorem-ipsum slug/content, so `aenean-sed-pulvinar-et-diam` and similar filler posts no longer appear in public blog surfaces or XML sitemaps even if still published in tenant data. Admin-side cleanup remains safe to do manually later. |
 
 ### Phase C — Next.js Migration (Planned)
 

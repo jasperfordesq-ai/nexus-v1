@@ -373,8 +373,10 @@ class SitemapService
             "SELECT slug, COALESCE(updated_at, created_at) AS lastmod
              FROM posts
              WHERE tenant_id = ? AND status = 'published'
+               AND slug NOT IN ('aenean-sed-pulvinar-et-diam')
+               AND LOWER(CONCAT_WS(' ', title, excerpt, content, html_render)) NOT LIKE ?
              ORDER BY created_at DESC",
-            [$tenantId]
+            [$tenantId, '%lorem ipsum%']
         );
 
         return array_map(

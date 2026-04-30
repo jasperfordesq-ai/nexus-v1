@@ -18,6 +18,10 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class BlogService
 {
+    private const PLACEHOLDER_BLOG_SLUGS = [
+        'aenean-sed-pulvinar-et-diam',
+    ];
+
     public function __construct(
         private readonly Post $post,
         private readonly Category $category,
@@ -36,6 +40,7 @@ class BlogService
         $query = $this->post->newQuery()
             ->published()
             ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color']);
+        $this->excludePlaceholderPosts($query);
 
         if (! empty($filters['category_id'])) {
             $query->where('category_id', (int) $filters['category_id']);
@@ -83,6 +88,7 @@ class BlogService
         $query = $this->post->newQuery()
             ->published()
             ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color']);
+        $this->excludePlaceholderPosts($query);
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -110,6 +116,8 @@ class BlogService
         $post = $this->post->newQuery()
             ->published()
             ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color'])
+            ->whereNotIn('slug', self::PLACEHOLDER_BLOG_SLUGS)
+            ->whereRaw("LOWER(CONCAT_WS(' ', title, excerpt, content, html_render)) NOT LIKE ?", ['%lorem ipsum%'])
             ->where('slug', $slug)
             ->first();
 
@@ -155,6 +163,7 @@ class BlogService
             ->active()
             ->withCount(['posts' => function ($q) {
                 $q->where('status', 'published');
+                $this->excludePlaceholderPosts($q);
             }])
             ->orderBy('name')
             ->get()
@@ -169,6 +178,13 @@ class BlogService
     }
 
     // -- Helpers ---------------------------------------------------------------
+
+    private function excludePlaceholderPosts(Builder $query): void
+    {
+        $query
+            ->whereNotIn('slug', self::PLACEHOLDER_BLOG_SLUGS)
+            ->whereRaw("LOWER(CONCAT_WS(' ', title, excerpt, content, html_render)) NOT LIKE ?", ['%lorem ipsum%']);
+    }
 
     private function formatPostSummary(Post $post, string $baseUrl): array
     {
