@@ -18,6 +18,12 @@
  *   node scripts/prerender.mjs                    # Pre-render all routes
  *   node scripts/prerender.mjs --routes /about    # Pre-render specific route
  *
+ * Optional env:
+ *   NEXUS_PRERENDER_SITEMAP_URL=https://app.project-nexus.ie/sitemap.xml
+ *   NEXUS_PRERENDER_DYNAMIC_LIMIT=80
+ *   NEXUS_PRERENDER_SITEMAP_LIMIT=12
+ *   NEXUS_SKIP_DYNAMIC_PRERENDER=1
+ *
  * Requirements:
  *   - dist/ must exist (run `vite build` first)
  *   - @playwright/test must be installed
@@ -33,6 +39,9 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = join(__dirname, '..', 'dist');
 const PORT = 4173;
+const DEFAULT_SITEMAP_URL = `${process.env.VITE_APP_URL || 'https://app.project-nexus.ie'}/sitemap.xml`;
+const DYNAMIC_ROUTE_LIMIT = Math.max(0, Number.parseInt(process.env.NEXUS_PRERENDER_DYNAMIC_LIMIT || '80', 10) || 80);
+const SITEMAP_FETCH_LIMIT = Math.max(1, Number.parseInt(process.env.NEXUS_PRERENDER_SITEMAP_LIMIT || '12', 10) || 12);
 
 // ─── Public routes to pre-render ─────────────────────────────────────────────
 // These are pages that must be indexable by Google and should load instantly.
@@ -58,6 +67,84 @@ const PUBLIC_ROUTES = [
   '/platform/privacy',
   '/platform/disclaimer',
 ];
+
+const DYNAMIC_ROUTE_PATTERNS = [
+  /^\/(?:[a-z0-9-]+\/)?blog\/[^/?#]+$/i,
+  /^\/(?:[a-z0-9-]+\/)?listings\/[^/?#]+$/i,
+  /^\/(?:[a-z0-9-]+\/)?groups\/[^/?#]+$/i,
+];
+
+function extractXmlLocs(xml) {
+  return [...xml.matchAll(/<loc>\s*([^<]+)\s*<\/loc>/gi)]
+    .map(match => match[1].trim())
+    .filter(Boolean);
+}
+
+function isDynamicPrerenderRoute(pathname) {
+  return DYNAMIC_ROUTE_PATTERNS.some(pattern => pattern.test(pathname));
+}
+
+async function fetchSitemapXml(url) {
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'NexusPrerender/1.0',
+      Accept: 'application/xml,text/xml,*/*',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} from ${url}`);
+  }
+
+  return response.text();
+}
+
+async function fetchDynamicRoutesFromSitemap() {
+  if (process.env.NEXUS_SKIP_DYNAMIC_PRERENDER === '1' || process.env.NEXUS_SKIP_DYNAMIC_PRERENDER === 'true') {
+    console.log('Skipping dynamic route discovery because NEXUS_SKIP_DYNAMIC_PRERENDER is set.');
+    return [];
+  }
+
+  const sitemapUrl = process.env.NEXUS_PRERENDER_SITEMAP_URL || DEFAULT_SITEMAP_URL;
+  const queue = [sitemapUrl];
+  const seenSitemaps = new Set();
+  const routes = new Set();
+
+  try {
+    while (queue.length > 0 && seenSitemaps.size < SITEMAP_FETCH_LIMIT && routes.size < DYNAMIC_ROUTE_LIMIT) {
+      const current = queue.shift();
+      if (!current || seenSitemaps.has(current)) continue;
+      seenSitemaps.add(current);
+
+      const xml = await fetchSitemapXml(current);
+      const locs = extractXmlLocs(xml);
+
+      for (const loc of locs) {
+        let parsed;
+        try {
+          parsed = new URL(loc);
+        } catch {
+          continue;
+        }
+
+        if (parsed.pathname.endsWith('.xml')) {
+          queue.push(parsed.href);
+          continue;
+        }
+
+        if (isDynamicPrerenderRoute(parsed.pathname)) {
+          routes.add(parsed.pathname);
+          if (routes.size >= DYNAMIC_ROUTE_LIMIT) break;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(`Could not discover dynamic pre-render routes from sitemap: ${err.message}`);
+    return [];
+  }
+
+  return [...routes];
+}
 
 // ─── Lightweight static file server ──────────────────────────────────────────
 // Serves dist/ locally so Playwright can visit pages. Mimics nginx behaviour:
@@ -152,17 +239,17 @@ async function main() {
     return;
   }
 
+  if (!existsSync(DIST_DIR)) {
+    console.error('dist/ not found. Run `vite build` first.');
+    process.exit(1);
+  }
+
   // Parse --routes flag for selective pre-rendering
   const args = process.argv.slice(2);
   const routesIdx = args.indexOf('--routes');
   const routes = routesIdx !== -1
     ? args.slice(routesIdx + 1).filter(r => r.startsWith('/'))
-    : PUBLIC_ROUTES;
-
-  if (!existsSync(DIST_DIR)) {
-    console.error('dist/ not found. Run `vite build` first.');
-    process.exit(1);
-  }
+    : [...new Set([...PUBLIC_ROUTES, ...(await fetchDynamicRoutesFromSitemap())])];
 
   // Save the original index.html before we overwrite it with the pre-rendered homepage
   const originalIndex = readFileSync(join(DIST_DIR, 'index.html'), 'utf-8');
