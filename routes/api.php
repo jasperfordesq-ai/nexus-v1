@@ -1385,6 +1385,15 @@ Route::get('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controller
 Route::put('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'updateTierConfig']);
 Route::post('/v2/admin/caring-community/trust-tier/recompute', [\App\Http\Controllers\Api\TrustTierController::class, 'recomputeTiers']);
 
+// AG71 — Warmth Pass
+Route::get('/v2/caring-community/my-warmth-pass', [\App\Http\Controllers\Api\WarmthPassController::class, 'myPass'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/warmth-pass/{userId}', [\App\Http\Controllers\Api\WarmthPassController::class, 'adminViewPass']);
+
+// Care Recipient Circle + Municipal ROI
+Route::get('/v2/admin/caring-community/recipient/{userId}/circle', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'recipientCircle']);
+Route::get('/v2/admin/caring-community/municipal-roi', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'municipalRoi']);
+
 // AG68 — Caregiver/Angehörigen Support Flow
 Route::get('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'myLinks'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

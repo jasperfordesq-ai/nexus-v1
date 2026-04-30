@@ -14,6 +14,7 @@ import { Route, Navigate } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { SuperAdminRoute } from './SuperAdminRoute';
+import type { TenantFeatures } from '@/types';
 
 /** Small wrapper so Navigate targets can use tenantPath() inside Route elements. */
 function TenantRedirect({ to }: { to: string }) {
@@ -30,7 +31,7 @@ function FeatureGatedElement({
   feature,
   children,
 }: {
-  feature: string;
+  feature: keyof TenantFeatures;
   children: React.ReactNode;
 }) {
   const { hasFeature, tenantPath } = useTenant();
@@ -162,6 +163,9 @@ const RegionalPointsAdminPage = lazy(() => import('./modules/caring-community/Re
 const MunicipalVerificationAdminPage = lazy(() => import('./modules/caring-community/MunicipalVerificationAdminPage'));
 const SmartNudgesAdminPage = lazy(() => import('./modules/caring-community/SmartNudgesAdminPage'));
 const ResearchPartnershipsAdminPage = lazy(() => import('./modules/caring-community/ResearchPartnershipsAdminPage'));
+const WarmthPassAdminPage = lazy(() => import('./modules/caring-community/WarmthPassAdminPage'));
+const CareRecipientCirclePage = lazy(() => import('./modules/caring-community/CareRecipientCirclePage'));
+const MunicipalRoiAdminPage = lazy(() => import('./modules/caring-community/MunicipalRoiAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -731,6 +735,44 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><ResearchPartnershipsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* Warmth Pass */}
+      <Route
+        path="caring-community/warmth-pass"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><WarmthPassAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+      <Route
+        path="caring-community/warmth-pass/:userId"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><WarmthPassAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* Care Recipient Circle */}
+      <Route
+        path="caring-community/recipient-circle"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CareRecipientCirclePage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* Municipal ROI / B2G impact dashboard */}
+      <Route
+        path="caring-community/municipal-roi"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><MunicipalRoiAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

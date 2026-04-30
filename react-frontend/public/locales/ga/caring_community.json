@@ -112,5 +112,26 @@
       "candidates": "Substitute candidates could not be loaded",
       "assign": "Substitute could not be matched"
     }
+  },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
   }
 }

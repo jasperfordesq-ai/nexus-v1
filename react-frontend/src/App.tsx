@@ -173,6 +173,7 @@ const SafeguardingReportPage = lazyWithRetry(() => import('@/pages/caring-commun
 const MySafeguardingReportsPage = lazyWithRetry(() => import('@/pages/caring-community/MySafeguardingReportsPage'));
 const CareProviderDirectoryPage = lazyWithRetry(() => import('@/pages/caring-community/CareProviderDirectoryPage'));
 const MyTrustTierPage = lazyWithRetry(() => import('@/pages/caring-community/MyTrustTierPage'));
+const WarmthPassPage = lazyWithRetry(() => import('@/pages/caring-community/WarmthPassPage'));
 const CaregiverDashboardPage = lazyWithRetry(() => import('@/pages/caring-community/CaregiverDashboardPage'));
 const LinkCareReceiverPage = lazyWithRetry(() => import('@/pages/caring-community/LinkCareReceiverPage'));
 const CoverCarePage = lazyWithRetry(() => import('@/pages/caring-community/CoverCarePage'));
@@ -695,6 +696,14 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MyTrustTierPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        <Route path="caring-community/warmth-pass" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <WarmthPassPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

@@ -1237,6 +1237,284 @@ class AdminCaringCommunityController extends BaseApiController
         return $this->respondWithData($result);
     }
 
+    // -------------------------------------------------------------------------
+    // Warmth Pass — Care Recipient Circle
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/recipient/{userId}/circle
+     *
+     * Returns the support network (circle) for a care recipient, together with
+     * open help requests and any safeguarding flags.
+     */
+    public function recipientCircle(int $userId): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+
+        // Recipient user details
+        $recipient = \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if ($recipient === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
+        }
+
+        $recipientName = '';
+        if (!empty($recipient->name)) {
+            $recipientName = (string) $recipient->name;
+        } elseif (\Illuminate\Support\Facades\Schema::hasColumn('users', 'first_name')) {
+            $recipientName = trim(
+                ((string) ($recipient->first_name ?? '')) . ' ' . ((string) ($recipient->last_name ?? ''))
+            );
+        }
+
+        $memberSince = null;
+        if (!empty($recipient->created_at)) {
+            try {
+                $memberSince = (string) \Carbon\Carbon::parse((string) $recipient->created_at)->toDateString();
+            } catch (\Throwable) {
+                $memberSince = null;
+            }
+        }
+
+        // Support relationships + supporters
+        $relationships = [];
+        $totalHoursReceived = 0.0;
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
+            $hasRelationshipId = \Illuminate\Support\Facades\Schema::hasColumn('vol_logs', 'caring_support_relationship_id');
+
+            $rows = \Illuminate\Support\Facades\DB::table('caring_support_relationships as csr')
+                ->join('users as u', 'u.id', '=', 'csr.supporter_user_id')
+                ->where('csr.recipient_user_id', $userId)
+                ->where('csr.tenant_id', $tenantId)
+                ->where('csr.status', 'active')
+                ->select([
+                    'csr.id',
+                    'csr.supporter_user_id',
+                    'csr.relationship_type',
+                    'csr.last_activity_at',
+                    'csr.status',
+                    'u.name as supporter_name',
+                    'u.first_name as supporter_first_name',
+                    'u.last_name as supporter_last_name',
+                    'u.trust_tier as supporter_trust_tier',
+                ])
+                ->get();
+
+            foreach ($rows as $row) {
+                $relId = (int) $row->id;
+
+                // Hours for this relationship
+                $hoursForRel = 0.0;
+                if ($hasRelationshipId && \Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+                    $hoursForRel = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
+                        ->where('caring_support_relationship_id', $relId)
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', 'approved')
+                        ->sum('hours');
+                }
+
+                $totalHoursReceived += $hoursForRel;
+
+                // Supporter name
+                $supporterName = '';
+                if (!empty($row->supporter_name)) {
+                    $supporterName = (string) $row->supporter_name;
+                } else {
+                    $supporterName = trim(
+                        ((string) ($row->supporter_first_name ?? '')) . ' ' . ((string) ($row->supporter_last_name ?? ''))
+                    );
+                }
+
+                $lastActivityAt = null;
+                if (!empty($row->last_activity_at)) {
+                    try {
+                        $lastActivityAt = (string) \Carbon\Carbon::parse((string) $row->last_activity_at)->toIso8601String();
+                    } catch (\Throwable) {
+                        $lastActivityAt = null;
+                    }
+                }
+
+                $relationships[] = [
+                    'id'               => $relId,
+                    'supporter'        => [
+                        'id'         => (int) $row->supporter_user_id,
+                        'name'       => $supporterName,
+                        'trust_tier' => (int) ($row->supporter_trust_tier ?? 0),
+                    ],
+                    'type'             => (string) ($row->relationship_type ?? ''),
+                    'hours_logged'     => $hoursForRel,
+                    'last_activity_at' => $lastActivityAt,
+                    'status'           => (string) ($row->status ?? ''),
+                ];
+            }
+        }
+
+        // Open help requests
+        $openHelpRequests = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('caring_help_requests')) {
+            $closedStatuses = ['matched', 'cancelled', 'closed'];
+            $placeholders   = implode(',', array_fill(0, count($closedStatuses), '?'));
+
+            $openHelpRequests = (int) \Illuminate\Support\Facades\DB::table('caring_help_requests')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->whereNotIn('status', $closedStatuses)
+                ->count();
+        }
+
+        // Safeguarding flags
+        $safeguardingFlags = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('safeguarding_reports')) {
+            $subjectCol = 'subject_user_id';
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('safeguarding_reports', $subjectCol)) {
+                $subjectCol = \Illuminate\Support\Facades\Schema::hasColumn('safeguarding_reports', 'reported_user_id')
+                    ? 'reported_user_id'
+                    : null;
+            }
+
+            if ($subjectCol !== null) {
+                $safeguardingFlags = (int) \Illuminate\Support\Facades\DB::table('safeguarding_reports')
+                    ->where($subjectCol, $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->count();
+            }
+        }
+
+        return $this->respondWithData([
+            'recipient'              => [
+                'id'           => $userId,
+                'name'         => $recipientName,
+                'trust_tier'   => (int) ($recipient->trust_tier ?? 0),
+                'member_since' => $memberSince,
+            ],
+            'support_relationships'  => $relationships,
+            'total_hours_received'   => $totalHoursReceived,
+            'open_help_requests'     => $openHelpRequests,
+            'safeguarding_flags'     => $safeguardingFlags,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Municipal ROI
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/municipal-roi
+     *
+     * Aggregated ROI metrics for municipal/cooperative impact reporting.
+     * Uses Swiss formal care assistant hourly rate (CHF 35) and the
+     * prevention multiplier (×2) from the KISS/Age-Stiftung methodology.
+     */
+    public function municipalRoi(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+        $now      = now();
+        $oneYearAgo     = $now->copy()->subYear();
+        $twoYearsAgo    = $now->copy()->subYears(2);
+
+        // Total approved hours (all time)
+        $totalHours = 0.0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+            $totalHours = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->sum('hours');
+        }
+
+        // Active members (distinct users with ≥1 approved log in the last year)
+        $activeMembers = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+            $activeMembers = (int) \Illuminate\Support\Facades\DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->where('created_at', '>=', $oneYearAgo->toDateTimeString())
+                ->distinct('user_id')
+                ->count('user_id');
+        }
+
+        // Active support relationships
+        $activeRelationships = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
+            $activeRelationships = (int) \Illuminate\Support\Facades\DB::table('caring_support_relationships')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->count();
+        }
+
+        // Distinct recipients
+        $recipientCount = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
+            $recipientCount = (int) \Illuminate\Support\Facades\DB::table('caring_support_relationships')
+                ->where('tenant_id', $tenantId)
+                ->distinct('recipient_user_id')
+                ->count('recipient_user_id');
+        }
+
+        // Total approved exchanges
+        $totalExchanges = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+            $totalExchanges = (int) \Illuminate\Support\Facades\DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->count();
+        }
+
+        // Trend: hours in last 12 months vs 12–24 months ago
+        $hoursThisYear = 0.0;
+        $hoursPriorYear = 0.0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+            $hoursThisYear = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->where('created_at', '>=', $oneYearAgo->toDateTimeString())
+                ->sum('hours');
+
+            $hoursPriorYear = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->where('created_at', '>=', $twoYearsAgo->toDateTimeString())
+                ->where('created_at', '<', $oneYearAgo->toDateTimeString())
+                ->sum('hours');
+        }
+
+        $hoursYoyPct = null;
+        if ($hoursPriorYear > 0) {
+            $hoursYoyPct = round((($hoursThisYear - $hoursPriorYear) / $hoursPriorYear) * 100, 2);
+        }
+
+        // ROI computation (Swiss formal care assistant rate)
+        $hourlyRateChf          = 35;
+        $formalCareOffsetChf    = round($totalHours * $hourlyRateChf, 2);
+        $preventionValueChf     = round($formalCareOffsetChf * 2, 2);
+
+        return $this->respondWithData([
+            'total_hours'          => $totalHours,
+            'active_members'       => $activeMembers,
+            'active_relationships' => $activeRelationships,
+            'recipient_count'      => $recipientCount,
+            'total_exchanges'      => $totalExchanges,
+            'roi'                  => [
+                'hourly_rate_chf'            => $hourlyRateChf,
+                'formal_care_offset_chf'     => $formalCareOffsetChf,
+                'prevention_value_chf'       => $preventionValueChf,
+                'social_isolation_prevented' => $recipientCount,
+            ],
+            'trend'                => [
+                'hours_yoy_pct' => $hoursYoyPct,
+            ],
+        ]);
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         $this->requireAdmin();
