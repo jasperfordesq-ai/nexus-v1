@@ -106,7 +106,7 @@
     "title_placeholder": "Geben Sie einen klaren, beschreibenden Titel ein",
     "description_label": "Beschreibung",
     "description_placeholder": "Beschreiben Sie den Wettbewerb oder Ihre Idee im Detail",
-    "description_helper": "Beschreiben Sie das Problem klar, einschließlich wer betroffen ist, warum es wichtig ist und wie eine erfolgreiche Lösung aussieht",
+    "description_helper": "Beschreiben Sie das Problem klar, einschliesslich wer betroffen ist, warum es wichtig ist und wie eine erfolgreiche Lösung aussieht",
     "category_label": "Kategorie",
     "category_placeholder": "Kategorie auswählen",
     "category_free_label": "Kategorie (Freitext)",
@@ -147,7 +147,7 @@
     "set_open": "Für Einreichungen öffnen",
     "set_voting": "Zur Abstimmung verschieben",
     "set_evaluating": "Zur Bewertung verschieben",
-    "set_closed": "Wettbewerb schließen",
+    "set_closed": "Wettbewerb schliessen",
     "set_archived": "Wettbewerb archivieren",
     "reopen": "Wettbewerb wiedereröffnen",
     "unarchive": "Archivierung aufheben",
@@ -225,7 +225,7 @@
     "helper": "Bannerbild für den Wettbewerb (empfohlen 600x400)"
   },
   "guidance": {
-    "title": "Tipps für einen großartigen Wettbewerb",
+    "title": "Tipps für einen grossartigen Wettbewerb",
     "intro": "Ein gut formulierter Wettbewerb inspiriert bessere Ideen. Hier sind einige Tipps, die Ihnen helfen, eine effektive Problemstellung zu erstellen.",
     "tips": {
       "clear_problem": {
@@ -360,7 +360,7 @@
     "empty_title": "Noch keine Dokumente",
     "empty_description": "Laden Sie Dateien hoch, um sie mit Ihrem Team zu teilen.",
     "delete_confirm": "Dieses Dokument löschen?",
-    "max_size": "Maximale Dateigröße: 10 MB"
+    "max_size": "Maximale Dateigrösse: 10 MB"
   },
   "chatrooms": {
     "title": "Kanäle",

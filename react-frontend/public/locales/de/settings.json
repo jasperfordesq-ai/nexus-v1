@@ -471,14 +471,14 @@
     "density_spacious": "Grosszügig",
     "high_contrast": "Hoher Kontrast",
     "high_contrast_desc": "Erhöht Rahmen, Textkontrast und Fokusanzeiger für bessere Barrierefreiheit",
-    "accessibility_profile": "Accessibility Profile",
-    "accessibility_profile_desc": "Choose how the interface should adapt for easier reading, calmer motion, and simpler screens",
-    "large_text": "Large Text",
-    "large_text_desc": "Use the largest base text size across the interface",
-    "reduced_motion": "Reduced Motion",
-    "reduced_motion_desc": "Reduce animation and scrolling effects throughout the interface",
-    "simplified_layout": "Simplified Layout",
-    "simplified_layout_desc": "Reduce blur, shadows, and decorative depth while keeping the same navigation"
+    "accessibility_profile": "Barrierefreiheits-Profil",
+    "accessibility_profile_desc": "Wählen Sie, wie sich die Oberfläche anpassen soll — für einfacheres Lesen, ruhigere Bewegungen und übersichtlichere Bildschirme",
+    "large_text": "Grosse Schrift",
+    "large_text_desc": "Verwenden Sie die grösste Basis-Textgrösse in der gesamten Oberfläche",
+    "reduced_motion": "Reduzierte Bewegung",
+    "reduced_motion_desc": "Reduziert Animationen und Scroll-Effekte in der gesamten Oberfläche",
+    "simplified_layout": "Vereinfachtes Layout",
+    "simplified_layout_desc": "Reduziert Unschärfe, Schatten und dekorative Tiefe — die Navigation bleibt gleich"
   },
   "blocked_users": {
     "title": "Blockierte Benutzer",
@@ -536,6 +536,6 @@
     "chip_match_approval": "Treffer-Genehmigung",
     "chip_vetted_only": "Nur geprüfte Kontakte"
   },
-  "push_campaign_opt_in": "Receive promoted push notifications",
-  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
+  "push_campaign_opt_in": "Beworbene Push-Mitteilungen erhalten",
+  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Mitteilungen zu senden. Sie können sich jederzeit abmelden."
 }

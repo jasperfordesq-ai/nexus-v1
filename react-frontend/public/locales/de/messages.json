@@ -149,7 +149,7 @@
   "translate_hint": {
     "title": "Übersetzung ist verfügbar",
     "body": "Sie und diese Person können jeweils in Ihrer eigenen Sprache schreiben. Tippen Sie auf \"Übersetzen\" bei einer Nachricht, um sie in Ihrer Sprache zu lesen, oder verwenden Sie die Übersetzen-Schaltfläche im Header, um alles automatisch zu übersetzen.",
-    "dismiss": "Übersetzungshinweis schließen"
+    "dismiss": "Übersetzungshinweis schliessen"
   },
   "new_group": "Neue Gruppe",
   "create_group": "Gruppe erstellen",

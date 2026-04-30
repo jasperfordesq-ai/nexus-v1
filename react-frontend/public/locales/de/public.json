@@ -395,11 +395,11 @@
     "where_we_are": {
       "title": "Wo wir jetzt stehen",
       "paragraph1": "Diese Plattform entstand Mitte Dezember 2025, wobei die Entwicklung um den 15/12/2025 herum begann.",
-      "paragraph2": "Sie wuchs in kurzer Zeit schnell. Bis etwa zum 15/02/2026 wurde ein Großteil der früheren Arbeit sowohl am Frontend als auch am Backend bewusst verworfen und neu geschrieben, damit die Plattform auf stärkeren Grundlagen aufgebaut werden konnte.",
+      "paragraph2": "Sie wuchs in kurzer Zeit schnell. Bis etwa zum 15/02/2026 wurde ein Grossteil der früheren Arbeit sowohl am Frontend als auch am Backend bewusst verworfen und neu geschrieben, damit die Plattform auf stärkeren Grundlagen aufgebaut werden konnte.",
       "paragraph3": "Um den 24/02/2026 herum entschieden wir uns, das Frontend in React neu zu schreiben. Das Frontend ist der Teil, den die Nutzer sehen und mit dem sie interagieren — sozusagen der Körper der Plattform. Wir haben diese Änderung vorgenommen, um eine übersichtlichere und flexiblere Benutzererfahrung auf Basis wiederverwendbarer Komponenten zu schaffen, die Reaktionsfähigkeit auf verschiedenen Geräten — insbesondere auf Mobilgeräten — zu verbessern und die Benutzeroberfläche einfacher verbesserbar und wartbar zu machen, während die Plattform wächst.",
       "paragraph4": "Um den 17/03/2026 herum entschieden wir uns, das Backend in Laravel neu zu schreiben. Das Backend ist der Teil, der hinter den Kulissen arbeitet — sozusagen das Gehirn der Plattform. Wir haben diese Änderung vorgenommen, um der Plattform ein stärkeres und wartbareres Fundament zu geben, mit besserer Struktur für Authentifizierung, Validierung, Hintergrundverarbeitung, Caching und langfristige Entwicklerproduktivität.",
       "paragraph5": "Stand 24/03/2026 ist dies nach wie vor eine sehr neue Plattform, die sich schnell weiterentwickelt. Die meisten Kernfunktionen sind bereits vorhanden, aber einige Teile werden noch verfeinert, während das neue Frontend und das neue Backend miteinander verbunden und poliert werden.",
-      "paragraph6": "Wir arbeiten außerdem im Hintergrund an einer eigenen Mobiltelefon-App, die bald verfügbar sein sollte."
+      "paragraph6": "Wir arbeiten ausserdem im Hintergrund an einer eigenen Mobiltelefon-App, die bald verfügbar sein sollte."
     },
     "whats_stable": {
       "title": "Was stabil ist und funktioniert",
@@ -484,7 +484,7 @@
       "report_bug_description": "Haben Sie etwas Fehlerhaftes gefunden? Bitte eröffnen Sie ein Issue auf GitHub — das ist der schnellste Weg, uns eine Lösung vorzulegen. Beschreiben Sie, was Sie getan haben, was Sie erwartet haben und was tatsächlich passiert ist.",
       "github_link": "Ein Issue auf GitHub eröffnen",
       "become_tester_title": "Ihre Gemeinschaft zu NEXUS bringen",
-      "become_tester_description": "Wenn Sie eine Zeitbank oder ein Gemeinschaftsnetzwerk betreiben und der Plattform beitreten möchten, würden wir gerne mit Ihnen zusammenarbeiten. Kontaktieren Sie uns über GitHub Discussions oder die Kontaktseite — wir unterstützen Gemeinschaften aller Größen."
+      "become_tester_description": "Wenn Sie eine Zeitbank oder ein Gemeinschaftsnetzwerk betreiben und der Plattform beitreten möchten, würden wir gerne mit Ihnen zusammenarbeiten. Kontaktieren Sie uns über GitHub Discussions oder die Kontaktseite — wir unterstützen Gemeinschaften aller Grössen."
     },
     "security": {
       "title": "Sicherheitsmeldung",
