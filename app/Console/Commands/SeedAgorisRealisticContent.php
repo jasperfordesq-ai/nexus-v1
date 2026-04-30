@@ -192,7 +192,7 @@ class SeedAgorisRealisticContent extends Command
                 'first_name' => $row['first'],
                 'last_name' => $row['last'],
                 'name' => "{$row['first']} {$row['last']}",
-                'password_hash' => Hash::make(Str::random(32)),
+                'password_hash' => Hash::make(SeedAgorisDemoData::DEMO_PASSWORD),
                 'role' => 'member',
                 'status' => 'active',
                 'bio' => $row['bio'],

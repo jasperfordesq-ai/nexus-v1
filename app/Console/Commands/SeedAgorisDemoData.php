@@ -30,6 +30,16 @@ class SeedAgorisDemoData extends Command
 
     protected $description = 'Seed the Agoris/KISS caring-community demo tenant with rich sample data';
 
+    /**
+     * Shared strong demo password for ALL seeded Agoris demo accounts.
+     *
+     * 23 chars, mixed case, digit, symbol — meets every reasonable strong-password rule.
+     * The same passphrase is used by `SeedAgorisRealisticContent` and `SeedAgorisPolish`
+     * so a pilot evaluator can sign in as any seeded persona without a per-user lookup.
+     * Rotate if Agoris ever moves from a demo/pilot tenant to a production one.
+     */
+    public const DEMO_PASSWORD = 'Cham-Caring-Pilot-2026!';
+
     /** @var array<string, list<string>> */
     private array $columns = [];
 
@@ -77,7 +87,7 @@ class SeedAgorisDemoData extends Command
             $this->line(sprintf('  %-24s %d', $label, $count));
         }
         $this->newLine();
-        $this->line('Demo admin: agoris.admin@example.test / Password123!');
+        $this->line('Demo admin: agoris.admin@example.test / ' . self::DEMO_PASSWORD);
 
         return self::SUCCESS;
     }
@@ -180,7 +190,7 @@ class SeedAgorisDemoData extends Command
                 'first_name' => $row['first'],
                 'last_name' => $row['last'],
                 'name' => "{$row['first']} {$row['last']}",
-                'password_hash' => Hash::make('Password123!'),
+                'password_hash' => Hash::make(self::DEMO_PASSWORD),
                 'role' => $row['role'],
                 'status' => 'active',
                 'bio' => $row['bio'],
