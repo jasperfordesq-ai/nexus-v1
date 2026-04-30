@@ -10,7 +10,7 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Routing\Controller;
 use App\Services\Auth\SocialAuthService;
-use App\Services\TenantContext;
+use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
