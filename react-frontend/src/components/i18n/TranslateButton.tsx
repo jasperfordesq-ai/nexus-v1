@@ -95,7 +95,7 @@ export function TranslateButton({
         toast.error(t('translate.failed', 'Translation failed. Please try again.'));
       }
     } catch {
-      toast.show(t('translate.failed', 'Translation failed. Please try again.'), 'error');
+      toast.showToast(t('translate.failed', 'Translation failed. Please try again.'), 'error');
     } finally {
       setLoading(false);
     }

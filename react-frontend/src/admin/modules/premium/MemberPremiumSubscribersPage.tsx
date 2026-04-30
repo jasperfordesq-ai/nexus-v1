@@ -70,8 +70,8 @@ export function MemberPremiumSubscribersPage() {
         per_page: perPage,
         status: statusFilter || undefined,
       });
-      setRows(res.rows ?? []);
-      setTotal(res.total ?? 0);
+      setRows(res.data?.rows ?? []);
+      setTotal(res.data?.total ?? 0);
     } catch {
       toast.error('Failed to load subscribers');
     } finally {

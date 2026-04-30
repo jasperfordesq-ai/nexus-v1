@@ -26,8 +26,10 @@ interface UseApiOptions {
 
 interface UseApiReturn<T> extends UseApiState<T> {
   execute: () => Promise<ApiResponse<T>>;
+  refetch: () => Promise<ApiResponse<T>>;
   reset: () => void;
   setData: (data: T | null) => void;
+  loading: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +37,7 @@ interface UseApiReturn<T> extends UseApiState<T> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useApi<T>(
-  endpoint: string,
+  endpoint: string | null,
   options: UseApiOptions = {}
 ): UseApiReturn<T> {
   const { immediate = true, deps = [] } = options;
@@ -51,6 +53,12 @@ export function useApi<T>(
 
   const execute = useCallback(async (): Promise<ApiResponse<T>> => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+    if (!endpoint) {
+      const response: ApiResponse<T> = { success: true, data: undefined };
+      setState({ data: null, isLoading: false, error: null, meta: null });
+      return response;
+    }
 
     const response = await api.get<T>(endpoint);
 
@@ -85,7 +93,7 @@ export function useApi<T>(
   useEffect(() => {
     mountedRef.current = true;
 
-    if (immediate) {
+    if (immediate && endpoint) {
       execute();
     }
 
@@ -98,8 +106,10 @@ export function useApi<T>(
   return {
     ...state,
     execute,
+    refetch: execute,
     reset,
     setData,
+    loading: state.isLoading,
   };
 }
 

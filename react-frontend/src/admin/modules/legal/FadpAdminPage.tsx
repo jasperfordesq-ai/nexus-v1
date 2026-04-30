@@ -87,7 +87,7 @@ interface ConsentRecord {
 
 function downloadCsv(rows: Record<string, unknown>[], filename: string) {
   if (rows.length === 0) return;
-  const headers = Object.keys(rows[0]);
+  const headers = Object.keys(rows[0] ?? {});
   const csvContent = [
     headers.join(','),
     ...rows.map(row =>
@@ -175,7 +175,7 @@ export function FadpAdminPage() {
     setActivitiesLoading(true);
     try {
       const res = await api.get<ProcessingActivity[]>('/v2/admin/fadp/processing-activities');
-      setActivities(res.data);
+      setActivities(res.data ?? []);
     } catch {
       toast.showToast('Failed to load processing activities', 'error');
     } finally {
@@ -187,7 +187,7 @@ export function FadpAdminPage() {
     setRetentionLoading(true);
     try {
       const res = await api.get<RetentionConfig>('/v2/admin/fadp/retention-config');
-      setRetention(res.data);
+      if (res.data) setRetention(res.data);
     } catch {
       toast.showToast('Failed to load retention config', 'error');
     } finally {
@@ -199,7 +199,7 @@ export function FadpAdminPage() {
     setConsentLoading(true);
     try {
       const res = await api.get<ConsentRecord[]>('/v2/admin/fadp/consent-ledger');
-      setConsentRecords(res.data);
+      setConsentRecords(res.data ?? []);
     } catch {
       toast.showToast('Failed to load consent ledger', 'error');
     } finally {
@@ -210,7 +210,7 @@ export function FadpAdminPage() {
   const loadRegister = useCallback(async () => {
     try {
       const res = await api.get<Record<string, unknown>>('/v2/admin/fadp/processing-register');
-      setRegisterData(res.data);
+      setRegisterData(res.data ?? null);
     } catch {
       // non-critical
     }

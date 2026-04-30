@@ -95,6 +95,13 @@ const defaultFeatures: TenantFeatures = {
   ai_chat: true,
   marketplace: false,
   message_translation: true,
+  member_premium: false,
+  partner_api: false,
+  ai_agents: false,
+  fadp_compliance: false,
+  local_advertising: false,
+  merchant_coupons: false,
+  regional_analytics: false,
 };
 
 // Default modules (all enabled)

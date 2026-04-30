@@ -134,7 +134,7 @@ export default function VereinCrossInvitationButton({ userId }: Props) {
         startContent={<UserPlus className="w-4 h-4" />}
         onPress={() => setOpen(true)}
       >
-        {t('verein_federation.invite_to_verein_button', { name: primary.targetName })}
+        {t('verein_federation.invite_to_verein_button', { name: primary?.targetName ?? '' })}
       </Button>
 
       <Modal isOpen={open} onClose={() => setOpen(false)} size="md">

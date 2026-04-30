@@ -265,7 +265,7 @@ export default function EmergencyAlertAdminPage() {
                         <span className="text-xs">{formatDate(alert.expires_at)}</span>
                       </TableCell>
                       <TableCell>
-                        {Boolean(alert.push_sent) ? (
+                        {alert.push_sent ? (
                           <div className="flex items-center gap-1">
                             <Bell size={14} className="text-success" />
                             {pushResult ? (

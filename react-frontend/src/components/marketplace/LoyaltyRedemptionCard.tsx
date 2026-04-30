@@ -208,7 +208,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
           minValue={0}
           maxValue={quote.max_credits_usable}
           value={credits}
-          onChange={(v) => setCredits(Array.isArray(v) ? v[0] : v)}
+          onChange={(v) => setCredits(Array.isArray(v) ? (v[0] ?? 0) : v)}
           color="warning"
           showTooltip
         />

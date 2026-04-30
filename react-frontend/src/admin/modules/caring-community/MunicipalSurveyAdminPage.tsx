@@ -366,6 +366,7 @@ export default function MunicipalSurveyAdminPage() {
         `/v2/admin/caring-community/surveys/${survey.id}`
       );
       const raw = res.data;
+      if (!raw) return;
       const detail: SurveyDetail = 'data' in raw ? (raw as { data: SurveyDetail }).data : raw;
       if (detail.analytics) {
         setAnalyticsData(detail.analytics);
@@ -677,7 +678,7 @@ export default function MunicipalSurveyAdminPage() {
                   </Card>
                 ))}
                 <Button
-                  variant="dashed"
+                  variant="bordered"
                   startContent={<Plus size={14} />}
                   onPress={addQuestion}
                   className="w-full"

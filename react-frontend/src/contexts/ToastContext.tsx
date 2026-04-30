@@ -40,6 +40,8 @@ interface ToastContextType {
   error: (title: string, message?: string) => void;
   warning: (title: string, message?: string) => void;
   info: (title: string, message?: string) => void;
+  show: (toast: Omit<Toast, 'id'>) => void;
+  showToast: (title: string, type?: ToastType, message?: string) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,9 +92,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     addToast({ type: 'info', title, message });
   }, [addToast]);
 
+  const showToast = useCallback((title: string, type: ToastType = 'info', message?: string) => {
+    addToast({ type, title, message });
+  }, [addToast]);
+
   const value = useMemo(
-    () => ({ toasts, addToast, removeToast, success, error, warning, info }),
-    [toasts, addToast, removeToast, success, error, warning, info],
+    () => ({ toasts, addToast, removeToast, success, error, warning, info, show: addToast, showToast }),
+    [toasts, addToast, removeToast, success, error, warning, info, showToast],
   );
 
   return (
@@ -132,8 +138,10 @@ export function useToast(): ToastContextType {
       error: context.error,
       warning: context.warning,
       info: context.info,
+      show: context.show,
+      showToast: context.showToast,
     }),
-    [context.addToast, context.removeToast, context.success, context.error, context.warning, context.info],
+    [context.addToast, context.removeToast, context.success, context.error, context.warning, context.info, context.show, context.showToast],
   );
 }
 

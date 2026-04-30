@@ -60,7 +60,7 @@ export function PricingPage() {
       try {
         const res = await api.get<{ tiers: PremiumTier[] }>('/v2/member-premium/tiers');
         if (!cancelled) {
-          setTiers(res.tiers ?? []);
+          setTiers(res.data?.tiers ?? []);
         }
       } catch {
         if (!cancelled) {
@@ -101,8 +101,8 @@ export function PricingPage() {
           return_url: returnUrl,
         }
       );
-      if (res.checkout_url) {
-        window.location.href = res.checkout_url;
+      if (res.data?.checkout_url) {
+        window.location.href = res.data.checkout_url;
       } else {
         showToast(t('premium.checkout_no_url', 'Checkout could not be started'), 'error');
         setSubmittingTierId(null);

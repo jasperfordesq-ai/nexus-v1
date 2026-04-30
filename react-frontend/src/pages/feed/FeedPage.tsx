@@ -1097,6 +1097,7 @@ export function FeedPage() {
                         if (ads.length === 0) return null;
                         const adIndex = Math.floor((index + 1) / 8) - 1;
                         const ad = ads[adIndex % ads.length];
+                        if (!ad) return null;
                         return (
                           <motion.div
                             key={`ad-${ad.campaign_id}-${adIndex}`}

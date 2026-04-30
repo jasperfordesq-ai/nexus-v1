@@ -196,9 +196,9 @@ export function NationalKissDashboardPage() {
         api.get<{ rows: ComparativeRow[] }>(`/v2/admin/national/kiss/comparative?${params.toString()}`),
         api.get<{ trend: TrendPoint[] }>('/v2/admin/national/kiss/trend'),
       ]);
-      setSummary(summaryRes);
-      setComparative(comparativeRes.rows ?? []);
-      setTrend(trendRes.trend ?? []);
+      setSummary(summaryRes.data ?? null);
+      setComparative(comparativeRes.data?.rows ?? []);
+      setTrend(trendRes.data?.trend ?? []);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load dashboard';
       showToast(message, 'error');

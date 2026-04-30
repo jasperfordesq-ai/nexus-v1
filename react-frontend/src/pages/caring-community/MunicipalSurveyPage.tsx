@@ -231,7 +231,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
   const handleSubmit = async () => {
     // Validate required questions
     for (const q of questions) {
-      if (!Boolean(q.is_required)) continue;
+      if (!q.is_required) continue;
       const val = answers[String(q.id)];
       if (val === undefined || val === '' || (Array.isArray(val) && val.length === 0)) {
         setError(t('required_error'));
@@ -361,6 +361,7 @@ export default function MunicipalSurveyPage() {
         `/v2/caring-community/surveys/${survey.id}`
       );
       const raw = res.data;
+      if (!raw) return;
       const detail: Survey = 'data' in raw ? (raw as { data: Survey }).data : raw;
       setActiveSurvey(detail);
     } catch (e: unknown) {

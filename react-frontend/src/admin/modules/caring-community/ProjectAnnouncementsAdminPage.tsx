@@ -124,7 +124,7 @@ export default function ProjectAnnouncementsAdminPage() {
         setError(res.error ?? t('errors.load'));
         return;
       }
-      setProjects(unwrapData<ProjectAnnouncement[]>(res.data) ?? []);
+      setProjects(unwrapData<ProjectAnnouncement[]>(res.data ?? []) ?? []);
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.fetchProjects', err);
       setError(err instanceof Error ? err.message : t('errors.load'));

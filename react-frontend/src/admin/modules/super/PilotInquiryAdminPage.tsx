@@ -529,7 +529,7 @@ export function PilotInquiryAdminPage() {
           >
             {s.label}
             {stats?.by_stage[s.key] && (
-              <span className="ml-1 opacity-60">({stats.by_stage[s.key].count})</span>
+              <span className="ml-1 opacity-60">({stats.by_stage[s.key]?.count ?? 0})</span>
             )}
           </Button>
         ))}

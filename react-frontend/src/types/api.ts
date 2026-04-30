@@ -1138,6 +1138,11 @@ export interface TenantFeatures {
   message_translation: boolean;
   member_premium: boolean;
   partner_api: boolean;
+  ai_agents: boolean;
+  fadp_compliance: boolean;
+  local_advertising: boolean;
+  merchant_coupons: boolean;
+  regional_analytics: boolean;
 }
 
 export interface TenantModules {

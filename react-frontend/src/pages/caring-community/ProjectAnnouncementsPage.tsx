@@ -93,12 +93,12 @@ export default function ProjectAnnouncementsPage() {
         const res = await api.get<{ data: ProjectAnnouncement } | ProjectAnnouncement>(
           `/v2/caring-community/projects/${id}`,
         );
-        setProject(unwrapData<ProjectAnnouncement>(res.data));
+        setProject(res.data ? unwrapData<ProjectAnnouncement>(res.data) : null);
       } else {
         const res = await api.get<{ data: ProjectAnnouncement[] } | ProjectAnnouncement[]>(
           '/v2/caring-community/projects',
         );
-        setProjects(unwrapData<ProjectAnnouncement[]>(res.data));
+        setProjects(unwrapData<ProjectAnnouncement[]>(res.data ?? []));
       }
     } catch (err: unknown) {
       logError('ProjectAnnouncementsPage.load', err);

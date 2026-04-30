@@ -65,7 +65,7 @@ export function MySubscriptionPage() {
     setLoading(true);
     try {
       const res = await api.get<MeResponse>('/v2/member-premium/me');
-      setData(res);
+      setData(res.data ?? null);
     } catch {
       setData({ subscription: null, entitled_tier: null, unlocked_features: [] });
     } finally {
@@ -83,8 +83,8 @@ export function MySubscriptionPage() {
       const res = await api.post<{ portal_url: string }>('/v2/member-premium/billing-portal', {
         return_url: window.location.origin + tenantPath('/premium/manage'),
       });
-      if (res.portal_url) {
-        window.location.href = res.portal_url;
+      if (res.data?.portal_url) {
+        window.location.href = res.data.portal_url;
       } else {
         showToast(t('premium.portal_failed', 'Could not open billing portal'), 'error');
         setActionBusy(null);

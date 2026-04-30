@@ -654,7 +654,8 @@ export default function RegionalAnalyticsPage() {
   const handleExport = async () => {
     try {
       const res = await api.get(`${BASE}/export?period=${period}`);
-      const data = res.data?.data ?? res.data;
+      const payload = res.data as { data?: unknown } | undefined;
+      const data = payload?.data ?? res.data;
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

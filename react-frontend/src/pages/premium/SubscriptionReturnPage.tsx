@@ -55,8 +55,8 @@ export function SubscriptionReturnPage() {
       try {
         const res = await api.get<SubscriptionResponse>('/v2/member-premium/me');
         if (!mounted) return;
-        if (res.subscription?.is_active && res.entitled_tier) {
-          setTierName(res.entitled_tier.tier_name);
+        if (res.data?.subscription?.is_active && res.data.entitled_tier) {
+          setTierName(res.data.entitled_tier.tier_name);
           setStatus('success');
           return;
         }

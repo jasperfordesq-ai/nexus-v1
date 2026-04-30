@@ -1337,6 +1337,20 @@ class AdminConfigController extends BaseApiController
             && trim((string) ($config['native_app_push_sender_id'] ?? '')) !== ''
             && trim((string) ($config['native_app_tenant_channel_prefix'] ?? '')) !== '';
 
+        $missing = [];
+        if ($storeMode === 'tenant_branded' && !$hasIosIdentity) {
+            $missing[] = 'ios_identity';
+        }
+        if ($storeMode === 'tenant_branded' && !$hasAndroidIdentity) {
+            $missing[] = 'android_identity';
+        }
+        if ($storeMode === 'tenant_branded' && !$hasStoreMetadata) {
+            $missing[] = 'store_metadata';
+        }
+        if ($storeMode === 'tenant_branded' && !$pushRoutingConfigured) {
+            $missing[] = 'push_routing';
+        }
+
         return [
             'store_mode' => $storeMode,
             'has_ios_identity' => $hasIosIdentity,
@@ -1348,6 +1362,7 @@ class AdminConfigController extends BaseApiController
                 && $hasAndroidIdentity
                 && $hasStoreMetadata
                 && $pushRoutingConfigured,
+            'missing_requirements' => $missing,
         ];
     }
 

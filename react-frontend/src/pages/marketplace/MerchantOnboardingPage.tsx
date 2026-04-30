@@ -229,6 +229,7 @@ export function MerchantOnboardingPage() {
       try {
         const res = await api.get<OnboardingStatus>('/v2/merchant-onboarding/status');
         const status = res.data;
+        if (!status) return;
 
         if (status.onboarding_completed) {
           setCompleted(true);
@@ -258,7 +259,7 @@ export function MerchantOnboardingPage() {
             const addr =
               typeof p.business_address === 'string'
                 ? (JSON.parse(p.business_address) as AddressFields)
-                : (p.business_address as AddressFields);
+                : (p.business_address as unknown as AddressFields);
             setAddress({
               street: addr.street ?? '',
               city: addr.city ?? '',
@@ -275,7 +276,7 @@ export function MerchantOnboardingPage() {
             setOpeningHours(prev => {
               const next = { ...prev };
               (Object.keys(raw) as DayKey[]).forEach(d => {
-                next[d] = raw[d];
+                next[d] = raw[d] ?? null;
               });
               return next;
             });
@@ -349,7 +350,7 @@ export function MerchantOnboardingPage() {
     setSaving(true);
     try {
       const res = await api.post<CompleteResult>('/v2/merchant-onboarding/complete', {});
-      setBadgeGranted(res.data.badge_granted ?? false);
+      setBadgeGranted(res.data?.badge_granted ?? false);
       setCompleted(true);
     } catch (err) {
       logError('MerchantOnboardingPage: complete', err);
@@ -828,3 +829,5 @@ export function MerchantOnboardingPage() {
     </div>
   );
 }
+
+export default MerchantOnboardingPage;

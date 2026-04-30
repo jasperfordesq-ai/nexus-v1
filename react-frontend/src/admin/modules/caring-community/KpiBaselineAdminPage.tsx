@@ -258,7 +258,7 @@ export default function KpiBaselineAdminPage() {
       setComparingId(id);
       try {
         const res = await api.get<ComparisonResult>(`/v2/admin/caring-community/kpi-baselines/${id}/compare`);
-        setComparison(res.data);
+        setComparison(res.data ?? null);
         setSelectedBaselineId(id);
       } catch {
         showToast('Failed to load comparison', 'error');

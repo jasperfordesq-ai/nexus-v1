@@ -157,7 +157,7 @@ export function TrustTierAdminPage() {
         '/v2/admin/caring-community/trust-tier/recompute',
         {},
       );
-      const updated = result.data?.updated ?? result.updated ?? 0;
+      const updated = result.data?.data?.updated ?? 0;
       showToast(`Tiers recomputed for ${updated} members.`, 'success');
     } catch {
       showToast('Failed to recompute tiers.', 'error');

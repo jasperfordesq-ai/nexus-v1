@@ -124,6 +124,7 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipCsrf?: boolean;
   body?: unknown;
   timeout?: number; // Request timeout in ms (default 30000)
+  responseType?: 'json' | 'blob' | 'text';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -141,7 +141,7 @@ export default function CareProviderAdminPage() {
     setError(null);
     try {
       const res = await api.get<DirectoryResponse>('/v2/admin/caring-community/providers');
-      setProviders(res.data ?? []);
+      setProviders(res.data?.data ?? []);
     } catch (err) {
       logError('CareProviderAdminPage.fetch', err);
       setError('Failed to load care providers.');
@@ -190,7 +190,7 @@ export default function CareProviderAdminPage() {
   async function handleSave() {
     const errors: Partial<ProviderFormData> = {};
     if (!form.name.trim()) errors.name = 'Name is required.';
-    if (!form.type) errors.type = 'Type is required.';
+    if (!form.type) errors.type = '';
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);

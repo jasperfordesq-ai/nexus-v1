@@ -38,11 +38,11 @@ async function fetchUnlocked(): Promise<string[]> {
   inflight = (async () => {
     try {
       const res = await api.get<MeResponse>('/v2/member-premium/me');
-      cachedFeatures = res.unlocked_features ?? [];
-      return cachedFeatures;
+      cachedFeatures = res.data?.unlocked_features ?? [];
+      return cachedFeatures ?? [];
     } catch {
       cachedFeatures = [];
-      return cachedFeatures;
+      return cachedFeatures ?? [];
     } finally {
       inflight = null;
     }

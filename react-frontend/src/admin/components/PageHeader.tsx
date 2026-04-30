@@ -13,16 +13,23 @@ import type { ReactNode } from 'react';
 interface PageHeaderProps {
   title: string;
   description?: string;
+  subtitle?: string;
+  icon?: ReactNode;
   actions?: ReactNode;
 }
 
-export function PageHeader({ title, description, actions }: PageHeaderProps) {
+export function PageHeader({ title, description, subtitle, icon, actions }: PageHeaderProps) {
+  const body = description ?? subtitle;
+
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-        {description && (
-          <p className="mt-1 text-sm text-default-500">{description}</p>
+        <div className="flex min-w-0 items-center gap-3">
+          {icon && <span className="shrink-0 text-primary">{icon}</span>}
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+        </div>
+        {body && (
+          <p className="mt-1 text-sm text-default-500">{body}</p>
         )}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

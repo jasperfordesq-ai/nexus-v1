@@ -91,11 +91,12 @@ export default function CoverCarePage() {
         api.get<{ data: CaregiverLink[] } | CaregiverLink[]>('/v2/caring-community/caregiver/links'),
         api.get<{ data: CoverRequest[] } | CoverRequest[]>('/v2/caring-community/caregiver/cover-requests'),
       ]);
-      const nextLinks = unwrapData<CaregiverLink[]>(linksRes.data);
+      const nextLinks = unwrapData<CaregiverLink[]>(linksRes.data ?? []);
       setLinks(nextLinks);
-      setRequests(unwrapData<CoverRequest[]>(requestsRes.data));
-      if (!caredForId && nextLinks.length > 0) {
-        setCaredForId(String(nextLinks[0].cared_for_id));
+      setRequests(unwrapData<CoverRequest[]>(requestsRes.data ?? []));
+      const firstLink = nextLinks[0];
+      if (!caredForId && firstLink) {
+        setCaredForId(String(firstLink.cared_for_id));
       }
     } catch (err: unknown) {
       logError('CoverCarePage.load', err);
@@ -144,7 +145,7 @@ export default function CoverCarePage() {
       const res = await api.get<{ data: Candidate[] } | Candidate[]>(
         `/v2/caring-community/caregiver/cover-requests/${requestId}/candidates`,
       );
-      setCandidates((prev) => ({ ...prev, [requestId]: unwrapData<Candidate[]>(res.data) }));
+      setCandidates((prev) => ({ ...prev, [requestId]: unwrapData<Candidate[]>(res.data ?? []) }));
     } catch (err: unknown) {
       logError('CoverCarePage.loadCandidates', err);
       showToast(t('cover.errors.candidates'), 'error');
@@ -335,7 +336,7 @@ export default function CoverCarePage() {
 
               {(candidates[request.id] ?? []).length > 0 && (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  {candidates[request.id].map((candidate) => (
+                  {(candidates[request.id] ?? []).map((candidate) => (
                     <div key={candidate.id} className="rounded-lg border border-theme-default bg-theme-elevated p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">

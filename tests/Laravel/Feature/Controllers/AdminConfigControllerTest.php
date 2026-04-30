@@ -318,6 +318,50 @@ class AdminConfigControllerTest extends TestCase
         $manifest->assertJsonPath('data.deployment_readiness.tenant_branded_ready', true);
     }
 
+    public function test_native_app_tenant_branded_readiness_lists_missing_requirements(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $update = $this->apiPut('/v2/admin/config/native-app', [
+            'native_app_store_mode' => 'tenant_branded',
+            'native_app_name' => 'KISS Musterstadt',
+            'native_app_bundle_id' => '',
+            'native_app_package_name' => '',
+            'native_app_ios_app_store_id' => '',
+            'native_app_android_play_store_id' => '',
+            'native_app_marketing_url' => '',
+            'native_app_privacy_url' => '',
+            'native_app_support_url' => '',
+            'native_app_push_enabled' => false,
+            'native_app_push_sender_id' => '',
+            'native_app_tenant_channel_prefix' => '',
+        ]);
+
+        $update->assertStatus(200);
+
+        $response = $this->apiGet('/v2/admin/config/native-app');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.deployment_readiness.tenant_branded_ready', false);
+        $response->assertJsonPath('data.deployment_readiness.missing_requirements', [
+            'ios_identity',
+            'android_identity',
+            'store_metadata',
+            'push_routing',
+        ]);
+
+        $manifest = $this->apiGet('/v2/admin/config/native-app/build-manifest');
+
+        $manifest->assertStatus(200);
+        $manifest->assertJsonPath('data.deployment_readiness.missing_requirements', [
+            'ios_identity',
+            'android_identity',
+            'store_metadata',
+            'push_routing',
+        ]);
+    }
+
     // ================================================================
     // CRON JOBS — GET /v2/admin/system/cron-jobs
     // ================================================================

@@ -98,7 +98,7 @@ export function MemberPremiumAdminPage() {
     setLoading(true);
     try {
       const res = await memberPremiumAdminApi.listTiers();
-      setTiers(res.tiers ?? []);
+      setTiers(res.data?.tiers ?? []);
     } catch {
       toast.error('Failed to load tiers');
     } finally {

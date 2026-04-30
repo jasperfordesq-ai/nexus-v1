@@ -205,7 +205,7 @@ export function PilotInquiryPage() {
       };
 
       const res = await api.post('/v2/pilot-inquiry', payload);
-      const data = 'data' in res ? res.data : res;
+      const data = ('data' in res ? res.data : res) as { fit_score?: number; stage?: string };
       setResult({ fit_score: data.fit_score ?? 0, stage: data.stage ?? 'new' });
     } catch (err) {
       logError('PilotInquiryPage submit failed', err);

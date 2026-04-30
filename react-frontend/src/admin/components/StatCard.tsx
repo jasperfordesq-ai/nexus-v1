@@ -16,11 +16,13 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import TrendingDown from 'lucide-react/icons/trending-down';
 import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 interface StatCardProps {
-  label: string;
+  label?: string;
+  title?: string;
   value: string | number;
-  icon: LucideIcon;
+  icon: LucideIcon | ReactNode;
   trend?: number;
   trendLabel?: string;
   description?: string;
@@ -43,6 +45,7 @@ const colorMap = {
 
 export function StatCard({
   label,
+  title,
   value,
   icon: Icon,
   trend,
@@ -53,13 +56,15 @@ export function StatCard({
   to,
   linkAriaLabel,
 }: StatCardProps) {
+  const resolvedLabel = label ?? title ?? '';
+  const iconNode = typeof Icon === 'function' ? <Icon size={24} /> : Icon;
   const body = (
     <CardBody className="flex flex-row items-center gap-4 p-4">
       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${colorMap[color]}`}>
-        <Icon size={24} />
+        {iconNode}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-default-500">{label}</p>
+        <p className="text-sm text-default-500">{resolvedLabel}</p>
         {loading ? (
           <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
         ) : (
@@ -103,7 +108,7 @@ export function StatCard({
         isPressable
         as={Link}
         to={to}
-        aria-label={linkAriaLabel ?? label}
+        aria-label={linkAriaLabel ?? resolvedLabel}
         className="group text-left transition-shadow hover:shadow-md"
       >
         {body}

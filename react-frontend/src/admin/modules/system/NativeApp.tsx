@@ -24,6 +24,7 @@ import {
 import Download from 'lucide-react/icons/download';
 import Save from 'lucide-react/icons/save';
 import Smartphone from 'lucide-react/icons/smartphone';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageHeader } from '../../components';
@@ -37,6 +38,7 @@ interface NativeAppReadiness {
   has_store_metadata?: boolean;
   push_routing_configured?: boolean;
   tenant_branded_ready?: boolean;
+  missing_requirements?: string[];
 }
 
 interface NativeAppResponse {
@@ -72,11 +74,11 @@ const DEFAULT_FORM: NativeAppForm = {
 };
 
 const readinessLabels: Array<[keyof NativeAppReadiness, string]> = [
-  ['has_ios_identity', 'iOS identity'],
-  ['has_android_identity', 'Android identity'],
-  ['has_store_metadata', 'Store metadata'],
-  ['push_routing_configured', 'Push routing'],
-  ['tenant_branded_ready', 'Tenant-branded ready'],
+  ['has_ios_identity', 'readiness_ios_identity'],
+  ['has_android_identity', 'readiness_android_identity'],
+  ['has_store_metadata', 'readiness_store_metadata'],
+  ['push_routing_configured', 'readiness_push_routing'],
+  ['tenant_branded_ready', 'readiness_tenant_branded'],
 ];
 
 function fieldValue(formData: NativeAppForm, key: string): string {
@@ -85,7 +87,8 @@ function fieldValue(formData: NativeAppForm, key: string): string {
 }
 
 export function NativeApp() {
-  usePageTitle('System');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -106,10 +109,9 @@ export function NativeApp() {
         setFormData((prev) => ({ ...prev, ...(payload.native_app ?? {}) }));
         setReadiness(payload.deployment_readiness ?? {});
       })
-      .catch(() => toast.error('Failed to load native app settings'))
+      .catch(() => toast.error(t('system.failed_to_load_native_app_settings')))
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
-  }, []);
+  }, [t, toast]);
 
   const updateField = (key: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -123,9 +125,9 @@ export function NativeApp() {
       const payload = (refreshed.data ?? {}) as NativeAppResponse;
       setFormData((prev) => ({ ...prev, ...(payload.native_app ?? {}) }));
       setReadiness(payload.deployment_readiness ?? {});
-      toast.success('Native app settings saved successfully');
+      toast.success(t('system.native_app_settings_saved_successfully'));
     } catch {
-      toast.error('Failed to save native app settings');
+      toast.error(t('system.failed_to_save_native_app_settings'));
     } finally {
       setSaving(false);
     }
@@ -143,9 +145,9 @@ export function NativeApp() {
       link.download = 'native-app-build-manifest.json';
       link.click();
       URL.revokeObjectURL(url);
-      toast.success('Build manifest exported');
+      toast.success(t('system.native_app.build_manifest_exported'));
     } catch {
-      toast.error('Failed to export build manifest');
+      toast.error(t('system.native_app.build_manifest_export_failed'));
     } finally {
       setExporting(false);
     }
@@ -162,124 +164,134 @@ export function NativeApp() {
   return (
     <div>
       <PageHeader
-        title="Native App"
-        description="Configure PWA, push, and tenant-branded mobile app build readiness"
+        title={t('system.native_app_title')}
+        description={t('system.native_app.description')}
       />
 
       <div className="space-y-4">
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Smartphone size={20} />
-            <h3 className="text-lg font-semibold">App Configuration</h3>
+            <h3 className="text-lg font-semibold">{t('system.native_app.app_configuration')}</h3>
           </CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="App name" variant="bordered" value={fieldValue(formData, 'native_app_name')} onValueChange={(v) => updateField('native_app_name', v)} />
-            <Input label="Short name" variant="bordered" value={fieldValue(formData, 'native_app_short_name')} onValueChange={(v) => updateField('native_app_short_name', v)} />
-            <Input label="Bundle ID" variant="bordered" value={fieldValue(formData, 'native_app_bundle_id')} onValueChange={(v) => updateField('native_app_bundle_id', v)} />
-            <Input label="Package name" variant="bordered" value={fieldValue(formData, 'native_app_package_name')} onValueChange={(v) => updateField('native_app_package_name', v)} />
-            <Input label="App version" variant="bordered" value={fieldValue(formData, 'native_app_version')} onValueChange={(v) => updateField('native_app_version', v)} />
-            <Select label="Store mode" selectedKeys={[fieldValue(formData, 'native_app_store_mode')]} onChange={(event) => updateField('native_app_store_mode', event.target.value)}>
-              <SelectItem key="shared">Shared NEXUS app</SelectItem>
-              <SelectItem key="tenant_branded">Tenant-branded app</SelectItem>
+            <Input label={t('system.native_app.app_name')} variant="bordered" value={fieldValue(formData, 'native_app_name')} onValueChange={(v) => updateField('native_app_name', v)} />
+            <Input label={t('system.native_app.short_name')} variant="bordered" value={fieldValue(formData, 'native_app_short_name')} onValueChange={(v) => updateField('native_app_short_name', v)} />
+            <Input label={t('system.native_app.bundle_id')} variant="bordered" value={fieldValue(formData, 'native_app_bundle_id')} onValueChange={(v) => updateField('native_app_bundle_id', v)} />
+            <Input label={t('system.native_app.package_name')} variant="bordered" value={fieldValue(formData, 'native_app_package_name')} onValueChange={(v) => updateField('native_app_package_name', v)} />
+            <Input label={t('system.native_app.app_version')} variant="bordered" value={fieldValue(formData, 'native_app_version')} onValueChange={(v) => updateField('native_app_version', v)} />
+            <Select label={t('system.native_app.store_mode')} selectedKeys={[fieldValue(formData, 'native_app_store_mode')]} onChange={(event) => updateField('native_app_store_mode', event.target.value)}>
+              <SelectItem key="shared">{t('system.native_app.shared_app')}</SelectItem>
+              <SelectItem key="tenant_branded">{t('system.native_app.tenant_branded_app')}</SelectItem>
             </Select>
-            <Select label="Build profile" selectedKeys={[fieldValue(formData, 'native_app_build_profile')]} onChange={(event) => updateField('native_app_build_profile', event.target.value)}>
-              <SelectItem key="preview">Preview</SelectItem>
-              <SelectItem key="production">Production</SelectItem>
+            <Select label={t('system.native_app.build_profile')} selectedKeys={[fieldValue(formData, 'native_app_build_profile')]} onChange={(event) => updateField('native_app_build_profile', event.target.value)}>
+              <SelectItem key="preview">{t('system.native_app.preview')}</SelectItem>
+              <SelectItem key="production">{t('system.native_app.production')}</SelectItem>
             </Select>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Tenant-Branded Store Metadata</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.store_metadata')}</h3></CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="iOS App Store ID" variant="bordered" value={fieldValue(formData, 'native_app_ios_app_store_id')} onValueChange={(v) => updateField('native_app_ios_app_store_id', v)} />
-            <Input label="Android Play Store ID" variant="bordered" value={fieldValue(formData, 'native_app_android_play_store_id')} onValueChange={(v) => updateField('native_app_android_play_store_id', v)} />
-            <Input label="Marketing URL" variant="bordered" value={fieldValue(formData, 'native_app_marketing_url')} onValueChange={(v) => updateField('native_app_marketing_url', v)} />
-            <Input label="Privacy URL" variant="bordered" value={fieldValue(formData, 'native_app_privacy_url')} onValueChange={(v) => updateField('native_app_privacy_url', v)} />
-            <Input label="Support URL" variant="bordered" value={fieldValue(formData, 'native_app_support_url')} onValueChange={(v) => updateField('native_app_support_url', v)} className="md:col-span-2" />
+            <Input label={t('system.native_app.ios_app_store_id')} variant="bordered" value={fieldValue(formData, 'native_app_ios_app_store_id')} onValueChange={(v) => updateField('native_app_ios_app_store_id', v)} />
+            <Input label={t('system.native_app.android_play_store_id')} variant="bordered" value={fieldValue(formData, 'native_app_android_play_store_id')} onValueChange={(v) => updateField('native_app_android_play_store_id', v)} />
+            <Input label={t('system.native_app.marketing_url')} variant="bordered" value={fieldValue(formData, 'native_app_marketing_url')} onValueChange={(v) => updateField('native_app_marketing_url', v)} />
+            <Input label={t('system.native_app.privacy_url')} variant="bordered" value={fieldValue(formData, 'native_app_privacy_url')} onValueChange={(v) => updateField('native_app_privacy_url', v)} />
+            <Input label={t('system.native_app.support_url')} variant="bordered" value={fieldValue(formData, 'native_app_support_url')} onValueChange={(v) => updateField('native_app_support_url', v)} className="md:col-span-2" />
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Push Notifications</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.push_notifications')}</h3></CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium">Enable push notifications</p>
-                <p className="text-sm text-default-500">Route FCM/APNs notifications through the configured mobile app channel.</p>
+                <p className="font-medium">{t('system.native_app.enable_push_notifications')}</p>
+                <p className="text-sm text-default-500">{t('system.native_app.enable_push_notifications_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.native_app_push_enabled} onValueChange={(v) => updateField('native_app_push_enabled', v)} aria-label="Push Notifications" />
+              <Switch isSelected={!!formData.native_app_push_enabled} onValueChange={(v) => updateField('native_app_push_enabled', v)} aria-label={t('system.native_app.push_notifications')} />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input label="FCM server key" type="password" variant="bordered" value={fieldValue(formData, 'native_app_fcm_server_key')} onValueChange={(v) => updateField('native_app_fcm_server_key', v)} />
-              <Input label="APNs key ID" type="password" variant="bordered" value={fieldValue(formData, 'native_app_apns_key_id')} onValueChange={(v) => updateField('native_app_apns_key_id', v)} />
-              <Input label="APNs team ID" variant="bordered" value={fieldValue(formData, 'native_app_apns_team_id')} onValueChange={(v) => updateField('native_app_apns_team_id', v)} />
-              <Input label="Push sender ID" variant="bordered" value={fieldValue(formData, 'native_app_push_sender_id')} onValueChange={(v) => updateField('native_app_push_sender_id', v)} />
-              <Input label="Tenant channel prefix" variant="bordered" value={fieldValue(formData, 'native_app_tenant_channel_prefix')} onValueChange={(v) => updateField('native_app_tenant_channel_prefix', v)} className="md:col-span-2" />
+              <Input label={t('system.native_app.fcm_server_key')} type="password" variant="bordered" value={fieldValue(formData, 'native_app_fcm_server_key')} onValueChange={(v) => updateField('native_app_fcm_server_key', v)} />
+              <Input label={t('system.native_app.apns_key_id')} type="password" variant="bordered" value={fieldValue(formData, 'native_app_apns_key_id')} onValueChange={(v) => updateField('native_app_apns_key_id', v)} />
+              <Input label={t('system.native_app.apns_team_id')} variant="bordered" value={fieldValue(formData, 'native_app_apns_team_id')} onValueChange={(v) => updateField('native_app_apns_team_id', v)} />
+              <Input label={t('system.native_app.push_sender_id')} variant="bordered" value={fieldValue(formData, 'native_app_push_sender_id')} onValueChange={(v) => updateField('native_app_push_sender_id', v)} />
+              <Input label={t('system.native_app.tenant_channel_prefix')} variant="bordered" value={fieldValue(formData, 'native_app_tenant_channel_prefix')} onValueChange={(v) => updateField('native_app_tenant_channel_prefix', v)} className="md:col-span-2" />
             </div>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">PWA Settings</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.pwa_settings')}</h3></CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex items-center justify-between rounded-lg border border-divider p-3">
               <div>
-                <p className="font-medium">Service worker</p>
-                <p className="text-sm text-default-500">Enable offline shell and app caching.</p>
+                <p className="font-medium">{t('system.native_app.service_worker')}</p>
+                <p className="text-sm text-default-500">{t('system.native_app.service_worker_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.native_app_service_worker} onValueChange={(v) => updateField('native_app_service_worker', v)} aria-label="Service Worker" />
+              <Switch isSelected={!!formData.native_app_service_worker} onValueChange={(v) => updateField('native_app_service_worker', v)} aria-label={t('system.native_app.service_worker')} />
             </div>
             <div className="flex items-center justify-between rounded-lg border border-divider p-3">
               <div>
-                <p className="font-medium">Install prompt</p>
-                <p className="text-sm text-default-500">Show eligible browser install prompts.</p>
+                <p className="font-medium">{t('system.native_app.install_prompt')}</p>
+                <p className="text-sm text-default-500">{t('system.native_app.install_prompt_desc')}</p>
               </div>
-              <Switch isSelected={!!formData.native_app_install_prompt} onValueChange={(v) => updateField('native_app_install_prompt', v)} aria-label="Install Prompt" />
+              <Switch isSelected={!!formData.native_app_install_prompt} onValueChange={(v) => updateField('native_app_install_prompt', v)} aria-label={t('system.native_app.install_prompt')} />
             </div>
-            <Input label="Theme color" type="color" variant="bordered" value={fieldValue(formData, 'native_app_theme_color')} onValueChange={(v) => updateField('native_app_theme_color', v)} />
-            <Input label="Background color" type="color" variant="bordered" value={fieldValue(formData, 'native_app_background_color')} onValueChange={(v) => updateField('native_app_background_color', v)} />
-            <Select label="Display" selectedKeys={[fieldValue(formData, 'native_app_display')]} onChange={(event) => updateField('native_app_display', event.target.value)}>
-              <SelectItem key="standalone">Standalone</SelectItem>
-              <SelectItem key="fullscreen">Fullscreen</SelectItem>
-              <SelectItem key="minimal-ui">Minimal UI</SelectItem>
-              <SelectItem key="browser">Browser</SelectItem>
+            <Input label={t('system.native_app.theme_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_theme_color')} onValueChange={(v) => updateField('native_app_theme_color', v)} />
+            <Input label={t('system.native_app.background_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_background_color')} onValueChange={(v) => updateField('native_app_background_color', v)} />
+            <Select label={t('system.native_app.display')} selectedKeys={[fieldValue(formData, 'native_app_display')]} onChange={(event) => updateField('native_app_display', event.target.value)}>
+              <SelectItem key="standalone">{t('system.native_app.standalone')}</SelectItem>
+              <SelectItem key="fullscreen">{t('system.native_app.fullscreen')}</SelectItem>
+              <SelectItem key="minimal-ui">{t('system.native_app.minimal_ui')}</SelectItem>
+              <SelectItem key="browser">{t('system.native_app.browser')}</SelectItem>
             </Select>
-            <Select label="Orientation" selectedKeys={[fieldValue(formData, 'native_app_orientation')]} onChange={(event) => updateField('native_app_orientation', event.target.value)}>
-              <SelectItem key="portrait">Portrait</SelectItem>
-              <SelectItem key="landscape">Landscape</SelectItem>
-              <SelectItem key="any">Any</SelectItem>
+            <Select label={t('system.native_app.orientation')} selectedKeys={[fieldValue(formData, 'native_app_orientation')]} onChange={(event) => updateField('native_app_orientation', event.target.value)}>
+              <SelectItem key="portrait">{t('system.native_app.portrait')}</SelectItem>
+              <SelectItem key="landscape">{t('system.native_app.landscape')}</SelectItem>
+              <SelectItem key="any">{t('system.native_app.any')}</SelectItem>
             </Select>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Deployment Readiness</h3>
+            <h3 className="text-lg font-semibold">{t('system.native_app.deployment_readiness')}</h3>
             <Chip color={tenantBranded && readiness.tenant_branded_ready ? 'success' : 'warning'} variant="flat">
               {readyCount} / {readinessLabels.length}
             </Chip>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-              {readinessLabels.map(([key, label]) => (
+              {readinessLabels.map(([key, labelKey]) => (
                 <div key={key} className="rounded-lg border border-divider p-3">
-                  <p className="text-sm font-medium">{label}</p>
+                  <p className="text-sm font-medium">{t(`system.native_app.${labelKey}`)}</p>
                   <Chip size="sm" color={readiness[key] ? 'success' : 'default'} variant="flat" className="mt-2">
-                    {readiness[key] ? 'Ready' : 'Missing'}
+                    {readiness[key] ? t('system.native_app.ready') : t('system.native_app.missing')}
                   </Chip>
                 </div>
               ))}
             </div>
+            {!!readiness.missing_requirements?.length && (
+              <div className="mt-4 rounded-lg border border-warning-200 bg-warning-50 p-3 text-sm text-warning-800">
+                <p className="font-medium">{t('system.native_app.missing_requirements')}</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5">
+                  {readiness.missing_requirements.map((requirement) => (
+                    <li key={requirement}>{t(`system.native_app.requirements.${requirement}`)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </CardBody>
         </Card>
 
         <div className="flex justify-end gap-2">
           <Button variant="flat" startContent={<Download size={16} />} onPress={() => void exportBuildManifest()} isLoading={exporting}>
-            Export Build Manifest
+            {t('system.native_app.export_build_manifest')}
           </Button>
           <Button color="primary" startContent={<Save size={16} />} onPress={() => void handleSave()} isLoading={saving}>
-            Save Settings
+            {t('system.native_app.save_settings')}
           </Button>
         </div>
       </div>
