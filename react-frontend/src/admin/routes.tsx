@@ -167,6 +167,9 @@ const WarmthPassAdminPage = lazy(() => import('./modules/caring-community/Warmth
 const CareRecipientCirclePage = lazy(() => import('./modules/caring-community/CareRecipientCirclePage'));
 const MunicipalRoiAdminPage = lazy(() => import('./modules/caring-community/MunicipalRoiAdminPage'));
 const SubRegionsAdminPage = lazy(() => import('./modules/caring-community/SubRegionsAdminPage'));
+const PilotScoreboardAdminPage = lazy(() => import('./modules/caring-community/PilotScoreboardAdminPage'));
+const OperatingPolicyAdminPage = lazy(() => import('./modules/caring-community/OperatingPolicyAdminPage'));
+const DisclosurePackAdminPage = lazy(() => import('./modules/caring-community/DisclosurePackAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -784,6 +787,36 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><SubRegionsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG83 — Pilot Success Scoreboard */}
+      <Route
+        path="caring-community/pilot-scoreboard"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><PilotScoreboardAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG81 — Operating Policy */}
+      <Route
+        path="caring-community/operating-policy"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><OperatingPolicyAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG80 — FADP/nDSG Disclosure Pack */}
+      <Route
+        path="caring-community/disclosure-pack"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><DisclosurePackAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

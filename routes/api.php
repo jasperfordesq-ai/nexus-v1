@@ -1427,6 +1427,21 @@ Route::get('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Ap
 Route::post('/v2/admin/caring-community/kpi-baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'captureKpiBaseline']);
 Route::get('/v2/admin/caring-community/kpi-baselines/{id}/compare', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'compareKpiBaseline']);
 
+// AG83 — Pilot Success Scoreboard
+Route::get('/v2/admin/caring-community/pilot-scoreboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'pilotScoreboard']);
+Route::get('/v2/admin/caring-community/pilot-scoreboard/baselines', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'pilotScoreboardBaselines']);
+Route::post('/v2/admin/caring-community/pilot-scoreboard/pre-pilot', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'capturePrePilotBaseline']);
+Route::post('/v2/admin/caring-community/pilot-scoreboard/quarterly', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'captureQuarterlyReview']);
+
+// AG81 — Operating Policy
+Route::get('/v2/admin/caring-community/operating-policy', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'operatingPolicyShow']);
+Route::put('/v2/admin/caring-community/operating-policy', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'operatingPolicyUpdate']);
+
+// AG80 — FADP/nDSG Disclosure Pack
+Route::get('/v2/admin/caring-community/disclosure-pack', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'disclosurePackShow']);
+Route::put('/v2/admin/caring-community/disclosure-pack', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'disclosurePackUpdate']);
+Route::get('/v2/admin/caring-community/disclosure-pack/export', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'disclosurePackExport']);
+
 // AG65 — Academic / research partnership framework
 Route::get('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'myConsent'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

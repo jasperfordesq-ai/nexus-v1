@@ -20,7 +20,10 @@ use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringNudgeService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use App\Services\CaringCommunity\KpiBaselineService;
+use App\Services\CaringCommunity\OperatingPolicyService;
 use App\Services\CaringCommunity\PaperOnboardingIntakeService;
+use App\Services\CaringCommunity\PilotDisclosurePackService;
+use App\Services\CaringCommunity\PilotScoreboardService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use App\Services\CaringCommunityMemberStatementService;
@@ -56,6 +59,9 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly CaringNudgeService $nudgeService,
         private readonly KpiBaselineService $kpiBaselineService,
         private readonly PaperOnboardingIntakeService $paperOnboardingIntakeService,
+        private readonly PilotScoreboardService $pilotScoreboardService,
+        private readonly OperatingPolicyService $operatingPolicyService,
+        private readonly PilotDisclosurePackService $disclosurePackService,
     ) {
     }
 
@@ -1512,6 +1518,197 @@ class AdminCaringCommunityController extends BaseApiController
             'trend'                => [
                 'hours_yoy_pct' => $hoursYoyPct,
             ],
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // AG83 — Pilot Success Scoreboard
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/pilot-scoreboard
+     */
+    public function pilotScoreboard(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData(
+            $this->pilotScoreboardService->scoreboard(TenantContext::getId())
+        );
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/pilot-scoreboard/baselines
+     */
+    public function pilotScoreboardBaselines(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'items' => $this->pilotScoreboardService->listBaselines(TenantContext::getId()),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/pilot-scoreboard/pre-pilot
+     * Body: { notes? }
+     */
+    public function capturePrePilotBaseline(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $notes = $this->input('notes');
+        $notes = is_string($notes) ? trim($notes) : null;
+        $notes = $notes === '' ? null : $notes;
+
+        $baseline = $this->pilotScoreboardService->capturePrePilotBaseline(
+            TenantContext::getId(),
+            $actorId,
+            $notes,
+        );
+
+        if (isset($baseline['error'])) {
+            return $this->respondWithError('UNAVAILABLE', __('api.service_unavailable'), null, 503);
+        }
+
+        return $this->respondWithData($baseline);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/pilot-scoreboard/quarterly
+     * Body: { label?, notes? }
+     */
+    public function captureQuarterlyReview(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $actorId = (int) auth()->id();
+        $rawLabel = $this->input('label');
+        $label = is_string($rawLabel) && trim($rawLabel) !== ''
+            ? mb_substr(trim($rawLabel), 0, 120)
+            : 'quarterly_' . now()->format('Y_m');
+
+        if ($label === PilotScoreboardService::PRE_PILOT_LABEL) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.field_required'),
+                'label',
+                422,
+            );
+        }
+
+        $notes = $this->input('notes');
+        $notes = is_string($notes) ? trim($notes) : null;
+        $notes = $notes === '' ? null : $notes;
+
+        $baseline = $this->pilotScoreboardService->captureBaseline(
+            TenantContext::getId(),
+            $label,
+            $actorId,
+            $notes,
+        );
+
+        if (isset($baseline['error'])) {
+            return $this->respondWithError('UNAVAILABLE', __('api.service_unavailable'), null, 503);
+        }
+
+        return $this->respondWithData($baseline);
+    }
+
+    // -------------------------------------------------------------------------
+    // AG81 — Operating Policy
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/operating-policy
+     */
+    public function operatingPolicyShow(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData(
+            $this->operatingPolicyService->get(TenantContext::getId())
+        );
+    }
+
+    /**
+     * PUT /api/v2/admin/caring-community/operating-policy
+     */
+    public function operatingPolicyUpdate(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $payload = (array) request()->all();
+        $result = $this->operatingPolicyService->update(TenantContext::getId(), $payload);
+
+        if (isset($result['errors']) && $result['errors'] !== []) {
+            return $this->respondWithErrors(array_map(
+                fn ($e) => ['code' => 'VALIDATION_ERROR', 'message' => $e['message'], 'field' => $e['field']],
+                $result['errors'],
+            ), 422);
+        }
+
+        return $this->respondWithData($result['policy'] ?? []);
+    }
+
+    // -------------------------------------------------------------------------
+    // AG80 — FADP / nDSG Disclosure Pack
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/caring-community/disclosure-pack
+     */
+    public function disclosurePackShow(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData(
+            $this->disclosurePackService->get(TenantContext::getId())
+        );
+    }
+
+    /**
+     * PUT /api/v2/admin/caring-community/disclosure-pack
+     */
+    public function disclosurePackUpdate(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $payload = (array) request()->all();
+        $result = $this->disclosurePackService->update(TenantContext::getId(), $payload);
+
+        if (isset($result['errors']) && $result['errors'] !== []) {
+            return $this->respondWithErrors(array_map(
+                fn ($e) => ['code' => 'VALIDATION_ERROR', 'message' => $e['message'], 'field' => $e['field']],
+                $result['errors'],
+            ), 422);
+        }
+
+        return $this->respondWithData($result['pack'] ?? []);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/disclosure-pack/export
+     * Returns Markdown for printing/sharing as the formal pilot disclosure document.
+     */
+    public function disclosurePackExport(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        return $this->respondWithData([
+            'format'   => 'markdown',
+            'content'  => $this->disclosurePackService->renderMarkdown(TenantContext::getId()),
+            'filename' => 'fadp-ndsg-disclosure-pack.md',
         ]);
     }
 

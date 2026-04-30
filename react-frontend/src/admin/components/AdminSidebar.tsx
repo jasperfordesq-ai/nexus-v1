@@ -268,6 +268,9 @@ function useAdminNav(): NavSection[] {
         { label: 'Smart Nudges', href: '/admin/caring-community/nudges', icon: Bell },
         { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical },
         { label: 'Sub-Regions', href: '/admin/caring-community/sub-regions', icon: MapPin },
+        { label: 'Pilot Scoreboard', href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
+        { label: 'Operating Policy', href: '/admin/caring-community/operating-policy', icon: ScrollText },
+        { label: 'Disclosure Pack', href: '/admin/caring-community/disclosure-pack', icon: ShieldCheck },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },
