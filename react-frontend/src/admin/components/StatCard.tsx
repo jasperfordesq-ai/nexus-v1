@@ -12,6 +12,7 @@
 
 import { Card, CardBody } from '@heroui/react';
 import { Link } from 'react-router-dom';
+import { isValidElement } from 'react';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import TrendingDown from 'lucide-react/icons/trending-down';
@@ -57,7 +58,11 @@ export function StatCard({
   linkAriaLabel,
 }: StatCardProps) {
   const resolvedLabel = label ?? title ?? '';
-  const iconNode = typeof Icon === 'function' ? <Icon size={24} /> : Icon;
+  // Lucide icons are React.forwardRef objects (typeof === 'object'), not functions.
+  // Discriminate via isValidElement: pre-rendered JSX passes through; component
+  // references get instantiated with size={24}.
+  const IconAsComponent = Icon as LucideIcon;
+  const iconNode = isValidElement(Icon) ? Icon : <IconAsComponent size={24} />;
   const body = (
     <CardBody className="flex flex-row items-center gap-4 p-4">
       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${colorMap[color]}`}>

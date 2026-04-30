@@ -276,6 +276,36 @@ describe('StatCard', () => {
     );
     expect(screen.getByText('-5%')).toBeInTheDocument();
   });
+
+  it('renders Lucide forwardRef icon as SVG, not as a raw object (regression: React #31)', () => {
+    const errors: unknown[] = [];
+    const orig = console.error;
+    console.error = (...args: unknown[]) => { errors.push(args); };
+    try {
+      const { container } = render(
+        <HeroUIProvider>
+          <StatCard label="Total Users" value={1234} icon={Users} />
+        </HeroUIProvider>
+      );
+      expect(container.querySelector('svg.lucide-users')).toBeInTheDocument();
+    } finally {
+      console.error = orig;
+    }
+    const reactErrors = errors.filter((args) =>
+      Array.isArray(args) &&
+      args.some((a) => typeof a === 'string' && (a.includes('React error #31') || a.includes('Objects are not valid as a React child')))
+    );
+    expect(reactErrors).toEqual([]);
+  });
+
+  it('accepts a pre-rendered JSX icon node', () => {
+    const { container } = render(
+      <HeroUIProvider>
+        <StatCard label="Custom" value={42} icon={<span data-testid="custom-icon">★</span>} />
+      </HeroUIProvider>
+    );
+    expect(container.querySelector('[data-testid="custom-icon"]')).toBeInTheDocument();
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
