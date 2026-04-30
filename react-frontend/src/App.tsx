@@ -179,6 +179,9 @@ const LinkCareReceiverPage = lazyWithRetry(() => import('@/pages/caring-communit
 const CoverCarePage = lazyWithRetry(() => import('@/pages/caring-community/CoverCarePage'));
 const MunicipalSurveyPage = lazyWithRetry(() => import('@/pages/caring-community/MunicipalSurveyPage'));
 const ProjectAnnouncementsPage = lazyWithRetry(() => import('@/pages/caring-community/ProjectAnnouncementsPage'));
+const CivicDigestPage = lazyWithRetry(() => import('@/pages/caring-community/CivicDigestPage'));
+const MunicipalityFeedbackPage = lazyWithRetry(() => import('@/pages/caring-community/MunicipalityFeedbackPage'));
+const SuccessStoriesPage = lazyWithRetry(() => import('@/pages/caring-community/SuccessStoriesPage'));
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VereinMembersImportPage = lazyWithRetry(() => import('@/pages/clubs/VereinMembersImportPage'));
@@ -755,6 +758,33 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <ProjectAnnouncementsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG90 — Personalised Civic Digest */}
+        <Route path="caring-community/civic-digest" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <CivicDigestPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG91 — Success Stories */}
+        <Route path="caring-community/success-stories" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <SuccessStoriesPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG92 — Two-Way Municipality Feedback */}
+        <Route path="caring-community/feedback" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MunicipalityFeedbackPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

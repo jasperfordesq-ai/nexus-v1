@@ -1,0 +1,842 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Services\CaringCommunity;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * AG90 — Personalised Civic Information Filter and Regional Digest.
+ *
+ * Read/composition layer that merges items from several existing tenant
+ * content sources (project announcements, events, vol_organizations,
+ * care providers, marketplace, safety alerts, help requests, feed posts)
+ * into a single ranked feed for residents.
+ *
+ * Owns NO new content table. Tenant-level cadence and per-user preferences
+ * are stored as JSON envelopes in `tenant_settings`.
+ *
+ * Every source query is Schema::hasTable-guarded so missing tables degrade
+ * gracefully and don't break the digest.
+ */
+class CivicDigestService
+{
+    public const SETTING_TENANT_DEFAULT = 'caring.civic_digest.tenant_default_cadence';
+    public const SETTING_USER_PREFIX    = 'caring.civic_digest.user_prefs.';
+
+    private const ALLOWED_CADENCES = ['off', 'daily', 'weekly'];
+
+    private const SOURCE_WEIGHTS = [
+        'safety_alert'  => 10,
+        'project'       => 3,
+        'announcement'  => 2,
+        'event'         => 1,
+        'vol_org'       => 1,
+        'care_provider' => 1,
+        'marketplace'   => 1,
+        'help_request'  => 1,
+        'feed_post'     => 1,
+    ];
+
+    private const ALLOWED_SOURCES = [
+        'announcement',
+        'project',
+        'event',
+        'vol_org',
+        'care_provider',
+        'marketplace',
+        'safety_alert',
+        'help_request',
+        'feed_post',
+    ];
+
+    /**
+     * Build the personalised digest for the given member.
+     *
+     * @return list<array{
+     *     id: string,
+     *     source: string,
+     *     title: string,
+     *     summary: string,
+     *     occurred_at: string|null,
+     *     sub_region_id: int|null,
+     *     audience_match_score: int,
+     *     link_path: string|null
+     * }>
+     */
+    public function digestForMember(int $tenantId, int $userId, int $limit = 50): array
+    {
+        if ($tenantId <= 0 || $userId <= 0) {
+            return [];
+        }
+
+        $prefs = $this->getUserPrefs($tenantId, $userId);
+        $optOut = is_array($prefs['opt_out_sources'] ?? null) ? $prefs['opt_out_sources'] : [];
+
+        $userSubRegionId = $this->resolveUserSubRegionId($tenantId, $userId, $prefs);
+        $interests = $this->resolveUserInterests($tenantId, $userId);
+
+        // Pull from each source — each call is fully Schema-guarded
+        $items = [];
+        $sourceFetchers = [
+            'announcement'  => fn (): array => $this->fetchAnnouncements($tenantId),
+            'project'       => fn (): array => $this->fetchProjects($tenantId),
+            'event'         => fn (): array => $this->fetchEvents($tenantId),
+            'vol_org'       => fn (): array => $this->fetchVolOrgs($tenantId),
+            'care_provider' => fn (): array => $this->fetchCareProviders($tenantId),
+            'marketplace'   => fn (): array => $this->fetchMarketplace($tenantId),
+            'safety_alert'  => fn (): array => $this->fetchSafetyAlerts($tenantId),
+            'help_request'  => fn (): array => $this->fetchHelpRequests($tenantId),
+            'feed_post'     => fn (): array => $this->fetchFeedPosts($tenantId),
+        ];
+
+        foreach ($sourceFetchers as $sourceKey => $fetcher) {
+            if (in_array($sourceKey, $optOut, true)) {
+                continue;
+            }
+            try {
+                foreach ($fetcher() as $row) {
+                    $items[] = $row;
+                }
+            } catch (\Throwable $e) {
+                // Source temporarily unavailable — skip silently
+                continue;
+            }
+        }
+
+        // Score, filter, and sort
+        $scored = [];
+        foreach ($items as $item) {
+            $score = $this->scoreItem($item, $userSubRegionId, $interests);
+            if ($score < 1) {
+                continue;
+            }
+            $item['audience_match_score'] = $score;
+            $scored[] = $item;
+        }
+
+        usort($scored, function ($a, $b) {
+            if ($a['audience_match_score'] !== $b['audience_match_score']) {
+                return $b['audience_match_score'] <=> $a['audience_match_score'];
+            }
+            $aTime = $a['occurred_at'] ?? '';
+            $bTime = $b['occurred_at'] ?? '';
+            return strcmp((string) $bTime, (string) $aTime);
+        });
+
+        if ($limit < 1) {
+            $limit = 50;
+        }
+
+        return array_slice($scored, 0, $limit);
+    }
+
+    /**
+     * @return array{
+     *     enabled: bool,
+     *     cadence: string,
+     *     preferred_sub_region_id: int|null,
+     *     opt_out_sources: list<string>,
+     *     updated_at: int|null
+     * }
+     */
+    public function getUserPrefs(int $tenantId, int $userId): array
+    {
+        $defaults = [
+            'enabled' => true,
+            'cadence' => $this->getTenantCadence($tenantId),
+            'preferred_sub_region_id' => null,
+            'opt_out_sources' => [],
+            'updated_at' => null,
+        ];
+
+        if (!Schema::hasTable('tenant_settings')) {
+            return $defaults;
+        }
+
+        $row = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('setting_key', self::SETTING_USER_PREFIX . $userId)
+            ->first();
+
+        if (!$row || !$row->setting_value) {
+            return $defaults;
+        }
+
+        $decoded = json_decode((string) $row->setting_value, true);
+        if (!is_array($decoded)) {
+            return $defaults;
+        }
+
+        $cadence = isset($decoded['cadence']) && in_array($decoded['cadence'], self::ALLOWED_CADENCES, true)
+            ? $decoded['cadence']
+            : $defaults['cadence'];
+
+        $preferredSubRegion = isset($decoded['preferred_sub_region_id']) && is_numeric($decoded['preferred_sub_region_id'])
+            ? (int) $decoded['preferred_sub_region_id']
+            : null;
+
+        $optOut = [];
+        if (isset($decoded['opt_out_sources']) && is_array($decoded['opt_out_sources'])) {
+            foreach ($decoded['opt_out_sources'] as $source) {
+                if (is_string($source) && in_array($source, self::ALLOWED_SOURCES, true)) {
+                    $optOut[] = $source;
+                }
+            }
+        }
+
+        return [
+            'enabled' => isset($decoded['enabled']) ? (bool) $decoded['enabled'] : true,
+            'cadence' => $cadence,
+            'preferred_sub_region_id' => $preferredSubRegion,
+            'opt_out_sources' => array_values(array_unique($optOut)),
+            'updated_at' => isset($decoded['updated_at']) && is_numeric($decoded['updated_at'])
+                ? (int) $decoded['updated_at']
+                : null,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $prefs
+     * @return array{prefs?: array<string, mixed>, errors?: list<array{field: string, message: string}>}
+     */
+    public function setUserPrefs(int $tenantId, int $userId, array $prefs): array
+    {
+        $errors = [];
+
+        $current = $this->getUserPrefs($tenantId, $userId);
+        $merged = $current;
+
+        if (array_key_exists('cadence', $prefs)) {
+            if (!is_string($prefs['cadence']) || !in_array($prefs['cadence'], self::ALLOWED_CADENCES, true)) {
+                $errors[] = ['field' => 'cadence', 'message' => 'cadence must be one of: off, daily, weekly'];
+            } else {
+                $merged['cadence'] = $prefs['cadence'];
+                $merged['enabled'] = $prefs['cadence'] !== 'off';
+            }
+        }
+
+        if (array_key_exists('preferred_sub_region_id', $prefs)) {
+            if ($prefs['preferred_sub_region_id'] === null || $prefs['preferred_sub_region_id'] === '') {
+                $merged['preferred_sub_region_id'] = null;
+            } elseif (is_numeric($prefs['preferred_sub_region_id'])) {
+                $merged['preferred_sub_region_id'] = (int) $prefs['preferred_sub_region_id'];
+            } else {
+                $errors[] = ['field' => 'preferred_sub_region_id', 'message' => 'must be numeric or null'];
+            }
+        }
+
+        if (array_key_exists('opt_out_sources', $prefs)) {
+            if (!is_array($prefs['opt_out_sources'])) {
+                $errors[] = ['field' => 'opt_out_sources', 'message' => 'must be an array of source keys'];
+            } else {
+                $clean = [];
+                foreach ($prefs['opt_out_sources'] as $src) {
+                    if (is_string($src) && in_array($src, self::ALLOWED_SOURCES, true)) {
+                        $clean[] = $src;
+                    }
+                }
+                $merged['opt_out_sources'] = array_values(array_unique($clean));
+            }
+        }
+
+        if ($errors !== []) {
+            return ['errors' => $errors];
+        }
+
+        $merged['updated_at'] = time();
+
+        if (!Schema::hasTable('tenant_settings')) {
+            return ['prefs' => $merged];
+        }
+
+        $now = now();
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $tenantId,
+                'setting_key' => self::SETTING_USER_PREFIX . $userId,
+            ],
+            [
+                'setting_value' => json_encode($merged, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'setting_type' => 'json',
+                'category' => 'caring_community',
+                'description' => 'AG90 civic digest user preferences',
+                'updated_at' => $now,
+            ],
+        );
+
+        return ['prefs' => $merged];
+    }
+
+    public function getTenantCadence(int $tenantId): string
+    {
+        if (!Schema::hasTable('tenant_settings')) {
+            return 'weekly';
+        }
+
+        $row = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('setting_key', self::SETTING_TENANT_DEFAULT)
+            ->first();
+
+        if (!$row || !$row->setting_value) {
+            return 'weekly';
+        }
+
+        $value = trim((string) $row->setting_value, "\" \t\n\r\0\x0B");
+        return in_array($value, self::ALLOWED_CADENCES, true) ? $value : 'weekly';
+    }
+
+    /**
+     * @return array{cadence?: string, errors?: list<array{field: string, message: string}>}
+     */
+    public function setTenantCadence(int $tenantId, string $cadence): array
+    {
+        if (!in_array($cadence, self::ALLOWED_CADENCES, true)) {
+            return [
+                'errors' => [
+                    ['field' => 'cadence', 'message' => 'cadence must be one of: off, daily, weekly'],
+                ],
+            ];
+        }
+
+        if (!Schema::hasTable('tenant_settings')) {
+            return ['cadence' => $cadence];
+        }
+
+        $now = now();
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $tenantId,
+                'setting_key' => self::SETTING_TENANT_DEFAULT,
+            ],
+            [
+                'setting_value' => $cadence,
+                'setting_type' => 'string',
+                'category' => 'caring_community',
+                'description' => 'AG90 civic digest tenant default cadence',
+                'updated_at' => $now,
+            ],
+        );
+
+        return ['cadence' => $cadence];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Source fetchers — each Schema::hasTable-guarded, tenant-scoped,
+    // 30-day window unless source semantics dictate otherwise.
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchAnnouncements(int $tenantId): array
+    {
+        // Re-uses caring_project_announcements rows whose status='draft' is excluded;
+        // 'announcement' source represents short-lived published items vs 'project'
+        // which represents long-running ones (status active/paused, with stages).
+        if (!Schema::hasTable('caring_project_announcements')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('caring_project_announcements')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['active', 'paused', 'completed'])
+            ->where(function ($q) use ($cutoff) {
+                $q->where('published_at', '>=', $cutoff)
+                    ->orWhere('last_update_at', '>=', $cutoff);
+            })
+            ->where(function ($q) {
+                $q->whereNull('current_stage')->orWhere('progress_percent', '>=', 100);
+            })
+            ->orderByDesc('last_update_at')
+            ->limit(20)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'announcement:' . (int) $r->id,
+                'source' => 'announcement',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => (string) ($r->summary ?? ''),
+                'occurred_at' => isset($r->last_update_at) ? (string) $r->last_update_at : (isset($r->published_at) ? (string) $r->published_at : null),
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/caring-community/projects/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchProjects(int $tenantId): array
+    {
+        if (!Schema::hasTable('caring_project_announcements')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('caring_project_announcements')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['active', 'paused'])
+            ->where('progress_percent', '<', 100)
+            ->where(function ($q) use ($cutoff) {
+                $q->where('published_at', '>=', $cutoff)
+                    ->orWhere('last_update_at', '>=', $cutoff);
+            })
+            ->orderByDesc('last_update_at')
+            ->limit(20)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'project:' . (int) $r->id,
+                'source' => 'project',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => (string) ($r->summary ?? ''),
+                'occurred_at' => isset($r->last_update_at) ? (string) $r->last_update_at : (isset($r->published_at) ? (string) $r->published_at : null),
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/caring-community/projects/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchEvents(int $tenantId): array
+    {
+        if (!Schema::hasTable('events')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $now = date('Y-m-d H:i:s');
+
+        $rows = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('start_time', '>=', $now)
+            ->where('start_time', '<=', date('Y-m-d H:i:s', strtotime('+45 days')))
+            ->where(function ($q) use ($cutoff) {
+                $q->where('created_at', '>=', $cutoff)
+                    ->orWhere('updated_at', '>=', $cutoff);
+            })
+            ->orderBy('start_time')
+            ->limit(20)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'event:' . (int) $r->id,
+                'source' => 'event',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => $this->shorten((string) ($r->description ?? '')),
+                'occurred_at' => isset($r->start_time) ? (string) $r->start_time : null,
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/events/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchVolOrgs(int $tenantId): array
+    {
+        if (!Schema::hasTable('vol_organizations')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('vol_organizations')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where(function ($q) use ($cutoff) {
+                $q->where('updated_at', '>=', $cutoff)
+                    ->orWhere('created_at', '>=', $cutoff);
+            })
+            ->orderByDesc('updated_at')
+            ->limit(15)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'vol_org:' . (int) $r->id,
+                'source' => 'vol_org',
+                'title' => (string) ($r->name ?? ''),
+                'summary' => $this->shorten((string) ($r->description ?? '')),
+                'occurred_at' => isset($r->updated_at) ? (string) $r->updated_at : (isset($r->created_at) ? (string) $r->created_at : null),
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/organisations/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchCareProviders(int $tenantId): array
+    {
+        if (!Schema::hasTable('caring_care_providers')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('caring_care_providers')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where(function ($q) use ($cutoff) {
+                $q->where('updated_at', '>=', $cutoff)
+                    ->orWhere('created_at', '>=', $cutoff);
+            })
+            ->orderByDesc('updated_at')
+            ->limit(15)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $cats = [];
+            if (isset($r->categories) && is_string($r->categories)) {
+                $decoded = json_decode($r->categories, true);
+                if (is_array($decoded)) {
+                    $cats = array_values(array_filter($decoded, 'is_string'));
+                }
+            }
+            $items[] = [
+                'id' => 'care_provider:' . (int) $r->id,
+                'source' => 'care_provider',
+                'title' => (string) ($r->name ?? ''),
+                'summary' => $this->shorten((string) ($r->description ?? '')),
+                'occurred_at' => isset($r->updated_at) ? (string) $r->updated_at : (isset($r->created_at) ? (string) $r->created_at : null),
+                'sub_region_id' => isset($r->sub_region_id) && $r->sub_region_id !== null ? (int) $r->sub_region_id : null,
+                'audience_match_score' => 0,
+                'link_path' => '/caring-community/care-providers/' . (int) $r->id,
+                'categories' => $cats,
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchMarketplace(int $tenantId): array
+    {
+        if (!Schema::hasTable('marketplace_listings')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('marketplace_listings')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('moderation_status', 'approved')
+            ->where(function ($q) use ($cutoff) {
+                $q->where('updated_at', '>=', $cutoff)
+                    ->orWhere('created_at', '>=', $cutoff);
+            })
+            ->orderByDesc('created_at')
+            ->limit(15)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'marketplace:' . (int) $r->id,
+                'source' => 'marketplace',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => $this->shorten((string) ($r->description ?? '')),
+                'occurred_at' => isset($r->created_at) ? (string) $r->created_at : null,
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/marketplace/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchSafetyAlerts(int $tenantId): array
+    {
+        if (!Schema::hasTable('caring_emergency_alerts')) {
+            return [];
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('caring_emergency_alerts')
+            ->where('tenant_id', $tenantId)
+            ->where('is_active', 1)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>=', $now);
+            })
+            ->where(function ($q) use ($cutoff) {
+                $q->where('sent_at', '>=', $cutoff)
+                    ->orWhere('created_at', '>=', $cutoff);
+            })
+            ->orderByDesc('sent_at')
+            ->limit(10)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'safety_alert:' . (int) $r->id,
+                'source' => 'safety_alert',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => $this->shorten((string) ($r->body ?? '')),
+                'occurred_at' => isset($r->sent_at) ? (string) $r->sent_at : (isset($r->created_at) ? (string) $r->created_at : null),
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/caring-community/alerts/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchHelpRequests(int $tenantId): array
+    {
+        if (!Schema::hasTable('caring_help_requests')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('caring_help_requests')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'pending')
+            ->where(function ($q) use ($cutoff) {
+                $q->where('created_at', '>=', $cutoff)
+                    ->orWhere('updated_at', '>=', $cutoff);
+            })
+            ->orderByDesc('created_at')
+            ->limit(15)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'help_request:' . (int) $r->id,
+                'source' => 'help_request',
+                'title' => $this->shorten((string) ($r->what ?? ''), 80),
+                'summary' => isset($r->when_needed) ? (string) $r->when_needed : '',
+                'occurred_at' => isset($r->created_at) ? (string) $r->created_at : null,
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/caring-community/help-requests/' . (int) $r->id,
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fetchFeedPosts(int $tenantId): array
+    {
+        if (!Schema::hasTable('posts')) {
+            return [];
+        }
+
+        $cutoff = $this->cutoff30Days();
+        $rows = DB::table('posts')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'published')
+            ->where(function ($q) use ($cutoff) {
+                $q->where('updated_at', '>=', $cutoff)
+                    ->orWhere('created_at', '>=', $cutoff);
+            })
+            ->orderByDesc('created_at')
+            ->limit(15)
+            ->get();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $items[] = [
+                'id' => 'feed_post:' . (int) $r->id,
+                'source' => 'feed_post',
+                'title' => (string) ($r->title ?? ''),
+                'summary' => $this->shorten((string) ($r->excerpt ?? '')),
+                'occurred_at' => isset($r->created_at) ? (string) $r->created_at : null,
+                'sub_region_id' => null,
+                'audience_match_score' => 0,
+                'link_path' => '/blog/' . (string) ($r->slug ?? (int) $r->id),
+                'categories' => [],
+            ];
+        }
+        return $items;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Internals
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * @param array<string, mixed> $prefs
+     */
+    private function resolveUserSubRegionId(int $tenantId, int $userId, array $prefs): ?int
+    {
+        // 1. Explicit per-user preference wins
+        $preferred = $prefs['preferred_sub_region_id'] ?? null;
+        if (is_int($preferred) && $preferred > 0) {
+            return $preferred;
+        }
+
+        // 2. Try users.sub_region_id if column exists
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'sub_region_id')) {
+            try {
+                $row = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->first(['sub_region_id']);
+                if ($row && isset($row->sub_region_id) && $row->sub_region_id !== null) {
+                    return (int) $row->sub_region_id;
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function resolveUserInterests(int $tenantId, int $userId): array
+    {
+        $interests = [];
+
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'skills')) {
+            try {
+                $row = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->first(['skills']);
+                if ($row && isset($row->skills) && is_string($row->skills) && $row->skills !== '') {
+                    foreach (explode(',', $row->skills) as $s) {
+                        $s = trim($s);
+                        if ($s !== '') {
+                            $interests[] = mb_strtolower($s);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
+        if (Schema::hasTable('user_skills')) {
+            try {
+                $rows = DB::table('user_skills')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->limit(40)
+                    ->get(['skill_name']);
+                foreach ($rows as $r) {
+                    if (isset($r->skill_name) && is_string($r->skill_name) && $r->skill_name !== '') {
+                        $interests[] = mb_strtolower(trim($r->skill_name));
+                    }
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
+        return array_values(array_unique(array_filter($interests, fn ($s) => $s !== '')));
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     * @param list<string> $interests
+     */
+    private function scoreItem(array $item, ?int $userSubRegionId, array $interests): int
+    {
+        $score = 0;
+
+        // Source weight
+        $source = (string) ($item['source'] ?? '');
+        $score += self::SOURCE_WEIGHTS[$source] ?? 0;
+
+        // Recency boost (0..5 based on how recent within 30 days)
+        $occurredAt = $item['occurred_at'] ?? null;
+        if (is_string($occurredAt) && $occurredAt !== '') {
+            $ts = strtotime($occurredAt);
+            if ($ts !== false) {
+                $ageDays = max(0, (time() - $ts) / 86400);
+                if ($ageDays <= 30) {
+                    $recencyBoost = (int) round(5 * (1 - ($ageDays / 30)));
+                    $score += max(0, $recencyBoost);
+                }
+            }
+        }
+
+        // Sub-region match
+        if ($userSubRegionId !== null
+            && isset($item['sub_region_id'])
+            && is_int($item['sub_region_id'])
+            && $item['sub_region_id'] === $userSubRegionId
+        ) {
+            $score += 5;
+        }
+
+        // Interest match
+        if ($interests !== [] && isset($item['categories']) && is_array($item['categories']) && $item['categories'] !== []) {
+            $itemCats = array_map(fn ($c) => is_string($c) ? mb_strtolower($c) : '', $item['categories']);
+            $overlap = array_intersect($interests, $itemCats);
+            if ($overlap !== []) {
+                $score += 3;
+            }
+        }
+
+        return $score;
+    }
+
+    private function cutoff30Days(): string
+    {
+        return date('Y-m-d H:i:s', strtotime('-30 days'));
+    }
+
+    private function shorten(string $text, int $max = 240): string
+    {
+        $text = trim(strip_tags($text));
+        if ($text === '') {
+            return '';
+        }
+        if (mb_strlen($text) <= $max) {
+            return $text;
+        }
+        return mb_substr($text, 0, $max - 1) . '…';
+    }
+}

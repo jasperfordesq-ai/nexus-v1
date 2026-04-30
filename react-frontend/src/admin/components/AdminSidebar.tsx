@@ -83,6 +83,7 @@ import Flag from 'lucide-react/icons/flag';
 import UserX from 'lucide-react/icons/user-x';
 import Server from 'lucide-react/icons/server';
 import Scale from 'lucide-react/icons/scale';
+import Layers from 'lucide-react/icons/layers';
 import PlugZap from 'lucide-react/icons/plug-zap';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
@@ -278,6 +279,11 @@ function useAdminNav(): NavSection[] {
         { label: 'Commercial Boundary', href: '/admin/caring-community/commercial-boundary', icon: Scale },
         { label: 'Isolated-Node Gate', href: '/admin/caring-community/isolated-node', icon: Server },
         { label: 'External Integrations', href: '/admin/caring-community/external-integrations', icon: PlugZap },
+        { label: 'Communication Copilot', href: '/admin/caring-community/copilot', icon: Bot },
+        { label: 'Success Stories', href: '/admin/caring-community/success-stories', icon: Star },
+        { label: 'Feedback Inbox', href: '/admin/caring-community/feedback', icon: MessageSquare },
+        { label: 'Integration Showcase', href: '/admin/caring-community/integration-showcase', icon: Layers },
+        { label: 'Lead Nurture', href: '/admin/caring-community/lead-nurture', icon: Filter },
       ] : []),
       ...(hasFeature('groups') ? [
         { label: "Groups", href: '/admin/groups', icon: Users },

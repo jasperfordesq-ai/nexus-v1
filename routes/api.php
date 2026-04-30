@@ -1461,6 +1461,58 @@ Route::post('/v2/admin/caring-community/external-integrations', [\App\Http\Contr
 Route::put('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'update']);
 Route::delete('/v2/admin/caring-community/external-integrations/{itemId}', [\App\Http\Controllers\Api\Admin\ExternalIntegrationController::class, 'destroy']);
 
+// AG89 — Municipal Communication & Moderation Copilot
+Route::get('/v2/admin/caring-community/copilot/proposals', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'index']);
+Route::post('/v2/admin/caring-community/copilot/proposals', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'generate']);
+Route::post('/v2/admin/caring-community/copilot/proposals/{proposalId}/accept', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'accept']);
+Route::post('/v2/admin/caring-community/copilot/proposals/{proposalId}/reject', [\App\Http\Controllers\Api\Admin\MunicipalCopilotController::class, 'reject']);
+
+// AG90 — Personalised Civic Digest
+Route::get('/v2/caring-community/digest', [\App\Http\Controllers\Api\CivicDigestController::class, 'myDigest'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/digest/prefs', [\App\Http\Controllers\Api\CivicDigestController::class, 'myPrefs'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::put('/v2/caring-community/digest/prefs', [\App\Http\Controllers\Api\CivicDigestController::class, 'updateMyPrefs'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/digest/cadence', [\App\Http\Controllers\Api\CivicDigestController::class, 'tenantCadence']);
+Route::put('/v2/admin/caring-community/digest/cadence', [\App\Http\Controllers\Api\CivicDigestController::class, 'setTenantCadence']);
+
+// AG91 — Success-Story Proof Cards
+Route::get('/v2/caring-community/success-stories', [\App\Http\Controllers\Api\SuccessStoryController::class, 'index'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/success-stories', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'index']);
+Route::post('/v2/admin/caring-community/success-stories/seed-demo', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'seed']);
+Route::post('/v2/admin/caring-community/success-stories', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'store']);
+Route::put('/v2/admin/caring-community/success-stories/{storyId}', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'update']);
+Route::delete('/v2/admin/caring-community/success-stories/{storyId}', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'destroy']);
+Route::post('/v2/admin/caring-community/success-stories/{storyId}/refresh-live', [\App\Http\Controllers\Api\Admin\SuccessStoryAdminController::class, 'refresh']);
+
+// AG92 — Two-Way Municipality Feedback Inbox
+Route::post('/v2/caring-community/feedback', [\App\Http\Controllers\Api\MunicipalityFeedbackController::class, 'submit'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/feedback/mine', [\App\Http\Controllers\Api\MunicipalityFeedbackController::class, 'myList'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/admin/caring-community/feedback/dashboard', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'dashboard']);
+Route::get('/v2/admin/caring-community/feedback/export.csv', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'exportCsv']);
+Route::get('/v2/admin/caring-community/feedback', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'index']);
+Route::get('/v2/admin/caring-community/feedback/{id}', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'show'])->whereNumber('id');
+Route::put('/v2/admin/caring-community/feedback/{id}/triage', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'triage'])->whereNumber('id');
+Route::post('/v2/admin/caring-community/feedback/{id}/resolve', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'resolve'])->whereNumber('id');
+Route::post('/v2/admin/caring-community/feedback/{id}/close', [\App\Http\Controllers\Api\Admin\AdminMunicipalityFeedbackController::class, 'close'])->whereNumber('id');
+
+// AG93 — Open-Standards and Integration Showcase
+Route::get('/v2/admin/caring-community/integration-showcase', [\App\Http\Controllers\Api\Admin\IntegrationShowcaseController::class, 'index']);
+
+// AG94 — Newsletter and Pilot-Region Lead Nurture
+Route::post('/v2/caring-community/leads/capture', [\App\Http\Controllers\Api\LeadCaptureController::class, 'capture'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class)
+    ->withoutMiddleware(\App\Http\Middleware\RequireAuth::class);
+Route::get('/v2/admin/caring-community/leads/summary', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'summary']);
+Route::get('/v2/admin/caring-community/leads/export.csv', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'exportCsv']);
+Route::get('/v2/admin/caring-community/leads', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'index']);
+Route::put('/v2/admin/caring-community/leads/{contactId}', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'update']);
+Route::post('/v2/admin/caring-community/leads/{contactId}/unsubscribe', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'unsubscribe']);
+
 // AG65 — Academic / research partnership framework
 Route::get('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'myConsent'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);

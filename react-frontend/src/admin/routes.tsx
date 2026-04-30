@@ -174,6 +174,11 @@ const DataQualityAdminPage = lazy(() => import('./modules/caring-community/DataQ
 const CommercialBoundaryAdminPage = lazy(() => import('./modules/caring-community/CommercialBoundaryAdminPage'));
 const IsolatedNodeAdminPage = lazy(() => import('./modules/caring-community/IsolatedNodeAdminPage'));
 const ExternalIntegrationsAdminPage = lazy(() => import('./modules/caring-community/ExternalIntegrationsAdminPage'));
+const MunicipalCopilotAdminPage = lazy(() => import('./modules/caring-community/MunicipalCopilotAdminPage'));
+const SuccessStoryAdminPage = lazy(() => import('./modules/caring-community/SuccessStoryAdminPage'));
+const MunicipalityFeedbackAdminPage = lazy(() => import('./modules/caring-community/MunicipalityFeedbackAdminPage'));
+const IntegrationShowcaseAdminPage = lazy(() => import('./modules/caring-community/IntegrationShowcaseAdminPage'));
+const LeadNurtureAdminPage = lazy(() => import('./modules/caring-community/LeadNurtureAdminPage'));
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -861,6 +866,56 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><ExternalIntegrationsAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG89 — Municipal Communication & Moderation Copilot */}
+      <Route
+        path="caring-community/copilot"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><MunicipalCopilotAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG91 — Success-Story Proof Cards */}
+      <Route
+        path="caring-community/success-stories"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><SuccessStoryAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG92 — Two-Way Municipality Feedback Inbox */}
+      <Route
+        path="caring-community/feedback"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><MunicipalityFeedbackAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG93 — Open-Standards and Integration Showcase */}
+      <Route
+        path="caring-community/integration-showcase"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><IntegrationShowcaseAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* AG94 — Lead Nurture */}
+      <Route
+        path="caring-community/lead-nurture"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><LeadNurtureAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />
