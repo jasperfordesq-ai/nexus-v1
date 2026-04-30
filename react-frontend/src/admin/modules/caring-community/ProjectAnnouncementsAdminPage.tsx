@@ -120,7 +120,11 @@ export default function ProjectAnnouncementsAdminPage() {
       const res = await api.get<{ data: ProjectAnnouncement[] } | ProjectAnnouncement[]>(
         `/v2/admin/caring-community/projects${suffix}`,
       );
-      setProjects(unwrapData<ProjectAnnouncement[]>(res.data));
+      if (!res.success) {
+        setError(res.error ?? t('errors.load'));
+        return;
+      }
+      setProjects(unwrapData<ProjectAnnouncement[]>(res.data) ?? []);
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.fetchProjects', err);
       setError(err instanceof Error ? err.message : t('errors.load'));
@@ -148,7 +152,7 @@ export default function ProjectAnnouncementsAdminPage() {
     if (!title.trim()) return;
     setSubmitting(true);
     try {
-      await api.post('/v2/admin/caring-community/projects', {
+      const res = await api.post('/v2/admin/caring-community/projects', {
         title: title.trim(),
         summary: summary.trim() || null,
         location: location.trim() || null,
@@ -156,6 +160,10 @@ export default function ProjectAnnouncementsAdminPage() {
         progress_percent: Number(progressPercent || 0),
         status: publishNow ? 'active' : 'draft',
       });
+      if (!res.success) {
+        setError(res.error ?? t('errors.create'));
+        return;
+      }
       createModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
@@ -181,7 +189,7 @@ export default function ProjectAnnouncementsAdminPage() {
     if (!selectedProject || !updateTitle.trim()) return;
     setSubmitting(true);
     try {
-      await api.post(`/v2/admin/caring-community/projects/${selectedProject.id}/updates`, {
+      const res = await api.post(`/v2/admin/caring-community/projects/${selectedProject.id}/updates`, {
         title: updateTitle.trim(),
         body: updateBody.trim() || null,
         stage_label: updateStage.trim() || null,
@@ -189,6 +197,10 @@ export default function ProjectAnnouncementsAdminPage() {
         is_milestone: isMilestone,
         status: publishUpdateNow ? 'published' : 'draft',
       });
+      if (!res.success) {
+        setError(res.error ?? t('errors.update'));
+        return;
+      }
       updateModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
@@ -202,7 +214,11 @@ export default function ProjectAnnouncementsAdminPage() {
   const publishProject = async (projectId: number) => {
     setActionId(projectId);
     try {
-      await api.post(`/v2/admin/caring-community/projects/${projectId}/publish`);
+      const res = await api.post(`/v2/admin/caring-community/projects/${projectId}/publish`);
+      if (!res.success) {
+        setError(res.error ?? t('errors.publish'));
+        return;
+      }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.publishProject', err);
@@ -215,7 +231,11 @@ export default function ProjectAnnouncementsAdminPage() {
   const setProjectStatus = async (project: ProjectAnnouncement, status: ProjectStatus) => {
     setActionId(project.id);
     try {
-      await api.put(`/v2/admin/caring-community/projects/${project.id}`, { status });
+      const res = await api.put(`/v2/admin/caring-community/projects/${project.id}`, { status });
+      if (!res.success) {
+        setError(res.error ?? t('errors.status'));
+        return;
+      }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.setProjectStatus', err);

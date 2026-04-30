@@ -11,8 +11,6 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\CaringCommunity\ProjectAnnouncementService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use RuntimeException;
@@ -103,15 +101,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminIndex(): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $status = request()->query('status');
@@ -124,15 +118,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminShow(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $project = ProjectAnnouncementService::getProject($id, $tenantId, true);
@@ -146,15 +136,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminStore(): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -181,15 +167,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminUpdate(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -215,15 +197,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminPublish(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         try {
@@ -235,15 +213,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminCreateUpdate(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -277,15 +251,11 @@ class ProjectAnnouncementController extends BaseApiController
 
     public function adminPublishUpdate(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
-        }
-
-        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         try {
@@ -313,32 +283,4 @@ class ProjectAnnouncementController extends BaseApiController
         ]);
     }
 
-    private function hasAnnouncerAccess(int $userId, int $tenantId): bool
-    {
-        $user = DB::table('users')
-            ->where('id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->first(['role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
-
-        if ($user && (
-            in_array((string) $user->role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
-            || (int) ($user->is_admin ?? 0) === 1
-            || (int) ($user->is_super_admin ?? 0) === 1
-            || (int) ($user->is_tenant_super_admin ?? 0) === 1
-            || (int) ($user->is_god ?? 0) === 1
-        )) {
-            return true;
-        }
-
-        if (! Schema::hasTable('user_roles') || ! Schema::hasTable('roles')) {
-            return false;
-        }
-
-        return (bool) DB::table('user_roles')
-            ->join('roles', 'roles.id', '=', 'user_roles.role_id')
-            ->where('user_roles.user_id', $userId)
-            ->where('user_roles.tenant_id', $tenantId)
-            ->whereIn('roles.name', ['admin', 'municipality_announcer'])
-            ->exists();
-    }
 }
