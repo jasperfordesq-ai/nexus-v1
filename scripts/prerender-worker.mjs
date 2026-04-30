@@ -30,13 +30,33 @@ async function renderPage(page, url) {
   // Extra settle time for tenant bootstrap + content rendering
   await page.waitForTimeout(SETTLE_TIME);
 
-  // Strip dynamically injected Google Maps scripts — they're added at runtime
+  // Strip dynamically injected Google Maps assets — they're added at runtime
   // by APIProvider. Leaving them in the prerendered HTML causes double-loading
-  // when the SPA boots, which breaks the Maps API with "loaded multiple times".
+  // when the SPA boots, which breaks the Maps API with "loaded multiple times"
+  // and "Element with name gmp-internal-* already defined" custom-element clashes.
+  //
+  // We remove (a) <script> tags for maps.googleapis.com / maps-api-v3 / maps.gstatic.com,
+  // (b) <link rel="preload|modulepreload|prefetch"> hints for the same hosts (these
+  // would otherwise fetch Maps chunks before the bootstrap on cold load, producing
+  // "google is not defined" in main.js / common.js / map.js / util.js), and
+  // (c) <link rel="preconnect"|"dns-prefetch"> for those hosts.
   await page.evaluate(() => {
-    document.querySelectorAll(
-      'script[src*="maps.googleapis.com"], script[src*="maps-api-v3"]'
-    ).forEach((s) => s.remove());
+    const HOST_RE = /maps\.googleapis\.com|maps-api-v3|maps\.gstatic\.com/;
+    document.querySelectorAll('script[src]').forEach((s) => {
+      if (HOST_RE.test(s.getAttribute('src') || '')) s.remove();
+    });
+    document.querySelectorAll('link[href]').forEach((l) => {
+      const rel = (l.getAttribute('rel') || '').toLowerCase();
+      const href = l.getAttribute('href') || '';
+      if (
+        (rel.includes('preload') || rel.includes('modulepreload') ||
+         rel.includes('prefetch') || rel.includes('preconnect') ||
+         rel.includes('dns-prefetch')) &&
+        HOST_RE.test(href)
+      ) {
+        l.remove();
+      }
+    });
   });
 
   return await page.content();

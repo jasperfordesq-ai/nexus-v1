@@ -137,8 +137,16 @@ export function ExchangesPage() {
     loadConfig();
   }, [loadConfig]);
 
-  // Load exchanges on tab change
+  // Load exchanges on tab change — but only after config has loaded and the
+  // backend says the workflow is enabled. Otherwise GET /v2/exchanges returns
+  // 400 FEATURE_DISABLED (the same gate the empty-state below uses) and we
+  // pollute the console + show a generic load-failure on a feature that's
+  // simply turned off at the broker-control level.
   useEffect(() => {
+    if (!hasFeature('exchange_workflow')) return;
+    if (!config) return; // wait for config; the early returns below handle it
+    if (!config.exchange_workflow_enabled) return;
+
     loadExchangesRef.current();
     // Cleanup on unmount
     return () => {
@@ -146,7 +154,7 @@ export function ExchangesPage() {
         abortControllerRef.current.abort();
       }
     };
-  }, [selectedTab]);
+  }, [selectedTab, config, hasFeature]);
 
   function handleTabChange(key: string | number) {
     setSelectedTab(key.toString());
