@@ -152,6 +152,7 @@ const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/Carin
 const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
 const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
 const HourTransferAdminPage = lazy(() => import('./modules/caring-community/HourTransferAdminPage'));
+const FederationPeersAdminPage = lazy(() => import('./modules/caring-community/FederationPeersAdminPage'));
 const SafeguardingReportsAdminPage = lazy(() => import('./modules/caring-community/SafeguardingReportsAdminPage'));
 const CareProviderAdminPage = lazy(() => import('./modules/caring-community/CareProviderAdminPage'));
 const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTierAdminPage'));
@@ -640,6 +641,14 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><HourTransferAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+      <Route
+        path="caring-community/federation-peers"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><FederationPeersAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

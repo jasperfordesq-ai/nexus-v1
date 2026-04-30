@@ -13,6 +13,7 @@ use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
@@ -52,6 +53,11 @@ class CaringHourTransferService
     private const STATUS_COMPLETED = 'completed';
     private const STATUS_REJECTED = 'rejected';
 
+    public function __construct(
+        private readonly ?FederationPeerService $peers = null,
+    ) {
+    }
+
     /**
      * Member at source tenant initiates a transfer to a member at destination tenant.
      *
@@ -86,27 +92,38 @@ class CaringHourTransferService
             throw new RuntimeException('Insufficient banked hours.');
         }
 
-        // Resolve destination tenant (must be a different tenant)
+        // Cross-platform federation: when no local tenant matches the slug but
+        // a remote federation peer is registered with that slug, accept the
+        // initiation without resolving a local destination user. The remote
+        // install will look up the matching email at delivery time.
+        $remotePeer = $this->peers?->findByPeerSlug($sourceTenantId, $destinationTenantSlug);
+
+        // Resolve destination tenant (must be a different tenant if local)
         $destinationTenant = DB::table('tenants')
             ->where('slug', $destinationTenantSlug)
             ->first(['id', 'slug', 'name']);
 
-        if (!$destinationTenant) {
+        if (! $destinationTenant && ! $remotePeer) {
             throw new RuntimeException('Destination cooperative not found.');
         }
-        if ((int) $destinationTenant->id === $sourceTenantId) {
+        if ($destinationTenant && (int) $destinationTenant->id === $sourceTenantId) {
             throw new InvalidArgumentException('Destination cooperative must be different from source.');
         }
 
-        // Match by email — the destination tenant must have the same email registered
-        $destinationUser = DB::table('users')
-            ->where('tenant_id', $destinationTenant->id)
-            ->where('email', $sourceUser->email)
-            ->first(['id']);
+        if ($destinationTenant) {
+            // Match by email — same-platform federation requires the destination
+            // tenant to already have the same email registered.
+            $destinationUser = DB::table('users')
+                ->where('tenant_id', $destinationTenant->id)
+                ->where('email', $sourceUser->email)
+                ->first(['id']);
 
-        if (!$destinationUser) {
-            throw new RuntimeException('No matching member at destination cooperative — register there first.');
+            if (!$destinationUser) {
+                throw new RuntimeException('No matching member at destination cooperative — register there first.');
+            }
         }
+        // For remote peers we accept the email at face value; the remote
+        // install verifies it on delivery.
 
         $row = [
             'tenant_id'                => $sourceTenantId,
@@ -158,22 +175,30 @@ class CaringHourTransferService
             throw new RuntimeException('Transfer is not pending and cannot be approved.');
         }
 
-        // Resolve destination tenant + user from the persisted slug + email
+        // Resolve destination — either a local tenant (same-platform) or a
+        // registered remote peer (cross-platform).
+        $remotePeer = $this->peers?->findByPeerSlug($sourceTenantId, (string) $transfer->counterpart_tenant_slug);
+
         $destinationTenant = DB::table('tenants')
             ->where('slug', $transfer->counterpart_tenant_slug)
             ->first(['id', 'slug', 'name']);
 
-        if (!$destinationTenant) {
+        if (! $destinationTenant && ! $remotePeer) {
             throw new RuntimeException('Destination cooperative no longer exists.');
         }
 
-        $destinationUser = DB::table('users')
-            ->where('tenant_id', $destinationTenant->id)
-            ->where('email', $transfer->counterpart_member_email)
-            ->first(['id', 'email']);
+        $destinationUser = null;
+        if ($destinationTenant) {
+            $destinationUser = DB::table('users')
+                ->where('tenant_id', $destinationTenant->id)
+                ->where('email', $transfer->counterpart_member_email)
+                ->first(['id', 'email']);
 
-        if (!$destinationUser) {
-            throw new RuntimeException('No matching destination member — they may have removed their account.');
+            // If a local tenant exists with that slug but no matching member,
+            // fall back to a remote peer with the same slug if one exists.
+            if (! $destinationUser && ! $remotePeer) {
+                throw new RuntimeException('No matching destination member — they may have removed their account.');
+            }
         }
 
         $sourceTenantSlug = (string) (DB::table('tenants')
@@ -193,7 +218,15 @@ class CaringHourTransferService
             'transfer_id'             => $transferId,
             'generated_at'            => now()->toIso8601String(),
         ];
-        $signature = $this->signPayload($payload, $this->sharedPlatformSecret());
+        $isRemote = $remotePeer !== null && (! $destinationTenant || ! $destinationUser);
+        $secret = $isRemote
+            ? (string) ($remotePeer['shared_secret'] ?? '')
+            : $this->sharedPlatformSecret();
+        if ($isRemote && $secret === '') {
+            throw new RuntimeException('Federation peer is missing a shared secret.');
+        }
+
+        $signature = $this->signPayload($payload, $secret);
 
         return DB::transaction(function () use (
             $transferId,
@@ -204,7 +237,9 @@ class CaringHourTransferService
             $hours,
             $payload,
             $signature,
-            $approverUserId
+            $approverUserId,
+            $isRemote,
+            $remotePeer
         ): array {
             // Lock + re-check source row
             $locked = DB::table('caring_hour_transfers')
@@ -242,7 +277,7 @@ class CaringHourTransferService
                 'transaction_type'   => 'other',
                 'is_federated'       => 1,
                 'sender_tenant_id'   => $sourceTenantId,
-                'receiver_tenant_id' => (int) $destinationTenant->id,
+                'receiver_tenant_id' => $destinationTenant ? (int) $destinationTenant->id : 0,
                 'created_at'         => $now,
                 'updated_at'         => $now,
             ]);
@@ -259,27 +294,59 @@ class CaringHourTransferService
                     'status'       => self::STATUS_SENT,
                     'signature'    => $signature,
                     'payload_json' => json_encode($payload),
+                    'is_remote'    => $isRemote ? 1 : 0,
                     'updated_at'   => $now,
                 ]);
 
-            // ── 2. Insert destination row & credit destination wallet ───────
-            $destinationRowId = $this->deliverToDestination(
-                payload: $payload,
-                signature: $signature,
-                destinationTenantId: (int) $destinationTenant->id,
-                destinationUserId: (int) $destinationUser->id,
-                sourceTransferId: $transferId,
-                sourceTenantId: $sourceTenantId,
-            );
+            // ── 2. Deliver to destination ────────────────────────────────────
+            if ($isRemote) {
+                // Cross-platform: HTTP POST to the remote peer's inbound endpoint.
+                // Wallet has already been debited above; if delivery fails, the
+                // source row stays in `sent` for retry. The transaction commits
+                // so the debit is durable; the admin can re-trigger delivery.
+                $deliveryResult = $this->deliverToRemotePeer(
+                    payload: $payload,
+                    signature: $signature,
+                    peer: $remotePeer,
+                    sourceTransferId: $transferId,
+                );
 
-            // ── 3. Mark source row completed + cross-link ───────────────────
-            DB::table('caring_hour_transfers')
-                ->where('id', $transferId)
-                ->update([
-                    'status'             => self::STATUS_COMPLETED,
-                    'linked_transfer_id' => $destinationRowId,
-                    'updated_at'         => now(),
-                ]);
+                DB::table('caring_hour_transfers')
+                    ->where('id', $transferId)
+                    ->update([
+                        'status' => $deliveryResult['delivered']
+                            ? self::STATUS_COMPLETED
+                            : self::STATUS_SENT,
+                        'updated_at' => now(),
+                    ]);
+
+                if (! $deliveryResult['delivered']) {
+                    Log::warning('[CaringHourTransfer] Remote delivery failed; row left in `sent` for retry', [
+                        'transfer_id' => $transferId,
+                        'peer_slug'   => $remotePeer['peer_slug'] ?? null,
+                        'error'       => $deliveryResult['error'] ?? null,
+                    ]);
+                }
+            } else {
+                // Same-platform: insert destination row + credit destination wallet
+                $destinationRowId = $this->deliverToDestination(
+                    payload: $payload,
+                    signature: $signature,
+                    destinationTenantId: (int) $destinationTenant->id,
+                    destinationUserId: (int) $destinationUser->id,
+                    sourceTransferId: $transferId,
+                    sourceTenantId: $sourceTenantId,
+                );
+
+                // Mark source row completed + cross-link
+                DB::table('caring_hour_transfers')
+                    ->where('id', $transferId)
+                    ->update([
+                        'status'             => self::STATUS_COMPLETED,
+                        'linked_transfer_id' => $destinationRowId,
+                        'updated_at'         => now(),
+                    ]);
+            }
 
             // Best-effort event dispatch — do not fail the transfer on event errors
             try {
@@ -294,10 +361,14 @@ class CaringHourTransferService
                 Log::warning('[CaringHourTransfer] TransactionCompleted dispatch failed: ' . $e->getMessage());
             }
 
+            $finalStatus = (string) (DB::table('caring_hour_transfers')->where('id', $transferId)->value('status') ?? '');
+            $linkedRow = (int) (DB::table('caring_hour_transfers')->where('id', $transferId)->value('linked_transfer_id') ?? 0);
+
             return [
                 'transfer_id'             => $transferId,
-                'status'                  => self::STATUS_COMPLETED,
-                'destination_transfer_id' => $destinationRowId,
+                'status'                  => $finalStatus !== '' ? $finalStatus : self::STATUS_COMPLETED,
+                'destination_transfer_id' => $linkedRow,
+                'remote'                  => $isRemote,
             ];
         });
     }
@@ -496,6 +567,189 @@ class CaringHourTransferService
             $key = base64_decode(substr($key, 7), true) ?: $key;
         }
         return hash('sha256', 'caring-hour-transfer:' . $key);
+    }
+
+    /**
+     * Cross-platform delivery: POST the signed payload to the remote peer's
+     * inbound endpoint and treat the row as completed when the remote returns
+     * 200 OK with `accepted: true`. On any other outcome the source row is
+     * left in `sent` so an admin can retry.
+     *
+     * @param array<string,mixed> $peer
+     * @return array{delivered:bool,status:int,error:?string,response:array<string,mixed>|null}
+     */
+    private function deliverToRemotePeer(
+        array $payload,
+        string $signature,
+        array $peer,
+        int $sourceTransferId,
+    ): array {
+        $baseUrl = (string) ($peer['base_url'] ?? '');
+        if ($baseUrl === '') {
+            return ['delivered' => false, 'status' => 0, 'error' => 'missing base_url', 'response' => null];
+        }
+
+        $endpoint = rtrim($baseUrl, '/') . '/v2/federation/hour-transfer/inbound';
+
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'X-Federation-Algorithm' => self::ALGORITHM,
+                    'X-Federation-Signature' => $signature,
+                    'X-Federation-Source'    => (string) $payload['source_tenant_slug'],
+                    'X-Federation-Transfer'  => (string) $sourceTransferId,
+                    'Content-Type'           => 'application/json',
+                    'Accept'                 => 'application/json',
+                ])
+                ->retry(2, 250)
+                ->post($endpoint, [
+                    'payload'   => $payload,
+                    'signature' => $signature,
+                ]);
+        } catch (\Throwable $e) {
+            return [
+                'delivered' => false,
+                'status'    => 0,
+                'error'     => $e->getMessage(),
+                'response'  => null,
+            ];
+        }
+
+        $body = $response->json();
+        if (! is_array($body)) {
+            $body = [];
+        }
+        $accepted = (bool) ($body['accepted'] ?? false);
+        $delivered = $response->successful() && $accepted;
+
+        return [
+            'delivered' => $delivered,
+            'status'    => $response->status(),
+            'error'     => $delivered ? null : ('remote-rejected: ' . ($body['error'] ?? $response->body())),
+            'response'  => $body,
+        ];
+    }
+
+    /**
+     * Inbound entry point used by `FederationHourTransferController::inbound()`.
+     * Verifies the signature against the registered peer's shared secret,
+     * applies idempotency, and credits the destination user's wallet.
+     *
+     * @param array<string,mixed> $payload
+     * @return array{accepted:bool,destination_transfer_id:?int,error:?string,duplicated:bool}
+     */
+    public function acceptRemoteTransfer(int $destinationTenantId, array $peer, array $payload, string $signature): array
+    {
+        $secret = (string) ($peer['shared_secret'] ?? '');
+        if ($secret === '') {
+            return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'peer_no_secret', 'duplicated' => false];
+        }
+        if (! $this->verifySignature($payload, $signature, $secret)) {
+            return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'signature_invalid', 'duplicated' => false];
+        }
+
+        $sourceSlug = (string) ($payload['source_tenant_slug'] ?? '');
+        $sourceTransferId = (int) ($payload['transfer_id'] ?? 0);
+        $sourceEmail = (string) ($payload['source_member_email'] ?? '');
+        $hours = round((float) ($payload['hours'] ?? 0), 2);
+
+        if ($sourceSlug === '' || $sourceTransferId <= 0 || $sourceEmail === '' || $hours <= 0) {
+            return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'payload_invalid', 'duplicated' => false];
+        }
+
+        $idempotencyKey = $sourceSlug . ':' . $sourceTransferId;
+
+        // Find destination user by email at this tenant
+        $destinationUser = DB::table('users')
+            ->where('tenant_id', $destinationTenantId)
+            ->where('email', $sourceEmail)
+            ->first(['id']);
+        if (! $destinationUser) {
+            return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'destination_member_not_found', 'duplicated' => false];
+        }
+
+        return DB::transaction(function () use (
+            $destinationTenantId,
+            $destinationUser,
+            $sourceSlug,
+            $sourceEmail,
+            $hours,
+            $payload,
+            $signature,
+            $idempotencyKey
+        ): array {
+            // Idempotency: if a row with this key already exists, return the
+            // prior result without crediting again.
+            $existing = DB::table('caring_hour_transfers')
+                ->where('tenant_id', $destinationTenantId)
+                ->where('remote_idempotency_key', $idempotencyKey)
+                ->lockForUpdate()
+                ->first();
+            if ($existing) {
+                return [
+                    'accepted'                => true,
+                    'destination_transfer_id' => (int) $existing->id,
+                    'error'                   => null,
+                    'duplicated'              => true,
+                ];
+            }
+
+            $now = now();
+            $destinationRowId = (int) DB::table('caring_hour_transfers')->insertGetId([
+                'tenant_id'                => $destinationTenantId,
+                'counterpart_tenant_slug'  => $sourceSlug,
+                'role'                     => 'destination',
+                'member_user_id'           => (int) $destinationUser->id,
+                'counterpart_member_email' => $sourceEmail,
+                'hours_transferred'        => $hours,
+                'status'                   => self::STATUS_RECEIVED,
+                'reason'                   => isset($payload['reason']) ? (string) $payload['reason'] : null,
+                'signature'                => $signature,
+                'payload_json'             => json_encode($payload),
+                'linked_transfer_id'       => null,
+                'remote_idempotency_key'   => $idempotencyKey,
+                'is_remote'                => 1,
+                'created_at'               => $now,
+                'updated_at'               => $now,
+            ]);
+
+            // Credit destination user's wallet
+            DB::table('transactions')->insert([
+                'tenant_id'          => $destinationTenantId,
+                'sender_id'          => (int) $destinationUser->id,
+                'receiver_id'        => (int) $destinationUser->id,
+                'amount'             => $hours,
+                'description'        => '[hour_transfer_in_remote] from ' . $sourceSlug
+                    . (($payload['reason'] ?? '') !== '' ? ' — ' . (string) $payload['reason'] : ''),
+                'status'             => 'completed',
+                'transaction_type'   => 'other',
+                'is_federated'       => 1,
+                'sender_tenant_id'   => 0, // remote tenant has no local ID
+                'receiver_tenant_id' => $destinationTenantId,
+                'created_at'         => $now,
+                'updated_at'         => $now,
+            ]);
+
+            DB::table('users')
+                ->where('id', (int) $destinationUser->id)
+                ->where('tenant_id', $destinationTenantId)
+                ->increment('balance', $hours);
+
+            // Promote destination row to completed
+            DB::table('caring_hour_transfers')
+                ->where('id', $destinationRowId)
+                ->update([
+                    'status'     => self::STATUS_COMPLETED,
+                    'updated_at' => now(),
+                ]);
+
+            return [
+                'accepted'                => true,
+                'destination_transfer_id' => $destinationRowId,
+                'error'                   => null,
+                'duplicated'              => false,
+            ];
+        });
     }
 
     /**

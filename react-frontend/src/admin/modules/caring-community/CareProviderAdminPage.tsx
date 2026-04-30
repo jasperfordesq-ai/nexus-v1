@@ -38,6 +38,7 @@ import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import Layers from 'lucide-react/icons/layers';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -69,6 +70,28 @@ interface DirectoryResponse {
   per_page: number;
   current_page: number;
 }
+
+interface DuplicatePair {
+  provider_a: { id: number; name: string; type: ProviderType; is_verified: boolean };
+  provider_b: { id: number; name: string; type: ProviderType; is_verified: boolean };
+  score: number;
+  signals: string[];
+}
+
+interface DuplicatesResponse {
+  pairs: DuplicatePair[];
+  total: number;
+  scanned: number;
+}
+
+const SIGNAL_LABELS: Record<string, string> = {
+  name_match:      'Name match',
+  name_similar:    'Name similar',
+  email_match:     'Email match',
+  phone_match:     'Phone match',
+  website_match:   'Website match',
+  address_overlap: 'Address overlap',
+};
 
 interface ProviderFormData {
   name: string;
@@ -133,6 +156,11 @@ export default function CareProviderAdminPage() {
   const [form, setForm] = useState<ProviderFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<Partial<ProviderFormData>>({});
+
+  // Duplicates panel state
+  const [duplicates, setDuplicates] = useState<DuplicatesResponse | null>(null);
+  const [duplicatesLoading, setDuplicatesLoading] = useState(false);
+  const [duplicatesOpen, setDuplicatesOpen] = useState(false);
 
   // ── Fetch ────────────────────────────────────────────────────────────────
 
@@ -243,6 +271,40 @@ export default function CareProviderAdminPage() {
     }
   }
 
+  // ── Duplicates ───────────────────────────────────────────────────────────
+
+  async function loadDuplicates() {
+    setDuplicatesLoading(true);
+    setDuplicatesOpen(true);
+    try {
+      const res = await api.get<DuplicatesResponse>(
+        '/v2/admin/caring-community/providers/duplicates?threshold=0.65',
+      );
+      setDuplicates(res.data ?? { pairs: [], total: 0, scanned: 0 });
+    } catch (err) {
+      logError('CareProviderAdminPage.duplicates', err);
+      showToast('Failed to scan for duplicates.', 'error');
+      setDuplicates({ pairs: [], total: 0, scanned: 0 });
+    } finally {
+      setDuplicatesLoading(false);
+    }
+  }
+
+  async function handleDeactivateProvider(providerId: number, providerName: string) {
+    if (!window.confirm(`Mark "${providerName}" as inactive? You can re-activate it later.`)) {
+      return;
+    }
+    try {
+      await api.delete(`/v2/admin/caring-community/providers/${providerId}`);
+      showToast(`"${providerName}" deactivated.`, 'success');
+      await loadDuplicates();
+      void fetchProviders();
+    } catch (err) {
+      logError('CareProviderAdminPage.deactivate', err);
+      showToast('Failed to deactivate provider.', 'error');
+    }
+  }
+
   // ── Verify ───────────────────────────────────────────────────────────────
 
   async function handleVerify(provider: CareProvider) {
@@ -268,14 +330,127 @@ export default function CareProviderAdminPage() {
             Manage Spitex, day centres, associations, and volunteer groups
           </p>
         </div>
-        <Button
-          color="primary"
-          startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
-          onPress={openCreate}
-        >
-          Add Provider
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="flat"
+            startContent={<Layers className="h-4 w-4" aria-hidden="true" />}
+            onPress={loadDuplicates}
+            isLoading={duplicatesLoading && duplicates === null}
+          >
+            Find Duplicates
+          </Button>
+          <Button
+            color="primary"
+            startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
+            onPress={openCreate}
+          >
+            Add Provider
+          </Button>
+        </div>
       </div>
+
+      {/* Duplicates Panel */}
+      {duplicatesOpen && (
+        <div className="rounded-xl border border-default-200 bg-default-50 dark:bg-default-100/40 p-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <h2 className="text-sm font-semibold flex items-center gap-2">
+                <Layers className="h-4 w-4" aria-hidden="true" />
+                Potential Duplicates
+              </h2>
+              <p className="text-xs text-default-500 mt-0.5">
+                {duplicates
+                  ? `Scanned ${duplicates.scanned} active providers — ${duplicates.total} pair${duplicates.total === 1 ? '' : 's'} above 65% similarity`
+                  : 'Scanning…'}
+              </p>
+            </div>
+            <Button size="sm" variant="light" onPress={() => setDuplicatesOpen(false)}>
+              Close
+            </Button>
+          </div>
+
+          {duplicatesLoading ? (
+            <div className="flex justify-center py-6">
+              <Spinner size="sm" />
+            </div>
+          ) : duplicates && duplicates.pairs.length === 0 ? (
+            <p className="text-sm text-default-500 py-3">
+              No likely duplicates found. The directory looks clean.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {duplicates?.pairs.map((pair, idx) => (
+                <div
+                  key={`${pair.provider_a.id}-${pair.provider_b.id}-${idx}`}
+                  className="rounded-lg border border-default-200 bg-content1 p-3"
+                >
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="flex-1 min-w-[260px]">
+                      <p className="font-medium text-sm flex items-center gap-1.5">
+                        {pair.provider_a.is_verified && (
+                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified" />
+                        )}
+                        {pair.provider_a.name}
+                      </p>
+                      <p className="text-xs text-default-500">
+                        #{pair.provider_a.id} · {pair.provider_a.type}
+                      </p>
+                    </div>
+                    <div className="text-default-400 text-xs self-center">vs</div>
+                    <div className="flex-1 min-w-[260px]">
+                      <p className="font-medium text-sm flex items-center gap-1.5">
+                        {pair.provider_b.is_verified && (
+                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified" />
+                        )}
+                        {pair.provider_b.name}
+                      </p>
+                      <p className="text-xs text-default-500">
+                        #{pair.provider_b.id} · {pair.provider_b.type}
+                      </p>
+                    </div>
+                    <Chip
+                      size="sm"
+                      color={pair.score >= 0.85 ? 'danger' : pair.score >= 0.75 ? 'warning' : 'default'}
+                      variant="flat"
+                    >
+                      {Math.round(pair.score * 100)}% match
+                    </Chip>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    {pair.signals.map((sig) => (
+                      <Chip key={sig} size="sm" variant="flat" color="primary">
+                        {SIGNAL_LABELS[sig] ?? sig}
+                      </Chip>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 mt-2.5">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="danger"
+                      onPress={() =>
+                        handleDeactivateProvider(pair.provider_b.id, pair.provider_b.name)
+                      }
+                    >
+                      Deactivate &ldquo;{pair.provider_b.name}&rdquo;
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="danger"
+                      onPress={() =>
+                        handleDeactivateProvider(pair.provider_a.id, pair.provider_a.name)
+                      }
+                    >
+                      Deactivate &ldquo;{pair.provider_a.name}&rdquo;
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Table */}
       {loading ? (

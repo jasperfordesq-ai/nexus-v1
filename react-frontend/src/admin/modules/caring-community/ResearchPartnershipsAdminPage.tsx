@@ -30,6 +30,7 @@ import {
 } from '@heroui/react';
 import Database from 'lucide-react/icons/database';
 import FileCheck2 from 'lucide-react/icons/file-check-2';
+import FileText from 'lucide-react/icons/file-text';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -52,6 +53,22 @@ interface ResearchPartner {
   starts_at: string | null;
   ends_at: string | null;
   created_at: string;
+}
+
+interface AgreementTemplateSummary {
+  key: string;
+  title: string;
+  summary: string;
+  suitable_for: string[];
+  placeholders: string[];
+}
+
+interface AgreementTemplateRender {
+  key: string;
+  title: string;
+  markdown: string;
+  placeholders_used: string[];
+  placeholders_missing: string[];
 }
 
 interface ResearchExport {
@@ -106,6 +123,14 @@ export default function ResearchPartnershipsAdminPage() {
   const [periodStart, setPeriodStart] = useState('2026-01-01');
   const [periodEnd, setPeriodEnd] = useState('2026-12-31');
 
+  // AG65 — agreement templates
+  const [templates, setTemplates] = useState<AgreementTemplateSummary[]>([]);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [activeTemplate, setActiveTemplate] = useState<AgreementTemplateSummary | null>(null);
+  const [templateValues, setTemplateValues] = useState<Record<string, string>>({});
+  const [renderedTemplate, setRenderedTemplate] = useState<AgreementTemplateRender | null>(null);
+  const [renderingTemplate, setRenderingTemplate] = useState(false);
+
   const activePartners = useMemo(
     () => partners.filter((partner) => partner.status === 'active'),
     [partners],
@@ -114,9 +139,10 @@ export default function ResearchPartnershipsAdminPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [partnerResponse, exportResponse] = await Promise.all([
+      const [partnerResponse, exportResponse, templatesResponse] = await Promise.all([
         api.get<{ partners: ResearchPartner[] }>('/v2/admin/caring-community/research/partners'),
         api.get<{ exports: ResearchExport[] }>('/v2/admin/caring-community/research/dataset-exports'),
+        api.get<{ templates: AgreementTemplateSummary[] }>('/v2/admin/caring-community/research/agreement-templates'),
       ]);
 
       if (partnerResponse.success) {
@@ -125,12 +151,59 @@ export default function ResearchPartnershipsAdminPage() {
       if (exportResponse.success) {
         setExports(exportResponse.data?.exports ?? []);
       }
+      if (templatesResponse.success) {
+        setTemplates(templatesResponse.data?.templates ?? []);
+      }
     } catch {
       showToast('Failed to load research partnerships', 'error');
     } finally {
       setLoading(false);
     }
   }, [showToast]);
+
+  const openTemplate = useCallback((template: AgreementTemplateSummary) => {
+    setActiveTemplate(template);
+    const initialValues: Record<string, string> = {};
+    template.placeholders.forEach((p) => {
+      initialValues[p] = '';
+    });
+    setTemplateValues(initialValues);
+    setRenderedTemplate(null);
+    setTemplateModalOpen(true);
+  }, []);
+
+  const renderTemplate = useCallback(async () => {
+    if (!activeTemplate) return;
+    setRenderingTemplate(true);
+    try {
+      const response = await api.post<AgreementTemplateRender>(
+        `/v2/admin/caring-community/research/agreement-templates/${encodeURIComponent(activeTemplate.key)}/render`,
+        { values: templateValues },
+      );
+      if (response.success && response.data) {
+        setRenderedTemplate(response.data);
+      } else {
+        showToast(response.error || 'Failed to render template', 'error');
+      }
+    } catch {
+      showToast('Failed to render template', 'error');
+    } finally {
+      setRenderingTemplate(false);
+    }
+  }, [activeTemplate, templateValues, showToast]);
+
+  const downloadRendered = useCallback(() => {
+    if (!renderedTemplate) return;
+    const blob = new Blob([renderedTemplate.markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${renderedTemplate.key}-${new Date().toISOString().slice(0, 10)}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [renderedTemplate]);
 
   useEffect(() => {
     void load();
@@ -277,6 +350,60 @@ export default function ResearchPartnershipsAdminPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
+          <FileText size={18} className="text-primary" />
+          <span className="font-semibold">Agreement Templates</span>
+          <span className="text-xs text-default-500 font-normal ml-2">
+            FADP/nDSG-aligned drafts for legal review
+          </span>
+        </CardHeader>
+        <CardBody>
+          {templates.length === 0 ? (
+            <p className="text-sm text-default-500">No agreement templates available.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {templates.map((template) => (
+                <div
+                  key={template.key}
+                  className="rounded-lg border border-default-200 bg-content1 p-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{template.title}</p>
+                      <p className="text-xs text-default-500 mt-1">{template.summary}</p>
+                    </div>
+                  </div>
+                  {template.suitable_for.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {template.suitable_for.map((s) => (
+                        <Chip key={s} size="sm" variant="flat" color="default">
+                          {s}
+                        </Chip>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between mt-2.5">
+                    <span className="text-xs text-default-400">
+                      {template.placeholders.length} placeholder
+                      {template.placeholders.length === 1 ? '' : 's'}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="primary"
+                      onPress={() => openTemplate(template)}
+                    >
+                      Open
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex items-center gap-2">
           <FileCheck2 size={18} className="text-primary" />
           <span className="font-semibold">Dataset Export History</span>
         </CardHeader>
@@ -361,6 +488,67 @@ export default function ResearchPartnershipsAdminPage() {
                 <Button variant="flat" onPress={close}>Cancel</Button>
                 <Button color="primary" onPress={() => void createPartner()} isDisabled={!name.trim() || !institution.trim()}>
                   Create
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={templateModalOpen} onOpenChange={setTemplateModalOpen} size="3xl" scrollBehavior="inside">
+        <ModalContent>
+          {(close) => (
+            <>
+              <ModalHeader>
+                {activeTemplate?.title ?? 'Agreement Template'}
+              </ModalHeader>
+              <ModalBody className="gap-4">
+                {activeTemplate && (
+                  <>
+                    <p className="text-sm text-default-500">{activeTemplate.summary}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {activeTemplate.placeholders.map((p) => (
+                        <Input
+                          key={p}
+                          label={p.replace(/_/g, ' ')}
+                          size="sm"
+                          value={templateValues[p] ?? ''}
+                          onValueChange={(v) =>
+                            setTemplateValues((prev) => ({ ...prev, [p]: v }))
+                          }
+                        />
+                      ))}
+                    </div>
+                    {renderedTemplate && (
+                      <div className="rounded-lg border border-default-200 bg-default-50 dark:bg-default-100/30 p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold">
+                            Rendered Markdown ({renderedTemplate.markdown.length} chars)
+                          </span>
+                          {renderedTemplate.placeholders_missing.length > 0 && (
+                            <Chip size="sm" color="warning" variant="flat">
+                              {renderedTemplate.placeholders_missing.length} placeholder
+                              {renderedTemplate.placeholders_missing.length === 1 ? '' : 's'} missing
+                            </Chip>
+                          )}
+                        </div>
+                        <pre className="text-xs whitespace-pre-wrap font-mono max-h-80 overflow-y-auto">
+                          {renderedTemplate.markdown}
+                        </pre>
+                      </div>
+                    )}
+                  </>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={close}>Close</Button>
+                {renderedTemplate && (
+                  <Button variant="flat" color="primary" onPress={downloadRendered}>
+                    Download Markdown
+                  </Button>
+                )}
+                <Button color="primary" onPress={() => void renderTemplate()} isLoading={renderingTemplate}>
+                  {renderedTemplate ? 'Re-render' : 'Render'}
                 </Button>
               </ModalFooter>
             </>

@@ -265,6 +265,7 @@ function useAdminNav(): NavSection[] {
         { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
         { label: 'Loyalty Programme', href: '/admin/caring-community/loyalty', icon: Coins },
         { label: 'Hour Transfers', href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
+        { label: 'Federation Peers', href: '/admin/caring-community/federation-peers', icon: Network },
         { label: 'Safeguarding Reports', href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
         { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
         { label: 'Regional Points', href: '/admin/regional-points', icon: Coins },

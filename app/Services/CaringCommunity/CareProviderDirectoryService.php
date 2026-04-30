@@ -228,6 +228,213 @@ class CareProviderDirectoryService
     }
 
     /**
+     * AG64 follow-up — Find potential duplicate / overlapping provider rows.
+     *
+     * Compares every active provider against every other active provider and
+     * scores by: name similarity, contact-email match, contact-phone match,
+     * website-domain match, address-token overlap. Returns pairs that score
+     * above a "likely duplicate" threshold so a coordinator can manually merge
+     * or de-duplicate. This is read-only — the actual merge stays admin-driven.
+     *
+     * @return array{pairs:array<int,array<string,mixed>>,total:int,scanned:int}
+     */
+    public function findPotentialDuplicates(int $tenantId, float $threshold = 0.65, int $maxPairs = 50): array
+    {
+        $this->assertAvailable();
+
+        $rows = DB::table(self::TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->orderBy('id')
+            ->get([
+                'id', 'name', 'type', 'contact_email', 'contact_phone',
+                'website_url', 'address', 'is_verified',
+            ])
+            ->all();
+
+        $count = count($rows);
+        $pairs = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $a = $rows[$i];
+            for ($j = $i + 1; $j < $count; $j++) {
+                $b = $rows[$j];
+
+                $signals = $this->compareProviders($a, $b);
+                if ($signals['score'] >= $threshold) {
+                    $pairs[] = [
+                        'provider_a' => [
+                            'id'          => (int) $a->id,
+                            'name'        => (string) $a->name,
+                            'type'        => (string) $a->type,
+                            'is_verified' => (bool) $a->is_verified,
+                        ],
+                        'provider_b' => [
+                            'id'          => (int) $b->id,
+                            'name'        => (string) $b->name,
+                            'type'        => (string) $b->type,
+                            'is_verified' => (bool) $b->is_verified,
+                        ],
+                        'score'   => round($signals['score'], 3),
+                        'signals' => $signals['signals'],
+                    ];
+                }
+            }
+        }
+
+        usort($pairs, static fn (array $x, array $y) => $y['score'] <=> $x['score']);
+
+        $total = count($pairs);
+        if ($total > $maxPairs) {
+            $pairs = array_slice($pairs, 0, $maxPairs);
+        }
+
+        return [
+            'pairs'   => $pairs,
+            'total'   => $total,
+            'scanned' => $count,
+        ];
+    }
+
+    /**
+     * Score-based comparison of two providers. Each signal contributes a
+     * weighted fraction; total score is in [0, 1].
+     *
+     * @return array{score:float,signals:array<int,string>}
+     */
+    private function compareProviders(object $a, object $b): array
+    {
+        $signals = [];
+        $score = 0.0;
+
+        // Name similarity (weight 0.45) — case-insensitive Levenshtein-derived ratio.
+        $nameA = $this->normaliseName((string) $a->name);
+        $nameB = $this->normaliseName((string) $b->name);
+        $nameSim = $this->stringSimilarity($nameA, $nameB);
+        if ($nameSim >= 0.85) {
+            $signals[] = 'name_match';
+            $score += 0.45;
+        } elseif ($nameSim >= 0.70) {
+            $signals[] = 'name_similar';
+            $score += 0.25;
+        }
+
+        // Contact email exact match (weight 0.30).
+        $emailA = strtolower(trim((string) ($a->contact_email ?? '')));
+        $emailB = strtolower(trim((string) ($b->contact_email ?? '')));
+        if ($emailA !== '' && $emailA === $emailB) {
+            $signals[] = 'email_match';
+            $score += 0.30;
+        }
+
+        // Contact phone — match on digits only (weight 0.25).
+        $phoneA = preg_replace('/\D+/', '', (string) ($a->contact_phone ?? '')) ?? '';
+        $phoneB = preg_replace('/\D+/', '', (string) ($b->contact_phone ?? '')) ?? '';
+        if (strlen($phoneA) >= 7 && $phoneA === $phoneB) {
+            $signals[] = 'phone_match';
+            $score += 0.25;
+        }
+
+        // Website domain match (weight 0.25).
+        $domainA = $this->extractDomain((string) ($a->website_url ?? ''));
+        $domainB = $this->extractDomain((string) ($b->website_url ?? ''));
+        if ($domainA !== '' && $domainA === $domainB) {
+            $signals[] = 'website_match';
+            $score += 0.25;
+        }
+
+        // Address token overlap (weight 0.15) — at least 2 shared 4+-char tokens.
+        $tokensA = $this->addressTokens((string) ($a->address ?? ''));
+        $tokensB = $this->addressTokens((string) ($b->address ?? ''));
+        $shared = array_intersect($tokensA, $tokensB);
+        if (count($shared) >= 2) {
+            $signals[] = 'address_overlap';
+            $score += 0.15;
+        }
+
+        // Same type bonus (weight 0.05) — only adds a small lift.
+        if ((string) $a->type === (string) $b->type) {
+            $score += 0.05;
+        }
+
+        if ($score > 1.0) {
+            $score = 1.0;
+        }
+
+        return ['score' => $score, 'signals' => $signals];
+    }
+
+    private function normaliseName(string $name): string
+    {
+        $name = mb_strtolower($name);
+        // Strip common org/legal-form noise so "Spitex AG" and "Spitex" match.
+        $name = preg_replace(
+            '/\b(ag|gmbh|sa|sàrl|sarl|verein|genossenschaft|cooperative|association|kiss|spitex)\b/u',
+            ' ',
+            $name
+        ) ?? $name;
+        $name = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $name) ?? $name;
+        $name = preg_replace('/\s+/', ' ', $name) ?? $name;
+        return trim($name);
+    }
+
+    /**
+     * Levenshtein-based similarity in [0, 1]. Falls back to similar_text if
+     * either string exceeds the PHP levenshtein() 255-char limit.
+     */
+    private function stringSimilarity(string $a, string $b): float
+    {
+        if ($a === '' || $b === '') {
+            return 0.0;
+        }
+        if ($a === $b) {
+            return 1.0;
+        }
+
+        $maxLen = max(strlen($a), strlen($b));
+        if ($maxLen === 0) {
+            return 0.0;
+        }
+
+        if (strlen($a) <= 255 && strlen($b) <= 255) {
+            $distance = levenshtein($a, $b);
+            return 1.0 - ($distance / $maxLen);
+        }
+
+        $percent = 0.0;
+        similar_text($a, $b, $percent);
+        return $percent / 100.0;
+    }
+
+    private function extractDomain(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+        if (!preg_match('#^https?://#i', $url)) {
+            $url = 'http://' . $url;
+        }
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!is_string($host)) {
+            return '';
+        }
+        $host = strtolower($host);
+        return preg_replace('/^www\./', '', $host) ?? $host;
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function addressTokens(string $address): array
+    {
+        $address = mb_strtolower($address);
+        $address = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $address) ?? $address;
+        $tokens = preg_split('/\s+/', trim($address)) ?: [];
+        return array_values(array_filter($tokens, static fn (string $t) => mb_strlen($t) >= 4));
+    }
+
+    /**
      * Admin-only listing — returns all statuses (for the admin panel).
      *
      * @return array{data: array, total: int, per_page: int, current_page: int}

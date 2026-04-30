@@ -1375,6 +1375,7 @@ Route::get('/v2/caring-community/providers/{id}', [\App\Http\Controllers\Api\Car
 Route::get('/v2/caring-community/sub-regions', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'index'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminIndex']);
+Route::get('/v2/admin/caring-community/providers/duplicates', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminDuplicates']);
 Route::post('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'store']);
 Route::put('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminUpdate']);
 Route::delete('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminDelete']);
@@ -1523,6 +1524,17 @@ Route::post('/v2/admin/caring-community/research/partners', [\App\Http\Controlle
 Route::post('/v2/admin/caring-community/research/partners/{partnerId}/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminGenerateDataset']);
 Route::get('/v2/admin/caring-community/research/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminDatasetExports']);
 Route::post('/v2/admin/caring-community/research/dataset-exports/{exportId}/revoke', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminRevokeDatasetExport']);
+Route::get('/v2/admin/caring-community/research/agreement-templates', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminListAgreementTemplates']);
+Route::post('/v2/admin/caring-community/research/agreement-templates/{key}/render', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminRenderAgreementTemplate']);
+
+// AG23 follow-up — Cross-platform federation peers
+Route::get('/v2/admin/caring-community/federation-peers', [\App\Http\Controllers\Api\AdminFederationPeerController::class, 'index']);
+Route::post('/v2/admin/caring-community/federation-peers', [\App\Http\Controllers\Api\AdminFederationPeerController::class, 'store']);
+Route::put('/v2/admin/caring-community/federation-peers/{id}/status', [\App\Http\Controllers\Api\AdminFederationPeerController::class, 'updateStatus']);
+Route::post('/v2/admin/caring-community/federation-peers/{id}/rotate-secret', [\App\Http\Controllers\Api\AdminFederationPeerController::class, 'rotateSecret']);
+Route::delete('/v2/admin/caring-community/federation-peers/{id}', [\App\Http\Controllers\Api\AdminFederationPeerController::class, 'destroy']);
+
+// AG23 follow-up — Public inbound federation endpoint registered outside the auth+admin group at end of file
 
 // AG70 — Emergency/Safety Alert Tier
 Route::get('/v2/caring-community/emergency-alerts', [\App\Http\Controllers\Api\EmergencyAlertController::class, 'activeAlerts'])
@@ -2066,6 +2078,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/safeguarding/my-preferences', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myPreferences']);
     Route::post('/v2/safeguarding/revoke', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'revoke']);
 });
+
+// AG23 follow-up — Public inbound federation endpoint (HMAC signature auth, no session)
+Route::post('/v2/federation/hour-transfer/inbound', [\App\Http\Controllers\Api\FederationHourTransferController::class, 'inbound']);
 
 // AG54 — Verein membership dues (member-facing + verein-admin scoped)
 Route::middleware(['auth:sanctum'])->group(function () {

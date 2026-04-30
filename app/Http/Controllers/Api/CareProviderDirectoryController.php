@@ -245,6 +245,36 @@ class CareProviderDirectoryController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/admin/caring-community/providers/duplicates
+     * AG64 follow-up — list potential duplicate / overlapping provider pairs.
+     */
+    public function adminDuplicates(): JsonResponse
+    {
+        $this->requireAuth();
+        $this->requireAdmin();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        try {
+            $threshold = (float) request()->query('threshold', 0.65);
+            if ($threshold < 0.30) {
+                $threshold = 0.30;
+            }
+            if ($threshold > 0.95) {
+                $threshold = 0.95;
+            }
+
+            return $this->respondWithData(
+                $this->service->findPotentialDuplicates(TenantContext::getId(), $threshold)
+            );
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
+        }
+    }
+
+    /**
      * POST /api/v2/admin/caring-community/providers/{id}/verify
      * Mark a provider as verified.
      */

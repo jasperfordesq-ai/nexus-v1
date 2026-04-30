@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CaringCommunity\ResearchAgreementTemplateService;
 use App\Services\CaringCommunity\ResearchPartnershipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -19,8 +20,57 @@ class ResearchPartnershipController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(private readonly ResearchPartnershipService $service)
+    public function __construct(
+        private readonly ResearchPartnershipService $service,
+        private readonly ResearchAgreementTemplateService $templates,
+    ) {
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/research/agreement-templates
+     * AG65 follow-up — list available research agreement templates.
+     */
+    public function adminListAgreementTemplates(): JsonResponse
     {
+        $disabled = $this->guardAdminResearch();
+        if ($disabled) {
+            return $disabled;
+        }
+
+        return $this->respondWithData([
+            'templates' => $this->templates->listTemplates(),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/research/agreement-templates/{key}/render
+     * AG65 follow-up — render a template's Markdown body with supplied placeholders.
+     */
+    public function adminRenderAgreementTemplate(string $key): JsonResponse
+    {
+        $disabled = $this->guardAdminResearch();
+        if ($disabled) {
+            return $disabled;
+        }
+
+        $input = $this->getAllInput();
+        $values = is_array($input['values'] ?? null) ? $input['values'] : [];
+
+        // Coerce values to strings so callers can't smuggle arrays into placeholders.
+        $stringValues = [];
+        foreach ($values as $k => $v) {
+            if (is_scalar($v)) {
+                $stringValues[(string) $k] = (string) $v;
+            }
+        }
+
+        try {
+            $rendered = $this->templates->render($key, $stringValues);
+        } catch (InvalidArgumentException $e) {
+            return $this->respondWithError('TEMPLATE_NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->respondWithData($rendered);
     }
 
     public function adminIndex(): JsonResponse
