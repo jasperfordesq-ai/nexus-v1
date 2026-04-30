@@ -1372,11 +1372,17 @@ Route::get('/v2/caring-community/providers', [\App\Http\Controllers\Api\CareProv
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'show'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/caring-community/sub-regions', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'index'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminIndex']);
 Route::post('/v2/admin/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'store']);
 Route::put('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminUpdate']);
 Route::delete('/v2/admin/caring-community/providers/{id}', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminDelete']);
 Route::post('/v2/admin/caring-community/providers/{id}/verify', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'adminVerify']);
+Route::get('/v2/admin/caring-community/sub-regions', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'adminIndex']);
+Route::post('/v2/admin/caring-community/sub-regions', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'store']);
+Route::put('/v2/admin/caring-community/sub-regions/{id}', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'update']);
+Route::delete('/v2/admin/caring-community/sub-regions/{id}', [\App\Http\Controllers\Api\CaringSubRegionController::class, 'delete']);
 
 // AG67 — Trust Tier System
 Route::get('/v2/caring-community/my-trust-tier', [\App\Http\Controllers\Api\TrustTierController::class, 'myTier'])

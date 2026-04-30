@@ -50,7 +50,7 @@ class CareProviderDirectoryService
      *
      * @param  int    $tenantId
      * @param  array  $filters  Supported keys: type (string|null), search (string|null),
-     *                          verified_only (bool), page (int)
+     *                          sub_region_id (int|null), verified_only (bool), page (int)
      * @return array{data: array, total: int, per_page: int, current_page: int}
      */
     public function list(int $tenantId, array $filters = []): array
@@ -59,6 +59,7 @@ class CareProviderDirectoryService
 
         $type         = isset($filters['type']) && $filters['type'] !== '' ? (string) $filters['type'] : null;
         $search       = isset($filters['search']) && $filters['search'] !== '' ? (string) $filters['search'] : null;
+        $subRegionId  = isset($filters['sub_region_id']) && (int) $filters['sub_region_id'] > 0 ? (int) $filters['sub_region_id'] : null;
         $verifiedOnly = !empty($filters['verified_only']);
         $page         = max(1, (int) ($filters['page'] ?? 1));
         $offset       = ($page - 1) * self::PER_PAGE;
@@ -69,6 +70,10 @@ class CareProviderDirectoryService
 
         if ($type !== null) {
             $query->where('type', $type);
+        }
+
+        if ($subRegionId !== null && Schema::hasColumn(self::TABLE, 'sub_region_id')) {
+            $query->where('sub_region_id', $subRegionId);
         }
 
         if ($search !== null) {
@@ -127,7 +132,7 @@ class CareProviderDirectoryService
     {
         $this->assertAvailable();
 
-        $id = DB::table(self::TABLE)->insertGetId([
+        $payload = [
             'tenant_id'     => $tenantId,
             'name'          => (string) ($data['name'] ?? ''),
             'type'          => (string) ($data['type'] ?? ''),
@@ -143,7 +148,13 @@ class CareProviderDirectoryService
             'created_by'    => $adminUserId,
             'created_at'    => now(),
             'updated_at'    => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn(self::TABLE, 'sub_region_id')) {
+            $payload['sub_region_id'] = $this->normaliseSubRegionId($data['sub_region_id'] ?? null, $tenantId);
+        }
+
+        $id = DB::table(self::TABLE)->insertGetId($payload);
 
         return $this->get($id, $tenantId) ?? [];
     }
@@ -170,6 +181,10 @@ class CareProviderDirectoryService
             $payload['categories'] = $data['categories'] !== null
                 ? json_encode($data['categories'])
                 : null;
+        }
+
+        if (array_key_exists('sub_region_id', $data) && Schema::hasColumn(self::TABLE, 'sub_region_id')) {
+            $payload['sub_region_id'] = $this->normaliseSubRegionId($data['sub_region_id'], $tenantId);
         }
 
         if (array_key_exists('opening_hours', $data)) {
@@ -258,6 +273,8 @@ class CareProviderDirectoryService
             'description'   => isset($row['description']) ? (string) $row['description'] : null,
             'categories'    => isset($row['categories']) ? json_decode((string) $row['categories'], true) : null,
             'address'       => isset($row['address']) ? (string) $row['address'] : null,
+            'sub_region_id' => isset($row['sub_region_id']) ? (int) $row['sub_region_id'] : null,
+            'sub_region'    => $this->loadSubRegion($row),
             'contact_phone' => isset($row['contact_phone']) ? (string) $row['contact_phone'] : null,
             'contact_email' => isset($row['contact_email']) ? (string) $row['contact_email'] : null,
             'website_url'   => isset($row['website_url']) ? (string) $row['website_url'] : null,
@@ -267,6 +284,52 @@ class CareProviderDirectoryService
             'created_by'    => isset($row['created_by']) ? (int) $row['created_by'] : null,
             'created_at'    => $row['created_at'] ?? null,
             'updated_at'    => $row['updated_at'] ?? null,
+        ];
+    }
+
+    private function normaliseSubRegionId(mixed $value, int $tenantId): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! Schema::hasTable('caring_sub_regions') || ! Schema::hasColumn(self::TABLE, 'sub_region_id')) {
+            return null;
+        }
+
+        $id = (int) $value;
+        if ($id <= 0) {
+            return null;
+        }
+
+        return DB::table('caring_sub_regions')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists()
+                ? $id
+                : null;
+    }
+
+    private function loadSubRegion(array $row): ?array
+    {
+        if (! isset($row['sub_region_id']) || $row['sub_region_id'] === null || ! Schema::hasTable('caring_sub_regions')) {
+            return null;
+        }
+
+        $subRegion = DB::table('caring_sub_regions')
+            ->where('id', (int) $row['sub_region_id'])
+            ->where('tenant_id', (int) $row['tenant_id'])
+            ->first();
+
+        if (! $subRegion) {
+            return null;
+        }
+
+        return [
+            'id' => (int) $subRegion->id,
+            'name' => (string) $subRegion->name,
+            'slug' => (string) $subRegion->slug,
+            'type' => (string) $subRegion->type,
         ];
     }
 }

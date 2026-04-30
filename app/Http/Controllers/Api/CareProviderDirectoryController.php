@@ -50,6 +50,7 @@ class CareProviderDirectoryController extends BaseApiController
             $filters = [
                 'type'          => request()->query('type'),
                 'search'        => request()->query('search'),
+                'sub_region_id' => request()->query('sub_region_id'),
                 'verified_only' => filter_var(request()->query('verified_only', false), FILTER_VALIDATE_BOOLEAN),
                 'page'          => (int) request()->query('page', 1),
             ];
@@ -137,6 +138,7 @@ class CareProviderDirectoryController extends BaseApiController
             'type'          => 'required|string|in:spitex,tagesstätte,private,verein,volunteer',
             'description'   => 'nullable|string',
             'address'       => 'nullable|string|max:255',
+            'sub_region_id' => 'nullable|integer|min:1',
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email|max:255',
             'website_url'   => 'nullable|url|max:255',
@@ -182,6 +184,7 @@ class CareProviderDirectoryController extends BaseApiController
             'type'          => 'sometimes|required|string|in:spitex,tagesstätte,private,verein,volunteer',
             'description'   => 'nullable|string',
             'address'       => 'nullable|string|max:255',
+            'sub_region_id' => 'nullable|integer|min:1',
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email|max:255',
             'website_url'   => 'nullable|url|max:255',
