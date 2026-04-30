@@ -32,6 +32,24 @@ class SocialAuthController extends Controller
     ) {
     }
 
+    /**
+     * Public endpoint — returns the list of OAuth providers enabled for the
+     * current tenant. Empty array when OAUTH_ENABLED env flag is off, or when
+     * the tenant has explicitly disabled all providers. Frontend uses this to
+     * decide whether to render Google/Apple/Facebook buttons.
+     */
+    public function enabledProviders(Request $request): JsonResponse
+    {
+        $tenantId = TenantContext::getId() ?: (int) $request->input('tenant_id', 0);
+        if ($tenantId <= 0) {
+            return response()->json(['success' => true, 'providers' => []]);
+        }
+        return response()->json([
+            'success' => true,
+            'providers' => $this->social->enabledProviders($tenantId),
+        ]);
+    }
+
     public function redirect(Request $request, string $provider): JsonResponse
     {
         try {

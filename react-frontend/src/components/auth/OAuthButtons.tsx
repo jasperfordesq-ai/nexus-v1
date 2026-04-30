@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useEffect, useState } from 'react';
 import { Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
@@ -35,8 +36,28 @@ const PROVIDERS: ReadonlyArray<{ id: Provider; Icon: typeof GoogleIcon; key: str
 export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: OAuthButtonsProps) {
   const { t } = useTranslation('common');
 
+  // If parent didn't pass enabledProviders, ask the backend which providers are enabled.
+  // Backend returns [] when OAUTH_ENABLED is off — buttons hide entirely.
+  const [serverProviders, setServerProviders] = useState<Provider[] | null>(
+    enabledProviders ?? null
+  );
+  useEffect(() => {
+    if (enabledProviders !== undefined) return;
+    const headers: Record<string, string> = {};
+    if (tenantId) headers['X-Tenant-Id'] = String(tenantId);
+    fetch('/api/v2/auth/oauth/enabled-providers', { credentials: 'include', headers })
+      .then((r) => r.json())
+      .then((data: { success?: boolean; providers?: Provider[] }) => {
+        setServerProviders(Array.isArray(data?.providers) ? data.providers : []);
+      })
+      .catch(() => setServerProviders([]));
+  }, [enabledProviders, tenantId]);
+
+  // While we don't yet know, render nothing (no flash of unavailable buttons)
+  if (serverProviders === null) return null;
+
   const visible = PROVIDERS.filter((p) =>
-    enabledProviders && enabledProviders.length > 0 ? enabledProviders.includes(p.id) : true
+    serverProviders.length > 0 ? serverProviders.includes(p.id) : false
   );
 
   if (visible.length === 0) {

@@ -301,10 +301,19 @@ class SocialAuthService
 
     /**
      * Get the list of OAuth providers enabled for a tenant.
-     * Defaults to all 3 if the setting is absent.
+     *
+     * 🔴 GLOBAL KILL SWITCH: when env OAUTH_ENABLED=false (default), no providers
+     * are returned regardless of tenant setting. Set OAUTH_ENABLED=true in .env
+     * once real Google/Apple/Facebook OAuth credentials are configured.
+     *
+     * Otherwise: per-tenant setting `auth.oauth.enabled_providers` (defaults to all 3).
      */
     public function enabledProviders(int $tenantId): array
     {
+        // Global kill switch — ON only when explicitly enabled in env
+        if (! filter_var(env('OAUTH_ENABLED', false), FILTER_VALIDATE_BOOLEAN)) {
+            return [];
+        }
         $raw = $this->tenantSettings->get($tenantId, 'auth.oauth.enabled_providers');
         if ($raw === null || $raw === '') {
             return self::SUPPORTED_PROVIDERS;
