@@ -14,9 +14,10 @@ return new class extends Migration {
         if (!Schema::hasTable('appreciations')) {
             Schema::create('appreciations', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->unsignedBigInteger('sender_id');
-                $table->unsignedBigInteger('receiver_id');
-                $table->unsignedBigInteger('tenant_id');
+                // Match users.id and tenants.id which are int(11) signed on this DB
+                $table->integer('sender_id');
+                $table->integer('receiver_id');
+                $table->integer('tenant_id');
                 $table->text('message');
                 $table->string('context_type', 32)->nullable();
                 $table->unsignedBigInteger('context_id')->nullable();
@@ -39,9 +40,10 @@ return new class extends Migration {
             Schema::create('appreciation_reactions', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->unsignedBigInteger('appreciation_id');
-                $table->unsignedBigInteger('user_id');
+                // Match users.id and tenants.id which are int(11) signed on this DB
+                $table->integer('user_id');
                 $table->string('reaction_type', 16);
-                $table->unsignedBigInteger('tenant_id');
+                $table->integer('tenant_id');
                 $table->timestamp('created_at')->useCurrent();
 
                 $table->unique(['appreciation_id', 'user_id'], 'appreciation_reactions_unique');

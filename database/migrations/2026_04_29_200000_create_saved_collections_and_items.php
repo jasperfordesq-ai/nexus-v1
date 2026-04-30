@@ -14,8 +14,9 @@ return new class extends Migration {
         if (!Schema::hasTable('saved_collections')) {
             Schema::create('saved_collections', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('tenant_id');
+                // Match users.id and tenants.id which are int(11) signed on this DB
+                $table->integer('user_id');
+                $table->integer('tenant_id');
                 $table->string('name', 100);
                 $table->text('description')->nullable();
                 $table->boolean('is_public')->default(false);
@@ -37,9 +38,11 @@ return new class extends Migration {
             Schema::create('saved_items', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->unsignedBigInteger('collection_id');
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('tenant_id');
+                // Match users.id and tenants.id which are int(11) signed on this DB
+                $table->integer('user_id');
+                $table->integer('tenant_id');
                 $table->string('item_type', 32);
+                // item_id is polymorphic — use bigInt to cover all referenced tables
                 $table->unsignedBigInteger('item_id');
                 $table->string('note', 500)->nullable();
                 $table->timestamp('saved_at')->useCurrent();
