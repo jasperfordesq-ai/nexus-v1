@@ -48,7 +48,7 @@ export function AppreciationModal({
   onSent,
 }: AppreciationModalProps) {
   const { t } = useTranslation('common');
-  const { showToast } = useToast();
+  const toast = useToast();
   const [message, setMessage] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -74,25 +74,25 @@ export function AppreciationModal({
         is_public: isPublic,
       });
       if (res.success) {
-        showToast(t('appreciations.sent_success', 'Thank-you sent!'), 'success');
+        toast.success(t('appreciations.sent_success', 'Thank-you sent!'));
         onSent?.();
         setMessage('');
         onClose();
       } else {
         const err = (res as unknown as { error?: string }).error || '';
         if (err.includes('rate_limit')) {
-          showToast(t('appreciations.rate_limited', 'Daily thank-you limit reached'), 'error');
+          toast.error(t('appreciations.rate_limited', 'Daily thank-you limit reached'));
         } else {
-          showToast(t('appreciations.send_failed', 'Could not send thank-you'), 'error');
+          toast.error(t('appreciations.send_failed', 'Could not send thank-you'));
         }
       }
     } catch (err) {
       logError('AppreciationModal: send failed', err);
-      showToast(t('appreciations.send_failed', 'Could not send thank-you'), 'error');
+      toast.error(t('appreciations.send_failed', 'Could not send thank-you'));
     } finally {
       setSubmitting(false);
     }
-  }, [message, receiverId, contextType, contextId, isPublic, onSent, onClose, showToast, t]);
+  }, [message, receiverId, contextType, contextId, isPublic, onSent, onClose, toast, t]);
 
   const remaining = MAX_LEN - message.length;
   const titleStr = receiverName

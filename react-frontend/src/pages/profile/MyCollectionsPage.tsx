@@ -32,7 +32,7 @@ interface Collection {
 
 export default function MyCollectionsPage() {
   const { t } = useTranslation('common');
-  const { showToast } = useToast();
+  const toast = useToast();
   usePageTitle(t('collections.my_title', 'My Collections'));
 
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -70,18 +70,18 @@ export default function MyCollectionsPage() {
       });
       if (res.success && res.data) {
         setCollections((prev) => [...prev, res.data as Collection]);
-        showToast(t('collections.created', 'Collection created'), 'success');
+        toast.success(t('collections.created', 'Collection created'));
         setNewName('');
         setNewDescription('');
         setNewPublic(false);
         setShowCreate(false);
       }
     } catch {
-      showToast(t('common.error', 'Something went wrong'), 'error');
+      toast.error(t('common.error', 'Something went wrong'));
     } finally {
       setCreating(false);
     }
-  }, [newName, newDescription, newPublic, showToast, t]);
+  }, [newName, newDescription, newPublic, toast, t]);
 
   if (loading) return <LoadingScreen />;
 

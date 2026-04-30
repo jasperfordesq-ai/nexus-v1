@@ -56,7 +56,7 @@ const ITEM_LINKS: Record<string, (id: number) => string> = {
 export default function CollectionDetailPage() {
   const { t } = useTranslation('common');
   const { id } = useParams<{ id: string }>();
-  const { showToast } = useToast();
+  const toast = useToast();
   const [data, setData] = useState<ApiPayload | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -87,12 +87,12 @@ export default function CollectionDetailPage() {
       const res = await api.delete(`/v2/me/saved-items/${savedItemId}`);
       if (res.success) {
         setData((prev) => prev ? { ...prev, items: prev.items.filter((i) => i.id !== savedItemId) } : prev);
-        showToast(t('collections.item_removed', 'Removed'), 'success');
+        toast.success(t('collections.item_removed', 'Removed'));
       }
     } catch {
-      showToast(t('common.error', 'Something went wrong'), 'error');
+      toast.error(t('common.error', 'Something went wrong'));
     }
-  }, [showToast, t]);
+  }, [toast, t]);
 
   if (loading && !data) return <LoadingScreen />;
 
