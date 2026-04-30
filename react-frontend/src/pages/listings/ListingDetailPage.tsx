@@ -49,6 +49,84 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
+interface ListingStructuredDataOptions {
+  origin: string;
+  pathname: string;
+  profileUrl: (path: string) => string;
+  communityMemberLabel: string;
+}
+
+function maybeNumber(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function buildListingStructuredData(listing: Listing, options: ListingStructuredDataOptions) {
+  const category = listing.category?.name || listing.category_name;
+  const authorName = listing.user?.name
+    || `${listing.user?.first_name ?? ''} ${listing.user?.last_name ?? ''}`.trim()
+    || listing.author_name
+    || options.communityMemberLabel;
+  const hoursEstimate = listing.estimated_hours ?? listing.hours_estimate;
+  const latitude = maybeNumber(listing.latitude);
+  const longitude = maybeNumber(listing.longitude);
+  const ratingValue = maybeNumber(listing.author_rating ?? listing.user?.average_rating);
+  const reviewCount = maybeNumber(listing.author_reviews_count ?? listing.user?.reviews_count);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${options.origin}${options.pathname}#listing`,
+    mainEntityOfPage: `${options.origin}${options.pathname}`,
+    name: listing.title,
+    description: listing.description?.substring(0, 300),
+    url: `${options.origin}${options.pathname}`,
+    serviceType: category || listing.service_type || listing.type,
+    category,
+    ...(listing.image_url ? { image: resolveAssetUrl(listing.image_url) } : {}),
+    ...(listing.created_at ? { datePosted: listing.created_at } : {}),
+    ...(listing.updated_at ? { dateModified: listing.updated_at } : {}),
+    ...(listing.expires_at ? { validThrough: listing.expires_at } : {}),
+    ...(listing.location ? { areaServed: listing.location } : {}),
+    ...(latitude !== null && longitude !== null ? {
+      serviceArea: {
+        '@type': 'Place',
+        name: listing.location,
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude,
+          longitude,
+        },
+      },
+    } : {}),
+    provider: {
+      '@type': 'Person',
+      name: authorName,
+      ...(listing.user?.id ? { url: `${options.origin}${options.profileUrl(`/profile/${listing.user.id}`)}` } : {}),
+      ...(ratingValue !== null && ratingValue > 0 ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue,
+          ...(reviewCount !== null && reviewCount > 0 ? { reviewCount } : {}),
+        },
+      } : {}),
+    },
+    ...(hoursEstimate ? {
+      offers: {
+        '@type': 'Offer',
+        price: hoursEstimate,
+        priceCurrency: 'HOUR',
+        availability: listing.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      },
+    } : {}),
+    potentialAction: {
+      '@type': listing.type === 'request' ? 'AskAction' : 'CommunicateAction',
+      target: `${options.origin}${options.pathname}`,
+    },
+  };
+}
+
 export function ListingDetailPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
@@ -289,6 +367,13 @@ export function ListingDetailPage() {
     );
   }
 
+  const listingStructuredData = buildListingStructuredData(listing, {
+    origin: window.location.origin,
+    pathname: window.location.pathname,
+    profileUrl: tenantPath,
+    communityMemberLabel: t('community_member', 'Community Member'),
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -298,21 +383,7 @@ export function ListingDetailPage() {
       <PageMeta title={listing?.title} description={listing?.description?.substring(0, 160)} image={listing?.image_url || undefined} />
       <Helmet>
         <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Service',
-            name: listing?.title,
-            ...(listing?.description ? { description: listing.description.substring(0, 160) } : {}),
-            url: `${window.location.origin}${window.location.pathname}`,
-            ...(listing?.image_url ? { image: resolveAssetUrl(listing.image_url) } : {}),
-            ...(listing?.category?.name || listing?.category_name ? { category: listing.category?.name || listing.category_name } : {}),
-            ...(listing?.location ? { areaServed: listing.location } : {}),
-            provider: {
-              '@type': 'Person',
-              name: listing?.user?.name || `${listing?.user?.first_name ?? ''} ${listing?.user?.last_name ?? ''}`.trim() || t('community_member', 'Community Member'),
-              ...(listing?.user?.id ? { url: `${window.location.origin}${tenantPath(`/profile/${listing.user.id}`)}` } : {}),
-            },
-          })}
+          {JSON.stringify(listingStructuredData)}
         </script>
       </Helmet>
       {/* Breadcrumbs */}
