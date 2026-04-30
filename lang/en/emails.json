@@ -127,7 +127,8 @@
     "fallback_job": "a job",
     "fallback_manager": "Manager",
     "fallback_organization": "Organization",
-    "or_separator": "or"
+    "or_separator": "or",
+    "signoff": "Thanks,\n{{app}}"
   },
   "footer": {
     "unsubscribe": "Unsubscribe from these emails",
@@ -512,5 +513,41 @@
     "body": "Upgrade request from tenant: :tenant (ID: :tenant_id)\n\nRequested by: :email\n\nMessage: :message",
     "unknown_email": "unknown",
     "no_message": "(none)"
+  },
+  "verein_federation": {
+    "invitation_received_title": "You have a new club invitation",
+    "invitation_received_preview": "You've been invited to join {target}",
+    "invitation_received_subject": "Invitation to join {target}",
+    "invitation_received_body": "A member of {source} has invited you to also join {target}. The two clubs are part of the same municipal network.",
+    "message_label": "Personal message",
+    "cta_respond": "Review invitation",
+    "invitation_accepted_title": "Your club invitation was accepted",
+    "invitation_accepted_preview": "Good news — they accepted!",
+    "invitation_accepted_subject": "Your invitation was accepted",
+    "invitation_accepted_body": "{name} has accepted your invitation to join {target}. You can now connect with them in the new club."
+  },
+  "verein_dues": {
+    "generated_subject": "Your {organization} membership dues for {year}",
+    "generated_title": "Membership dues for {year}",
+    "generated_body": "Your annual {organization} membership dues of {amount} for {year} are now ready to pay. You can pay securely online via card or bank transfer.",
+    "reminder_subject": "Reminder: {organization} membership dues for {year}",
+    "reminder_title": "Your {organization} membership is overdue",
+    "reminder_body": "Your {organization} membership dues of {amount} for {year} were due on {due_date} and are now overdue. Please pay as soon as possible to keep your membership active.",
+    "paid_subject": "Receipt: {organization} membership {year}",
+    "paid_title": "Thank you for your payment",
+    "paid_body": "We've received your {organization} membership dues of {amount} for {year}. Your membership is now active.",
+    "cta_pay": "Pay membership dues",
+    "cta_view": "View my dues",
+    "cta_receipt": "View Stripe receipt"
+  },
+  "appreciation": {
+    "subject": "{{sender}} sent you a thank-you",
+    "preview": "{{sender}} appreciates what you did",
+    "title": "You received a thank-you",
+    "body": "{{sender}} just sent you a thank-you note. Your contribution was noticed and appreciated.",
+    "message_label": "Their message",
+    "public_note": "This appreciation is public — others can see it on your profile.",
+    "private_note": "This appreciation is private — only you can see it.",
+    "cta_view": "View on your profile"
   }
 }

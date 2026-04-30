@@ -1,0 +1,19 @@
+{
+  "invalid_scope": "Invalid sharing scope. Must be one of: events, members, both, none.",
+  "invalid_action": "Invalid action. Must be 'accept' or 'decline'.",
+  "verein_not_found": "Club not found.",
+  "event_not_found": "Event not found.",
+  "share_not_found": "Event share not found.",
+  "invitation_not_found": "Invitation not found.",
+  "invitation_not_pending": "This invitation is no longer pending.",
+  "invitee_not_member": "The invitee is not an active member of this club.",
+  "source_not_consenting": "Your club has not enabled event sharing.",
+  "member_sharing_disabled": "Cross-club member invitations are not enabled for both clubs.",
+  "different_municipality": "The two clubs are in different municipalities.",
+  "targets_required": "At least one target club must be specified.",
+  "target_and_invitee_required": "target_organization_id and invitee_user_id are required.",
+  "notification_invitation_title": "New club invitation",
+  "notification_invitation_received": "A member of {source} has invited you to join {target}.",
+  "notification_accepted_title": "Invitation accepted",
+  "notification_invitation_accepted": "{name} accepted your invitation to join {target}."
+}

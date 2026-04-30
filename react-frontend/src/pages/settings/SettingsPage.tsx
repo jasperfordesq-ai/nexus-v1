@@ -62,6 +62,7 @@ import { SecurityTab } from './tabs/SecurityTab';
 import type { SessionInfo, TwoFactorSetup } from './tabs/SecurityTab';
 import { SkillsTab } from './tabs/SkillsTab';
 import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
+import { ConnectedAccountsTab } from './tabs/ConnectedAccountsTab';
 import { SafeguardingTab } from './tabs/SafeguardingTab';
 import { TranslationTab } from './tabs/TranslationTab';
 
@@ -77,7 +78,7 @@ export function SettingsPage() {
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
   const toast = useToast();
-  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'safeguarding', 'translation'];
+  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'connected-accounts', 'safeguarding', 'translation'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isDirty, setIsDirty] = useState(false);
@@ -910,6 +911,15 @@ export function SettingsPage() {
             }
           />
           <Tab
+            key="connected-accounts"
+            title={
+              <span className="flex items-center gap-2">
+                <Lock className="w-4 h-4" aria-hidden="true" />
+                {t("tabs.connected_accounts", { defaultValue: "Connected accounts" })}
+              </span>
+            }
+          />
+          <Tab
             key="safeguarding"
             title={
               <span className="flex items-center gap-2">
@@ -1067,6 +1077,9 @@ export function SettingsPage() {
 
         {/* LINKED ACCOUNTS TAB */}
         {activeTab === 'linked-accounts' && <LinkedAccountsTab />}
+
+        {/* CONNECTED ACCOUNTS TAB (OAuth — SOC13) */}
+        {activeTab === 'connected-accounts' && <ConnectedAccountsTab />}
 
         {/* SAFEGUARDING TAB */}
         {activeTab === 'safeguarding' && <SafeguardingTab />}

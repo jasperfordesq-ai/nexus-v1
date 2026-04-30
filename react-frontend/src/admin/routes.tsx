@@ -348,6 +348,8 @@ const SubscriptionsAdmin = lazy(() => import('./modules/content/Subscriptions'))
 const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuilder'));
 // AG60 — API Partners admin (Partner API integration management)
 const ApiPartnersAdminPage = lazy(() => import('./modules/api-partners/ApiPartnersAdminPage'));
+// AG59 — Paid Regional Analytics admin (super-admin only)
+const RegionalAnalyticsAdminPage = lazy(() => import('./modules/regional-analytics/RegionalAnalyticsAdminPage'));
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
@@ -826,6 +828,9 @@ export function AdminRoutes() {
       <Route path="reports/municipal-impact" element={<Lazy><MunicipalImpactReportsPage /></Lazy>} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
+
+      {/* ─── SELLABLE PRODUCTS — Regional Analytics (AG59) ─── */}
+      <Route path="regional-analytics/subscriptions" element={<Lazy><RegionalAnalyticsAdminPage /></Lazy>} />
 
       {/* ─── INTEGRATIONS — API Partners (AG60) ─── */}
       <Route

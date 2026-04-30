@@ -992,6 +992,13 @@ Route::post('/v2/merchant-onboarding/step-2', [\App\Http\Controllers\Api\Merchan
 Route::post('/v2/merchant-onboarding/step-3', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep3']);
 Route::post('/v2/merchant-onboarding/complete', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'complete']);
 
+// SOC13 — Social login (OAuth) authenticated endpoints (link/unlink/identities)
+Route::post('/v2/auth/oauth/{provider}/link', [\App\Http\Controllers\Auth\SocialAuthController::class, 'link'])
+    ->where('provider', 'google|apple|facebook');
+Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\SocialAuthController::class, 'unlink'])
+    ->where('provider', 'google|apple|facebook');
+Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -1296,6 +1303,33 @@ Route::post('/v2/caring-community/hour-gifts/{id}/decline', [\App\Http\Controlle
 Route::post('/v2/caring-community/hour-gifts/{id}/revert', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftRevert']);
 Route::get('/v2/caring-community/hour-gifts/inbox', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftInbox']);
 Route::get('/v2/caring-community/hour-gifts/sent', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSent']);
+
+// AG55 — Verein-to-Verein federation (admin + member-facing)
+// Verein admin endpoints (consent, network, event sharing). Use the controller's
+// own role check (verein_admin or tenant admin); skip the global EnsureIsAdmin
+// alias so a Verein admin who isn't a platform admin can still access them.
+Route::get('/v2/vereine/{organizationId}/federation-consent', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'getConsent'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::put('/v2/vereine/{organizationId}/federation-consent', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'updateConsent'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/vereine/{organizationId}/network', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'getNetwork'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/vereine/{organizationId}/share-event', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'shareEvent'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/vereine/{organizationId}/shared-events', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'listSharedEvents'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::delete('/v2/vereine/{organizationId}/event-shares/{shareId}', [\App\Http\Controllers\Api\Verein\VereinFederationAdminController::class, 'withdrawShare'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+
+// Member-facing AG55 endpoints (any authed user)
+Route::get('/v2/vereine/{organizationId}/cross-invitations', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'listForVerein'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/vereine/{organizationId}/cross-invitations', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'create'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::get('/v2/me/verein-invitations', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'listMine'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+Route::post('/v2/me/verein-invitations/{id}/respond', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'respond'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 
 // Caring Community — Safeguarding reports (K9)
 // AG32 — KISS estate / legacy hours
@@ -1925,6 +1959,24 @@ Route::get('/v2/admin/safeguarding/members/{userId}/activity.csv', [\App\Http\Co
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/safeguarding/my-preferences', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myPreferences']);
     Route::post('/v2/safeguarding/revoke', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'revoke']);
+});
+
+// AG54 — Verein membership dues (member-facing + verein-admin scoped)
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Member-facing
+    Route::get('/v2/me/verein-dues', [\App\Http\Controllers\Api\Verein\MyDuesController::class, 'myDues']);
+    Route::get('/v2/me/verein-dues/{duesId}', [\App\Http\Controllers\Api\Verein\MyDuesController::class, 'showDues'])->whereNumber('duesId');
+    Route::post('/v2/me/verein-dues/{duesId}/pay', [\App\Http\Controllers\Api\Verein\MyDuesController::class, 'payDues'])->whereNumber('duesId');
+    Route::get('/v2/users/{userId}/verein-membership-status', [\App\Http\Controllers\Api\Verein\MyDuesController::class, 'membershipStatus'])->whereNumber('userId');
+
+    // Verein-admin scoped (tenant admin OR scoped verein_admin per-org)
+    Route::get('/v2/vereine/{organizationId}/dues/fee-config', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'getFeeConfig'])->whereNumber('organizationId');
+    Route::put('/v2/vereine/{organizationId}/dues/fee-config', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'setFeeConfig'])->whereNumber('organizationId');
+    Route::post('/v2/vereine/{organizationId}/dues/generate', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'generateAnnualDues'])->whereNumber('organizationId');
+    Route::get('/v2/vereine/{organizationId}/dues', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'listDues'])->whereNumber('organizationId');
+    Route::get('/v2/vereine/{organizationId}/dues/overdue', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'listOverdue'])->whereNumber('organizationId');
+    Route::post('/v2/vereine/{organizationId}/dues/{duesId}/waive', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'waiveDues'])->whereNumber('organizationId')->whereNumber('duesId');
+    Route::post('/v2/vereine/{organizationId}/dues/{duesId}/remind', [\App\Http\Controllers\Api\Verein\VereinDuesAdminController::class, 'sendReminder'])->whereNumber('organizationId')->whereNumber('duesId');
 });
 
 // ============================================
@@ -2777,6 +2829,29 @@ Route::middleware('partner.api:webhooks.manage')->group(function () {
         ->withoutMiddleware('auth:sanctum');
 });
 
+// ============================================
+// AG59 — Paid Regional Analytics product
+// ============================================
+// Partner-facing endpoints: auth via subscription_token (Bearer header or ?token=)
+// — controller resolves the token directly, so no Sanctum middleware here.
+Route::prefix('partner-analytics')->group(function () {
+    Route::get('/me/dashboard', [\App\Http\Controllers\Api\RegionalAnalyticsPartnerController::class, 'dashboard']);
+    Route::get('/me/reports', [\App\Http\Controllers\Api\RegionalAnalyticsPartnerController::class, 'reports']);
+    Route::get('/me/reports/{id}/download', [\App\Http\Controllers\Api\RegionalAnalyticsPartnerController::class, 'downloadReport'])
+        ->whereNumber('id');
+});
+
+// Super-admin CRUD + report generation + access log
+Route::middleware(['auth:sanctum', 'super-admin'])->prefix('super-admin/regional-analytics')->group(function () {
+    Route::get('/subscriptions', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'index']);
+    Route::post('/subscriptions', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'store']);
+    Route::get('/subscriptions/{id}', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'show'])->whereNumber('id');
+    Route::put('/subscriptions/{id}', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'update'])->whereNumber('id');
+    Route::delete('/subscriptions/{id}', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'destroy'])->whereNumber('id');
+    Route::post('/subscriptions/{id}/generate-report', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'generateReport'])->whereNumber('id');
+    Route::get('/access-log', [\App\Http\Controllers\Api\SuperAdmin\RegionalAnalyticsAdminController::class, 'accessLog']);
+});
+
 // Admin: Partner CRUD + credential rotation + call log
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v2/admin/api-partners', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'index']);
@@ -2787,4 +2862,35 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v2/admin/api-partners/{id}/suspend', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'suspend'])->whereNumber('id');
     Route::post('/v2/admin/api-partners/{id}/regenerate-credentials', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'regenerateCredentials'])->whereNumber('id');
     Route::get('/v2/admin/api-partners/{id}/call-log', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'callLog'])->whereNumber('id');
+});
+
+// ============================================
+// SOC10 — Bookmarks / Saved Collections
+// SOC14 — Appreciations / Thank-you
+// ============================================
+Route::middleware('auth:sanctum')->group(function () {
+    // SOC10 — collections
+    Route::get('/v2/me/collections', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'listCollections']);
+    Route::post('/v2/me/collections', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'createCollection']);
+    Route::patch('/v2/me/collections/{id}', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'updateCollection'])->whereNumber('id');
+    Route::delete('/v2/me/collections/{id}', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'deleteCollection'])->whereNumber('id');
+    Route::get('/v2/me/collections/{id}/items', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'listItems'])->whereNumber('id');
+
+    // SOC10 — saved items
+    Route::get('/v2/me/saved-items/check', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'checkSingle']);
+    Route::post('/v2/me/saved-items/check-bulk', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'checkBulk']);
+    Route::post('/v2/me/saved-items', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'saveItem']);
+    Route::delete('/v2/me/saved-items', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'unsaveByPair']);
+    Route::delete('/v2/me/saved-items/{id}', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'unsaveItem'])->whereNumber('id');
+
+    // SOC10 — view another user's public collections
+    Route::get('/v2/users/{userId}/public-collections', [\App\Http\Controllers\Api\SavedCollectionsController::class, 'publicCollections'])->whereNumber('userId');
+
+    // SOC14 — appreciations
+    Route::post('/v2/appreciations', [\App\Http\Controllers\Api\AppreciationsController::class, 'send']);
+    Route::get('/v2/appreciations/most-appreciated', [\App\Http\Controllers\Api\AppreciationsController::class, 'mostAppreciated']);
+    Route::get('/v2/me/appreciations', [\App\Http\Controllers\Api\AppreciationsController::class, 'mine']);
+    Route::get('/v2/users/{userId}/appreciations', [\App\Http\Controllers\Api\AppreciationsController::class, 'publicForUser'])->whereNumber('userId');
+    Route::post('/v2/appreciations/{id}/react', [\App\Http\Controllers\Api\AppreciationsController::class, 'react'])->whereNumber('id');
+    Route::delete('/v2/appreciations/{id}/react', [\App\Http\Controllers\Api\AppreciationsController::class, 'removeReaction'])->whereNumber('id');
 });

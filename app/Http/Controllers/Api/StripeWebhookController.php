@@ -204,6 +204,9 @@ class StripeWebhookController extends BaseApiController
 
         // Also dispatch to identity verification payment handler
         \App\Services\Identity\IdentityVerificationPaymentService::handlePaymentSucceeded($paymentIntent);
+
+        // AG54 — Verein membership dues (handler self-checks nexus_type metadata)
+        \App\Services\Verein\VereinDuesService::handleWebhookEvent('payment_intent.succeeded', $paymentIntent);
     }
 
     private function handlePaymentFailed(object $paymentIntent): void

@@ -45,6 +45,7 @@ import { FederatedTrustBadge } from '@/components/federation';
 import { EndorseButton } from '@/components/endorsements/EndorseButton';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { StoryHighlights } from '@/components/stories/StoryHighlights';
+import VereinCrossInvitationButton from '@/pages/vereine/VereinCrossInvitationButton';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -747,6 +748,9 @@ export function ProfilePage() {
                           : t('connect')}
                       </Button>
                     )}
+                    {!isOwnProfile && isAuthenticated && profile.id ? (
+                      <VereinCrossInvitationButton userId={profile.id} />
+                    ) : null}
                     {isAuthenticated && (
                       <Dropdown>
                         <DropdownTrigger>

@@ -615,6 +615,8 @@ function useAdminNav(): NavSection[] {
           { label: "Federation Whitelist", href: '/admin/super/federation/whitelist', icon: Shield },
           { label: "Federation Partnerships", href: '/admin/super/federation/partnerships', icon: Handshake },
           { label: "Federation Audit Log", href: '/admin/super/federation/audit', icon: FileSearch },
+          // AG59 — Sellable products (paid regional analytics)
+          { label: "Regional Analytics (Paid)", href: '/admin/regional-analytics/subscriptions', icon: BarChart3 },
         ],
       });
     }

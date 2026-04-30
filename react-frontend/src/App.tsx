@@ -97,6 +97,7 @@ const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPassword
 const VerifyEmailPage = lazyWithRetry(() => import('./pages/auth/VerifyEmailPage'));
 const VerifyIdentityPage = lazyWithRetry(() => import('./pages/auth/VerifyIdentityPage'));
 const VerifyIdentityOptionalPage = lazyWithRetry(() => import('./pages/settings/VerifyIdentityOptionalPage'));
+const OauthCallbackPage = lazyWithRetry(() => import('./pages/auth/OauthCallbackPage'));
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
@@ -114,6 +115,11 @@ const MessagesPage = lazyWithRetry(() => import('@/pages/messages/MessagesPage')
 const ConversationPage = lazyWithRetry(() => import('@/pages/messages/ConversationPage'));
 const WalletPage = lazyWithRetry(() => import('@/pages/wallet/WalletPage'));
 const ProfilePage = lazyWithRetry(() => import('@/pages/profile/ProfilePage'));
+// SOC10 / SOC14 — collections & appreciations
+const MyCollectionsPage = lazyWithRetry(() => import('@/pages/profile/MyCollectionsPage'));
+const CollectionDetailPage = lazyWithRetry(() => import('@/pages/profile/CollectionDetailPage'));
+const UserCollectionsView = lazyWithRetry(() => import('@/pages/profile/UserCollectionsView'));
+const AppreciationWallPage = lazyWithRetry(() => import('@/pages/profile/AppreciationWallPage'));
 const SettingsPage = lazyWithRetry(() => import('@/pages/settings/SettingsPage'));
 const BlockedUsersPage = lazyWithRetry(() => import('@/pages/settings/BlockedUsersPage'));
 const SearchPage = lazyWithRetry(() => import('@/pages/search/SearchPage'));
@@ -175,6 +181,10 @@ const ProjectAnnouncementsPage = lazyWithRetry(() => import('@/pages/caring-comm
 const DataExportPage = lazyWithRetry(() => import('@/pages/settings/DataExportPage'));
 const ClubsPage = lazyWithRetry(() => import('@/pages/clubs/ClubsPage'));
 const VereinMembersImportPage = lazyWithRetry(() => import('@/pages/clubs/VereinMembersImportPage'));
+const MyVereinInvitationsPage = lazyWithRetry(() => import('@/pages/profile/MyVereinInvitationsPage'));
+const VereinDuesManagementPage = lazyWithRetry(() => import('@/pages/vereine/VereinDuesManagementPage'));
+const MyVereinDuesPage = lazyWithRetry(() => import('@/pages/profile/MyVereinDuesPage'));
+const MunicipalityCalendarPage = lazyWithRetry(() => import('@/pages/public/MunicipalityCalendarPage'));
 const RegionalPointsPage = lazyWithRetry(() => import('@/pages/wallet/RegionalPointsPage'));
 const MyAdCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyAdCampaignsPage'));
 const MyPushCampaignsPage = lazyWithRetry(() => import('@/pages/advertise/MyPushCampaignsPage'));
@@ -279,6 +289,9 @@ const CustomPage = lazyWithRetry(() => import('@/pages/public/CustomPage'));
 const TimebankingGuidePage = lazyWithRetry(() => import('@/pages/about/TimebankingGuidePage'));
 // AG60 — Developers portal (Partner API docs)
 const DevelopersHomePage = lazyWithRetry(() => import('@/pages/developers/DevelopersHomePage'));
+// AG59 — Paid Regional Analytics product (public landing + partner dashboard)
+const RegionalAnalyticsLandingPage = lazyWithRetry(() => import('@/pages/public/RegionalAnalyticsLandingPage'));
+const PartnerDashboardPage = lazyWithRetry(() => import('@/pages/partner-analytics/PartnerDashboardPage'));
 const DevelopersAuthPage = lazyWithRetry(() => import('@/pages/developers/DevelopersAuthPage'));
 const DevelopersEndpointsPage = lazyWithRetry(() => import('@/pages/developers/DevelopersEndpointsPage'));
 const DevelopersWebhooksPage = lazyWithRetry(() => import('@/pages/developers/DevelopersWebhooksPage'));
@@ -316,6 +329,7 @@ function AppRoutes() {
         <Route path="password/reset" element={<ResetPasswordPage />} />
         <Route path="verify-email" element={<VerifyEmailPage />} />
         <Route path="verify-identity" element={<VerifyIdentityPage />} />
+        <Route path="auth/oauth/callback" element={<OauthCallbackPage />} />
       </Route>
 
       {/* Main Routes (with navbar/footer) */}
@@ -353,6 +367,10 @@ function AppRoutes() {
         <Route path="developers/auth" element={<ErrorBoundary><DevelopersAuthPage /></ErrorBoundary>} />
         <Route path="developers/endpoints" element={<ErrorBoundary><DevelopersEndpointsPage /></ErrorBoundary>} />
         <Route path="developers/webhooks" element={<ErrorBoundary><DevelopersWebhooksPage /></ErrorBoundary>} />
+
+        {/* AG59 — Paid Regional Analytics — public marketing + token-auth partner dashboard */}
+        <Route path="regional-analytics" element={<ErrorBoundary><RegionalAnalyticsLandingPage /></ErrorBoundary>} />
+        <Route path="partner-analytics/dashboard" element={<ErrorBoundary><PartnerDashboardPage /></ErrorBoundary>} />
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
@@ -745,6 +763,38 @@ function AppRoutes() {
           </FeatureGate>
         } />
 
+        {/* AG54 — Verein membership dues */}
+        <Route path="clubs/:id/admin/dues" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Verein Dues">
+              <VereinDuesManagementPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="me/verein-dues" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="My Verein Dues">
+              <MyVereinDuesPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* AG55 — Verein-to-Verein federation */}
+        <Route path="me/verein-invitations" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Verein Invitations">
+              <MyVereinInvitationsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="municipality-calendar" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Municipality Calendar">
+              <MunicipalityCalendarPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
         {/* Advertiser self-serve portal (AG56/AG57) */}
         <Route path="advertise/campaigns" element={<ErrorBoundary><MyAdCampaignsPage /></ErrorBoundary>} />
         <Route path="advertise/push-campaigns" element={<ErrorBoundary><MyPushCampaignsPage /></ErrorBoundary>} />
@@ -904,6 +954,28 @@ function AppRoutes() {
                 <ProfilePage />
               </FeatureErrorBoundary>
             </FeatureGate>
+          } />
+          {/* SOC10 — Saved collections */}
+          <Route path="me/collections" element={
+            <FeatureErrorBoundary featureName="My Collections">
+              <MyCollectionsPage />
+            </FeatureErrorBoundary>
+          } />
+          <Route path="me/collections/:id" element={
+            <FeatureErrorBoundary featureName="Collection">
+              <CollectionDetailPage />
+            </FeatureErrorBoundary>
+          } />
+          <Route path="users/:userId/collections" element={
+            <FeatureErrorBoundary featureName="Public Collections">
+              <UserCollectionsView />
+            </FeatureErrorBoundary>
+          } />
+          {/* SOC14 — Appreciation wall */}
+          <Route path="users/:userId/appreciations" element={
+            <FeatureErrorBoundary featureName="Appreciations">
+              <AppreciationWallPage />
+            </FeatureErrorBoundary>
           } />
           <Route path="settings" element={
             <FeatureGate module="settings" redirect="/dashboard">

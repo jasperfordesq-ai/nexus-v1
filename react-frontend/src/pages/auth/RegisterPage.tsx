@@ -42,6 +42,7 @@ import { useAuth, useTenant } from '@/contexts';
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
+import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { PageMeta } from '@/components/seo';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
@@ -855,8 +856,12 @@ export function RegisterPage() {
   const renderForm = () => {
     if (!isMobile) {
       // Desktop view - all fields visible
+      const oauthTenantId = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
       return (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {oauthTenantId && (
+            <OAuthButtons intent="register" tenantId={oauthTenantId} />
+          )}
           {/* Honeypot - hidden from users, visible to bots */}
           <div className="hidden" aria-hidden="true">
             <label htmlFor="website">{t('register.honeypot_label', 'Website')}</label>
@@ -891,8 +896,12 @@ export function RegisterPage() {
     }
 
     // Mobile view - step by step
+    const oauthTenantIdMobile = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
     return (
       <form onSubmit={handleSubmit} className="space-y-4">
+        {currentStep === 1 && oauthTenantIdMobile && (
+          <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
+        )}
         {/* Honeypot - hidden from users, visible to bots */}
         <div className="hidden" aria-hidden="true">
           <label htmlFor="website">{t('register.honeypot_label')}</label>

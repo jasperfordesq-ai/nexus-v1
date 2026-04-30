@@ -6,6 +6,13 @@
 export { BookmarkButton } from './BookmarkButton';
 export type { BookmarkButtonProps } from './BookmarkButton';
 
+// SOC10 — new bookmark/saved-collections system
+export { SaveButton } from './SaveButton';
+
+// SOC14 — appreciations
+export { AppreciationModal } from './AppreciationModal';
+export { MostAppreciatedWidget } from './MostAppreciatedWidget';
+
 export { CommentsSection } from './CommentsSection';
 export type { CommentsSectionProps } from './CommentsSection';
 

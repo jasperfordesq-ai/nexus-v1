@@ -95,6 +95,21 @@ class AppreciationService
                 }
                 Notification::createNotification((int) $appreciation->receiver_id, $message, $link, 'appreciation');
             });
+
+            // Send mail (LocaleContext is wrapped inside the Mailable).
+            \App\Mail\AppreciationReceived::send(
+                (object) [
+                    'id' => $appreciation->receiver_id,
+                    'email' => $receiver->email ?? null,
+                    'name' => $receiver->name ?? null,
+                    'first_name' => $receiver->first_name ?? null,
+                    'last_name' => $receiver->last_name ?? null,
+                    'preferred_language' => $receiver->preferred_language ?? null,
+                ],
+                $senderName,
+                $appreciation->message,
+                (bool) $appreciation->is_public,
+            );
         } catch (\Throwable $e) {
             Log::warning('AppreciationService::notifyReceiver: ' . $e->getMessage());
         }

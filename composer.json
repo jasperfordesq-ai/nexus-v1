@@ -38,6 +38,7 @@
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^12.54",
         "laravel/sanctum": "^4.3",
+        "laravel/socialite": "^5.27",
         "lbuchs/webauthn": "^2.2",
         "meilisearch/meilisearch-php": "^1.10",
         "minishlink/web-push": "^10.0",

@@ -95,6 +95,23 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('verein-federation-expire-invitations');
 
+        // AG54 — Verein membership dues lifecycle commands
+        $schedule->command('verein:mark-overdue')
+            ->dailyAt('05:00')
+            ->withoutOverlapping()
+            ->name('verein-mark-overdue-dues');
+
+        $schedule->command('verein:send-dues-reminders')
+            ->dailyAt('06:00')
+            ->withoutOverlapping()
+            ->name('verein-send-dues-reminders');
+
+        // Annual run on Jan 1 at 02:00 — idempotent, regenerating skips rows already present.
+        $schedule->command('verein:generate-annual-dues')
+            ->yearlyOn(1, 1, '02:00')
+            ->withoutOverlapping()
+            ->name('verein-generate-annual-dues');
+
         $schedule->command('sitemap:generate')
             ->dailyAt('04:00')
             ->withoutOverlapping()
