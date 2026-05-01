@@ -230,6 +230,15 @@ class AdminUsersController extends BaseApiController
             ], $badgeRows);
         } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
+        $roles = [];
+        try {
+            $roleRows = DB::select(
+                "SELECT r.name FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = ? AND ur.tenant_id = ?",
+                [$id, $tenantId]
+            );
+            $roles = array_column(array_map(fn($r) => ['name' => $r->name], $roleRows), 'name');
+        } catch (\Throwable $e) { Log::warning('Roles query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
+
         return $this->respondWithData([
             'id' => (int) $user->id,
             'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
@@ -260,6 +269,7 @@ class AdminUsersController extends BaseApiController
             'insurance_status' => $user->insurance_status ?? 'none',
             'created_at' => $user->created_at,
             'last_active_at' => $user->last_active_at ?? null,
+            'roles' => $roles,
         ]);
     }
 

@@ -150,8 +150,7 @@ export function UserEdit() {
         setOrganizationName(userData.organization_name || '');
         setIsTenantSuperAdmin(userData.is_tenant_super_admin || false);
         setIsGlobalSuperAdmin(userData.is_super_admin || false);
-        const roles = (userData as unknown as Record<string, unknown>).roles as string[] | undefined;
-        setIsMunicipalityAnnouncer(Array.isArray(roles) ? roles.includes('municipality_announcer') : false);
+        setIsMunicipalityAnnouncer(Array.isArray(userData.roles) ? userData.roles.includes('municipality_announcer') : false);
       } else {
         setLoadError(res.error || "Load error");
       }

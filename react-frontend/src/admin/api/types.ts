@@ -141,6 +141,7 @@ export interface AdminUserDetail extends AdminUser {
   organization_name?: string;
   badges: AdminBadge[];
   permissions?: string[];
+  roles?: string[];
   vetting_status?: 'none' | 'pending' | 'verified' | 'expired';
   insurance_status?: 'none' | 'pending' | 'verified' | 'expired';
 }
