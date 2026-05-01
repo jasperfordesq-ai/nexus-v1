@@ -2,8 +2,8 @@
 title: Project NEXUS — Response Pack for Martin Villiger, Roland Greber, and Christopher Mueller
 audience: Agoris AG / Fondation KISS leadership
 prepared_by: Jasper Ford, Project NEXUS
-date: 2026-04-30 (revised after AG55 / AG65 / AG72 follow-up buildout)
-status: Draft for review before sending
+date: 2026-05-01 (revised after AG55-AG97 follow-up buildout and May 1 hardening pass)
+status: Ready for forwarding, subject to final access/provisioning details
 ---
 
 # Response Pack — Agoris / KISS / Caring Community Engagement
@@ -16,7 +16,7 @@ It is intended as a single-page-able executive summary plus deeper supporting se
 
 ## 1. Executive summary (one paragraph)
 
-**Yes, NEXUS can be adapted and extended for KISS and Agoris.** A switchable Caring Community module cluster is already built and live on the production tenant `https://app.project-nexus.ie/agoris`. It covers the full KISS time-bank workflow (verified hour logging, coordinator review, escalation, member statements, recurring support relationships, organisation auto-payment), the Caring Community member experience (request help, offer favour, my support relationships, invite codes), the municipal/canton/cooperative impact reporting layer with CHF social-value estimates, and the supporting infrastructure (multilingual de/fr/it/en, federation between regional nodes, kill-switch tested at API and route level). The module is built once and reusable for KISS, Swiss cantons, Irish/UK timebanks, and international federation partners — not an Agoris-specific fork. NEXUS now covers approximately 88 percent of the broader Agoris platform vision, and approximately 99 percent of a KISS-only time-bank deployment. The remaining gaps are no longer basic workflow gaps; they are mostly strategic/commercial decisions, external-partner integrations, legal/commercial structuring, Swiss-native content review, and later isolated-node/mobile build operations. The next concrete step is a careful guided walkthrough with you, Roland, and Christopher, followed by a focused product/legal/commercial workshop on KISS workflows, municipal reports, data protection, open-source/commercial boundaries, and Swiss deployment expectations.
+**Yes, NEXUS can be adapted and extended for KISS and Agoris.** A switchable Caring Community module cluster is already built and live on the production tenant `https://app.project-nexus.ie/agoris`. It covers the full KISS time-bank workflow (verified hour logging, coordinator review, escalation, member statements, recurring support relationships, organisation auto-payment), the Caring Community member experience (request help, offer favour, my support relationships, invite codes), the municipal/canton/cooperative impact reporting layer with CHF social-value estimates, and the supporting infrastructure (11-language UI, federation between regional nodes, kill-switch tested at API and route level). The module is built once and reusable for KISS, Swiss cantons, Irish/UK timebanks, and international federation partners — not an Agoris-specific fork. NEXUS now covers approximately 88 percent of the broader Agoris platform vision, and approximately 99 percent of a KISS-only time-bank deployment. Since the original 2026-04-30 pack, the follow-up build has also added the website-completeness demo layer (AG89-AG94), launch-readiness/SLA/digest operations dashboards (AG95-AG97), accessibility regression coverage, federation aggregate real-query hardening, database retention/cascade fixes, recipient-locale notification rendering, and safer error/logging behaviour. The remaining gaps are no longer basic workflow gaps; they are mostly strategic/commercial decisions, external-partner integrations, legal/commercial structuring, Swiss-native content review, and later isolated-node/mobile build operations. The next concrete step is a careful guided walkthrough with you, Roland, and Christopher, followed by a focused product/legal/commercial workshop on KISS workflows, municipal reports, data protection, open-source/commercial boundaries, and Swiss deployment expectations.
 
 ---
 
@@ -64,7 +64,7 @@ The full inventory at the production tenant `https://app.project-nexus.ie/agoris
 | Organisations directory | `/organisations` | Live |
 | Events / Groups / Goals / Resources / Polls | Various | Live |
 | Federated cross-community discovery | `/federation` | Live |
-| Multilingual de / fr / it / en | Tenant default `de` | Live |
+| Multilingual DE / FR / IT / EN plus ES / PT / NL / PL / GA / JA / AR | Tenant default `de` | Live |
 | Near-me proximity filtering on listings, events, opportunities | All filterable | Live |
 
 ### Admin-facing (KISS Workflow Console + reporting)
@@ -253,14 +253,15 @@ The most important additions for a "best demo ever" are:
 
 | New roadmap item | Why it matters for the walkthrough |
 |---|---|
-| AG89 municipal AI communication/moderation copilot | Demonstrates Agoris's claim that AI supports municipal communication and moderation, not only matching or summaries. |
-| AG90 personalised civic information filter/digest | Demonstrates the resident-side promise that relevant regional information becomes simple and filtered by locality/interests. |
-| AG91 success-story proof cards | Turns KPI/ROI data into the "Erfolgsgeschichten" proof layer Agoris points to publicly. |
-| AG92 two-way municipality feedback inbox | Covers feedback/dialogue beyond formal surveys and one-way announcements. |
-| AG93 open-standards and integration showcase | Makes the modular/open/payment/admin-interface claims easy for Tom/Roland to inspect. |
-| AG94 newsletter and pilot-region lead nurture | Covers the website's newsletter/contact funnel and gives follow-up structure after the demo. |
+| AG89 municipal AI communication/moderation copilot | Shipped: demonstrates Agoris's claim that AI supports municipal communication and moderation, not only matching or summaries. |
+| AG90 personalised civic information filter/digest | Shipped: demonstrates the resident-side promise that relevant regional information becomes simple and filtered by locality/interests; admin cadence control is now available. |
+| AG91 success-story proof cards | Shipped: turns KPI/ROI data into the "Erfolgsgeschichten" proof layer Agoris points to publicly. |
+| AG92 two-way municipality feedback inbox | Shipped: covers feedback/dialogue beyond formal surveys and one-way announcements. |
+| AG93 open-standards and integration showcase | Shipped: makes the modular/open/payment/admin-interface claims easy for Tom/Roland to inspect. |
+| AG94 newsletter and pilot-region lead nurture | Shipped: covers the website's newsletter/contact funnel and gives follow-up structure after the demo. |
+| AG95-AG97 pilot operations dashboards | Shipped: launch-readiness gate, help-request SLA dashboard, and civic-digest cadence admin give Martin/Roland/Christopher a concrete evaluation control room rather than a loose demo. |
 
-These items should be built as incremental layers on completed NEXUS modules, not as rewrites. The roadmap now includes an appendix showing which completed modules they extend.
+These items were built as incremental layers on completed NEXUS modules, not as rewrites. The roadmap now includes an appendix showing which completed modules they extend.
 
 I propose this sequence:
 
@@ -299,7 +300,7 @@ If you want to evaluate the platform yourself before scheduling the walkthrough:
 - Review the open-source code at `https://github.com/jasperfordesq-ai/nexus-v1`.
 - Read the architecture note at `docs/AGORIS_CARING_COMMUNITY_ARCHITECTURE.md` in the repo.
 
-The German UI is the default for that tenant, with French / Italian / English available via the language switcher. KISS-specific terminology has been hand-translated to native Swiss German throughout: Zeitvorsorge, Sorgende Gemeinschaft, Vertrauensperson, Unterstützungsbeziehung, Gefälligkeit, with du-form addressing for community warmth.
+The German UI is the default for that tenant, with French / Italian / English and the broader NEXUS language set available via the language switcher. KISS-specific German terminology has had a first-pass Swiss spelling and phrasing review: Zeitvorsorge, Sorgende Gemeinschaft, Vertrauensperson, Unterstützungsbeziehung, Gefälligkeit, with du-form addressing for community warmth. Final Swiss-native validation, especially Christopher's UX/readability review and FR/IT phrasing, is still recommended before a public Swiss pilot.
 
 ---
 
@@ -315,4 +316,4 @@ I will hold the walkthrough slot open and respond same-day to any technical or c
 
 ---
 
-*This document was originally prepared on 2026-04-27 and revised on 2026-04-30 after the AG55, AG65, and AG72 follow-up buildout. The state of the platform, the gap analysis, and the roadmap items referenced are accurate to 2026-04-30. The supporting source code, integration tests, and architecture notes referenced live in the public repository above.*
+*This document was originally prepared on 2026-04-27, revised on 2026-04-30 after the AG55, AG65, and AG72 follow-up buildout, and checked again on 2026-05-01 after the AG89-AG97 demo/operations layer and the May 1 hardening pass. The state of the platform, the gap analysis, and the roadmap items referenced are accurate to 2026-05-01. The supporting source code, integration tests, and architecture notes referenced live in the public repository above.*

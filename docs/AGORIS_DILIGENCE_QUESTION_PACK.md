@@ -1,6 +1,6 @@
 # AGORIS / KISS Diligence Question Pack
 
-> Prepared: 2026-04-30  
+> Prepared: 2026-05-01  
 > Audience: Martin Villiger, Roland Greber, Dr. Christopher Mueller, Tom Debus  
 > Purpose: questions to clarify the overlap between Project NEXUS, Fondation KISS needs, and AGORIS commercial strategy before any pilot, integration, private deployment, or licensing decision.
 
@@ -95,7 +95,7 @@ Before any deeper buildout, ask AGORIS/KISS to confirm:
 
 ## 11. Website Completeness Questions
 
-The 2026-04-30 live scrape of `agoris.ch` added AG89-AG94 to the roadmap. Use these questions to validate whether the remaining public website promises are truly in scope for the demo or only later marketing/product strategy.
+The 2026-04-30 live scrape of `agoris.ch` added AG89-AG94 to the roadmap, and the May 1 pass shipped those demo layers plus AG95-AG97 pilot operations dashboards. Use these questions to validate whether the now-demonstrable surfaces are truly in scope for the first pilot, only later marketing/product strategy, or commercial/private AGORIS territory.
 
 1. For the claimed AI support in municipal communication and moderation, should AGORIS expect an admin copilot that drafts, reviews, targets, translates, and queues official posts before publication?
 2. For "Informationsfilter" and direct communication, should residents receive a personalised regional digest combining municipality posts, project updates, Vereine, care providers, safety alerts, marketplace offers, and help needs?
@@ -103,3 +103,11 @@ The 2026-04-30 live scrape of `agoris.ch` added AG89-AG94 to the roadmap. Use th
 4. For feedback/dialogue, is a lightweight municipality inbox enough, or must feedback be routed into formal survey/project/CRM workflows?
 5. For open standards and integrations, what does Tom/Roland need to see: OpenAPI, webhook signatures, federation aggregate payload, OAuth/client credentials, a sample partner app, or all of these?
 6. For newsletter/contact capture, should NEXUS demonstrate lead nurture for municipalities, investors, businesses, residents, and partners, or leave this in HubSpot/AGORIS CRM?
+
+## 12. Readiness Sign-Off Questions
+
+1. Who owns the launch-readiness gate for each workstream: Martin/KISS for operations, Christopher for resident UX, Roland/AGORIS for commercial boundary, Tom for architecture, and legal counsel for FADP/nDSG?
+2. Are the AG95 launch-readiness sections enough for a first go/no-go review, or does AGORIS need additional procurement, finance, or board-approval gates?
+3. What help-request SLA should be configured for a pilot, and who is accountable when the AG96 dashboard shows breached or at-risk requests?
+4. Should the AG90 civic digest start disabled, weekly, or daily for pilot residents?
+5. Which hardening evidence matters most before access is provisioned: accessibility regression results, database retention/cascade changes, recipient-locale notification tests, federation aggregate audit trail, or all of them?

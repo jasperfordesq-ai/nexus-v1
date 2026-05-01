@@ -1,6 +1,6 @@
 # Caring Community Architecture (Agoris / KISS reference)
 
-> Last updated: 2026-04-30 — refreshed after pilot-evaluation batch shipped (AG78/AG80/AG81/AG82/AG83/AG84/AG85/AG86/AG87/AG88).
+> Last updated: 2026-05-01 — refreshed after pilot-evaluation batch, website-completeness demo layer, pilot-operations dashboards, and May 1 hardening pass shipped (AG78/AG80-AG97).
 
 This note preserves the implementation and product architecture for the Agoris / KISS evaluation work. It should be read with `docs/ROADMAP.md`, especially the strategic partnership section.
 
@@ -87,7 +87,7 @@ For the Agoris/KISS path, the default rule is tenant-local first:
 
 ## Current Follow-Up Priorities
 
-The original build priorities in this note have mostly moved from implementation gaps to validation and governance questions. With the 2026-04-30 pilot-evaluation batch (AG78/AG80–AG88, all shipped except AG79), the platform now has admin surfaces for every governance and pilot-readiness question that was previously hand-waved. The near-term priorities are now:
+The original build priorities in this note have mostly moved from implementation gaps to validation and governance questions. With the 2026-04-30 pilot-evaluation batch (AG78/AG80-AG88), the website-completeness layer (AG89-AG94), the pilot-operations dashboards (AG95-AG97), and the May 1 hardening pass, the platform now has admin surfaces for every governance, demonstration, and pilot-readiness question that was previously hand-waved. The near-term priorities are now:
 
 1. Run the AG78 guided walkthrough (`docs/CARING_COMMUNITY_PILOT_EVALUATION.md`) with prospective pilot stakeholders to produce the AG88 decision memo.
 2. Commission the AG79 Swiss German/French/Italian terminology review — only remaining AG78–AG88 item not yet shipped, requires a native speaker rather than a code change.
@@ -272,17 +272,18 @@ This means a canton can run an isolated node in canton-controlled infrastructure
 
 ## Website Completeness Extension Layer
 
-The 2026-04-30 live scrape of `agoris.ch` did not reveal hidden public app, login, customer, pricing, or API pages. It did, however, surface a few remaining demo promises that should be treated as an extension layer on top of the completed Caring Community foundation rather than as changes to completed modules.
+The 2026-04-30 live scrape of `agoris.ch` did not reveal hidden public app, login, customer, pricing, or API pages. It did, however, surface a few demo promises that have now been implemented as an extension layer on top of the completed Caring Community foundation rather than as changes to completed modules.
 
 Reference document: `docs/AGORIS_WEBSITE_COMPLETENESS_AUDIT.md`.
 
 | Roadmap ID | Architectural implication |
 |---|---|
-| AG89 municipal AI communication/moderation copilot | Add a municipality-specific agent definition and proposal workflow that can draft, target, moderate, translate-check, and queue official communications before publication. It should reuse the existing KI-Agenten proposal/decision model where possible, but expose a municipality-admin workflow rather than hiding inside generic agent runs. |
-| AG90 personalised civic information filter/digest | Compose an aggregated resident digest from existing feed, project announcements, safety alerts, events, Vereine, care providers, marketplace/time-credit offers, and sub-region metadata. This should remain a read/composition layer over completed modules, not a new duplicate content store. |
-| AG91 success-story proof cards | Package selected KPI/ROI/pilot-scoreboard signals into exportable narrative cards. The data source should remain AG66/AG76/AG83 metrics; the new layer is presentation, caveats, and evidence provenance. |
-| AG92 two-way municipality feedback inbox | Add a lightweight inbound civic feedback workflow distinct from formal surveys. Feedback should be tenant-scoped, optionally sub-region-scoped, routable to municipality/coordinator roles, and aggregateable without exposing unnecessary personal data. |
-| AG93 open-standards and integration showcase | Make existing federation/API/webhook/OpenAPI/partner API capabilities visible to evaluators through docs and, if useful, a sandbox screen. Do not create a second integration system. |
-| AG94 newsletter and pilot-region lead nurture | Extend pilot inquiry/contact capture into segmented follow-up for municipalities, investors, local businesses, residents, and partners, with explicit consent and locale handling. This is demo/evaluation support, not a core KISS time-bank dependency. |
+| AG89 municipal AI communication/moderation copilot | Shipped as a municipality-specific proposal workflow that can draft, target, review, translate-check, and queue official communications before publication while reusing the existing KI-Agenten proposal/decision model. |
+| AG90 personalised civic information filter/digest | Shipped as a resident digest over existing feed, project announcements, safety alerts, events, Vereine, care providers, marketplace/time-credit offers, and sub-region metadata. It remains a read/composition layer over completed modules, not a duplicate content store. |
+| AG91 success-story proof cards | Shipped as exportable narrative cards over KPI/ROI/pilot-scoreboard signals, with caveats and evidence provenance. |
+| AG92 two-way municipality feedback inbox | Shipped as a lightweight inbound civic feedback workflow distinct from formal surveys, tenant-scoped and optionally sub-region-scoped. |
+| AG93 open-standards and integration showcase | Shipped as an evaluator-facing view of federation/API/webhook/OpenAPI/partner API capabilities without creating a second integration system. |
+| AG94 newsletter and pilot-region lead nurture | Shipped as segmented follow-up for municipalities, investors, local businesses, residents, and partners, with explicit consent and locale handling. This remains demo/evaluation support, not a core KISS time-bank dependency. |
+| AG95-AG97 pilot operations dashboards | Shipped as launch-readiness, help-request SLA, and civic-digest cadence surfaces so pilot operators can evaluate readiness from the admin console. |
 
-These items are the recommended next "best demo ever" layer because together they show the full Agoris promise: AI-assisted municipal work, filtered resident relevance, two-way dialogue, measurable proof, open integration, and follow-up pipeline.
+Together these items form the "best demo ever" layer because they show the full Agoris promise: AI-assisted municipal work, filtered resident relevance, two-way dialogue, measurable proof, open integration, follow-up pipeline, and operational readiness.
