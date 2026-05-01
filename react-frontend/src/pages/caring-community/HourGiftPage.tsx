@@ -345,22 +345,25 @@ export function HourGiftPage() {
                         <ul className="mt-2 divide-y divide-default-200 overflow-hidden rounded-lg border border-default-200">
                           {recipientResults.map((m) => (
                             <li key={m.id}>
-                              <button
+                              <Button
                                 type="button"
-                                className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-default-100"
-                                onClick={() => {
+                                variant="light"
+                                className="h-auto w-full justify-start rounded-none px-3 py-2 text-left"
+                                startContent={
+                                  <Avatar
+                                    src={m.profile_photo ?? m.avatar_url ?? undefined}
+                                    name={m.name}
+                                    size="sm"
+                                  />
+                                }
+                                onPress={() => {
                                   setRecipient(m);
                                   setRecipientResults([]);
                                   setRecipientQuery('');
                                 }}
                               >
-                                <Avatar
-                                  src={m.profile_photo ?? m.avatar_url ?? undefined}
-                                  name={m.name}
-                                  size="sm"
-                                />
-                                <span className="text-sm">{m.name}</span>
-                              </button>
+                                <span className="min-w-0 truncate text-sm">{m.name}</span>
+                              </Button>
                             </li>
                           ))}
                         </ul>
@@ -441,7 +444,7 @@ export function HourGiftPage() {
                           </div>
                         </div>
                         <span className="text-lg font-semibold text-theme-primary tabular-nums">
-                          {g.hours}h
+                          {t('hours_short', { count: g.hours })}
                         </span>
                       </div>
                       {g.message && (
@@ -536,7 +539,7 @@ export function HourGiftPage() {
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <span className="text-lg font-semibold text-theme-primary tabular-nums">
-                            {g.hours}h
+                            {t('hours_short', { count: g.hours })}
                           </span>
                           <Chip size="sm" color={STATUS_COLOR[g.status]} variant="flat">
                             {t(`hour_gift.sent.status.${g.status}`)}

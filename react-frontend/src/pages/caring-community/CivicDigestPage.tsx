@@ -10,7 +10,6 @@ import {
   Card,
   CardBody,
   Chip,
-  Input,
   Select,
   SelectItem,
   Skeleton,
@@ -33,6 +32,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useApi } from '@/hooks/useApi';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { SubRegionFilter } from '@/components/caring-community/SubRegionFilter';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -134,18 +134,14 @@ export function CivicDigestPage() {
   );
 
   const [cadence, setCadence] = useState<'off' | 'daily' | 'weekly'>('weekly');
-  const [subRegionInput, setSubRegionInput] = useState<string>('');
+  const [preferredSubRegionId, setPreferredSubRegionId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Sync local form state once data arrives
   useEffect(() => {
     if (data?.prefs) {
       setCadence(data.prefs.cadence);
-      setSubRegionInput(
-        data.prefs.preferred_sub_region_id !== null
-          ? String(data.prefs.preferred_sub_region_id)
-          : '',
-      );
+      setPreferredSubRegionId(data.prefs.preferred_sub_region_id);
     }
   }, [data?.prefs]);
 
@@ -154,10 +150,9 @@ export function CivicDigestPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const subRegionTrimmed = subRegionInput.trim();
       const payload: Record<string, unknown> = {
         cadence,
-        preferred_sub_region_id: subRegionTrimmed === '' ? null : Number(subRegionTrimmed),
+        preferred_sub_region_id: preferredSubRegionId,
       };
       const res = await api.put<{ prefs: DigestPrefs }>(
         '/v2/caring-community/digest/prefs',
@@ -167,7 +162,7 @@ export function CivicDigestPage() {
         showToast(t('prefs_save_success'), 'success');
         await refetch();
       }
-    } catch (err) {
+    } catch {
       showToast(t('prefs_save_error'), 'error');
     } finally {
       setSaving(false);
@@ -298,15 +293,15 @@ export function CivicDigestPage() {
             <SelectItem key="weekly">{t('prefs_cadence_weekly')}</SelectItem>
           </Select>
 
-          <Input
-            label={t('prefs_sub_region_label')}
-            placeholder={t('prefs_sub_region_placeholder')}
-            description={t('prefs_sub_region_help')}
-            value={subRegionInput}
-            onValueChange={setSubRegionInput}
-            variant="bordered"
-            inputMode="numeric"
-          />
+          <div className="space-y-2">
+            <SubRegionFilter
+              selectedId={preferredSubRegionId}
+              onChange={setPreferredSubRegionId}
+              label={t('prefs_sub_region_label')}
+              className="flex-col items-start sm:flex-row sm:items-center"
+            />
+            <p className="text-xs leading-5 text-theme-muted">{t('prefs_sub_region_help')}</p>
+          </div>
 
           <div className="flex justify-end">
             <Button

@@ -150,18 +150,23 @@ export function LinkCareReceiverPage() {
                     <ul className="divide-y divide-theme-default">
                       {searchResults.slice(0, 8).map((user) => (
                         <li key={user.id}>
-                          <button
+                          <Button
                             type="button"
-                            onClick={() => handleSelectUser(user)}
-                            className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-theme-elevated transition-colors"
+                            variant="light"
+                            className="h-auto w-full justify-start rounded-none px-4 py-3 text-left"
+                            startContent={
+                              <Avatar
+                                src={user.avatar_url ?? undefined}
+                                name={user.name}
+                                size="sm"
+                              />
+                            }
+                            onPress={() => handleSelectUser(user)}
                           >
-                            <Avatar
-                              src={user.avatar_url ?? undefined}
-                              name={user.name}
-                              size="sm"
-                            />
-                            <span className="text-sm font-medium text-theme-primary">{user.name}</span>
-                          </button>
+                            <span className="min-w-0 truncate text-sm font-medium text-theme-primary">
+                              {user.name}
+                            </span>
+                          </Button>
                         </li>
                       ))}
                     </ul>
