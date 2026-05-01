@@ -1,12 +1,12 @@
 {
-  "page_title": "Success Stories",
-  "intro": "Proof cards tied to live metrics from our pilot. Each story shows a before-and-after change, the affected audience, the method behind the figure, and where the evidence comes from.",
-  "empty_state": "No success stories have been published yet. Check back soon — community coordinators are putting cards together.",
-  "demo_label": "Demo / illustrative",
-  "audience_label": "Audience",
-  "before_label": "Before",
-  "after_label": "After",
-  "caveat_label": "Method",
-  "evidence_label": "Evidence",
-  "error_loading": "We couldn't load the success stories right now. Please try again in a moment."
+  "page_title": "Histoires de réussite",
+  "intro": "Des fiches de preuve appuyées sur des données en temps réel issues de notre projet pilote. Chaque histoire présente une évolution avant/après, le public concerné, la méthode utilisée et la source des données.",
+  "empty_state": "Aucune histoire de réussite n'a encore été publiée. Revenez bientôt — les coordinateur·trices de la communauté préparent les fiches.",
+  "demo_label": "Démo / illustratif",
+  "audience_label": "Public",
+  "before_label": "Avant",
+  "after_label": "Après",
+  "caveat_label": "Méthode",
+  "evidence_label": "Preuve",
+  "error_loading": "Impossible de charger les histoires de réussite pour le moment. Veuillez réessayer dans un instant."
 }

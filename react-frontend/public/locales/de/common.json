@@ -694,7 +694,8 @@
     "load_more": "Mehr laden",
     "errors": {
       "load_failed": "Der Marktplatz konnte nicht geladen werden. Bitte versuche es erneut."
-    }
+    },
+    "retry": "Try again"
   },
   "proximity": {
     "label": "In meiner Nähe",

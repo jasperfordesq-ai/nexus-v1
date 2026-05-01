@@ -471,14 +471,14 @@
     "density_spacious": "Spazioso",
     "high_contrast": "Alto contrasto",
     "high_contrast_desc": "Aumenta bordi, contrasto del testo e indicatori di messa a fuoco per una migliore accessibilità",
-    "accessibility_profile": "Accessibility Profile",
-    "accessibility_profile_desc": "Choose how the interface should adapt for easier reading, calmer motion, and simpler screens",
-    "large_text": "Large Text",
-    "large_text_desc": "Use the largest base text size across the interface",
-    "reduced_motion": "Reduced Motion",
-    "reduced_motion_desc": "Reduce animation and scrolling effects throughout the interface",
-    "simplified_layout": "Simplified Layout",
-    "simplified_layout_desc": "Reduce blur, shadows, and decorative depth while keeping the same navigation"
+    "accessibility_profile": "Profilo di accessibilità",
+    "accessibility_profile_desc": "Scegli come deve adattarsi l'interfaccia — per una lettura più semplice, movimenti più calmi e schermate più chiare",
+    "large_text": "Testo grande",
+    "large_text_desc": "Usa la dimensione di base più grande in tutta l'interfaccia",
+    "reduced_motion": "Movimento ridotto",
+    "reduced_motion_desc": "Riduce le animazioni e gli effetti di scorrimento in tutta l'interfaccia",
+    "simplified_layout": "Layout semplificato",
+    "simplified_layout_desc": "Riduce sfocatura, ombre e profondità decorative — la navigazione rimane invariata"
   },
   "blocked_users": {
     "title": "Utenti bloccati",
@@ -536,6 +536,6 @@
     "chip_match_approval": "Match approval",
     "chip_vetted_only": "Vetted contacts only"
   },
-  "push_campaign_opt_in": "Receive promoted push notifications",
-  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
+  "push_campaign_opt_in": "Ricevi notifiche push promozionali",
+  "push_campaign_opt_in_description": "Consenti alle aziende e organizzazioni locali di inviarti notifiche push mirate. Puoi disiscriverti in qualsiasi momento."
 }

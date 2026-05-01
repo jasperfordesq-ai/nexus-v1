@@ -19,5 +19,10 @@
     "3": "Neutral",
     "4": "Satisfied",
     "5": "Very satisfied"
-  }
+  },
+  "submit_error": "Error submitting response. Please try again.",
+  "load_error": "Failed to load surveys. Please try again.",
+  "yes": "Yes",
+  "no": "No",
+  "closes_on": "Closes: {{date}}"
 }
