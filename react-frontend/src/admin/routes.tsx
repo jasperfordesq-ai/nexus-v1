@@ -148,42 +148,7 @@ const VolunteerGivingDays = lazy(() => import('./modules/volunteering/VolunteerG
 const VolunteerConsents = lazy(() => import('./modules/volunteering/VolunteerConsents'));
 const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerProjects'));
 const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
-const CaringCommunityAdmin = lazy(() => import('./modules/caring-community/CaringCommunityAdmin'));
-const CaringCommunityWorkflowPage = lazy(() => import('./modules/caring-community/CaringCommunityWorkflowPage'));
-const LoyaltyAdminPage = lazy(() => import('./modules/caring-community/LoyaltyAdminPage'));
-const HourTransferAdminPage = lazy(() => import('./modules/caring-community/HourTransferAdminPage'));
-const FederationPeersAdminPage = lazy(() => import('./modules/caring-community/FederationPeersAdminPage'));
-const SafeguardingReportsAdminPage = lazy(() => import('./modules/caring-community/SafeguardingReportsAdminPage'));
-const CareProviderAdminPage = lazy(() => import('./modules/caring-community/CareProviderAdminPage'));
-const TrustTierAdminPage = lazy(() => import('./modules/caring-community/TrustTierAdminPage'));
-const KpiBaselineAdminPage = lazy(() => import('./modules/caring-community/KpiBaselineAdminPage'));
-const EmergencyAlertAdminPage = lazy(() => import('./modules/caring-community/EmergencyAlertAdminPage'));
-const MunicipalSurveyAdminPage = lazy(() => import('./modules/caring-community/MunicipalSurveyAdminPage'));
-const ProjectAnnouncementsAdminPage = lazy(() => import('./modules/caring-community/ProjectAnnouncementsAdminPage'));
-const RegionalPointsAdminPage = lazy(() => import('./modules/caring-community/RegionalPointsAdminPage'));
-const MunicipalVerificationAdminPage = lazy(() => import('./modules/caring-community/MunicipalVerificationAdminPage'));
-const SmartNudgesAdminPage = lazy(() => import('./modules/caring-community/SmartNudgesAdminPage'));
-const ResearchPartnershipsAdminPage = lazy(() => import('./modules/caring-community/ResearchPartnershipsAdminPage'));
-const WarmthPassAdminPage = lazy(() => import('./modules/caring-community/WarmthPassAdminPage'));
-const CareRecipientCirclePage = lazy(() => import('./modules/caring-community/CareRecipientCirclePage'));
-const MunicipalRoiAdminPage = lazy(() => import('./modules/caring-community/MunicipalRoiAdminPage'));
-const CategoryCoefficientsAdminPage = lazy(() => import('./modules/caring-community/CategoryCoefficientsAdminPage'));
-const SubRegionsAdminPage = lazy(() => import('./modules/caring-community/SubRegionsAdminPage'));
-const PilotScoreboardAdminPage = lazy(() => import('./modules/caring-community/PilotScoreboardAdminPage'));
-const OperatingPolicyAdminPage = lazy(() => import('./modules/caring-community/OperatingPolicyAdminPage'));
-const DisclosurePackAdminPage = lazy(() => import('./modules/caring-community/DisclosurePackAdminPage'));
-const DataQualityAdminPage = lazy(() => import('./modules/caring-community/DataQualityAdminPage'));
-const CommercialBoundaryAdminPage = lazy(() => import('./modules/caring-community/CommercialBoundaryAdminPage'));
-const IsolatedNodeAdminPage = lazy(() => import('./modules/caring-community/IsolatedNodeAdminPage'));
-const ExternalIntegrationsAdminPage = lazy(() => import('./modules/caring-community/ExternalIntegrationsAdminPage'));
-const MunicipalCopilotAdminPage = lazy(() => import('./modules/caring-community/MunicipalCopilotAdminPage'));
-const SuccessStoryAdminPage = lazy(() => import('./modules/caring-community/SuccessStoryAdminPage'));
-const MunicipalityFeedbackAdminPage = lazy(() => import('./modules/caring-community/MunicipalityFeedbackAdminPage'));
-const IntegrationShowcaseAdminPage = lazy(() => import('./modules/caring-community/IntegrationShowcaseAdminPage'));
-const LeadNurtureAdminPage = lazy(() => import('./modules/caring-community/LeadNurtureAdminPage'));
-const PilotLaunchReadinessAdminPage = lazy(() => import('./modules/caring-community/PilotLaunchReadinessAdminPage'));
-const HelpRequestSlaAdminPage = lazy(() => import('./modules/caring-community/HelpRequestSlaAdminPage'));
-const CivicDigestAdminPage = lazy(() => import('./modules/caring-community/CivicDigestAdminPage'));
+// Caring Community pages moved to /caring/* (CaringApp) — no longer registered here.
 
 // Advertising module
 const AdCampaignAdminPage = lazy(() => import('./modules/advertising/AdCampaignAdminPage'));
@@ -316,8 +281,6 @@ const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage
 const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
 const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
-const MunicipalImpactReportsPage = lazy(() => import('./modules/reports/MunicipalImpactReportsPage'));
-
 // National (KISS Foundation) module
 const NationalKissDashboardPage = lazy(() => import('./modules/national/NationalKissDashboardPage'));
 
@@ -615,363 +578,48 @@ export function AdminRoutes() {
       <Route path="volunteering/consents" element={<Lazy><VolunteerConsents /></Lazy>} />
       <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
       <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
-      {/* ─── CARING COMMUNITY (feature-gated) ─── */}
-      <Route
-        path="caring-community"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CaringCommunityAdmin /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/workflow"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CaringCommunityWorkflowPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/loyalty"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><LoyaltyAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/hour-transfers"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><HourTransferAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/federation-peers"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><FederationPeersAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/safeguarding"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><SafeguardingReportsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
+      {/* ─── CARING COMMUNITY — retired from /admin, now lives at /caring/* ─── */}
+      {/* These redirects preserve bookmarks to the old /admin/caring-community/* URLs. */}
+      <Route path="caring-community" element={<TenantRedirect to="/caring" />} />
+      <Route path="caring-community/workflow" element={<TenantRedirect to="/caring/workflow" />} />
+      <Route path="caring-community/projects" element={<TenantRedirect to="/caring/projects" />} />
+      <Route path="caring-community/loyalty" element={<TenantRedirect to="/caring/loyalty" />} />
+      <Route path="caring-community/hour-transfers" element={<TenantRedirect to="/caring/hour-transfers" />} />
+      <Route path="caring-community/sub-regions" element={<TenantRedirect to="/caring/sub-regions" />} />
+      <Route path="caring-community/federation-peers" element={<TenantRedirect to="/caring/federation-peers" />} />
+      <Route path="caring-community/sla-dashboard" element={<TenantRedirect to="/caring/sla-dashboard" />} />
+      <Route path="caring-community/providers" element={<TenantRedirect to="/caring/providers" />} />
+      <Route path="caring-community/warmth-pass" element={<TenantRedirect to="/caring/warmth-pass" />} />
+      <Route path="caring-community/warmth-pass/:userId" element={<TenantRedirect to="/caring/warmth-pass" />} />
+      <Route path="caring-community/recipient-circle" element={<TenantRedirect to="/caring/recipient-circle" />} />
+      <Route path="caring-community/nudges" element={<TenantRedirect to="/caring/nudges" />} />
+      <Route path="caring-community/emergency-alerts" element={<TenantRedirect to="/caring/emergency-alerts" />} />
+      <Route path="caring-community/surveys" element={<TenantRedirect to="/caring/surveys" />} />
+      <Route path="caring-community/copilot" element={<TenantRedirect to="/caring/copilot" />} />
+      <Route path="caring-community/civic-digest" element={<TenantRedirect to="/caring/civic-digest" />} />
+      <Route path="caring-community/lead-nurture" element={<TenantRedirect to="/caring/lead-nurture" />} />
+      <Route path="caring-community/success-stories" element={<TenantRedirect to="/caring/success-stories" />} />
+      <Route path="caring-community/feedback" element={<TenantRedirect to="/caring/feedback" />} />
+      <Route path="caring-community/verification" element={<TenantRedirect to="/caring/verification" />} />
+      <Route path="caring-community/safeguarding" element={<TenantRedirect to="/caring/safeguarding" />} />
+      <Route path="caring-community/trust-tier" element={<TenantRedirect to="/caring/trust-tier" />} />
+      <Route path="caring-community/launch-readiness" element={<TenantRedirect to="/caring/launch-readiness" />} />
+      <Route path="caring-community/pilot-scoreboard" element={<TenantRedirect to="/caring/pilot-scoreboard" />} />
+      <Route path="caring-community/data-quality" element={<TenantRedirect to="/caring/data-quality" />} />
+      <Route path="caring-community/operating-policy" element={<TenantRedirect to="/caring/operating-policy" />} />
+      <Route path="caring-community/disclosure-pack" element={<TenantRedirect to="/caring/disclosure-pack" />} />
+      <Route path="caring-community/commercial-boundary" element={<TenantRedirect to="/caring/commercial-boundary" />} />
+      <Route path="caring-community/isolated-node" element={<TenantRedirect to="/caring/isolated-node" />} />
+      <Route path="caring-community/research" element={<TenantRedirect to="/caring/research" />} />
+      <Route path="caring-community/external-integrations" element={<TenantRedirect to="/caring/external-integrations" />} />
+      <Route path="caring-community/integration-showcase" element={<TenantRedirect to="/caring/integration-showcase" />} />
+      <Route path="caring-community/kpi-baselines" element={<TenantRedirect to="/caring/kpi-baselines" />} />
+      <Route path="caring-community/municipal-roi" element={<TenantRedirect to="/caring/municipal-roi" />} />
+      <Route path="caring-community/category-coefficients" element={<TenantRedirect to="/caring/category-coefficients" />} />
 
-      {/* AG64 — Care-provider directory */}
-      <Route
-        path="caring-community/providers"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CareProviderAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
+      {/* /admin/regional-points → /caring/regional-points */}
+      <Route path="regional-points" element={<TenantRedirect to="/caring/regional-points" />} />
 
-      {/* AG67 — Trust tier config */}
-      <Route
-        path="caring-community/trust-tier"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><TrustTierAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG66 — KPI baselines */}
-      <Route
-        path="caring-community/kpi-baselines"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><KpiBaselineAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG70 — Emergency alerts */}
-      <Route
-        path="caring-community/emergency-alerts"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><EmergencyAlertAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG62 — Municipality surveys */}
-      <Route
-        path="caring-community/surveys"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><MunicipalSurveyAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG69 — Multi-stage project announcements */}
-      <Route
-        path="caring-community/projects"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><ProjectAnnouncementsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG28 — Regional points (third currency) */}
-      <Route
-        path="regional-points"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><RegionalPointsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG29 — Municipal verification */}
-      <Route
-        path="caring-community/verification"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><MunicipalVerificationAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG31 — Smart member nudges */}
-      <Route
-        path="caring-community/nudges"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><SmartNudgesAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG65 — Research partnerships */}
-      <Route
-        path="caring-community/research"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><ResearchPartnershipsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* Warmth Pass */}
-      <Route
-        path="caring-community/warmth-pass"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><WarmthPassAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-      <Route
-        path="caring-community/warmth-pass/:userId"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><WarmthPassAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* Care Recipient Circle */}
-      <Route
-        path="caring-community/recipient-circle"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CareRecipientCirclePage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* Municipal ROI / B2G impact dashboard */}
-      <Route
-        path="caring-community/municipal-roi"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><MunicipalRoiAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* Per-category substitution coefficients (Pflege-CHF) */}
-      <Route
-        path="caring-community/category-coefficients"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CategoryCoefficientsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG77 — Sub-regional geographic units */}
-      <Route
-        path="caring-community/sub-regions"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><SubRegionsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG83 — Pilot Success Scoreboard */}
-      <Route
-        path="caring-community/pilot-scoreboard"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><PilotScoreboardAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG81 — Operating Policy */}
-      <Route
-        path="caring-community/operating-policy"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><OperatingPolicyAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG80 — FADP/nDSG Disclosure Pack */}
-      <Route
-        path="caring-community/disclosure-pack"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><DisclosurePackAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG84 — Pilot Data Quality */}
-      <Route
-        path="caring-community/data-quality"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><DataQualityAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG82 — Commercial Boundary Map */}
-      <Route
-        path="caring-community/commercial-boundary"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CommercialBoundaryAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG85 — Isolated-Node Decision Gate */}
-      <Route
-        path="caring-community/isolated-node"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><IsolatedNodeAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG87 — External Integration Backlog */}
-      <Route
-        path="caring-community/external-integrations"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><ExternalIntegrationsAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG89 — Municipal Communication & Moderation Copilot */}
-      <Route
-        path="caring-community/copilot"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><MunicipalCopilotAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG91 — Success-Story Proof Cards */}
-      <Route
-        path="caring-community/success-stories"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><SuccessStoryAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG92 — Two-Way Municipality Feedback Inbox */}
-      <Route
-        path="caring-community/feedback"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><MunicipalityFeedbackAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG93 — Open-Standards and Integration Showcase */}
-      <Route
-        path="caring-community/integration-showcase"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><IntegrationShowcaseAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG94 — Lead Nurture */}
-      <Route
-        path="caring-community/lead-nurture"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><LeadNurtureAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG95 — Pilot Launch Readiness Dashboard */}
-      <Route
-        path="caring-community/launch-readiness"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><PilotLaunchReadinessAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG96 — Help Request SLA Dashboard */}
-      <Route
-        path="caring-community/sla-dashboard"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><HelpRequestSlaAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
-
-      {/* AG97 — Civic Digest Cadence */}
-      <Route
-        path="caring-community/civic-digest"
-        element={
-          <FeatureGatedElement feature="caring_community">
-            <Lazy><CivicDigestAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
 
       {/* AG56 — Local advertising campaigns */}
       <Route path="advertising/campaigns" element={<Lazy><AdCampaignAdminPage /></Lazy>} />
@@ -1074,7 +722,7 @@ export function AdminRoutes() {
       <Route path="reports/social-value" element={<TenantRedirect to="/admin/impact-report" />} />
       <Route path="reports/members" element={<Lazy><MemberReportsPage /></Lazy>} />
       <Route path="reports/hours" element={<Lazy><HoursReportsPage /></Lazy>} />
-      <Route path="reports/municipal-impact" element={<Lazy><MunicipalImpactReportsPage /></Lazy>} />
+      <Route path="reports/municipal-impact" element={<TenantRedirect to="/caring/municipal-impact" />} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
 

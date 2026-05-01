@@ -266,47 +266,6 @@ function useAdminNav(): NavSection[] {
     userRecord?.is_super_admin === true;
 
   return useMemo(() => {
-    // ── Caring Community Module — all items grouped under one dedicated dropdown ───
-    const caringCommunityItems = hasFeature('caring_community') ? [
-      { label: t('caring_community'), href: '/admin/caring-community', icon: Heart, group: t('caring_group_overview') },
-      { label: t('caring_workflow'), href: '/admin/caring-community/workflow', icon: ClipboardCheck },
-      { label: t('caring_projects'), href: '/admin/caring-community/projects', icon: Megaphone },
-      { label: t('caring_loyalty_programme'), href: '/admin/caring-community/loyalty', icon: Coins, group: t('caring_group_operations') },
-      { label: t('caring_hour_transfers'), href: '/admin/caring-community/hour-transfers', icon: ArrowRightLeft },
-      { label: t('caring_regional_points'), href: '/admin/regional-points', icon: Coins },
-      { label: t('caring_sub_regions'), href: '/admin/caring-community/sub-regions', icon: MapPin },
-      { label: t('caring_federation_peers'), href: '/admin/caring-community/federation-peers', icon: Network },
-      { label: t('caring_sla_dashboard'), href: '/admin/caring-community/sla-dashboard', icon: Timer },
-      { label: t('caring_providers'), href: '/admin/caring-community/providers', icon: Users2 },
-      { label: t('warmth_pass'), href: '/admin/caring-community/warmth-pass', icon: Star },
-      { label: t('care_recipient_circle'), href: '/admin/caring-community/recipient-circle', icon: Heart },
-      { label: t('caring_smart_nudges'), href: '/admin/caring-community/nudges', icon: Bell, group: t('caring_group_engagement') },
-      { label: t('emergency_alerts'), href: '/admin/caring-community/emergency-alerts', icon: AlertTriangle },
-      { label: t('municipal_surveys'), href: '/admin/caring-community/surveys', icon: ClipboardList },
-      { label: t('caring_communication_copilot'), href: '/admin/caring-community/copilot', icon: Bot },
-      { label: t('caring_civic_digest'), href: '/admin/caring-community/civic-digest', icon: Newspaper },
-      { label: t('caring_lead_nurture'), href: '/admin/caring-community/lead-nurture', icon: Filter },
-      { label: t('caring_success_stories'), href: '/admin/caring-community/success-stories', icon: Star },
-      { label: t('caring_feedback_inbox'), href: '/admin/caring-community/feedback', icon: MessageSquare },
-      { label: t('caring_municipal_verification'), href: '/admin/caring-community/verification', icon: ShieldCheck, group: t('caring_group_trust_safety') },
-      { label: t('caring_safeguarding_reports'), href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
-      { label: t('trust_tiers'), href: '/admin/caring-community/trust-tier', icon: Shield },
-      { label: t('caring_launch_readiness'), href: '/admin/caring-community/launch-readiness', icon: Rocket, group: t('caring_group_pilot_governance') },
-      { label: t('caring_pilot_scoreboard'), href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
-      { label: t('caring_pilot_data_quality'), href: '/admin/caring-community/data-quality', icon: ClipboardCheck },
-      { label: t('caring_operating_policy'), href: '/admin/caring-community/operating-policy', icon: ScrollText },
-      { label: t('caring_disclosure_pack'), href: '/admin/caring-community/disclosure-pack', icon: ShieldCheck },
-      { label: t('caring_commercial_boundary'), href: '/admin/caring-community/commercial-boundary', icon: Scale },
-      { label: t('caring_isolated_node_gate'), href: '/admin/caring-community/isolated-node', icon: Server },
-      { label: t('research_partnerships'), href: '/admin/caring-community/research', icon: FlaskConical, group: t('caring_group_partnerships') },
-      { label: t('caring_external_integrations'), href: '/admin/caring-community/external-integrations', icon: PlugZap },
-      { label: t('caring_integration_showcase'), href: '/admin/caring-community/integration-showcase', icon: Layers },
-      { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: BarChart3, group: t('caring_group_reporting') },
-      { label: t('kpi_baselines'), href: '/admin/caring-community/kpi-baselines', icon: BarChart3 },
-      { label: t('municipal_roi'), href: '/admin/caring-community/municipal-roi', icon: TrendingUp },
-      { label: t('caring_category_coefficients'), href: '/admin/caring-community/category-coefficients', icon: Sliders },
-    ] : [];
-
     // ── Community items — each sub-feature gated independently ───────────
     const communityItems = [
       ...(hasFeature('groups') ? [
@@ -481,13 +440,6 @@ function useAdminNav(): NavSection[] {
         icon: Shield,
         items: moderationItems,
       },
-      // Caring Community Module — own dropdown, gated by caring_community feature
-      ...(caringCommunityItems.length > 0 ? [{
-        key: 'caring_community',
-        label: "Caring Community",
-        icon: Heart,
-        items: caringCommunityItems,
-      }] as NavSection[] : []),
       // Community — hidden entirely if all sub-features are disabled
       ...(communityItems.length > 0 ? [{
         key: 'community',
@@ -690,7 +642,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
   const sections = useAdminNav();
   const location = useLocation();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
 
   // ── Expanded sections (accordion per zone) ──────────────────────────────
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -1096,6 +1048,29 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                 </Link>
               )}
             </li>
+
+            {/* Community Caring Panel — pinned below Broker Panel, gated by caring_community feature */}
+            {hasFeature('caring_community') && (
+              <li>
+                {collapsed ? (
+                  <Link
+                    to={tenantPath('/caring')}
+                    className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
+                    title={"Community Caring Panel"}
+                  >
+                    <Heart size={18} />
+                  </Link>
+                ) : (
+                  <Link
+                    to={tenantPath('/caring')}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    <Heart size={18} className="shrink-0" />
+                    <span>{"Community Caring Panel"}</span>
+                  </Link>
+                )}
+              </li>
+            )}
 
             {/* Recent pages — shown if 2+ visits and sidebar is expanded */}
             {showRecent && (

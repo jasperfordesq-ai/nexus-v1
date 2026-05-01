@@ -105,6 +105,9 @@ const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
 // Broker Panel (lazy-loaded — simplified admin interface for brokers)
 const BrokerApp = lazyWithRetry(() => import('@/broker/BrokerApp'));
 
+// Community Caring Panel (lazy-loaded — dedicated hub for caring_community module)
+const CaringApp = lazyWithRetry(() => import('@/caring/CaringApp'));
+
 // Lazy-loaded Pages (all use lazyWithRetry to handle stale chunk errors after deploys)
 const HomePage = lazyWithRetry(() => import('@/pages/public/HomePage'));
 const DashboardPage = lazyWithRetry(() => import('@/pages/dashboard/DashboardPage'));
@@ -1585,6 +1588,9 @@ function AppRoutes() {
 
       {/* Broker Panel (simplified admin for brokers) — fully lazy-loaded */}
       <Route path="broker/*" element={<BrokerApp />} />
+
+      {/* Community Caring Panel — fully lazy-loaded, gated by caring_community feature */}
+      <Route path="caring/*" element={<CaringApp />} />
 
       {/* 404 Fallback (must be after admin to avoid catching /admin paths) */}
       <Route element={<Layout />}>
