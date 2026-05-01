@@ -111,14 +111,24 @@ class FederationAggregateService
             }
         }
 
-        // Member bracket — bucket the raw count
+        // Member bracket — bucket the raw count.
+        // Only count active members; banned/suspended/inactive accounts must
+        // not inflate the bracket exposed to federation peers.
         $memberCount = 0;
         if (Schema::hasTable('users')) {
             try {
-                $row = DB::selectOne(
-                    "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ?",
-                    [$tenantId]
-                );
+                if (Schema::hasColumn('users', 'status')) {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) AS cnt FROM users
+                          WHERE tenant_id = ? AND status = 'active'",
+                        [$tenantId]
+                    );
+                } else {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ?",
+                        [$tenantId]
+                    );
+                }
                 $memberCount = (int) ($row->cnt ?? 0);
             } catch (\Throwable $e) {
                 $memberCount = 0;
@@ -126,14 +136,25 @@ class FederationAggregateService
         }
         $bracket = $this->bucketMemberCount($memberCount);
 
-        // Partner orgs — count of vol_organizations
+        // Partner orgs — count of approved vol_organizations only.
+        // Excludes pending / suspended / rejected orgs to avoid misrepresenting
+        // the cooperative's active partner footprint.
         $partnerOrgsCount = 0;
         if (Schema::hasTable('vol_organizations')) {
             try {
-                $row = DB::selectOne(
-                    "SELECT COUNT(*) AS cnt FROM vol_organizations WHERE tenant_id = ?",
-                    [$tenantId]
-                );
+                if (Schema::hasColumn('vol_organizations', 'status')) {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) AS cnt FROM vol_organizations
+                          WHERE tenant_id = ?
+                            AND status IN ('approved', 'active')",
+                        [$tenantId]
+                    );
+                } else {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) AS cnt FROM vol_organizations WHERE tenant_id = ?",
+                        [$tenantId]
+                    );
+                }
                 $partnerOrgsCount = (int) ($row->cnt ?? 0);
             } catch (\Throwable $e) {
                 $partnerOrgsCount = 0;
