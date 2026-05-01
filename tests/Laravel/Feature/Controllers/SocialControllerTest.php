@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -145,6 +146,119 @@ class SocialControllerTest extends TestCase
         $response = $this->apiPost('/social/like', ['post_id' => 1]);
 
         $response->assertStatus(401);
+    }
+
+    // ------------------------------------------------------------------
+    //  Reaction + like persistence across feed reload (regression guard)
+    //
+    //  This is the class of bug that has regressed repeatedly:
+    //  user reacts/likes → page refresh → reaction/like is gone.
+    //  Root cause is always: toggle endpoint works, but feed GET never
+    //  batch-loads the social state back from the DB.
+    // ------------------------------------------------------------------
+
+    /**
+     * Regression: reactions must survive a page refresh.
+     *
+     * Steps: react → reload feed via GET /v2/feed → assert user_reaction
+     * is populated for that post.
+     *
+     * Previously broken because SocialController.feedV2() never called
+     * ReactionService::getReactionsForPosts() — fixed 2026-05-01.
+     */
+    public function test_reaction_persists_after_feed_reload(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // Create a post + feed_activity entry so it appears in the feed
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id'   => $user->id,
+            'content'   => 'Regression test post for reaction persistence',
+            'type'      => 'post',
+            'visibility' => 'public',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('feed_activity')->insert([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
+            'source_type' => 'post',
+            'source_id'   => $postId,
+            'content'     => 'Regression test post for reaction persistence',
+            'is_hidden'   => 0,
+            'is_visible'  => 1,
+            'created_at'  => now(),
+        ]);
+
+        // React to the post
+        $this->apiPost("/v2/posts/{$postId}/reactions", ['reaction_type' => 'like'])
+            ->assertStatus(200);
+
+        // Simulate page refresh: reload the feed from scratch
+        $response = $this->apiGet('/v2/feed?type=posts');
+        $response->assertStatus(200);
+
+        $items = $response->json('data') ?? [];
+        $post  = collect($items)->firstWhere('id', $postId);
+
+        $this->assertNotNull($post, 'Post should appear in the feed');
+        $this->assertNotNull(
+            $post['reactions']['user_reaction'] ?? null,
+            'Reaction must survive a feed reload — user_reaction should not be null after reacting'
+        );
+        $this->assertEquals('like', $post['reactions']['user_reaction']);
+        $this->assertGreaterThan(0, $post['reactions']['total'] ?? 0);
+    }
+
+    /**
+     * Regression: is_liked (simple like) must survive a page refresh.
+     *
+     * Covers the legacy likes table path, separate from emoji reactions.
+     */
+    public function test_like_persists_after_feed_reload(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $user->id,
+            'content'    => 'Regression test post for like persistence',
+            'type'       => 'post',
+            'visibility' => 'public',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('feed_activity')->insert([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
+            'source_type' => 'post',
+            'source_id'   => $postId,
+            'content'     => 'Regression test post for like persistence',
+            'is_hidden'   => 0,
+            'is_visible'  => 1,
+            'created_at'  => now(),
+        ]);
+
+        // Like the post via the likes endpoint
+        $this->apiPost('/v2/feed/like', ['target_type' => 'post', 'target_id' => $postId])
+            ->assertStatus(200);
+
+        // Simulate page refresh
+        $response = $this->apiGet('/v2/feed?type=posts');
+        $response->assertStatus(200);
+
+        $items = $response->json('data') ?? [];
+        $post  = collect($items)->firstWhere('id', $postId);
+
+        $this->assertNotNull($post, 'Post should appear in the feed');
+        $this->assertTrue(
+            (bool) ($post['is_liked'] ?? false),
+            'is_liked must survive a feed reload — should be true after liking'
+        );
+        $this->assertGreaterThan(0, $post['likes_count'] ?? 0);
     }
 
     // ------------------------------------------------------------------
