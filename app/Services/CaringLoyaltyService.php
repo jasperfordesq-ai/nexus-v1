@@ -139,26 +139,26 @@ class CaringLoyaltyService
         $tenantId = TenantContext::getId();
 
         if ($creditsToUse <= 0) {
-            throw new InvalidArgumentException('Credits to use must be greater than 0');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.credits_must_be_positive'));
         }
         if ($orderTotalChf <= 0) {
-            throw new InvalidArgumentException('Order total must be greater than 0');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.invalid_order_total'));
         }
-        if (round($creditsToUse, 2) != $creditsToUse) {
-            throw new InvalidArgumentException('Credits must have at most 2 decimal places');
+        if (abs(round($creditsToUse, 2) - $creditsToUse) > 0.0001) {
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.credits_decimal_precision'));
         }
         if ($creditsToUse > self::MAX_CREDITS_PER_REDEMPTION) {
-            throw new InvalidArgumentException('Credits to use exceed per-redemption maximum');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.credits_exceed_max'));
         }
         if ($memberId === $sellerId) {
-            throw new RuntimeException('Cannot redeem credits at your own listing');
+            throw new RuntimeException(__('caring_community.loyalty.errors.self_redemption_forbidden'));
         }
 
         if (!Schema::hasTable('marketplace_seller_loyalty_settings')) {
-            throw new RuntimeException('Loyalty programme not available on this tenant');
+            throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
         if (!Schema::hasTable('caring_loyalty_redemptions')) {
-            throw new RuntimeException('Loyalty programme not available on this tenant');
+            throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
 
         // Lock seller settings row first (deterministic order: settings then user)
@@ -170,21 +170,21 @@ class CaringLoyaltyService
                 ->first();
 
             if (!$settings || !(int) $settings->accepts_time_credits) {
-                throw new RuntimeException('This merchant is no longer accepting time credits');
+                throw new RuntimeException(__('caring_community.loyalty.errors.merchant_disabled'));
             }
 
             $rate   = (float) $settings->loyalty_chf_per_hour;
             $maxPct = (int) $settings->loyalty_max_discount_pct;
 
             if ($rate <= 0 || $maxPct <= 0) {
-                throw new RuntimeException('Merchant loyalty configuration invalid');
+                throw new RuntimeException(__('caring_community.loyalty.errors.merchant_misconfigured'));
             }
 
             $discountChf = round($creditsToUse * $rate, 2);
             $maxDiscountChf = round(($orderTotalChf * $maxPct) / 100, 2);
 
             if ($discountChf > $maxDiscountChf + 0.005) {
-                throw new RuntimeException('Discount exceeds maximum allowed for this order');
+                throw new RuntimeException(__('caring_community.loyalty.errors.exceeds_max_discount'));
             }
 
             // Lock the member's row to prevent racing wallet debits
@@ -195,12 +195,15 @@ class CaringLoyaltyService
                 ->first();
 
             if (!$member) {
-                throw new RuntimeException('Member account not found');
+                throw new RuntimeException(__('caring_community.loyalty.errors.member_not_found'));
             }
 
             $currentBalance = (float) $member->balance;
+            if ($currentBalance <= 0) {
+                throw new RuntimeException(__('caring_community.loyalty.errors.zero_balance'));
+            }
             if ($currentBalance < $creditsToUse) {
-                throw new RuntimeException('Not enough time credits in wallet');
+                throw new RuntimeException(__('caring_community.loyalty.errors.insufficient_credits'));
             }
 
             // Debit wallet
@@ -263,12 +266,12 @@ class CaringLoyaltyService
         $tenantId = TenantContext::getId();
 
         if (!Schema::hasTable('caring_loyalty_redemptions')) {
-            throw new RuntimeException('Loyalty programme not available on this tenant');
+            throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
 
         $reasonClean = $reason !== null ? trim($reason) : null;
         if ($reasonClean !== null && strlen($reasonClean) > 500) {
-            throw new InvalidArgumentException('Reversal reason must be 500 characters or fewer');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.reversal_reason_too_long'));
         }
 
         $hasReversedAt = Schema::hasColumn('caring_loyalty_redemptions', 'reversed_at');
@@ -283,11 +286,11 @@ class CaringLoyaltyService
                 ->first();
 
             if (!$redemption) {
-                throw new RuntimeException('Redemption not found');
+                throw new RuntimeException(__('caring_community.loyalty.errors.redemption_not_found'));
             }
 
             if ((string) $redemption->status !== 'applied') {
-                throw new RuntimeException('Only applied redemptions can be reversed');
+                throw new RuntimeException(__('caring_community.loyalty.errors.redemption_not_reversible'));
             }
 
             $credits   = (float) $redemption->credits_used;
@@ -301,7 +304,7 @@ class CaringLoyaltyService
                 ->first();
 
             if (!$member) {
-                throw new RuntimeException('Member account not found');
+                throw new RuntimeException(__('caring_community.loyalty.errors.member_not_found'));
             }
 
             $newBalance = round(((float) $member->balance) + $credits, 2);
@@ -525,13 +528,13 @@ class CaringLoyaltyService
         $tenantId = TenantContext::getId();
 
         if ($chfPerHour <= 0 || $chfPerHour > 9999) {
-            throw new InvalidArgumentException('CHF per hour must be between 0 and 9999');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.invalid_exchange_rate'));
         }
         if ($maxDiscountPct < 0 || $maxDiscountPct > 100) {
-            throw new InvalidArgumentException('Max discount percent must be between 0 and 100');
+            throw new InvalidArgumentException(__('caring_community.loyalty.errors.invalid_max_discount_pct'));
         }
         if (!Schema::hasTable('marketplace_seller_loyalty_settings')) {
-            throw new RuntimeException('Loyalty programme not available on this tenant');
+            throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
 
         DB::table('marketplace_seller_loyalty_settings')->updateOrInsert(

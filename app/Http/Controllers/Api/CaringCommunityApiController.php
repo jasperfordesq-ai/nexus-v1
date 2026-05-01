@@ -1170,7 +1170,16 @@ class CaringCommunityApiController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
             $msg = $e->getMessage();
-            $code = str_contains(strtolower($msg), 'enough') ? 'INSUFFICIENT_CREDITS' : 'REDEMPTION_FAILED';
+            $insufficient = __('caring_community.loyalty.errors.insufficient_credits');
+            $zero = __('caring_community.loyalty.errors.zero_balance');
+            $merchantOff = __('caring_community.loyalty.errors.merchant_disabled');
+            $tooMuch = __('caring_community.loyalty.errors.exceeds_max_discount');
+            $code = match (true) {
+                $msg === $insufficient || $msg === $zero => 'INSUFFICIENT_CREDITS',
+                $msg === $merchantOff                    => 'MERCHANT_DISABLED',
+                $msg === $tooMuch                        => 'EXCEEDS_MAX_DISCOUNT',
+                default                                  => 'REDEMPTION_FAILED',
+            };
             return $this->respondWithError($code, $msg, null, 422);
         }
 
