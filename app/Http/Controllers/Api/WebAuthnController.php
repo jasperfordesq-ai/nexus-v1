@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\TenantSettingsService;
@@ -206,40 +207,44 @@ class WebAuthnController extends BaseApiController
         // Consume the challenge (single-use)
         $this->consumeChallenge($input);
 
-        // Security notification: bell for passkey registered
-        try {
-            $passkeyLabel = $deviceName ? "\"$deviceName\"" : __('emails_security_alerts.passkey_registered.title');
-            Notification::createNotification(
-                $userId,
-                __('emails_security_alerts.passkey_registered.body', ['community' => TenantContext::get()['name'] ?? 'Project NEXUS']),
-                null,
-                'passkey_registered'
-            );
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("Failed to create passkey registered notification: " . $e->getMessage());
-        }
-
-        // Security email: alert user that a passkey was registered
+        // Security notification + email — both rendered in user's preferred_language.
         try {
             $user = User::query()->find($userId);
-            if ($user && $user->email) {
-                $mailer     = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                $userName   = $user->first_name ?? $user->name ?? '';
+            $userLocale = $user->preferred_language ?? null;
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_security_alerts.passkey_registered.title'))
-                    ->previewText(__('emails_security_alerts.passkey_registered.preview'))
-                    ->greeting($userName)
-                    ->paragraph(__('emails_security_alerts.passkey_registered.body', ['community' => $tenantName]))
-                    ->paragraph(__('emails_security_alerts.passkey_registered.warning'))
-                    ->render();
-
-                $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
-                if (!$mailer->send($user->email, $subject, $html)) {
-                    \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
+            LocaleContext::withLocale($userLocale, function () use ($userId) {
+                try {
+                    Notification::createNotification(
+                        $userId,
+                        __('emails_security_alerts.passkey_registered.body', ['community' => TenantContext::get()['name'] ?? 'Project NEXUS']),
+                        null,
+                        'passkey_registered'
+                    );
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Failed to create passkey registered notification: " . $e->getMessage());
                 }
+            });
+
+            if ($user && $user->email) {
+                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
+                    $mailer     = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                    $userName   = $user->first_name ?? $user->name ?? '';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_security_alerts.passkey_registered.title'))
+                        ->previewText(__('emails_security_alerts.passkey_registered.preview'))
+                        ->greeting($userName)
+                        ->paragraph(__('emails_security_alerts.passkey_registered.body', ['community' => $tenantName]))
+                        ->paragraph(__('emails_security_alerts.passkey_registered.warning'))
+                        ->render();
+
+                    $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
+                    if (!$mailer->send($user->email, $subject, $html)) {
+                        \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
+                    }
+                });
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email: " . $e->getMessage());
@@ -494,38 +499,44 @@ class WebAuthnController extends BaseApiController
             );
         }
 
-        // Security notification: bell + email for passkey removed
-        try {
-            Notification::createNotification(
-                $userId,
-                __('api_controllers_2.webauthn.passkey_removed_bell'),
-                null,
-                'passkey_removed'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[WebAuthn] Failed to create passkey removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
-        }
-
+        // Security notification + email — both rendered in user's preferred_language.
         try {
             $user = User::query()->find($userId);
-            if ($user && $user->email) {
-                $mailer     = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                $userName   = $user->first_name ?? $user->name ?? '';
+            $userLocale = $user->preferred_language ?? null;
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('danger')
-                    ->title(__('emails_security_alerts.passkey_removed.title'))
-                    ->previewText(__('emails_security_alerts.passkey_removed.preview'))
-                    ->greeting($userName)
-                    ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
-                    ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
-                    ->render();
-
-                $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                if (!$mailer->send($user->email, $subject, $html)) {
-                    Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
+            LocaleContext::withLocale($userLocale, function () use ($userId) {
+                try {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_2.webauthn.passkey_removed_bell'),
+                        null,
+                        'passkey_removed'
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[WebAuthn] Failed to create passkey removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }
+            });
+
+            if ($user && $user->email) {
+                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
+                    $mailer     = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                    $userName   = $user->first_name ?? $user->name ?? '';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('danger')
+                        ->title(__('emails_security_alerts.passkey_removed.title'))
+                        ->previewText(__('emails_security_alerts.passkey_removed.preview'))
+                        ->greeting($userName)
+                        ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
+                        ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
+                        ->render();
+
+                    $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
+                    if (!$mailer->send($user->email, $subject, $html)) {
+                        Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[WebAuthn] Failed to send passkey removed email: ' . $e->getMessage(), ['user_id' => $userId]);
@@ -581,39 +592,46 @@ class WebAuthnController extends BaseApiController
             [$userId, $tenantId]
         );
 
-        // Security notification: bell + email for all passkeys removed
+        // Security notification + email for all passkeys removed — rendered in
+        // the user's preferred_language.
         if ($count > 0) {
             try {
-                Notification::createNotification(
-                    $userId,
-                    __('api_controllers_2.webauthn.all_passkeys_removed_bell', ['count' => $count]),
-                    null,
-                    'passkey_removed'
-                );
-            } catch (\Throwable $e) {
-                Log::warning('[WebAuthn] Failed to create all-passkeys removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
-            }
-
-            try {
                 $user = User::query()->find($userId);
-                if ($user && $user->email) {
-                    $mailer     = Mailer::forCurrentTenant();
-                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                    $userName   = $user->first_name ?? $user->name ?? '';
+                $userLocale = $user->preferred_language ?? null;
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('danger')
-                        ->title(__('emails_security_alerts.passkey_removed.title'))
-                        ->previewText(__('emails_security_alerts.passkey_removed.preview'))
-                        ->greeting($userName)
-                        ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
-                        ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
-                        ->render();
-
-                    $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html)) {
-                        Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
+                LocaleContext::withLocale($userLocale, function () use ($userId, $count) {
+                    try {
+                        Notification::createNotification(
+                            $userId,
+                            __('api_controllers_2.webauthn.all_passkeys_removed_bell', ['count' => $count]),
+                            null,
+                            'passkey_removed'
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('[WebAuthn] Failed to create all-passkeys removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
                     }
+                });
+
+                if ($user && $user->email) {
+                    LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
+                        $mailer     = Mailer::forCurrentTenant();
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $userName   = $user->first_name ?? $user->name ?? '';
+
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('danger')
+                            ->title(__('emails_security_alerts.passkey_removed.title'))
+                            ->previewText(__('emails_security_alerts.passkey_removed.preview'))
+                            ->greeting($userName)
+                            ->paragraph(__('emails_security_alerts.passkey_removed.body', ['community' => $tenantName]))
+                            ->paragraph(__('emails_security_alerts.passkey_removed.warning'))
+                            ->render();
+
+                        $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
+                        if (!$mailer->send($user->email, $subject, $html)) {
+                            Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
+                        }
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[WebAuthn] Failed to send all-passkeys removed email: ' . $e->getMessage(), ['user_id' => $userId]);

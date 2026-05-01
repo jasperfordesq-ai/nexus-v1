@@ -14,6 +14,7 @@ use App\Core\RateLimiter;
 use App\Core\Mailer;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
+use App\I18n\LocaleContext;
 use App\Services\RateLimitService;
 use Illuminate\Support\Facades\Log;
 
@@ -151,7 +152,7 @@ class EmailVerificationController extends BaseApiController
         // Get user details (tenant-scoped)
         $tenantId = TenantContext::getId();
         $userRow = DB::selectOne(
-            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT id, email, first_name, email_verified_at, tenant_id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
         $user = $userRow ? (array)$userRow : null;
@@ -208,7 +209,7 @@ class EmailVerificationController extends BaseApiController
 
         // Look up user (tenant-scoped)
         $userRow = DB::selectOne(
-            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE email = ? AND tenant_id = ?",
+            "SELECT id, email, first_name, email_verified_at, tenant_id, preferred_language FROM users WHERE email = ? AND tenant_id = ?",
             [$email, $tenantId]
         );
         $user = $userRow ? (array)$userRow : null;
@@ -274,20 +275,24 @@ class EmailVerificationController extends BaseApiController
                 }
             }
 
-            $firstName = $user['first_name'] ?? '';
-            $greeting = $firstName !== ''
-                ? __('emails_misc.auth.verify_email_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName])
-                : __('emails_misc.auth.verify_email_greeting_fallback');
+            // Render in the recipient's preferred_language so the verification
+            // email arrives in their locale rather than the request caller's.
+            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($mailer, $user, $tenantName, $verifyUrl) {
+                $firstName = $user['first_name'] ?? '';
+                $greeting = $firstName !== ''
+                    ? __('emails_misc.auth.verify_email_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName])
+                    : __('emails_misc.auth.verify_email_greeting_fallback');
 
-            $html = EmailTemplateBuilder::make()
-                ->title(__('emails_misc.auth.verify_email_title'))
-                ->greeting($greeting)
-                ->paragraph(__('emails_misc.auth.verify_email_body'))
-                ->paragraph(__('emails_misc.auth.verify_email_ignore'))
-                ->button(__('emails_misc.auth.verify_email_cta'), $verifyUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.auth.verify_email_title'))
+                    ->greeting($greeting)
+                    ->paragraph(__('emails_misc.auth.verify_email_body'))
+                    ->paragraph(__('emails_misc.auth.verify_email_ignore'))
+                    ->button(__('emails_misc.auth.verify_email_cta'), $verifyUrl)
+                    ->render();
 
-            return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html);
+                return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html);
+            });
         } catch (\Throwable $e) {
             Log::warning('[EmailVerification] Verification email failed for user: ' . $e->getMessage(), ['user_id' => $user['id']]);
             return false;

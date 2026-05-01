@@ -10,6 +10,7 @@ use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\TotpService;
@@ -107,39 +108,46 @@ class TwoFactorController extends BaseApiController
             );
         }
 
-        // Security notification: bell for 2FA enabled
-        try {
-            Notification::createNotification(
-                $userId,
-                __('api_controllers_2.two_factor.enabled_notification'),
-                null,
-                '2fa_enabled'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
-        }
-
-        // Security email: alert user that 2FA was enabled
+        // Security notification + email: render in the user's preferred_language
+        // so both bell text and the email match the recipient's locale, not the
+        // request caller's (which can differ for impersonation/admin flows).
         try {
             $user = User::query()->find($userId);
-            if ($user && $user->email) {
-                $mailer     = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                $userName   = $user->first_name ?? $user->name ?? '';
+            $userLocale = $user->preferred_language ?? null;
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails_security_alerts.2fa_enabled.title'))
-                    ->previewText(__('emails_security_alerts.2fa_enabled.preview'))
-                    ->greeting($userName)
-                    ->paragraph(__('emails_security_alerts.2fa_enabled.body'))
-                    ->paragraph(__('emails_security_alerts.2fa_enabled.warning'))
-                    ->render();
-
-                $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
-                if (!$mailer->send($user->email, $subject, $html)) {
-                    Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
+            LocaleContext::withLocale($userLocale, function () use ($userId) {
+                try {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_2.two_factor.enabled_notification'),
+                        null,
+                        '2fa_enabled'
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }
+            });
+
+            if ($user && $user->email) {
+                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
+                    $mailer     = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                    $userName   = $user->first_name ?? $user->name ?? '';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_security_alerts.2fa_enabled.title'))
+                        ->previewText(__('emails_security_alerts.2fa_enabled.preview'))
+                        ->greeting($userName)
+                        ->paragraph(__('emails_security_alerts.2fa_enabled.body'))
+                        ->paragraph(__('emails_security_alerts.2fa_enabled.warning'))
+                        ->render();
+
+                    $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
+                    if (!$mailer->send($user->email, $subject, $html)) {
+                        Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[2FA] Failed to send 2FA enabled email: ' . $e->getMessage(), ['user_id' => $userId]);
@@ -179,38 +187,44 @@ class TwoFactorController extends BaseApiController
             );
         }
 
-        // Security notification: bell + email for 2FA disabled
-        try {
-            Notification::createNotification(
-                $userId,
-                __('api_controllers_2.two_factor.disabled_notification'),
-                null,
-                '2fa_disabled'
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[2FA] Failed to create 2FA disabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
-        }
-
+        // Security notification + email: render in the user's preferred_language.
         try {
             $user = User::query()->find($userId);
-            if ($user && $user->email) {
-                $mailer     = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                $userName   = $user->first_name ?? $user->name ?? '';
+            $userLocale = $user->preferred_language ?? null;
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('danger')
-                    ->title(__('emails_security_alerts.2fa_disabled.title'))
-                    ->previewText(__('emails_security_alerts.2fa_disabled.preview'))
-                    ->greeting($userName)
-                    ->paragraph(__('emails_security_alerts.2fa_disabled.body'))
-                    ->paragraph(__('emails_security_alerts.2fa_disabled.warning'))
-                    ->render();
-
-                $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
-                if (!$mailer->send($user->email, $subject, $html)) {
-                    Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
+            LocaleContext::withLocale($userLocale, function () use ($userId) {
+                try {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_2.two_factor.disabled_notification'),
+                        null,
+                        '2fa_disabled'
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[2FA] Failed to create 2FA disabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }
+            });
+
+            if ($user && $user->email) {
+                LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
+                    $mailer     = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                    $userName   = $user->first_name ?? $user->name ?? '';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('danger')
+                        ->title(__('emails_security_alerts.2fa_disabled.title'))
+                        ->previewText(__('emails_security_alerts.2fa_disabled.preview'))
+                        ->greeting($userName)
+                        ->paragraph(__('emails_security_alerts.2fa_disabled.body'))
+                        ->paragraph(__('emails_security_alerts.2fa_disabled.warning'))
+                        ->render();
+
+                    $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
+                    if (!$mailer->send($user->email, $subject, $html)) {
+                        Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[2FA] Failed to send 2FA disabled email: ' . $e->getMessage(), ['user_id' => $userId]);

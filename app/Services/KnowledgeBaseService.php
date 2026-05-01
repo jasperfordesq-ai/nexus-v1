@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -401,33 +402,37 @@ class KnowledgeBaseService
             $author = DB::table('users')
                 ->where('id', $authorId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select('id', 'email', 'name', 'first_name')
+                ->select('id', 'email', 'name', 'first_name', 'preferred_language')
                 ->first();
 
             if (! $author || empty($author->email)) {
                 return;
             }
 
-            $firstName  = $author->first_name ?? (explode(' ', $author->name ?? '')[0] ?: 'there');
-            $community  = TenantContext::getName();
-            $articleUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/kb/' . $articleId;
+            // Render subject + body in the author's preferred_language so the
+            // confirmation arrives in their locale, not the caller's.
+            LocaleContext::withLocale($author, function () use ($author, $title, $articleId, $isUpdate) {
+                $firstName  = $author->first_name ?? (explode(' ', $author->name ?? '')[0] ?: 'there');
+                $community  = TenantContext::getName();
+                $articleUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/kb/' . $articleId;
 
-            $namespace = $isUpdate ? 'kb_updated' : 'kb_published';
+                $namespace = $isUpdate ? 'kb_updated' : 'kb_published';
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails_content.' . $namespace . '.title'))
-                ->previewText(__('emails_content.' . $namespace . '.preview', ['title' => $title, 'community' => $community]))
-                ->greeting($firstName)
-                ->paragraph(__('emails_content.' . $namespace . '.body', ['title' => $title, 'community' => $community]))
-                ->button(__('emails_content.' . $namespace . '.cta'), $articleUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_content.' . $namespace . '.title'))
+                    ->previewText(__('emails_content.' . $namespace . '.preview', ['title' => $title, 'community' => $community]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_content.' . $namespace . '.body', ['title' => $title, 'community' => $community]))
+                    ->button(__('emails_content.' . $namespace . '.cta'), $articleUrl)
+                    ->render();
 
-            Mailer::forCurrentTenant()->send(
-                $author->email,
-                __('emails_content.' . $namespace . '.subject', ['title' => $title, 'community' => $community]),
-                $html
-            );
+                Mailer::forCurrentTenant()->send(
+                    $author->email,
+                    __('emails_content.' . $namespace . '.subject', ['title' => $title, 'community' => $community]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning('[KnowledgeBaseService] publication email failed for author ' . $authorId . ': ' . $e->getMessage());
         }

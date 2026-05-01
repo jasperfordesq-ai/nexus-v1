@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\I18n\LocaleContext;
 use App\Services\FederationActivityService;
 use App\Services\FederationAuditService;
 use App\Services\FederationDirectoryService;
@@ -47,22 +48,27 @@ class AdminFederationController extends BaseApiController
      *
      * Uses explicit tenantId parameter on createNotification() for cross-tenant writes.
      */
-    private function notifyPartnerAdmins(int $partnerTenantId, string $message, string $type = 'federation', ?string $link = '/admin/federation'): void
+    private function notifyPartnerAdmins(int $partnerTenantId, string $messageKey, array $messageParams = [], string $type = 'federation', ?string $link = '/admin/federation'): void
     {
         try {
             $admins = DB::select(
-                "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
+                "SELECT id, preferred_language FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
                 [$partnerTenantId]
             );
             foreach ($admins as $admin) {
-                Notification::createNotification(
-                    (int) $admin->id,
-                    $message,
-                    $link,
-                    $type,
-                    true,
-                    $partnerTenantId
-                );
+                // Render message text inside each recipient's preferred_language
+                // so the bell text appears in THEIR locale, not the caller's.
+                LocaleContext::withLocale($admin, function () use ($admin, $messageKey, $messageParams, $link, $type, $partnerTenantId) {
+                    $message = __($messageKey, $messageParams);
+                    Notification::createNotification(
+                        (int) $admin->id,
+                        $message,
+                        $link,
+                        $type,
+                        true,
+                        $partnerTenantId
+                    );
+                });
             }
         } catch (\Exception $e) {
             Log::warning('[Federation] Failed to notify partner admins', [
@@ -269,7 +275,8 @@ class AdminFederationController extends BaseApiController
                 $tenantName = $this->getTenantName($tenantId);
                 $this->notifyPartnerAdmins(
                     $initiatorTenantId,
-                    __('svc_notifications_2.federation.notify_partnership_approved', ['tenant_name' => $tenantName]),
+                    'svc_notifications_2.federation.notify_partnership_approved',
+                    ['tenant_name' => $tenantName],
                     'federation_partnership_approved'
                 );
             }
@@ -311,7 +318,8 @@ class AdminFederationController extends BaseApiController
                 $tenantName = $this->getTenantName($tenantId);
                 $this->notifyPartnerAdmins(
                     $otherTenantId,
-                    __('svc_notifications_2.federation.notify_partnership_rejected', ['tenant_name' => $tenantName]),
+                    'svc_notifications_2.federation.notify_partnership_rejected',
+                    ['tenant_name' => $tenantName],
                     'federation_partnership_rejected'
                 );
             }
@@ -353,7 +361,8 @@ class AdminFederationController extends BaseApiController
                 $tenantName = $this->getTenantName($tenantId);
                 $this->notifyPartnerAdmins(
                     $otherTenantId,
-                    __('svc_notifications_2.federation.notify_partnership_terminated', ['tenant_name' => $tenantName]),
+                    'svc_notifications_2.federation.notify_partnership_terminated',
+                    ['tenant_name' => $tenantName],
                     'federation_partnership_terminated'
                 );
             }
@@ -391,7 +400,8 @@ class AdminFederationController extends BaseApiController
                 $tenantName = $this->getTenantName($tenantId);
                 $this->notifyPartnerAdmins(
                     $otherTenantId,
-                    __('svc_notifications_2.federation.notify_partnership_reactivated', ['tenant_name' => $tenantName]),
+                    'svc_notifications_2.federation.notify_partnership_reactivated',
+                    ['tenant_name' => $tenantName],
                     'federation_partnership_reactivated'
                 );
             }
