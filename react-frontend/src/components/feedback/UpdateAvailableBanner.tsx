@@ -27,10 +27,14 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import X from 'lucide-react/icons/x';
 import { Button } from '@heroui/react';
 
-// Stores the BUILD_COMMIT that the user clicked "Update" from.
+// Stores the BUILD_COMMIT + timestamp that the user clicked "Update" from.
 // If on reload we're STILL running that same commit, the update hasn't taken
-// effect yet — suppress the banner entirely instead of showing it again.
+// effect yet — suppress the banner for up to 10 minutes instead of looping.
+// Uses localStorage (not sessionStorage) so the suppression survives mobile
+// app kills, where the OS tears down the WebView between background/foreground
+// cycles and sessionStorage is wiped even though the waiting SW persists.
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
+const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -41,20 +45,40 @@ async function hasWaitingSW(): Promise<boolean> {
   }
 }
 
+function markUpdateTriggered(): void {
+  try {
+    localStorage.setItem(SW_UPDATE_FROM_COMMIT_KEY, `${__BUILD_COMMIT__}:${Date.now()}`);
+  } catch { /* non-blocking */ }
+}
+
 /**
  * Returns true if the user already triggered an update from this exact build
- * and the page is still running old code (i.e. the reload didn't pick up new assets).
+ * recently and the page is still running old code (reload hasn't taken effect).
+ * Suppression expires after SW_UPDATE_SUPPRESSION_TTL so a genuinely broken
+ * update doesn't permanently hide the banner.
  */
 function isUpdateAlreadyTriggered(): boolean {
-  const fromCommit = sessionStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
-  if (!fromCommit) return false;
-  if (fromCommit === __BUILD_COMMIT__) {
-    // Still running the same build — update hasn't taken effect. Suppress.
-    return true;
+  try {
+    const raw = localStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
+    if (!raw) return false;
+    const colonIdx = raw.lastIndexOf(':');
+    const commit = raw.slice(0, colonIdx);
+    const ts = parseInt(raw.slice(colonIdx + 1), 10);
+    if (commit !== __BUILD_COMMIT__) {
+      // Different build is running — the update worked! Clean up.
+      localStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY);
+      return false;
+    }
+    if (Date.now() - ts < SW_UPDATE_SUPPRESSION_TTL) {
+      // Same build, within suppression window — update in progress, suppress.
+      return true;
+    }
+    // Suppression expired — update didn't complete in time, allow retry.
+    localStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY);
+    return false;
+  } catch {
+    return false;
   }
-  // Different build is running — the update worked! Clean up.
-  sessionStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY);
-  return false;
 }
 
 export function UpdateAvailableBanner() {
@@ -127,10 +151,9 @@ export function UpdateAvailableBanner() {
   }, [checkAndShow]);
 
   function handleUpdate() {
-    // Store which build we're updating FROM — on reload, if __BUILD_COMMIT__
-    // still matches this value, the update hasn't taken effect yet and we
-    // suppress the banner instead of showing it again in an annoying loop.
-    sessionStorage.setItem(SW_UPDATE_FROM_COMMIT_KEY, __BUILD_COMMIT__);
+    // Record which build we're updating FROM so the banner stays suppressed
+    // on reload if the same build is still running (update in progress).
+    markUpdateTriggered();
     setUpdating(true);
 
     const updateSW = (window as NexusWindow).__nexus_updateSW;

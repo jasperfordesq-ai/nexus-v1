@@ -28,12 +28,25 @@ if (import.meta.env.PROD) {
     onOfflineReady?: () => void;
   }) => (reloadPage?: boolean) => void }) => {
     // Check if the user already triggered an update from this exact build.
-    // If so, don't fire events that would re-show the banner — the SW just
-    // needs time to activate and the next reload will pick up new code.
+    // Uses localStorage (not sessionStorage) + TTL so the suppression survives
+    // mobile app kills where sessionStorage is wiped between background/foreground.
     const UPDATE_COMMIT_KEY = 'nexus_sw_update_from_commit';
+    const UPDATE_TTL = 10 * 60 * 1000; // 10 minutes — matches UpdateAvailableBanner
     const updateAlreadyTriggered = () => {
-      const fromCommit = sessionStorage.getItem(UPDATE_COMMIT_KEY);
-      return !!(fromCommit && fromCommit === __BUILD_COMMIT__);
+      try {
+        const raw = localStorage.getItem(UPDATE_COMMIT_KEY);
+        if (!raw) return false;
+        const colonIdx = raw.lastIndexOf(':');
+        const commit = raw.slice(0, colonIdx);
+        const ts = parseInt(raw.slice(colonIdx + 1), 10);
+        if (commit !== __BUILD_COMMIT__) {
+          localStorage.removeItem(UPDATE_COMMIT_KEY);
+          return false;
+        }
+        return Date.now() - ts < UPDATE_TTL;
+      } catch {
+        return false;
+      }
     };
 
     const updateSW = registerSW({
