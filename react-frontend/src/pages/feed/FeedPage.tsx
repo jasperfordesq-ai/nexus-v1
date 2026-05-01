@@ -52,7 +52,6 @@ import { FeedSidebar } from '@/components/feed/sidebar';
 import { StoriesBar } from '@/components/feed/StoriesBar';
 import { FeedModeToggle } from '@/components/feed/FeedModeToggle';
 import { SubFilterChips } from '@/components/feed/SubFilterChips';
-import { MobileFAB } from '@/components/feed/MobileFAB';
 import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggestionsWidget';
 import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
@@ -1243,8 +1242,7 @@ export function FeedPage() {
     </div>
 
     {/* Mobile FAB */}
-    {isAuthenticated && <MobileFAB onPress={() => openCompose('post')} />}
-    </>
+</>
   );
 }
 

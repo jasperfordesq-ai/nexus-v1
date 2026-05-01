@@ -14,6 +14,7 @@ use App\Services\LinkPreviewService;
 use App\Services\PersonalisedFeedService;
 use App\Services\PollService;
 use App\Services\PostMediaService;
+use App\Services\ReactionService;
 use App\Services\SocialNotificationService;
 use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
@@ -46,6 +47,7 @@ class SocialController extends BaseApiController
         private readonly PollService $pollService,
         private readonly PostMediaService $postMediaService,
         private readonly PersonalisedFeedService $personalisedFeedService,
+        private readonly ReactionService $reactionService,
     ) {}
 
     /**
@@ -109,13 +111,20 @@ class SocialController extends BaseApiController
             $mediaByPost = $this->postMediaService->getMediaForPosts($postIds);
         }
 
-        // Strip internal cursor fields and attach media
+        // Batch load reactions for all post items (restores user_reaction after page refresh)
+        $reactionsByPost = !empty($postIds)
+            ? $this->reactionService->getReactionsForPosts($postIds, $userId)
+            : [];
+
+        // Strip internal cursor fields and attach media + reactions
         foreach ($result['items'] as &$item) {
             unset($item['_activity_id'], $item['_activity_created_at']);
 
-            // Attach media array for post items
+            // Attach media array and reactions for post items
             if (($item['type'] ?? '') === 'post' && isset($item['id'])) {
                 $item['media'] = $mediaByPost[(int) $item['id']] ?? [];
+                $item['reactions'] = $reactionsByPost[(int) $item['id']]
+                    ?? ['counts' => [], 'total' => 0, 'user_reaction' => null];
             }
         }
         unset($item);
