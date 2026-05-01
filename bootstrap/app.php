@@ -43,6 +43,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-clear-expired-monitoring');
 
+        $schedule->command('safeguarding:sla-escalate')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('safeguarding-sla-escalate');
+
         // Surface federated transactions stuck in 'pending' (saga safety-net).
         $schedule->job(new \App\Jobs\ReconcileFederationPendingTxJob())
             ->everyFiveMinutes()

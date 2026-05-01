@@ -249,6 +249,102 @@ class CaringLoyaltyService
         return $result;
     }
 
+    /**
+     * Reverse an applied redemption: restore credits to the member's wallet,
+     * mark the row reversed, and record the admin and reason.
+     *
+     * @return array{redemption_id: int, credits_restored: float, member_new_balance: float}
+     *
+     * @throws InvalidArgumentException Validation failures
+     * @throws RuntimeException Redemption missing / not in applied state / cross-tenant
+     */
+    public function reverse(int $redemptionId, ?string $reason, int $adminUserId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        if (!Schema::hasTable('caring_loyalty_redemptions')) {
+            throw new RuntimeException('Loyalty programme not available on this tenant');
+        }
+
+        $reasonClean = $reason !== null ? trim($reason) : null;
+        if ($reasonClean !== null && strlen($reasonClean) > 500) {
+            throw new InvalidArgumentException('Reversal reason must be 500 characters or fewer');
+        }
+
+        $hasReversedAt = Schema::hasColumn('caring_loyalty_redemptions', 'reversed_at');
+        $hasReversedBy = Schema::hasColumn('caring_loyalty_redemptions', 'reversed_by');
+        $hasReversalReason = Schema::hasColumn('caring_loyalty_redemptions', 'reversal_reason');
+
+        $result = DB::transaction(function () use ($tenantId, $redemptionId, $reasonClean, $adminUserId, $hasReversedAt, $hasReversedBy, $hasReversalReason) {
+            $redemption = DB::table('caring_loyalty_redemptions')
+                ->where('id', $redemptionId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$redemption) {
+                throw new RuntimeException('Redemption not found');
+            }
+
+            if ((string) $redemption->status !== 'applied') {
+                throw new RuntimeException('Only applied redemptions can be reversed');
+            }
+
+            $credits   = (float) $redemption->credits_used;
+            $memberId  = (int) $redemption->member_user_id;
+
+            // Restore credits to the member's wallet under row lock
+            $member = DB::table('users')
+                ->where('id', $memberId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$member) {
+                throw new RuntimeException('Member account not found');
+            }
+
+            $newBalance = round(((float) $member->balance) + $credits, 2);
+
+            DB::table('users')
+                ->where('id', $memberId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'balance'    => $newBalance,
+                    'updated_at' => now(),
+                ]);
+
+            $update = [
+                'status'     => 'reversed',
+                'updated_at' => now(),
+            ];
+            if ($hasReversedAt)    { $update['reversed_at']     = now(); }
+            if ($hasReversedBy)    { $update['reversed_by']     = $adminUserId; }
+            if ($hasReversalReason) { $update['reversal_reason'] = $reasonClean; }
+
+            DB::table('caring_loyalty_redemptions')
+                ->where('id', $redemptionId)
+                ->where('tenant_id', $tenantId)
+                ->update($update);
+
+            return [
+                'redemption_id'      => $redemptionId,
+                'credits_restored'   => $credits,
+                'member_new_balance' => $newBalance,
+            ];
+        });
+
+        Log::info('CaringLoyaltyService: redemption reversed', [
+            'tenant_id'      => $tenantId,
+            'redemption_id'  => $result['redemption_id'],
+            'admin_user_id'  => $adminUserId,
+            'credits_restored' => $result['credits_restored'],
+            'reason'         => $reasonClean,
+        ]);
+
+        return $result;
+    }
+
     // ─── History APIs ─────────────────────────────────────────────────────────
 
     /**

@@ -10,6 +10,9 @@ import {
   Card,
   CardBody,
   Chip,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectItem,
   Skeleton,
@@ -21,6 +24,8 @@ import Bell from 'lucide-react/icons/bell';
 import Calendar from 'lucide-react/icons/calendar';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import HelpCircle from 'lucide-react/icons/help-circle';
+import Info from 'lucide-react/icons/info';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Newspaper from 'lucide-react/icons/newspaper';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
@@ -49,6 +54,12 @@ type DigestSource =
   | 'help_request'
   | 'feed_post';
 
+interface DigestScoreReason {
+  key: string;
+  label_key: string;
+  weight: number;
+}
+
 interface DigestItem {
   id: string;
   source: DigestSource;
@@ -58,6 +69,7 @@ interface DigestItem {
   sub_region_id: number | null;
   audience_match_score: number;
   link_path: string | null;
+  score_reasons?: DigestScoreReason[];
 }
 
 interface DigestPrefs {
@@ -104,6 +116,18 @@ function sourceColor(source: DigestSource): 'default' | 'primary' | 'warning' | 
     default:
       return 'default';
   }
+}
+
+/** Empirical max score from scoring weights (source 10 + recency 5 + sub-region 5 + category 3). */
+const MAX_MATCH_SCORE = 20;
+
+/**
+ * The PHP service emits label_key values like "civic_digest.transparency.reason_safety".
+ * Our t() is already bound to the 'civic_digest' namespace, so strip that prefix
+ * before lookup to avoid double-namespacing.
+ */
+function reasonKey(rawKey: string): string {
+  return rawKey.startsWith('civic_digest.') ? rawKey.slice('civic_digest.'.length) : rawKey;
 }
 
 function relativeLabel(iso: string | null, t: (key: string, opts?: Record<string, unknown>) => string): string {
@@ -182,6 +206,16 @@ export function CivicDigestPage() {
         </CardBody>
       </Card>
 
+      {/* Transparency global note */}
+      <Card>
+        <CardBody className="flex flex-row items-start gap-3 p-4">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+          <p className="text-xs leading-relaxed text-theme-muted">
+            {t('transparency.global_note')}
+          </p>
+        </CardBody>
+      </Card>
+
       {/* Loading state */}
       {isLoading && (
         <div className="space-y-3">
@@ -222,6 +256,8 @@ export function CivicDigestPage() {
           {items.map((item) => {
             const Icon = SOURCE_ICON[item.source] ?? Newspaper;
             const sourceLabelKey = `source_${item.source}` as const;
+            const reasons = item.score_reasons ?? [];
+            const matchDisplay = Math.min(item.audience_match_score, MAX_MATCH_SCORE);
             return (
               <li key={item.id}>
                 <Card>
@@ -240,6 +276,17 @@ export function CivicDigestPage() {
                               {relativeLabel(item.occurred_at, t)}
                             </span>
                           )}
+                          {item.audience_match_score > 0 && (
+                            <Chip
+                              size="sm"
+                              variant="flat"
+                              color="default"
+                              className="ml-auto"
+                            >
+                              {t('transparency.match_score_label')}: {matchDisplay}/
+                              {MAX_MATCH_SCORE}
+                            </Chip>
+                          )}
                         </div>
                         <h2 className="mt-1.5 text-base font-semibold leading-snug text-theme-primary">
                           {item.title}
@@ -249,16 +296,56 @@ export function CivicDigestPage() {
                             {item.summary}
                           </p>
                         )}
-                        {item.link_path && (
-                          <div className="mt-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-3">
+                          {item.link_path && (
                             <Link
                               to={tenantPath(item.link_path)}
                               className="text-sm font-medium text-[var(--color-primary)] hover:underline"
                             >
                               {t('open_link')}
                             </Link>
-                          </div>
-                        )}
+                          )}
+                          <Popover placement="bottom-start" showArrow>
+                            <PopoverTrigger>
+                              <Button
+                                size="sm"
+                                variant="light"
+                                startContent={<HelpCircle className="h-3.5 w-3.5" aria-hidden />}
+                                className="h-7 min-h-0 px-2 text-xs"
+                              >
+                                {t('transparency.why_button')}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="max-w-xs">
+                              <div className="px-1 py-2 space-y-2">
+                                <p className="text-xs font-semibold text-theme-primary">
+                                  {t('transparency.why_button')}
+                                </p>
+                                {reasons.length === 0 ? (
+                                  <p className="text-xs text-theme-muted">
+                                    {t('transparency.no_reasons')}
+                                  </p>
+                                ) : (
+                                  <ul className="space-y-1.5">
+                                    {reasons.map((r) => (
+                                      <li
+                                        key={r.key}
+                                        className="flex items-start justify-between gap-2 text-xs"
+                                      >
+                                        <span className="text-theme-primary">
+                                          {t(reasonKey(r.label_key))}
+                                        </span>
+                                        <span className="shrink-0 text-theme-muted">
+                                          +{r.weight}
+                                        </span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
                     </div>
                   </CardBody>

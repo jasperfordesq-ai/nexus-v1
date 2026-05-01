@@ -5,9 +5,11 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Progress, Skeleton } from '@heroui/react';
+import { Button, Progress, Skeleton } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle2 from 'lucide-react/icons/check-circle-2';
+import Circle from 'lucide-react/icons/circle';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
 import { TrustTierBadge } from '@/components/caring-community/TrustTierBadge';
@@ -21,19 +23,52 @@ import { usePageTitle } from '@/hooks';
 // Types
 // ---------------------------------------------------------------------------
 
-interface MyTrustTierResponse {
-  tier: 0 | 1 | 2 | 3 | 4;
-  label: string;
-  next_tier: string | null;
+type TrustTier = 0 | 1 | 2 | 3 | 4;
+
+interface TrustTierSignal {
+  key: string;
+  label_key: string;
+  current: number;
+  required: number;
+  achieved: boolean;
+  unit: string;
+}
+
+interface TrustTierBreakdown {
+  tier: TrustTier;
+  tier_label: string;
+  next_tier_label: string | null;
+  progress_pct: number;
+  signals: TrustTierSignal[];
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Map tier 0–4 to a rough "progress within tier" percentage for the bar */
-function tierToPercent(tier: number): number {
-  return Math.round((tier / 4) * 100);
+function tierColor(
+  tier: TrustTier,
+): 'default' | 'primary' | 'success' | 'secondary' | 'warning' {
+  switch (tier) {
+    case 0:
+      return 'default';
+    case 1:
+      return 'primary';
+    case 2:
+      return 'success';
+    case 3:
+      return 'secondary';
+    case 4:
+      return 'warning';
+  }
+}
+
+function signalProgressPct(signal: TrustTierSignal): number {
+  if (signal.required <= 0) {
+    return signal.achieved ? 100 : 0;
+  }
+  const pct = (signal.current / signal.required) * 100;
+  return Math.max(0, Math.min(100, Math.round(pct)));
 }
 
 // ---------------------------------------------------------------------------
@@ -46,8 +81,8 @@ export function MyTrustTierPage() {
   const navigate = useNavigate();
   usePageTitle(t('trust_tier.title'));
 
-  const { data, isLoading, error } = useApi<MyTrustTierResponse>(
-    '/v2/caring-community/my-trust-tier',
+  const { data, isLoading, error, refetch } = useApi<TrustTierBreakdown>(
+    '/v2/caring-community/me/trust-tier/breakdown',
     { immediate: true },
   );
 
@@ -80,14 +115,17 @@ export function MyTrustTierPage() {
         <GlassCard className="p-6 sm:p-8">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15">
-              <ShieldCheck className="h-6 w-6 text-[var(--color-primary)]" aria-hidden="true" />
+              <ShieldCheck
+                className="h-6 w-6 text-[var(--color-primary)]"
+                aria-hidden="true"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold leading-tight text-theme-primary sm:text-3xl">
-                {t('trust_tier.title')}
+                {t('trust_tier.breakdown.title')}
               </h1>
               <p className="mt-2 text-base leading-8 text-theme-muted">
-                {t('trust_tier.subtitle')}
+                {t('trust_tier.breakdown.subtitle')}
               </p>
             </div>
           </div>
@@ -96,9 +134,20 @@ export function MyTrustTierPage() {
         {/* Error state */}
         {error && !isLoading && (
           <GlassCard className="p-6">
-            <div className="flex items-center gap-3 text-danger">
-              <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-              <p className="font-medium">{t('trust_tier.title')}</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-danger">
+                <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+                <p className="font-medium">{t('trust_tier.title')}</p>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                onPress={() => {
+                  void refetch();
+                }}
+              >
+                {t('trust_tier.breakdown.retry')}
+              </Button>
             </div>
           </GlassCard>
         )}
@@ -109,13 +158,15 @@ export function MyTrustTierPage() {
             <Skeleton className="h-6 w-1/3 rounded-lg" />
             <Skeleton className="h-4 w-2/3 rounded-lg" />
             <Skeleton className="h-3 w-full rounded-lg" />
+            <Skeleton className="h-3 w-full rounded-lg" />
+            <Skeleton className="h-3 w-full rounded-lg" />
           </GlassCard>
         )}
 
         {/* Tier card */}
         {!isLoading && !error && data && (
           <GlassCard className="p-6 space-y-6">
-            {/* Current tier */}
+            {/* Current + next tier */}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-theme-muted mb-1">
@@ -124,67 +175,101 @@ export function MyTrustTierPage() {
                 <TrustTierBadge tier={data.tier} size="md" showLabel />
               </div>
 
-              {data.next_tier && (
+              {data.next_tier_label && (
                 <div className="text-right">
                   <p className="text-sm font-medium text-theme-muted mb-1">
                     {t('trust_tier.next_tier')}
                   </p>
                   <p className="text-sm font-semibold text-theme-primary capitalize">
-                    {t(`trust_tier.tier_${data.next_tier}`)}
+                    {t(`trust_tier.tier_${data.next_tier_label}`)}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Progress bar */}
+            {/* Overall progress */}
             <div>
               <p className="mb-2 text-sm text-theme-muted">
-                {data.next_tier
-                  ? t('trust_tier.progress_to_next', { tier: t(`trust_tier.tier_${data.next_tier}`) })
-                  : t(`trust_tier.tier_${data.label}`)}
+                {data.next_tier_label
+                  ? t('trust_tier.progress_to_next', {
+                      tier: t(`trust_tier.tier_${data.next_tier_label}`),
+                    })
+                  : t(`trust_tier.tier_${data.tier_label}`)}
               </p>
               <Progress
-                value={tierToPercent(data.tier)}
-                color={
-                  data.tier === 0 ? 'default'
-                  : data.tier === 1 ? 'primary'
-                  : data.tier === 2 ? 'success'
-                  : data.tier === 3 ? 'secondary'
-                  : 'warning'
-                }
+                value={data.progress_pct}
+                color={tierColor(data.tier)}
                 className="max-w-md"
-                aria-label={t('trust_tier.title')}
+                aria-label={t('trust_tier.breakdown.title')}
               />
-              <p className="mt-1 text-xs text-theme-muted">{tierToPercent(data.tier)}%</p>
-            </div>
-
-            {/* Criteria list */}
-            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-theme-muted">
-                {t('trust_tier.next_tier')}
+              <p className="mt-1 text-xs text-theme-muted">
+                {Math.round(data.progress_pct)}%
               </p>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-theme-muted">{t('trust_tier.criteria_hours')}</span>
-                  <span className="text-sm font-semibold text-theme-primary">
-                    {t('trust_tier.criteria_hours')}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-theme-muted">{t('trust_tier.criteria_reviews')}</span>
-                  <span className="text-sm font-semibold text-theme-primary">
-                    {t('trust_tier.criteria_reviews')}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-theme-muted">{t('trust_tier.criteria_identity')}</span>
-                  <span className="text-sm font-semibold text-theme-primary">
-                    {t('trust_tier.criteria_identity')}
-                  </span>
-                </div>
-              </div>
             </div>
+
+            {/* Per-signal breakdown */}
+            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4 space-y-4">
+              {data.signals.length === 0 && (
+                <p className="text-sm text-theme-muted">
+                  {t('trust_tier.breakdown.no_signals')}
+                </p>
+              )}
+
+              {data.signals.map((signal) => {
+                const Icon = signal.achieved ? CheckCircle2 : Circle;
+                const iconColor = signal.achieved
+                  ? 'text-success'
+                  : 'text-theme-muted';
+                return (
+                  <div key={signal.key} className="space-y-1.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-2">
+                        <Icon
+                          className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`}
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-theme-primary">
+                            {t(signal.label_key)}
+                          </p>
+                          <p className="text-xs text-theme-muted">
+                            {signal.unit === 'boolean'
+                              ? signal.achieved
+                                ? t('trust_tier.breakdown.achieved')
+                                : t('trust_tier.breakdown.in_progress')
+                              : t('trust_tier.breakdown.signal_progress', {
+                                  current: signal.current,
+                                  required: signal.required,
+                                })}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs font-medium ${
+                          signal.achieved ? 'text-success' : 'text-theme-muted'
+                        }`}
+                      >
+                        {signal.achieved
+                          ? t('trust_tier.breakdown.achieved')
+                          : t('trust_tier.breakdown.in_progress')}
+                      </span>
+                    </div>
+                    <Progress
+                      value={signalProgressPct(signal)}
+                      color={signal.achieved ? 'success' : 'primary'}
+                      size="sm"
+                      aria-label={t(signal.label_key)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            {data.next_tier_label && (
+              <p className="text-xs text-theme-muted">
+                {t('trust_tier.breakdown.next_tier_hint')}
+              </p>
+            )}
           </GlassCard>
         )}
       </div>

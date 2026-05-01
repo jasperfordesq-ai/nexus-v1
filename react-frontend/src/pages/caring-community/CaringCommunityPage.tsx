@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { ComponentType } from 'react';
 import { Button, Chip } from '@heroui/react';
@@ -32,6 +33,12 @@ import Wallet from 'lucide-react/icons/wallet';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
+import {
+  OnboardingChoiceModal,
+  clearStoredOnboardingChoice,
+  readStoredOnboardingChoice,
+  type OnboardingChoice,
+} from '@/components/caring-community/OnboardingChoiceModal';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import type { TenantFeatures, TenantModules } from '@/types/api';
@@ -77,6 +84,13 @@ const moduleCards: ActionDef[] = [
   { key: 'trust', href: '/verify-identity', icon: ShieldCheck },
 ];
 
+// Per-choice priority lists. Keys are surfaced first; remaining actions
+// (when "show all" is active) follow in their original declaration order.
+const CHOICE_PRIORITY: Record<Exclude<OnboardingChoice, 'browse'>, ReadonlyArray<string>> = {
+  recipient: ['request_help', 'my_relationships', 'future_care_fund', 'safeguarding_report', 'markt', 'hour_gift'],
+  helper: ['offer_favour', 'offer_time', 'log_hours', 'coordinate_org', 'cover_care', 'my_relationships'],
+};
+
 function isVisible(
   item: ActionDef,
   hasFeature: (feature: keyof TenantFeatures) => boolean,
@@ -87,13 +101,69 @@ function isVisible(
   return true;
 }
 
+function applyChoiceFilter(
+  actions: ActionDef[],
+  choice: OnboardingChoice | null,
+  showAll: boolean,
+): ActionDef[] {
+  if (!choice || choice === 'browse' || showAll) return actions;
+  const priority = CHOICE_PRIORITY[choice];
+  const lookup = new Map(actions.map((a) => [a.key, a] as const));
+  const ordered: ActionDef[] = [];
+  for (const key of priority) {
+    const match = lookup.get(key);
+    if (match) {
+      ordered.push(match);
+      lookup.delete(key);
+    }
+  }
+  return ordered;
+}
+
 export function CaringCommunityPage() {
   const { t } = useTranslation('common');
   const { branding, hasFeature, hasModule, tenantPath } = useTenant();
   usePageTitle(t('caring_community.meta.title'));
 
-  const visibleActions = primaryActions.filter((item) => isVisible(item, hasFeature, hasModule));
-  const visibleCards = moduleCards.filter((item) => isVisible(item, hasFeature, hasModule));
+  const [choice, setChoice] = useState<OnboardingChoice | null>(() => readStoredOnboardingChoice());
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [showAll, setShowAll] = useState<boolean>(false);
+
+  // Open the modal once on first mount when no stored choice exists.
+  useEffect(() => {
+    if (readStoredOnboardingChoice() === null) {
+      setModalOpen(true);
+    }
+  }, []);
+
+  const handleChoice = useCallback((picked: OnboardingChoice) => {
+    setChoice(picked);
+    setShowAll(false);
+    setModalOpen(false);
+  }, []);
+
+  const handleRefine = useCallback(() => {
+    clearStoredOnboardingChoice();
+    setChoice(null);
+    setShowAll(false);
+    setModalOpen(true);
+  }, []);
+
+  const handleToggleShowAll = useCallback(() => {
+    setShowAll((v) => !v);
+  }, []);
+
+  const visibleActions = useMemo(() => {
+    const base = primaryActions.filter((item) => isVisible(item, hasFeature, hasModule));
+    return applyChoiceFilter(base, choice, showAll);
+  }, [choice, hasFeature, hasModule, showAll]);
+
+  const visibleCards = useMemo(
+    () => moduleCards.filter((item) => isVisible(item, hasFeature, hasModule)),
+    [hasFeature, hasModule],
+  );
+
+  const isFiltering = choice !== null && choice !== 'browse' && !showAll;
 
   return (
     <>
@@ -101,6 +171,12 @@ export function CaringCommunityPage() {
         title={t('caring_community.meta.title')}
         description={t('caring_community.meta.description')}
         noIndex
+      />
+
+      <OnboardingChoiceModal
+        isOpen={modalOpen}
+        onChoice={handleChoice}
+        onClose={() => setModalOpen(false)}
       />
 
       <div className="space-y-6">
@@ -130,6 +206,20 @@ export function CaringCommunityPage() {
                   {t('caring_community.subtitle')}
                 </p>
               </div>
+
+              {(choice !== null && choice !== 'browse') && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button size="sm" variant="flat" onPress={handleToggleShowAll}>
+                    {isFiltering
+                      ? t('caring_community:onboarding.show_all')
+                      : t('caring_community:onboarding.refine')}
+                  </Button>
+                  <Button size="sm" variant="light" onPress={handleRefine}>
+                    {t('caring_community:onboarding.refine')}
+                  </Button>
+                </div>
+              )}
+
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {visibleActions.map((item) => {
                   const Icon = item.icon;

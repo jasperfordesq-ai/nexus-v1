@@ -173,6 +173,7 @@ const SafeguardingReportPage = lazyWithRetry(() => import('@/pages/caring-commun
 const MySafeguardingReportsPage = lazyWithRetry(() => import('@/pages/caring-community/MySafeguardingReportsPage'));
 const CareProviderDirectoryPage = lazyWithRetry(() => import('@/pages/caring-community/CareProviderDirectoryPage'));
 const MyTrustTierPage = lazyWithRetry(() => import('@/pages/caring-community/MyTrustTierPage'));
+const MyDataExportPage = lazyWithRetry(() => import('@/pages/caring-community/MyDataExportPage'));
 const WarmthPassPage = lazyWithRetry(() => import('@/pages/caring-community/WarmthPassPage'));
 const CaregiverDashboardPage = lazyWithRetry(() => import('@/pages/caring-community/CaregiverDashboardPage'));
 const LinkCareReceiverPage = lazyWithRetry(() => import('@/pages/caring-community/LinkCareReceiverPage'));
@@ -699,6 +700,15 @@ function AppRoutes() {
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MyTrustTierPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* E3 — Member-side GDPR/FADP data export */}
+        <Route path="caring-community/my-data-export" element={
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+            <FeatureErrorBoundary featureName="Caring Community">
+              <MyDataExportPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

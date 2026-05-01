@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Events\VolLogStatusChanged;
 use App\Services\CaringCommunity\CaringRegionalPointService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -143,6 +144,20 @@ class CaringCommunityWorkflowService
             } catch (\Throwable) {
                 $regionalPointsResult = null;
             }
+        }
+
+        // Notify the regional-points cascade-revert listener that a vol_log
+        // changed status. The listener is a no-op except when the previous
+        // status was `approved` and points were auto-issued.
+        try {
+            VolLogStatusChanged::dispatch(
+                $tenantId,
+                $logId,
+                (string) $log->status,
+                $status,
+            );
+        } catch (\Throwable) {
+            // Event dispatch failure must not break the parent flow.
         }
 
         return [

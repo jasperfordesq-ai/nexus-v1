@@ -428,6 +428,19 @@
         "title": "Community projects",
         "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
       }
+    },
+    "onboarding": {
+      "title": "What brings you here today?",
+      "intro": "Choose the path that best fits you. You can change this later.",
+      "choice_recipient": "I need support",
+      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
+      "choice_helper": "I want to help",
+      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
+      "choice_browse": "I want to browse",
+      "choice_browse_desc": "Show the full caring community hub.",
+      "show_all": "Show all actions",
+      "show_recommended": "Show recommended",
+      "change_answer": "Change answer"
     }
   },
   "request_help": {

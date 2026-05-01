@@ -23,6 +23,7 @@ use App\Services\CaringCommunity\KpiBaselineService;
 use App\Services\CaringCommunity\OperatingPolicyService;
 use App\Services\CaringCommunity\PaperOnboardingIntakeService;
 use App\Services\CaringCommunity\PilotDisclosurePackService;
+use App\Services\CaringCommunity\PilotLaunchReadinessService;
 use App\Services\CaringCommunity\PilotScoreboardService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
@@ -66,6 +67,7 @@ class AdminCaringCommunityController extends BaseApiController
         private readonly PilotScoreboardService $pilotScoreboardService,
         private readonly OperatingPolicyService $operatingPolicyService,
         private readonly PilotDisclosurePackService $disclosurePackService,
+        private readonly PilotLaunchReadinessService $pilotLaunchReadinessService,
     ) {
     }
 
@@ -991,6 +993,46 @@ class AdminCaringCommunityController extends BaseApiController
         } catch (\RuntimeException $e) {
             return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 503);
         }
+
+        return $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/admin/caring-community/loyalty/redemptions/{id}/reverse
+     *
+     * Body: { reason?: string }
+     *
+     * Reverse an applied loyalty redemption: restore the credits to the
+     * member's wallet and mark the row reversed. The redemption must belong
+     * to the current tenant and be in the `applied` state.
+     */
+    public function reverseLoyaltyRedemption(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $adminId = $this->requireAuth();
+        $input = $this->getAllInput();
+        $reason = isset($input['reason']) ? (string) $input['reason'] : null;
+
+        try {
+            $result = $this->loyaltyService->reverse($id, $reason, $adminId);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'not found') !== false) {
+                return $this->respondWithError('NOT_FOUND', $msg, null, 404);
+            }
+            return $this->respondWithError('REVERSAL_FAILED', $msg, null, 422);
+        }
+
+        Log::info('Admin reversed loyalty redemption', [
+            'tenant_id'         => TenantContext::getId(),
+            'redemption_id'     => $id,
+            'admin_user_id'     => $adminId,
+            'credits_restored'  => $result['credits_restored'],
+        ]);
 
         return $this->respondWithData($result);
     }
@@ -2353,6 +2395,80 @@ class AdminCaringCommunityController extends BaseApiController
             'id'                       => $id,
             'substitution_coefficient' => $coefficient,
             'source_table'             => $sourceTable,
+        ]);
+    }
+
+    /**
+     * POST /v2/admin/caring-community/launch-readiness/launch
+     *
+     * AG95 — enforce the pilot launch readiness gate. Only succeeds when every
+     * section in the readiness report is `ready`. Persists pilot_launched_at /
+     * pilot_launched_by to tenant_settings so the platform can refer to the
+     * "live" milestone in dashboards and reports. One-way action: a tenant
+     * that has launched returns 422 ALREADY_LAUNCHED on subsequent calls.
+     */
+    public function launchPilot(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) {
+            return $disabled;
+        }
+
+        $adminUserId = (int) auth()->id();
+        $tenantId = TenantContext::getId();
+
+        $result = $this->pilotLaunchReadinessService->launchPilot($tenantId, $adminUserId);
+
+        if (isset($result['error'])) {
+            $code = (string) $result['error'];
+
+            if ($code === 'STORAGE_UNAVAILABLE') {
+                return $this->respondWithError(
+                    'STORAGE_UNAVAILABLE',
+                    'Tenant settings storage is not available.',
+                    null,
+                    503,
+                );
+            }
+
+            if ($code === 'ALREADY_LAUNCHED') {
+                return $this->respondWithError(
+                    'ALREADY_LAUNCHED',
+                    'This pilot has already been launched.',
+                    null,
+                    422,
+                );
+            }
+
+            if ($code === 'CANNOT_LAUNCH') {
+                $payload = [
+                    'code'     => 'CANNOT_LAUNCH',
+                    'message'  => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
+                    'blockers' => $result['blockers'] ?? [],
+                ];
+                return response()->json([
+                    'success' => false,
+                    'error'   => $payload,
+                ], 422);
+            }
+
+            return $this->respondWithError($code, 'Launch failed.', null, 422);
+        }
+
+        try {
+            ActivityLog::log(
+                $adminUserId,
+                'caring_pilot_launched',
+                'Pilot launched (AG95 readiness gate closed)'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('caring_pilot_launched activity log failed: ' . $e->getMessage());
+        }
+
+        return $this->respondWithData([
+            'launched_at'    => $result['launched_at'],
+            'launched_by_id' => $result['launched_by_id'],
+            'report'         => $this->pilotLaunchReadinessService->report($tenantId),
         ]);
     }
 

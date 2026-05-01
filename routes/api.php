@@ -1261,6 +1261,10 @@ Route::post('/v2/admin/caring-community/vereine/{organizationId}/members/import'
 Route::post('/v2/admin/caring-community/vereine/{organizationId}/admins', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assignVereinAdmin']);
 // Member-facing caring community endpoints (auth required, scoped to current user)
 Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
+Route::post('/v2/caring-community/my-relationships/{id}/pause', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'pauseRelationship']);
+Route::post('/v2/caring-community/my-relationships/{id}/end', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'endRelationship']);
+Route::post('/v2/caring-community/my-relationships/{id}/resume', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'resumeRelationship']);
+Route::put('/v2/caring-community/me/onboarding-choice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'setOnboardingChoice']);
 Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
 Route::get('/v2/caring-community/my-ahv-pension-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myAhvPensionExport'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
@@ -1288,6 +1292,12 @@ Route::put('/v2/admin/caring-community/regional-points/seller-settings', [\App\H
 Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
 Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
 Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);
+
+// Caring Community — Member-side GDPR/FADP data export (E3)
+Route::get('/v2/caring-community/me/data-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myDataExport']);
+
+// Caring Community — federation directory (browse discoverable peer communities)
+Route::get('/v2/caring-community/federation-directory', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'federationDirectory']);
 
 // Caring Community — cooperative-to-cooperative banked-hour transfer (K3)
 Route::post('/v2/caring-community/hour-transfer/initiate', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferInitiate']);
@@ -1366,6 +1376,7 @@ Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/note', [\App\H
 Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
 Route::get('/v2/admin/caring-community/loyalty/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getLoyaltySellerSettings']);
 Route::put('/v2/admin/caring-community/loyalty/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateLoyaltySellerSettings']);
+Route::post('/v2/admin/caring-community/loyalty/redemptions/{id}/reverse', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'reverseLoyaltyRedemption']);
 
 // AG64 — Care-Provider Directory
 Route::get('/v2/caring-community/providers', [\App\Http\Controllers\Api\CareProviderDirectoryController::class, 'index'])
@@ -1387,6 +1398,9 @@ Route::delete('/v2/admin/caring-community/sub-regions/{id}', [\App\Http\Controll
 
 // AG67 — Trust Tier System
 Route::get('/v2/caring-community/my-trust-tier', [\App\Http\Controllers\Api\TrustTierController::class, 'myTier'])
+    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+// Task D — transparency: per-signal trust tier breakdown for the authenticated member
+Route::get('/v2/caring-community/me/trust-tier/breakdown', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myTrustTierBreakdown'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'getTierConfig']);
 Route::put('/v2/admin/caring-community/trust-tier/config', [\App\Http\Controllers\Api\TrustTierController::class, 'updateTierConfig']);
@@ -1468,6 +1482,7 @@ Route::delete('/v2/admin/caring-community/external-integrations/{itemId}', [\App
 // AG95 — Pilot Launch Readiness Dashboard
 Route::get('/v2/admin/caring-community/launch-readiness', [\App\Http\Controllers\Api\Admin\PilotLaunchReadinessController::class, 'index']);
 Route::post('/v2/admin/caring-community/launch-readiness/acknowledge-boundary', [\App\Http\Controllers\Api\Admin\PilotLaunchReadinessController::class, 'acknowledgeBoundary']);
+Route::post('/v2/admin/caring-community/launch-readiness/launch', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'launchPilot']);
 
 // AG96 — Help Request SLA Breach Dashboard
 Route::get('/v2/admin/caring-community/sla-dashboard', [\App\Http\Controllers\Api\Admin\HelpRequestSlaController::class, 'dashboard']);

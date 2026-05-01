@@ -12,6 +12,11 @@ import {
   CardHeader,
   Chip,
   Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Progress,
   Spinner,
   Tooltip,
@@ -41,6 +46,17 @@ interface ReadinessSection {
   extra?: Record<string, unknown>;
 }
 
+interface ReadinessLaunchedState {
+  launched_at: string;
+  launched_by_id: number;
+}
+
+interface ReadinessBlocker {
+  key: string;
+  label: string;
+  status: string;
+}
+
 interface ReadinessReport {
   generated_at: string;
   overall: {
@@ -51,6 +67,9 @@ interface ReadinessReport {
   };
   sections: ReadinessSection[];
   isolated_node_required: boolean;
+  can_launch: boolean;
+  blockers: ReadinessBlocker[];
+  launched: ReadinessLaunchedState | null;
 }
 
 const STATUS_COLORS: Record<SectionStatus, 'success' | 'warning' | 'default' | 'danger'> = {
@@ -80,6 +99,8 @@ export default function PilotLaunchReadinessAdminPage() {
   const [report, setReport] = useState<ReadinessReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [acknowledging, setAcknowledging] = useState(false);
+  const [launching, setLaunching] = useState(false);
+  const [launchModalOpen, setLaunchModalOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -113,11 +134,47 @@ export default function PilotLaunchReadinessAdminPage() {
     }
   };
 
+  const launchPilot = async () => {
+    setLaunching(true);
+    try {
+      const res = await api.post<{
+        launched_at: string;
+        launched_by_id: number;
+        report: ReadinessReport;
+      }>('/v2/admin/caring-community/launch-readiness/launch', {});
+      if (res.success) {
+        if (res.data?.report) {
+          setReport(res.data.report);
+        } else {
+          await load();
+        }
+        showToast('Pilot launched successfully.', 'success');
+        setLaunchModalOpen(false);
+      } else {
+        const msg =
+          res.error?.code === 'CANNOT_LAUNCH'
+            ? 'Cannot launch — readiness gate is not closed.'
+            : res.error?.code === 'ALREADY_LAUNCHED'
+            ? 'This pilot has already been launched.'
+            : 'Failed to launch pilot.';
+        showToast(msg, 'error');
+        await load();
+      }
+    } catch {
+      showToast('Failed to launch pilot.', 'error');
+    } finally {
+      setLaunching(false);
+    }
+  };
+
   const overall = report?.overall;
   const progressValue =
     overall && overall.total_section_count > 0
       ? Math.round((overall.ready_section_count / overall.total_section_count) * 100)
       : 0;
+  const isLaunched = !!report?.launched;
+  const canLaunch = !!report?.can_launch;
+  const blockerCount = report?.blockers?.length ?? 0;
 
   return (
     <div className="space-y-6">
@@ -126,20 +183,90 @@ export default function PilotLaunchReadinessAdminPage() {
         subtitle="AG95 — go/no-go report combining AG80–AG87 evaluation surfaces"
         icon={<Rocket size={20} />}
         actions={
-          <Tooltip content="Refresh">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="flat"
-              onPress={load}
-              isLoading={loading}
-              aria-label="Refresh"
-            >
-              <RefreshCw size={15} />
-            </Button>
-          </Tooltip>
+          <div className="flex items-center gap-2">
+            {!isLaunched && (
+              <Button
+                color="success"
+                size="lg"
+                startContent={<Rocket size={16} />}
+                onPress={() => setLaunchModalOpen(true)}
+                isDisabled={!canLaunch || loading}
+              >
+                Launch pilot
+              </Button>
+            )}
+            <Tooltip content="Refresh">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                onPress={load}
+                isLoading={loading}
+                aria-label="Refresh"
+              >
+                <RefreshCw size={15} />
+              </Button>
+            </Tooltip>
+          </div>
         }
       />
+
+      {!loading && report && (
+        isLaunched ? (
+          <Card className="border border-success-300 bg-success-50/50 dark:bg-success-900/10">
+            <CardBody className="space-y-1 py-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={22} className="text-success" />
+                <div>
+                  <p className="text-base font-semibold">Pilot launched</p>
+                  <p className="text-sm text-default-600">
+                    Launched on{' '}
+                    {report.launched
+                      ? new Date(report.launched.launched_at).toLocaleString()
+                      : '—'}
+                    {report.launched?.launched_by_id
+                      ? ` by user #${report.launched.launched_by_id}`
+                      : ''}
+                    . This is a one-way milestone — readiness checks remain visible for audit.
+                  </p>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        ) : canLaunch ? (
+          <Card className="border border-success-300 bg-success-50/50 dark:bg-success-900/10">
+            <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={22} className="text-success" />
+                <div>
+                  <p className="text-base font-semibold">Ready to launch</p>
+                  <p className="text-sm text-default-600">
+                    Every readiness section is ready. Click <em>Launch pilot</em> when your
+                    coordinator team is ready to make this a one-way decision.
+                  </p>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        ) : (
+          <Card className="border border-danger-300 bg-danger-50/50 dark:bg-danger-900/10">
+            <CardBody className="space-y-1 py-4">
+              <div className="flex items-center gap-3">
+                <ShieldAlert size={22} className="text-danger" />
+                <div>
+                  <p className="text-base font-semibold">
+                    Cannot launch yet — {blockerCount} blocker{blockerCount === 1 ? '' : 's'}{' '}
+                    remain{blockerCount === 1 ? 's' : ''}
+                  </p>
+                  <p className="text-sm text-default-600">
+                    Resolve every section below before the launch button is enabled.
+                  </p>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        )
+      )}
 
       {loading && (
         <div className="flex justify-center py-16">
@@ -270,6 +397,71 @@ export default function PilotLaunchReadinessAdminPage() {
           </p>
         </>
       )}
+
+      <Modal
+        isOpen={launchModalOpen}
+        onOpenChange={(open) => {
+          if (!launching) setLaunchModalOpen(open);
+        }}
+        size="xl"
+        backdrop="blur"
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <Rocket size={20} className="text-success" />
+            Launch the pilot?
+          </ModalHeader>
+          <ModalBody className="space-y-3">
+            <p>
+              Launching the pilot is a <strong>one-way action</strong>. It records the launch
+              timestamp and operator on the tenant, and platform reports begin treating the
+              community as live.
+            </p>
+            <p>
+              Before continuing, confirm with your coordinator team that:
+            </p>
+            <ul className="list-disc pl-6 text-sm text-default-700 space-y-1">
+              <li>The disclosure pack, operating policy, and commercial boundary are signed off</li>
+              <li>The pre-pilot scoreboard baseline has been captured</li>
+              <li>Data quality checks are green</li>
+              <li>Real residents are ready to be invited</li>
+            </ul>
+            {report && (
+              <div className="rounded-lg border border-default-200 bg-default-50 p-3 text-xs text-default-700 dark:bg-default-100/30">
+                <p className="font-semibold mb-1">Section summary</p>
+                <ul className="space-y-0.5">
+                  {report.sections.map((s) => (
+                    <li key={s.key} className="flex items-center justify-between gap-2">
+                      <span>{s.label}</span>
+                      <Chip size="sm" variant="flat" color={STATUS_COLORS[s.status]}>
+                        {STATUS_LABELS[s.status]}
+                      </Chip>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={() => setLaunchModalOpen(false)}
+              isDisabled={launching}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="success"
+              startContent={<Rocket size={16} />}
+              onPress={launchPilot}
+              isLoading={launching}
+              isDisabled={!canLaunch}
+            >
+              Yes, launch the pilot
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -3,22 +3,40 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Chip, Skeleton, Tooltip } from '@heroui/react';
+import {
+  Avatar,
+  Button,
+  Chip,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Skeleton,
+  Textarea,
+  Tooltip,
+} from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Clock from 'lucide-react/icons/clock';
 import Heart from 'lucide-react/icons/heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import Pause from 'lucide-react/icons/pause';
+import Play from 'lucide-react/icons/play';
+import StopCircle from 'lucide-react/icons/stop-circle';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { useApi } from '@/hooks/useApi';
 import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -52,6 +70,8 @@ interface SupportRelationship {
   partner: Partner;
   recent_logs: RecentLog[];
 }
+
+type ActionKind = 'pause' | 'end';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -92,9 +112,13 @@ function RelationshipCardSkeleton() {
 interface RelationshipCardProps {
   relationship: SupportRelationship;
   t: (key: string, opts?: Record<string, unknown>) => string;
+  onPause: (rel: SupportRelationship) => void;
+  onEnd: (rel: SupportRelationship) => void;
+  onResume: (rel: SupportRelationship) => void;
+  busyId: number | null;
 }
 
-function RelationshipCard({ relationship, t }: RelationshipCardProps) {
+function RelationshipCard({ relationship, t, onPause, onEnd, onResume, busyId }: RelationshipCardProps) {
   const overdue = relationship.status === 'active' && isOverdue(relationship.next_check_in_at);
 
   const statusColor =
@@ -105,6 +129,7 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
         : 'default';
 
   const roleColor = relationship.role === 'supporter' ? 'primary' : 'secondary';
+  const isBusy = busyId === relationship.id;
 
   return (
     <GlassCard className="p-5" role="article" aria-labelledby={`support-relationship-${relationship.id}`}>
@@ -204,7 +229,142 @@ function RelationshipCard({ relationship, t }: RelationshipCardProps) {
           </ul>
         )}
       </div>
+
+      {/* Member-side actions */}
+      {(relationship.status === 'active' || relationship.status === 'paused') && (
+        <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+          {relationship.status === 'active' && (
+            <>
+              <Button
+                size="sm"
+                color="warning"
+                variant="flat"
+                startContent={<Pause className="h-4 w-4" aria-hidden="true" />}
+                onPress={() => onPause(relationship)}
+                isDisabled={isBusy}
+              >
+                {t('caring_community:relationships.actions.pause')}
+              </Button>
+              <Button
+                size="sm"
+                color="danger"
+                variant="flat"
+                startContent={<StopCircle className="h-4 w-4" aria-hidden="true" />}
+                onPress={() => onEnd(relationship)}
+                isDisabled={isBusy}
+              >
+                {t('caring_community:relationships.actions.end')}
+              </Button>
+            </>
+          )}
+          {relationship.status === 'paused' && (
+            <Button
+              size="sm"
+              color="success"
+              variant="flat"
+              startContent={<Play className="h-4 w-4" aria-hidden="true" />}
+              onPress={() => onResume(relationship)}
+              isDisabled={isBusy}
+              isLoading={isBusy}
+            >
+              {t('caring_community:relationships.actions.resume')}
+            </Button>
+          )}
+        </div>
+      )}
     </GlassCard>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Action confirmation modal
+// ---------------------------------------------------------------------------
+
+interface ActionModalProps {
+  kind: ActionKind | null;
+  relationship: SupportRelationship | null;
+  isSubmitting: boolean;
+  onCancel: () => void;
+  onConfirm: (reason: string, resumeAt: string) => void;
+}
+
+function ActionModal({ kind, relationship, isSubmitting, onCancel, onConfirm }: ActionModalProps) {
+  const { t } = useTranslation('common');
+  const [reason, setReason] = useState('');
+  const [resumeAt, setResumeAt] = useState('');
+
+  // Reset fields whenever the modal opens for a new action.
+  useEffect(() => {
+    if (kind !== null) {
+      setReason('');
+      setResumeAt('');
+    }
+  }, [kind, relationship?.id]);
+
+  const isOpen = kind !== null && relationship !== null;
+
+  const handleConfirm = () => {
+    onConfirm(reason.trim(), resumeAt.trim());
+  };
+
+  const titleKey =
+    kind === 'pause'
+      ? 'caring_community:relationships.pause_modal.title'
+      : 'caring_community:relationships.end_modal.title';
+  const descKey =
+    kind === 'pause'
+      ? 'caring_community:relationships.pause_modal.description'
+      : 'caring_community:relationships.end_modal.description';
+  const reasonLabelKey =
+    kind === 'pause'
+      ? 'caring_community:relationships.pause_modal.reason_label'
+      : 'caring_community:relationships.end_modal.reason_label';
+  const confirmKey =
+    kind === 'pause'
+      ? 'caring_community:relationships.pause_modal.confirm'
+      : 'caring_community:relationships.end_modal.confirm';
+
+  return (
+    <Modal isOpen={isOpen} onClose={isSubmitting ? undefined : onCancel} size="md" placement="center">
+      <ModalContent>
+        <ModalHeader>
+          <h2 className="text-lg font-semibold text-theme-primary">{t(titleKey)}</h2>
+        </ModalHeader>
+        <ModalBody>
+          <p className="text-sm leading-6 text-theme-muted">{t(descKey)}</p>
+          <Textarea
+            label={t(reasonLabelKey)}
+            value={reason}
+            onValueChange={setReason}
+            maxLength={500}
+            variant="bordered"
+            classNames={{ inputWrapper: 'mt-1' }}
+          />
+          {kind === 'pause' && (
+            <Input
+              type="date"
+              label={t('caring_community:relationships.pause_modal.resume_at_label')}
+              value={resumeAt}
+              onValueChange={setResumeAt}
+              variant="bordered"
+            />
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="flat" onPress={onCancel} isDisabled={isSubmitting}>
+            {t('common.cancel', { defaultValue: 'Cancel' })}
+          </Button>
+          <Button
+            color={kind === 'end' ? 'danger' : 'warning'}
+            onPress={handleConfirm}
+            isLoading={isSubmitting}
+            isDisabled={isSubmitting}
+          >
+            {t(confirmKey)}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 
@@ -216,12 +376,17 @@ export function MySupportRelationshipsPage() {
   const { t } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
   const navigate = useNavigate();
+  const toast = useToast();
   usePageTitle(t('my_support_relationships.meta.title'));
 
-  const { data: relationships, isLoading, error } = useApi<SupportRelationship[]>(
+  const { data: relationships, isLoading, error, refetch } = useApi<SupportRelationship[]>(
     '/v2/caring-community/my-relationships',
     { immediate: true },
   );
+
+  const [actionKind, setActionKind] = useState<ActionKind | null>(null);
+  const [actionTarget, setActionTarget] = useState<SupportRelationship | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
 
   // Redirect if feature is disabled
   useEffect(() => {
@@ -230,12 +395,101 @@ export function MySupportRelationshipsPage() {
     }
   }, [hasFeature, navigate, tenantPath]);
 
+  const openPause = useCallback((rel: SupportRelationship) => {
+    setActionKind('pause');
+    setActionTarget(rel);
+  }, []);
+
+  const openEnd = useCallback((rel: SupportRelationship) => {
+    setActionKind('end');
+    setActionTarget(rel);
+  }, []);
+
+  const closeAction = useCallback(() => {
+    setActionKind(null);
+    setActionTarget(null);
+  }, []);
+
+  const handleConfirmAction = useCallback(
+    async (reason: string, resumeAt: string) => {
+      if (!actionTarget || !actionKind) return;
+      setBusyId(actionTarget.id);
+      try {
+        if (actionKind === 'pause') {
+          const body: { reason?: string; resume_at?: string } = {};
+          if (reason !== '') body.reason = reason;
+          if (resumeAt !== '') body.resume_at = resumeAt;
+          const res = await api.post(
+            `/v2/caring-community/my-relationships/${actionTarget.id}/pause`,
+            body,
+          );
+          if (res.success) {
+            toast.success(t('caring_community:relationships.toast_paused'));
+            closeAction();
+            await refetch();
+          } else {
+            toast.error(t('my_support_relationships.errors.load_failed'));
+          }
+        } else {
+          const body: { reason?: string } = {};
+          if (reason !== '') body.reason = reason;
+          const res = await api.post(
+            `/v2/caring-community/my-relationships/${actionTarget.id}/end`,
+            body,
+          );
+          if (res.success) {
+            toast.success(t('caring_community:relationships.toast_ended'));
+            closeAction();
+            await refetch();
+          } else {
+            toast.error(t('my_support_relationships.errors.load_failed'));
+          }
+        }
+      } catch (err: unknown) {
+        logError('MySupportRelationshipsPage: action failed', err);
+        toast.error(t('my_support_relationships.errors.load_failed'));
+      } finally {
+        setBusyId(null);
+      }
+    },
+    [actionKind, actionTarget, closeAction, refetch, t, toast],
+  );
+
+  const handleResume = useCallback(
+    async (rel: SupportRelationship) => {
+      setBusyId(rel.id);
+      try {
+        const res = await api.post(`/v2/caring-community/my-relationships/${rel.id}/resume`);
+        if (res.success) {
+          toast.success(t('caring_community:relationships.toast_resumed'));
+          await refetch();
+        } else {
+          toast.error(t('my_support_relationships.errors.load_failed'));
+        }
+      } catch (err: unknown) {
+        logError('MySupportRelationshipsPage: resume failed', err);
+        toast.error(t('my_support_relationships.errors.load_failed'));
+      } finally {
+        setBusyId(null);
+      }
+    },
+    [refetch, t, toast],
+  );
+
   return (
     <>
       <PageMeta
         title={t('my_support_relationships.meta.title')}
         description={t('my_support_relationships.meta.description')}
         noIndex
+      />
+
+      <ActionModal
+        kind={actionKind}
+        relationship={actionTarget}
+        isSubmitting={busyId !== null}
+        onCancel={closeAction}
+        onConfirm={handleConfirmAction}
       />
 
       <div className="space-y-6">
@@ -304,7 +558,15 @@ export function MySupportRelationshipsPage() {
         {!isLoading && !error && relationships && relationships.length > 0 && (
           <div className="space-y-4">
             {relationships.map((rel) => (
-              <RelationshipCard key={rel.id} relationship={rel} t={t} />
+              <RelationshipCard
+                key={rel.id}
+                relationship={rel}
+                t={t}
+                onPause={openPause}
+                onEnd={openEnd}
+                onResume={handleResume}
+                busyId={busyId}
+              />
             ))}
           </div>
         )}

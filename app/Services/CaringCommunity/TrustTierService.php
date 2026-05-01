@@ -222,6 +222,98 @@ class TrustTierService
             && Schema::hasColumn('users', 'trust_tier');
     }
 
+    /**
+     * Compute the trust tier and a per-signal breakdown for a user, showing
+     * exactly which criteria contributed to the current tier and what is still
+     * needed to reach the next one.
+     *
+     * Tenant-scoped via the underlying signal queries.
+     *
+     * @return array{
+     *     tier: int,
+     *     tier_label: string,
+     *     next_tier_label: string|null,
+     *     progress_pct: float,
+     *     signals: list<array{
+     *         key: string,
+     *         label_key: string,
+     *         current: int,
+     *         required: int,
+     *         achieved: bool,
+     *         unit: string
+     *     }>
+     * }
+     */
+    public function computeBreakdownForUser(int $userId, int $tenantId): array
+    {
+        $tier = $this->computeTier($userId, $tenantId);
+        $tierLabel = $this->getTierLabel($tier);
+
+        $nextTierInt = $tier < self::TIER_COORDINATOR ? $tier + 1 : null;
+        $nextTierLabel = $nextTierInt !== null ? $this->getTierLabel($nextTierInt) : null;
+
+        // Live stats (tenant-scoped inside each helper)
+        $hoursLogged      = $this->countApprovedHours($userId, $tenantId);
+        $reviewsReceived  = $this->countReviewsReceived($userId, $tenantId);
+        $identityVerified = $this->isIdentityVerified($userId, $tenantId);
+
+        // Decide which tier's thresholds to display:
+        //   - if there is a next tier, show what's needed to reach it
+        //   - otherwise (already coordinator) show the coordinator thresholds (all achieved)
+        $criteria = $this->getConfig($tenantId);
+        $targetTierName = $nextTierLabel ?? 'coordinator';
+        $thresholds = $criteria[$targetTierName] ?? self::DEFAULT_CRITERIA[$targetTierName] ?? self::DEFAULT_CRITERIA['member'];
+
+        $hoursRequired   = (int) ($thresholds['hours_logged'] ?? 0);
+        $reviewsRequired = (int) ($thresholds['reviews_received'] ?? 0);
+        $identityRequired = (bool) ($thresholds['identity_verified'] ?? false);
+
+        $signals = [
+            [
+                'key'       => 'hours_logged',
+                'label_key' => 'trust_tier.signals.hours_logged',
+                'current'   => $hoursLogged,
+                'required'  => $hoursRequired,
+                'achieved'  => $hoursRequired === 0 || $hoursLogged >= $hoursRequired,
+                'unit'      => 'hours',
+            ],
+            [
+                'key'       => 'reviews_received',
+                'label_key' => 'trust_tier.signals.reviews_received',
+                'current'   => $reviewsReceived,
+                'required'  => $reviewsRequired,
+                'achieved'  => $reviewsRequired === 0 || $reviewsReceived >= $reviewsRequired,
+                'unit'      => 'reviews',
+            ],
+            [
+                'key'       => 'identity_verified',
+                'label_key' => 'trust_tier.signals.identity_verified',
+                'current'   => $identityVerified ? 1 : 0,
+                'required'  => $identityRequired ? 1 : 0,
+                'achieved'  => !$identityRequired || $identityVerified,
+                'unit'      => 'boolean',
+            ],
+        ];
+
+        // Progress: fraction of signals achieved toward the next tier (0–100)
+        $achieved = 0;
+        foreach ($signals as $s) {
+            if ($s['achieved']) {
+                $achieved++;
+            }
+        }
+        $total = count($signals);
+        $progressPct = $total > 0 ? round(($achieved / $total) * 100, 1) : 0.0;
+
+        return [
+            'tier'            => $tier,
+            'tier_label'      => $tierLabel,
+            'next_tier_label' => $nextTierLabel,
+            'progress_pct'    => (float) $progressPct,
+            'signals'         => $signals,
+        ];
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

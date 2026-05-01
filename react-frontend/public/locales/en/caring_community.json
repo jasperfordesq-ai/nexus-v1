@@ -12,7 +12,22 @@
     "criteria_hours": "Hours logged",
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
-    "progress_to_next": "Progress to {{tier}}"
+    "progress_to_next": "Progress to {{tier}}",
+    "breakdown": {
+      "title": "Your trust tier breakdown",
+      "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
+      "signal_progress": "{{current}} of {{required}}",
+      "achieved": "Achieved",
+      "in_progress": "In progress",
+      "next_tier_hint": "Complete the remaining signals to reach the next tier.",
+      "no_signals": "No signals tracked for your current tier.",
+      "retry": "Try again"
+    },
+    "signals": {
+      "hours_logged": "Volunteer hours logged",
+      "reviews_received": "Positive reviews received",
+      "identity_verified": "Identity verified"
+    }
   },
   "caregiver": {
     "dashboard_title": "Caregiver Dashboard",
@@ -108,10 +123,69 @@
     "no_providers_hint": "Try adjusting your filters or search"
   },
   "emergency_alert": {
+    "region_label": "Emergency alerts",
     "dismiss": "Dismiss",
     "severity_info": "Information",
     "severity_warning": "Warning",
     "severity_danger": "Emergency"
+  },
+  "federation_picker": {
+    "title": "Browse federated communities",
+    "search_placeholder": "Search by community name or region",
+    "browse_button": "Browse communities",
+    "selected_label": "Selected:",
+    "no_selection": "No community selected",
+    "select_button": "Select",
+    "cancel_button": "Cancel",
+    "empty": "No federated communities are currently discoverable. You can still enter a community slug manually.",
+    "fallback_label": "Or enter a community slug manually",
+    "member_count_label": "members"
+  },
+  "onboarding": {
+    "title": "Welcome to your Caring Community",
+    "intro": "We'll show you the most useful actions based on what you need.",
+    "choice_recipient": "I need help",
+    "choice_recipient_desc": "Find support, manage care, get help with daily tasks",
+    "choice_helper": "I want to help others",
+    "choice_helper_desc": "Offer your time, support neighbours, log care hours",
+    "choice_browse": "Show me everything",
+    "choice_browse_desc": "Explore the full hub of caring community features",
+    "show_all": "Show all features",
+    "refine": "Refine my view"
+  },
+  "relationships": {
+    "actions": {
+      "pause": "Pause",
+      "end": "End relationship",
+      "resume": "Resume"
+    },
+    "pause_modal": {
+      "title": "Pause this support relationship",
+      "description": "You can resume later. Would you like to add a reason or set a resume date?",
+      "reason_label": "Reason (optional)",
+      "resume_at_label": "Resume on (optional)",
+      "confirm": "Pause"
+    },
+    "end_modal": {
+      "title": "End this support relationship",
+      "description": "This action is permanent. The relationship will be marked ended and remain in your history.",
+      "reason_label": "Reason (optional)",
+      "confirm": "End relationship"
+    },
+    "toast_paused": "Relationship paused.",
+    "toast_ended": "Relationship ended.",
+    "toast_resumed": "Relationship resumed."
+  },
+  "data_export": {
+    "title": "My data export",
+    "intro": "Download a complete copy of your personal data held by this caring community, in compliance with the Swiss Federal Act on Data Protection (FADP) and GDPR. The export includes your profile, hours logged, support relationships, hour gifts and transfers, loyalty redemptions, regional points, safeguarding reports you've filed, and your civic digest preferences.",
+    "download_button": "Download my data (JSON)",
+    "format_note": "Your export will be a JSON file. Contact your community coordinator if you'd prefer another format.",
+    "privacy_note": "Your export contains only data you've submitted or actions you've taken. It does not include other members' personal information.",
+    "downloading": "Preparing your export…",
+    "success_toast": "Your export has started downloading.",
+    "error_toast": "We couldn't generate your export. Please try again or contact support.",
+    "back": "Back"
   },
   "warmth_pass": {
     "title": "My Warmth Pass",

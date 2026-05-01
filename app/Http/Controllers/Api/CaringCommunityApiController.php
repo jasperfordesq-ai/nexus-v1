@@ -12,7 +12,9 @@ use App\Core\TenantContext;
 use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
+use App\Services\CaringCommunity\FederationPeerService;
 use App\Services\CaringCommunity\SafeguardingService;
+use App\Services\CaringCommunity\TrustTierService;
 use App\Services\AhvPensionExportService;
 use App\Services\CaringHelpRequestNlpService;
 use App\Services\CaringInviteCodeService;
@@ -23,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Member-facing API for the Caring Community module.
@@ -43,7 +46,41 @@ class CaringCommunityApiController extends BaseApiController
         private readonly SafeguardingService $safeguardingService,
         private readonly CaringHourGiftService $hourGiftService,
         private readonly CaringRegionalPointService $regionalPointService,
+        private readonly TrustTierService $trustTierService,
+        private readonly FederationPeerService $federationPeerService,
     ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // Federation directory — discoverable peer communities for hour transfers
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/caring-community/federation-directory
+     *
+     * Returns the discoverable federation peers registered for the current
+     * tenant. Used by the HourTransferPage "Browse communities" picker to
+     * replace the developer-jargon "tenant slug" free-text input.
+     *
+     * Response is member-safe (no shared secrets, no admin notes).
+     */
+    public function federationDirectory(): JsonResponse
+    {
+        $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        try {
+            $peers = $this->federationPeerService->listDiscoverable($tenantId);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithData(['peers' => []]);
+        }
+
+        return $this->respondWithData(['peers' => $peers]);
     }
 
     // -------------------------------------------------------------------------
@@ -1159,6 +1196,266 @@ class CaringCommunityApiController extends BaseApiController
     }
 
     // -------------------------------------------------------------------------
+    // Member-side onboarding personalisation
+    // -------------------------------------------------------------------------
+
+    /**
+     * PUT /api/v2/caring-community/me/onboarding-choice
+     *
+     * Persist the member's "what brings you here?" hub-onboarding choice so it
+     * survives across devices. Best-effort — the choice is also kept in the
+     * client's localStorage and is purely a UX hint, never load-bearing data.
+     *
+     * Body: { choice: 'recipient'|'helper'|'browse' }
+     */
+    public function setOnboardingChoice(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $input  = $this->getAllInput();
+        $choice = (string) ($input['choice'] ?? '');
+
+        if (!in_array($choice, ['recipient', 'helper', 'browse'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'choice', 422);
+        }
+
+        // Store under the users.notification_preferences JSON bag — the only
+        // generic per-user JSON column we have without a schema migration.
+        // Namespace under "caring_community" so we don't collide with the
+        // existing notification settings.
+        try {
+            if (Schema::hasColumn('users', 'notification_preferences')) {
+                $row = DB::table('users')
+                    ->select('notification_preferences')
+                    ->where('id', $userId)
+                    ->first();
+
+                $prefs = [];
+                if ($row && $row->notification_preferences !== null) {
+                    $decoded = json_decode((string) $row->notification_preferences, true);
+                    if (is_array($decoded)) {
+                        $prefs = $decoded;
+                    }
+                }
+
+                $caring = isset($prefs['caring_community']) && is_array($prefs['caring_community'])
+                    ? $prefs['caring_community']
+                    : [];
+                $caring['onboarding_choice'] = $choice;
+                $prefs['caring_community']   = $caring;
+
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->update([
+                        'notification_preferences' => json_encode($prefs, JSON_UNESCAPED_UNICODE),
+                        'updated_at'               => now(),
+                    ]);
+            }
+        } catch (\Throwable $e) {
+            // Non-fatal — the choice is also kept in localStorage on the client.
+            Log::info('[CaringCommunity] setOnboardingChoice persist failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+
+        return $this->respondWithData(['success' => true, 'choice' => $choice]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Member-side support-relationship lifecycle (pause / end / resume)
+    // -------------------------------------------------------------------------
+
+    /**
+     * POST /api/v2/caring-community/my-relationships/{id}/pause
+     *
+     * The supporter or recipient on a relationship may pause it themselves
+     * (e.g. for a holiday or short-term break). Body: { reason?, resume_at? }.
+     */
+    public function pauseRelationship(int $id): JsonResponse
+    {
+        $userId   = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $row = $this->loadOwnedRelationship($tenantId, $userId, $id);
+        if ($row === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
+        }
+        if ((string) $row->status !== 'active') {
+            return $this->respondWithError('INVALID_STATE', 'Only active relationships can be paused.', null, 422);
+        }
+
+        $input    = $this->getAllInput();
+        $reason   = isset($input['reason']) ? trim((string) $input['reason']) : '';
+        $resumeAt = isset($input['resume_at']) ? trim((string) $input['resume_at']) : '';
+
+        if ($resumeAt !== '' && !\DateTime::createFromFormat('Y-m-d', $resumeAt)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_date'), 'resume_at', 422);
+        }
+
+        try {
+            DB::table('caring_support_relationships')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'status'     => 'paused',
+                    'updated_at' => now(),
+                ]);
+        } catch (\Throwable $e) {
+            Log::error('[CaringCommunity] pauseRelationship update failed', [
+                'tenant_id'       => $tenantId,
+                'user_id'         => $userId,
+                'relationship_id' => $id,
+                'error'           => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        Log::info('[CaringCommunity] relationship paused by member', [
+            'tenant_id'       => $tenantId,
+            'user_id'         => $userId,
+            'relationship_id' => $id,
+            'reason'          => $reason !== '' ? mb_substr($reason, 0, 500) : null,
+            'resume_at'       => $resumeAt !== '' ? $resumeAt : null,
+        ]);
+
+        return $this->respondWithData(['success' => true, 'status' => 'paused']);
+    }
+
+    /**
+     * POST /api/v2/caring-community/my-relationships/{id}/end
+     *
+     * Permanent end of a relationship by either party. Body: { reason? }.
+     */
+    public function endRelationship(int $id): JsonResponse
+    {
+        $userId   = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $row = $this->loadOwnedRelationship($tenantId, $userId, $id);
+        if ($row === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
+        }
+        if (!in_array((string) $row->status, ['active', 'paused'], true)) {
+            return $this->respondWithError('INVALID_STATE', 'Relationship is not in an endable state.', null, 422);
+        }
+
+        $input  = $this->getAllInput();
+        $reason = isset($input['reason']) ? trim((string) $input['reason']) : '';
+
+        try {
+            DB::table('caring_support_relationships')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'status'     => 'cancelled',
+                    'end_date'   => now()->toDateString(),
+                    'updated_at' => now(),
+                ]);
+        } catch (\Throwable $e) {
+            Log::error('[CaringCommunity] endRelationship update failed', [
+                'tenant_id'       => $tenantId,
+                'user_id'         => $userId,
+                'relationship_id' => $id,
+                'error'           => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        Log::info('[CaringCommunity] relationship ended by member', [
+            'tenant_id'       => $tenantId,
+            'user_id'         => $userId,
+            'relationship_id' => $id,
+            'reason'          => $reason !== '' ? mb_substr($reason, 0, 500) : null,
+        ]);
+
+        return $this->respondWithData(['success' => true, 'status' => 'cancelled']);
+    }
+
+    /**
+     * POST /api/v2/caring-community/my-relationships/{id}/resume
+     *
+     * Resume a previously paused relationship. No body fields required.
+     */
+    public function resumeRelationship(int $id): JsonResponse
+    {
+        $userId   = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $row = $this->loadOwnedRelationship($tenantId, $userId, $id);
+        if ($row === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
+        }
+        if ((string) $row->status !== 'paused') {
+            return $this->respondWithError('INVALID_STATE', 'Only paused relationships can be resumed.', null, 422);
+        }
+
+        try {
+            DB::table('caring_support_relationships')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'status'     => 'active',
+                    'updated_at' => now(),
+                ]);
+        } catch (\Throwable $e) {
+            Log::error('[CaringCommunity] resumeRelationship update failed', [
+                'tenant_id'       => $tenantId,
+                'user_id'         => $userId,
+                'relationship_id' => $id,
+                'error'           => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
+
+        Log::info('[CaringCommunity] relationship resumed by member', [
+            'tenant_id'       => $tenantId,
+            'user_id'         => $userId,
+            'relationship_id' => $id,
+        ]);
+
+        return $this->respondWithData(['success' => true, 'status' => 'active']);
+    }
+
+    /**
+     * Load a relationship row only if it exists, is in the current tenant,
+     * AND the authenticated user is either the supporter or the recipient.
+     * Returns null on miss to keep the caller's IDOR check clean.
+     */
+    private function loadOwnedRelationship(int $tenantId, int $userId, int $id): ?object
+    {
+        $row = DB::table('caring_support_relationships')
+            ->select('id', 'tenant_id', 'supporter_id', 'recipient_id', 'status')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$row) {
+            return null;
+        }
+        if ((int) $row->supporter_id !== $userId && (int) $row->recipient_id !== $userId) {
+            return null;
+        }
+        return $row;
+    }
+
+    // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
 
@@ -1301,5 +1598,317 @@ class CaringCommunityApiController extends BaseApiController
             . (string) ($row->user_last_name ?? '')
         );
         return $full !== '' ? $full : (string) ($row->user_name ?? '');
+    }
+
+    // -------------------------------------------------------------------------
+    // Transparency endpoints (Task D — trust tier breakdown + digest reasons)
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/caring-community/me/trust-tier/breakdown
+     *
+     * Returns the authenticated member's tier plus a per-signal breakdown of
+     * what contributed to it and what is still required for the next tier.
+     */
+    public function myTrustTierBreakdown(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        if (!$this->trustTierService->isAvailable()) {
+            return $this->respondWithError('FEATURE_UNAVAILABLE', __('api.service_unavailable'), null, 503);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        return $this->respondWithData(
+            $this->trustTierService->computeBreakdownForUser($userId, $tenantId),
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // E3 — Member-side GDPR / FADP data export
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/caring-community/me/data-export
+     *
+     * Streams a JSON export of every record the authenticated member has a
+     * stake in across the caring-community module, scoped strictly to the
+     * member's tenant. Required by the Swiss FADP and GDPR right to data
+     * portability. The export contains only data the member has personally
+     * submitted or actions the member has taken — it never includes other
+     * members' personal information.
+     */
+    public function myDataExport(): StreamedResponse|JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $payload = $this->buildMyDataExportPayload($tenantId, $userId);
+
+        $filename = sprintf(
+            'my-data-%d-%s.json',
+            $userId,
+            now()->format('Y-m-d')
+        );
+
+        return new StreamedResponse(
+            function () use ($payload): void {
+                echo json_encode(
+                    $payload,
+                    JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+                );
+            },
+            200,
+            [
+                'Content-Type'        => 'application/json; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control'       => 'no-store, no-cache, must-revalidate, private',
+                'Pragma'              => 'no-cache',
+            ]
+        );
+    }
+
+    /**
+     * Build the full data-export payload for the authenticated member.
+     *
+     * Every section is defensively guarded with Schema::hasTable() so that
+     * tenants on stripped-down test schemas / incomplete migrations still
+     * produce a valid (smaller) export rather than 500ing.
+     */
+    private function buildMyDataExportPayload(int $tenantId, int $userId): array
+    {
+        $data = [];
+
+        // Profile (own row, exclude credential columns)
+        $data['profile'] = $this->exportUserProfile($tenantId, $userId);
+
+        // Volunteer hours logged
+        if (Schema::hasTable('vol_logs')) {
+            $data['vol_logs'] = DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Caring support relationships (either side)
+        if (Schema::hasTable('caring_support_relationships')) {
+            $data['caring_support_relationships'] = DB::table('caring_support_relationships')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($q) use ($userId) {
+                    $q->where('supporter_id', $userId)
+                        ->orWhere('recipient_id', $userId);
+                })
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Help requests filed by the member
+        if (Schema::hasTable('caring_help_requests')) {
+            $data['caring_help_requests'] = DB::table('caring_help_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Favours offered/received
+        if (Schema::hasTable('caring_favours')) {
+            $favourQuery = DB::table('caring_favours')->where('tenant_id', $tenantId);
+            $hasOfferer = Schema::hasColumn('caring_favours', 'offerer_id');
+            $hasRecipient = Schema::hasColumn('caring_favours', 'recipient_id');
+            if ($hasOfferer && $hasRecipient) {
+                $favourQuery->where(function ($q) use ($userId) {
+                    $q->where('offerer_id', $userId)->orWhere('recipient_id', $userId);
+                });
+            } elseif ($hasOfferer) {
+                $favourQuery->where('offerer_id', $userId);
+            } elseif ($hasRecipient) {
+                $favourQuery->where('recipient_id', $userId);
+            } elseif (Schema::hasColumn('caring_favours', 'user_id')) {
+                $favourQuery->where('user_id', $userId);
+            } else {
+                $favourQuery = null;
+            }
+            if ($favourQuery !== null) {
+                $data['caring_favours'] = $favourQuery
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
+            }
+        }
+
+        // Hour gifts (sender or recipient)
+        if (Schema::hasTable('caring_hour_gifts')) {
+            $giftQuery = DB::table('caring_hour_gifts')->where('tenant_id', $tenantId);
+            $hasSender = Schema::hasColumn('caring_hour_gifts', 'sender_id');
+            $hasRecipient = Schema::hasColumn('caring_hour_gifts', 'recipient_id');
+            if ($hasSender && $hasRecipient) {
+                $giftQuery->where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('recipient_id', $userId);
+                });
+            } elseif ($hasSender) {
+                $giftQuery->where('sender_id', $userId);
+            } elseif ($hasRecipient) {
+                $giftQuery->where('recipient_id', $userId);
+            }
+            $data['caring_hour_gifts'] = $giftQuery
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Hour transfers (cross-cooperative)
+        if (Schema::hasTable('caring_hour_transfers')) {
+            $transferQuery = DB::table('caring_hour_transfers')->where('tenant_id', $tenantId);
+            if (Schema::hasColumn('caring_hour_transfers', 'member_user_id')) {
+                $transferQuery->where('member_user_id', $userId);
+            } elseif (Schema::hasColumn('caring_hour_transfers', 'user_id')) {
+                $transferQuery->where('user_id', $userId);
+            }
+            $data['caring_hour_transfers'] = $transferQuery
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Loyalty redemptions
+        if (Schema::hasTable('caring_loyalty_redemptions')) {
+            $data['caring_loyalty_redemptions'] = DB::table('caring_loyalty_redemptions')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+
+        // Regional point transactions
+        if (Schema::hasTable('caring_regional_point_transactions')) {
+            $data['caring_regional_point_transactions'] = DB::table('caring_regional_point_transactions')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+        if (Schema::hasTable('caring_regional_point_accounts')) {
+            $data['caring_regional_point_account'] = DB::table('caring_regional_point_accounts')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->first();
+            if ($data['caring_regional_point_account'] !== null) {
+                $data['caring_regional_point_account'] = (array) $data['caring_regional_point_account'];
+            }
+        }
+
+        // Safeguarding reports filed by the member
+        if (Schema::hasTable('safeguarding_reports')) {
+            $reporterCol = null;
+            foreach (['reporter_user_id', 'reporter_id', 'user_id'] as $candidate) {
+                if (Schema::hasColumn('safeguarding_reports', $candidate)) {
+                    $reporterCol = $candidate;
+                    break;
+                }
+            }
+            if ($reporterCol !== null) {
+                $data['safeguarding_reports'] = DB::table('safeguarding_reports')
+                    ->where('tenant_id', $tenantId)
+                    ->where($reporterCol, $userId)
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
+            }
+        }
+
+        // Civic-digest preferences (stored per-user in tenant_settings or
+        // user_settings). We surface whichever is present.
+        $civicDigestPrefs = [];
+        if (Schema::hasTable('user_settings')) {
+            $civicDigestPrefs['user_settings'] = DB::table('user_settings')
+                ->where('user_id', $userId)
+                ->where('setting_key', 'like', 'civic_digest.%')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+        if (Schema::hasTable('caring_civic_digest_subscriptions')) {
+            $civicDigestPrefs['subscriptions'] = DB::table('caring_civic_digest_subscriptions')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        }
+        $data['civic_digest_preferences'] = $civicDigestPrefs;
+
+        return [
+            'exported_at' => now()->toIso8601String(),
+            'tenant_id'   => $tenantId,
+            'user_id'     => $userId,
+            'data'        => $data,
+        ];
+    }
+
+    /**
+     * Export the member's profile row, stripping credential / token columns.
+     */
+    private function exportUserProfile(int $tenantId, int $userId): ?array
+    {
+        if (!Schema::hasTable('users')) {
+            return null;
+        }
+
+        $row = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $userId)
+            ->first();
+
+        if (!$row) {
+            return null;
+        }
+
+        $excluded = [
+            'password',
+            'password_hash',
+            'remember_token',
+            'remember_me_token',
+            'two_factor_secret',
+            'two_factor_recovery_codes',
+            'totp_secret',
+            'mfa_secret',
+            'webauthn_user_handle',
+            'api_token',
+            'api_token_hash',
+        ];
+
+        $arr = (array) $row;
+        foreach ($excluded as $col) {
+            unset($arr[$col]);
+        }
+
+        return $arr;
     }
 }

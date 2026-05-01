@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\VolLogStatusChanged;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\I18n\LocaleContext;
@@ -1280,7 +1281,24 @@ class VolunteerService
                 }
             });
 
-            // 3. Send notifications AFTER transaction committed successfully
+            // 3. Notify the regional-points cascade-revert listener.
+            // For pending -> approved or pending -> declined transitions the
+            // listener is a no-op, but we dispatch unconditionally so that
+            // if a future code path flips an approved log to another status
+            // (e.g. an admin "revert approval" action) the cascade fires
+            // automatically.
+            try {
+                VolLogStatusChanged::dispatch(
+                    $tenantId,
+                    $logId,
+                    (string) $log->status,
+                    $status,
+                );
+            } catch (\Throwable $e) {
+                // Event dispatch failure must not break the parent flow.
+            }
+
+            // 4. Send notifications AFTER transaction committed successfully
             try {
                 // Fetch volunteer preferred_language so the dispatched bell/push/email
                 // render in the volunteer's locale, not the reviewing admin's.

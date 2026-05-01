@@ -67,7 +67,8 @@ class CivicDigestService
      *     occurred_at: string|null,
      *     sub_region_id: int|null,
      *     audience_match_score: int,
-     *     link_path: string|null
+     *     link_path: string|null,
+     *     score_reasons: list<array{key: string, label_key: string, weight: int}>
      * }>
      */
     public function digestForMember(int $tenantId, int $userId, int $limit = 50): array
@@ -113,11 +114,12 @@ class CivicDigestService
         // Score, filter, and sort
         $scored = [];
         foreach ($items as $item) {
-            $score = $this->scoreItem($item, $userSubRegionId, $interests);
-            if ($score < 1) {
+            $breakdown = $this->scoreItemWithReasons($item, $userSubRegionId, $interests);
+            if ($breakdown['score'] < 1) {
                 continue;
             }
-            $item['audience_match_score'] = $score;
+            $item['audience_match_score'] = $breakdown['score'];
+            $item['score_reasons']        = $breakdown['reasons'];
             $scored[] = $item;
         }
 
@@ -843,16 +845,44 @@ class CivicDigestService
     }
 
     /**
+     * Score an item and return both the total score and a list of contributing
+     * reasons (top factors with their weights). Reasons are sorted by weight
+     * descending so the UI can show "top 2-3" easily.
+     *
      * @param array<string, mixed> $item
      * @param list<string> $interests
+     * @return array{score: int, reasons: list<array{key: string, label_key: string, weight: int}>}
      */
-    private function scoreItem(array $item, ?int $userSubRegionId, array $interests): int
+    private function scoreItemWithReasons(array $item, ?int $userSubRegionId, array $interests): array
     {
         $score = 0;
+        $reasons = [];
 
-        // Source weight
+        // Source weight — surfaces high-priority sources (safety/announcement/project)
         $source = (string) ($item['source'] ?? '');
-        $score += self::SOURCE_WEIGHTS[$source] ?? 0;
+        $sourceWeight = self::SOURCE_WEIGHTS[$source] ?? 0;
+        if ($sourceWeight > 0) {
+            $score += $sourceWeight;
+            if ($source === 'safety_alert') {
+                $reasons[] = [
+                    'key'       => 'safety',
+                    'label_key' => 'civic_digest.transparency.reason_safety',
+                    'weight'    => $sourceWeight,
+                ];
+            } elseif ($source === 'announcement') {
+                $reasons[] = [
+                    'key'       => 'announcement',
+                    'label_key' => 'civic_digest.transparency.reason_announcement',
+                    'weight'    => $sourceWeight,
+                ];
+            } elseif ($source === 'project') {
+                $reasons[] = [
+                    'key'       => 'priority',
+                    'label_key' => 'civic_digest.transparency.reason_priority',
+                    'weight'    => $sourceWeight,
+                ];
+            }
+        }
 
         // Recency boost (0..5 based on how recent within 30 days)
         $occurredAt = $item['occurred_at'] ?? null;
@@ -862,7 +892,14 @@ class CivicDigestService
                 $ageDays = max(0, (time() - $ts) / 86400);
                 if ($ageDays <= 30) {
                     $recencyBoost = (int) round(5 * (1 - ($ageDays / 30)));
-                    $score += max(0, $recencyBoost);
+                    if ($recencyBoost > 0) {
+                        $score += $recencyBoost;
+                        $reasons[] = [
+                            'key'       => 'recency',
+                            'label_key' => 'civic_digest.transparency.reason_recency',
+                            'weight'    => $recencyBoost,
+                        ];
+                    }
                 }
             }
         }
@@ -874,6 +911,11 @@ class CivicDigestService
             && $item['sub_region_id'] === $userSubRegionId
         ) {
             $score += 5;
+            $reasons[] = [
+                'key'       => 'sub_region_match',
+                'label_key' => 'civic_digest.transparency.reason_sub_region',
+                'weight'    => 5,
+            ];
         }
 
         // Interest match
@@ -882,10 +924,19 @@ class CivicDigestService
             $overlap = array_intersect($interests, $itemCats);
             if ($overlap !== []) {
                 $score += 3;
+                $reasons[] = [
+                    'key'       => 'category_match',
+                    'label_key' => 'civic_digest.transparency.reason_category_match',
+                    'weight'    => 3,
+                ];
             }
         }
 
-        return $score;
+        // Sort reasons by weight desc and keep top 3
+        usort($reasons, static fn ($a, $b) => $b['weight'] <=> $a['weight']);
+        $reasons = array_slice($reasons, 0, 3);
+
+        return ['score' => $score, 'reasons' => $reasons];
     }
 
     private function cutoff30Days(): string

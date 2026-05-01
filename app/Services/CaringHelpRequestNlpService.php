@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -70,7 +71,10 @@ class CaringHelpRequestNlpService
             ];
         }
 
-        $cacheKey = 'caring_nlp:' . hash('sha256', $transcript . ':' . $locale);
+        // tenant_id included to prevent cross-tenant transcript cache leak
+        $tenantId = TenantContext::getId();
+        $tenantPart = $tenantId !== null ? (string) $tenantId : 'no-tenant';
+        $cacheKey = 'caring_nlp:' . hash('sha256', $tenantPart . '|' . $transcript . '|' . $locale);
         $cached = Cache::get($cacheKey);
         if (is_array($cached)) {
             return $cached;

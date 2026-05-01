@@ -9,9 +9,14 @@ import { Button, Chip, Input, Spinner, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
+import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
+import {
+  FederationCommunityPicker,
+  type FederationPeer,
+} from '@/components/caring-community/FederationCommunityPicker';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -56,10 +61,14 @@ const STATUS_COLOR: Record<TransferStatus, 'default' | 'primary' | 'success' | '
 
 export function HourTransferPage() {
   const { t } = useTranslation('common');
+  const { t: tCaring } = useTranslation('caring_community');
   const { hasFeature, tenantPath } = useTenant();
   usePageTitle(t('hour_transfer.meta.title'));
 
   const [destinationSlug, setDestinationSlug] = useState('');
+  const [selectedPeer, setSelectedPeer] = useState<FederationPeer | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [directoryAvailable, setDirectoryAvailable] = useState<boolean | null>(null);
   const [hours, setHours] = useState('');
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -86,6 +95,38 @@ export function HourTransferPage() {
   useEffect(() => {
     void loadHistory();
   }, [loadHistory]);
+
+  // Probe the federation directory once on mount; if it's unavailable or
+  // returns no peers, fall back to the manual slug input.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get<{ peers: unknown[] }>(
+          '/v2/caring-community/federation-directory',
+        );
+        if (cancelled) return;
+        const peerCount = Array.isArray(res.data?.peers) ? res.data.peers.length : 0;
+        setDirectoryAvailable(res.success && peerCount > 0);
+      } catch (err) {
+        logError('HourTransferPage: federation directory probe failed', err);
+        if (!cancelled) setDirectoryAvailable(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handlePeerSelected = (peer: FederationPeer) => {
+    setSelectedPeer(peer);
+    setDestinationSlug(peer.slug);
+  };
+
+  const handleClearPeer = () => {
+    setSelectedPeer(null);
+    setDestinationSlug('');
+  };
 
   if (!hasFeature('caring_community')) {
     return <Navigate to={tenantPath('/caring-community')} replace />;
@@ -175,15 +216,73 @@ export function HourTransferPage() {
           )}
 
           <div className="space-y-5">
-            <Input
-              label={t('hour_transfer.form.destination_label')}
-              placeholder={t('hour_transfer.form.destination_placeholder')}
-              description={t('hour_transfer.form.destination_help')}
-              value={destinationSlug}
-              onValueChange={setDestinationSlug}
-              variant="bordered"
-              isRequired
-            />
+            {directoryAvailable === true ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-theme-primary">
+                  {t('hour_transfer.form.destination_label')}
+                </p>
+                <div className="flex flex-col gap-3 rounded-lg border border-default-200 bg-default-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    {selectedPeer ? (
+                      <>
+                        <p className="text-sm font-semibold text-theme-primary">
+                          <span className="text-theme-muted font-normal">
+                            {tCaring('federation_picker.selected_label')}{' '}
+                          </span>
+                          {selectedPeer.display_name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-theme-muted">
+                          {[selectedPeer.region, selectedPeer.slug]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-theme-muted">
+                        {tCaring('federation_picker.no_selection')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedPeer && (
+                      <Button size="sm" variant="flat" onPress={handleClearPeer}>
+                        {tCaring('federation_picker.cancel_button')}
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      color="primary"
+                      variant="bordered"
+                      startContent={<Globe className="h-4 w-4" aria-hidden="true" />}
+                      onPress={() => setPickerOpen(true)}
+                    >
+                      {tCaring('federation_picker.browse_button')}
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-theme-muted">
+                  {t('hour_transfer.form.destination_help')}
+                </p>
+              </div>
+            ) : (
+              <Input
+                label={
+                  directoryAvailable === false
+                    ? tCaring('federation_picker.fallback_label')
+                    : t('hour_transfer.form.destination_label')
+                }
+                placeholder={t('hour_transfer.form.destination_placeholder')}
+                description={
+                  directoryAvailable === false
+                    ? tCaring('federation_picker.empty')
+                    : t('hour_transfer.form.destination_help')
+                }
+                value={destinationSlug}
+                onValueChange={setDestinationSlug}
+                variant="bordered"
+                isRequired
+              />
+            )}
             <Input
               type="number"
               label={t('hour_transfer.form.hours_label')}
@@ -275,6 +374,12 @@ export function HourTransferPage() {
           )}
         </GlassCard>
       </div>
+
+      <FederationCommunityPicker
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={handlePeerSelected}
+      />
     </>
   );
 }

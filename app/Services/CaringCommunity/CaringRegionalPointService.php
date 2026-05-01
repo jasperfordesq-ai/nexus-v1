@@ -307,6 +307,156 @@ class CaringRegionalPointService
         });
     }
 
+    /**
+     * Reverse any auto-issued regional points previously awarded for a vol_log
+     * whose status has changed away from `approved`. Idempotent: a vol_log that
+     * already has a recorded reversal is a no-op.
+     *
+     * Creates a `vol_log_reversal` debit transaction for each prior
+     * `earned_for_hours` credit on the same vol_log_id. The member's balance is
+     * decremented even if it would go negative — they may have already spent
+     * the points, in which case we don't claw back from third parties; the
+     * negative balance is logged and surfaces to the coordinator.
+     *
+     * Tenant-scoped via TenantContext::getId(); operates inside a DB
+     * transaction with lockForUpdate on the account row.
+     *
+     * @param int    $volLogId  The vol_log whose points should be reversed.
+     * @param string $reason    Audit reason (status transition description).
+     *
+     * @return bool True if at least one reversal transaction was created.
+     */
+    public function reverseFromVolLog(int $volLogId, string $reason): bool
+    {
+        if ($volLogId <= 0) {
+            return false;
+        }
+
+        if (!Schema::hasTable('caring_regional_point_transactions')
+            || !Schema::hasTable('caring_regional_point_accounts')
+        ) {
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        if ($tenantId <= 0) {
+            return false;
+        }
+
+        return DB::transaction(function () use ($tenantId, $volLogId, $reason): bool {
+            // Find prior auto-issue transactions for this vol_log that have not
+            // already been reversed.
+            $originalIssues = DB::table('caring_regional_point_transactions')
+                ->where('tenant_id', $tenantId)
+                ->where('reference_type', 'vol_log')
+                ->where('reference_id', $volLogId)
+                ->where('type', 'earned_for_hours')
+                ->where('direction', 'credit')
+                ->get();
+
+            if ($originalIssues->isEmpty()) {
+                return false;
+            }
+
+            // Skip any issues that already have a matching reversal.
+            $alreadyReversedIds = DB::table('caring_regional_point_transactions')
+                ->where('tenant_id', $tenantId)
+                ->where('reference_type', 'vol_log_reversal')
+                ->where('reference_id', $volLogId)
+                ->pluck('metadata')
+                ->map(function ($meta) {
+                    if (!is_string($meta) || $meta === '') {
+                        return null;
+                    }
+                    $decoded = json_decode($meta, true);
+                    return is_array($decoded) ? ($decoded['original_transaction_id'] ?? null) : null;
+                })
+                ->filter()
+                ->map(fn ($v): int => (int) $v)
+                ->all();
+
+            $createdAny = false;
+
+            foreach ($originalIssues as $issue) {
+                $issueId = (int) $issue->id;
+                if (in_array($issueId, $alreadyReversedIds, true)) {
+                    continue;
+                }
+
+                $userId = (int) $issue->user_id;
+                $points = round((float) $issue->points, 2);
+                if ($points <= 0 || $userId <= 0) {
+                    continue;
+                }
+
+                $account = DB::table('caring_regional_point_accounts')
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', $userId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$account) {
+                    continue;
+                }
+
+                $currentBalance = (float) $account->balance;
+                $newBalance = round($currentBalance - $points, 2);
+
+                if ($newBalance < 0) {
+                    \Illuminate\Support\Facades\Log::warning(
+                        'caring_regional_points.vol_log_reversal_negative_balance',
+                        [
+                            'tenant_id'      => $tenantId,
+                            'user_id'        => $userId,
+                            'vol_log_id'     => $volLogId,
+                            'original_id'    => $issueId,
+                            'points'         => $points,
+                            'prior_balance'  => $currentBalance,
+                            'new_balance'    => $newBalance,
+                            'reason'         => $reason,
+                        ]
+                    );
+                }
+
+                DB::table('caring_regional_point_accounts')
+                    ->where('id', $account->id)
+                    ->update([
+                        'balance'         => $newBalance,
+                        'lifetime_earned' => max(0.0, round((float) $account->lifetime_earned - $points, 2)),
+                        'updated_at'      => now(),
+                    ]);
+
+                $description = mb_substr(
+                    'Regional points reversed: ' . trim($reason),
+                    0,
+                    500
+                );
+
+                $this->insertTransaction(
+                    tenantId: $tenantId,
+                    accountId: (int) $account->id,
+                    userId: $userId,
+                    actorId: null,
+                    type: 'reversal',
+                    direction: 'debit',
+                    points: $points,
+                    balanceAfter: $newBalance,
+                    description: $description,
+                    referenceType: 'vol_log_reversal',
+                    referenceId: $volLogId,
+                    metadata: [
+                        'original_transaction_id' => $issueId,
+                        'reason'                  => mb_substr(trim($reason), 0, 500),
+                    ]
+                );
+
+                $createdAny = true;
+            }
+
+            return $createdAny;
+        });
+    }
+
     public function transferBetweenMembers(int $senderId, int $recipientId, float $points, ?string $message = null): array
     {
         $tenantId = TenantContext::getId();

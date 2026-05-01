@@ -27,6 +27,7 @@ use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserFederatedOptOut;
 use App\Events\UserRegistered;
+use App\Events\VolLogStatusChanged;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
@@ -55,6 +56,7 @@ use App\Listeners\PushMessageToFederatedPartner;
 use App\Listeners\PushReviewToFederatedPartner;
 use App\Listeners\PushTransactionToFederatedPartner;
 use App\Listeners\PushVolunteerOpportunityToFederatedPartners;
+use App\Listeners\RevertRegionalPointsOnVolLogChange;
 use App\Listeners\SendOnboardingCompletionEmail;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
@@ -178,6 +180,10 @@ class EventServiceProvider extends ServiceProvider
 
         UserFederatedOptOut::class => [
             PushFederationDataRetraction::class,
+        ],
+
+        VolLogStatusChanged::class => [
+            RevertRegionalPointsOnVolLogChange::class,
         ],
     ];
 

@@ -89,11 +89,124 @@ class PilotLaunchReadinessService
 
         $overall = $this->computeOverallStatus($sections);
 
+        // Compute can_launch: every section must be `ready`. We treat
+        // `decided` as a synonym for `ready` should any future section adopt
+        // that status name (the AG85 isolated-node gate uses both internally).
+        $canLaunch = true;
+        $blockers  = [];
+        foreach ($sections as $section) {
+            $status = (string) ($section['status'] ?? '');
+            if (!in_array($status, [self::STATUS_READY, 'decided'], true)) {
+                $canLaunch = false;
+                $blockers[] = [
+                    'key'    => (string) ($section['key']   ?? ''),
+                    'label'  => (string) ($section['label'] ?? ''),
+                    'status' => $status,
+                ];
+            }
+        }
+
+        $launched = $this->getLaunchState($tenantId);
+
         return [
             'generated_at'           => now()->toIso8601String(),
             'overall'                => $overall,
             'sections'               => $sections,
             'isolated_node_required' => $isolatedNodeRequired,
+            'can_launch'             => $canLaunch && $launched === null,
+            'blockers'               => $blockers,
+            'launched'               => $launched,
+        ];
+    }
+
+    /**
+     * Launch the pilot — gated by can_launch from report().
+     *
+     * Returns:
+     *   - on success: ['launched_at' => string, 'launched_by_id' => int]
+     *   - if already launched: ['error' => 'ALREADY_LAUNCHED', 'launched' => array]
+     *   - if not ready: ['error' => 'CANNOT_LAUNCH', 'blockers' => array]
+     */
+    public function launchPilot(int $tenantId, int $userId): array
+    {
+        if (!Schema::hasTable('tenant_settings')) {
+            return ['error' => 'STORAGE_UNAVAILABLE'];
+        }
+
+        $existing = $this->getLaunchState($tenantId);
+        if ($existing !== null) {
+            return [
+                'error'    => 'ALREADY_LAUNCHED',
+                'launched' => $existing,
+            ];
+        }
+
+        $report = $this->report($tenantId);
+        if (empty($report['can_launch'])) {
+            return [
+                'error'    => 'CANNOT_LAUNCH',
+                'blockers' => $report['blockers'] ?? [],
+            ];
+        }
+
+        $launchedAt = now();
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'setting_key' => 'caring_community.pilot_launched_at'],
+            [
+                'setting_value' => $launchedAt->toIso8601String(),
+                'setting_type'  => 'string',
+                'category'      => 'caring_community',
+                'description'   => 'AG95 pilot launch timestamp',
+                'updated_at'    => now(),
+            ],
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'setting_key' => 'caring_community.pilot_launched_by'],
+            [
+                'setting_value' => (string) $userId,
+                'setting_type'  => 'integer',
+                'category'      => 'caring_community',
+                'description'   => 'AG95 pilot launch operator user id',
+                'updated_at'    => now(),
+            ],
+        );
+
+        return [
+            'launched_at'    => $launchedAt->toIso8601String(),
+            'launched_by_id' => $userId,
+        ];
+    }
+
+    /**
+     * Read the persisted launch state for a tenant.
+     *
+     * @return array{launched_at:string, launched_by_id:int}|null
+     */
+    private function getLaunchState(int $tenantId): ?array
+    {
+        if (!Schema::hasTable('tenant_settings')) {
+            return null;
+        }
+
+        $rows = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('setting_key', [
+                'caring_community.pilot_launched_at',
+                'caring_community.pilot_launched_by',
+            ])
+            ->pluck('setting_value', 'setting_key')
+            ->all();
+
+        $launchedAt = $rows['caring_community.pilot_launched_at'] ?? null;
+        if ($launchedAt === null || $launchedAt === '') {
+            return null;
+        }
+
+        $launchedById = $rows['caring_community.pilot_launched_by'] ?? null;
+
+        return [
+            'launched_at'    => (string) $launchedAt,
+            'launched_by_id' => $launchedById !== null ? (int) $launchedById : 0,
         ];
     }
 

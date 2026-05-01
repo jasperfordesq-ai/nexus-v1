@@ -9,8 +9,11 @@ declare(strict_types=1);
 namespace App\Services\CaringCommunity;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
+use App\Mail\SafeguardingCriticalMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use RuntimeException;
@@ -503,8 +506,11 @@ class SafeguardingService
     }
 
     /**
-     * Send a real-time notification to all users in this tenant who hold the
-     * `safeguarding.view` permission. Best-effort; failures are logged.
+     * Send a real-time notification + email to all users in this tenant who
+     * hold the `safeguarding.view` permission. Best-effort; failures are logged.
+     *
+     * Email send is wrapped in LocaleContext::withLocale() per recipient so
+     * coordinators receive the alert in their own preferred_language.
      */
     private function fanOutCriticalNotification(int $reportId, int $tenantId): void
     {
@@ -515,9 +521,9 @@ class SafeguardingService
         // Resolve user IDs that hold safeguarding.view in this tenant.
         // Schema differs across installs; use a defensive query that only
         // touches columns we know exist.
-        $reviewers = collect();
+        $reviewerIds = collect();
         try {
-            $reviewers = DB::table('user_permissions as up')
+            $reviewerIds = DB::table('user_permissions as up')
                 ->join('permissions as p', 'p.id', '=', 'up.permission_id')
                 ->where('p.name', 'safeguarding.view')
                 ->where('up.tenant_id', $tenantId)
@@ -528,12 +534,59 @@ class SafeguardingService
             return;
         }
 
+        if ($reviewerIds->isEmpty()) {
+            return;
+        }
+
+        // Hydrate recipient details (email + preferred_language) for the email
+        // pass. Defensive against minor users-table column differences.
+        $recipients = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $reviewerIds->all())
+            ->where('status', 'active')
+            ->get(['id', 'email', 'first_name', 'last_name', 'preferred_language']);
+
+        // Pull the report row + reporter name for the email payload.
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+
+        $reporter = null;
+        if ($report && isset($report->reporter_user_id)) {
+            $reporter = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('id', (int) $report->reporter_user_id)
+                ->first(['first_name', 'last_name']);
+        }
+        $reporterName = $reporter
+            ? trim((string) ($reporter->first_name ?? '') . ' ' . (string) ($reporter->last_name ?? ''))
+            : '';
+        if ($reporterName === '') {
+            $reporterName = 'A community member';
+        }
+
+        $base = (string) (config('app.frontend_url') ?: 'https://app.project-nexus.ie');
+        $adminUrl = rtrim($base, '/') . '/admin/caring-community/safeguarding/' . $reportId;
+
+        $reportPayload = [
+            'id'             => $report ? (int) $report->id : $reportId,
+            'category'       => $report->category ?? null,
+            'severity'       => $report->severity ?? 'critical',
+            'review_due_at'  => $report->review_due_at ?? null,
+            'sla_hours'      => self::REVIEW_SLA_HOURS['critical'],
+            'admin_url'      => $adminUrl,
+        ];
+
         $now = now();
-        foreach ($reviewers as $userId) {
+        foreach ($recipients as $recipient) {
+            $userId = (int) $recipient->id;
+
+            // 1) UI bell — kept exactly as before for backwards compatibility.
             try {
                 DB::table('notifications')->insert([
                     'tenant_id'  => $tenantId,
-                    'user_id'    => (int) $userId,
+                    'user_id'    => $userId,
                     'type'       => 'safeguarding_critical',
                     'message'    => 'Critical safeguarding report submitted',
                     'link'       => '/admin/caring-community/safeguarding/' . $reportId,
@@ -543,6 +596,25 @@ class SafeguardingService
                 ]);
             } catch (\Throwable $e) {
                 Log::warning('[Safeguarding] Notification insert failed: ' . $e->getMessage());
+            }
+
+            // 2) Email alert — wrapped in LocaleContext so subject + body
+            // render in the recipient coordinator's preferred_language.
+            if (empty($recipient->email)) {
+                continue;
+            }
+
+            try {
+                LocaleContext::withLocale($recipient, function () use ($recipient, $reportPayload, $reporterName): void {
+                    Mail::to($recipient->email)->send(
+                        new SafeguardingCriticalMail($reportPayload, $reporterName)
+                    );
+                });
+            } catch (\Throwable $e) {
+                Log::warning('[Safeguarding] Critical email send failed', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
             }
         }
     }

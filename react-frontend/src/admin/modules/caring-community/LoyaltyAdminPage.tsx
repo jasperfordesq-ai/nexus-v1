@@ -24,14 +24,21 @@ import {
   Chip,
   Divider,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Spinner,
   Switch,
+  Textarea,
 } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Wallet from 'lucide-react/icons/wallet';
 import Store from 'lucide-react/icons/store';
+import Undo2 from 'lucide-react/icons/undo-2';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -92,6 +99,11 @@ export default function LoyaltyAdminPage() {
   const [settings, setSettings] = useState<SellerSettings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
+
+  // Reversal modal state
+  const [reverseTarget, setReverseTarget] = useState<Redemption | null>(null);
+  const [reverseReason, setReverseReason] = useState('');
+  const [reversing, setReversing] = useState(false);
 
   const loadRedemptions = useCallback(async () => {
     try {
@@ -183,6 +195,46 @@ export default function LoyaltyAdminPage() {
       setSavingSettings(false);
     }
   }, [settings, selectedSeller, toast]);
+
+  const openReverseModal = useCallback((row: Redemption) => {
+    setReverseTarget(row);
+    setReverseReason('');
+  }, []);
+
+  const closeReverseModal = useCallback(() => {
+    if (reversing) return;
+    setReverseTarget(null);
+    setReverseReason('');
+  }, [reversing]);
+
+  const handleConfirmReverse = useCallback(async () => {
+    if (!reverseTarget) return;
+    setReversing(true);
+    try {
+      const res = await api.post<{
+        redemption_id: number;
+        credits_restored: number;
+        member_new_balance: number;
+      }>(`/v2/admin/caring-community/loyalty/redemptions/${reverseTarget.id}/reverse`, {
+        reason: reverseReason.trim() || undefined,
+      });
+      if (res.success && res.data) {
+        toast.success(
+          `Reversed: ${res.data.credits_restored.toFixed(2)} hours restored to member.`,
+        );
+        setReverseTarget(null);
+        setReverseReason('');
+        await loadRedemptions();
+      } else {
+        toast.error(res.error || 'Failed to reverse redemption');
+      }
+    } catch (err) {
+      logError('LoyaltyAdminPage: reverse failed', err);
+      toast.error('Failed to reverse redemption');
+    } finally {
+      setReversing(false);
+    }
+  }, [reverseTarget, reverseReason, toast, loadRedemptions]);
 
   if (loading) {
     return (
@@ -368,6 +420,8 @@ export default function LoyaltyAdminPage() {
                     <th className="text-right px-4 py-3">Hours</th>
                     <th className="text-right px-4 py-3">Rate</th>
                     <th className="text-right px-4 py-3">Discount</th>
+                    <th className="text-left px-4 py-3">Status</th>
+                    <th className="text-right px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -392,6 +446,36 @@ export default function LoyaltyAdminPage() {
                           CHF {row.discount_chf.toFixed(2)}
                         </Chip>
                       </td>
+                      <td className="px-4 py-3 text-sm">
+                        <Chip
+                          variant="flat"
+                          size="sm"
+                          color={
+                            row.status === 'applied'
+                              ? 'success'
+                              : row.status === 'reversed'
+                              ? 'danger'
+                              : 'warning'
+                          }
+                        >
+                          {row.status}
+                        </Chip>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        {row.status === 'applied' ? (
+                          <Button
+                            size="sm"
+                            color="danger"
+                            variant="flat"
+                            startContent={<Undo2 className="w-4 h-4" />}
+                            onPress={() => openReverseModal(row)}
+                          >
+                            Reverse
+                          </Button>
+                        ) : (
+                          <span className="text-default-400">—</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -400,6 +484,61 @@ export default function LoyaltyAdminPage() {
           )}
         </CardBody>
       </Card>
+
+      {/* ── Reversal confirmation modal ─────────────────────────────────── */}
+      <Modal isOpen={reverseTarget !== null} onClose={closeReverseModal} size="md">
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <Undo2 className="w-5 h-5 text-danger" />
+            <span>Reverse redemption</span>
+          </ModalHeader>
+          <ModalBody className="gap-4">
+            {reverseTarget && (
+              <>
+                <p className="text-sm text-default-700">
+                  This will restore{' '}
+                  <strong>{reverseTarget.credits_used.toFixed(2)} hours</strong> to{' '}
+                  <strong>{reverseTarget.member_name || 'the member'}</strong>'s
+                  wallet and mark the redemption as reversed. This cannot be undone.
+                </p>
+                <div className="rounded-md bg-default-100 px-3 py-2 text-xs text-default-600">
+                  <div>Merchant: {reverseTarget.merchant_name || '—'}</div>
+                  <div>
+                    Discount: CHF {reverseTarget.discount_chf.toFixed(2)} on order
+                    of CHF {reverseTarget.order_total_chf.toFixed(2)}
+                  </div>
+                  <div>
+                    Redeemed: {new Date(reverseTarget.redeemed_at).toLocaleString()}
+                  </div>
+                </div>
+                <Textarea
+                  label="Reason (optional)"
+                  placeholder="e.g. Refunded order, member request, error correction"
+                  value={reverseReason}
+                  onValueChange={setReverseReason}
+                  variant="bordered"
+                  minRows={2}
+                  maxRows={4}
+                  maxLength={500}
+                />
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={closeReverseModal} isDisabled={reversing}>
+              Cancel
+            </Button>
+            <Button
+              color="danger"
+              startContent={!reversing ? <Undo2 className="w-4 h-4" /> : null}
+              onPress={() => void handleConfirmReverse()}
+              isLoading={reversing}
+            >
+              Confirm reversal
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

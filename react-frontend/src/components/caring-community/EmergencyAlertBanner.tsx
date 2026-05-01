@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Button } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
@@ -67,9 +68,9 @@ const ICON_CLASSES: Record<EmergencyAlert['severity'], string> = {
 };
 
 const DISMISS_CLASSES: Record<EmergencyAlert['severity'], string> = {
-  info: 'hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300',
-  warning: 'hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300',
-  danger: 'hover:bg-red-100 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300',
+  info: 'text-blue-700 dark:text-blue-300',
+  warning: 'text-amber-700 dark:text-amber-300',
+  danger: 'text-red-700 dark:text-red-300',
 };
 
 // ---------------------------------------------------------------------------
@@ -127,7 +128,7 @@ export default function EmergencyAlertBanner() {
   };
 
   return (
-    <div className="w-full flex flex-col gap-0" role="region" aria-label="Emergency alerts">
+    <div className="w-full flex flex-col gap-0" role="region" aria-label={t('emergency_alert.region_label')}>
       {visible.map((alert) => (
         <div
           key={alert.id}
@@ -155,18 +156,17 @@ export default function EmergencyAlertBanner() {
             </div>
 
             {/* Dismiss button */}
-            <button
+            <Button
               type="button"
-              onClick={() => void handleDismiss(alert.id)}
-              className={[
-                'shrink-0 rounded-md p-1.5 transition-colors focus:outline-none',
-                'focus:ring-2 focus:ring-offset-1 focus:ring-current',
-                DISMISS_CLASSES[alert.severity],
-              ].join(' ')}
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => void handleDismiss(alert.id)}
+              className={['shrink-0', DISMISS_CLASSES[alert.severity]].join(' ')}
               aria-label={t('emergency_alert.dismiss')}
             >
               <X size={18} aria-hidden="true" />
-            </button>
+            </Button>
           </div>
         </div>
       ))}

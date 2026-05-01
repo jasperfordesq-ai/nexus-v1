@@ -227,6 +227,44 @@ class FederationPeerService
         ];
     }
 
+    /**
+     * List peers that members of the given tenant can discover and select
+     * as the destination for a federated hour-transfer. Filters to active
+     * peers (and the optional `discoverable` flag if the column exists).
+     *
+     * Returned rows are member-safe: no shared_secret, no notes.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function listDiscoverable(int $tenantId): array
+    {
+        if (! $this->isAvailable()) {
+            return [];
+        }
+
+        $query = DB::table(self::TABLE)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active');
+
+        if (Schema::hasColumn(self::TABLE, 'discoverable')) {
+            $query->where('discoverable', 1);
+        }
+
+        $rows = $query->orderBy('display_name')->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'id'                         => (int) $row->id,
+                'slug'                       => (string) $row->peer_slug,
+                'display_name'               => (string) $row->display_name,
+                'base_url'                   => (string) $row->base_url,
+                'region'                     => isset($row->region) ? (string) $row->region : null,
+                'member_count_bucket'        => isset($row->member_count_bucket) ? (string) $row->member_count_bucket : null,
+                'accepts_inbound_transfers'  => (string) $row->status === 'active',
+            ];
+        })->all();
+    }
+
     private function assertAvailable(): void
     {
         if (! $this->isAvailable()) {
