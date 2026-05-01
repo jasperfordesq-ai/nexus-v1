@@ -106,6 +106,7 @@ import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import Rocket from 'lucide-react/icons/rocket';
+import Sliders from 'lucide-react/icons/sliders';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -293,6 +294,7 @@ function useAdminNav(): NavSection[] {
       { label: 'External Integrations', href: '/admin/caring-community/external-integrations', icon: PlugZap },
       { label: 'Integration Showcase', href: '/admin/caring-community/integration-showcase', icon: Layers },
       { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: BarChart3, group: 'Reporting' },
+      { label: 'Category Coefficients', href: '/admin/caring-community/category-coefficients', icon: Sliders },
     ] : [];
 
     // ── Community items — each sub-feature gated independently ───────────

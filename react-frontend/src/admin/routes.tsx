@@ -167,6 +167,7 @@ const ResearchPartnershipsAdminPage = lazy(() => import('./modules/caring-commun
 const WarmthPassAdminPage = lazy(() => import('./modules/caring-community/WarmthPassAdminPage'));
 const CareRecipientCirclePage = lazy(() => import('./modules/caring-community/CareRecipientCirclePage'));
 const MunicipalRoiAdminPage = lazy(() => import('./modules/caring-community/MunicipalRoiAdminPage'));
+const CategoryCoefficientsAdminPage = lazy(() => import('./modules/caring-community/CategoryCoefficientsAdminPage'));
 const SubRegionsAdminPage = lazy(() => import('./modules/caring-community/SubRegionsAdminPage'));
 const PilotScoreboardAdminPage = lazy(() => import('./modules/caring-community/PilotScoreboardAdminPage'));
 const OperatingPolicyAdminPage = lazy(() => import('./modules/caring-community/OperatingPolicyAdminPage'));
@@ -798,6 +799,16 @@ export function AdminRoutes() {
         element={
           <FeatureGatedElement feature="caring_community">
             <Lazy><MunicipalRoiAdminPage /></Lazy>
+          </FeatureGatedElement>
+        }
+      />
+
+      {/* Per-category substitution coefficients (Pflege-CHF) */}
+      <Route
+        path="caring-community/category-coefficients"
+        element={
+          <FeatureGatedElement feature="caring_community">
+            <Lazy><CategoryCoefficientsAdminPage /></Lazy>
           </FeatureGatedElement>
         }
       />

@@ -1400,6 +1400,9 @@ Route::get('/v2/admin/caring-community/warmth-pass/{userId}', [\App\Http\Control
 // Care Recipient Circle + Municipal ROI
 Route::get('/v2/admin/caring-community/recipient/{userId}/circle', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'recipientCircle']);
 Route::get('/v2/admin/caring-community/municipal-roi', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'municipalRoi']);
+Route::get('/v2/admin/caring-community/municipal-roi/export', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'municipalRoiExport']);
+Route::get('/v2/admin/caring-community/category-coefficients', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listCategoryCoefficients']);
+Route::put('/v2/admin/caring-community/category-coefficients/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateCategoryCoefficient']);
 
 // AG68 — Caregiver/Angehörigen Support Flow
 Route::get('/v2/caring-community/caregiver/links', [\App\Http\Controllers\Api\CaregiverApiController::class, 'myLinks'])

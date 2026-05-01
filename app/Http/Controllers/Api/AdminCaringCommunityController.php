@@ -35,7 +35,11 @@ use App\Services\CaringLoyaltyService;
 use App\Services\CaringSupportRelationshipService;
 use App\Services\CaringTandemMatchingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminCaringCommunityController extends BaseApiController
 {
@@ -1415,8 +1419,19 @@ class AdminCaringCommunityController extends BaseApiController
      * GET /api/v2/admin/caring-community/municipal-roi
      *
      * Aggregated ROI metrics for municipal/cooperative impact reporting.
-     * Uses Swiss formal care assistant hourly rate (CHF 35) and the
-     * prevention multiplier (×2) from the KISS/Age-Stiftung methodology.
+     * Uses Swiss formal care assistant hourly rate (default CHF 35, tenant-overridable
+     * via tenant_settings key `caring_community.formal_care_hourly_rate_chf`) and the
+     * ×2 prevention multiplier from the KISS/Age-Stiftung methodology.
+     *
+     * Query parameters (all optional):
+     *   from           YYYY-MM-DD (default: start of current calendar year)
+     *   to             YYYY-MM-DD (default: today)
+     *   sub_region_id  Scope all metrics to a single sub-region
+     *
+     * Substitution-weighted hours multiply each approved log's hours by its
+     * category's `substitution_coefficient` (DECIMAL(3,2), default 1.00). When the
+     * column is absent (pre-migration), all coefficients fall back to 1.00 so the
+     * endpoint stays compatible.
      */
     public function municipalRoi(): JsonResponse
     {
@@ -1424,87 +1439,81 @@ class AdminCaringCommunityController extends BaseApiController
         if ($disabled) return $disabled;
 
         $tenantId = TenantContext::getId();
-        $now      = now();
-        $oneYearAgo     = $now->copy()->subYear();
-        $twoYearsAgo    = $now->copy()->subYears(2);
 
-        // Total approved hours (all time)
+        [$fromDate, $toDate] = $this->resolveRoiDateRange();
+        $subRegionId = $this->queryInt('sub_region_id', null, 1);
+
+        $scopedLogs = function () use ($tenantId, $fromDate, $toDate, $subRegionId) {
+            return $this->scopeVolLogsQuery($tenantId, $fromDate, $toDate, $subRegionId);
+        };
+
+        // Total unweighted approved hours (in range)
         $totalHours = 0.0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
-            $totalHours = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'approved')
-                ->sum('hours');
+        if (Schema::hasTable('vol_logs')) {
+            $totalHours = (float) $scopedLogs()
+                ->where('vol_logs.status', 'approved')
+                ->sum('vol_logs.hours');
         }
 
-        // Active members (distinct users with ≥1 approved log in the last year)
+        // Substitution-weighted hours (used for the formal-care offset CHF figure)
+        [$weightedHours, $substitutionApplied] = $this->computeWeightedHours(
+            $tenantId, $fromDate, $toDate, $subRegionId
+        );
+
+        // Active members (distinct users with ≥1 approved log in range)
         $activeMembers = 0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
-            $activeMembers = (int) \Illuminate\Support\Facades\DB::table('vol_logs')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'approved')
-                ->where('created_at', '>=', $oneYearAgo->toDateTimeString())
-                ->distinct('user_id')
-                ->count('user_id');
+        if (Schema::hasTable('vol_logs')) {
+            $activeMembers = (int) $scopedLogs()
+                ->where('vol_logs.status', 'approved')
+                ->distinct()
+                ->count('vol_logs.user_id');
         }
 
-        // Active support relationships
+        // Active relationships + recipient count
         $activeRelationships = 0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
-            $activeRelationships = (int) \Illuminate\Support\Facades\DB::table('caring_support_relationships')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
-                ->count();
+        $recipientCount      = 0;
+        if (Schema::hasTable('caring_support_relationships')) {
+            $relColumn = Schema::hasColumn('caring_support_relationships', 'recipient_id')
+                ? 'recipient_id'
+                : 'recipient_user_id'; // legacy fallback
+
+            $relQuery = DB::table('caring_support_relationships')
+                ->where('caring_support_relationships.tenant_id', $tenantId)
+                ->where('caring_support_relationships.status', 'active');
+            if ($subRegionId !== null) {
+                $relQuery = $this->applySubRegionToRelationships($relQuery, $tenantId, $subRegionId);
+            }
+            $activeRelationships = (int) (clone $relQuery)->count();
+
+            $recipientQuery = DB::table('caring_support_relationships')
+                ->where('caring_support_relationships.tenant_id', $tenantId);
+            if ($subRegionId !== null) {
+                $recipientQuery = $this->applySubRegionToRelationships($recipientQuery, $tenantId, $subRegionId);
+            }
+            $recipientCount = (int) $recipientQuery->distinct()->count('caring_support_relationships.' . $relColumn);
         }
 
-        // Distinct recipients
-        $recipientCount = 0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
-            $recipientCount = (int) \Illuminate\Support\Facades\DB::table('caring_support_relationships')
-                ->where('tenant_id', $tenantId)
-                ->distinct('recipient_user_id')
-                ->count('recipient_user_id');
-        }
-
-        // Total approved exchanges
+        // Total approved exchanges (in range)
         $totalExchanges = 0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
-            $totalExchanges = (int) \Illuminate\Support\Facades\DB::table('vol_logs')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'approved')
+        if (Schema::hasTable('vol_logs')) {
+            $totalExchanges = (int) $scopedLogs()
+                ->where('vol_logs.status', 'approved')
                 ->count();
         }
 
-        // Trend: hours in last 12 months vs 12–24 months ago
-        $hoursThisYear = 0.0;
-        $hoursPriorYear = 0.0;
-        if (\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
-            $hoursThisYear = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'approved')
-                ->where('created_at', '>=', $oneYearAgo->toDateTimeString())
-                ->sum('hours');
+        // YoY trend (12 months vs prior 12 months) — independent of date filter
+        $hoursYoyPct = $this->computeYoyTrend($tenantId);
 
-            $hoursPriorYear = (float) \Illuminate\Support\Facades\DB::table('vol_logs')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'approved')
-                ->where('created_at', '>=', $twoYearsAgo->toDateTimeString())
-                ->where('created_at', '<', $oneYearAgo->toDateTimeString())
-                ->sum('hours');
-        }
+        // Hourly rate — tenant override or default
+        [$hourlyRateChf, $hourlyRateSource] = $this->resolveHourlyRate($tenantId);
 
-        $hoursYoyPct = null;
-        if ($hoursPriorYear > 0) {
-            $hoursYoyPct = round((($hoursThisYear - $hoursPriorYear) / $hoursPriorYear) * 100, 2);
-        }
+        // ROI: weighted-hours × CHF rate (× 2 for prevention value)
+        $formalCareOffsetChf = round($weightedHours * $hourlyRateChf, 2);
+        $preventionValueChf  = round($formalCareOffsetChf * 2, 2);
 
-        // ROI computation (Swiss formal care assistant rate)
-        $hourlyRateChf          = 35;
-        $formalCareOffsetChf    = round($totalHours * $hourlyRateChf, 2);
-        $preventionValueChf     = round($formalCareOffsetChf * 2, 2);
-
-        return $this->respondWithData([
+        $payload = [
             'total_hours'          => $totalHours,
+            'weighted_hours'       => $weightedHours,
             'active_members'       => $activeMembers,
             'active_relationships' => $activeRelationships,
             'recipient_count'      => $recipientCount,
@@ -1518,7 +1527,468 @@ class AdminCaringCommunityController extends BaseApiController
             'trend'                => [
                 'hours_yoy_pct' => $hoursYoyPct,
             ],
+            'period'               => [
+                'from' => $fromDate->toDateString(),
+                'to'   => $toDate->toDateString(),
+            ],
+            'filters'              => [
+                'sub_region_id' => $subRegionId,
+            ],
+            'methodology'          => [
+                'hourly_rate_chf'       => $hourlyRateChf,
+                'hourly_rate_source'    => $hourlyRateSource,
+                'prevention_multiplier' => 2.0,
+                'substitution_applied'  => $substitutionApplied,
+            ],
+        ];
+
+        // Sub-region breakdown — only when no sub_region_id filter applied
+        if ($subRegionId === null && Schema::hasTable('caring_sub_regions')) {
+            $payload['breakdown_by_sub_region'] = $this->subRegionBreakdown(
+                $tenantId, $fromDate, $toDate, $hourlyRateChf
+            );
+        }
+
+        return $this->respondWithData($payload);
+    }
+
+    /**
+     * GET /api/v2/admin/caring-community/municipal-roi/export
+     *
+     * Streams a CSV containing the same metrics as municipalRoi() plus a
+     * sub-region breakdown table. Procurement-grade format for cantonal
+     * social department / Age-Stiftung evaluators.
+     */
+    public function municipalRoiExport(): StreamedResponse|JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+
+        [$fromDate, $toDate] = $this->resolveRoiDateRange();
+        $subRegionId = $this->queryInt('sub_region_id', null, 1);
+
+        $scopedLogs = function () use ($tenantId, $fromDate, $toDate, $subRegionId) {
+            return $this->scopeVolLogsQuery($tenantId, $fromDate, $toDate, $subRegionId);
+        };
+
+        $totalHours = 0.0;
+        if (Schema::hasTable('vol_logs')) {
+            $totalHours = (float) $scopedLogs()
+                ->where('vol_logs.status', 'approved')
+                ->sum('vol_logs.hours');
+        }
+
+        [$weightedHours, ] = $this->computeWeightedHours($tenantId, $fromDate, $toDate, $subRegionId);
+        [$hourlyRateChf, ] = $this->resolveHourlyRate($tenantId);
+
+        $formalCareOffsetChf = round($weightedHours * $hourlyRateChf, 2);
+        $preventionValueChf  = round($formalCareOffsetChf * 2, 2);
+
+        $activeMembers = 0;
+        if (Schema::hasTable('vol_logs')) {
+            $activeMembers = (int) $scopedLogs()
+                ->where('vol_logs.status', 'approved')
+                ->distinct()
+                ->count('vol_logs.user_id');
+        }
+
+        $activeRelationships = 0;
+        $recipientCount = 0;
+        if (Schema::hasTable('caring_support_relationships')) {
+            $relColumn = Schema::hasColumn('caring_support_relationships', 'recipient_id')
+                ? 'recipient_id'
+                : 'recipient_user_id';
+
+            $relQuery = DB::table('caring_support_relationships')
+                ->where('caring_support_relationships.tenant_id', $tenantId)
+                ->where('caring_support_relationships.status', 'active');
+            if ($subRegionId !== null) {
+                $relQuery = $this->applySubRegionToRelationships($relQuery, $tenantId, $subRegionId);
+            }
+            $activeRelationships = (int) (clone $relQuery)->count();
+
+            $recipientQuery = DB::table('caring_support_relationships')
+                ->where('caring_support_relationships.tenant_id', $tenantId);
+            if ($subRegionId !== null) {
+                $recipientQuery = $this->applySubRegionToRelationships($recipientQuery, $tenantId, $subRegionId);
+            }
+            $recipientCount = (int) $recipientQuery->distinct()->count('caring_support_relationships.' . $relColumn);
+        }
+
+        $breakdown = ($subRegionId === null && Schema::hasTable('caring_sub_regions'))
+            ? $this->subRegionBreakdown($tenantId, $fromDate, $toDate, $hourlyRateChf)
+            : [];
+
+        $tenantSlug = $this->tenantSlugForFilename($tenantId);
+        $filename = sprintf(
+            'municipal-roi-%s-%s-to-%s.csv',
+            $tenantSlug,
+            $fromDate->toDateString(),
+            $toDate->toDateString()
+        );
+
+        $rows = [
+            ['Metric', 'Value', 'Unit'],
+            ['Period start', $fromDate->toDateString(), ''],
+            ['Period end', $toDate->toDateString(), ''],
+            ['Total approved hours', number_format($totalHours, 2, '.', ''), 'hours'],
+            ['Substitution-weighted hours', number_format($weightedHours, 2, '.', ''), 'hours'],
+            ['Formal care hourly rate', number_format((float) $hourlyRateChf, 2, '.', ''), 'CHF'],
+            ['Formal care offset', number_format($formalCareOffsetChf, 2, '.', ''), 'CHF'],
+            ['Prevention value (2x multiplier)', number_format($preventionValueChf, 2, '.', ''), 'CHF'],
+            ['Active members', (string) $activeMembers, ''],
+            ['Active relationships', (string) $activeRelationships, ''],
+            ['Care recipients (out of isolation)', (string) $recipientCount, ''],
+        ];
+
+        if (!empty($breakdown)) {
+            $rows[] = ['', '', ''];
+            $rows[] = ['Sub-region breakdown', '', ''];
+            $rows[] = ['Sub-region', 'Hours', 'Weighted hours', 'Formal care offset CHF'];
+            foreach ($breakdown as $row) {
+                $rows[] = [
+                    (string) ($row['sub_region_name'] ?? ''),
+                    number_format((float) ($row['hours'] ?? 0), 2, '.', ''),
+                    number_format((float) ($row['weighted_hours'] ?? 0), 2, '.', ''),
+                    number_format((float) ($row['formal_care_offset_chf'] ?? 0), 2, '.', ''),
+                ];
+            }
+        }
+
+        return new StreamedResponse(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            // UTF-8 BOM so Excel renders Swiss German umlauts correctly.
+            fwrite($out, "\xEF\xBB\xBF");
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        }, 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control'       => 'no-store, max-age=0',
         ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Municipal ROI helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Resolve from/to dates from query params, defaulting to YTD.
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function resolveRoiDateRange(): array
+    {
+        $now = Carbon::now();
+
+        $fromRaw = $this->query('from');
+        $toRaw   = $this->query('to');
+
+        $from = $now->copy()->startOfYear();
+        $to   = $now->copy()->endOfDay();
+
+        if (is_string($fromRaw) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $fromRaw)) {
+            try {
+                $from = Carbon::parse($fromRaw)->startOfDay();
+            } catch (\Throwable $e) {
+                // keep default
+            }
+        }
+
+        if (is_string($toRaw) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $toRaw)) {
+            try {
+                $to = Carbon::parse($toRaw)->endOfDay();
+            } catch (\Throwable $e) {
+                // keep default
+            }
+        }
+
+        if ($from->greaterThan($to)) {
+            $from = $to->copy()->startOfDay();
+        }
+
+        return [$from, $to];
+    }
+
+    /**
+     * Build a vol_logs query scoped by tenant + date range + (optional) sub-region.
+     * Sub-region scoping is best-effort: vol_log → caring_support_relationship →
+     * caring_care_provider (organization match) → sub_region_id. Without those joins
+     * resolving, the sub-region scope falls through (the filter is effectively
+     * ignored rather than crashing).
+     */
+    private function scopeVolLogsQuery(int $tenantId, Carbon $from, Carbon $to, ?int $subRegionId)
+    {
+        $q = DB::table('vol_logs')
+            ->where('vol_logs.tenant_id', $tenantId)
+            ->whereBetween('vol_logs.created_at', [$from->toDateTimeString(), $to->toDateTimeString()]);
+
+        if ($subRegionId !== null
+            && Schema::hasTable('caring_support_relationships')
+            && Schema::hasTable('caring_care_providers')
+            && Schema::hasColumn('caring_care_providers', 'sub_region_id')
+        ) {
+            $q->join('caring_support_relationships as csr', function ($j) use ($tenantId) {
+                $j->on('csr.id', '=', 'vol_logs.caring_support_relationship_id')
+                  ->where('csr.tenant_id', '=', $tenantId);
+            })
+              ->join('caring_care_providers as ccp', function ($j) use ($tenantId, $subRegionId) {
+                  $j->on('ccp.id', '=', 'csr.organization_id')
+                    ->where('ccp.tenant_id', '=', $tenantId)
+                    ->where('ccp.sub_region_id', '=', $subRegionId);
+              });
+        }
+
+        return $q;
+    }
+
+    /**
+     * Apply sub-region scoping to a caring_support_relationships query.
+     */
+    private function applySubRegionToRelationships($query, int $tenantId, int $subRegionId)
+    {
+        if (Schema::hasTable('caring_care_providers')
+            && Schema::hasColumn('caring_care_providers', 'sub_region_id')
+        ) {
+            $query->join('caring_care_providers as ccp', function ($j) use ($tenantId, $subRegionId) {
+                $j->on('ccp.id', '=', 'caring_support_relationships.organization_id')
+                  ->where('ccp.tenant_id', '=', $tenantId)
+                  ->where('ccp.sub_region_id', '=', $subRegionId);
+            });
+        }
+        return $query;
+    }
+
+    /**
+     * Compute substitution-weighted approved hours for the period.
+     * Returns [weighted_hours, substitution_applied_bool].
+     *
+     * @return array{0: float, 1: bool}
+     */
+    private function computeWeightedHours(int $tenantId, Carbon $from, Carbon $to, ?int $subRegionId): array
+    {
+        if (!Schema::hasTable('vol_logs')) {
+            return [0.0, false];
+        }
+
+        $hasCoefficient = Schema::hasTable('categories')
+            && Schema::hasColumn('categories', 'substitution_coefficient');
+
+        if (!$hasCoefficient) {
+            // Pre-migration: fall back to unweighted total. UI sees substitution_applied=false.
+            $totalHours = (float) $this->scopeVolLogsQuery($tenantId, $from, $to, $subRegionId)
+                ->where('vol_logs.status', 'approved')
+                ->sum('vol_logs.hours');
+            return [round($totalHours, 2), false];
+        }
+
+        // Sum hours × COALESCE(category.substitution_coefficient, 1.00).
+        // category_id is pulled from either the vol_opportunity OR the
+        // caring_support_relationship (whichever the log is linked to). Logs with
+        // neither still count at coefficient 1.00 via COALESCE.
+        $sql = "
+            SELECT COALESCE(SUM(vl.hours * COALESCE(c.substitution_coefficient, 1.00)), 0) AS weighted
+            FROM vol_logs vl
+            LEFT JOIN vol_opportunities vo ON vo.id = vl.opportunity_id
+            LEFT JOIN caring_support_relationships csr ON csr.id = vl.caring_support_relationship_id
+            LEFT JOIN categories c ON c.id = COALESCE(vo.category_id, csr.category_id)
+        ";
+        $where = " WHERE vl.tenant_id = ? AND vl.status = 'approved' AND vl.created_at BETWEEN ? AND ?";
+        $params = [$tenantId, $from->toDateTimeString(), $to->toDateTimeString()];
+
+        if ($subRegionId !== null
+            && Schema::hasTable('caring_care_providers')
+            && Schema::hasColumn('caring_care_providers', 'sub_region_id')
+        ) {
+            $sql .= " INNER JOIN caring_care_providers ccp ON ccp.id = csr.organization_id AND ccp.tenant_id = vl.tenant_id";
+            $where .= " AND ccp.sub_region_id = ?";
+            $params[] = $subRegionId;
+        }
+
+        try {
+            $row = DB::selectOne($sql . $where, $params);
+            $weighted = (float) ($row->weighted ?? 0);
+            return [round($weighted, 2), true];
+        } catch (\Throwable $e) {
+            Log::warning('municipalRoi computeWeightedHours failed', [
+                'tenant_id' => $tenantId,
+                'error'     => $e->getMessage(),
+            ]);
+            return [0.0, false];
+        }
+    }
+
+    /**
+     * YoY trend in % — last 12 months vs prior 12 months.
+     */
+    private function computeYoyTrend(int $tenantId): ?float
+    {
+        if (!Schema::hasTable('vol_logs')) {
+            return null;
+        }
+
+        $now = Carbon::now();
+        $oneYearAgo = $now->copy()->subYear();
+        $twoYearsAgo = $now->copy()->subYears(2);
+
+        $hoursThisYear = (float) DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'approved')
+            ->where('created_at', '>=', $oneYearAgo->toDateTimeString())
+            ->sum('hours');
+
+        $hoursPriorYear = (float) DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'approved')
+            ->where('created_at', '>=', $twoYearsAgo->toDateTimeString())
+            ->where('created_at', '<', $oneYearAgo->toDateTimeString())
+            ->sum('hours');
+
+        if ($hoursPriorYear <= 0) {
+            return null;
+        }
+
+        return round((($hoursThisYear - $hoursPriorYear) / $hoursPriorYear) * 100, 2);
+    }
+
+    /**
+     * Read tenant-configurable hourly rate from tenant_settings.
+     * Returns [rate_chf, source ('tenant_setting'|'default')].
+     *
+     * @return array{0: float, 1: string}
+     */
+    private function resolveHourlyRate(int $tenantId): array
+    {
+        $default = 35.0;
+
+        if (!Schema::hasTable('tenant_settings')) {
+            return [$default, 'default'];
+        }
+
+        $row = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('setting_key', 'caring_community.formal_care_hourly_rate_chf')
+            ->first(['setting_value']);
+
+        if (!$row || $row->setting_value === null || $row->setting_value === '') {
+            return [$default, 'default'];
+        }
+
+        $value = is_string($row->setting_value) ? trim($row->setting_value) : (string) $row->setting_value;
+        if (!is_numeric($value)) {
+            return [$default, 'default'];
+        }
+
+        $rate = (float) $value;
+        if ($rate <= 0) {
+            return [$default, 'default'];
+        }
+
+        return [$rate, 'tenant_setting'];
+    }
+
+    /**
+     * Build a sub-region breakdown for the tenant in the date range.
+     * Returns [{sub_region_id, sub_region_name, hours, weighted_hours, formal_care_offset_chf}, ...].
+     *
+     * @return array<int, array<string,mixed>>
+     */
+    private function subRegionBreakdown(int $tenantId, Carbon $from, Carbon $to, float $hourlyRateChf): array
+    {
+        if (!Schema::hasTable('caring_sub_regions')
+            || !Schema::hasTable('caring_support_relationships')
+            || !Schema::hasTable('caring_care_providers')
+            || !Schema::hasColumn('caring_care_providers', 'sub_region_id')
+            || !Schema::hasTable('vol_logs')
+        ) {
+            return [];
+        }
+
+        $hasCoefficient = Schema::hasColumn('categories', 'substitution_coefficient');
+
+        $weightedExpr = $hasCoefficient
+            ? 'SUM(vl.hours * COALESCE(c.substitution_coefficient, 1.00))'
+            : 'SUM(vl.hours)';
+
+        $categoryJoin = $hasCoefficient
+            ? '
+                LEFT JOIN vol_opportunities vo ON vo.id = vl.opportunity_id
+                LEFT JOIN categories c ON c.id = COALESCE(vo.category_id, csr.category_id)
+              '
+            : '';
+
+        $sql = "
+            SELECT
+                sr.id   AS sub_region_id,
+                sr.name AS sub_region_name,
+                COALESCE(SUM(vl.hours), 0) AS hours,
+                COALESCE({$weightedExpr}, 0) AS weighted_hours
+            FROM caring_sub_regions sr
+            INNER JOIN caring_care_providers ccp
+                ON ccp.sub_region_id = sr.id
+                AND ccp.tenant_id = sr.tenant_id
+            INNER JOIN caring_support_relationships csr
+                ON csr.organization_id = ccp.id
+                AND csr.tenant_id = sr.tenant_id
+            INNER JOIN vol_logs vl
+                ON vl.caring_support_relationship_id = csr.id
+                AND vl.tenant_id = sr.tenant_id
+                AND vl.status = 'approved'
+                AND vl.created_at BETWEEN ? AND ?
+            {$categoryJoin}
+            WHERE sr.tenant_id = ?
+            GROUP BY sr.id, sr.name
+            ORDER BY hours DESC, sr.name ASC
+        ";
+
+        try {
+            $rows = DB::select($sql, [$from->toDateTimeString(), $to->toDateTimeString(), $tenantId]);
+        } catch (\Throwable $e) {
+            Log::warning('municipalRoi sub-region breakdown failed', [
+                'tenant_id' => $tenantId,
+                'error'     => $e->getMessage(),
+            ]);
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $hours = (float) ($row->hours ?? 0);
+            $weighted = (float) ($row->weighted_hours ?? 0);
+            $out[] = [
+                'sub_region_id'          => (int) $row->sub_region_id,
+                'sub_region_name'        => (string) $row->sub_region_name,
+                'hours'                  => round($hours, 2),
+                'weighted_hours'         => round($weighted, 2),
+                'formal_care_offset_chf' => round($weighted * $hourlyRateChf, 2),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Best-effort tenant slug for CSV filename.
+     */
+    private function tenantSlugForFilename(int $tenantId): string
+    {
+        try {
+            $row = DB::table('tenants')->where('id', $tenantId)->first(['slug', 'name']);
+            if ($row && !empty($row->slug)) {
+                $slug = preg_replace('/[^a-z0-9_-]+/i', '-', (string) $row->slug);
+                return trim((string) $slug, '-') ?: ('tenant-' . $tenantId);
+            }
+            if ($row && !empty($row->name)) {
+                $slug = preg_replace('/[^a-z0-9_-]+/i', '-', strtolower((string) $row->name));
+                return trim((string) $slug, '-') ?: ('tenant-' . $tenantId);
+            }
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        return 'tenant-' . $tenantId;
     }
 
     // -------------------------------------------------------------------------
@@ -1709,6 +2179,180 @@ class AdminCaringCommunityController extends BaseApiController
             'format'   => 'markdown',
             'content'  => $this->disclosurePackService->renderMarkdown(TenantContext::getId()),
             'filename' => 'fadp-ndsg-disclosure-pack.md',
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Per-Category Substitution Coefficients (Pflege-CHF computation)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Tables that may carry a `substitution_coefficient` column for the
+     * caring community Pflege-CHF computation. Currently the caring/volunteer
+     * help categories live in the shared, tenant-scoped `categories` table —
+     * both `caring_support_relationships.category_id` and
+     * `vol_opportunities.category_id` FK to it.
+     *
+     * @var list<string>
+     */
+    private const CATEGORY_COEFFICIENT_TABLES = ['categories'];
+
+    /**
+     * GET /api/v2/admin/caring-community/category-coefficients
+     *
+     * Returns the per-category substitution coefficients used to convert
+     * community caring hours into formal-care-hour equivalents.
+     */
+    public function listCategoryCoefficients(): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+        $rows     = [];
+        $migrationPending = false;
+
+        foreach (self::CATEGORY_COEFFICIENT_TABLES as $table) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+            if (!Schema::hasColumn($table, 'substitution_coefficient')) {
+                $migrationPending = true;
+                continue;
+            }
+
+            $query = DB::table($table)
+                ->select(['id', 'name', 'substitution_coefficient']);
+
+            // Categories table is tenant-scoped — scope by current tenant.
+            if (Schema::hasColumn($table, 'tenant_id')) {
+                $query->where('tenant_id', $tenantId);
+            }
+
+            // Active flag — only show enabled categories where present.
+            if (Schema::hasColumn($table, 'is_active')) {
+                $query->where('is_active', 1);
+            }
+
+            // Stable ordering for the editor.
+            if (Schema::hasColumn($table, 'sort_order')) {
+                $query->orderBy('sort_order')->orderBy('name');
+            } else {
+                $query->orderBy('name');
+            }
+
+            foreach ($query->get() as $row) {
+                $rows[] = [
+                    'id'                       => (int) $row->id,
+                    'name'                     => (string) $row->name,
+                    'substitution_coefficient' => (float) $row->substitution_coefficient,
+                    'source_table'             => $table,
+                ];
+            }
+        }
+
+        if ($migrationPending && $rows === []) {
+            return $this->respondWithData([
+                'categories'        => [],
+                'migration_pending' => true,
+            ]);
+        }
+
+        return $this->respondWithData([
+            'categories'        => $rows,
+            'migration_pending' => false,
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/admin/caring-community/category-coefficients/{id}
+     *
+     * Body: { substitution_coefficient: float, source_table: string }
+     */
+    public function updateCategoryCoefficient(int $id): JsonResponse
+    {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) return $disabled;
+
+        $tenantId = TenantContext::getId();
+        $input    = $this->getAllInput();
+
+        $sourceTable = isset($input['source_table']) ? (string) $input['source_table'] : '';
+        if (!in_array($sourceTable, self::CATEGORY_COEFFICIENT_TABLES, true)) {
+            return $this->respondWithError(
+                'VALIDATION_INVALID_FIELD',
+                'Invalid source_table',
+                'source_table',
+                422,
+            );
+        }
+
+        if (!Schema::hasTable($sourceTable) || !Schema::hasColumn($sourceTable, 'substitution_coefficient')) {
+            return $this->respondWithError(
+                'MIGRATION_PENDING',
+                'The substitution_coefficient column has not been migrated yet. Run `php artisan migrate`.',
+                null,
+                503,
+            );
+        }
+
+        if (!array_key_exists('substitution_coefficient', $input)) {
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED_FIELD',
+                'substitution_coefficient is required',
+                'substitution_coefficient',
+                422,
+            );
+        }
+
+        $rawCoefficient = $input['substitution_coefficient'];
+        if (!is_numeric($rawCoefficient)) {
+            return $this->respondWithError(
+                'VALIDATION_INVALID_FIELD',
+                'substitution_coefficient must be a number',
+                'substitution_coefficient',
+                422,
+            );
+        }
+
+        $coefficient = round((float) $rawCoefficient, 2);
+        if ($coefficient < 0.0 || $coefficient > 9.99) {
+            return $this->respondWithError(
+                'VALIDATION_OUT_OF_RANGE',
+                'substitution_coefficient must be between 0.00 and 9.99',
+                'substitution_coefficient',
+                422,
+            );
+        }
+
+        $query = DB::table($sourceTable)->where('id', $id);
+        if (Schema::hasColumn($sourceTable, 'tenant_id')) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        $existing = (clone $query)->first(['id']);
+        if ($existing === null) {
+            return $this->respondWithError(
+                'NOT_FOUND',
+                'Category not found',
+                null,
+                404,
+            );
+        }
+
+        $query->update(['substitution_coefficient' => $coefficient]);
+
+        Log::info('caring_community.category_coefficient_updated', [
+            'tenant_id'                => $tenantId,
+            'category_id'              => $id,
+            'source_table'             => $sourceTable,
+            'substitution_coefficient' => $coefficient,
+        ]);
+
+        return $this->respondWithData([
+            'id'                       => $id,
+            'substitution_coefficient' => $coefficient,
+            'source_table'             => $sourceTable,
         ]);
     }
 
