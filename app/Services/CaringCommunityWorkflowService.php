@@ -88,19 +88,28 @@ class CaringCommunityWorkflowService
             return null;
         }
 
-        $log = DB::table('vol_logs')
-            ->where('tenant_id', $tenantId)
-            ->where('id', $logId)
-            ->first();
-        if (!$log || (string) $log->status !== 'pending' || (int) $log->user_id === $reviewerId) {
-            return null;
-        }
-
         $status = $action === 'approve' ? 'approved' : 'declined';
         $paymentResult = null;
         $regionalPointsResult = null;
+        $log = null;
+        $aborted = false;
 
-        DB::transaction(function () use ($tenantId, $logId, $log, $status, $action, &$paymentResult): void {
+        DB::transaction(function () use ($tenantId, $logId, $reviewerId, $status, $action, &$paymentResult, &$log, &$aborted): void {
+            // Lock the row for the duration of the transaction so two
+            // concurrent approve/decline requests can't both pass the
+            // status==='pending' guard before either has committed.
+            $locked = DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $logId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$locked || (string) $locked->status !== 'pending' || (int) $locked->user_id === $reviewerId) {
+                $aborted = true;
+                return;
+            }
+            $log = $locked;
+
             DB::table('vol_logs')
                 ->where('tenant_id', $tenantId)
                 ->where('id', $logId)
@@ -131,6 +140,10 @@ class CaringCommunityWorkflowService
                 (float) $log->hours,
             );
         });
+
+        if ($aborted || $log === null) {
+            return null;
+        }
 
         if ($action === 'approve') {
             try {

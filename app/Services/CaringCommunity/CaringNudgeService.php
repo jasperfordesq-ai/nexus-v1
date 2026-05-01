@@ -596,8 +596,13 @@ class CaringNudgeService
         $cutoff = now()->subDays(self::UNFULFILLED_HELP_REQUEST_DAYS)->toDateTimeString();
 
         $rows = DB::table('caring_help_requests as hr')
-            ->leftJoin('users as u', function ($join) use ($tenantId): void {
-                $join->on('u.id', '=', 'hr.user_id')->where('u.tenant_id', '=', $tenantId);
+            ->join('users as u', function ($join) use ($tenantId): void {
+                // Inner join so a help request only emits when its requester
+                // exists AND lives in the same tenant — defends against
+                // cross-tenant leakage if hr.user_id ever points elsewhere.
+                $join->on('u.id', '=', 'hr.user_id')
+                    ->on('u.tenant_id', '=', 'hr.tenant_id')
+                    ->where('u.tenant_id', '=', $tenantId);
             })
             ->where('hr.tenant_id', $tenantId)
             ->where('hr.status', 'pending')
@@ -964,29 +969,16 @@ class CaringNudgeService
             return 0;
         }
 
-        $rows = DB::table('users')
+        // Push the JSON predicate down to MySQL so the database filters at the
+        // storage engine instead of streaming every user row to PHP for decode.
+        // Mirrors the `caring_smart_nudges` key path read by parseOptedOut().
+        // JSON_EXTRACT returns the JSON literal `false` (not the SQL FALSE),
+        // so compare with CAST(... AS JSON) to be robust across MySQL/MariaDB.
+        return (int) DB::table('users')
             ->where('tenant_id', $tenantId)
             ->whereNotNull('notification_preferences')
-            ->get(['notification_preferences']);
-
-        $count = 0;
-        foreach ($rows as $row) {
-            $prefs = is_string($row->notification_preferences)
-                ? json_decode($row->notification_preferences, true)
-                : $row->notification_preferences;
-            if (is_string($prefs)) {
-                $prefs = json_decode($prefs, true);
-            }
-            if (
-                is_array($prefs)
-                && array_key_exists('caring_smart_nudges', $prefs)
-                && filter_var($prefs['caring_smart_nudges'], FILTER_VALIDATE_BOOLEAN) === false
-            ) {
-                $count++;
-            }
-        }
-
-        return $count;
+            ->whereRaw("JSON_EXTRACT(notification_preferences, '$.caring_smart_nudges') = CAST('false' AS JSON)")
+            ->count();
     }
 
     /**

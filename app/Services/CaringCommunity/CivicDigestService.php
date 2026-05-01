@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services\CaringCommunity;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -791,7 +792,11 @@ class CivicDigestService
                     return (int) $row->sub_region_id;
                 }
             } catch (\Throwable $e) {
-                // ignore
+                Log::warning('CivicDigestService: failed to resolve user sub_region_id', [
+                    'exception' => $e->getMessage(),
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                ]);
             }
         }
 
@@ -820,7 +825,11 @@ class CivicDigestService
                     }
                 }
             } catch (\Throwable $e) {
-                // ignore
+                Log::warning('CivicDigestService: failed to read users.skills for interests', [
+                    'exception' => $e->getMessage(),
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                ]);
             }
         }
 
@@ -837,7 +846,11 @@ class CivicDigestService
                     }
                 }
             } catch (\Throwable $e) {
-                // ignore
+                Log::warning('CivicDigestService: failed to read user_skills for interests', [
+                    'exception' => $e->getMessage(),
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                ]);
             }
         }
 

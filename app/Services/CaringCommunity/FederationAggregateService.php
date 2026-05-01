@@ -418,8 +418,17 @@ class FederationAggregateService
                 return ['slug' => $row->slug, 'name' => $row->name];
             }
         } catch (\Throwable $e) {
-            // ignore
+            Log::warning('FederationAggregateService: failed to resolve tenant meta', [
+                'exception' => $e->getMessage(),
+                'tenant_id' => $tenantId,
+            ]);
         }
+
+        // Log when we fall through to the empty shape so post-mortems can
+        // detect signed payloads with stub identity (tenant row missing).
+        Log::warning('FederationAggregateService: returning empty tenant meta (stub identity)', [
+            'tenant_id' => $tenantId,
+        ]);
         return ['slug' => null, 'name' => null];
     }
 
