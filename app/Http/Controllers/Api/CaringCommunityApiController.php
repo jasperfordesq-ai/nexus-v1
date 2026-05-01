@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use App\Services\CaringCommunity\CaringRegionalPointService;
@@ -1299,7 +1300,13 @@ class CaringCommunityApiController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
         }
         if ((string) $row->status !== 'active') {
-            return $this->respondWithError('INVALID_STATE', 'Only active relationships can be paused.', null, 422);
+            $lang = (string) (DB::table('users')->where('id', $userId)->value('preferred_language') ?? '');
+            return LocaleContext::withLocale($lang !== '' ? $lang : null, fn () => $this->respondWithError(
+                'INVALID_STATE',
+                __('api.caring_community.relationship_pause_invalid_state'),
+                null,
+                422,
+            ));
         }
 
         $input    = $this->getAllInput();
@@ -1358,7 +1365,13 @@ class CaringCommunityApiController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
         }
         if (!in_array((string) $row->status, ['active', 'paused'], true)) {
-            return $this->respondWithError('INVALID_STATE', 'Relationship is not in an endable state.', null, 422);
+            $lang = (string) (DB::table('users')->where('id', $userId)->value('preferred_language') ?? '');
+            return LocaleContext::withLocale($lang !== '' ? $lang : null, fn () => $this->respondWithError(
+                'INVALID_STATE',
+                __('api.caring_community.relationship_end_invalid_state'),
+                null,
+                422,
+            ));
         }
 
         $input  = $this->getAllInput();
@@ -1412,7 +1425,13 @@ class CaringCommunityApiController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.not_found'), null, 404);
         }
         if ((string) $row->status !== 'paused') {
-            return $this->respondWithError('INVALID_STATE', 'Only paused relationships can be resumed.', null, 422);
+            $lang = (string) (DB::table('users')->where('id', $userId)->value('preferred_language') ?? '');
+            return LocaleContext::withLocale($lang !== '' ? $lang : null, fn () => $this->respondWithError(
+                'INVALID_STATE',
+                __('api.caring_community.relationship_resume_invalid_state'),
+                null,
+                422,
+            ));
         }
 
         try {

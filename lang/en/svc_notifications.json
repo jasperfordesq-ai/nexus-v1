@@ -2,6 +2,9 @@
   "badge_collection": {
     "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
   },
+  "safeguarding": {
+    "critical_report_submitted": "Critical safeguarding report submitted"
+  },
   "broker": {
     "message_for_review": "New message for review from {{sender}}"
   },

@@ -131,5 +131,8 @@
     "reminder_bell": "Goal reminder: \"{{title}}\"",
     "reminder_push_title": "Goal Reminder",
     "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+  },
+  "safeguarding": {
+    "critical_report_submitted": "Critical safeguarding report submitted"
   }
 }

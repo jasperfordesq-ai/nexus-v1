@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\CaringCommunity;
 
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\CaringTandemMatchingService;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +42,18 @@ class CaringNudgeService
     /** Synthetic score reported for non-tandem nudges. */
     private const SIGNAL_SCORE_HIGH = 0.85;
     private const SIGNAL_SCORE_MEDIUM = 0.7;
+
+    /** @var array<int,bool> userId => optedOut (per-tenant ephemeral cache) */
+    private array $optOutCache = [];
+
+    /** @var array<string,bool> "tenant:source:target" => recently-nudged */
+    private array $recentNudgeBySourceCache = [];
+
+    /** @var array<string,bool> "tenant:target:related" => recently-nudged */
+    private array $recentNudgePairCache = [];
+
+    /** @var array<int,string> userId => name */
+    private array $userNameCache = [];
 
     public function __construct(
         private readonly CaringTandemMatchingService $tandemMatchingService,
@@ -137,6 +150,26 @@ class CaringNudgeService
         }
 
         // ── Existing trigger: tandem_candidate ──────────────────────────
+        // Bulk-warm opt-out + recently-nudged caches across the whole
+        // suggestion set so the inner loop avoids per-row N+1 queries.
+        $tandemUserIds = [];
+        $tandemPairs = [];
+        foreach ($suggestions as $suggestion) {
+            $t = (int) ($suggestion['supporter']['id'] ?? 0);
+            $r = (int) ($suggestion['recipient']['id'] ?? 0);
+            if ($t > 0) {
+                $tandemUserIds[] = $t;
+            }
+            if ($r > 0) {
+                $tandemUserIds[] = $r;
+            }
+            if ($t > 0 && $r > 0) {
+                $tandemPairs[] = [$t, $r];
+            }
+        }
+        $this->preloadOptOuts($tenantId, $tandemUserIds);
+        $this->preloadRecentPairs($tenantId, $tandemPairs, $cooldownDays);
+
         foreach ($suggestions as $suggestion) {
             $score = (float) ($suggestion['score'] ?? 0);
             if ($score < $config['min_score']) {
@@ -163,6 +196,10 @@ class CaringNudgeService
                 'reason' => (string) ($suggestion['reason'] ?? ''),
                 'source_type' => 'tandem_candidate',
                 'notification_url' => '/caring-community/request-help',
+                // Render the message inside LocaleContext at dispatch time so
+                // it resolves in the recipient's preferred_language.
+                'notification_key' => 'api.caring_nudge_notification',
+                'notification_params' => ['name' => (string) ($suggestion['recipient']['name'] ?? '')],
                 'notification_message' => __('api.caring_nudge_notification', ['name' => (string) ($suggestion['recipient']['name'] ?? '')]),
             ];
 
@@ -195,6 +232,24 @@ class CaringNudgeService
         $sent = 0;
         $items = [];
 
+        // Bulk-load preferred_language for all unique target users so we can
+        // wrap each Notification::createNotification render in the recipient's
+        // locale (avoids leaking the queue worker's default).
+        $targetIds = array_values(array_unique(array_filter(
+            array_map(fn ($c) => (int) ($c['target_user']['id'] ?? 0), $candidates),
+            fn ($id) => $id > 0,
+        )));
+        $preferredLang = [];
+        if (count($targetIds) > 0) {
+            $rows = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $targetIds)
+                ->get(['id', 'preferred_language']);
+            foreach ($rows as $r) {
+                $preferredLang[(int) $r->id] = (string) ($r->preferred_language ?? '');
+            }
+        }
+
         foreach ($candidates as $candidate) {
             if ($dryRun) {
                 $items[] = $candidate + ['status' => 'preview'];
@@ -204,17 +259,28 @@ class CaringNudgeService
             $targetId = (int) $candidate['target_user']['id'];
             $relatedId = (int) ($candidate['related_user']['id'] ?? 0);
             $sourceType = (string) ($candidate['source_type'] ?? 'tandem_candidate');
-            $message = (string) ($candidate['notification_message']
-                ?? __('api.caring_nudge_notification', ['name' => (string) ($candidate['related_user']['name'] ?? '')]));
             $url = (string) ($candidate['notification_url'] ?? '/caring-community/request-help');
 
-            $notificationId = Notification::createNotification(
-                $targetId,
-                $message,
-                $url,
-                'caring_smart_nudge',
-                false,
-                $tenantId,
+            $notificationKey = (string) ($candidate['notification_key']
+                ?? 'api.caring_nudge_notification');
+            $notificationParams = (array) ($candidate['notification_params']
+                ?? ['name' => (string) ($candidate['related_user']['name'] ?? '')]);
+
+            $lang = $preferredLang[$targetId] ?? '';
+
+            // Wrap the bell render + insert in the recipient's locale so the
+            // message is translated to their preferred_language regardless of
+            // the queue worker's default locale.
+            $notificationId = LocaleContext::withLocale(
+                $lang !== '' ? $lang : null,
+                fn () => Notification::createNotification(
+                    $targetId,
+                    (string) __($notificationKey, $notificationParams),
+                    $url,
+                    'caring_smart_nudge',
+                    false,
+                    $tenantId,
+                ),
             );
 
             $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId([
@@ -379,6 +445,11 @@ class CaringNudgeService
 
     private function recentlyNudged(int $tenantId, int $targetId, int $relatedId, int $cooldownDays): bool
     {
+        $key = $tenantId . ':' . $targetId . ':' . $relatedId;
+        if (array_key_exists($key, $this->recentNudgePairCache)) {
+            return $this->recentNudgePairCache[$key];
+        }
+
         $query = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('target_user_id', $targetId)
@@ -390,7 +461,9 @@ class CaringNudgeService
             $query->whereNull('related_user_id');
         }
 
-        return $query->exists();
+        $result = $query->exists();
+        $this->recentNudgePairCache[$key] = $result;
+        return $result;
     }
 
     /**
@@ -398,12 +471,20 @@ class CaringNudgeService
      */
     private function recentlyNudgedBySource(int $tenantId, int $targetId, string $sourceType, int $cooldownDays): bool
     {
-        return DB::table('caring_smart_nudges')
+        $key = $tenantId . ':' . $sourceType . ':' . $targetId;
+        if (array_key_exists($key, $this->recentNudgeBySourceCache)) {
+            return $this->recentNudgeBySourceCache[$key];
+        }
+
+        $exists = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('target_user_id', $targetId)
             ->where('source_type', $sourceType)
             ->where('sent_at', '>=', now()->subDays($cooldownDays))
             ->exists();
+
+        $this->recentNudgeBySourceCache[$key] = $exists;
+        return $exists;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -460,6 +541,12 @@ class CaringNudgeService
             ->get(['id', 'name'])
             ->keyBy('id');
 
+        // Bulk-load opt-out status and recently-nudged-by-source map in one
+        // query each — replaces per-row N+1 lookups inside the loop below.
+        $atRiskInts = array_map(fn ($v) => (int) $v, $atRisk);
+        $this->preloadOptOuts($tenantId, $atRiskInts);
+        $this->preloadRecentBySource($tenantId, 'helper_at_risk', $atRiskInts, $cooldownDays);
+
         $out = [];
         foreach ($atRisk as $userId) {
             $user = $users->get($userId);
@@ -484,6 +571,8 @@ class CaringNudgeService
                 'reason' => 'helper_at_risk',
                 'source_type' => 'helper_at_risk',
                 'notification_url' => '/caring-community',
+                'notification_key' => 'caring_community.nudges.helper_at_risk.message',
+                'notification_params' => [],
                 'notification_message' => __('caring_community.nudges.helper_at_risk.message'),
             ];
         }
@@ -526,6 +615,17 @@ class CaringNudgeService
             return [];
         }
 
+        // Bulk-load coordinator opt-outs, names, and recently-nudged pairs.
+        $this->preloadOptOuts($tenantId, $coordinatorIds);
+        $this->preloadUserNames($tenantId, $coordinatorIds);
+        $pairs = [];
+        foreach ($rows as $row) {
+            foreach ($coordinatorIds as $coordId) {
+                $pairs[] = [(int) $coordId, (int) $row->user_id];
+            }
+        }
+        $this->preloadRecentPairs($tenantId, $pairs, $cooldownDays);
+
         $out = [];
         foreach ($rows as $row) {
             $requesterId = (int) $row->user_id;
@@ -543,10 +643,7 @@ class CaringNudgeService
                 $out[] = [
                     'target_user' => [
                         'id' => $coordId,
-                        'name' => (string) (DB::table('users')
-                            ->where('tenant_id', $tenantId)
-                            ->where('id', $coordId)
-                            ->value('name') ?? ''),
+                        'name' => $this->userName($tenantId, $coordId),
                     ],
                     'related_user' => ['id' => $requesterId, 'name' => $requesterName],
                     'score' => self::SIGNAL_SCORE_HIGH,
@@ -558,6 +655,11 @@ class CaringNudgeService
                     'reason' => 'unfulfilled_help_request',
                     'source_type' => 'unfulfilled_help_request',
                     'notification_url' => '/admin/caring-community/workflow',
+                    'notification_key' => 'caring_community.nudges.unfulfilled_help_request.message',
+                    'notification_params' => [
+                        'name' => $requesterName,
+                        'days' => self::UNFULFILLED_HELP_REQUEST_DAYS,
+                    ],
                     'notification_message' => __('caring_community.nudges.unfulfilled_help_request.message', [
                         'name' => $requesterName,
                         'days' => self::UNFULFILLED_HELP_REQUEST_DAYS,
@@ -598,6 +700,11 @@ class CaringNudgeService
             return [];
         }
 
+        // Bulk-load admin opt-outs, names, and recently-nudged-by-source.
+        $this->preloadOptOuts($tenantId, $admins);
+        $this->preloadUserNames($tenantId, $admins);
+        $this->preloadRecentBySource($tenantId, 'low_coverage_subregion', $admins, $cooldownDays);
+
         $out = [];
         foreach ($flagged as $region) {
             foreach ($admins as $adminId) {
@@ -611,10 +718,7 @@ class CaringNudgeService
                 $out[] = [
                     'target_user' => [
                         'id' => $adminId,
-                        'name' => (string) (DB::table('users')
-                            ->where('tenant_id', $tenantId)
-                            ->where('id', $adminId)
-                            ->value('name') ?? ''),
+                        'name' => $this->userName($tenantId, $adminId),
                     ],
                     'related_user' => ['id' => 0, 'name' => (string) $region['name']],
                     'score' => self::SIGNAL_SCORE_MEDIUM,
@@ -628,6 +732,8 @@ class CaringNudgeService
                     'reason' => 'low_coverage_subregion',
                     'source_type' => 'low_coverage_subregion',
                     'notification_url' => '/admin/caring-community/sub-regions',
+                    'notification_key' => 'caring_community.nudges.low_coverage_subregion.message',
+                    'notification_params' => ['name' => (string) $region['name']],
                     'notification_message' => __('caring_community.nudges.low_coverage_subregion.message', [
                         'name' => (string) $region['name'],
                     ]),
@@ -669,11 +775,26 @@ class CaringNudgeService
 
     private function memberOptedOut(int $tenantId, int $userId): bool
     {
+        if (array_key_exists($userId, $this->optOutCache)) {
+            return $this->optOutCache[$userId];
+        }
+
         $raw = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('id', $userId)
             ->value('notification_preferences');
 
+        $result = $this->parseOptedOut($raw);
+        $this->optOutCache[$userId] = $result;
+        return $result;
+    }
+
+    /**
+     * Parse a notification_preferences JSON blob and return whether the user
+     * has explicitly opted out of caring_smart_nudges.
+     */
+    private function parseOptedOut(mixed $raw): bool
+    {
         if (!$raw) {
             return false;
         }
@@ -687,6 +808,154 @@ class CaringNudgeService
         }
 
         return filter_var($prefs['caring_smart_nudges'], FILTER_VALIDATE_BOOLEAN) === false;
+    }
+
+    /**
+     * Bulk-load notification_preferences for a set of users in a single query
+     * and warm $optOutCache. Avoids N+1 from per-row memberOptedOut() calls.
+     *
+     * @param  list<int> $userIds
+     */
+    private function preloadOptOuts(int $tenantId, array $userIds): void
+    {
+        $userIds = array_values(array_unique(array_filter($userIds, fn ($v) => (int) $v > 0)));
+        if (count($userIds) === 0) {
+            return;
+        }
+
+        $missing = array_values(array_filter(
+            $userIds,
+            fn ($id) => !array_key_exists((int) $id, $this->optOutCache),
+        ));
+        if (count($missing) === 0) {
+            return;
+        }
+
+        $rows = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $missing)
+            ->get(['id', 'notification_preferences']);
+
+        $seen = [];
+        foreach ($rows as $row) {
+            $id = (int) $row->id;
+            $this->optOutCache[$id] = $this->parseOptedOut($row->notification_preferences);
+            $seen[$id] = true;
+        }
+        // Users with no row default to NOT opted out.
+        foreach ($missing as $id) {
+            if (!isset($seen[(int) $id])) {
+                $this->optOutCache[(int) $id] = false;
+            }
+        }
+    }
+
+    /**
+     * Bulk-load the set of (target_user_id) pairs that have already received
+     * a nudge of $sourceType within $cooldownDays. Warms $recentNudgeBySourceCache.
+     *
+     * @param  list<int> $userIds
+     */
+    private function preloadRecentBySource(int $tenantId, string $sourceType, array $userIds, int $cooldownDays): void
+    {
+        $userIds = array_values(array_unique(array_filter($userIds, fn ($v) => (int) $v > 0)));
+        if (count($userIds) === 0) {
+            return;
+        }
+
+        $hits = DB::table('caring_smart_nudges')
+            ->where('tenant_id', $tenantId)
+            ->where('source_type', $sourceType)
+            ->where('sent_at', '>=', now()->subDays($cooldownDays))
+            ->whereIn('target_user_id', $userIds)
+            ->distinct()
+            ->pluck('target_user_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+
+        $hitSet = array_flip($hits);
+        foreach ($userIds as $id) {
+            $key = $tenantId . ':' . $sourceType . ':' . (int) $id;
+            $this->recentNudgeBySourceCache[$key] = isset($hitSet[(int) $id]);
+        }
+    }
+
+    /**
+     * Bulk-load the set of (target_user_id, related_user_id) pairs that have
+     * already been nudged within $cooldownDays. Warms $recentNudgePairCache.
+     *
+     * @param  list<array{0:int,1:int}> $pairs
+     */
+    private function preloadRecentPairs(int $tenantId, array $pairs, int $cooldownDays): void
+    {
+        if (count($pairs) === 0) {
+            return;
+        }
+
+        $targetIds = array_values(array_unique(array_map(fn ($p) => (int) $p[0], $pairs)));
+        if (count($targetIds) === 0) {
+            return;
+        }
+
+        $rows = DB::table('caring_smart_nudges')
+            ->where('tenant_id', $tenantId)
+            ->where('sent_at', '>=', now()->subDays($cooldownDays))
+            ->whereIn('target_user_id', $targetIds)
+            ->get(['target_user_id', 'related_user_id']);
+
+        $hitSet = [];
+        foreach ($rows as $r) {
+            $t = (int) $r->target_user_id;
+            $rel = $r->related_user_id !== null ? (int) $r->related_user_id : 0;
+            $hitSet[$t . ':' . $rel] = true;
+        }
+
+        foreach ($pairs as [$t, $rel]) {
+            $key = $tenantId . ':' . (int) $t . ':' . (int) $rel;
+            $this->recentNudgePairCache[$key] = isset($hitSet[(int) $t . ':' . (int) $rel]);
+        }
+    }
+
+    /**
+     * Bulk-load names for a set of user IDs and warm $userNameCache.
+     *
+     * @param  list<int> $userIds
+     */
+    private function preloadUserNames(int $tenantId, array $userIds): void
+    {
+        $userIds = array_values(array_unique(array_filter(
+            $userIds,
+            fn ($v) => (int) $v > 0 && !isset($this->userNameCache[(int) $v]),
+        )));
+        if (count($userIds) === 0) {
+            return;
+        }
+
+        $rows = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $userIds)
+            ->get(['id', 'name']);
+
+        foreach ($rows as $r) {
+            $this->userNameCache[(int) $r->id] = (string) ($r->name ?? '');
+        }
+        // Fill in any missing IDs as empty string.
+        foreach ($userIds as $id) {
+            if (!isset($this->userNameCache[(int) $id])) {
+                $this->userNameCache[(int) $id] = '';
+            }
+        }
+    }
+
+    private function userName(int $tenantId, int $userId): string
+    {
+        if ($userId <= 0) {
+            return '';
+        }
+        if (!isset($this->userNameCache[$userId])) {
+            $this->preloadUserNames($tenantId, [$userId]);
+        }
+        return $this->userNameCache[$userId] ?? '';
     }
 
     private function optedOutCount(int $tenantId): int

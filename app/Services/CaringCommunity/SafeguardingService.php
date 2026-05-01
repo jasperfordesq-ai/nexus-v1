@@ -582,40 +582,39 @@ class SafeguardingService
         foreach ($recipients as $recipient) {
             $userId = (int) $recipient->id;
 
-            // 1) UI bell — kept exactly as before for backwards compatibility.
-            try {
-                DB::table('notifications')->insert([
-                    'tenant_id'  => $tenantId,
-                    'user_id'    => $userId,
-                    'type'       => 'safeguarding_critical',
-                    'message'    => 'Critical safeguarding report submitted',
-                    'link'       => '/admin/caring-community/safeguarding/' . $reportId,
-                    'is_read'    => 0,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            } catch (\Throwable $e) {
-                Log::warning('[Safeguarding] Notification insert failed: ' . $e->getMessage());
-            }
+            LocaleContext::withLocale($recipient, function () use ($recipient, $reportId, $reportPayload, $reporterName, $tenantId, $userId, $now): void {
+                // 1) UI bell — message rendered in recipient's preferred_language.
+                try {
+                    DB::table('notifications')->insert([
+                        'tenant_id'  => $tenantId,
+                        'user_id'    => $userId,
+                        'type'       => 'safeguarding_critical',
+                        'message'    => __('svc_notifications.safeguarding.critical_report_submitted'),
+                        'link'       => '/admin/caring-community/safeguarding/' . $reportId,
+                        'is_read'    => 0,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::warning('[Safeguarding] Notification insert failed: ' . $e->getMessage());
+                }
 
-            // 2) Email alert — wrapped in LocaleContext so subject + body
-            // render in the recipient coordinator's preferred_language.
-            if (empty($recipient->email)) {
-                continue;
-            }
+                // 2) Email alert — subject + body rendered in recipient's preferred_language.
+                if (empty($recipient->email)) {
+                    return;
+                }
 
-            try {
-                LocaleContext::withLocale($recipient, function () use ($recipient, $reportPayload, $reporterName): void {
+                try {
                     Mail::to($recipient->email)->send(
                         new SafeguardingCriticalMail($reportPayload, $reporterName)
                     );
-                });
-            } catch (\Throwable $e) {
-                Log::warning('[Safeguarding] Critical email send failed', [
-                    'user_id' => $userId,
-                    'error'   => $e->getMessage(),
-                ]);
-            }
+                } catch (\Throwable $e) {
+                    Log::warning('[Safeguarding] Critical email send failed', [
+                        'user_id' => $userId,
+                        'error'   => $e->getMessage(),
+                    ]);
+                }
+            });
         }
     }
 
