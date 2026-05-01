@@ -134,6 +134,23 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('caring-nudges-dispatch');
 
+        // AG90 — Personalised civic digest dispatch (email + push).
+        // Daily run at 07:00 for members opted into daily cadence; weekly run
+        // on Mondays at 07:30. Both have idempotency guards inside the command
+        // (last_sent_at per user) so re-running within the cadence window is a
+        // no-op.
+        $schedule->command('caring:civic-digest-dispatch --cadence=daily')
+            ->dailyAt('07:00')
+            ->withoutOverlapping(60)
+            ->runInBackground()
+            ->name('caring-civic-digest-daily');
+
+        $schedule->command('caring:civic-digest-dispatch --cadence=weekly')
+            ->weeklyOn(1, '07:30')
+            ->withoutOverlapping(60)
+            ->runInBackground()
+            ->name('caring-civic-digest-weekly');
+
         // Listings: auto-unfeature listings whose featured_until has passed
         $schedule->call(function () {
             app(\App\Services\ListingFeaturedService::class)->processExpiredFeatured();

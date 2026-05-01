@@ -1,0 +1,29 @@
+{
+  "email": {
+    "subject_daily": "Ihr täglicher Gemeinde-Digest — {{community}}",
+    "subject_weekly": "Ihr wöchentlicher Gemeinde-Digest — {{community}}",
+    "greeting": "Hallo {{name}},",
+    "intro_daily": "Das ist heute neu in Ihrer Gemeinschaft — {{count}} Aktualisierung(en), ausgewählt nach Ihrer Region und Ihren Interessen.",
+    "intro_weekly": "Hier ist Ihre Wochenübersicht — {{count}} Aktualisierung(en), ausgewählt nach Ihrer Region und Ihren Interessen.",
+    "empty": "Aktuell gibt es nichts Neues in Ihrer Gemeinschaft. Wir halten Sie auf dem Laufenden.",
+    "cta_open": "Öffnen",
+    "cta_manage_prefs": "Digest-Einstellungen verwalten",
+    "footer": "Sie erhalten diese E-Mail, weil Sie den Gemeinde-Digest von {{community}} aktiviert haben. Sie können die Häufigkeit jederzeit ändern oder den Versand abbestellen.",
+    "match_score": "Treffer {{score}}",
+    "view_all": "Vollständigen Digest ansehen"
+  },
+  "push": {
+    "title": "Ihr Gemeinde-Digest ist bereit",
+    "body_one": "{{count}} neue Aktualisierung in Ihrer Gemeinschaft",
+    "body_other": "{{count}} neue Aktualisierungen in Ihrer Gemeinschaft"
+  },
+  "source_announcement": "Mitteilung",
+  "source_project": "Projekt-Update",
+  "source_event": "Veranstaltung",
+  "source_vol_org": "Lokale Organisation",
+  "source_care_provider": "Pflegedienst",
+  "source_marketplace": "Marktplatz",
+  "source_safety_alert": "Sicherheitshinweis",
+  "source_help_request": "Hilfe gesucht",
+  "source_feed_post": "Beitrag aus der Gemeinschaft"
+}

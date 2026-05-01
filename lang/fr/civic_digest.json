@@ -1,0 +1,29 @@
+{
+  "email": {
+    "subject_daily": "Votre digest communal du jour — {{community}}",
+    "subject_weekly": "Votre digest communal de la semaine — {{community}}",
+    "greeting": "Bonjour {{name}},",
+    "intro_daily": "Voici les nouveautés du jour dans votre communauté — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
+    "intro_weekly": "Voici votre récap hebdomadaire — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
+    "empty": "Rien de neuf dans votre communauté pour l'instant. Nous vous tiendrons informé.",
+    "cta_open": "Ouvrir",
+    "cta_manage_prefs": "Gérer les préférences du digest",
+    "footer": "Vous recevez ce message car vous avez activé le digest communal de {{community}}. Vous pouvez modifier la fréquence ou vous désabonner à tout moment.",
+    "match_score": "Pertinence {{score}}",
+    "view_all": "Voir le digest complet"
+  },
+  "push": {
+    "title": "Votre digest communal est prêt",
+    "body_one": "{{count}} nouvelle actualité dans votre communauté",
+    "body_other": "{{count}} nouvelles actualités dans votre communauté"
+  },
+  "source_announcement": "Annonce",
+  "source_project": "Mise à jour de projet",
+  "source_event": "Événement",
+  "source_vol_org": "Organisation locale",
+  "source_care_provider": "Service de soins",
+  "source_marketplace": "Marché",
+  "source_safety_alert": "Alerte sécurité",
+  "source_help_request": "Aide recherchée",
+  "source_feed_post": "Publication communautaire"
+}

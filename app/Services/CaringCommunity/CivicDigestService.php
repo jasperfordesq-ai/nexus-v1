@@ -274,6 +274,71 @@ class CivicDigestService
         return ['prefs' => $merged];
     }
 
+    /**
+     * Mark the digest as sent for a given user — used by the dispatch command
+     * for idempotency. Stored alongside user prefs as a `last_sent_at` field.
+     */
+    public function markSentNow(int $tenantId, int $userId): void
+    {
+        if ($tenantId <= 0 || $userId <= 0 || !Schema::hasTable('tenant_settings')) {
+            return;
+        }
+        $current = $this->getUserPrefs($tenantId, $userId);
+        $payload = [
+            'enabled' => $current['enabled'],
+            'cadence' => $current['cadence'],
+            'preferred_sub_region_id' => $current['preferred_sub_region_id'],
+            'opt_out_sources' => $current['opt_out_sources'],
+            'updated_at' => $current['updated_at'],
+            'last_sent_at' => time(),
+        ];
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $tenantId,
+                'setting_key' => self::SETTING_USER_PREFIX . $userId,
+            ],
+            [
+                'setting_value' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'setting_type' => 'json',
+                'category' => 'caring_community',
+                'description' => 'AG90 civic digest user preferences',
+                'updated_at' => now(),
+            ],
+        );
+    }
+
+    /**
+     * Read the last_sent_at timestamp for a user (epoch seconds), or null if
+     * never sent.
+     */
+    public function getLastSentAt(int $tenantId, int $userId): ?int
+    {
+        if ($tenantId <= 0 || $userId <= 0 || !Schema::hasTable('tenant_settings')) {
+            return null;
+        }
+        $row = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('setting_key', self::SETTING_USER_PREFIX . $userId)
+            ->first();
+        if (!$row || !$row->setting_value) {
+            return null;
+        }
+        $decoded = json_decode((string) $row->setting_value, true);
+        if (!is_array($decoded) || !isset($decoded['last_sent_at']) || !is_numeric($decoded['last_sent_at'])) {
+            return null;
+        }
+        return (int) $decoded['last_sent_at'];
+    }
+
+    /**
+     * Returns the count of allowed sources — used by the dispatch command to
+     * detect "opted out of everything" (skip silently).
+     */
+    public function allowedSourceCount(): int
+    {
+        return count(self::ALLOWED_SOURCES);
+    }
+
     public function getTenantCadence(int $tenantId): string
     {
         if (!Schema::hasTable('tenant_settings')) {
