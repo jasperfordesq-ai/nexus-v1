@@ -63,6 +63,7 @@ import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { dispatchFeedSync } from '@/lib/feedSync';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
 import { useLongPress } from '@/hooks/useLongPress';
@@ -758,6 +759,7 @@ const FeedCard = React.memo(function FeedCard({
       if (response.success) {
         if (isMountedRef.current) setNewComment('');
         if (isMountedRef.current) setLocalCommentsCount((prev) => prev + 1);
+        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: +1 } });
         loadComments(); // Reload to show new comment
       }
     } catch (err) {
@@ -786,6 +788,7 @@ const FeedCard = React.memo(function FeedCard({
       const response = await api.delete(`/v2/comments/${commentId}`);
       if (response.success) {
         setLocalCommentsCount((prev) => Math.max(0, prev - 1));
+        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: -1 } });
         loadComments();
         return true;
       }

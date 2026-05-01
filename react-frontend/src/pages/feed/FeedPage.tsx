@@ -56,6 +56,7 @@ import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggest
 import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
+import { FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -369,6 +370,31 @@ export function FeedPage() {
     const currentAppendAbort = appendAbortRef.current;
     return () => { currentAbort?.abort(); currentAppendAbort?.abort(); };
   }, [filter, feedMode, subFilter]); // loadFeed via ref to avoid dependency loop
+
+  /* ───────── Cross-page social state sync ───────── */
+  // When a detail page (listing, event, post, etc.) changes a like or comment count,
+  // it dispatches a FEED_SYNC_EVENT. We patch the matching item in-place so the feed
+  // card reflects the change without a full reload.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { targetType, targetId, patch } = (e as CustomEvent<FeedSyncPayload>).detail;
+      setItems((prev) =>
+        prev.map((item) => {
+          if (item.type !== targetType || item.id !== targetId) return item;
+          const next = { ...item };
+          if (patch.is_liked !== undefined) next.is_liked = patch.is_liked;
+          if (patch.likes_count !== undefined) next.likes_count = patch.likes_count;
+          if (patch.comments_count_delta !== undefined) {
+            next.comments_count = Math.max(0, (item.comments_count ?? 0) + patch.comments_count_delta);
+          }
+          if (patch.reactions !== undefined) next.reactions = patch.reactions;
+          return next;
+        })
+      );
+    };
+    window.addEventListener(FEED_SYNC_EVENT, handler);
+    return () => window.removeEventListener(FEED_SYNC_EVENT, handler);
+  }, []);
 
   /* ───────── Scroll position tracking ───────── */
 

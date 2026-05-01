@@ -26,6 +26,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { dispatchFeedSync } from '@/lib/feedSync';
 import type { FeedItem } from '@/components/feed/types';
 import type { Group, User, FeedPost, Event } from '@/types/api';
 
@@ -324,21 +325,24 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   const handleFeedToggleLike = async (item: FeedItem) => {
+    const newIsLiked = !item.is_liked;
+    const newLikesCount = newIsLiked ? item.likes_count + 1 : item.likes_count - 1;
     setFeedItems((prev) =>
       prev.map((fi) =>
         fi.id === item.id && fi.type === item.type
-          ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+          ? { ...fi, is_liked: newIsLiked, likes_count: newLikesCount }
           : fi
       )
     );
     try {
       await api.post('/v2/feed/like', { target_type: item.type, target_id: item.id });
+      dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { is_liked: newIsLiked, likes_count: newLikesCount } });
     } catch (err) {
       logError('Failed to toggle like', err);
       setFeedItems((prev) =>
         prev.map((fi) =>
           fi.id === item.id && fi.type === item.type
-            ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+            ? { ...fi, is_liked: item.is_liked, likes_count: item.likes_count }
             : fi
         )
       );

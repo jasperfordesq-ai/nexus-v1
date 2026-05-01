@@ -6,6 +6,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { dispatchFeedSync } from '@/lib/feedSync';
 import type { FeedComment } from '@/components/feed/types';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -83,13 +84,17 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     setLikesCount((prev) => wasLiked ? prev - 1 : prev + 1);
     setIsLiking(true);
     try {
-      const res = await api.post<{ status: string; likes_count: number }>('/v2/feed/like', {
+      const res = await api.post<{ status: string; action?: string; likes_count: number }>('/v2/feed/like', {
         target_type: targetType,
         target_id: targetId,
       });
       if (res.success && res.data) {
-        setIsLiked(res.data.status === 'liked');
-        setLikesCount(res.data.likes_count);
+        const newIsLiked = res.data.status === 'liked' || res.data.action === 'liked';
+        const newCount = res.data.likes_count;
+        setIsLiked(newIsLiked);
+        setLikesCount(newCount);
+        // Sync the feed page so the card reflects this change immediately
+        dispatchFeedSync({ targetType, targetId, patch: { is_liked: newIsLiked, likes_count: newCount } });
       }
     } catch (err) {
       // Revert on error
@@ -135,6 +140,7 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       });
       if (res.success) {
         setCommentsCount((prev) => prev + 1);
+        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: +1 } });
         // Reload to get server-rendered comment with author info
         loadingRef.current = false;
         await loadComments();
@@ -180,6 +186,7 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
             .map((c) => (c.replies?.length ? { ...c, replies: removeFromTree(c.replies) } : c));
         setComments(removeFromTree);
         setCommentsCount((prev) => Math.max(0, prev - 1));
+        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: -1 } });
         return true;
       }
       return false;

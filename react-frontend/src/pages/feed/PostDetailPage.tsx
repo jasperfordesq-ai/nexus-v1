@@ -35,6 +35,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { dispatchFeedSync } from '@/lib/feedSync';
 
 export function PostDetailPage() {
   const { t } = useTranslation('feed');
@@ -88,24 +89,15 @@ export function PostDetailPage() {
   }, [id, t]);
 
   const handleToggleLike = async (feedItem: FeedItem) => {
-    setItem((prev) =>
-      prev ? {
-        ...prev,
-        is_liked: !prev.is_liked,
-        likes_count: prev.is_liked ? prev.likes_count - 1 : prev.likes_count + 1,
-      } : null
-    );
+    const newIsLiked = !feedItem.is_liked;
+    const newLikesCount = newIsLiked ? feedItem.likes_count + 1 : feedItem.likes_count - 1;
+    setItem((prev) => prev ? { ...prev, is_liked: newIsLiked, likes_count: newLikesCount } : null);
     try {
       await api.post('/v2/feed/like', { target_type: feedItem.type, target_id: feedItem.id });
+      dispatchFeedSync({ targetType: feedItem.type, targetId: feedItem.id, patch: { is_liked: newIsLiked, likes_count: newLikesCount } });
     } catch (err) {
       logError('Failed to toggle like', err);
-      setItem((prev) =>
-        prev ? {
-          ...prev,
-          is_liked: !prev.is_liked,
-          likes_count: prev.is_liked ? prev.likes_count - 1 : prev.likes_count + 1,
-        } : null
-      );
+      setItem((prev) => prev ? { ...prev, is_liked: feedItem.is_liked, likes_count: feedItem.likes_count } : null);
     }
   };
 
