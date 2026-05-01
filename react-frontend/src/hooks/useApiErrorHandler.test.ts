@@ -60,6 +60,25 @@ describe('useApiErrorHandler', () => {
     );
   });
 
+  it('deduplicates identical API error toasts during request cascades', () => {
+    renderHook(() => useApiErrorHandler());
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(API_ERROR_EVENT, {
+          detail: { message: 'Network error', code: 'NETWORK_ERROR' },
+        })
+      );
+      window.dispatchEvent(
+        new CustomEvent(API_ERROR_EVENT, {
+          detail: { message: 'Network error', code: 'NETWORK_ERROR' },
+        })
+      );
+    });
+
+    expect(mockError).toHaveBeenCalledTimes(1);
+  });
+
   it('shows toast for HTTP 404', () => {
     renderHook(() => useApiErrorHandler());
 

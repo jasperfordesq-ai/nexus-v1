@@ -85,20 +85,25 @@ class SafeguardingEscalationDeliveryTest extends TestCase
             $permissionId = DB::table('permissions')->where('name', 'safeguarding.view')->value('id');
             if (!$permissionId) {
                 $permissionId = DB::table('permissions')->insertGetId([
-                    'name'        => 'safeguarding.view',
-                    'description' => 'View safeguarding reports',
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
+                    'name'         => 'safeguarding.view',
+                    'display_name' => 'View safeguarding reports',
+                    'description'  => 'View safeguarding reports',
+                    'category'     => 'safeguarding',
+                    'is_dangerous' => 0,
+                    'tenant_id'    => null,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
                 ]);
             }
             DB::table('user_permissions')->insert([
                 'tenant_id'     => $tenantId,
                 'user_id'       => $userId,
                 'permission_id' => $permissionId,
-                'created_at'    => now(),
+                'granted'       => 1,
+                'granted_at'    => now(),
             ]);
             return true;
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             return false;
         }
     }

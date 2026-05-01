@@ -151,6 +151,8 @@
     "choice_browse": "Show me everything",
     "choice_browse_desc": "Explore the full hub of caring community features",
     "show_all": "Show all features",
+    "show_recommended": "Show recommended",
+    "change_answer": "Change answer",
     "refine": "Refine my view"
   },
   "relationships": {

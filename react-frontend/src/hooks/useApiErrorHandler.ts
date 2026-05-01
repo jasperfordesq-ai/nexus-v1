@@ -8,7 +8,7 @@
  * Listens for API error events and displays toast notifications
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/contexts';
 import { API_ERROR_EVENT, type ApiErrorEventDetail } from '@/lib/api';
 
@@ -18,6 +18,7 @@ import { API_ERROR_EVENT, type ApiErrorEventDetail } from '@/lib/api';
  */
 export function useApiErrorHandler() {
   const { error } = useToast();
+  const lastToastRef = useRef<{ key: string; at: number } | null>(null);
 
   useEffect(() => {
     function handleApiError(event: CustomEvent<ApiErrorEventDetail>) {
@@ -30,6 +31,13 @@ export function useApiErrorHandler() {
       if (code === 'SESSION_EXPIRED') {
         return;
       }
+
+      const key = `${code}:${userMessage}`;
+      const now = Date.now();
+      if (lastToastRef.current?.key === key && now - lastToastRef.current.at < 4000) {
+        return;
+      }
+      lastToastRef.current = { key, at: now };
 
       error('Request Failed', userMessage);
     }

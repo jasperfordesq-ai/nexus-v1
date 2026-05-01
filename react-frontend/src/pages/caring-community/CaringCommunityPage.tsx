@@ -212,10 +212,10 @@ export function CaringCommunityPage() {
                   <Button size="sm" variant="flat" onPress={handleToggleShowAll}>
                     {isFiltering
                       ? t('caring_community:onboarding.show_all')
-                      : t('caring_community:onboarding.refine')}
+                      : t('caring_community:onboarding.show_recommended')}
                   </Button>
                   <Button size="sm" variant="light" onPress={handleRefine}>
-                    {t('caring_community:onboarding.refine')}
+                    {t('caring_community:onboarding.change_answer')}
                   </Button>
                 </div>
               )}

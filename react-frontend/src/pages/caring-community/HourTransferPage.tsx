@@ -211,7 +211,7 @@ export function HourTransferPage() {
           {success && (
             <div className="mb-6 flex items-start gap-3 rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
               <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-              <p>{t('hour_transfer.history.empty')}</p>
+              <p>{t('hour_transfer.success_message')}</p>
             </div>
           )}
 

@@ -92,14 +92,25 @@ class PilotLaunchReadinessService
         // Compute can_launch: every section must be `ready`. We treat
         // `decided` as a synonym for `ready` should any future section adopt
         // that status name (the AG85 isolated-node gate uses both internally).
+        //
+        // Special case: the AG85 isolated-node section is informational for
+        // hosted deployments (not_required). In that case it does not block
+        // the launch even if the section reports `not_started`.
         $canLaunch = true;
         $blockers  = [];
         foreach ($sections as $section) {
             $status = (string) ($section['status'] ?? '');
+            $key    = (string) ($section['key']    ?? '');
+
+            // Informational hosted-mode isolated-node section is never a blocker.
+            if ($key === 'isolated_node' && !$isolatedNodeRequired) {
+                continue;
+            }
+
             if (!in_array($status, [self::STATUS_READY, 'decided'], true)) {
                 $canLaunch = false;
                 $blockers[] = [
-                    'key'    => (string) ($section['key']   ?? ''),
+                    'key'    => $key,
                     'label'  => (string) ($section['label'] ?? ''),
                     'status' => $status,
                 ];

@@ -377,7 +377,7 @@
     },
     "modules": {
       "title": "Connected capabilities",
-      "subtitle": "The hub is only visible when the Caring Community switch is enabled.",
+      "subtitle": "Explore the services and community spaces connected to care support.",
       "open": "Open",
       "timebank": {
         "title": "Time bank",
@@ -550,6 +550,7 @@
     },
     "title": "Transfer Your Banked Hours",
     "subtitle": "Moving to another community? Your banked hours go with you.",
+    "success_message": "Transfer request submitted. A coordinator will review it before hours move.",
     "form": {
       "destination_label": "Destination cooperative",
       "destination_placeholder": "e.g. zug-kiss",

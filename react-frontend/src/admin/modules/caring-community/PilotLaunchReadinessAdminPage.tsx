@@ -151,10 +151,11 @@ export default function PilotLaunchReadinessAdminPage() {
         showToast('Pilot launched successfully.', 'success');
         setLaunchModalOpen(false);
       } else {
+        const code = res.code ?? '';
         const msg =
-          res.error?.code === 'CANNOT_LAUNCH'
+          code === 'CANNOT_LAUNCH'
             ? 'Cannot launch — readiness gate is not closed.'
-            : res.error?.code === 'ALREADY_LAUNCHED'
+            : code === 'ALREADY_LAUNCHED'
             ? 'This pilot has already been launched.'
             : 'Failed to launch pilot.';
         showToast(msg, 'error');

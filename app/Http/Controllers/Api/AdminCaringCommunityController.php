@@ -2441,14 +2441,19 @@ class AdminCaringCommunityController extends BaseApiController
             }
 
             if ($code === 'CANNOT_LAUNCH') {
-                $payload = [
-                    'code'     => 'CANNOT_LAUNCH',
-                    'message'  => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
-                    'blockers' => $result['blockers'] ?? [],
-                ];
+                // Custom shape so the structured `blockers` list can be
+                // surfaced to the admin UI alongside the standard error code.
                 return response()->json([
                     'success' => false,
-                    'error'   => $payload,
+                    'errors'  => [[
+                        'code'    => 'CANNOT_LAUNCH',
+                        'message' => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
+                    ]],
+                    'error'   => [
+                        'code'     => 'CANNOT_LAUNCH',
+                        'message'  => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
+                        'blockers' => $result['blockers'] ?? [],
+                    ],
                 ], 422);
             }
 
