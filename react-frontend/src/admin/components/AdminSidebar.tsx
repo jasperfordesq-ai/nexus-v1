@@ -107,6 +107,8 @@ import BellRing from 'lucide-react/icons/bell-ring';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import Rocket from 'lucide-react/icons/rocket';
 import Sliders from 'lucide-react/icons/sliders';
+import Users2 from 'lucide-react/icons/users-2';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -275,7 +277,12 @@ function useAdminNav(): NavSection[] {
       { label: t('caring_sub_regions'), href: '/admin/caring-community/sub-regions', icon: MapPin },
       { label: t('caring_federation_peers'), href: '/admin/caring-community/federation-peers', icon: Network },
       { label: t('caring_sla_dashboard'), href: '/admin/caring-community/sla-dashboard', icon: Timer },
+      { label: t('caring_providers'), href: '/admin/caring-community/providers', icon: Users2 },
+      { label: t('warmth_pass'), href: '/admin/caring-community/warmth-pass', icon: Star },
+      { label: t('care_recipient_circle'), href: '/admin/caring-community/recipient-circle', icon: Heart },
       { label: t('caring_smart_nudges'), href: '/admin/caring-community/nudges', icon: Bell, group: t('caring_group_engagement') },
+      { label: t('emergency_alerts'), href: '/admin/caring-community/emergency-alerts', icon: AlertTriangle },
+      { label: t('municipal_surveys'), href: '/admin/caring-community/surveys', icon: ClipboardList },
       { label: t('caring_communication_copilot'), href: '/admin/caring-community/copilot', icon: Bot },
       { label: t('caring_civic_digest'), href: '/admin/caring-community/civic-digest', icon: Newspaper },
       { label: t('caring_lead_nurture'), href: '/admin/caring-community/lead-nurture', icon: Filter },
@@ -283,6 +290,7 @@ function useAdminNav(): NavSection[] {
       { label: t('caring_feedback_inbox'), href: '/admin/caring-community/feedback', icon: MessageSquare },
       { label: t('caring_municipal_verification'), href: '/admin/caring-community/verification', icon: ShieldCheck, group: t('caring_group_trust_safety') },
       { label: t('caring_safeguarding_reports'), href: '/admin/caring-community/safeguarding', icon: ShieldAlert },
+      { label: t('trust_tiers'), href: '/admin/caring-community/trust-tier', icon: Shield },
       { label: t('caring_launch_readiness'), href: '/admin/caring-community/launch-readiness', icon: Rocket, group: t('caring_group_pilot_governance') },
       { label: t('caring_pilot_scoreboard'), href: '/admin/caring-community/pilot-scoreboard', icon: Flag },
       { label: t('caring_pilot_data_quality'), href: '/admin/caring-community/data-quality', icon: ClipboardCheck },
@@ -294,6 +302,8 @@ function useAdminNav(): NavSection[] {
       { label: t('caring_external_integrations'), href: '/admin/caring-community/external-integrations', icon: PlugZap },
       { label: t('caring_integration_showcase'), href: '/admin/caring-community/integration-showcase', icon: Layers },
       { label: t('municipal_impact_reports'), href: '/admin/reports/municipal-impact', icon: BarChart3, group: t('caring_group_reporting') },
+      { label: t('kpi_baselines'), href: '/admin/caring-community/kpi-baselines', icon: BarChart3 },
+      { label: t('municipal_roi'), href: '/admin/caring-community/municipal-roi', icon: TrendingUp },
       { label: t('caring_category_coefficients'), href: '/admin/caring-community/category-coefficients', icon: Sliders },
     ] : [];
 

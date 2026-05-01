@@ -207,5 +207,13 @@
   "caring_isolated_node_gate": "Isolated-Node Gate",
   "caring_external_integrations": "External Integrations",
   "caring_integration_showcase": "Integration Showcase",
-  "caring_category_coefficients": "Category Coefficients"
+  "caring_category_coefficients": "Category Coefficients",
+  "caring_providers": "Care Providers",
+  "trust_tiers": "Trust Tiers",
+  "kpi_baselines": "KPI Baselines",
+  "emergency_alerts": "Emergency Alerts",
+  "municipal_surveys": "Municipal Surveys",
+  "warmth_pass": "Warmth Pass",
+  "care_recipient_circle": "Care Recipient Circle",
+  "municipal_roi": "Municipal ROI"
 }
