@@ -8,6 +8,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// CONFLICT: shares 2026_05_01_120000 timestamp with add_reversal_columns_to_caring_loyalty_redemptions
+// — must rename in next migration cycle. Keep ordering deterministic by alphabetical fallback
+// (Laravel sorts equal timestamps by full filename, and "add_reversal..." sorts before
+// "add_substitution..." alphabetically, which matches the order this one was already Ran in).
+// This migration is already Ran in local + production; renaming would re-execute it. Do NOT rename.
+
 /**
  * Adds `substitution_coefficient` (DECIMAL(3,2), default 1.00) to the canonical
  * category table used by BOTH the volunteering module (vol_opportunities.category_id)
