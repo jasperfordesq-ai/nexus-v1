@@ -14,6 +14,7 @@ import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 
 type MyReport = {
   id: number;
@@ -49,6 +50,7 @@ export default function MySafeguardingReportsPage(): JSX.Element {
 
   const [reports, setReports] = useState<MyReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,11 +59,20 @@ export default function MySafeguardingReportsPage(): JSX.Element {
         const res = await api.get<{ items: MyReport[] }>(
           '/v2/caring-community/safeguarding/my-reports',
         );
-        if (!cancelled && res.success && res.data) {
-          setReports(res.data.items ?? []);
+        if (!cancelled) {
+          if (res.success && res.data) {
+            setReports(res.data.items ?? []);
+          } else {
+            setError(t('safeguarding_reports.errors.load_failed'));
+            setReports([]);
+          }
         }
-      } catch {
-        if (!cancelled) setReports([]);
+      } catch (err) {
+        logError('MySafeguardingReportsPage: fetch failed', err);
+        if (!cancelled) {
+          setError(t('safeguarding_reports.errors.load_failed'));
+          setReports([]);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -70,7 +81,7 @@ export default function MySafeguardingReportsPage(): JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   if (!hasFeature('caring_community')) {
     return <Navigate to={tenantPath('/caring-community')} replace />;
@@ -111,11 +122,20 @@ export default function MySafeguardingReportsPage(): JSX.Element {
             </div>
           </div>
 
+          {error && !loading && (
+            <div
+              role="alert"
+              className="mb-4 rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700 dark:border-danger-800 dark:bg-danger-950/30 dark:text-danger-300"
+            >
+              {error}
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center py-12">
               <Spinner />
             </div>
-          ) : reports.length === 0 ? (
+          ) : reports.length === 0 && !error ? (
             <div className="py-10 text-center text-sm text-theme-muted">
               {t('safeguarding_reports.my_reports.empty')}
             </div>

@@ -200,7 +200,7 @@ function MarktCard({ item }: MarktCardProps) {
           <div className="flex items-center gap-2 min-w-0">
             <Avatar
               src={avatarSrc}
-              name={item.user_name || 'User'}
+              name={item.user_name || t('common.unknown_user')}
               size="sm"
               className="shrink-0 w-7 h-7"
             />

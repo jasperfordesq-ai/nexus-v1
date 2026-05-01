@@ -354,7 +354,7 @@ function ActionModal({ kind, relationship, isSubmitting, onCancel, onConfirm }: 
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onCancel} isDisabled={isSubmitting}>
-            {t('common.cancel', { defaultValue: 'Cancel' })}
+            {t('common.cancel')}
           </Button>
           <Button
             color={kind === 'end' ? 'danger' : 'warning'}

@@ -17,6 +17,7 @@ import { useApi } from '@/hooks/useApi';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import api from '@/lib/api';
+import { logError } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,7 +72,8 @@ export function LinkCareReceiverPage() {
       });
       showToast(t('caregiver.link_success'), 'success');
       void navigate(tenantPath('/caring-community/caregiver'), { replace: true });
-    } catch {
+    } catch (err) {
+      logError('LinkCareReceiverPage submit failed', err);
       showToast(t('caregiver.link_error'), 'error');
     } finally {
       setIsSubmitting(false);

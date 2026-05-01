@@ -164,7 +164,7 @@ export function HourTransferPage() {
         } else if (code === 'INSUFFICIENT_HOURS') {
           setError(t('hour_transfer.errors.insufficient_hours'));
         } else {
-          setError(res.error || t('hour_transfer.errors.submit_failed'));
+          setError(t('hour_transfer.errors.submit_failed'));
         }
       }
     } catch (err) {

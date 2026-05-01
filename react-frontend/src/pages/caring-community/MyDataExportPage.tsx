@@ -65,7 +65,7 @@ export default function MyDataExportPage(): JSX.Element {
             size="sm"
             startContent={<ArrowLeft size={16} />}
           >
-            {t('data_export.back', { defaultValue: 'Back' })}
+            {t('data_export.back')}
           </Button>
         </div>
 

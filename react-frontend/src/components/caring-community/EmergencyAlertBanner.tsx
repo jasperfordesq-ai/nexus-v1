@@ -23,6 +23,7 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { useTenant } from '@/contexts';
+import { logError } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -95,8 +96,8 @@ export default function EmergencyAlertBanner() {
             ? (data as { data: EmergencyAlert[] }).data
             : []);
       setAlerts(list);
-    } catch {
-      // Silently fail — missing alerts should never break the page
+    } catch (err) {
+      logError('EmergencyAlertBanner: fetchAlerts failed', err);
     }
   };
 
@@ -122,8 +123,8 @@ export default function EmergencyAlertBanner() {
     setDismissed((prev) => new Set(prev).add(id));
     try {
       await api.post(`/v2/caring-community/emergency-alerts/${id}/dismiss`);
-    } catch {
-      // Non-fatal; analytics record may be missed but banner is hidden
+    } catch (err) {
+      logError('EmergencyAlertBanner: dismiss failed', err);
     }
   };
 
@@ -137,7 +138,7 @@ export default function EmergencyAlertBanner() {
             SEVERITY_CLASSES[alert.severity],
           ].join(' ')}
           role="alert"
-          aria-live="assertive"
+          aria-live={alert.severity === 'danger' ? 'assertive' : 'polite'}
         >
           <div className="max-w-5xl mx-auto flex items-start gap-3">
             {/* Icon */}
