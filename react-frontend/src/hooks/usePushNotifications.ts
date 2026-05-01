@@ -190,12 +190,14 @@ export function usePushNotifications(userId: number | null) {
         );
 
         // 6. Listen for incoming notifications (foreground)
+        // On iOS, the system will now display a banner + sound + badge (configured via
+        // PushNotifications.presentationOptions in capacitor.config.json). On Android,
+        // the system always shows notifications regardless of foreground state.
+        // The in-app notification bell also updates in real-time via Pusher.
         const recvListener = await PushNotifications.addListener(
           'pushNotificationReceived',
           (notification: PushNotificationSchema) => {
             logDebug('[Push] Notification received in foreground', notification.title);
-            // Don't navigate — the user sees it as a system notification
-            // The in-app notification bell also updates via Pusher
           }
         );
 
@@ -208,11 +210,40 @@ export function usePushNotifications(userId: number | null) {
           }
         );
 
+        // 8. Clear delivered notifications (badge + notification tray) when the app
+        // returns to the foreground — keeps the badge count accurate and avoids
+        // stale alerts showing in the tray after the user has opened the app.
+        const appModulePath = '@capacitor/app';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { App } = await import(/* @vite-ignore */ appModulePath) as any;
+        const stateListener = await App.addListener(
+          'appStateChange',
+          async ({ isActive }: { isActive: boolean }) => {
+            if (isActive) {
+              try {
+                await PushNotifications.removeAllDeliveredNotifications();
+                logDebug('[Push] Cleared delivered notifications on app focus');
+              } catch {
+                // Non-fatal — badge may linger until next focus cycle
+              }
+            }
+          }
+        );
+
+        // Also clear immediately on registration so any tray leftovers from a previous
+        // session (e.g. app killed with unread badges) are cleaned up on first login.
+        try {
+          await PushNotifications.removeAllDeliveredNotifications();
+        } catch {
+          // Non-fatal
+        }
+
         cleanup = () => {
           regListener.remove();
           errListener.remove();
           recvListener.remove();
           tapListener.remove();
+          stateListener.remove();
           // Reset so a subsequent login (new userId) can re-register.
           // Do NOT reset here if the userId is still the same — only on unmount.
           registeredForUserRef.current = -1;
