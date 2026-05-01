@@ -175,7 +175,7 @@ function RelationshipCard({ relationship, t, onPause, onEnd, onResume, busyId }:
         <span className="flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {t(`my_support_relationships.frequency.${relationship.frequency}`)}
-          {' · '}
+          <span aria-hidden="true">/</span>
           {t('my_support_relationships.expected_hours', { hours: relationship.expected_hours })}
         </span>
 
@@ -210,7 +210,9 @@ function RelationshipCard({ relationship, t, onPause, onEnd, onResume, busyId }:
             {relationship.recent_logs.map((log, i) => (
               <li key={i} className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-theme-muted">{formatDate(log.date)}</span>
-                <span className="font-medium text-theme-primary">{log.hours}h</span>
+                <span className="font-medium text-theme-primary">
+                  {t('my_support_relationships.hours_short', { hours: log.hours })}
+                </span>
                 <Chip
                   size="sm"
                   color={

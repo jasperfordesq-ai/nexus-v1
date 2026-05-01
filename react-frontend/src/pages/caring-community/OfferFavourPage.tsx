@@ -150,6 +150,7 @@ export function OfferFavourPage() {
               isRequired
               description={`${charCount} / ${charLimit}`}
               isInvalid={charCount > charLimit}
+              errorMessage={charCount > charLimit ? t('offer_favour.form.what_too_long') : undefined}
               classNames={{ label: 'text-base font-medium' }}
             />
 
@@ -189,7 +190,7 @@ export function OfferFavourPage() {
             />
 
             {error && (
-              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
+              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">{error}</p>
             )}
 
             <Button

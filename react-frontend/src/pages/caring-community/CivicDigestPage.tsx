@@ -20,6 +20,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import Calendar from 'lucide-react/icons/calendar';
 import HandHeart from 'lucide-react/icons/hand-heart';
@@ -38,6 +39,7 @@ import { useApi } from '@/hooks/useApi';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { SubRegionFilter } from '@/components/caring-community/SubRegionFilter';
+import { PageMeta } from '@/components/seo';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -194,7 +196,18 @@ export function CivicDigestPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <PageMeta title={t('page_title')} description={t('intro_body')} noIndex />
+
+      <div className="space-y-6">
+        <Link
+          to={tenantPath('/caring-community')}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {t('back_link')}
+        </Link>
+
       {/* Intro */}
       <Card>
         <CardBody className="gap-3 p-6">
@@ -402,7 +415,8 @@ export function CivicDigestPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

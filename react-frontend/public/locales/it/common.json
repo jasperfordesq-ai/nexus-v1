@@ -563,7 +563,20 @@
         "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
       }
     },
-    "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger."
+    "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger.",
+    "onboarding": {
+      "title": "What brings you here today?",
+      "intro": "Choose the path that best fits you. You can change this later.",
+      "choice_recipient": "I need support",
+      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
+      "choice_helper": "I want to help",
+      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
+      "choice_browse": "I want to browse",
+      "choice_browse_desc": "Show the full caring community hub.",
+      "show_all": "Show all actions",
+      "show_recommended": "Show recommended",
+      "change_answer": "Change answer"
+    }
   },
   "my_support_relationships": {
     "meta": {
@@ -605,7 +618,8 @@
       "approved": "Approved",
       "pending": "Pending",
       "declined": "Declined"
-    }
+    },
+    "hours_short": "{{hours}}h"
   },
   "request_help": {
     "meta": {
@@ -732,7 +746,8 @@
       "recipient_placeholder": "Name, or leave blank to keep anonymous",
       "date_label": "When?",
       "submit": "Record Favour",
-      "submitting": "Recording..."
+      "submitting": "Recording...",
+      "what_too_long": "Please keep your favour under 500 characters."
     },
     "success": {
       "title": "Thank You!",
@@ -911,7 +926,8 @@
       "destination_not_found": "We couldn't find that destination cooperative.",
       "no_matching_email": "Your email is not registered at the destination cooperative — register there first.",
       "insufficient_hours": "You don't have enough banked hours."
-    }
+    },
+    "success_message": "Transfer request submitted. A coordinator will review it before hours move."
   },
   "data_export": {
     "meta": {

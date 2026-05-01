@@ -623,6 +623,7 @@
     "next_check_in": "Next check-in",
     "overdue": "Overdue",
     "expected_hours": "{{hours}}h expected",
+    "hours_short": "{{hours}}h",
     "recent_logs": "Recent hours logged",
     "no_recent_logs": "No hours logged yet",
     "back": "Back to Community Hub",
@@ -845,6 +846,7 @@
       "recipient_label": "Who did you help? (optional)",
       "recipient_placeholder": "Name, or leave blank to keep anonymous",
       "date_label": "When?",
+      "what_too_long": "Please keep your favour under 500 characters.",
       "submit": "Record Favour",
       "submitting": "Recording..."
     },

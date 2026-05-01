@@ -45,5 +45,18 @@
     "title": "Il tuo digest comunale è pronto",
     "body_one": "{{count}} nuovo aggiornamento nella tua comunità",
     "body_other": "{{count}} nuovi aggiornamenti nella tua comunità"
+  },
+  "back_link": "Back to Community Hub",
+  "transparency": {
+    "why_button": "Why am I seeing this?",
+    "match_score_label": "Match",
+    "global_note": "Items are ranked by relevance to your sub-region, interests, and recent activity. Tap 'Why?' on any item for details.",
+    "reason_sub_region": "Matches your sub-region",
+    "reason_priority": "Marked as priority/urgent",
+    "reason_recency": "Recently published",
+    "reason_category_match": "Matches your interests",
+    "reason_safety": "Safety alert",
+    "reason_announcement": "Official announcement",
+    "no_reasons": "Default ranking"
   }
 }

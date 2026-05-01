@@ -108,7 +108,7 @@ export function MyTrustTierPage() {
           className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          {t('trust_tier.title')}
+          {t('trust_tier.back')}
         </Link>
 
         {/* Page header */}
@@ -137,7 +137,7 @@ export function MyTrustTierPage() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-danger">
                 <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-                <p className="font-medium">{t('trust_tier.title')}</p>
+                <p className="font-medium">{t('trust_tier.breakdown.error')}</p>
               </div>
               <Button
                 size="sm"

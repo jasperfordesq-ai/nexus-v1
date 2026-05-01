@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -21,6 +22,7 @@
       "in_progress": "In progress",
       "next_tier_hint": "Complete the remaining signals to reach the next tier.",
       "no_signals": "No signals tracked for your current tier.",
+      "error": "We couldn't load your trust tier breakdown.",
       "retry": "Try again"
     },
     "signals": {

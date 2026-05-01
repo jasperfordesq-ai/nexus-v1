@@ -563,7 +563,20 @@
         "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
       }
     },
-    "welcome_banner": "Willkommen! Hier kannst du um Hilfe bitten, deine Zeit anbieten oder einfach eine nachbarschaftliche Gefälligkeit festhalten. Jeder Beitrag – ob gross oder klein – stärkt deine Gemeinschaft."
+    "welcome_banner": "Willkommen! Hier kannst du um Hilfe bitten, deine Zeit anbieten oder einfach eine nachbarschaftliche Gefälligkeit festhalten. Jeder Beitrag – ob gross oder klein – stärkt deine Gemeinschaft.",
+    "onboarding": {
+      "title": "What brings you here today?",
+      "intro": "Choose the path that best fits you. You can change this later.",
+      "choice_recipient": "I need support",
+      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
+      "choice_helper": "I want to help",
+      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
+      "choice_browse": "I want to browse",
+      "choice_browse_desc": "Show the full caring community hub.",
+      "show_all": "Show all actions",
+      "show_recommended": "Show recommended",
+      "change_answer": "Change answer"
+    }
   },
   "my_support_relationships": {
     "meta": {
@@ -605,7 +618,8 @@
       "approved": "Approved",
       "pending": "Pending",
       "declined": "Declined"
-    }
+    },
+    "hours_short": "{{hours}}h"
   },
   "request_help": {
     "meta": {
@@ -741,7 +755,8 @@
       "recipient_placeholder": "Name, oder leer lassen für anonym",
       "date_label": "Wann?",
       "submit": "Gefälligkeit erfassen",
-      "submitting": "Wird erfasst..."
+      "submitting": "Wird erfasst...",
+      "what_too_long": "Please keep your favour under 500 characters."
     },
     "success": {
       "title": "Vielen Dank!",
@@ -920,7 +935,8 @@
       "destination_not_found": "Diese Ziel-Genossenschaft konnten wir nicht finden.",
       "no_matching_email": "Deine E-Mail-Adresse ist bei der Ziel-Genossenschaft nicht registriert — bitte melde dich dort zuerst an.",
       "insufficient_hours": "Du hast nicht genug gutgeschriebene Stunden."
-    }
+    },
+    "success_message": "Transfer request submitted. A coordinator will review it before hours move."
   },
   "data_export": {
     "meta": {
