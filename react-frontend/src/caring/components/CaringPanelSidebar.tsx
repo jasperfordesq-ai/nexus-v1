@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Button, Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import Heart from 'lucide-react/icons/heart';
@@ -61,8 +60,89 @@ interface NavSection {
   items: NavItem[];
 }
 
+const SECTIONS: NavSection[] = [
+  {
+    key: 'overview',
+    title: 'Overview',
+    items: [
+      { key: 'dashboard', label: 'Caring Community', icon: LayoutDashboard, path: '/caring' },
+      { key: 'workflow', label: 'Caring Workflow', icon: ClipboardCheck, path: '/caring/workflow' },
+      { key: 'projects', label: 'Caring Projects', icon: Megaphone, path: '/caring/projects' },
+    ],
+  },
+  {
+    key: 'operations',
+    title: 'Operations',
+    items: [
+      { key: 'loyalty', label: 'Loyalty Programme', icon: Coins, path: '/caring/loyalty' },
+      { key: 'hour-transfers', label: 'Hour Transfers', icon: ArrowRightLeft, path: '/caring/hour-transfers' },
+      { key: 'regional-points', label: 'Regional Points', icon: Coins, path: '/caring/regional-points' },
+      { key: 'sub-regions', label: 'Sub-Regions', icon: MapPin, path: '/caring/sub-regions' },
+      { key: 'federation-peers', label: 'Federation Peers', icon: Network, path: '/caring/federation-peers' },
+      { key: 'sla-dashboard', label: 'SLA Dashboard', icon: Timer, path: '/caring/sla-dashboard' },
+      { key: 'providers', label: 'Providers', icon: Users2, path: '/caring/providers' },
+      { key: 'warmth-pass', label: 'Warmth Pass', icon: Star, path: '/caring/warmth-pass' },
+      { key: 'recipient-circle', label: 'Care Recipient Circle', icon: Heart, path: '/caring/recipient-circle' },
+    ],
+  },
+  {
+    key: 'engagement',
+    title: 'Engagement',
+    items: [
+      { key: 'nudges', label: 'Smart Nudges', icon: Bell, path: '/caring/nudges' },
+      { key: 'emergency-alerts', label: 'Emergency Alerts', icon: AlertTriangle, path: '/caring/emergency-alerts' },
+      { key: 'surveys', label: 'Municipal Surveys', icon: ClipboardList, path: '/caring/surveys' },
+      { key: 'copilot', label: 'Communication Copilot', icon: Bot, path: '/caring/copilot' },
+      { key: 'civic-digest', label: 'Civic Digest', icon: Newspaper, path: '/caring/civic-digest' },
+      { key: 'lead-nurture', label: 'Lead Nurture', icon: Filter, path: '/caring/lead-nurture' },
+      { key: 'success-stories', label: 'Success Stories', icon: Star, path: '/caring/success-stories' },
+      { key: 'feedback', label: 'Feedback Inbox', icon: MessageSquare, path: '/caring/feedback' },
+    ],
+  },
+  {
+    key: 'trust_safety',
+    title: 'Trust & Safety',
+    items: [
+      { key: 'verification', label: 'Municipal Verification', icon: ShieldCheck, path: '/caring/verification' },
+      { key: 'safeguarding', label: 'Safeguarding Reports', icon: ShieldAlert, path: '/caring/safeguarding' },
+      { key: 'trust-tier', label: 'Trust Tiers', icon: Shield, path: '/caring/trust-tier' },
+    ],
+  },
+  {
+    key: 'pilot_governance',
+    title: 'Pilot Governance',
+    items: [
+      { key: 'launch-readiness', label: 'Launch Readiness', icon: Rocket, path: '/caring/launch-readiness' },
+      { key: 'pilot-scoreboard', label: 'Pilot Scoreboard', icon: Flag, path: '/caring/pilot-scoreboard' },
+      { key: 'data-quality', label: 'Pilot Data Quality', icon: ClipboardCheck, path: '/caring/data-quality' },
+      { key: 'operating-policy', label: 'Operating Policy', icon: ScrollText, path: '/caring/operating-policy' },
+      { key: 'disclosure-pack', label: 'Disclosure Pack', icon: ShieldCheck, path: '/caring/disclosure-pack' },
+      { key: 'commercial-boundary', label: 'Commercial Boundary', icon: Scale, path: '/caring/commercial-boundary' },
+      { key: 'isolated-node', label: 'Isolated Node Gate', icon: Server, path: '/caring/isolated-node' },
+    ],
+  },
+  {
+    key: 'partnerships',
+    title: 'Partnerships',
+    items: [
+      { key: 'research', label: 'Research Partnerships', icon: FlaskConical, path: '/caring/research' },
+      { key: 'external-integrations', label: 'External Integrations', icon: PlugZap, path: '/caring/external-integrations' },
+      { key: 'integration-showcase', label: 'Integration Showcase', icon: Layers, path: '/caring/integration-showcase' },
+    ],
+  },
+  {
+    key: 'reporting',
+    title: 'Reporting',
+    items: [
+      { key: 'municipal-impact', label: 'Municipal Impact Reports', icon: BarChart3, path: '/caring/municipal-impact' },
+      { key: 'kpi-baselines', label: 'KPI Baselines', icon: BarChart3, path: '/caring/kpi-baselines' },
+      { key: 'municipal-roi', label: 'Municipal ROI', icon: TrendingUp, path: '/caring/municipal-roi' },
+      { key: 'category-coefficients', label: 'Category Coefficients', icon: Sliders, path: '/caring/category-coefficients' },
+    ],
+  },
+];
+
 export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarProps) {
-  const { t } = useTranslation('admin');
   const location = useLocation();
   const { tenantPath, tenant } = useTenant();
   const { user } = useAuth();
@@ -76,88 +156,6 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
     userRecord?.is_admin === true ||
     userRecord?.is_super_admin === true ||
     userRecord?.is_tenant_super_admin === true;
-
-  const sections: NavSection[] = [
-    {
-      key: 'overview',
-      title: t('caring_group_overview'),
-      items: [
-        { key: 'dashboard', label: t('caring_community'), icon: LayoutDashboard, path: '/caring' },
-        { key: 'workflow', label: t('caring_workflow'), icon: ClipboardCheck, path: '/caring/workflow' },
-        { key: 'projects', label: t('caring_projects'), icon: Megaphone, path: '/caring/projects' },
-      ],
-    },
-    {
-      key: 'operations',
-      title: t('caring_group_operations'),
-      items: [
-        { key: 'loyalty', label: t('caring_loyalty_programme'), icon: Coins, path: '/caring/loyalty' },
-        { key: 'hour-transfers', label: t('caring_hour_transfers'), icon: ArrowRightLeft, path: '/caring/hour-transfers' },
-        { key: 'regional-points', label: t('caring_regional_points'), icon: Coins, path: '/caring/regional-points' },
-        { key: 'sub-regions', label: t('caring_sub_regions'), icon: MapPin, path: '/caring/sub-regions' },
-        { key: 'federation-peers', label: t('caring_federation_peers'), icon: Network, path: '/caring/federation-peers' },
-        { key: 'sla-dashboard', label: t('caring_sla_dashboard'), icon: Timer, path: '/caring/sla-dashboard' },
-        { key: 'providers', label: t('caring_providers'), icon: Users2, path: '/caring/providers' },
-        { key: 'warmth-pass', label: t('warmth_pass'), icon: Star, path: '/caring/warmth-pass' },
-        { key: 'recipient-circle', label: t('care_recipient_circle'), icon: Heart, path: '/caring/recipient-circle' },
-      ],
-    },
-    {
-      key: 'engagement',
-      title: t('caring_group_engagement'),
-      items: [
-        { key: 'nudges', label: t('caring_smart_nudges'), icon: Bell, path: '/caring/nudges' },
-        { key: 'emergency-alerts', label: t('emergency_alerts'), icon: AlertTriangle, path: '/caring/emergency-alerts' },
-        { key: 'surveys', label: t('municipal_surveys'), icon: ClipboardList, path: '/caring/surveys' },
-        { key: 'copilot', label: t('caring_communication_copilot'), icon: Bot, path: '/caring/copilot' },
-        { key: 'civic-digest', label: t('caring_civic_digest'), icon: Newspaper, path: '/caring/civic-digest' },
-        { key: 'lead-nurture', label: t('caring_lead_nurture'), icon: Filter, path: '/caring/lead-nurture' },
-        { key: 'success-stories', label: t('caring_success_stories'), icon: Star, path: '/caring/success-stories' },
-        { key: 'feedback', label: t('caring_feedback_inbox'), icon: MessageSquare, path: '/caring/feedback' },
-      ],
-    },
-    {
-      key: 'trust_safety',
-      title: t('caring_group_trust_safety'),
-      items: [
-        { key: 'verification', label: t('caring_municipal_verification'), icon: ShieldCheck, path: '/caring/verification' },
-        { key: 'safeguarding', label: t('caring_safeguarding_reports'), icon: ShieldAlert, path: '/caring/safeguarding' },
-        { key: 'trust-tier', label: t('trust_tiers'), icon: Shield, path: '/caring/trust-tier' },
-      ],
-    },
-    {
-      key: 'pilot_governance',
-      title: t('caring_group_pilot_governance'),
-      items: [
-        { key: 'launch-readiness', label: t('caring_launch_readiness'), icon: Rocket, path: '/caring/launch-readiness' },
-        { key: 'pilot-scoreboard', label: t('caring_pilot_scoreboard'), icon: Flag, path: '/caring/pilot-scoreboard' },
-        { key: 'data-quality', label: t('caring_pilot_data_quality'), icon: ClipboardCheck, path: '/caring/data-quality' },
-        { key: 'operating-policy', label: t('caring_operating_policy'), icon: ScrollText, path: '/caring/operating-policy' },
-        { key: 'disclosure-pack', label: t('caring_disclosure_pack'), icon: ShieldCheck, path: '/caring/disclosure-pack' },
-        { key: 'commercial-boundary', label: t('caring_commercial_boundary'), icon: Scale, path: '/caring/commercial-boundary' },
-        { key: 'isolated-node', label: t('caring_isolated_node_gate'), icon: Server, path: '/caring/isolated-node' },
-      ],
-    },
-    {
-      key: 'partnerships',
-      title: t('caring_group_partnerships'),
-      items: [
-        { key: 'research', label: t('research_partnerships'), icon: FlaskConical, path: '/caring/research' },
-        { key: 'external-integrations', label: t('caring_external_integrations'), icon: PlugZap, path: '/caring/external-integrations' },
-        { key: 'integration-showcase', label: t('caring_integration_showcase'), icon: Layers, path: '/caring/integration-showcase' },
-      ],
-    },
-    {
-      key: 'reporting',
-      title: t('caring_group_reporting'),
-      items: [
-        { key: 'municipal-impact', label: t('municipal_impact_reports'), icon: BarChart3, path: '/caring/municipal-impact' },
-        { key: 'kpi-baselines', label: t('kpi_baselines'), icon: BarChart3, path: '/caring/kpi-baselines' },
-        { key: 'municipal-roi', label: t('municipal_roi'), icon: TrendingUp, path: '/caring/municipal-roi' },
-        { key: 'category-coefficients', label: t('caring_category_coefficients'), icon: Sliders, path: '/caring/category-coefficients' },
-      ],
-    },
-  ];
 
   const isActive = (path: string) => {
     const current = location.pathname;
@@ -227,7 +225,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-3">
-        {sections.map((section, idx) => (
+        {SECTIONS.map((section, idx) => (
           <div key={section.key} className={idx > 0 ? 'mt-4' : ''}>
             {!collapsed && (
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-default-400">
