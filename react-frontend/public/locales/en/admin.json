@@ -47,6 +47,11 @@
       "enabled": "Caring Community enabled",
       "disabled": "Caring Community disabled"
     },
+    "status": {
+      "active": "Active",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
     "errors": {
       "load_failed": "Failed to load Caring Community configuration",
       "save_failed": "Failed to update Caring Community"

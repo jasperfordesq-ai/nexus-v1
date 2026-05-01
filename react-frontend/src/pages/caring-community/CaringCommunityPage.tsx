@@ -20,6 +20,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import MoveRight from 'lucide-react/icons/move-right';
 import Store from 'lucide-react/icons/store';
 import Coins from 'lucide-react/icons/coins';
 import PiggyBank from 'lucide-react/icons/piggy-bank';
@@ -228,17 +229,22 @@ export function CaringCommunityPage() {
                       key={item.key}
                       as={Link}
                       to={tenantPath(item.href)}
-                      className="h-auto min-h-28 w-full min-w-0 flex-col items-start justify-start gap-2 whitespace-normal bg-theme-elevated px-4 py-4 text-theme-primary"
+                      className="group h-auto min-h-28 w-full min-w-0 flex-col items-start justify-between gap-3 whitespace-normal bg-theme-elevated px-4 py-4 text-theme-primary transition-colors hover:bg-[var(--color-surface-hover)]"
                       variant="flat"
                     >
-                      <span className="flex w-full min-w-0 items-start gap-2">
-                        <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      <span className="flex w-full min-w-0 items-start gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </span>
                         <span className="min-w-0 text-left text-sm font-semibold leading-5 break-words">
                           {t(`caring_community.actions.${item.key}`)}
                         </span>
                       </span>
-                      <span className="block w-full min-w-0 text-left text-xs font-normal leading-5 break-words text-theme-muted">
-                        {t(`caring_community.actions.${item.key}_sub`)}
+                      <span className="flex w-full min-w-0 items-end justify-between gap-3">
+                        <span className="block min-w-0 text-left text-xs font-normal leading-5 break-words text-theme-muted">
+                          {t(`caring_community.actions.${item.key}_sub`)}
+                        </span>
+                        <MoveRight className="h-4 w-4 shrink-0 text-theme-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-primary)]" aria-hidden="true" />
                       </span>
                     </Button>
                   );
