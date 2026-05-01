@@ -832,6 +832,9 @@
       "empty": {
         "title": "Noch keine Einlösungen",
         "body": "Sobald Sie Ihre Zeitgutschriften bei einem lokalen Händler einsetzen, erscheint die Einlösung hier."
+      },
+      "errors": {
+        "load_failed": "Failed to load loyalty history"
       }
     }
   },
@@ -1090,7 +1093,10 @@
       "escalated": "Eskaliert",
       "submitted_at": "Eingereicht am {{date}}"
     },
-    "back": "Zurück zur Gemeinschaftsseite"
+    "back": "Zurück zur Gemeinschaftsseite",
+    "errors": {
+      "load_failed": "Failed to load reports"
+    }
   },
   "feed_ad": {
     "sponsored": "Sponsored",
@@ -1654,7 +1660,9 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "error": "Something went wrong",
-    "someone": "Someone"
+    "someone": "Someone",
+    "unknown_user": "User",
+    "not_available": "Not available"
   },
   "verein_federation": {
     "panel_title": "Federation with other clubs",

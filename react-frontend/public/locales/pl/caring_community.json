@@ -80,7 +80,10 @@
     "opening_hours": "Opening Hours",
     "no_providers": "No care providers found",
     "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type"
+    "filter_aria": "Filter providers by type",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}"
   },
   "emergency_alert": {
     "dismiss": "Dismiss",

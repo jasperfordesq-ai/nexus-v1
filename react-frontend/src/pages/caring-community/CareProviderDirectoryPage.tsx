@@ -96,7 +96,7 @@ function ProviderCardSkeleton() {
 
 interface ProviderCardProps {
   provider: CareProvider;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }
 
 function providerTypeLabel(type: CareProvider['type'], t: (key: string) => string): string {
@@ -151,6 +151,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
           {provider.contact_phone && (
             <a
               href={`tel:${provider.contact_phone}`}
+              aria-label={t('providers.call_aria', { phone: provider.contact_phone })}
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Phone className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -160,6 +161,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
           {provider.contact_email && (
             <a
               href={`mailto:${provider.contact_email}`}
+              aria-label={t('providers.email_aria', { email: provider.contact_email })}
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -171,6 +173,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
               href={provider.website_url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={t('providers.website_aria', { url: provider.website_url })}
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />

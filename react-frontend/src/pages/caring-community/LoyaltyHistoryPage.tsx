@@ -69,14 +69,14 @@ export function LoyaltyHistoryPage() {
         if (res.success && res.data) {
           setItems(res.data.items || []);
         } else {
-          setError(res.error || 'Failed to load');
+          setError(t('loyalty.history.errors.load_failed'));
           setItems([]);
         }
       })
       .catch((err) => {
         logError('LoyaltyHistoryPage: fetch failed', err);
         if (!cancelled) {
-          setError('Failed to load');
+          setError(t('loyalty.history.errors.load_failed'));
           setItems([]);
         }
       })
@@ -150,7 +150,9 @@ export function LoyaltyHistoryPage() {
                     {new Date(row.redeemed_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground">
-                    {row.merchant_name || '—'}
+                    {row.merchant_name || (
+                      <span aria-label={t('common.not_available')}>—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-default-600 hidden sm:table-cell">
                     {row.marketplace_listing_id && row.listing_title ? (
@@ -161,7 +163,7 @@ export function LoyaltyHistoryPage() {
                         {row.listing_title}
                       </Link>
                     ) : (
-                      '—'
+                      <span aria-label={t('common.not_available')}>—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-right tabular-nums">

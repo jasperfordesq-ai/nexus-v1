@@ -87,7 +87,10 @@
     "opening_hours": "Öffnungszeiten",
     "no_providers": "Keine Pflegeanbieter gefunden",
     "no_providers_hint": "Passen Sie Ihre Filter oder Suche an",
-    "filter_aria": "Anbieter nach Typ filtern"
+    "filter_aria": "Anbieter nach Typ filtern",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}"
   },
   "cover": {
     "title": "Stellvertretende Begleitung",

@@ -80,7 +80,10 @@
     "opening_hours": "Orari di apertura",
     "no_providers": "Nessun fornitore di cura trovato",
     "no_providers_hint": "Modifica i filtri o la ricerca",
-    "filter_aria": "Filtra i fornitori per tipo"
+    "filter_aria": "Filtra i fornitori per tipo",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}"
   },
   "emergency_alert": {
     "dismiss": "Chiudi",

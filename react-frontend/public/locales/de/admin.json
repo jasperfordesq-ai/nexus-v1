@@ -7413,6 +7413,7 @@
     "no_jobs_configured": "No background jobs configured",
     "label_ai_chat": "AI Chat",
     "label_blog": "Blog",
+    "label_caring_community": "Caring Community",
     "label_connections": "Connections",
     "label_dashboard": "Dashboard",
     "label_direct_messaging": "Direct Messaging",
@@ -7442,6 +7443,7 @@
     "label_wallet": "Wallet",
     "desc_ai_chat": "AI-powered chat assistant for members",
     "desc_blog": "Publish articles and community news",
+    "desc_caring_community": "Integrated care hub, KISS workflow, and municipal care reporting",
     "desc_connections": "Member-to-member connection requests",
     "desc_dashboard": "Personalised home dashboard for members",
     "desc_direct_messaging": "Private messaging between members",
@@ -8330,7 +8332,12 @@
       "load_failed": "Failed to load Caring Community configuration",
       "save_failed": "Failed to update Caring Community"
     },
-    "config_route_note": "Dedicated admin configuration route: {{route}}"
+    "config_route_note": "Dedicated admin configuration route: {{route}}",
+    "status": {
+      "active": "Active",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
   },
   "caring_workflow": {
     "meta": {

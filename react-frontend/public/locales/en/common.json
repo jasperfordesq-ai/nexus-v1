@@ -995,6 +995,9 @@
       "empty": {
         "title": "No Redemptions Yet",
         "body": "When you use your time credits at a local merchant, the redemption will appear here."
+      },
+      "errors": {
+        "load_failed": "Failed to load loyalty history"
       }
     }
   },
@@ -1094,7 +1097,10 @@
       "escalated": "Escalated",
       "submitted_at": "Submitted {{date}}"
     },
-    "back": "Back to Community Hub"
+    "back": "Back to Community Hub",
+    "errors": {
+      "load_failed": "Failed to load reports"
+    }
   },
   "feed_ad": {
     "sponsored": "Sponsored",
@@ -1658,7 +1664,9 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "error": "Something went wrong",
-    "someone": "Someone"
+    "someone": "Someone",
+    "unknown_user": "User",
+    "not_available": "Not available"
   },
   "verein_federation": {
     "panel_title": "Federation with other clubs",

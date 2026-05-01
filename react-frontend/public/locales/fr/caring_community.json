@@ -80,7 +80,10 @@
     "opening_hours": "Heures d'ouverture",
     "no_providers": "Aucun prestataire de soins trouvé",
     "no_providers_hint": "Ajustez vos filtres ou votre recherche",
-    "filter_aria": "Filtrer les prestataires par type"
+    "filter_aria": "Filtrer les prestataires par type",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}"
   },
   "emergency_alert": {
     "dismiss": "Fermer",
