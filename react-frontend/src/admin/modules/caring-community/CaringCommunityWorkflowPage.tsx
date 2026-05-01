@@ -358,10 +358,65 @@ type ForecastAlert = {
   action_url: string | null;
 };
 
+type SubRegionDemandRow = {
+  id: number;
+  name: string;
+  slug: string;
+  requested_30d: number;
+  fulfilled_30d: number;
+  coverage_ratio_30d: number;
+  requested_90d: number;
+  fulfilled_90d: number;
+  coverage_ratio_90d: number;
+  flagged: boolean;
+};
+
+type SubRegionDemand = {
+  window_days: { short: number; long: number };
+  sub_regions: SubRegionDemandRow[];
+  under_supplied_count: number;
+};
+
+type HelperChurnCategoryRow = {
+  category_id: number | null;
+  category_name: string;
+  prior_active: number;
+  lapsed: number;
+  churn_rate: number;
+};
+
+type HelperChurn = {
+  prior_window_days: { start: number; end: number };
+  lapsed_threshold_days: number;
+  overall: { prior_active: number; lapsed: number; churn_rate: number };
+  by_category: HelperChurnCategoryRow[];
+  lapsed_helper_ids: number[];
+};
+
+type CoefficientDriftRow = {
+  category_id: number;
+  category_name: string;
+  baseline_coefficient: number;
+  expected_session_hours: number;
+  observed_session_hours: number;
+  drift: number;
+  flagged: boolean;
+  sample_size: number;
+};
+
+type CoefficientDrift = {
+  threshold: number;
+  categories: CoefficientDriftRow[];
+  drift_count: number;
+};
+
 type ForecastResponse = {
   hours: ForecastSeries;
   members: ForecastSeries;
   recipients: ForecastSeries;
+  sub_region_demand?: SubRegionDemand;
+  helper_churn?: HelperChurn;
+  coefficient_drift?: CoefficientDrift;
   alerts: ForecastAlert[];
   generated_at: string;
 };
@@ -588,6 +643,143 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh }: Predict
               <ForecastMiniChart title="Active members" series={forecast.members} valueSuffix="" />
               <ForecastMiniChart title="Recipients reached" series={forecast.recipients} valueSuffix="" />
             </div>
+            {forecast.sub_region_demand && forecast.sub_region_demand.sub_regions.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                  <Info size={14} />
+                  Sub-region coverage (last {forecast.sub_region_demand.window_days.long} days)
+                  {forecast.sub_region_demand.under_supplied_count > 0 && (
+                    <Chip size="sm" variant="flat" color="warning">
+                      {forecast.sub_region_demand.under_supplied_count} under-supplied
+                    </Chip>
+                  )}
+                </div>
+                <div className="overflow-x-auto rounded-lg border border-default-200">
+                  <table className="w-full text-xs">
+                    <thead className="bg-default-50 text-default-500">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Sub-region</th>
+                        <th className="px-3 py-2 text-right">Requested (90d)</th>
+                        <th className="px-3 py-2 text-right">Fulfilled (90d)</th>
+                        <th className="px-3 py-2 text-right">Coverage</th>
+                        <th className="px-3 py-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {forecast.sub_region_demand.sub_regions.map((r) => (
+                        <tr key={r.id} className="border-t border-default-200">
+                          <td className="px-3 py-2">{r.name}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{r.requested_90d.toFixed(1)}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{r.fulfilled_90d.toFixed(1)}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</td>
+                          <td className="px-3 py-2">
+                            <Chip size="sm" variant="flat" color={r.flagged ? 'warning' : 'default'}>
+                              {r.flagged ? 'Under-supplied' : 'OK'}
+                            </Chip>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {forecast.helper_churn && forecast.helper_churn.overall.prior_active > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                  <Info size={14} />
+                  Helper churn (lapsed ≥ {forecast.helper_churn.lapsed_threshold_days} days)
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={forecast.helper_churn.overall.churn_rate > 0.3 ? 'warning' : 'default'}
+                  >
+                    {(forecast.helper_churn.overall.churn_rate * 100).toFixed(0)}% overall
+                  </Chip>
+                </div>
+                <p className="text-xs text-default-500">
+                  {forecast.helper_churn.overall.lapsed} of {forecast.helper_churn.overall.prior_active} previously
+                  active helpers haven't logged hours recently.
+                </p>
+                {forecast.helper_churn.by_category.length > 0 && (
+                  <div className="overflow-x-auto rounded-lg border border-default-200">
+                    <table className="w-full text-xs">
+                      <thead className="bg-default-50 text-default-500">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Category</th>
+                          <th className="px-3 py-2 text-right">Prior active</th>
+                          <th className="px-3 py-2 text-right">Lapsed</th>
+                          <th className="px-3 py-2 text-right">Churn rate</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {forecast.helper_churn.by_category.map((c) => (
+                          <tr
+                            key={`${c.category_id ?? 'none'}-${c.category_name}`}
+                            className="border-t border-default-200"
+                          >
+                            <td className="px-3 py-2">{c.category_name}</td>
+                            <td className="px-3 py-2 text-right tabular-nums">{c.prior_active}</td>
+                            <td className="px-3 py-2 text-right tabular-nums">{c.lapsed}</td>
+                            <td className="px-3 py-2 text-right tabular-nums">{(c.churn_rate * 100).toFixed(0)}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {forecast.coefficient_drift && forecast.coefficient_drift.categories.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                  <Info size={14} />
+                  Category coefficient drift
+                  {forecast.coefficient_drift.drift_count > 0 && (
+                    <Chip size="sm" variant="flat" color="warning">
+                      {forecast.coefficient_drift.drift_count} drifting
+                    </Chip>
+                  )}
+                </div>
+                <p className="text-xs text-default-500">
+                  Categories with absolute drift &gt; {(forecast.coefficient_drift.threshold * 100).toFixed(0)}% are
+                  flagged. Review baseline coefficients in the category coefficient editor.
+                </p>
+                <div className="overflow-x-auto rounded-lg border border-default-200">
+                  <table className="w-full text-xs">
+                    <thead className="bg-default-50 text-default-500">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Category</th>
+                        <th className="px-3 py-2 text-right">Baseline</th>
+                        <th className="px-3 py-2 text-right">Expected hrs</th>
+                        <th className="px-3 py-2 text-right">Observed hrs</th>
+                        <th className="px-3 py-2 text-right">Drift</th>
+                        <th className="px-3 py-2 text-right">Sample</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {forecast.coefficient_drift.categories.map((c) => (
+                        <tr key={c.category_id} className="border-t border-default-200">
+                          <td className="px-3 py-2">{c.category_name}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{c.baseline_coefficient.toFixed(2)}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{c.expected_session_hours.toFixed(2)}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{c.observed_session_hours.toFixed(2)}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">
+                            <Chip size="sm" variant="flat" color={c.flagged ? 'warning' : 'default'}>
+                              {(c.drift * 100).toFixed(0)}%
+                            </Chip>
+                          </td>
+                          <td className="px-3 py-2 text-right tabular-nums">{c.sample_size}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {forecast.alerts.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-default-900 flex items-center gap-2">

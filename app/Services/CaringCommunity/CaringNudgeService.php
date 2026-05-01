@@ -13,6 +13,16 @@ use App\Services\CaringTandemMatchingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Adds three trigger families on top of the original tandem-suggestion engine:
+ *  - helper_at_risk (helper inactive 21+ days but active in the prior 30)
+ *  - unfulfilled_help_request (caring_help_requests pending > 7 days)
+ *  - low_coverage_subregion (sub-region coverage_ratio < 0.5)
+ *
+ * Each trigger emits the same candidate shape as the existing tandem
+ * candidates so the dispatcher does not need to branch by source.
+ */
+
 class CaringNudgeService
 {
     private const SETTING_PREFIX = 'caring_community.nudges.';
@@ -20,8 +30,21 @@ class CaringNudgeService
     private const DEFAULT_COOLDOWN_DAYS = 14;
     private const DEFAULT_DAILY_LIMIT = 25;
 
+    /** Helper considered at risk if last log >= this many days ago. */
+    private const HELPER_AT_RISK_DAYS = 21;
+    /** … but only if they were active some time in the previous window. */
+    private const HELPER_AT_RISK_PRIOR_WINDOW_DAYS = 60;
+
+    /** Help request considered unfulfilled if pending for this many days. */
+    private const UNFULFILLED_HELP_REQUEST_DAYS = 7;
+
+    /** Synthetic score reported for non-tandem nudges. */
+    private const SIGNAL_SCORE_HIGH = 0.85;
+    private const SIGNAL_SCORE_MEDIUM = 0.7;
+
     public function __construct(
         private readonly CaringTandemMatchingService $tandemMatchingService,
+        private readonly ?CaringCommunityForecastService $forecastService = null,
     ) {
     }
 
@@ -88,6 +111,32 @@ class CaringNudgeService
 
         $suggestions = $this->tandemMatchingService->suggestTandems($tenantId, 100);
         $candidates = [];
+
+        // ── Trigger: helper_at_risk ──────────────────────────────────────
+        foreach ($this->helperAtRiskCandidates($tenantId, $cooldownDays) as $candidate) {
+            $candidates[] = $candidate;
+            if (count($candidates) >= $cap) {
+                return $candidates;
+            }
+        }
+
+        // ── Trigger: unfulfilled_help_request ───────────────────────────
+        foreach ($this->unfulfilledHelpRequestCandidates($tenantId, $cooldownDays) as $candidate) {
+            $candidates[] = $candidate;
+            if (count($candidates) >= $cap) {
+                return $candidates;
+            }
+        }
+
+        // ── Trigger: low_coverage_subregion ─────────────────────────────
+        foreach ($this->lowCoverageSubRegionCandidates($tenantId, $cooldownDays) as $candidate) {
+            $candidates[] = $candidate;
+            if (count($candidates) >= $cap) {
+                return $candidates;
+            }
+        }
+
+        // ── Existing trigger: tandem_candidate ──────────────────────────
         foreach ($suggestions as $suggestion) {
             $score = (float) ($suggestion['score'] ?? 0);
             if ($score < $config['min_score']) {
@@ -112,6 +161,9 @@ class CaringNudgeService
                 'score' => round($score, 3),
                 'signals' => $suggestion['signals'] ?? [],
                 'reason' => (string) ($suggestion['reason'] ?? ''),
+                'source_type' => 'tandem_candidate',
+                'notification_url' => '/caring-community/request-help',
+                'notification_message' => __('api.caring_nudge_notification', ['name' => (string) ($suggestion['recipient']['name'] ?? '')]),
             ];
 
             if (count($candidates) >= $cap) {
@@ -150,11 +202,16 @@ class CaringNudgeService
             }
 
             $targetId = (int) $candidate['target_user']['id'];
-            $relatedId = (int) $candidate['related_user']['id'];
+            $relatedId = (int) ($candidate['related_user']['id'] ?? 0);
+            $sourceType = (string) ($candidate['source_type'] ?? 'tandem_candidate');
+            $message = (string) ($candidate['notification_message']
+                ?? __('api.caring_nudge_notification', ['name' => (string) ($candidate['related_user']['name'] ?? '')]));
+            $url = (string) ($candidate['notification_url'] ?? '/caring-community/request-help');
+
             $notificationId = Notification::createNotification(
                 $targetId,
-                __('api.caring_nudge_notification', ['name' => (string) $candidate['related_user']['name']]),
-                '/caring-community/request-help',
+                $message,
+                $url,
                 'caring_smart_nudge',
                 false,
                 $tenantId,
@@ -163,8 +220,8 @@ class CaringNudgeService
             $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId([
                 'tenant_id' => $tenantId,
                 'target_user_id' => $targetId,
-                'related_user_id' => $relatedId,
-                'source_type' => 'tandem_candidate',
+                'related_user_id' => $relatedId > 0 ? $relatedId : null,
+                'source_type' => $sourceType,
                 'score' => $candidate['score'],
                 'signals' => json_encode($candidate['signals']),
                 'notification_id' => $notificationId,
@@ -285,6 +342,7 @@ class CaringNudgeService
         $rows = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('status', 'sent')
+            ->where('source_type', 'tandem_candidate')
             ->whereNotNull('related_user_id')
             ->limit(500)
             ->get(['id', 'target_user_id', 'related_user_id']);
@@ -321,12 +379,292 @@ class CaringNudgeService
 
     private function recentlyNudged(int $tenantId, int $targetId, int $relatedId, int $cooldownDays): bool
     {
+        $query = DB::table('caring_smart_nudges')
+            ->where('tenant_id', $tenantId)
+            ->where('target_user_id', $targetId)
+            ->where('sent_at', '>=', now()->subDays($cooldownDays));
+
+        if ($relatedId > 0) {
+            $query->where('related_user_id', $relatedId);
+        } else {
+            $query->whereNull('related_user_id');
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Has this target received a nudge of this source type recently?
+     */
+    private function recentlyNudgedBySource(int $tenantId, int $targetId, string $sourceType, int $cooldownDays): bool
+    {
         return DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('target_user_id', $targetId)
-            ->where('related_user_id', $relatedId)
+            ->where('source_type', $sourceType)
             ->where('sent_at', '>=', now()->subDays($cooldownDays))
             ->exists();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // New trigger: helper at risk of churn
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function helperAtRiskCandidates(int $tenantId, int $cooldownDays): array
+    {
+        if (!Schema::hasTable('vol_logs')) {
+            return [];
+        }
+
+        $lapsedSince = now()->subDays(self::HELPER_AT_RISK_DAYS)->toDateString();
+        $priorWindowStart = now()
+            ->subDays(self::HELPER_AT_RISK_DAYS + self::HELPER_AT_RISK_PRIOR_WINDOW_DAYS)
+            ->toDateString();
+
+        // Helpers active in the prior window (60 days before the lapse cutoff).
+        $priorActive = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'approved')
+            ->whereBetween('date_logged', [$priorWindowStart, $lapsedSince])
+            ->distinct()
+            ->pluck('user_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+
+        if (count($priorActive) === 0) {
+            return [];
+        }
+
+        // Of those, who has NOT logged anything since the lapse cutoff?
+        $stillActive = DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'approved')
+            ->where('date_logged', '>', $lapsedSince)
+            ->whereIn('user_id', $priorActive)
+            ->distinct()
+            ->pluck('user_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+
+        $atRisk = array_values(array_diff($priorActive, $stillActive));
+        if (count($atRisk) === 0) {
+            return [];
+        }
+
+        $users = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $atRisk)
+            ->get(['id', 'name'])
+            ->keyBy('id');
+
+        $out = [];
+        foreach ($atRisk as $userId) {
+            $user = $users->get($userId);
+            if ($user === null) {
+                continue;
+            }
+            if ($this->memberOptedOut($tenantId, $userId)) {
+                continue;
+            }
+            if ($this->recentlyNudgedBySource($tenantId, $userId, 'helper_at_risk', $cooldownDays)) {
+                continue;
+            }
+
+            $out[] = [
+                'target_user' => ['id' => $userId, 'name' => (string) $user->name],
+                'related_user' => ['id' => 0, 'name' => ''],
+                'score' => self::SIGNAL_SCORE_MEDIUM,
+                'signals' => [
+                    'lapsed_days_threshold' => self::HELPER_AT_RISK_DAYS,
+                    'prior_window_days' => self::HELPER_AT_RISK_PRIOR_WINDOW_DAYS,
+                ],
+                'reason' => 'helper_at_risk',
+                'source_type' => 'helper_at_risk',
+                'notification_url' => '/caring-community',
+                'notification_message' => __('caring_community.nudges.helper_at_risk.message'),
+            ];
+        }
+
+        return $out;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // New trigger: unfulfilled help request
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function unfulfilledHelpRequestCandidates(int $tenantId, int $cooldownDays): array
+    {
+        if (!Schema::hasTable('caring_help_requests')) {
+            return [];
+        }
+
+        $cutoff = now()->subDays(self::UNFULFILLED_HELP_REQUEST_DAYS)->toDateTimeString();
+
+        $rows = DB::table('caring_help_requests as hr')
+            ->leftJoin('users as u', function ($join) use ($tenantId): void {
+                $join->on('u.id', '=', 'hr.user_id')->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('hr.tenant_id', $tenantId)
+            ->where('hr.status', 'pending')
+            ->where('hr.created_at', '<=', $cutoff)
+            ->orderBy('hr.created_at')
+            ->limit(50)
+            ->get(['hr.id', 'hr.user_id', 'hr.what', 'hr.created_at', 'u.name as requester_name']);
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $coordinatorIds = $this->coordinatorTargets($tenantId);
+        if (count($coordinatorIds) === 0) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $requesterId = (int) $row->user_id;
+            $requesterName = (string) ($row->requester_name ?? '');
+
+            // Pick the first coordinator who is not opted out and not on cooldown.
+            foreach ($coordinatorIds as $coordId) {
+                if ($this->memberOptedOut($tenantId, $coordId)) {
+                    continue;
+                }
+                if ($this->recentlyNudged($tenantId, $coordId, $requesterId, $cooldownDays)) {
+                    continue;
+                }
+
+                $out[] = [
+                    'target_user' => [
+                        'id' => $coordId,
+                        'name' => (string) (DB::table('users')
+                            ->where('tenant_id', $tenantId)
+                            ->where('id', $coordId)
+                            ->value('name') ?? ''),
+                    ],
+                    'related_user' => ['id' => $requesterId, 'name' => $requesterName],
+                    'score' => self::SIGNAL_SCORE_HIGH,
+                    'signals' => [
+                        'help_request_id' => (int) $row->id,
+                        'pending_since' => (string) $row->created_at,
+                        'pending_days_threshold' => self::UNFULFILLED_HELP_REQUEST_DAYS,
+                    ],
+                    'reason' => 'unfulfilled_help_request',
+                    'source_type' => 'unfulfilled_help_request',
+                    'notification_url' => '/admin/caring-community/workflow',
+                    'notification_message' => __('caring_community.nudges.unfulfilled_help_request.message', [
+                        'name' => $requesterName,
+                        'days' => self::UNFULFILLED_HELP_REQUEST_DAYS,
+                    ]),
+                ];
+                break;
+            }
+        }
+
+        return $out;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // New trigger: low-coverage sub-region
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function lowCoverageSubRegionCandidates(int $tenantId, int $cooldownDays): array
+    {
+        if ($this->forecastService === null) {
+            return [];
+        }
+
+        $demand = $this->forecastService->subRegionDemand();
+        $flagged = array_values(array_filter(
+            $demand['sub_regions'] ?? [],
+            static fn ($r) => !empty($r['flagged']),
+        ));
+
+        if (count($flagged) === 0) {
+            return [];
+        }
+
+        $admins = $this->coordinatorTargets($tenantId);
+        if (count($admins) === 0) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($flagged as $region) {
+            foreach ($admins as $adminId) {
+                if ($this->memberOptedOut($tenantId, $adminId)) {
+                    continue;
+                }
+                if ($this->recentlyNudgedBySource($tenantId, $adminId, 'low_coverage_subregion', $cooldownDays)) {
+                    continue;
+                }
+
+                $out[] = [
+                    'target_user' => [
+                        'id' => $adminId,
+                        'name' => (string) (DB::table('users')
+                            ->where('tenant_id', $tenantId)
+                            ->where('id', $adminId)
+                            ->value('name') ?? ''),
+                    ],
+                    'related_user' => ['id' => 0, 'name' => (string) $region['name']],
+                    'score' => self::SIGNAL_SCORE_MEDIUM,
+                    'signals' => [
+                        'sub_region_id' => (int) $region['id'],
+                        'sub_region_name' => (string) $region['name'],
+                        'coverage_ratio_90d' => (float) $region['coverage_ratio_90d'],
+                        'requested_90d' => (float) $region['requested_90d'],
+                        'fulfilled_90d' => (float) $region['fulfilled_90d'],
+                    ],
+                    'reason' => 'low_coverage_subregion',
+                    'source_type' => 'low_coverage_subregion',
+                    'notification_url' => '/admin/caring-community/sub-regions',
+                    'notification_message' => __('caring_community.nudges.low_coverage_subregion.message', [
+                        'name' => (string) $region['name'],
+                    ]),
+                ];
+                break;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Resolve a list of coordinator/admin user IDs for the tenant.
+     * Used as fan-out targets for non-tandem nudges.
+     *
+     * @return list<int>
+     */
+    private function coordinatorTargets(int $tenantId): array
+    {
+        if (!Schema::hasTable('users')) {
+            return [];
+        }
+
+        $hasRole = Schema::hasColumn('users', 'role');
+        $query = DB::table('users')->where('tenant_id', $tenantId);
+        if ($hasRole) {
+            $query->whereIn('role', ['admin', 'super_admin', 'coordinator']);
+        }
+        if (Schema::hasColumn('users', 'status')) {
+            $query->where('status', 'active');
+        }
+
+        return $query
+            ->limit(10)
+            ->pluck('id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
     }
 
     private function memberOptedOut(int $tenantId, int $userId): bool

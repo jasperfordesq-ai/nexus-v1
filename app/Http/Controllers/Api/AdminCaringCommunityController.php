@@ -340,11 +340,14 @@ class AdminCaringCommunityController extends BaseApiController
         if ($disabled) return $disabled;
 
         return $this->respondWithData([
-            'hours'        => $this->forecastService->forecastHours(3),
-            'members'      => $this->forecastService->forecastMembers(3),
-            'recipients'   => $this->forecastService->forecastRecipients(3),
-            'alerts'       => $this->alertService->activeAlerts(),
-            'generated_at' => now()->toIso8601String(),
+            'hours'                => $this->forecastService->forecastHours(3),
+            'members'              => $this->forecastService->forecastMembers(3),
+            'recipients'           => $this->forecastService->forecastRecipients(3),
+            'sub_region_demand'    => $this->forecastService->subRegionDemand(),
+            'helper_churn'         => $this->forecastService->helperChurn(),
+            'coefficient_drift'    => $this->forecastService->categoryCoefficientDrift(),
+            'alerts'               => $this->alertService->activeAlerts(),
+            'generated_at'         => now()->toIso8601String(),
         ]);
     }
 
