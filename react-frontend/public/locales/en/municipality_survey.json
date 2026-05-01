@@ -11,8 +11,13 @@
   "success_body": "Your feedback has been recorded.",
   "back": "Back to Surveys",
   "required_error": "Please answer all required questions.",
+  "submit_error": "Error submitting response. Please try again.",
+  "load_error": "Failed to load surveys. Please try again.",
   "take_survey": "Take survey",
   "question_required": "Required",
+  "yes": "Yes",
+  "no": "No",
+  "closes_on": "Closes: {{date}}",
   "likert_options": {
     "1": "Very dissatisfied",
     "2": "Dissatisfied",

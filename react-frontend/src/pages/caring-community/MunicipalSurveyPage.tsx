@@ -128,8 +128,8 @@ function QuestionInput({ question, value, onChange, t }: QuestionProps) {
           isRequired={isRequired}
           orientation="horizontal"
         >
-          <Radio value="yes">Yes</Radio>
-          <Radio value="no">No</Radio>
+          <Radio value="yes">{t('yes')}</Radio>
+          <Radio value="no">{t('no')}</Radio>
         </RadioGroup>
       );
 
@@ -251,7 +251,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
       if (msg.toLowerCase().includes('already')) {
         setAlreadyResponded(true);
       } else {
-        setError(msg || 'Error submitting response');
+        setError(t('submit_error'));
       }
     } finally {
       setSubmitting(false);
@@ -316,7 +316,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalSurveyPage() {
-  const { t } = useTranslation('municipality_survey');
+  const { t, i18n } = useTranslation('municipality_survey');
   const { isAuthenticated } = useAuth();
   usePageTitle(t('meta.title'));
 
@@ -345,11 +345,11 @@ export default function MunicipalSurveyPage() {
       setSurveys(list);
     } catch (e: unknown) {
       logError('MunicipalSurveyPage.fetchSurveys', e);
-      setError(e instanceof Error ? e.message : 'Failed to load surveys');
+      setError(t('load_error'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { void fetchSurveys(); }, [fetchSurveys]);
 
@@ -380,6 +380,16 @@ export default function MunicipalSurveyPage() {
     setSucceeded(true);
     // Refetch to update counts
     void fetchSurveys();
+  };
+
+  const formatSurveyDate = (iso: string): string => {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return iso;
+    return new Intl.DateTimeFormat(i18n.language || 'en', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   };
 
   // ── Success state ──────────────────────────────────────────────────────────
@@ -462,7 +472,7 @@ export default function MunicipalSurveyPage() {
                 )}
                 {survey.ends_at && (
                   <p className="text-xs text-default-400">
-                    Closes: {new Date(survey.ends_at).toLocaleDateString()}
+                    {t('closes_on', { date: formatSurveyDate(survey.ends_at) })}
                   </p>
                 )}
               </div>

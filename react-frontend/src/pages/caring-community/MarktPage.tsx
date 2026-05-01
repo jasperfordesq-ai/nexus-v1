@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Avatar, Skeleton } from '@heroui/react';
+import { Button, Avatar, Skeleton, Tab, Tabs } from '@heroui/react';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Clock from 'lucide-react/icons/clock';
 import Tag from 'lucide-react/icons/tag';
@@ -319,13 +319,13 @@ export function MarktPage() {
     setPage(1);
     loadRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   // Reload when proximity or sub-region filter changes
   useEffect(() => {
     setPage(1);
     loadRef.current(true);
-  }, [radiusKm, position, subRegionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [radiusKm, position, subRegionId]);
 
   if (!isAuthenticated) return null;
 
@@ -368,28 +368,23 @@ export function MarktPage() {
         </div>
 
         {/* Tab bar */}
-        <div
-          className="flex gap-1 rounded-xl bg-theme-elevated p-1 border border-theme-default w-fit"
-          role="tablist"
+        <Tabs
           aria-label={t('markt.meta.title')}
+          selectedKey={activeTab}
+          onSelectionChange={(key) => setActiveTab(key as MarktTab)}
+          variant="solid"
+          classNames={{
+            base: 'w-full sm:w-auto',
+            tabList: 'flex-wrap border border-theme-default bg-theme-elevated p-1',
+            tab: 'h-9 px-4',
+            cursor: 'bg-theme-surface shadow-sm',
+            tabContent: 'text-sm font-medium group-data-[selected=true]:text-theme-primary',
+          }}
         >
           {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              role="tab"
-              aria-selected={activeTab === tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={[
-                'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-                activeTab === tab.key
-                  ? 'bg-theme-surface text-theme-primary shadow-sm'
-                  : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover',
-              ].join(' ')}
-            >
-              {tab.label}
-            </button>
+            <Tab key={tab.key} title={tab.label} />
           ))}
-        </div>
+        </Tabs>
 
         {/* Locality filters: sub-region + proximity */}
         <div className="flex flex-col gap-3 mb-4">
@@ -427,7 +422,7 @@ export function MarktPage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadRef.current(true)}
             >
-              {t('error_boundary.description')}
+              {t('markt.retry')}
             </Button>
           </GlassCard>
         ) : items.length === 0 && !showMarketplaceNotice ? (
