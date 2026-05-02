@@ -39,7 +39,7 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -278,7 +278,7 @@ export default function KpiBaselineAdminPage() {
         period: { start: capturePeriodStart, end: capturePeriodEnd },
         notes: captureNotes.trim() || undefined,
       });
-      showToast('Baseline captured successfully', 'success');
+      showToast('Baseline saved. Use it to compare future metrics against this snapshot.', 'success');
       setCaptureModalOpen(false);
       setCaptureLabel('');
       setCaptureNotes('');
@@ -294,7 +294,7 @@ export default function KpiBaselineAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Community KPI Baselines"
-        subtitle="Capture snapshots of your community metrics to track before/after impact"
+        subtitle={<>Capture snapshots of your community metrics to track before/after <Abbr term="KPI">KPI</Abbr> impact</>}
         icon={<Database size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -322,9 +322,9 @@ export default function KpiBaselineAdminPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
               <p className="text-default-600">
-                KPI Baselines record the state of your community before the Caring Community
+                <Abbr term="KPI">KPI</Abbr> Baselines record the state of your community before the Caring Community
                 programme begins. They are compared against current metrics at each quarterly review
-                to demonstrate impact. Capture baselines for every KPI before onboarding residents —
+                to demonstrate impact. Capture baselines for every <Abbr term="KPI">KPI</Abbr> before onboarding residents —
                 once the pilot starts, the baseline is frozen and cannot be backdated.
               </p>
               <p className="text-default-600">
@@ -433,7 +433,7 @@ export default function KpiBaselineAdminPage() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Database size={18} className="text-primary" />
-                Capture KPI Baseline
+                Capture <Abbr term="KPI">KPI</Abbr> Baseline
               </ModalHeader>
               <ModalBody className="gap-4">
                 <p className="text-sm text-[var(--color-text-muted)]">

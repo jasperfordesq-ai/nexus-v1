@@ -46,7 +46,7 @@ import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 interface PilotMetrics {
   active_members: number;
@@ -268,8 +268,8 @@ export default function PilotScoreboardAdminPage() {
                 The comparison table shows how each metric has moved relative to that baseline.
               </p>
               <p className="text-default-600">
-                Cost offset is calculated using the KISS/Age-Stiftung methodology: hours of informal
-                care × CHF 35/hr (Swiss formal-care assistant rate) × 2 (prevention multiplier
+                Cost offset is calculated using the <Abbr term="KISS" />/<abbr title="Stiftung für das Alter">Age-Stiftung</abbr> methodology: hours of informal
+                care × <Abbr term="CHF">CHF</Abbr> 35/hr (Swiss formal-care assistant rate) × 2 (prevention multiplier
                 reflecting avoided formal care costs). This methodology is recognised by Swiss
                 cantonal social services for pilot reporting.
               </p>
@@ -485,7 +485,7 @@ export default function PilotScoreboardAdminPage() {
 
       {!loading && current && (
         <p className="text-xs text-default-500">
-          Methodology: hours × CHF {current.methodology.hourly_rate_chf}/hr × {current.methodology.prevention_multiplier}
+          Methodology: hours × <Abbr term="CHF">CHF</Abbr> {current.methodology.hourly_rate_chf}/hr × {current.methodology.prevention_multiplier}
           {' '}prevention multiplier. Window: {current.methodology.window_days} days.
         </p>
       )}

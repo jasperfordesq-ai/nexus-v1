@@ -140,7 +140,7 @@ export function TrustTierAdminPage() {
     setSaving(true);
     try {
       await api.put('/v2/admin/caring-community/trust-tier/config', { criteria });
-      showToast('Trust tier configuration saved.', 'success');
+      showToast('Trust tier configuration saved. Changes apply on the next recompute run.', 'success');
       setLocalCriteria(null);
       void refetch();
     } catch {

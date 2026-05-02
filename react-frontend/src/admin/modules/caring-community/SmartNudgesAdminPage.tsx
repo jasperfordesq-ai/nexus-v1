@@ -176,7 +176,7 @@ export default function SmartNudgesAdminPage() {
         config,
       );
       if (res.success) {
-        toast.success('Nudge configuration saved');
+        toast.success('Nudge config saved. The updated rules will apply on the next scheduled run.');
         void load();
       } else {
         toast.error(res.error || 'Failed to save configuration');

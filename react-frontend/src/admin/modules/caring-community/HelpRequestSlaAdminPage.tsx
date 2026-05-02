@@ -31,7 +31,7 @@ import Settings from 'lucide-react/icons/settings';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 type Bucket = 'breached' | 'at_risk' | 'on_track';
 type SlaDimension = 'first_response' | 'resolution';
@@ -157,7 +157,7 @@ export default function HelpRequestSlaAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Help Request SLA Dashboard"
-        subtitle="AG96 — first-response and resolution SLA tracking against AG81 operating policy"
+        subtitle={<>AG96 — first-response and resolution <Abbr term="SLA">SLA</Abbr> tracking against AG81 operating policy</>}
         icon={<AlarmClock size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -340,7 +340,7 @@ export default function HelpRequestSlaAdminPage() {
                 <Table aria-label="Open help requests" removeWrapper>
                   <TableHeader>
                     <TableColumn>Request</TableColumn>
-                    <TableColumn>SLA</TableColumn>
+                    <TableColumn><Abbr term="SLA">SLA</Abbr></TableColumn>
                     <TableColumn>Bucket</TableColumn>
                     <TableColumn>Status</TableColumn>
                     <TableColumn>Created</TableColumn>
@@ -407,7 +407,7 @@ export default function HelpRequestSlaAdminPage() {
                   <TableHeader>
                     <TableColumn>Request</TableColumn>
                     <TableColumn>Turnaround</TableColumn>
-                    <TableColumn>Within SLA</TableColumn>
+                    <TableColumn>Within <Abbr term="SLA">SLA</Abbr></TableColumn>
                     <TableColumn>Resolved</TableColumn>
                   </TableHeader>
                   <TableBody>
@@ -452,9 +452,9 @@ export default function HelpRequestSlaAdminPage() {
 
           <Divider />
           <p className="text-xs text-default-500">
-            Report generated {new Date(data.generated_at).toLocaleString()}. SLA proxy:
+            Report generated {new Date(data.generated_at).toLocaleString()}. <Abbr term="SLA">SLA</Abbr> proxy:
             first-response = status moves out of <code>pending</code>; resolution = status reaches{' '}
-            <code>closed</code>. Adjust SLA windows in AG81 operating policy.
+            <code>closed</code>. Adjust <Abbr term="SLA">SLA</Abbr> windows in AG81 operating policy.
           </p>
         </>
       )}

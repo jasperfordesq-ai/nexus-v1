@@ -36,7 +36,7 @@ import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 type Severity = 'low' | 'medium' | 'high' | 'critical';
 type Status = 'submitted' | 'triaged' | 'investigating' | 'resolved' | 'dismissed';
@@ -371,7 +371,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                 <TableColumn>Subject</TableColumn>
                 <TableColumn>Status</TableColumn>
                 <TableColumn>Assigned</TableColumn>
-                <TableColumn>SLA</TableColumn>
+                <TableColumn><Abbr term="SLA">SLA</Abbr></TableColumn>
                 <TableColumn>Created</TableColumn>
                 <TableColumn>Actions</TableColumn>
               </TableHeader>
