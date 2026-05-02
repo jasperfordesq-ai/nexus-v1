@@ -352,6 +352,22 @@ run_candidate_migrations() {
     log_step "=== Candidate Laravel Migrations ($color) ==="
     write_deploy_status "running" "Candidate Laravel Migrations ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     log_warn "Running migrations online. Only expand/contract-safe migrations belong in this path."
+
+    log_info "Taking pre-migration database snapshot..."
+    local BACKUP_DIR="/opt/nexus-php/backups"
+    mkdir -p "$BACKUP_DIR"
+    local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S)-bluegreen.sql.gz"
+    local DB_PASS
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d '"'"'"')
+    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
+        log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
+        find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete
+    else
+        log_err "Database backup failed — aborting migration to prevent unrecoverable data loss"
+        rm -f "$BACKUP_FILE"
+        return 1
+    fi
+
     docker exec "$app_container" php /var/www/html/artisan migrate --force
     log_ok "Laravel migrations completed"
 }

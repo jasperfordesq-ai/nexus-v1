@@ -6,6 +6,26 @@ set -eo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/../lib/common.sh"
 
+backup_database_before_migrate() {
+    local BACKUP_DIR="/opt/nexus-php/backups"
+    mkdir -p "$BACKUP_DIR"
+
+    local DB_PASS
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d '"'"'"')
+
+    local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S).sql.gz"
+    log_info "Taking pre-migration database snapshot → $BACKUP_FILE"
+
+    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
+        log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
+        find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete
+    else
+        log_err "Database backup failed — aborting migration to prevent unrecoverable data loss"
+        rm -f "$BACKUP_FILE"
+        exit 1
+    fi
+}
+
 run_pending_migrations() {
     log_step "=== Database Migrations ==="
 
@@ -61,6 +81,9 @@ run_pending_migrations() {
         echo "  • $(basename "$F")" | tee -a "$LOG_FILE"
     done
     echo "" | tee -a "$LOG_FILE"
+
+    # Take a backup before executing any DDL
+    backup_database_before_migrate
 
     # Execute each pending migration
     local RAN=0
