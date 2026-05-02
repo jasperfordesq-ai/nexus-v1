@@ -1,0 +1,52 @@
+# =============================================================================
+# Project NEXUS - React Frontend Blue/Green Runtime
+# =============================================================================
+
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+
+ARG VITE_API_BASE=https://api.project-nexus.ie/api
+ARG VITE_GOOGLE_MAPS_API_KEY=
+ARG VITE_GOOGLE_MAPS_MAP_ID=
+ARG VITE_SENTRY_DSN=
+ARG VITE_SENTRY_ENVIRONMENT=production
+ARG VITE_SENTRY_TRACES_SAMPLE_RATE=0.1
+ARG VITE_PUSHER_KEY=
+ARG VITE_PUSHER_CLUSTER=eu
+ARG VITE_GIPHY_API_KEY=
+ARG VITE_STRIPE_PUBLISHABLE_KEY=
+ARG BUILD_COMMIT=unknown
+
+ENV VITE_API_BASE=$VITE_API_BASE
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
+ENV VITE_GOOGLE_MAPS_MAP_ID=$VITE_GOOGLE_MAPS_MAP_ID
+ENV VITE_SENTRY_DSN=$VITE_SENTRY_DSN
+ENV VITE_SENTRY_ENVIRONMENT=$VITE_SENTRY_ENVIRONMENT
+ENV VITE_SENTRY_TRACES_SAMPLE_RATE=$VITE_SENTRY_TRACES_SAMPLE_RATE
+ENV VITE_PUSHER_KEY=$VITE_PUSHER_KEY
+ENV VITE_PUSHER_CLUSTER=$VITE_PUSHER_CLUSTER
+ENV VITE_GIPHY_API_KEY=$VITE_GIPHY_API_KEY
+ENV VITE_STRIPE_PUBLISHABLE_KEY=$VITE_STRIPE_PUBLISHABLE_KEY
+ENV BUILD_COMMIT=$BUILD_COMMIT
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit
+
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NEXUS_SKIP_PRERENDER=1
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine3.21 AS production
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.bluegreen.conf /etc/nginx/templates/default.conf.template
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+

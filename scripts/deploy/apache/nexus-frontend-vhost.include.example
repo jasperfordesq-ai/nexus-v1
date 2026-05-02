@@ -1,0 +1,6 @@
+# Include this in the app.project-nexus.ie Apache vhost.
+
+ProxyPreserveHost On
+ProxyPass / http://127.0.0.1:${NEXUS_FRONTEND_PORT}/ retry=0
+ProxyPassReverse / http://127.0.0.1:${NEXUS_FRONTEND_PORT}/
+

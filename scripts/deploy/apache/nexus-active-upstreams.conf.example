@@ -1,0 +1,8 @@
+# Managed by scripts/deploy/bluegreen-deploy.sh
+# Copy to a server-owned Apache include path and set NEXUS_APACHE_ROUTES_FILE
+# to that real path before using the blue/green deploy script.
+
+Define NEXUS_API_PORT 8090
+Define NEXUS_FRONTEND_PORT 3000
+Define NEXUS_SALES_PORT 3003
+

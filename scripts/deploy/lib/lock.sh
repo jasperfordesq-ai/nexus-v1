@@ -23,7 +23,7 @@ check_lock() {
         if ps -p "$LOCK_PID" > /dev/null 2>&1; then
             # Verify it's actually a deploy process, not a recycled PID
             PROC_CMD=$(ps -p "$LOCK_PID" -o args= 2>/dev/null || echo "")
-            if echo "$PROC_CMD" | grep -q "safe-deploy"; then
+            if echo "$PROC_CMD" | grep -Eq "safe-deploy|bluegreen-deploy"; then
                 log_err "Another deployment is running (PID: $LOCK_PID, age: $((LOCK_AGE / 60))m)"
                 exit 1
             else

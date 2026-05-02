@@ -1,0 +1,132 @@
+# =============================================================================
+# Project NEXUS - Blue/Green Stateless Web Stack
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.bluegreen
+    image: nexus-php-app:${BUILD_COMMIT:-candidate}
+    container_name: nexus-${NEXUS_COLOR:-green}-php-app
+    restart: unless-stopped
+    ports:
+      - "${NEXUS_API_PORT:-8190}:80"
+    volumes:
+      - nexus-php-uploads:/var/www/html/httpdocs/uploads
+      - nexus-php-logs:/var/log
+      - nexus-php-storage:/var/www/html/storage
+    env_file:
+      - ${NEXUS_ENV_FILE:-.env}
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://api.project-nexus.ie
+      - DB_HOST=nexus-php-db
+      - DB_PORT=3306
+      - REDIS_HOST=nexus-php-redis
+      - REDIS_PORT=6379
+      - MEILISEARCH_HOST=http://nexus-meilisearch:7700
+      - MEILISEARCH_KEY=${MEILISEARCH_KEY}
+    networks:
+      - nexus-php-internal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./react-frontend
+      dockerfile: Dockerfile.bluegreen
+      args:
+        VITE_API_BASE: https://api.project-nexus.ie/api
+        VITE_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+        VITE_GOOGLE_MAPS_MAP_ID: ${GOOGLE_MAPS_MAP_ID:-}
+        VITE_SENTRY_DSN: ${SENTRY_DSN_REACT:-}
+        VITE_SENTRY_ENVIRONMENT: production
+        VITE_SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+        VITE_PUSHER_KEY: ${PUSHER_KEY:-}
+        VITE_PUSHER_CLUSTER: ${PUSHER_CLUSTER:-eu}
+        VITE_GIPHY_API_KEY: ${GIPHY_API_KEY:-}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+        BUILD_COMMIT: ${BUILD_COMMIT:-candidate}
+    image: nexus-react-prod:${BUILD_COMMIT:-candidate}
+    container_name: nexus-${NEXUS_COLOR:-green}-react
+    restart: unless-stopped
+    ports:
+      - "${NEXUS_FRONTEND_PORT:-3100}:80"
+    environment:
+      - NEXUS_API_UPSTREAM=nexus-${NEXUS_COLOR:-green}-php-app
+    volumes:
+      - nexus-php-prerendered:/usr/share/nginx/html/prerendered
+    networks:
+      - nexus-php-internal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  sales:
+    build:
+      context: ./sales-site
+      dockerfile: Dockerfile
+    image: nexus-sales-site:${BUILD_COMMIT:-candidate}
+    container_name: nexus-${NEXUS_COLOR:-green}-sales
+    restart: unless-stopped
+    ports:
+      - "${NEXUS_SALES_PORT:-3103}:80"
+    networks:
+      - nexus-php-internal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  queue:
+    image: nexus-php-app:${BUILD_COMMIT:-candidate}
+    container_name: nexus-${NEXUS_COLOR:-green}-php-queue
+    command: php artisan queue:work --queue=federation-high,federation,default --sleep=3 --tries=3 --timeout=60
+    restart: unless-stopped
+    volumes:
+      - nexus-php-logs:/var/log
+      - nexus-php-storage:/var/www/html/storage
+    env_file:
+      - ${NEXUS_ENV_FILE:-.env}
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://api.project-nexus.ie
+      - DB_HOST=nexus-php-db
+      - DB_PORT=3306
+      - REDIS_HOST=nexus-php-redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    networks:
+      - nexus-php-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'artisan queue:work' > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  nexus-php-internal:
+    external: true
+
+volumes:
+  nexus-php-uploads:
+    external: true
+  nexus-php-logs:
+    external: true
+  nexus-php-storage:
+    external: true
+  nexus-php-prerendered:
+    external: true

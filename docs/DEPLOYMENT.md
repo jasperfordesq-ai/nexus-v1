@@ -9,8 +9,9 @@
 | **Host** | Azure VM `20.224.171.253` |
 | **SSH** | `ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253` |
 | **Deploy Path** | `/opt/nexus-php/` |
-| **Deploy Script** | `scripts/safe-deploy.sh` |
-| **Docker Compose** | `compose.prod.yml` (production) / `compose.yml` (dev) |
+| **Primary Deploy Script** | `scripts/deploy/bluegreen-deploy.sh` |
+| **Fallback Deploy Script** | `scripts/safe-deploy.sh` |
+| **Docker Compose** | `compose.bluegreen.yml` (zero-downtime web) / `compose.prod.yml` (fallback production) / `compose.yml` (dev) |
 
 ## Production URLs
 
@@ -20,15 +21,15 @@
 | PHP API | https://api.project-nexus.ie | `nexus-php-app` | 8090 |
 | Sales Site | https://project-nexus.ie | `nexus-sales-site` | 3003 |
 
-All traffic routed through Cloudflare → Nginx reverse proxy on the VM.
+All traffic routes through Cloudflare and the Apache/Plesk reverse proxy on the VM.
 
 ---
 
 ## Deployment Modes
 
-### Full Deploy (recommended)
+### Zero-Downtime Deploy (recommended)
 
-Rebuilds **all containers** from scratch with `--no-cache`. Use for any code change.
+Builds the next release beside the live release, smokes it on inactive local ports, then switches Apache/Plesk routing with a graceful reload. This is the normal path for frequent deploys.
 
 ```bash
 # On your local machine:
@@ -39,7 +40,47 @@ ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
 
 # On the server:
 cd /opt/nexus-php
-sudo bash scripts/safe-deploy.sh full
+export NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams.conf
+sudo bash scripts/deploy/bluegreen-deploy.sh deploy
+```
+
+**What it does:**
+1. Leaves the current site live.
+2. Fetches `origin/main` without resetting the live working tree.
+3. Creates a separate release worktree under `/opt/nexus-releases/`.
+4. Builds immutable PHP, React, and sales images tagged by commit.
+5. Starts the inactive color on private local ports.
+6. Waits for Docker health checks and private HTTP smoke tests.
+7. Updates the Apache route include and runs a graceful Apache reload.
+8. Starts the matching queue worker and stops the previous queue worker.
+9. Runs public smoke tests after cutover.
+
+Run backwards-compatible Laravel migrations only when needed:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh deploy --migrate
+```
+
+Rollback does not rebuild:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh rollback
+```
+
+### Full Deploy (fallback only)
+
+Rebuilds **all containers** from scratch with `--no-cache` and uses global maintenance mode. Use only as an emergency fallback or before the Apache blue/green route switch has been installed.
+
+```bash
+# On your local machine:
+git push origin main
+
+# SSH into the server:
+ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
+
+# On the server:
+cd /opt/nexus-php
+sudo bash scripts/safe-deploy.sh full --detach
 ```
 
 **What it does:**
@@ -53,7 +94,7 @@ sudo bash scripts/safe-deploy.sh full
 8. Writes `.build-version` with commit hash + timestamp
 9. Purges Cloudflare cache (all domains)
 
-### Quick Deploy
+### Quick Deploy (fallback only)
 
 Rebuilds **frontend + sales site** and restarts PHP. Faster than full but still ensures React changes deploy.
 
