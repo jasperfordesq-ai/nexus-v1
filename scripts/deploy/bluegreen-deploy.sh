@@ -329,10 +329,7 @@ optimize_candidate_laravel() {
     docker exec "$app_container" php /var/www/html/artisan route:clear
     docker exec "$app_container" php /var/www/html/artisan event:clear
     docker exec "$app_container" php /var/www/html/artisan view:clear
-    docker exec "$app_container" php /var/www/html/artisan config:cache
-    docker exec "$app_container" php /var/www/html/artisan route:cache
-    docker exec "$app_container" php /var/www/html/artisan event:cache
-    docker exec "$app_container" php /var/www/html/artisan view:cache
+    docker exec "$app_container" php /var/www/html/artisan optimize
     # Signal any already-running workers for this color to gracefully reload
     docker exec "$app_container" php /var/www/html/artisan queue:restart 2>/dev/null || true
     docker exec "$app_container" php /var/www/html/artisan storage:link || true

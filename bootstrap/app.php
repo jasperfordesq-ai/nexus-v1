@@ -264,6 +264,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping(15)
             ->runInBackground()
             ->name('ag61-agents-run');
+
+        // Horizon metrics snapshots — required for the Horizon dashboard charts.
+        // Without periodic snapshots the wait-time and throughput graphs stay empty.
+        $schedule->command('horizon:snapshot')
+            ->everyFiveMinutes()
+            ->name('horizon-snapshot');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
