@@ -81,6 +81,27 @@ if [ "$MODE" = "status" ]; then
     exec bash "$DEPLOY_SCRIPTS/subcommands/status.sh"
 fi
 
+# ===========================================================================
+# Blue-green delegation
+# When NEXUS_APACHE_ROUTES_FILE is configured, delegate deploy/rollback to
+# bluegreen-deploy.sh (zero-downtime, no maintenance window) instead of the
+# maintenance-mode path below. Flags are forwarded transparently.
+# ===========================================================================
+if [ -n "${NEXUS_APACHE_ROUTES_FILE:-}" ] && \
+   [ -f "$SELF_DIR/deploy/bluegreen-deploy.sh" ]; then
+    BG_CMD="deploy"
+    [ "$MODE" = "rollback" ] && BG_CMD="rollback"
+    BG_ARGS=("$BG_CMD")
+    [ "$DETACH"          = "1" ] && BG_ARGS+=(--detach)
+    [ "$LARAVEL_MIGRATE" = "1" ] && BG_ARGS+=(--migrate)
+    [ "$SKIP_PRERENDER"  = "1" ] && BG_ARGS+=(--skip-prerender)
+    [ "$FORCE_PRERENDER" = "1" ] && BG_ARGS+=(--force-prerender)
+    [ -n "$PRERENDER_TENANT" ]   && BG_ARGS+=(--prerender-tenant "$PRERENDER_TENANT")
+    [ -n "$PRERENDER_ROUTES" ]   && BG_ARGS+=(--prerender-routes "$PRERENDER_ROUTES")
+    log_info "Blue-green configured (NEXUS_APACHE_ROUTES_FILE set) — delegating to bluegreen-deploy.sh (zero-downtime)"
+    exec bash "$SELF_DIR/deploy/bluegreen-deploy.sh" "${BG_ARGS[@]}"
+fi
+
 # Handle --detach: re-exec in background and return immediately
 # Skip if we're already the detached child (marker is set)
 if [ "$DETACH" = "1" ] && [ -z "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
@@ -235,6 +256,12 @@ if run_phase "$DEPLOY_SCRIPTS/phases/smoke-tests.sh"; then
     # Schedule post-deploy health check (background, non-blocking)
     run_phase "$DEPLOY_SCRIPTS/phases/schedule-health-check.sh"
 
+    # Post-deploy notification (non-blocking)
+    bash "$DEPLOY_SCRIPTS/phases/notify-deploy.sh" success \
+        "$(git -C "$DEPLOY_DIR" log -1 --format='%h' 2>/dev/null || true)" \
+        "$(git -C "$DEPLOY_DIR" log -1 --format='%s' 2>/dev/null || true)" \
+        "" 2>/dev/null || true
+
     state_clear
     exit 0
 else
@@ -249,5 +276,12 @@ else
     log_warn "  2. Rollback:   sudo bash scripts/safe-deploy.sh rollback"
     log_warn "  3. Force live:  sudo bash scripts/maintenance.sh off"
     log_info "Log saved to: $LOG_FILE"
+
+    # Failure notification (non-blocking)
+    bash "$DEPLOY_SCRIPTS/phases/notify-deploy.sh" failure \
+        "$(git -C "$DEPLOY_DIR" log -1 --format='%h' 2>/dev/null || true)" \
+        "$(git -C "$DEPLOY_DIR" log -1 --format='%s' 2>/dev/null || true)" \
+        "" 2>/dev/null || true
+
     exit 1
 fi

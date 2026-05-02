@@ -127,6 +127,15 @@ deploy_exit_trap() {
     else
         write_deploy_status "failed" "failed" "${CURRENT_ACTIVE:-$(read_active_color 2>/dev/null || echo unknown)}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
     fi
+    # Post-deploy notification (non-blocking)
+    local _notify_status
+    [ "$code" -eq 0 ] && _notify_status="success" || _notify_status="failure"
+    bash "$SELF_DIR/phases/notify-deploy.sh" \
+        "$_notify_status" \
+        "${CURRENT_COMMIT:0:12}" \
+        "$(git -C "$DEPLOY_DIR" log -1 --format='%s' "${CURRENT_COMMIT:-HEAD}" 2>/dev/null || true)" \
+        "${CURRENT_TARGET:-}" \
+        2>/dev/null || true
     cleanup
     exit "$code"
 }
@@ -751,6 +760,9 @@ cmd_deploy() {
     # Prune dangling Docker images to reclaim disk space
     phase "Docker Image Cleanup" "${CURRENT_TARGET:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
     bash "$SELF_DIR/phases/prune-images.sh"
+
+    # Prune deploy log files older than 30 days to prevent disk accumulation
+    find "$LOG_DIR" -name "bluegreen-deploy-*.log" -mtime +30 -delete 2>/dev/null || true
 }
 
 cmd_rollback() {
