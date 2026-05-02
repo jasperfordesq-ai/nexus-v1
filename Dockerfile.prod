@@ -133,7 +133,9 @@ RUN a2enmod headers \
     && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"\n\
 Header always set X-Frame-Options "SAMEORIGIN"\n\
 Header always set X-Content-Type-Options "nosniff"\n\
-Header always set Referrer-Policy "strict-origin-when-cross-origin"\n' \
+Header always set Referrer-Policy "strict-origin-when-cross-origin"\n\
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n\
+Header always set Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"' https://js.stripe.com https://maps.googleapis.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' data: https:; connect-src '"'"'self'"'"' wss: https://api.stripe.com https://maps.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; report-uri /api/v2/csp-report"\n' \
     > /etc/apache2/conf-available/security-headers.conf \
     && a2enconf security-headers
 
@@ -178,18 +180,28 @@ date.timezone = UTC\n\
 ; OPcache (aggressive for production)\n\
 opcache.enable = 1\n\
 opcache.memory_consumption = 256\n\
-opcache.interned_strings_buffer = 16\n\
-opcache.max_accelerated_files = 10000\n\
+opcache.interned_strings_buffer = 32\n\
+opcache.max_accelerated_files = 20000\n\
 opcache.validate_timestamps = 0\n\
 opcache.revalidate_freq = 0\n\
+opcache.revalidate_path = 1\n\
 opcache.save_comments = 1\n\
 opcache.enable_cli = 0\n\
+opcache.preload=/var/www/html/docker/preload.php\n\
+opcache.preload_user=www-data\n\
 \n\
 ; Security\n\
 expose_php = Off\n\
 allow_url_fopen = On\n\
 allow_url_include = Off\n\
 " >> "$PHP_INI_DIR/php.ini"
+
+# =============================================================================
+# Preload Script
+# =============================================================================
+# Copy OPcache preload script into image so it's available at PHP-FPM/Apache startup.
+# The ini directive (opcache.preload above) references the container path directly.
+COPY docker/preload.php /var/www/html/docker/preload.php
 
 # =============================================================================
 # Working Directory
@@ -236,7 +248,7 @@ EXPOSE 80
 # Health Check
 # =============================================================================
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost/health.php || exit 1
+    CMD curl -f http://localhost/up || exit 1
 
 # =============================================================================
 # Default Command
@@ -250,9 +262,7 @@ CMD ["sh", "-c", "\
     chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     if [ -f /var/www/html/artisan ]; then \
-        php /var/www/html/artisan config:cache || { echo '[FATAL] artisan config:cache failed'; exit 1; }; \
-        php /var/www/html/artisan route:cache  || { echo '[FATAL] artisan route:cache failed'; exit 1; }; \
-        php /var/www/html/artisan event:cache  || { echo '[FATAL] artisan event:cache failed'; exit 1; }; \
+        php /var/www/html/artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; \
         ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage 2>/dev/null || true; \
     fi; \
     apache2-foreground"]
