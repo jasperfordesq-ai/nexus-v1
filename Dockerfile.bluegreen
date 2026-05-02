@@ -179,8 +179,13 @@ RUN mkdir -p /var/www/html/storage/app/public \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Run package:discover so that auto-discovered service providers (Horizon,
+# Sanctum, etc.) are written into bootstrap/cache/packages.php inside the
+# image. Without this, --no-scripts skips discovery and Horizon commands
+# are absent at runtime when the bootstrap/cache volume is mounted.
+RUN php artisan package:discover --ansi 2>/dev/null || true
+
 # Pre-publish Horizon dashboard assets so they're baked into the image.
-# The '|| true' ensures a build failure here never blocks a deploy.
 RUN php artisan horizon:publish 2>/dev/null || true
 
 EXPOSE 80
