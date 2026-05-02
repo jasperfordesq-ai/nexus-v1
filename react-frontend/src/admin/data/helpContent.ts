@@ -1,0 +1,907 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Master registry of contextual help articles for every admin page.
+ * Keys are the path AFTER the tenant slug (e.g. '/caring', '/admin/national/kiss').
+ */
+
+export interface HelpStep {
+  label: string;
+  detail?: string;
+}
+
+export interface HelpArticle {
+  title: string;
+  summary: string;
+  steps?: HelpStep[];
+  tips?: string[];
+  caution?: string;
+  relatedPaths?: Array<{ label: string; path: string }>;
+}
+
+export const HELP_CONTENT: Record<string, HelpArticle> = {
+
+  // ─── Caring Community module ────────────────────────────────────────────────
+
+  '/caring': {
+    title: 'Caring Community — Module Hub',
+    summary:
+      'The Caring Community module is the top-level entry point for all KISS/AGORIS cooperative features. From here you can navigate to every sub-section: member trust tiers, safeguarding, ROI reporting, pilot readiness, and more.',
+    steps: [
+      { label: 'Review module health at a glance', detail: 'The hub shows live counts for active members, open help requests, pending safeguarding reports, and SLA compliance rate.' },
+      { label: 'Use the quick-links grid', detail: 'Each card links directly to its functional area. Cards with a red badge need immediate attention (e.g. overdue SLA, critical safeguarding report).' },
+      { label: 'Check the announcement bar', detail: 'If your cantonal partner or the KISS national office has posted a notice, it appears pinned at the top of the hub.' },
+    ],
+    tips: [
+      'Bookmark this page — it is the fastest way to spot issues that need your attention without navigating deep menus.',
+      'The module only appears in the sidebar if the caring_community feature flag is enabled for this tenant.',
+    ],
+    relatedPaths: [
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+      { label: 'Safeguarding', path: '/caring/safeguarding' },
+      { label: 'Launch Readiness', path: '/caring/launch-readiness' },
+    ],
+  },
+
+  '/caring/workflow': {
+    title: 'Coordinator Workflow Dashboard',
+    summary:
+      'A real-time Kanban-style board showing every caring exchange in flight. Exchanges move through states: Request → Matched → In Progress → Completed → Reviewed. Coordinators use this page to spot bottlenecks, reassign exchanges, and escalate stalled requests.',
+    steps: [
+      { label: 'Filter by status or category', detail: 'Use the top filter bar to narrow to a specific state (e.g. "Matched" only) or care category (e.g. Transport, Companionship).' },
+      { label: 'Open an exchange card', detail: 'Click any card to see the full detail panel: member profiles, agreed time, any coordinator notes, and the audit trail.' },
+      { label: 'Reassign or escalate', detail: 'Use the three-dot menu on a card to reassign to another coordinator, add a note, or mark as escalated for review.' },
+      { label: 'Mark as complete', detail: 'Once both parties confirm, use "Mark Complete" to trigger the hour-credit transfer and unlock the review prompt for both members.' },
+    ],
+    tips: [
+      'Exchanges stuck in "Matched" for more than 48 hours are highlighted in amber — follow up with both members.',
+      'The "My Exchanges" toggle filters to only exchanges where you are the assigned coordinator.',
+      'Completed exchanges that have not been reviewed after 7 days are flagged — reviews are important for the KPI baseline data.',
+    ],
+    relatedPaths: [
+      { label: 'Hour Transfers', path: '/caring/hour-transfers' },
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+    ],
+  },
+
+  '/caring/projects': {
+    title: 'Caring Projects & Community Initiatives',
+    summary:
+      'Projects are structured community initiatives that group multiple exchanges around a shared goal — for example, "Winter Neighbour Support 2025" or "Elderly Mobility Network". Each project has a budget in hours, a coordinator, start/end dates, and reporting milestones.',
+    steps: [
+      { label: 'Create a new project', detail: 'Click "New Project", give it a name and description, set the hour budget, and assign a lead coordinator.' },
+      { label: 'Add participating members', detail: 'Use the member search to add helpers and recipients. Members can also self-enrol if the project is marked as open.' },
+      { label: 'Link exchanges to the project', detail: 'When creating or editing an exchange, use the "Project" dropdown to associate it. All linked exchanges appear in the project\'s progress report.' },
+      { label: 'Review progress milestones', detail: 'The project detail page shows hours delivered vs budget, active members, and a timeline of completed exchanges.' },
+      { label: 'Close and report', detail: 'When the project ends, use "Generate Report" to produce a PDF summary suitable for cantonal stakeholders.' },
+    ],
+    tips: [
+      'Projects with zero exchanges after 14 days are flagged as "Stalled" — consider whether the goal is well-understood by members.',
+      'The hour budget is a guide, not a hard cap. You can overspend; the system will flag it but not block exchanges.',
+      'For grant-funded projects, use the "External Reference" field to store the funder\'s project code.',
+    ],
+    relatedPaths: [
+      { label: 'Coordinator Workflow', path: '/caring/workflow' },
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+    ],
+  },
+
+  '/caring/trust-tiers': {
+    title: 'Trust Tiers — Reputation Ladder',
+    summary:
+      'The Trust Tier system grades member reliability on a five-level scale: Newcomer (0) → Member (1) → Trusted (2) → Verified (3) → Coordinator (4). Tier determines what a member can do — for example, only Trusted+ members can export a Warmth Pass or take on intensive caring exchanges.',
+    steps: [
+      { label: 'View tier distribution', detail: 'The summary chart shows how many members are at each tier. A healthy cooperative has most members at Tier 1–2.' },
+      { label: 'Review pending tier promotions', detail: 'Members who have met the criteria for the next tier appear in the "Ready to Promote" list. Review their activity and approve or defer.' },
+      { label: 'Manually adjust a tier', detail: 'Find the member, click their current tier badge, and select the new tier. Write a short note explaining the adjustment — this is audited.' },
+      { label: 'Configure tier thresholds', detail: 'Under "Tier Settings", adjust the number of completed exchanges and average review score required to reach each tier.' },
+      { label: 'Review demotion candidates', detail: 'Members flagged for prolonged inactivity or safeguarding incidents may appear for tier review. Check context before demoting.' },
+    ],
+    tips: [
+      'Tier promotions are not automatic by default — a coordinator must approve each promotion. You can enable auto-promotion for Tier 0→1 in Tier Settings.',
+      'Members cannot see their numeric tier score — they see a named badge (e.g. "Trusted Member") instead.',
+      'Coordinator tier (4) should be rare and given only to people handling safeguarding or high-value exchanges.',
+    ],
+    caution:
+      'Demoting a Trusted member (tier 2→1) immediately invalidates their Warmth Pass at all KISS cooperative sites. Notify the member before demoting.',
+    relatedPaths: [
+      { label: 'Warmth Pass', path: '/caring/warmth-pass' },
+      { label: 'Safeguarding', path: '/caring/safeguarding' },
+    ],
+  },
+
+  '/caring/warmth-pass': {
+    title: 'Warmth Pass — Portable Trust Credential',
+    summary:
+      'The Warmth Pass is a cryptographically signed credential that lets a Trusted+ member (tier 2+) demonstrate their reputation at any affiliated KISS cooperative, not just their home community. It is issued here and can be revoked at any time.',
+    steps: [
+      { label: 'Issue a Warmth Pass', detail: 'Find the member (must be Tier 2+), click "Issue Warmth Pass". The system generates a signed QR code token with a 12-month expiry.' },
+      { label: 'Set the validity period', detail: 'Default is 12 months. You can shorten to 3 or 6 months for members on a trial promotion.' },
+      { label: 'Revoke a pass', detail: 'Click the active pass, then "Revoke". Revocation propagates to all KISS federation peers within minutes via the federation sync.' },
+      { label: 'Review pass usage', detail: 'The audit log shows when and at which cooperative a pass was scanned. Unusual location patterns should trigger a coordinator review.' },
+    ],
+    tips: [
+      'A member can hold only one active Warmth Pass at a time. Issuing a new one invalidates the previous.',
+      'Passes issued to members who are subsequently demoted below Tier 2 are automatically revoked — you do not need to do this manually.',
+      'The pass QR code is available in the member\'s profile as a downloadable PDF.',
+    ],
+    caution:
+      'Do not issue passes to members with any unresolved safeguarding reports, even if their tier technically qualifies them.',
+    relatedPaths: [
+      { label: 'Trust Tiers', path: '/caring/trust-tiers' },
+      { label: 'Federation Peers', path: '/caring/federation-peers' },
+    ],
+  },
+
+  '/caring/safeguarding': {
+    title: 'Safeguarding — Incident Reports & SLAs',
+    summary:
+      'This page manages all safeguarding incident reports raised within your cooperative. Reports are triaged by severity: Critical (respond within 1 hour), High (24 hours), Medium (72 hours), Low (next scheduled meeting). Coordinators must acknowledge and action each report within the SLA window.',
+    steps: [
+      { label: 'Review the open incidents queue', detail: 'Reports are sorted by severity and time elapsed. Red rows are breaching or have breached their SLA.' },
+      { label: 'Acknowledge a report', detail: 'Click the report, then "Acknowledge" to stop the SLA clock and signal that a coordinator has taken ownership.' },
+      { label: 'Record your investigation notes', detail: 'Use the Notes field to document steps taken, people contacted, and outcomes. Notes are confidential and not visible to members.' },
+      { label: 'Escalate to external agencies', detail: 'For Critical incidents involving risk of harm, use "Escalate Externally" to log that you have contacted statutory services (police, social work, etc.).' },
+      { label: 'Close the report', detail: 'Once resolved, mark the report as Closed with a resolution summary. Closed reports are archived but never deleted.' },
+    ],
+    tips: [
+      'Critical severity incidents also trigger an immediate push notification to all Coordinator-tier members.',
+      'If you are unsure about severity, default to High — it is better to over-respond than miss a genuine safeguarding issue.',
+      'All incident data is excluded from the Public Impact Report — it is coordinator-only.',
+    ],
+    caution:
+      'Never close a safeguarding report without a written resolution summary. Blank closures are flagged in the data quality audit.',
+    relatedPaths: [
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+      { label: 'Data Quality', path: '/caring/data-quality' },
+    ],
+  },
+
+  '/caring/category-coefficients': {
+    title: 'Category Substitution Coefficients',
+    summary:
+      'Each care category has a substitution coefficient that converts community exchange hours into formal-care equivalents. A coefficient of 1.0 means one hour of community care is counted as equivalent to one hour of professional care (CHF 35/hr). Intensive personal care may be 2.0; light social contact may be 0.5.',
+    steps: [
+      { label: 'Review existing coefficients', detail: 'The table shows every active care category with its current coefficient and the date it was last agreed with your cantonal partner.' },
+      { label: 'Edit a coefficient', detail: 'Click the pencil icon next to the category, enter the new value, add a justification note, and save. The change is versioned.' },
+      { label: 'Add a new category', detail: 'Use "Add Category" to create a new care type (e.g. "Physiotherapy Support") and assign it an initial coefficient.' },
+      { label: 'Generate a coefficient report', detail: 'Use "Export PDF" to produce a formatted document for your cantonal partner\'s approval, listing all categories and their evidence basis.' },
+    ],
+    tips: [
+      'Coefficients above 1.5 require written agreement from your cantonal health partner — document this in the justification field.',
+      'The ROI report multiplies actual hours delivered by each category\'s coefficient to derive the total formal-care cost avoided.',
+      'Review all coefficients at least annually — care practice standards change and your evidence base should stay current.',
+    ],
+    caution:
+      'Changing a coefficient immediately affects all future ROI calculations. Historical reports are not retroactively updated — note the change date when presenting multi-year data.',
+    relatedPaths: [
+      { label: 'Operating Policy', path: '/caring/operating-policy' },
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+    ],
+  },
+
+  '/caring/operating-policy': {
+    title: 'Operating Policy — KISS/AGORIS Parameters',
+    summary:
+      'The Operating Policy stores the core economic parameters for your cooperative deployment: the formal-care hourly rate in CHF, the cost-offset multiplier, maximum exchange duration limits, and other global constraints. These values flow through to all ROI and impact calculations.',
+    steps: [
+      { label: 'Set the formal-care hourly rate', detail: 'Enter the current professional care rate in CHF (Swiss standard is CHF 35/hr). Adjust for your region or care type if your cantonal agreement specifies differently.' },
+      { label: 'Set the cost-offset multiplier', detail: 'This multiplier adjusts the coefficient-weighted hours to account for administration, volunteer coordination, and overhead. Default is 0.8.' },
+      { label: 'Configure exchange limits', detail: 'Set maximum single-exchange duration (e.g. 8 hours) and minimum (e.g. 15 minutes). Exchanges outside these limits require coordinator approval.' },
+      { label: 'Set the policy effective date', detail: 'Specify when these parameters take effect. Changes are versioned so historical reports remain accurate.' },
+      { label: 'Publish and notify', detail: 'Use "Publish Policy" to make the new values live. Consider notifying coordinators via the announcement system.' },
+    ],
+    tips: [
+      'Agree all parameter changes with your cantonal partner before publishing — unilateral changes can invalidate your grant reporting.',
+      'The policy version history is fully audited — you can always view what parameters were in effect on any given date.',
+    ],
+    caution:
+      'Changing the formal-care hourly rate mid-pilot will affect all future ROI reports. Agree with your cantonal partner first and document the reason for the change.',
+    relatedPaths: [
+      { label: 'Category Coefficients', path: '/caring/category-coefficients' },
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+    ],
+  },
+
+  '/caring/isolated-node': {
+    title: 'Isolated Node — Data Sovereignty Mode',
+    summary:
+      'Isolated Node mode configures this deployment to store all personal data within a defined geographic boundary and disables federation data sync with external KISS cooperatives. This is required for deployments that must comply with Switzerland\'s FADP/nDSG (Federal Act on Data Protection).',
+    steps: [
+      { label: 'Enable Isolated Node mode', detail: 'Toggle the master switch on. You will be asked to confirm the geographic boundary (e.g. "Kanton Bern") and the legal basis for the restriction.' },
+      { label: 'Configure allowed data flows', detail: 'Some data flows (e.g. anonymised aggregate statistics for the national dashboard) can be whitelisted. Review each flow and approve or block it.' },
+      { label: 'Disable federation sync', detail: 'When Isolated Node is active, Warmth Pass federation sync and peer cooperative connections are suspended. Members will see a notice explaining this.' },
+      { label: 'Generate a FADP compliance record', detail: 'Use "Generate Compliance Report" to produce a record of data boundaries, retention periods, and lawful bases suitable for a FADP audit.' },
+    ],
+    tips: [
+      'Isolated Node mode does not affect local operations — members can still exchange hours, earn badges, and use all features within the cooperative.',
+      'If you are unsure whether your deployment needs Isolated Node mode, consult the AGORIS technical team before enabling it.',
+    ],
+    caution:
+      'Enabling Isolated Node mode severs Warmth Pass portability for all members immediately. Notify members before switching on.',
+    relatedPaths: [
+      { label: 'Commercial Boundary', path: '/caring/commercial-boundary' },
+      { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
+      { label: 'Federation Peers', path: '/caring/federation-peers' },
+    ],
+  },
+
+  '/caring/commercial-boundary': {
+    title: 'Commercial Boundary — AGPL Capability Classification',
+    summary:
+      'This page classifies each platform capability according to whether it is covered by the AGPL-3.0 open-source licence, is configurable per tenant, requires a private deployment agreement, or is a commercial add-on. Use this as a reference when discussing licensing with partner municipalities or cooperatives.',
+    steps: [
+      { label: 'Browse the capability registry', detail: 'Each feature is listed with its AGPL classification (Public / Tenant Config / Private Deployment / Commercial) and a plain-language description.' },
+      { label: 'Filter by classification', detail: 'Use the filter tabs to view only commercial features, or only AGPL-public features, depending on what you need to communicate.' },
+      { label: 'Export for partner reference', detail: 'Use "Export PDF" to produce a formatted document you can share with a municipality or funder who needs to understand what is open-source vs proprietary.' },
+    ],
+    tips: [
+      'AGPL Public features must remain publicly available under AGPL-3.0 — you cannot restrict access to them in any deployment.',
+      'Commercial features require a separate written agreement with Fondation KISS or the NEXUS platform operator.',
+    ],
+    relatedPaths: [
+      { label: 'Isolated Node', path: '/caring/isolated-node' },
+      { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
+    ],
+  },
+
+  '/caring/disclosure-pack': {
+    title: 'FADP/nDSG Data Protection Disclosure Pack',
+    summary:
+      'The Disclosure Pack assembles all data protection documentation required under Swiss FADP/nDSG: privacy notices, data processing agreements, retention schedules, sub-processor lists, and the right-to-access response template. Generate and review these before your cooperative goes live with personal data.',
+    steps: [
+      { label: 'Review auto-populated fields', detail: 'The system pre-fills organisation name, data controller details, and retention periods from your Operating Policy. Check each field for accuracy.' },
+      { label: 'Add sub-processors', detail: 'List any third-party services that process member data (e.g. email service, hosting provider). Each sub-processor needs a name, location, and legal basis.' },
+      { label: 'Set retention periods', detail: 'Review the default retention periods for each data category (e.g. exchange records: 7 years for financial audit; safeguarding reports: 10 years). Adjust if your cantonal rules differ.' },
+      { label: 'Generate the full pack', detail: 'Click "Generate Pack" to produce a ZIP of PDF documents. Share with your data protection officer (or cantonal authority) for sign-off.' },
+      { label: 'Publish the member-facing privacy notice', detail: 'Once approved, use "Publish Privacy Notice" to make the notice available at your cooperative\'s Privacy Policy page.' },
+    ],
+    tips: [
+      'Re-generate the pack whenever you add a new sub-processor, change retention periods, or enable Isolated Node mode.',
+      'The pack includes a template right-to-access response — use it when a member requests their data under Article 25 nDSG.',
+    ],
+    relatedPaths: [
+      { label: 'Isolated Node', path: '/caring/isolated-node' },
+      { label: 'Commercial Boundary', path: '/caring/commercial-boundary' },
+    ],
+  },
+
+  '/caring/municipal-roi': {
+    title: 'Municipal/Canton ROI Report',
+    summary:
+      'Generates a formal cost-avoidance report for cantonal stakeholders showing how many hours of professional care were substituted by community exchanges, expressed in CHF. This is the primary financial evidence document for grant renewals and municipal partnership agreements.',
+    steps: [
+      { label: 'Select the reporting period', detail: 'Choose start and end dates. Typical periods are quarterly or annual, aligned with your grant reporting cycle.' },
+      { label: 'Choose the audience mode', detail: 'Canton mode shows cantonal cost-avoidance figures. Municipality mode focuses on local partnership outcomes. Cooperative mode shows reciprocity and retention metrics.' },
+      { label: 'Review the data quality warning', detail: 'If the data quality score is below 80%, a warning appears. Review the Data Quality page before generating a formal report.' },
+      { label: 'Generate the report', detail: 'Click "Generate Report". The system calculates: total exchange hours × per-category coefficient × formal-care hourly rate (CHF 35 default).' },
+      { label: 'Export and distribute', detail: 'Download as PDF (formatted for official use) or CSV (for cantonal finance teams who need raw data).' },
+    ],
+    tips: [
+      'Lock the operating policy parameters before generating a report you will submit officially — changes after the fact make the figures inconsistent.',
+      'Include the KPI Baseline snapshot alongside the ROI report to give context: how has participation, quality of life, and cost-avoidance trended over time?',
+      'Run the Data Quality check first — a report with flagged gaps will undermine credibility with cantonal partners.',
+    ],
+    relatedPaths: [
+      { label: 'Category Coefficients', path: '/caring/category-coefficients' },
+      { label: 'Operating Policy', path: '/caring/operating-policy' },
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+      { label: 'Data Quality', path: '/caring/data-quality' },
+    ],
+  },
+
+  '/caring/municipal-impact': {
+    title: 'Municipal Impact Evidence Pack',
+    summary:
+      'An interactive evidence dashboard for municipal partners, with three audience modes — Canton (cost-avoidance focus), Municipality (local partner focus), and Cooperative (member reciprocity focus). Each mode surfaces different metrics and visualisations suited to that audience.',
+    steps: [
+      { label: 'Select audience mode', detail: 'Use the mode selector at the top: Canton for cantonal finance/health departments, Municipality for local council partners, Cooperative for your own board.' },
+      { label: 'Review the headline metrics', detail: 'Each mode highlights its most relevant figures: Canton sees CHF cost-avoidance; Municipality sees active members and exchange frequency; Cooperative sees retention and reciprocity rates.' },
+      { label: 'Drill into visualisations', detail: 'Charts are interactive — hover for tooltips, click to filter by time period, category, or sub-region.' },
+      { label: 'Export a print pack', detail: 'Use "Export for Presentation" to produce a slide-ready PDF with the key charts and headline numbers for your audience mode.' },
+    ],
+    tips: [
+      'The Canton audience mode links directly to the Municipal ROI report figures — they should be consistent.',
+      'For a council presentation, switch to Municipality mode and focus on the "Member Stories" section, which surfaces anonymised success stories.',
+    ],
+    relatedPaths: [
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+      { label: 'Success Stories', path: '/caring/success-stories' },
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+    ],
+  },
+
+  '/caring/kpi-baselines': {
+    title: 'KPI Baselines — Before/After Impact Measurement',
+    summary:
+      'KPI Baselines capture a snapshot of key community health indicators at a defined point in time (typically pilot launch). Subsequent snapshots are compared to the baseline to measure change — for example, a 15% reduction in reported loneliness or a 20% increase in social connections.',
+    steps: [
+      { label: 'Create the launch baseline', detail: 'Before your pilot goes live, click "Create Baseline Snapshot". This locks the current values for all KPI dimensions (loneliness index, active members, exchanges/week, etc.).' },
+      { label: 'Record a comparison snapshot', detail: 'At each reporting milestone (3 months, 6 months, 12 months), create a new snapshot. The system automatically calculates the percentage change from the baseline.' },
+      { label: 'Add survey-derived metrics', detail: 'For KPIs that come from member surveys (e.g. self-reported wellbeing score), use the manual entry fields to input the results.' },
+      { label: 'Review the change dashboard', detail: 'The side-by-side comparison table shows each KPI, its baseline value, current value, and directional trend (positive/negative).' },
+      { label: 'Include in reports', detail: 'The Impact Evidence Pack and Municipal ROI Report can both embed the baseline comparison. Use "Link to Impact Pack" to include it.' },
+    ],
+    tips: [
+      'Create the launch baseline before you enrol any members — a baseline taken after members have joined is not a true pre-launch measure.',
+      'For loneliness and wellbeing KPIs, use an established validated scale (e.g. UCLA Loneliness Scale, ONS Wellbeing) for credibility with academic or health partners.',
+    ],
+    relatedPaths: [
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+      { label: 'Pilot Scoreboard', path: '/caring/pilot-scoreboard' },
+    ],
+  },
+
+  '/caring/sla-dashboard': {
+    title: 'Help Request SLA Tracking Dashboard',
+    summary:
+      'Tracks all open help requests against their SLA commitment from the Operating Policy: Critical (1 hour), High (24 hours), Medium (72 hours), Low (next scheduled meeting). At-a-glance colour-coding shows compliance in real time.',
+    steps: [
+      { label: 'Review the SLA summary cards', detail: 'The four cards at the top show how many requests are in each severity tier and what percentage are within SLA. Red = breached; amber = within 20% of deadline.' },
+      { label: 'Filter to overdue requests', detail: 'Click "Overdue Only" to see only requests that have already breached their SLA. These need immediate attention.' },
+      { label: 'Assign or reassign', detail: 'Click any request to open the detail panel. Use "Assign to Coordinator" to allocate responsibility. The assignee receives an in-app notification.' },
+      { label: 'Snooze with justification', detail: 'If a request cannot be actioned yet (e.g. waiting for external information), use "Snooze" and write a reason. Snoozed requests pause the SLA clock temporarily.' },
+      { label: 'Export compliance report', detail: 'Generate a weekly SLA compliance CSV for your quality management records.' },
+    ],
+    tips: [
+      'The SLA dashboard refreshes every 60 seconds — you do not need to manually reload.',
+      'High-volume periods (winter, events) often cause SLA pressure. Use Smart Nudges to pre-emptively activate helpers before requests pile up.',
+    ],
+    caution:
+      'Snoozed requests still appear on the compliance report. Frequent snoozing of Critical requests will be flagged in the data quality audit.',
+    relatedPaths: [
+      { label: 'Safeguarding', path: '/caring/safeguarding' },
+      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Operating Policy', path: '/caring/operating-policy' },
+    ],
+  },
+
+  '/caring/data-quality': {
+    title: 'Data Quality Checks',
+    summary:
+      'Runs automated checks across your cooperative\'s data and reports issues by severity: Critical (blocks reporting), High (degrades report accuracy), Medium (advisory), Low (cosmetic). Fix Critical and High issues before generating any report for external stakeholders.',
+    steps: [
+      { label: 'Run a full quality check', detail: 'Click "Run Check Now". The scan typically takes 30–60 seconds. Results are cached for 6 hours — run again if you have made significant data changes.' },
+      { label: 'Review Critical issues first', detail: 'Critical issues (red) must be resolved before generating municipal reports. Click each issue for a description of the problem and a direct link to fix it.' },
+      { label: 'Work through High and Medium issues', detail: 'High issues (orange) affect the accuracy of ROI calculations. Medium issues (yellow) are advisory — fix them when convenient.' },
+      { label: 'Mark false positives', detail: 'If a flagged issue is not actually a problem (e.g. a member legitimately has no email address), use "Mark as Acknowledged" with a reason. This silences the flag.' },
+      { label: 'Track quality score over time', detail: 'The quality score (0–100) trends chart helps you identify whether data quality is improving after you action issues.' },
+    ],
+    tips: [
+      'Run the quality check as part of your monthly coordinator routine, not only before generating reports.',
+      'Missing safeguarding resolution summaries are always flagged as Critical — see the Safeguarding page to add them.',
+    ],
+    relatedPaths: [
+      { label: 'Municipal ROI', path: '/caring/municipal-roi' },
+      { label: 'Safeguarding', path: '/caring/safeguarding' },
+    ],
+  },
+
+  '/caring/launch-readiness': {
+    title: 'Pilot Launch Readiness Gate',
+    summary:
+      'A gated checklist of criteria that must all pass before your pilot is considered ready to go live. Readiness is evaluated across four signal areas: municipal value alignment, community participation, partner network, and local exchange capacity. All must be green before launch.',
+    steps: [
+      { label: 'Review the four readiness signals', detail: 'Municipal Value, Participation, Partner Network, and Local Exchange are each scored 0–100. All four must reach their configured threshold (default 70) before the gate opens.' },
+      { label: 'Drill into failing signals', detail: 'Click any amber or red signal card to see the specific sub-criteria that are not yet met, with actionable guidance on how to address each.' },
+      { label: 'Upload supporting evidence', detail: 'Some criteria require evidence upload (e.g. a signed municipal partnership letter, or a completed baseline survey). Use the upload button on the relevant criterion.' },
+      { label: 'Request a coordinator review', detail: 'Once you believe all criteria are met, use "Request Review" to notify a senior coordinator or KISS national representative to validate the readiness gate.' },
+      { label: 'Unlock the live deployment', detail: 'When the review approves all criteria, the "Go Live" button becomes available. This enables the Caring Community module for members.' },
+    ],
+    tips: [
+      'You can work on criteria in any order — there is no required sequence.',
+      'Evidence documents are stored securely and are accessible to KISS national for their records.',
+      'The readiness gate can be re-evaluated at any time — if circumstances change (e.g. a municipal partner withdraws), the gate status is updated automatically.',
+    ],
+    caution:
+      'Do not attempt to bypass the readiness gate manually. Launching without passing all criteria risks a poor member experience and undermines grant accountability.',
+    relatedPaths: [
+      { label: 'Pilot Scoreboard', path: '/caring/pilot-scoreboard' },
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+      { label: 'Operating Policy', path: '/caring/operating-policy' },
+    ],
+  },
+
+  '/caring/pilot-scoreboard': {
+    title: 'KISS Pilot Scoreboard',
+    summary:
+      'The live scorecard for your KISS pilot, tracking progress against the KISS methodology metrics. Metrics include exchange volume, member retention, reciprocity ratio (helpers who are also recipients), coordinator response time, and safeguarding compliance rate.',
+    steps: [
+      { label: 'Review the top-line score', detail: 'The overall pilot score (0–100) is a composite of all methodology metrics. Aim for 75+ to qualify for the KISS "Established Cooperative" recognition.' },
+      { label: 'Understand individual metric scores', detail: 'Each metric has a target range defined in the Operating Policy. Green = on target; amber = within 10% of target; red = below threshold.' },
+      { label: 'Compare to KISS benchmark', detail: 'Toggle "Show KISS Benchmark" to overlay the anonymised median scores from all KISS cooperatives. This shows how you compare to peers.' },
+      { label: 'Download the methodology report', detail: 'Generate a KISS-formatted methodology report for submission to Fondation KISS at your quarterly review.' },
+    ],
+    tips: [
+      'Reciprocity ratio (the proportion of members who give AND receive) is the most important single metric for KISS accreditation — aim for 60%+.',
+      'A low coordinator response time score almost always reflects SLA breaches — check the SLA Dashboard for the root cause.',
+    ],
+    relatedPaths: [
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+      { label: 'Launch Readiness', path: '/caring/launch-readiness' },
+    ],
+  },
+
+  '/caring/smart-nudges': {
+    title: 'Smart Nudges — Automated Engagement',
+    summary:
+      'Smart Nudges are automated, personalised messages sent to inactive or at-risk members to re-engage them. Rules are defined by inactivity threshold, member trust tier, and care category. All nudges are previewed before they go live.',
+    steps: [
+      { label: 'Create a nudge rule', detail: 'Click "New Nudge". Set the trigger (e.g. "member has not logged in for 14 days"), the target segment (e.g. Tier 1+ members in Transport category), and the channel (email / in-app).' },
+      { label: 'Write the nudge message', detail: 'Use the Communication Copilot assistant to draft a warm, personalised message. The member\'s first name is always merged in automatically.' },
+      { label: 'Set the sending schedule', detail: 'Choose when nudges can be sent (e.g. weekdays 9am–6pm only) and the maximum frequency (e.g. no more than once per week per member).' },
+      { label: 'Preview and activate', detail: 'Review the preview list of members who would currently receive the nudge. If the count is sensible, toggle the rule to Active.' },
+      { label: 'Review nudge performance', detail: 'The analytics panel shows open rate, click-through rate, and re-engagement rate (members who completed an exchange within 7 days of the nudge).' },
+    ],
+    tips: [
+      'Start with a low frequency — one nudge per fortnight is usually enough. Over-nudging leads to opt-outs.',
+      'Nudges are most effective for Tier 0–1 members who have not yet completed their first exchange.',
+      'Never use nudges for safeguarding follow-up — use the Safeguarding module for that.',
+    ],
+    relatedPaths: [
+      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+    ],
+  },
+
+  '/caring/emergency-alerts': {
+    title: 'Emergency Alerts — Broadcast to All Members',
+    summary:
+      'Send immediate, high-priority alerts to all members of your cooperative. Use this only for genuine emergencies: severe weather affecting travel to exchanges, safeguarding public notices, or urgent community health advice. All alerts are logged and time-stamped.',
+    steps: [
+      { label: 'Choose the alert type', detail: 'Select from: Safety Alert, Weather Warning, Service Disruption, or General Emergency. The type sets the visual style and the urgency of the push notification.' },
+      { label: 'Write the alert message', detail: 'Keep it brief (under 160 characters for SMS compatibility). State what the situation is, what members should do, and when you will provide an update.' },
+      { label: 'Select delivery channels', detail: 'Choose: In-App Banner, Email, Push Notification, or All Channels. Push is instant; email takes up to 5 minutes.' },
+      { label: 'Set an expiry time', detail: 'Alerts auto-expire after the time you set (default 24 hours). Expired alerts are dismissed from member screens automatically.' },
+      { label: 'Send and monitor', detail: 'Click "Send Alert". The delivery dashboard shows send/read rates in real time. Post an "All Clear" message as a follow-up when the situation is resolved.' },
+    ],
+    tips: [
+      'Test the alert system monthly with a "Test Mode" alert (visible only to Coordinator-tier members) to verify all channels are working.',
+      'If the alert affects only part of your community, use Sub-Regions to filter recipients instead of broadcasting to everyone.',
+    ],
+    caution:
+      'Do not use Emergency Alerts for routine communications. Alert fatigue will cause members to ignore future genuine alerts.',
+    relatedPaths: [
+      { label: 'Sub-Regions', path: '/caring/sub-regions' },
+      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+    ],
+  },
+
+  '/caring/municipal-surveys': {
+    title: 'Municipal Surveys',
+    summary:
+      'Create and distribute surveys to your municipality contacts — council officers, health department staff, and funding bodies. Surveys can be used to gather needs assessments, satisfaction feedback, or evidence for grant reporting.',
+    steps: [
+      { label: 'Create a new survey', detail: 'Click "New Survey". Choose from question types: multiple choice, rating scale (1–5 or 1–10), open text, and yes/no.' },
+      { label: 'Add recipients from your municipal contact list', detail: 'The recipient picker pulls from your Lead Nurture contact list. Filter by role (e.g. "Cantonal Health Officer") or organisation.' },
+      { label: 'Schedule or send immediately', detail: 'Surveys can be sent straight away or scheduled for a specific date (e.g. ahead of a quarterly review meeting).' },
+      { label: 'Analyse responses', detail: 'The results dashboard shows response rates, aggregate scores, and verbatim open-text answers. Filter by respondent role or organisation.' },
+      { label: 'Export for reports', detail: 'Use "Export CSV" for raw data or "Export Summary PDF" for a formatted summary suitable for inclusion in your impact documentation.' },
+    ],
+    tips: [
+      'Keep surveys short (5 questions or fewer). Municipal contacts are busy — short surveys get significantly higher completion rates.',
+      'Follow up non-respondents once after 7 days with an automated reminder. Do not send more than one reminder.',
+    ],
+    relatedPaths: [
+      { label: 'Lead Nurture', path: '/caring/lead-nurture' },
+      { label: 'Municipal Impact', path: '/caring/municipal-impact' },
+    ],
+  },
+
+  '/caring/communication-copilot': {
+    title: 'Communication Copilot — AI-Assisted Drafting',
+    summary:
+      'An AI writing assistant trained on KISS community communication standards. Paste a rough idea and the Copilot returns a polished draft in a warm, inclusive tone appropriate for timebanking communities. You review and edit before sending.',
+    steps: [
+      { label: 'Choose the communication type', detail: 'Select from: Member Announcement, Welcome Email, Impact Report Summary, Municipal Partner Update, or Free-form Draft.' },
+      { label: 'Describe what you want to say', detail: 'Write 1–3 sentences describing the key points. For example: "We held 120 exchanges in March. Loneliness scores improved by 12%. Thank members for their contribution."' },
+      { label: 'Generate and review the draft', detail: 'Click "Generate Draft". Read the output carefully — AI drafts may contain inaccuracies. Correct any figures or names before use.' },
+      { label: 'Adjust tone and length', detail: 'Use the sliders to adjust formality (informal ↔ formal) and length (brief ↔ detailed). Regenerate until you are happy.' },
+      { label: 'Copy to your sending tool', detail: 'Use "Copy to Clipboard" and paste into your email client, announcement composer, or newsletter editor.' },
+    ],
+    tips: [
+      'The Copilot works best with specific inputs — vague prompts produce generic drafts. Give it real numbers and named outcomes.',
+      'Always fact-check AI-generated text. The Copilot cannot access live data — it writes based on what you tell it.',
+    ],
+    caution:
+      'Never send a Copilot draft to external stakeholders (canton, media, funders) without a human review. AI can misstate figures or use unsuitable phrasing for formal contexts.',
+    relatedPaths: [
+      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Emergency Alerts', path: '/caring/emergency-alerts' },
+      { label: 'Civic Digest', path: '/caring/civic-digest' },
+    ],
+  },
+
+  '/caring/civic-digest': {
+    title: 'Civic Digest — Personalised Member Digest Settings',
+    summary:
+      'The Civic Digest is a personalised summary email sent to each member based on their interests, activity, and community role. This page controls the global digest settings: frequency options, content modules to include, and which member segments receive which digest type.',
+    steps: [
+      { label: 'Set available digest frequencies', detail: 'Choose which frequencies members can opt into: Daily, Weekly, Bi-weekly, Monthly, or Never. The default for new members is Weekly.' },
+      { label: 'Configure digest content modules', detail: 'Toggle which content blocks appear: Upcoming Events, Open Help Requests, New Members to Welcome, My Exchange Summary, Pilot Scoreboard highlights, etc.' },
+      { label: 'Set segment-specific rules', detail: 'Coordinators can receive an enriched digest with SLA status and data quality warnings. Set this under "Coordinator Digest Add-ons".' },
+      { label: 'Preview the digest', detail: 'Click "Preview" to see a sample digest rendered for a test member profile. Check layout, links, and content order.' },
+      { label: 'Send a one-off digest', detail: 'Use "Send Now" to dispatch a digest outside the normal schedule — useful for launching a campaign or sharing a milestone result.' },
+    ],
+    tips: [
+      'Members with "Never" selected still receive Emergency Alerts — the digest preference does not affect critical communications.',
+      'Weekly digests sent on Tuesday or Wednesday mornings tend to get the highest open rates in community platforms.',
+    ],
+    relatedPaths: [
+      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+    ],
+  },
+
+  '/caring/lead-nurture': {
+    title: 'Lead Nurture — Municipal Contact CRM',
+    summary:
+      'A lightweight contact management system for tracking conversations with potential pilot municipality contacts — local councillors, health department officers, cantonal staff, and community foundations. Track inquiry stage, last contact date, and next action for each lead.',
+    steps: [
+      { label: 'Add a contact', detail: 'Click "New Contact". Enter name, role, organisation, email, and the canton or municipality they represent.' },
+      { label: 'Set the inquiry stage', detail: 'Choose the pipeline stage: Prospect → Initial Outreach → Interested → Proposal Sent → Pilot Agreed → Onboarded → Declined. Move the stage as conversations progress.' },
+      { label: 'Log a contact note', detail: 'After each interaction (email, call, meeting), add a note with the date, what was discussed, and the agreed next action. Notes are private to coordinators.' },
+      { label: 'Set a follow-up reminder', detail: 'Use "Set Reminder" to create a task that will appear in your coordinator dashboard on a chosen date.' },
+      { label: 'Link to a tenant', detail: 'Once a municipality agrees to pilot, use "Link to Tenant" to associate the contact with the new NEXUS tenant being created for them.' },
+    ],
+    tips: [
+      'Keep notes brief but specific — "Called Maria, she will review the proposal by Friday 14 Feb" is more useful than "Called contact".',
+      'Contacts who have been in the same pipeline stage for 60+ days are highlighted — consider whether they need a different approach or should be moved to Declined.',
+    ],
+    relatedPaths: [
+      { label: 'Municipal Surveys', path: '/caring/municipal-surveys' },
+      { label: 'Pilot Inquiries', path: '/admin/pilot-inquiries' },
+    ],
+  },
+
+  '/caring/success-stories': {
+    title: 'Success Stories — Impact Proof Cards',
+    summary:
+      'Collect and manage short anonymised stories from members about the difference caring exchanges made in their lives. Stories are used in impact reports, municipal presentations, and the public-facing Impact Evidence Pack.',
+    steps: [
+      { label: 'Collect a story', detail: 'Click "New Story". Enter the member\'s pseudonym (never their real name in public materials), the type of exchange, the outcome, and a direct quote (with consent noted).' },
+      { label: 'Tag by impact category', detail: 'Tag each story with the relevant impact themes: Reduced Loneliness, Improved Mobility, Practical Support, Intergenerational Connection, etc. These drive filtering in reports.' },
+      { label: 'Mark consent status', detail: 'Every story must have a consent record before it can be published. Check "Verbal Consent Obtained" or upload a written consent form.' },
+      { label: 'Review and publish', detail: 'Use "Publish to Impact Pack" to make the story available in the Municipal Impact dashboard and Evidence Pack exports.' },
+      { label: 'Archive outdated stories', detail: 'Stories more than 2 years old should be reviewed for continued relevance. Archive those that no longer reflect current operations.' },
+    ],
+    tips: [
+      'The most compelling stories are specific: "Maria, 78, was able to stay independent for 6 more months because..." beats generic wellbeing statements.',
+      'Aim for at least 3 stories per care category — impact reports are more credible with a range of evidence.',
+    ],
+    caution:
+      'Never publish a story without a consent record. Publishing without consent is a FADP/nDSG violation.',
+    relatedPaths: [
+      { label: 'Municipal Impact', path: '/caring/municipal-impact' },
+      { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
+    ],
+  },
+
+  '/caring/feedback-inbox': {
+    title: 'Feedback Inbox — Municipality Feedback Triage',
+    summary:
+      'Centralises feedback submitted by municipal partners and stakeholders — concerns, questions, suggestions, and complaints. Each item is triaged by severity, assigned to a coordinator, and tracked through to resolution.',
+    steps: [
+      { label: 'Review new feedback items', detail: 'New items appear at the top of the inbox. Read each one and assess its severity: Critical (service failure / formal complaint), High (significant concern), Medium (query), Low (suggestion).' },
+      { label: 'Assign to a coordinator', detail: 'Use "Assign" to allocate the item to the coordinator best placed to respond. They will receive an in-app notification.' },
+      { label: 'Draft a response', detail: 'Use the "Reply" panel to draft your response. For Critical items, use the Communication Copilot to ensure the tone is appropriate.' },
+      { label: 'Send and log', detail: 'Sending the response logs the full thread in the item history. The municipal contact receives your reply by email.' },
+      { label: 'Close or escalate', detail: 'Mark as Resolved once the matter is concluded, or use "Escalate to KISS National" if the issue is beyond your cooperative\'s authority to address.' },
+    ],
+    tips: [
+      'Aim to acknowledge Critical feedback within 4 hours even if a full resolution takes longer. Acknowledgement alone prevents escalation.',
+      'Pattern recognition: if three or more feedback items touch the same theme (e.g. "slow coordinator response"), it signals a systemic issue to investigate.',
+    ],
+    relatedPaths: [
+      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
+    ],
+  },
+
+  '/caring/municipal-verification': {
+    title: 'Municipal Verification — DNS/Attestation Badge',
+    summary:
+      'Verified municipality partners are awarded a digital badge displayed on their community profile and in impact reports. Verification requires DNS record confirmation (proving control of the municipality\'s official domain) and a signed attestation letter.',
+    steps: [
+      { label: 'Initiate verification for a municipality', detail: 'Find the municipal contact in Lead Nurture, click "Initiate Verification". The system generates a unique DNS TXT record value for them to add to their domain.' },
+      { label: 'Instruct the municipality\'s IT team', detail: 'Share the DNS instruction guide (downloadable PDF) with the municipality\'s web administrator. They add the TXT record to their DNS.' },
+      { label: 'Trigger the DNS check', detail: 'Once they confirm the record is added, click "Check DNS". The system queries the domain automatically. Verification is instant if the record is found.' },
+      { label: 'Upload the attestation letter', detail: 'Upload the signed attestation letter (on official letterhead, signed by a responsible officer). This is stored as part of the compliance record.' },
+      { label: 'Issue the badge', detail: 'Once DNS and attestation are both confirmed, click "Issue Verified Badge". The badge appears on the municipality\'s partner profile immediately.' },
+    ],
+    tips: [
+      'DNS propagation can take up to 48 hours. Allow enough time before the check — do not retry more than once per hour.',
+      'The badge is automatically revoked if the DNS record is later removed. Verified partners should be advised to keep the record permanently.',
+    ],
+    relatedPaths: [
+      { label: 'Lead Nurture', path: '/caring/lead-nurture' },
+      { label: 'Municipal Impact', path: '/caring/municipal-impact' },
+    ],
+  },
+
+  '/caring/hour-transfers': {
+    title: 'Manual Hour Credit Transfers',
+    summary:
+      'Allows coordinators to manually transfer hour credits between member accounts outside of a completed exchange. Use this for corrections, grants of community credits, or administrative adjustments. All transfers are permanently audited.',
+    steps: [
+      { label: 'Select the source member', detail: 'Search for the member whose hours will be deducted. Confirm their current balance before proceeding.' },
+      { label: 'Select the destination member', detail: 'Search for the receiving member. The system warns if the destination member is on a different tenant.' },
+      { label: 'Enter the amount and reason', detail: 'Enter the number of hours (decimals allowed, e.g. 0.5 for 30 minutes). Write a clear reason — this appears in both members\' transaction histories.' },
+      { label: 'Confirm and execute', detail: 'Review the summary and click "Confirm Transfer". The adjustment takes effect immediately.' },
+      { label: 'Verify the audit log', detail: 'Check the audit log entry to confirm both balances have updated correctly.' },
+    ],
+    tips: [
+      'You cannot overdraft a member\'s account to a negative balance without an override flag — contact a super-admin if a negative balance is genuinely needed.',
+      'For bulk corrections (e.g. after a system error), use the CSV import for batch transfers rather than doing them one by one.',
+    ],
+    caution:
+      'Manual transfers cannot be reversed automatically. Double-check amounts before confirming — corrections require a second manual transfer in the opposite direction.',
+    relatedPaths: [
+      { label: 'Coordinator Workflow', path: '/caring/workflow' },
+      { label: 'Loyalty', path: '/caring/loyalty' },
+    ],
+  },
+
+  '/caring/loyalty': {
+    title: 'Loyalty Programme — Member Rewards',
+    summary:
+      'Configure the loyalty reward programme: badges, milestone rewards, streak bonuses, and special recognition for long-term members and top contributors. Loyalty mechanics drive engagement without displacing the intrinsic value of mutual aid.',
+    steps: [
+      { label: 'Review active reward rules', detail: 'The rules table shows every active loyalty trigger: exchange milestones (1st, 5th, 25th exchange), referral bonuses, birthday credits, etc.' },
+      { label: 'Edit or add a rule', detail: 'Click "New Rule". Set the trigger type (exchange count, review score, streak days, custom event), the reward amount in hours, and whether it is a one-time or recurring reward.' },
+      { label: 'Configure milestone badges', detail: 'Link a badge (created in the Badges admin) to a loyalty milestone so members receive both an hour reward and a visible recognition.' },
+      { label: 'Review the leaderboard', detail: 'Check the loyalty leaderboard for the top contributors this month. Consider sending them a personal thank-you via the Communication Copilot.' },
+      { label: 'Audit reward disbursements', detail: 'The disbursement log shows every reward issued, to whom, and why. Use this to spot anomalies.' },
+    ],
+    tips: [
+      'Reciprocity bonuses (for members who both give and receive in the same month) are highly effective for improving the reciprocity ratio on the Pilot Scoreboard.',
+      'Keep the programme simple — too many rules creates confusion. Three to five well-understood rewards outperform a complex points matrix.',
+    ],
+    relatedPaths: [
+      { label: 'Regional Points', path: '/caring/regional-points' },
+      { label: 'Pilot Scoreboard', path: '/caring/pilot-scoreboard' },
+    ],
+  },
+
+  '/caring/regional-points': {
+    title: 'Regional Points — Third-Currency Ledger',
+    summary:
+      'Regional Points are a complementary currency that sits alongside hour credits. They are issued by sub-regional bodies (Quartier councils, neighbourhood groups) and can be redeemed for local goods or services not covered by hour exchanges. This page manages the regional points ledger.',
+    steps: [
+      { label: 'Review the regional points balance sheet', detail: 'The ledger shows total points in circulation, issued this month, redeemed this month, and the outstanding liability.' },
+      { label: 'Issue a batch of points', detail: 'Use "Issue Points" to credit points to a member or group of members. Enter the amount, sub-region, and reason (e.g. "Neighbourhood clean-up participation").' },
+      { label: 'Configure redemption options', detail: 'Under "Redemption Catalogue", add items members can redeem points for (e.g. "Local bakery voucher — 50 points"). Each item needs a stock count or unlimited toggle.' },
+      { label: 'Review redemption requests', detail: 'Pending redemption requests appear in the queue. Approve or decline each one, with a reason for declines.' },
+      { label: 'Export the ledger', detail: 'Generate a periodic ledger report for your sub-regional partner showing points issued and redeemed.' },
+    ],
+    tips: [
+      'Regional Points should complement, not compete with, hour credits. Avoid setting up redeemable items that could also be exchanged as hour-credit services.',
+      'Keep the liability (unredeemed outstanding points) visible to your sub-regional partners — it represents a real commitment.',
+    ],
+    relatedPaths: [
+      { label: 'Sub-Regions', path: '/caring/sub-regions' },
+      { label: 'Loyalty', path: '/caring/loyalty' },
+    ],
+  },
+
+  '/caring/sub-regions': {
+    title: 'Sub-Regions — Geographic Subdivision Management',
+    summary:
+      'Sub-regions subdivide your cooperative\'s geographic area into smaller administrative units such as Quartier (neighbourhood), Ortsteil (district quarter), or village. Members can be assigned to sub-regions for targeted communications, local reports, and Regional Points management.',
+    steps: [
+      { label: 'Create a sub-region', detail: 'Click "New Sub-Region". Enter the name (e.g. "Länggasse-Felsenau"), type (Quartier / Ortsteil / Village / Custom), and optional boundary description.' },
+      { label: 'Assign members', detail: 'Use the bulk-assign tool to assign members based on their postcode/address, or manually assign individual members.' },
+      { label: 'Set a sub-region coordinator', detail: 'Assign a Coordinator-tier member as the responsible contact for this sub-region. They receive sub-region-specific SLA and digest notifications.' },
+      { label: 'Use in communications', detail: 'When sending Emergency Alerts, Smart Nudges, or Civic Digests, filter recipients by sub-region to target only relevant members.' },
+      { label: 'Review sub-region analytics', detail: 'The analytics tab shows exchange density, active member rate, and SLA compliance broken down by sub-region.' },
+    ],
+    tips: [
+      'Sub-regions work best when they map to real community identities that members recognise — use names people actually use for their neighbourhood.',
+      'Avoid creating too many sub-regions (more than 10 is usually too granular for a pilot cooperative).',
+    ],
+    relatedPaths: [
+      { label: 'Regional Points', path: '/caring/regional-points' },
+      { label: 'Emergency Alerts', path: '/caring/emergency-alerts' },
+    ],
+  },
+
+  '/caring/federation-peers': {
+    title: 'KISS Federation Peer Connections',
+    summary:
+      'Manage the federated connections between your cooperative and other KISS cooperatives. Federation enables Warmth Pass portability and cross-cooperative referrals. Each peer connection is governed by a bilateral trust agreement.',
+    steps: [
+      { label: 'View active peer connections', detail: 'The connections table shows all currently federated KISS cooperatives, their location, connection status, and when the link was last verified.' },
+      { label: 'Invite a new peer', detail: 'Click "Invite Peer Cooperative". Enter their NEXUS instance URL. They receive an invitation to accept and sign the bilateral trust agreement.' },
+      { label: 'Accept an incoming invitation', detail: 'Pending invitations appear in the "Incoming" tab. Review the requesting cooperative\'s profile before accepting.' },
+      { label: 'Configure data sharing rules', detail: 'For each peer, choose which data you share: Warmth Pass validation only, or also aggregate exchange statistics for the KISS national dashboard.' },
+      { label: 'Suspend a peer connection', detail: 'If a cooperative is no longer active or has had a safeguarding issue, use "Suspend" to pause the federation link without permanently removing it.' },
+    ],
+    tips: [
+      'Only connect with cooperatives you have verified in person or through the KISS national network — automated spam invitations can occur.',
+      'When Isolated Node mode is active, all federation peer data sync is automatically paused. Re-enable individually after reviewing FADP compliance.',
+    ],
+    relatedPaths: [
+      { label: 'Warmth Pass', path: '/caring/warmth-pass' },
+      { label: 'Isolated Node', path: '/caring/isolated-node' },
+    ],
+  },
+
+  '/caring/providers': {
+    title: 'Care Provider Directory',
+    summary:
+      'A curated directory of professional and semi-professional care providers affiliated with your cooperative. Providers are distinct from member volunteers — they are organisations or individuals who deliver specialised care services that complement community exchanges (e.g. professional physiotherapy, medical social work).',
+    steps: [
+      { label: 'Add a provider', detail: 'Click "New Provider". Enter the organisation name, contact details, care specialisms, geographic coverage, and whether they accept NEXUS referrals.' },
+      { label: 'Verify the provider', detail: 'Upload evidence of the provider\'s registration or accreditation (e.g. KESB registration, professional body membership). Mark them as Verified once documentation is confirmed.' },
+      { label: 'Link to care categories', detail: 'Associate the provider with the care categories they cover. This allows the matching engine to suggest them when a help request exceeds volunteer capacity.' },
+      { label: 'Review provider capacity', detail: 'Providers can update their available capacity (e.g. "accepting new referrals", "at capacity"). Check this before making referrals.' },
+      { label: 'Record referral outcomes', detail: 'After referring a member, log the referral outcome in the member\'s exchange record — this feeds into the KPI data.' },
+    ],
+    tips: [
+      'Providers do not need NEXUS accounts — the directory is coordinator-managed. Members see a simplified version of the directory on their profile.',
+      'Review the provider directory at least twice a year to remove organisations that have closed or changed their services.',
+    ],
+    relatedPaths: [
+      { label: 'Care Recipient Circle', path: '/caring/care-recipient-circle' },
+      { label: 'Coordinator Workflow', path: '/caring/workflow' },
+    ],
+  },
+
+  '/caring/care-recipient-circle': {
+    title: 'Care Recipient Circles & Beneficiary Management',
+    summary:
+      'A care recipient circle groups the support network around a specific community member who needs regular care — for example, an elderly person who receives help from three neighbours, a coordinator, and a professional nurse. This page creates and manages those circles.',
+    steps: [
+      { label: 'Create a circle for a recipient', detail: 'Click "New Circle". Select the care recipient (must be a member). Give the circle a descriptive name (e.g. "Hans S. — Tuesday Morning Support Group").' },
+      { label: 'Add circle members', detail: 'Add volunteer helpers, the assigned coordinator, and any professional providers. Each member has a role (Helper / Lead Coordinator / Professional Provider).' },
+      { label: 'Set a care plan', detail: 'Use the Care Plan field to document agreed support activities, frequency, and any health or safety notes relevant to helpers.' },
+      { label: 'Link exchanges to the circle', detail: 'Exchanges for the care recipient can be tagged with the circle. This gives a consolidated view of all support received by that person.' },
+      { label: 'Review circle activity', detail: 'The activity timeline shows recent exchanges, notes, and any safeguarding flags related to this recipient.' },
+    ],
+    tips: [
+      'Care plan content is confidential — only circle members and coordinators can see it.',
+      'When a circle member leaves (e.g. a volunteer moves away), archive them from the circle rather than deleting the role — this preserves the care history.',
+    ],
+    caution:
+      'Care plans may contain sensitive health information. Treat them as confidential records under FADP/nDSG.',
+    relatedPaths: [
+      { label: 'Providers', path: '/caring/providers' },
+      { label: 'Safeguarding', path: '/caring/safeguarding' },
+    ],
+  },
+
+  '/caring/research-partnerships': {
+    title: 'Research Partnerships — Academic Collaboration',
+    summary:
+      'Manage formal research partnerships with universities, public health institutes, and social research organisations. Partners can be granted read-only access to anonymised aggregate data for academic studies, subject to a signed data agreement.',
+    steps: [
+      { label: 'Create a research partnership record', detail: 'Click "New Partnership". Enter the institution name, lead researcher, research question, ethical approval reference, and agreed data scope.' },
+      { label: 'Upload the data agreement', detail: 'Upload the signed data processing agreement. Partnerships cannot be activated until a signed agreement is on file.' },
+      { label: 'Configure data access', detail: 'Use the data scope selector to specify which anonymised datasets the partner can access: exchange aggregates, KPI trends, survey results, demographic breakdowns.' },
+      { label: 'Issue researcher access credentials', detail: 'Once activated, use "Issue Access" to send the researcher a read-only API key or data export schedule.' },
+      { label: 'Review and renew', detail: 'Partnerships expire after the agreed term (typically one academic year). Use the renewal workflow to extend with updated consent.' },
+    ],
+    tips: [
+      'Never grant access to unanonymised member data. The platform anonymises data automatically for the research export endpoint, but verify this with your data protection officer.',
+      'Keep the ethics reference number on file — external audits may ask for evidence of ethical oversight.',
+    ],
+    relatedPaths: [
+      { label: 'KPI Baselines', path: '/caring/kpi-baselines' },
+      { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
+    ],
+  },
+
+  '/caring/external-integrations': {
+    title: 'External Integrations — APIs & Webhooks',
+    summary:
+      'Configure connections between NEXUS and third-party systems: social care case management platforms, cantonal health information systems, calendar tools, and notification services. Each integration uses a webhook or OAuth token that you manage here.',
+    steps: [
+      { label: 'Review active integrations', detail: 'The integration list shows each connection, its status (Active / Error / Disabled), last successful sync time, and the data types it exchanges.' },
+      { label: 'Add a new integration', detail: 'Click "New Integration". Choose the integration type (Webhook / REST API / OAuth), enter the endpoint URL, and configure the trigger events.' },
+      { label: 'Test the connection', detail: 'Use "Send Test Payload" to verify the endpoint is reachable and returns the expected response. Check the test log for any errors.' },
+      { label: 'Configure retry behaviour', detail: 'Set the retry policy for failed webhook calls: number of retries, backoff interval, and whether to alert a coordinator on repeated failures.' },
+      { label: 'Review the event log', detail: 'The event log shows every outbound webhook call and inbound event received, with request/response bodies for debugging.' },
+    ],
+    tips: [
+      'Rotate API keys at least annually and immediately if a key is accidentally exposed (e.g. committed to a public repository).',
+      'Test integrations in your staging environment before enabling them on the live cooperative.',
+    ],
+    relatedPaths: [
+      { label: 'Integration Showcase', path: '/caring/integration-showcase' },
+      { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
+    ],
+  },
+
+  '/caring/integration-showcase': {
+    title: 'Integration Showcase — Developer Reference',
+    summary:
+      'A developer-facing reference page showing the available NEXUS API endpoints, webhook event schemas, OAuth configuration, and sample payloads. Use this when building integrations or sharing technical documentation with a third-party developer.',
+    steps: [
+      { label: 'Browse available endpoints', detail: 'Use the endpoint browser to explore available REST API paths grouped by domain (Members, Exchanges, Wallet, Events, etc.). Each entry shows the method, path, parameters, and response schema.' },
+      { label: 'Copy sample payloads', detail: 'Click "Copy Sample" next to any webhook event to get a realistic example JSON payload for use in your integration code or testing.' },
+      { label: 'Review OAuth scopes', detail: 'The OAuth scopes table shows all available permission scopes, what data they grant access to, and the minimum trust tier required to authorise them.' },
+      { label: 'Download the OpenAPI spec', detail: 'Use "Download OpenAPI 3.1 Spec" to get the full machine-readable API definition, compatible with Postman, Insomnia, and code generation tools.' },
+      { label: 'Test with the API sandbox', detail: 'The built-in sandbox lets you make authenticated test calls against your cooperative\'s staging data without affecting live records.' },
+    ],
+    tips: [
+      'Share the OpenAPI spec with third-party developers rather than writing manual API documentation — it stays up to date automatically.',
+      'The sandbox uses a separate set of test credentials from your live API keys — do not mix them up.',
+    ],
+    relatedPaths: [
+      { label: 'External Integrations', path: '/caring/external-integrations' },
+    ],
+  },
+
+  // ─── KISS / AGORIS national / super-admin pages ────────────────────────────
+
+  '/admin/national/kiss': {
+    title: 'Fondation KISS — National Cross-Cooperative Dashboard',
+    summary:
+      'A national-level aggregate dashboard visible only to KISS national staff and super-administrators. Aggregates key metrics across all active KISS cooperatives: total exchange hours, combined CHF cost-avoidance, cross-cooperative Warmth Pass usage, and federation health.',
+    steps: [
+      { label: 'Review the national summary cards', detail: 'The top row shows: total cooperatives active, total exchange hours (month/year), combined CHF cost-avoidance, and total unique members across all cooperatives.' },
+      { label: 'Drill into a specific cooperative', detail: 'Click any cooperative\'s row in the table to open their detailed dashboard. You have read-only access to their data.' },
+      { label: 'Review federation health', detail: 'The federation health map shows which cooperatives are connected via Warmth Pass federation and which have recently sync-failed.' },
+      { label: 'Export the national report', detail: 'Use "Export National Report" to produce an aggregated PDF for Fondation KISS board meetings or federal health authority submissions.' },
+      { label: 'Raise a national alert', detail: 'Use the "National Announcement" to send a message to all cooperative coordinators simultaneously — for example, a methodology update or a system maintenance notice.' },
+    ],
+    tips: [
+      'The national dashboard does not contain any individually identifiable member data — only cooperative-level aggregates.',
+      'Use the "Benchmark View" to show each cooperative\'s KISS pilot score alongside the national median.',
+    ],
+    relatedPaths: [
+      { label: 'KI Agents', path: '/admin/ki-agents' },
+      { label: 'Pilot Inquiries', path: '/admin/pilot-inquiries' },
+    ],
+  },
+
+  '/admin/ki-agents': {
+    title: 'KI-Agenten — Autonomous Agent Framework',
+    summary:
+      'The KI-Agenten (AI Agent) framework allows NEXUS to propose automated actions based on data patterns — for example, suggesting a Smart Nudge campaign, flagging a member at risk of dropping out, or recommending a coefficient adjustment. All proposals require human approval before they take effect. Agents never act unilaterally unless you explicitly raise the auto-apply threshold.',
+    steps: [
+      { label: 'Review pending proposals', detail: 'The proposals queue shows each agent\'s recommendation, the data evidence behind it, and the proposed action. Read the evidence carefully before approving.' },
+      { label: 'Approve or reject a proposal', detail: 'Click "Approve" to execute the action immediately, "Reject" to dismiss it, or "Defer" to reconsider at a later date. Add a note explaining your decision.' },
+      { label: 'Configure the auto-apply threshold', detail: 'In Agent Settings, you can set a confidence threshold above which low-risk proposals are auto-applied (default: disabled). Only enable this for specific low-risk action types.' },
+      { label: 'Review agent performance', detail: 'The agent analytics tab shows how many proposals were made, approved, rejected, and deferred, plus the outcomes of approved actions (did they achieve the intended effect?).' },
+      { label: 'Add or disable agent types', detail: 'Use the Agent Registry to enable or disable specific agent types. Start with a small set and expand as you become confident in their recommendations.' },
+    ],
+    tips: [
+      'The propose-then-approve model is a deliberate safety mechanism — do not disable it for consequential actions (e.g. safeguarding escalations, large credit transfers).',
+      'Agents learn from your approve/reject decisions over time. Consistent rejections of a specific agent type are a signal to review its configuration.',
+    ],
+    caution:
+      'Never raise the auto-apply threshold for agents that can initiate financial transfers, safeguarding escalations, or member tier changes. These must always require human review.',
+    relatedPaths: [
+      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'National KISS Dashboard', path: '/admin/national/kiss' },
+    ],
+  },
+
+  '/admin/pilot-inquiries': {
+    title: 'Pilot Inquiries — Gemeinde Onboarding Pipeline',
+    summary:
+      'Manages the end-to-end pipeline for municipalities (Gemeinde) expressing interest in piloting NEXUS/AGORIS. Each inquiry is tracked from initial contact through to pilot agreement and cooperative launch. This is the starting point for all new cooperative onboarding.',
+    steps: [
+      { label: 'Review new inquiries', detail: 'New inquiries arrive from the public-facing contact form, KISS national referrals, or manual entry. Each shows the municipality name, canton, contact person, and initial inquiry notes.' },
+      { label: 'Qualify the inquiry', detail: 'Use the qualification checklist to assess readiness: Is there a designated coordinator? Is there municipal council support? Is there a suitable existing community network? Score each factor.' },
+      { label: 'Move through the pipeline', detail: 'Drag or advance the inquiry through stages: New → Qualifying → Proposal Sent → Pilot Agreement → Onboarding → Active. Each stage has required actions documented.' },
+      { label: 'Generate a pilot proposal', detail: 'At the Proposal Sent stage, use "Generate Proposal" to produce a customised PDF proposal using the municipality\'s details, their canton\'s care rate, and standard KISS methodology terms.' },
+      { label: 'Trigger tenant creation', detail: 'Once a pilot agreement is signed and uploaded, use "Create Cooperative Tenant" to provision a new NEXUS tenant for them. This links the inquiry to the Live Launch Readiness gate.' },
+    ],
+    tips: [
+      'Inquiries that stall at "Qualifying" for more than 30 days usually lack internal municipal champion — focus outreach on finding a senior sponsor.',
+      'The pipeline has a companion view in the Lead Nurture page — use whichever view fits your workflow, they share the same data.',
+    ],
+    relatedPaths: [
+      { label: 'Lead Nurture', path: '/caring/lead-nurture' },
+      { label: 'Launch Readiness', path: '/caring/launch-readiness' },
+      { label: 'National KISS Dashboard', path: '/admin/national/kiss' },
+    ],
+  },
+};
