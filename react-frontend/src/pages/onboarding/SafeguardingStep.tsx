@@ -446,10 +446,10 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
           </div>
           <div>
             <h2 className="text-lg font-semibold text-theme-primary">
-              {t('safeguarding_title', 'Support & Safeguarding')}
+              {t('safeguarding_title')}
             </h2>
             <p className="text-sm text-theme-muted">
-              {t('safeguarding_subtitle', 'Let us know if you\'d like additional support')}
+              {t('safeguarding_subtitle')}
             </p>
           </div>
         </div>
@@ -457,18 +457,14 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         {/* Intro text (admin-configurable or default) */}
         <div className="p-4 rounded-lg bg-theme-elevated mb-5">
           <p className="text-sm text-theme-secondary leading-relaxed">
-            {introText || t('safeguarding_intro',
-              'Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.'
-            )}
+            {introText || t('safeguarding_intro')}
           </p>
         </div>
 
         {/* GDPR consent notice */}
         <div className="p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 mb-5">
           <p className="text-xs text-blue-700 dark:text-blue-400">
-            {t('safeguarding_gdpr_notice',
-              'This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses.'
-            )}
+            {t('safeguarding_gdpr_notice')}
           </p>
         </div>
 

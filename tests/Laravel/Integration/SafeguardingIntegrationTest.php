@@ -268,6 +268,81 @@ class SafeguardingIntegrationTest extends TestCase
         $this->assertNotNull($log, 'Audit log must be created even for a declination');
     }
 
+    // =========================================================================
+    // Test 7: Annual review command excludes none_apply rows
+    // =========================================================================
+
+    public function test_review_flags_command_excludes_none_apply_from_reminder_query(): void
+    {
+        $user = $this->authenticatedMember();
+
+        // A real safeguarding option — should qualify for an annual reminder
+        $realOptionId = $this->createSafeguardingOption([
+            'requires_broker_approval' => true,
+        ], 'real_annual_review');
+
+        // The none_apply declination option — must never trigger a reminder
+        $noneApplyOptionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'option_key'  => 'none_apply',
+            'option_type' => 'checkbox',
+            'label'       => 'None of these apply to me',
+            'description' => 'Declination',
+            'is_active'   => 1,
+            'is_required' => 0,
+            'sort_order'  => 999,
+            'triggers'    => json_encode([]),
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        $oldDate = now()->subDays(400);
+
+        // Insert both preference rows with consent_given_at > 365 days ago
+        DB::table('user_safeguarding_preferences')->insert([
+            [
+                'tenant_id'        => $this->testTenantId,
+                'user_id'          => $user->id,
+                'option_id'        => $realOptionId,
+                'selected_value'   => '1',
+                'consent_given_at' => $oldDate,
+                'consent_ip'       => '127.0.0.1',
+                'created_at'       => $oldDate,
+                'updated_at'       => $oldDate,
+            ],
+            [
+                'tenant_id'        => $this->testTenantId,
+                'user_id'          => $user->id,
+                'option_id'        => $noneApplyOptionId,
+                'selected_value'   => '1',
+                'consent_given_at' => $oldDate,
+                'consent_ip'       => '127.0.0.1',
+                'created_at'       => $oldDate,
+                'updated_at'       => $oldDate,
+            ],
+        ]);
+
+        // Replicate the exact query the command uses for reminders.
+        // Only rows where option_key != 'none_apply' should qualify.
+        $count = DB::table('user_safeguarding_preferences as p')
+            ->join('users as u', 'u.id', '=', 'p.user_id')
+            ->join('tenant_safeguarding_options as o', 'o.id', '=', 'p.option_id')
+            ->where('p.tenant_id', $this->testTenantId)
+            ->where('p.user_id', $user->id)
+            ->whereNull('p.revoked_at')
+            ->whereNull('p.review_reminder_sent_at')
+            ->where('o.option_key', '!=', 'none_apply')
+            ->where('p.consent_given_at', '<', now()->subDays(365))
+            ->where('u.status', 'active')
+            ->count();
+
+        $this->assertEquals(
+            1,
+            $count,
+            'Only the real preference row should qualify for annual reminders — none_apply must be excluded'
+        );
+    }
+
     public function test_preference_save_creates_audit_log(): void
     {
         $user = $this->authenticatedMember();

@@ -342,6 +342,29 @@ class SafeguardingPreferenceService
         $tenantId = TenantContext::getId();
         $now = now();
 
+        // Server-side mutual exclusivity: if none_apply is submitted alongside
+        // real option selections, real options win (they activate protections;
+        // none_apply cancels them). Strips none_apply silently so a direct API
+        // call cannot simultaneously decline and self-identify as needing support.
+        $submittedIds = array_map(fn ($p) => (int) ($p['option_id'] ?? 0), $preferences);
+        $submittedIds = array_filter($submittedIds);
+        if (!empty($submittedIds)) {
+            $noneApplyIds = DB::table('tenant_safeguarding_options')
+                ->where('tenant_id', $tenantId)
+                ->where('option_key', 'none_apply')
+                ->whereIn('id', array_values($submittedIds))
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->toArray();
+
+            if (!empty($noneApplyIds) && count($submittedIds) > count($noneApplyIds)) {
+                $preferences = array_values(array_filter(
+                    $preferences,
+                    fn ($p) => !in_array((int) ($p['option_id'] ?? 0), $noneApplyIds, true)
+                ));
+            }
+        }
+
         DB::beginTransaction();
         try {
             foreach ($preferences as $pref) {

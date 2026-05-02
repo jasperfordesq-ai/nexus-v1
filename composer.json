@@ -37,6 +37,7 @@
         "endroid/qr-code": "^6.0",
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^12.54",
+        "laravel/horizon": "^5.0",
         "laravel/sanctum": "^4.3",
         "laravel/socialite": "^5.27",
         "lbuchs/webauthn": "^2.2",
@@ -47,7 +48,6 @@
         "sendgrid/sendgrid": "^8.1",
         "sentry/sentry": "^4.0",
         "spomky-labs/otphp": "^11.4",
-        "laravel/horizon": "^5.0",
         "stripe/stripe-php": "^16.0"
     },
     "require-dev": {
