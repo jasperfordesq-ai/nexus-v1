@@ -62,6 +62,7 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Key from 'lucide-react/icons/key';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Heart from 'lucide-react/icons/heart';
+import HelpCircle from 'lucide-react/icons/help-circle';
 import Cog from 'lucide-react/icons/cog';
 import Timer from 'lucide-react/icons/timer';
 import Contact from 'lucide-react/icons/contact';
@@ -1155,6 +1156,22 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
         )}
 
       </nav>
+
+      {/* Help Centre — always visible at bottom */}
+      <div className="shrink-0 border-t border-divider px-2 py-2">
+        <Link
+          to={tenantPath('/admin/help')}
+          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-default-100 ${
+            location.pathname.includes('/admin/help')
+              ? 'bg-primary-50 text-primary'
+              : 'text-default-600'
+          } ${collapsed ? 'justify-center' : ''}`}
+          title="Help Centre"
+        >
+          <HelpCircle size={16} className="shrink-0" />
+          {!collapsed && <span>Help Centre</span>}
+        </Link>
+      </div>
     </aside>
   );
 }

@@ -284,6 +284,9 @@ const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueue
 // National (KISS Foundation) module
 const NationalKissDashboardPage = lazy(() => import('./modules/national/NationalKissDashboardPage'));
 
+// Help Centre
+const AdminHelpCenterPage = lazy(() => import('./modules/help/AdminHelpCenterPage'));
+
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
 
@@ -741,6 +744,9 @@ export function AdminRoutes() {
 
       {/* ─── REDIRECT: /admin/login → main login page ─── */}
       <Route path="login" element={<TenantRedirect to="/login" />} />
+
+      {/* ─── HELP CENTRE ─── */}
+      <Route path="help" element={<Lazy><AdminHelpCenterPage /></Lazy>} />
 
       {/* ─── 404 CATCH-ALL ─── */}
       <Route path="*" element={<Lazy><AdminNotFound /></Lazy>} />
