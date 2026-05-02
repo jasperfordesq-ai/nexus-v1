@@ -374,4 +374,57 @@ class SafeguardingIntegrationTest extends TestCase
         $this->assertEquals('user', $log->entity_type);
         $this->assertEquals($user->id, (int) $log->entity_id);
     }
+
+    // =========================================================================
+    // Test 8: Backend mutual exclusivity — none_apply stripped when real options present
+    // =========================================================================
+
+    public function test_none_apply_stripped_when_submitted_alongside_real_options(): void
+    {
+        $user = $this->authenticatedMember();
+
+        $realOptionId = $this->createSafeguardingOption([
+            'requires_broker_approval' => true,
+        ], 'mutex_real');
+
+        $noneApplyId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'option_key'  => 'none_apply',
+            'option_type' => 'checkbox',
+            'label'       => 'None of these apply to me',
+            'description' => 'Declination',
+            'is_active'   => 1,
+            'is_required' => 0,
+            'sort_order'  => 999,
+            'triggers'    => json_encode([]),
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        // Submit both simultaneously — simulates a direct API bypass
+        $response = $this->apiPost('/v2/onboarding/safeguarding', [
+            'preferences' => [
+                ['option_id' => $realOptionId, 'value' => '1'],
+                ['option_id' => $noneApplyId,  'value' => '1'],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+
+        // Real option must be saved
+        $realPref = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('option_id', $realOptionId)
+            ->first();
+        $this->assertNotNull($realPref, 'Real preference must be saved');
+
+        // none_apply must be stripped — no row for it
+        $noneApplyPref = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('option_id', $noneApplyId)
+            ->first();
+        $this->assertNull($noneApplyPref, 'none_apply must be stripped when real options are present in the same submission');
+    }
 }

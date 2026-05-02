@@ -64,7 +64,7 @@ return new class extends Migration
         // Safe to remove all none_apply rows on rollback — admins can re-add if needed.
         DB::table('tenant_safeguarding_options')
             ->where('option_key', 'none_apply')
-            ->whereNull('preset_source')
+            ->where('preset_source', null) // explicit null sentinel — matches only migration-seeded rows
             ->delete();
     }
 };

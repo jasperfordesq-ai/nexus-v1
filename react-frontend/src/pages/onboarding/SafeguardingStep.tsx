@@ -295,21 +295,25 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
 
   if (confirmationShown) {
     const isDecliningOnly = selectedOptions.length > 0 && selectedOptions.every(o => o.option_key === 'none_apply');
+
+    // Only compute activations when real protections were selected.
     const activations: string[] = [];
-    if (aggregatedTriggers.requires_broker_approval) {
-      activations.push(t('safeguarding.confirmation.activation_broker_review'));
-    }
-    if (aggregatedTriggers.restricts_matching || aggregatedTriggers.requires_broker_approval) {
-      activations.push(t('safeguarding.confirmation.activation_match_approval'));
-    }
-    if (aggregatedTriggers.requires_vetted_interaction) {
-      activations.push(t('safeguarding.confirmation.activation_discovery_hidden'));
-    }
-    if (aggregatedTriggers.notify_admin_on_selection) {
-      activations.push(t('safeguarding.confirmation.activation_notification'));
-    }
-    if (activations.length === 0) {
-      activations.push(t('safeguarding.confirmation.activation_none'));
+    if (!isDecliningOnly) {
+      if (aggregatedTriggers.requires_broker_approval) {
+        activations.push(t('safeguarding.confirmation.activation_broker_review'));
+      }
+      if (aggregatedTriggers.restricts_matching || aggregatedTriggers.requires_broker_approval) {
+        activations.push(t('safeguarding.confirmation.activation_match_approval'));
+      }
+      if (aggregatedTriggers.requires_vetted_interaction) {
+        activations.push(t('safeguarding.confirmation.activation_discovery_hidden'));
+      }
+      if (aggregatedTriggers.notify_admin_on_selection) {
+        activations.push(t('safeguarding.confirmation.activation_notification'));
+      }
+      if (activations.length === 0) {
+        activations.push(t('safeguarding.confirmation.activation_none'));
+      }
     }
 
     return (
@@ -365,20 +369,22 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
             )}
           </section>
 
-          {/* Who can see this */}
-          <section className="mb-6 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
-            <div className="flex items-start gap-2">
-              <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">
-                  {t('safeguarding.confirmation.who_can_see_heading')}
-                </h3>
-                <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-                  {t('safeguarding.confirmation.who_can_see_body')}
-                </p>
+          {/* Who can see this — only shown when real protections are active */}
+          {!isDecliningOnly && (
+            <section className="mb-6 p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+              <div className="flex items-start gap-2">
+                <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                    {t('safeguarding.confirmation.who_can_see_heading')}
+                  </h3>
+                  <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
+                    {t('safeguarding.confirmation.who_can_see_body')}
+                  </p>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* What activates — only shown when real protections are selected */}
           {!isDecliningOnly && (
