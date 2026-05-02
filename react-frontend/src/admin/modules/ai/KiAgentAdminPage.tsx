@@ -570,15 +570,33 @@ export default function KiAgentAdminPage() {
                   ),
                 )}
               </div>
-              <Button
-                color="success"
-                size="sm"
-                startContent={<Zap size={14} />}
-                onPress={handleApproveAllEligible}
-                isLoading={approvingAll}
-              >
-                Approve All Eligible
-              </Button>
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  color="success"
+                  size="sm"
+                  startContent={<Zap size={14} />}
+                  onPress={handleApproveAllEligible}
+                  isLoading={approvingAll}
+                >
+                  Approve All Eligible
+                </Button>
+                <p className="text-xs text-default-400">
+                  Approves all <em>pending_review</em> proposals whose confidence meets the auto-apply threshold.
+                </p>
+              </div>
+            </div>
+
+            {/* Status + confidence legend */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
+              <span className="font-medium text-default-700">Status:</span>
+              <span><Chip size="sm" color="warning" variant="flat" className="mr-1">pending review</Chip>awaiting your decision</span>
+              <span><Chip size="sm" color="success" variant="flat" className="mr-1">approved</Chip>human-approved &amp; applied</span>
+              <span><Chip size="sm" color="success" variant="flat" className="mr-1">auto applied</Chip>applied automatically (exceeded threshold)</span>
+              <span><Chip size="sm" color="danger" variant="flat" className="mr-1">rejected</Chip>discarded, not applied</span>
+              <span className="ml-2 font-medium text-default-700">Confidence:</span>
+              <span className="text-success-600">■ ≥80% safe to auto-apply</span>
+              <span className="text-warning-600">■ 50–79% review recommended</span>
+              <span className="text-danger-600">■ &lt;50% low confidence</span>
             </div>
 
             <Table
@@ -596,7 +614,7 @@ export default function KiAgentAdminPage() {
                 <TableColumn>Created</TableColumn>
                 <TableColumn>Actions</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No proposals found.">
+              <TableBody emptyContent={proposalFilter === 'pending_review' ? 'No proposals awaiting review. Run an agent from the Runs tab to generate proposals.' : 'No proposals match this filter.'}>
                 {proposals.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
@@ -681,6 +699,8 @@ export default function KiAgentAdminPage() {
                 value={triggerType}
                 onChange={(e) => setTriggerType(e.target.value as AgentType)}
                 className="rounded-lg border border-default-300 bg-default-50 px-3 py-1.5 text-sm"
+                aria-label="Agent type to trigger"
+                title="Agent type"
               >
                 {AGENT_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -711,10 +731,10 @@ export default function KiAgentAdminPage() {
                 <TableColumn>Applied</TableColumn>
                 <TableColumn>Started</TableColumn>
                 <TableColumn>Duration</TableColumn>
-                <TableColumn>Triggered by</TableColumn>
+                <TableColumn title="'manual' = triggered by an admin from this page; 'scheduled' = run automatically on the configured schedule hour">Triggered by</TableColumn>
                 <TableColumn>Actions</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No runs yet.">
+              <TableBody emptyContent="No runs yet. Use the 'Trigger a run now' panel above to kick off your first agent run.">
                 {runs.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>

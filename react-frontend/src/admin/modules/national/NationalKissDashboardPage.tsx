@@ -289,6 +289,26 @@ export function NationalKissDashboardPage() {
         </CardBody>
       </Card>
 
+      {/* Health status legend */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
+        <span className="font-medium text-default-700">Health status key:</span>
+        <span className="flex items-center gap-1.5">
+          <Chip size="sm" color="success" variant="flat">Thriving</Chip>
+          hours growing strongly (&gt;10% vs prior period)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Chip size="sm" color="warning" variant="flat">Stable</Chip>
+          flat activity (±10%)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Chip size="sm" color="danger" variant="flat">Struggling</Chip>
+          declining activity or fewer than 5 verified hours in period
+        </span>
+        <span className="ml-3 text-default-400">
+          Member counts shown as privacy-preserving brackets (e.g. "50–99") — no individual data is ever surfaced here.
+        </span>
+      </div>
+
       {/* Period selector */}
       <Card>
         <CardBody className="flex flex-col gap-3 md:flex-row md:items-end">
@@ -436,7 +456,10 @@ export function NationalKissDashboardPage() {
               <Spinner />
             </div>
           ) : sortedRows.length === 0 ? (
-            <p className="text-sm text-default-500">No KISS cooperatives configured. Set <code>tenant_category = &apos;kiss_cooperative&apos;</code> on at least one tenant.</p>
+            <p className="text-sm text-default-500">
+              No KISS cooperatives configured yet. Go to <strong>Super Admin → Tenants</strong> and set the
+              tenant category to <strong>kiss_cooperative</strong> on at least one tenant to populate this dashboard.
+            </p>
           ) : (
             <Table
               aria-label="Comparative metrics by cooperative"
@@ -446,12 +469,12 @@ export function NationalKissDashboardPage() {
             >
               <TableHeader>
                 <TableColumn onClick={() => handleSort('name')} className="cursor-pointer">Cooperative</TableColumn>
-                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right">Hours</TableColumn>
-                <TableColumn>Members</TableColumn>
-                <TableColumn>Recipients</TableColumn>
-                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right">Tandems</TableColumn>
-                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right">Retention</TableColumn>
-                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right">Reciprocity</TableColumn>
+                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right" title="Total verified care hours in the selected period">Hours ↕</TableColumn>
+                <TableColumn title="Active member count shown as a privacy-preserving bracket">Members</TableColumn>
+                <TableColumn title="Care recipients reached (privacy-preserving bracket)">Recipients</TableColumn>
+                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right" title="Recurring helper/recipient pairs with 2+ completed exchanges">Tandems ↕</TableColumn>
+                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right" title="% of members active in both this period and the prior equivalent period">Retention ↕</TableColumn>
+                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right" title="% of supporters who also received hours in the period — indicates mutual exchange health">Reciprocity ↕</TableColumn>
                 <TableColumn>Status</TableColumn>
               </TableHeader>
               <TableBody>

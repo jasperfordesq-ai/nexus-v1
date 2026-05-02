@@ -487,6 +487,15 @@ export function PilotInquiryAdminPage() {
         </CardBody>
       </Card>
 
+      {/* Fit score scale */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
+        <span className="font-medium text-default-700">Fit score scale (0–100):</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="flat">60–100</Chip>Good match — prioritise outreach</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="flat">40–59</Chip>Potential — investigate further</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="flat">0–39</Chip>Weak fit — low priority</span>
+        <span className="ml-3 text-default-400">Score factors: population size, existing KISS cooperative, digital readiness, budget, timeline.</span>
+      </div>
+
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
@@ -513,7 +522,9 @@ export function PilotInquiryAdminPage() {
 
       {/* Stage timing */}
       {stats && (
-        <div className="flex gap-4 text-xs text-gray-400 flex-wrap">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-default-600">Pipeline velocity — average days from inquiry submission to each milestone:</p>
+          <div className="flex gap-4 text-xs text-gray-400 flex-wrap">
           {stats.avg_days_to_proposal !== null && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" /> Avg to proposal: <strong className="text-white">{stats.avg_days_to_proposal}d</strong>
@@ -529,6 +540,7 @@ export function PilotInquiryAdminPage() {
               <Clock className="w-3 h-3" /> Avg to live: <strong className="text-white">{stats.avg_days_to_live}d</strong>
             </span>
           )}
+          </div>
         </div>
       )}
 
@@ -567,7 +579,11 @@ export function PilotInquiryAdminPage() {
       ) : inquiries.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <MapPin className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No pilot inquiries yet.</p>
+          <p className="font-medium text-default-600">No pilot inquiries yet.</p>
+          <p className="text-sm mt-1 text-default-400">
+            Inquiries arrive via the public interest form on the NEXUS sales site. Once submitted, they appear
+            here automatically. Use the stage filter above to check if inquiries exist in other stages.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

@@ -129,6 +129,25 @@ type TemplatesResponse = {
   templates: ReportTemplate[];
 };
 
+const READINESS_HELP: Record<string, { what: string; fix: string }> = {
+  municipal_value: {
+    what: 'Estimated cost offset to formal care (hours × policy hour value × prevention multiplier).',
+    fix: 'No cost offset calculable yet. Approve pending volunteer hour logs to populate this metric.',
+  },
+  participation: {
+    what: 'Distinct members active as supporters or recipients in this period.',
+    fix: 'Below the minimum participation threshold. Continue onboarding members and completing exchanges.',
+  },
+  partner_network: {
+    what: 'Trusted partner organisations that contributed hours in this period.',
+    fix: 'No trusted organisations active. Onboard organisations via Volunteering → Organisations.',
+  },
+  local_exchange: {
+    what: 'Verified exchanges (completed and approved) recorded in this period.',
+    fix: 'No completed exchanges yet. Coordinators should approve pending hour logs.',
+  },
+};
+
 const defaultTemplateForm = {
   name: '',
   description: '',
@@ -655,22 +674,39 @@ export default function MunicipalImpactReportsPage() {
       {!loading && summary && (
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card shadow="sm" className="lg:col-span-2">
-            <CardHeader>
+            <CardHeader className="flex flex-col items-start gap-1">
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.readiness')}</h2>
+              <p className="text-xs text-default-500">
+                These four signals indicate whether the report has enough data to be convincing to an external audience.
+                <strong className="text-success-600"> Ready</strong> = sufficient data;
+                <strong className="text-warning-600"> Needs data</strong> = metric is below threshold — hover each card for guidance.
+              </p>
             </CardHeader>
             <Divider />
             <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-4">
-              {(summary.readiness_signals ?? []).map((signal) => (
-                <div key={signal.key} className="rounded-lg border border-default-200 p-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-default-800">{t(`municipal_reports.readiness.${signal.key}`)}</p>
-                    <Chip size="sm" color={signal.status === 'ready' ? 'success' : 'warning'} variant="flat">
-                      {t(`municipal_reports.readiness.status.${signal.status}`)}
-                    </Chip>
+              {(summary.readiness_signals ?? []).map((signal) => {
+                const help = READINESS_HELP[signal.key];
+                return (
+                  <div
+                    key={signal.key}
+                    className="rounded-lg border border-default-200 p-3"
+                    title={help ? (signal.status === 'needs_data' ? help.fix : help.what) : undefined}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-default-800">{t(`municipal_reports.readiness.${signal.key}`)}</p>
+                      <Chip size="sm" color={signal.status === 'ready' ? 'success' : 'warning'} variant="flat">
+                        {t(`municipal_reports.readiness.status.${signal.status}`)}
+                      </Chip>
+                    </div>
+                    <p className="mt-2 text-2xl font-semibold text-default-900">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
+                    {help && (
+                      <p className="mt-1 text-xs text-default-400">
+                        {signal.status === 'needs_data' ? help.fix : help.what}
+                      </p>
+                    )}
                   </div>
-                  <p className="mt-2 text-2xl font-semibold text-default-900">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
-                </div>
-              ))}
+                );
+              })}
             </CardBody>
           </Card>
 
@@ -746,12 +782,14 @@ export default function MunicipalImpactReportsPage() {
           <ModalBody className="gap-4">
             <Input
               label={t('municipal_reports.templates.fields.name')}
+              placeholder="e.g. Q3 2025 Canton Report for Funders"
               value={templateForm.name}
               onValueChange={(name) => setTemplateForm((form) => ({ ...form, name }))}
               isRequired
             />
             <Textarea
               label={t('municipal_reports.templates.fields.description')}
+              placeholder="Optional note for future reference — e.g. 'Used for annual AGM presentation'"
               value={templateForm.description}
               onValueChange={(description) => setTemplateForm((form) => ({ ...form, description }))}
               minRows={2}
@@ -759,6 +797,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Select
                 label={t('municipal_reports.templates.fields.audience')}
+                description="Determines the narrative framing and which sections appear in the PDF/CSV export."
                 selectedKeys={[templateForm.audience]}
                 onSelectionChange={(keys) => {
                   const value = Array.from(keys)[0] as ReportTemplate['audience'] | undefined;
@@ -771,6 +810,7 @@ export default function MunicipalImpactReportsPage() {
               </Select>
               <Select
                 label={t('municipal_reports.templates.fields.period')}
+                description="Default reporting window applied when no manual date filter is set."
                 selectedKeys={[templateForm.date_preset]}
                 onSelectionChange={(keys) => {
                   const value = Array.from(keys)[0] as ReportTemplate['date_preset'] | undefined;
@@ -785,6 +825,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Input
                 label={t('municipal_reports.templates.fields.hour_value')}
+                description="Local formal-care hourly rate for cost-offset calculation (e.g. CHF 35 for Switzerland). Leave blank to use the tenant default."
                 type="number"
                 min={0}
                 max={500}
