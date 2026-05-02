@@ -15,13 +15,7 @@ describe('map-config', () => {
     expect(typeof MAPS_ENABLED).toBe('boolean');
   });
 
-  it('MAPS_ENABLED reflects whether VITE_GOOGLE_MAPS_API_KEY is set', () => {
-    // MAPS_ENABLED is derived from !!import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-    // It should be a boolean regardless of env configuration
-    if (import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
-      expect(MAPS_ENABLED).toBe(true);
-    } else {
-      expect(MAPS_ENABLED).toBe(false);
-    }
+  it('keeps map affordances enabled unless explicitly disabled at build time', () => {
+    expect(MAPS_ENABLED).toBe(import.meta.env.VITE_GOOGLE_MAPS_ENABLED !== '0');
   });
 });

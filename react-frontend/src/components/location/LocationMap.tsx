@@ -33,7 +33,7 @@ import {
 } from '@googlemaps/markerclusterer';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
-import { GoogleMapsProvider } from './GoogleMapsProvider';
+import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
 
 export interface MapMarker {
   id: number | string;
@@ -219,6 +219,7 @@ function LocationMapInner({
   onMapsFailed,
 }: LocationMapProps) {
   const { resolvedTheme } = useTheme();
+  const mapsConfig = useGoogleMapsConfig();
   const map = useMap();
   const status = useApiLoadingStatus();
   const [activeMarkerId, setActiveMarkerId] = useState<number | string | null>(null);
@@ -284,9 +285,9 @@ function LocationMapInner({
         streetViewControl={false}
         fullscreenControl={true}
         zoomControl={true}
-        styles={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID ? undefined : (resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined)}
+        styles={mapsConfig?.mapId ? undefined : (resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined)}
         clickableIcons={false}
-        mapId={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || undefined}
+        mapId={mapsConfig?.mapId || undefined}
       >
         {clusteringEnabled ? (
           <ClusteredMarkers
@@ -319,8 +320,6 @@ function LocationMapInner({
 // ---------------------------------------------------------------------------
 
 export function LocationMap(props: LocationMapProps) {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) return null;
   return (
     <GoogleMapsProvider>
       <LocationMapInner {...props} />

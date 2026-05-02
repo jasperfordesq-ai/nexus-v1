@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_TENANT_ID: string;
   readonly VITE_GIPHY_API_KEY?: string;
   readonly VITE_GOOGLE_MAPS_API_KEY?: string;
+  readonly VITE_GOOGLE_MAPS_ENABLED?: string;
   readonly VITE_SENTRY_DSN?: string;
   readonly VITE_STRIPE_PUBLISHABLE_KEY?: string;
   readonly DEV: boolean;

@@ -356,14 +356,8 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
  * when rendered, so public pages do not load Maps globally.
  */
 export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
-  // If no API key is configured, render a plain fallback without loading Maps.
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) {
-    return <PlaceAutocompleteFallback {...props} />;
-  }
-
   return (
-    <GoogleMapsProvider>
+    <GoogleMapsProvider fallback={<PlaceAutocompleteFallback {...props} />}>
       <PlaceAutocompleteWithGoogle {...props} />
     </GoogleMapsProvider>
   );

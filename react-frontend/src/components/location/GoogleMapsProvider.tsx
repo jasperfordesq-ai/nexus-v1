@@ -4,19 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * GoogleMapsProvider — wraps the app with Google Maps API context.
+ * GoogleMapsProvider - wraps Maps surfaces with Google Maps API context.
  *
- * Uses @vis.gl/react-google-maps APIProvider to load the Google Maps
- * JavaScript API. The API key comes from VITE_GOOGLE_MAPS_API_KEY.
- *
- * If no API key is configured, renders children without the provider
- * (graceful degradation — PlaceAutocompleteInput falls back to plain text).
- *
- * If the API key fails auth (billing not enabled, restricted, etc.),
- * the error dialog is suppressed and map components gracefully return null.
+ * Fetches the browser API key at runtime so production builds do not bake the
+ * key into public HTML or static JS assets. The provider is mounted only by
+ * map/autocomplete components, so ordinary page views do not load Google Maps.
  */
 
-import { type ReactNode, useEffect } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
 declare global {
@@ -25,34 +20,99 @@ declare global {
   }
 }
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+const MAPS_CONFIG_URL = `${import.meta.env.VITE_API_BASE || '/api'}/v2/config/google-maps`;
+
+export interface GoogleMapsConfig {
+  enabled: boolean;
+  apiKey: string;
+  mapId: string | null;
+}
+
+const GoogleMapsConfigContext = createContext<GoogleMapsConfig | null>(null);
+
+let configPromise: Promise<GoogleMapsConfig> | null = null;
+
+export function resetGoogleMapsConfigForTests() {
+  if (import.meta.env.MODE === 'test') {
+    configPromise = null;
+  }
+}
+
+async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
+  if (!configPromise) {
+    configPromise = fetch(MAPS_CONFIG_URL, {
+      headers: { Accept: 'application/json' },
+      credentials: 'include',
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Google Maps config failed: ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const data = payload?.data ?? {};
+
+        return {
+          enabled: Boolean(data.enabled && data.apiKey),
+          apiKey: typeof data.apiKey === 'string' ? data.apiKey : '',
+          mapId: typeof data.mapId === 'string' && data.mapId !== '' ? data.mapId : null,
+        };
+      })
+      .catch((error) => {
+        if (import.meta.env.DEV) {
+          console.warn('[GoogleMaps] Config fetch failed.', error);
+        }
+
+        return { enabled: false, apiKey: '', mapId: null };
+      });
+  }
+
+  return configPromise;
+}
 
 interface GoogleMapsProviderProps {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
-export function GoogleMapsProvider({ children }: GoogleMapsProviderProps) {
-  // Suppress the Google Maps "This page can't load Google Maps correctly" dialog.
-  // When auth fails (billing, key restrictions), Google calls window.gm_authFailure.
-  // By defining it, we prevent the default alert dialog from appearing.
-  // Individual map components detect AUTH_FAILURE via useApiLoadingStatus() and return null.
+export function useGoogleMapsConfig() {
+  return useContext(GoogleMapsConfigContext);
+}
+
+export function GoogleMapsProvider({ children, fallback = null }: GoogleMapsProviderProps) {
+  const [config, setConfig] = useState<GoogleMapsConfig | null>(null);
+
   useEffect(() => {
     window.gm_authFailure = () => {
       if (import.meta.env.DEV) {
         console.warn(
-          '[GoogleMaps] Auth failure — check billing is enabled and API key restrictions in Google Cloud Console.'
+          '[GoogleMaps] Auth failure - check billing is enabled and API key restrictions in Google Cloud Console.'
         );
       }
     };
   }, []);
 
-  if (!GOOGLE_MAPS_API_KEY) {
-    return <>{children}</>;
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchGoogleMapsConfig().then((nextConfig) => {
+      if (isMounted) setConfig(nextConfig);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!config || !config.enabled || !config.apiKey) {
+    return <>{fallback}</>;
   }
 
   return (
-    <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-      {children}
+    <APIProvider apiKey={config.apiKey}>
+      <GoogleMapsConfigContext.Provider value={config}>
+        {children}
+      </GoogleMapsConfigContext.Provider>
     </APIProvider>
   );
 }

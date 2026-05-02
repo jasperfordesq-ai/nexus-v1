@@ -8,12 +8,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
 // ─── Set env before module imports ───────────────────────────────────────────
-import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
@@ -45,6 +44,7 @@ vi.mock('@vis.gl/react-google-maps', () => ({
   },
 };
 
+import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 import { LocationMap } from '../LocationMap';
 
 function W({ children }: { children: React.ReactNode }) {
@@ -58,19 +58,31 @@ function W({ children }: { children: React.ReactNode }) {
 describe('LocationMap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
+    resetGoogleMapsConfigForTests();
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        data: {
+          enabled: true,
+          apiKey: 'test-key',
+          mapId: null,
+        },
+      }),
+    })));
     mockUseApiLoadingStatus.mockReturnValue('LOADED');
   });
 
-  it('renders without crashing with one marker', () => {
+  it('renders without crashing with one marker', async () => {
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test Marker' }];
     const { container } = render(
       <W><LocationMap markers={markers} /></W>,
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    });
   });
 
-  it('renders multiple markers', () => {
+  it('renders multiple markers', async () => {
     const markers = [
       { id: 1, lat: 53.35, lng: -6.26, title: 'Marker 1' },
       { id: 2, lat: 53.40, lng: -6.30, title: 'Marker 2' },
@@ -78,35 +90,47 @@ describe('LocationMap', () => {
     const { container } = render(
       <W><LocationMap markers={markers} /></W>,
     );
-    const markerElements = container.querySelectorAll('[data-testid="marker"]');
-    expect(markerElements.length).toBe(2);
+    await waitFor(() => {
+      const markerElements = container.querySelectorAll('[data-testid="marker"]');
+      expect(markerElements.length).toBe(2);
+    });
   });
 
-  it('returns null when no API key is set', () => {
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY = '';
+  it('returns null when Maps config is disabled', async () => {
+    resetGoogleMapsConfigForTests();
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: { enabled: false, apiKey: '', mapId: null } }),
+    })));
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
     const { container } = render(
       <W><LocationMap markers={markers} /></W>,
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+    });
   });
 
-  it('returns null when API auth fails', () => {
+  it('returns null when API auth fails', async () => {
     mockUseApiLoadingStatus.mockReturnValue('AUTH_FAILURE');
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
     const { container } = render(
       <W><LocationMap markers={markers} /></W>,
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+    });
   });
 
-  it('applies custom className and height', () => {
+  it('applies custom className and height', async () => {
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
     const { container } = render(
       <W><LocationMap markers={markers} className="custom-map" height="500px" /></W>,
     );
-    const wrapper = container.querySelector('.custom-map');
-    expect(wrapper).toBeTruthy();
-    expect(wrapper?.getAttribute('style')).toContain('500px');
+    await waitFor(() => {
+      const wrapper = container.querySelector('.custom-map');
+      expect(wrapper).toBeTruthy();
+      expect(wrapper?.getAttribute('style')).toContain('500px');
+    });
   });
 });

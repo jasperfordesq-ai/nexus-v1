@@ -46,6 +46,8 @@ Route::get('/v2/tenant/bootstrap', [\App\Http\Controllers\Api\TenantBootstrapCon
 Route::get('/v2/tenants', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'list']);
 Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'platformStats']);
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
+Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigController::class, 'show'])
+    ->middleware('throttle:60,1');
 
 // ============================================
 
