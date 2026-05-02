@@ -405,42 +405,47 @@ Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 | **Host** | `20.224.171.253` (Azure VM) |
 | **SSH** | `ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253` |
 | **Deploy Path** | `/opt/nexus-php/` |
-| **Deploy Script** | `scripts/safe-deploy.sh` (bash — run on server via SSH) |
-| **Method** | Git pull + Docker rebuild (`compose.prod.yml`) |
+| **Deploy Script** | `scripts/safe-deploy.sh` (entry point — delegates to blue-green on production) |
+| **Blue-Green Script** | `scripts/deploy/bluegreen-deploy.sh` (zero-downtime orchestrator) |
+| **Method** | Zero-downtime blue/green switch (when `NEXUS_APACHE_ROUTES_FILE` is set) |
 
 ```bash
-# Step 1: Push code (pre-push hook validates TypeScript + build)
+# Step 1: Push code
 git push origin main
 
-# Step 2: Deploy (--detach runs in background, survives SSH disconnect)
+# Step 2: Deploy — safe-deploy.sh auto-delegates to bluegreen-deploy.sh on production
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh full --detach"
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh auto --detach"
 
-# Step 3: Check progress (run as many times as needed)
+# Step 3: Check progress
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh logs"
+  "cd /opt/nexus-php && sudo bash scripts/deploy/bluegreen-deploy.sh logs"
 
-# Other modes
-sudo bash scripts/safe-deploy.sh quick --detach   # Quick: frontend + PHP restart
-sudo bash scripts/safe-deploy.sh rollback --detach # Rollback
-sudo bash scripts/safe-deploy.sh status            # Check deployment status
-sudo bash scripts/safe-deploy.sh logs -f           # Follow log live (Ctrl+C safe)
+# Other modes (on production — all delegate to blue-green automatically)
+sudo bash scripts/safe-deploy.sh auto --detach     # RECOMMENDED: auto-detects, zero-downtime
+sudo bash scripts/safe-deploy.sh rollback --detach # Rollback to previous color
+sudo bash scripts/safe-deploy.sh status            # Show active color + last deploy status
+sudo bash scripts/deploy/bluegreen-deploy.sh logs  # Blue-green specific log tail
+sudo bash scripts/deploy/bluegreen-deploy.sh logs -f  # Follow blue-green log live
+sudo bash scripts/deploy/bluegreen-deploy.sh monitor  # Live monitor dashboard
 ```
 
-> **⚠️ ALWAYS use `--detach` for deploys.** Docker builds take 10+ minutes. Without `--detach`, SSH will timeout and leave the site in maintenance mode. The `--detach` flag runs the deploy in a background process that survives SSH disconnects.
+> **⚠️ ALWAYS use `--detach` for deploys.** Docker builds take 10+ minutes. Without `--detach`, SSH will timeout mid-build. The `--detach` flag runs the deploy in a background process that survives SSH disconnects.
 >
-> **⚠️ Always use `full` for React/frontend changes.** The `quick` mode rebuilds frontend + restarts PHP, but `full` does a complete `--no-cache` rebuild of all containers which is safest.
+> **How it works on production:** `safe-deploy.sh` detects `NEXUS_APACHE_ROUTES_FILE` is set and `exec`s into `bluegreen-deploy.sh`. The inactive color (blue or green) is built and tested while the active color keeps serving live traffic. Apache route file is atomically swapped — **zero downtime, no maintenance window.**
 
 ### 🔴 Critical Deploy Rules
 
-1. **`--no-cache` on production Docker builds** — stale layers cause phantom bugs
-2. **`docker restart nexus-php-app` after PHP deploys** — OPCache never re-reads files
-3. **Never build React locally and upload `dist/`** — always rebuild on server
-4. **Cloudflare cache purge after every deploy** — automated in deploy scripts
+1. **Blue-green builds the inactive color** — the live color keeps serving; no maintenance window required
+2. **Never build React locally and upload `dist/`** — always rebuild on server inside the container image
+3. **Cloudflare cache purge after every deploy** — automated, fires after traffic switch + smoke tests pass
+4. **`--no-cache` applies to `safe-deploy.sh full` (maintenance-mode path only)** — blue-green always builds fresh from the git worktree commit; layer caching by commit tag is intentional
 
 ### Container Ownership
 
-**Our containers:** `nexus-php-app`, `nexus-php-db`, `nexus-php-redis`, `nexus-react-prod`, `nexus-sales-site`, `nexus-phpmyadmin`.
+**Our containers (production — blue-green):** `nexus-blue-php-app`, `nexus-blue-react`, `nexus-blue-sales`, `nexus-blue-php-queue`, `nexus-blue-php-scheduler`, `nexus-green-php-app`, `nexus-green-react`, `nexus-green-sales`, `nexus-green-php-queue`, `nexus-green-php-scheduler`, `nexus-php-db`, `nexus-php-redis`, `nexus-meilisearch`.
+
+**Legacy single-color containers** (may still exist on first migration): `nexus-php-app`, `nexus-react-prod`, `nexus-sales-site`, `nexus-php-queue`, `nexus-php-scheduler`.
 
 **NEVER touch:** `nexus-backend-*`, `nexus-frontend-*`, `nexus-uk-*`, `nexus-civic-*` — they belong to other projects.
 
@@ -481,15 +486,24 @@ sudo bash scripts/maintenance.sh status
 
 ### Deployment integration
 
-The deploy script (`scripts/safe-deploy.sh`) automatically:
+**Blue-green path (production — when `NEXUS_APACHE_ROUTES_FILE` is set):**
+The deploy script does NOT use maintenance mode. The inactive color builds and tests while the live color keeps serving. Maintenance mode is not touched at any point.
+
+**Maintenance-mode path (fallback — when `NEXUS_APACHE_ROUTES_FILE` is NOT set):**
+`scripts/safe-deploy.sh` automatically:
 1. **Enables** maintenance mode (both layers) at the start of every deployment
-2. **Re-enables** Layer 1 after container rebuilds (since `docker compose up --force-recreate` wipes container filesystems — Layer 2 survives in the database)
-3. **Disables** maintenance mode (both layers) at the end of a successful deployment
-4. **Leaves it ON** if deployment fails — with clear recovery instructions printed to console
+2. **Disables** maintenance mode (both layers) at the end of a successful deployment
+3. **Leaves it ON** if deployment fails — with clear recovery instructions printed to console
 
 ### On deployment failure
 
-If a deploy fails, **maintenance mode stays ON**. Recovery:
+**Blue-green:** The previous active color is still running and serving traffic.
+
+1. Re-deploy: `sudo bash scripts/safe-deploy.sh auto --detach`
+2. Rollback: `sudo bash scripts/safe-deploy.sh rollback --detach`
+
+**Maintenance-mode path:** Maintenance mode stays ON.
+
 1. Re-deploy: `sudo bash scripts/safe-deploy.sh full`
 2. Rollback: `sudo bash scripts/safe-deploy.sh rollback`
 3. Force live: `sudo bash scripts/maintenance.sh off` (only if you're sure the platform is healthy)
@@ -497,21 +511,22 @@ If a deploy fails, **maintenance mode stays ON**. Recovery:
 ### For AI assistants
 
 When the user says **"deploy"** (or any variation), **ALWAYS use `auto --detach`**:
+
 ```bash
-# Launch deploy — auto detects quick vs full from git diff, runs in background
+# Launch deploy — on production this delegates to bluegreen-deploy.sh automatically
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
   "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh auto --detach"
 
-# Poll for completion (run every 30-60 seconds until done)
+# Poll for completion
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh logs"
+  "cd /opt/nexus-php && sudo bash scripts/deploy/bluegreen-deploy.sh logs"
 ```
 
-**How `auto` works:** it fetches origin/main and checks what files changed. If `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, or any `Dockerfile` changed → `full` rebuild. Everything else → `quick` (PHP source is volume-mounted, not baked into the image, so only OPCache restart is needed).
+**How it works on production:** `safe-deploy.sh auto` detects `NEXUS_APACHE_ROUTES_FILE` is set and `exec`s into `bluegreen-deploy.sh deploy --detach`. The inactive color builds in the background while live traffic continues uninterrupted. There is no maintenance window.
 
-**NEVER run `safe-deploy.sh` WITHOUT `--detach`** — Docker builds can take several minutes and WILL timeout the SSH session, leaving the site stuck in maintenance mode.
+**NEVER run without `--detach`** — Docker image builds take 10+ minutes and will timeout an SSH session without it.
 
-**NEVER manually choose `full` for PHP/Laravel code changes** — `auto` will correctly pick `quick`, which is sufficient since PHP files are volume-mounted.
+**NEVER manually choose `full` or `quick`** — `auto` delegates to bluegreen which always does a fresh image build of the inactive color. quick/full only apply if blue-green is not configured.
 
 When the user says **"maintenance mode on"**, run:
 ```bash
@@ -702,13 +717,14 @@ sudo bash scripts/maintenance.sh off        # Disable (platform goes live)
 sudo bash scripts/maintenance.sh status     # Check current status
 
 # Deploy (run on Azure VM via SSH) — ALWAYS use --detach to survive SSH disconnects
-sudo bash scripts/safe-deploy.sh full --detach    # Full deploy (background, SSH-safe)
-sudo bash scripts/safe-deploy.sh quick --detach   # Quick deploy (background, SSH-safe)
-sudo bash scripts/safe-deploy.sh rollback --detach # Rollback (background, SSH-safe)
-sudo bash scripts/safe-deploy.sh status            # Check deployment status
-sudo bash scripts/safe-deploy.sh logs              # View latest deploy log
-sudo bash scripts/safe-deploy.sh logs -f           # Follow deploy log live
-bash scripts/purge-cloudflare-cache.sh             # Cache purge only
+# On production: safe-deploy.sh auto-delegates to bluegreen-deploy.sh (zero-downtime)
+sudo bash scripts/safe-deploy.sh auto --detach              # RECOMMENDED — zero-downtime blue-green
+sudo bash scripts/safe-deploy.sh rollback --detach          # Rollback to previous color
+sudo bash scripts/safe-deploy.sh status                     # Show active color + deploy status
+sudo bash scripts/deploy/bluegreen-deploy.sh logs           # Tail blue-green deploy log
+sudo bash scripts/deploy/bluegreen-deploy.sh logs -f        # Follow blue-green log live
+sudo bash scripts/deploy/bluegreen-deploy.sh monitor        # Live deploy dashboard
+bash scripts/purge-cloudflare-cache.sh                      # Cache purge only
 
 # Meilisearch — re-sync search index (run from LOCAL machine via SSH)
 # scripts/ is NOT volume-mounted in the PHP container, so must docker cp before exec
