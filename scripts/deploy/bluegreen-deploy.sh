@@ -332,6 +332,9 @@ optimize_candidate_laravel() {
     docker exec "$app_container" php /var/www/html/artisan config:cache
     docker exec "$app_container" php /var/www/html/artisan route:cache
     docker exec "$app_container" php /var/www/html/artisan event:cache
+    docker exec "$app_container" php /var/www/html/artisan view:cache
+    # Signal any already-running workers for this color to gracefully reload
+    docker exec "$app_container" php /var/www/html/artisan queue:restart 2>/dev/null || true
     docker exec "$app_container" php /var/www/html/artisan storage:link || true
     log_ok "Candidate Laravel caches rebuilt"
 }
@@ -655,6 +658,11 @@ cmd_deploy() {
     create_lock
     trap deploy_exit_trap EXIT
 
+    # Validate environment before doing anything irreversible
+    . "$SELF_DIR/phases/validate-env.sh"
+    validate_required_env_vars
+    validate_dockerfiles
+
     local active target commit release_dir release_meta
     active="$(read_active_color)"
     target="$(inactive_color "$active")"
@@ -678,6 +686,15 @@ cmd_deploy() {
         write_apache_routes "$active"
         exit 1
     fi
+    # Purge Cloudflare cache after traffic switch — must run after smoke tests pass
+    # so CF doesn't cache the old content right after purge
+    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
+        phase "Cloudflare Cache Purge" "${CURRENT_ACTIVE:-}" "$target" "${CURRENT_COMMIT:-}"
+        bash "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" 2>&1 | tee -a "$LOG_FILE" || \
+            log_warn "Cloudflare purge had errors — run manually: sudo bash scripts/purge-cloudflare-cache.sh"
+    else
+        log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
+    fi
     write_color_release "$target" "$commit" "$release_dir"
     if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
         log_err "Worker cutover failed; reverting web traffic to $active"
@@ -697,7 +714,30 @@ cmd_deploy() {
     run_prerender_for_color "$target" "$release_dir"
     schedule_followup_health_check
     git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
+    # Prune old release worktrees — keep the 3 most recent commits (current + 2 rollback candidates)
+    if [ -d "$RELEASES_DIR" ]; then
+        local keep_commits
+        keep_commits="$(git log --format='%H' -n 3 origin/main 2>/dev/null || true)"
+        for rel_dir in "$RELEASES_DIR"/*/; do
+            local rel_commit
+            rel_commit="$(basename "$rel_dir")"
+            if [ -z "$rel_commit" ] || [ "$rel_commit" = "*" ]; then continue; fi
+            if ! echo "$keep_commits" | grep -qF "$rel_commit"; then
+                log_info "Pruning old release worktree: $rel_commit"
+                git worktree remove --force "$rel_dir" 2>/dev/null || rm -rf "$rel_dir" || true
+            fi
+        done
+        git worktree prune 2>/dev/null || true
+    fi
     state_set DEPLOY_SUCCESS 1
+
+    # Write build version file — records commit/timestamp into httpdocs/.build-version
+    phase "Write Build Version" "${CURRENT_TARGET:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+    MODE=bluegreen bash "$SELF_DIR/phases/write-build-version.sh"
+
+    # Prune dangling Docker images to reclaim disk space
+    phase "Docker Image Cleanup" "${CURRENT_TARGET:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+    bash "$SELF_DIR/phases/prune-images.sh"
 }
 
 cmd_rollback() {
@@ -718,6 +758,17 @@ cmd_rollback() {
     log_warn "Rolling back from $active to $target"
     write_deploy_status "running" "starting rollback" "$active" "$target" ""
     smoke_color "$target"
+
+    # Verify rollback target is healthy before switching traffic
+    log_info "Verifying rollback target ($target) is healthy before cutover..."
+    ROLLBACK_APP="nexus-${target}-php-app"
+    if ! docker inspect --format='{{.State.Health.Status}}' "$ROLLBACK_APP" 2>/dev/null | grep -q "healthy"; then
+        log_err "Rollback target $ROLLBACK_APP is not healthy — aborting rollback to prevent double-failure"
+        log_err "Run: docker ps -a | grep nexus-${target} to investigate"
+        exit 1
+    fi
+    log_ok "Rollback target $ROLLBACK_APP is healthy — proceeding with traffic switch"
+
     write_apache_routes "$target"
     if release_meta="$(read_color_release "$target")"; then
         commit="${release_meta%%|*}"
