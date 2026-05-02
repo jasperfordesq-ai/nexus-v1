@@ -131,26 +131,11 @@ class OnboardingController extends BaseApiController
                 );
             }
 
-            // Validate safeguarding step completion if required
-            $steps = OnboardingConfigService::getActiveSteps($tenantId);
-            $safeguardingStep = collect($steps)->firstWhere('slug', 'safeguarding');
-            if ($safeguardingStep && ($safeguardingStep['required'] ?? false)) {
-                $hasPreferences = DB::table('user_safeguarding_preferences')
-                    ->where('tenant_id', $tenantId)
-                    ->where('user_id', $userId)
-                    ->whereNull('revoked_at')
-                    ->exists();
-
-                if (!$hasPreferences) {
-                    DB::rollback();
-                    return $this->respondWithError(
-                        'VALIDATION_REQUIRED_STEP',
-                        __('api.safeguarding_step_required'),
-                        'safeguarding',
-                        422
-                    );
-                }
-            }
+            // Safeguarding step: options are opt-in. A user choosing none of the
+            // checkboxes is a valid response ("none apply to me"). Marking the
+            // step "required" means it's shown in the wizard, not that the user
+            // must self-classify as vulnerable. Per-option `is_required` flags
+            // are still enforced client-side at the SafeguardingStep component.
 
             $this->onboardingService->saveInterests($userId, $interests);
             $this->onboardingService->saveSkills($userId, $offers, $needs);
