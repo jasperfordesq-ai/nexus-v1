@@ -107,15 +107,11 @@ fi
 # containers against live traffic and cause an outage.
 _BG_STATE_CHECK="$DEPLOY_DIR/.bluegreen-active"
 if [ -z "${NEXUS_APACHE_ROUTES_FILE:-}" ] && [ -f "$_BG_STATE_CHECK" ]; then
-    log_err "FATAL: blue-green state file found at $_BG_STATE_CHECK"
-    log_err "but NEXUS_APACHE_ROUTES_FILE is not set and the routes file does not"
-    log_err "exist at /etc/apache2/conf-enabled/nexus-active-upstreams.conf."
-    log_err ""
-    log_err "The maintenance-mode deploy path cannot run safely on a server that"
-    log_err "has previously used blue-green — it would destroy live containers."
-    log_err ""
-    log_err "To fix, run the one-time setup script on the production server:"
-    log_err "  sudo bash scripts/setup-bluegreen.sh"
+    echo "[FAIL] FATAL: blue-green state file found at $_BG_STATE_CHECK"
+    echo "[FAIL] but NEXUS_APACHE_ROUTES_FILE is not set and the routes file does not"
+    echo "[FAIL] exist at /etc/apache2/conf-enabled/nexus-active-upstreams.conf."
+    echo "[FAIL] The maintenance-mode deploy path cannot run safely on a blue-green server."
+    echo "[FAIL] Run: sudo bash scripts/setup-bluegreen.sh"
     exit 1
 fi
 unset _BG_STATE_CHECK
@@ -131,7 +127,7 @@ if [ -n "${NEXUS_APACHE_ROUTES_FILE:-}" ] && \
     [ "$FORCE_PRERENDER" = "1" ] && BG_ARGS+=(--force-prerender)
     [ -n "$PRERENDER_TENANT" ]   && BG_ARGS+=(--prerender-tenant "$PRERENDER_TENANT")
     [ -n "$PRERENDER_ROUTES" ]   && BG_ARGS+=(--prerender-routes "$PRERENDER_ROUTES")
-    log_info "Blue-green configured (NEXUS_APACHE_ROUTES_FILE set) — delegating to bluegreen-deploy.sh (zero-downtime)"
+    echo "[INFO] Blue-green configured — delegating to bluegreen-deploy.sh (zero-downtime)"
     exec bash "$SELF_DIR/deploy/bluegreen-deploy.sh" "${BG_ARGS[@]}"
 fi
 
