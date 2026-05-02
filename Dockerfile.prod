@@ -263,6 +263,7 @@ CMD ["sh", "-c", "\
     chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     if [ -f /var/www/html/artisan ]; then \
         php /var/www/html/artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; \
+        php /var/www/html/artisan horizon:publish 2>/dev/null || true; \
         ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage 2>/dev/null || true; \
     fi; \
     apache2-foreground"]

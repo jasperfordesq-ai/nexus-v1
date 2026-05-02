@@ -452,7 +452,7 @@ smoke_color() {
     log_step "=== Candidate Smoke Tests ($color) ==="
     write_deploy_status "running" "Candidate Smoke Tests ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
 
-    curl -sf "http://127.0.0.1:$api_port/health.php" >/dev/null
+    curl -sf "http://127.0.0.1:$api_port/up" >/dev/null
     log_ok "API health passed on $api_port"
 
     bootstrap="$(curl -sf -H "X-Tenant-Slug: hour-timebank" "http://127.0.0.1:$api_port/api/v2/tenant/bootstrap" || true)"
@@ -527,7 +527,7 @@ start_workers_for_color() {
 post_cutover_smoke() {
     phase "Public Post-Cutover Smoke Tests" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
 
-    curl -sf https://api.project-nexus.ie/health.php >/dev/null
+    curl -sf https://api.project-nexus.ie/up >/dev/null
     log_ok "Public API health passed"
 
     local bootstrap
