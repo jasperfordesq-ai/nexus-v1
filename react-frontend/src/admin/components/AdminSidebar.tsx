@@ -165,7 +165,7 @@ const ZONES: NavZone[] = [
     // What your community does: content, activities, commerce
     key: 'content_commerce',
     label: 'zone_community',
-    sectionKeys: ['caring_community', 'community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
+    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
   },
   {
     // Keeping the platform safe: content + user safety together
