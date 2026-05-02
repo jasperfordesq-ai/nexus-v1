@@ -17,7 +17,23 @@ MIN_DISK_SPACE_MB=1024  # 1GB minimum free space
 
 # --- Maintenance Mode ---
 MAINTENANCE_FILE="/var/www/html/.maintenance"
-PHP_CONTAINER="nexus-php-app"
+
+# Resolve the active PHP container name.
+# In blue-green mode the container is nexus-blue-php-app or nexus-green-php-app.
+# We read the state file written by bluegreen-deploy.sh so the correct container
+# is used by every maintenance-mode helper that references $PHP_CONTAINER.
+# Falls back to the legacy nexus-php-app name when no state file is present.
+_BLUEGREEN_STATE_FOR_COMMON="${NEXUS_BLUEGREEN_STATE_FILE:-${DEPLOY_DIR:-/opt/nexus-php}/.bluegreen-active}"
+if [ -f "$_BLUEGREEN_STATE_FOR_COMMON" ]; then
+    _BG_COLOR="$(tr -d '[:space:]' < "$_BLUEGREEN_STATE_FOR_COMMON" 2>/dev/null || echo "")"
+    case "$_BG_COLOR" in
+        blue|green) PHP_CONTAINER="nexus-$_BG_COLOR-php-app" ;;
+        *)           PHP_CONTAINER="nexus-php-app" ;;
+    esac
+else
+    PHP_CONTAINER="nexus-php-app"
+fi
+unset _BLUEGREEN_STATE_FOR_COMMON _BG_COLOR
 
 # Enable BuildKit for faster parallel builds and better layer caching
 export DOCKER_BUILDKIT=1

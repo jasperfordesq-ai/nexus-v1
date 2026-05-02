@@ -115,11 +115,11 @@ validate_environment() {
         log_ok "compose.prod.yml exists"
     fi
 
-    # Check if containers are running
-    if ! docker ps --filter "name=nexus-php-app" --format "{{.Names}}" | grep -q "nexus-php-app"; then
-        log_warn "nexus-php-app container is not running"
+    # Check if any PHP app container is running — accepts blue-green or legacy names
+    if docker ps --format "{{.Names}}" | grep -qE "^nexus-(blue|green)-php-app$|^nexus-php-app$"; then
+        log_ok "PHP app container running ($(docker ps --format "{{.Names}}" | grep -E "^nexus-(blue|green)-php-app$|^nexus-php-app$" | head -1))"
     else
-        log_ok "nexus-php-app container running"
+        log_warn "No PHP app container running (nexus-blue-php-app, nexus-green-php-app, or nexus-php-app)"
     fi
 
     if ! docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then

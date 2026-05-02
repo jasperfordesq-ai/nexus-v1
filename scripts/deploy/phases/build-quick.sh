@@ -12,6 +12,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/migrate-legacy-sql.sh"     # provides run_pending_migrations
 . "$SCRIPT_DIR/laravel-cache.sh"          # provides run_laravel_cache
 
+# ── Blue-green guard ────────────────────────────────────────────────────────
+# This script is the legacy single-container deploy path.  It recreates live
+# containers in-place and MUST NEVER run on a server configured for blue-green.
+# safe-deploy.sh should have caught this already, but we enforce it here too.
+_BG_ROUTES_CHECK="${NEXUS_APACHE_ROUTES_FILE:-/etc/apache2/conf-enabled/nexus-active-upstreams.conf}"
+_BG_STATE_CHECK="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
+if [ -f "$_BG_ROUTES_CHECK" ] || [ -f "$_BG_STATE_CHECK" ]; then
+    log_err "FATAL: build-quick (maintenance-mode path) invoked on a blue-green server."
+    log_err "This would recreate live containers during a deploy and cause an outage."
+    log_err "Use: sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
+    exit 1
+fi
+unset _BG_ROUTES_CHECK _BG_STATE_CHECK
+# ────────────────────────────────────────────────────────────────────────────
+
 save_current_commit() {
     CURRENT_COMMIT=$(git rev-parse HEAD)
     echo "$CURRENT_COMMIT" > "$LAST_DEPLOY_FILE"

@@ -95,6 +95,8 @@ CLAUDE.md
 !/scripts/test-artisan-cache.sh
 !/scripts/pre-push-checks.sh
 !/scripts/validate-env.php
+!/scripts/setup-bluegreen.sh
+!/scripts/fill-i18n-gaps.mjs
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml

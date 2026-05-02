@@ -86,7 +86,40 @@ fi
 # When NEXUS_APACHE_ROUTES_FILE is configured, delegate deploy/rollback to
 # bluegreen-deploy.sh (zero-downtime, no maintenance window) instead of the
 # maintenance-mode path below. Flags are forwarded transparently.
+#
+# IMPORTANT: sudo strips environment variables, so NEXUS_APACHE_ROUTES_FILE
+# will not be present even if the caller has it set. We auto-detect it here
+# by checking the canonical production path. If the file exists on disk, the
+# blue-green path is used regardless of whether the env var was passed in.
 # ===========================================================================
+if [ -z "${NEXUS_APACHE_ROUTES_FILE:-}" ]; then
+    _CANDIDATE="/etc/apache2/conf-enabled/nexus-active-upstreams.conf"
+    if [ -f "$_CANDIDATE" ]; then
+        export NEXUS_APACHE_ROUTES_FILE="$_CANDIDATE"
+        log_info "Auto-detected NEXUS_APACHE_ROUTES_FILE=$NEXUS_APACHE_ROUTES_FILE (sudo stripped env)"
+    fi
+    unset _CANDIDATE
+fi
+
+# Safety net: if a blue-green state file exists but the routes file is gone
+# (e.g. after a server migration or manual Apache change), refuse to fall
+# through to the maintenance-mode path. That path would recreate legacy
+# containers against live traffic and cause an outage.
+_BG_STATE_CHECK="$DEPLOY_DIR/.bluegreen-active"
+if [ -z "${NEXUS_APACHE_ROUTES_FILE:-}" ] && [ -f "$_BG_STATE_CHECK" ]; then
+    log_err "FATAL: blue-green state file found at $_BG_STATE_CHECK"
+    log_err "but NEXUS_APACHE_ROUTES_FILE is not set and the routes file does not"
+    log_err "exist at /etc/apache2/conf-enabled/nexus-active-upstreams.conf."
+    log_err ""
+    log_err "The maintenance-mode deploy path cannot run safely on a server that"
+    log_err "has previously used blue-green — it would destroy live containers."
+    log_err ""
+    log_err "To fix, run the one-time setup script on the production server:"
+    log_err "  sudo bash scripts/setup-bluegreen.sh"
+    exit 1
+fi
+unset _BG_STATE_CHECK
+
 if [ -n "${NEXUS_APACHE_ROUTES_FILE:-}" ] && \
    [ -f "$SELF_DIR/deploy/bluegreen-deploy.sh" ]; then
     BG_CMD="deploy"
