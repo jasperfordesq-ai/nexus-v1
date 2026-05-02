@@ -48,7 +48,8 @@ RUN docker-php-ext-configure gd \
         opcache \
         xml \
         curl \
-        fileinfo
+        fileinfo \
+        pcntl
 
 # Redis extension
 RUN pecl install redis-6.1.0 && docker-php-ext-enable redis
