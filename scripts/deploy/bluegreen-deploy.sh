@@ -23,18 +23,24 @@ LOG_FILE="${NEXUS_BLUEGREEN_LOG_FILE:-$LOG_DIR/bluegreen-deploy-$TIMESTAMP.log}"
 export LOG_FILE
 
 STATE_FILE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
+STATUS_FILE="${NEXUS_BLUEGREEN_STATUS_FILE:-$DEPLOY_DIR/.bluegreen-status}"
+LATEST_LOG_FILE="${NEXUS_BLUEGREEN_LATEST_LOG_FILE:-$DEPLOY_DIR/.bluegreen-latest-log}"
 RELEASES_DIR="${NEXUS_RELEASES_DIR:-$(dirname "$DEPLOY_DIR")/nexus-releases}"
 APACHE_ROUTES_FILE="${NEXUS_APACHE_ROUTES_FILE:-}"
 APACHE_CONFIGTEST="${NEXUS_APACHE_CONFIGTEST:-apachectl configtest}"
 APACHE_RELOAD="${NEXUS_APACHE_RELOAD:-systemctl reload apache2}"
 ACTIVE_COLOR_DEFAULT="${NEXUS_ACTIVE_COLOR_DEFAULT:-blue}"
 LARAVEL_MIGRATE=0
+DETACH=0
 SKIP_PRERENDER=0
 FORCE_PRERENDER=0
 PRERENDER_TENANT=""
 PRERENDER_ROUTES=""
 PREPARED_COMMIT=""
 PREPARED_RELEASE_DIR=""
+CURRENT_ACTIVE=""
+CURRENT_TARGET=""
+CURRENT_COMMIT=""
 
 BLUE_API_PORT="${NEXUS_BLUE_API_PORT:-8090}"
 BLUE_FRONTEND_PORT="${NEXUS_BLUE_FRONTEND_PORT:-3000}"
@@ -47,11 +53,15 @@ usage() {
     cat <<'USAGE'
 Usage:
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy
+  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --migrate
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --skip-prerender
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --force-prerender
   sudo bash scripts/deploy/bluegreen-deploy.sh rollback
   sudo bash scripts/deploy/bluegreen-deploy.sh status
+  sudo bash scripts/deploy/bluegreen-deploy.sh logs
+  sudo bash scripts/deploy/bluegreen-deploy.sh logs -f
+  sudo bash scripts/deploy/bluegreen-deploy.sh monitor
 
 Required server env for deploy/rollback:
   NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams.conf
@@ -67,6 +77,7 @@ parse_flags() {
     while [ "$#" -gt 0 ]; do
         case "$1" in
             --migrate) LARAVEL_MIGRATE=1 ;;
+            --detach|-d) DETACH=1 ;;
             --skip-prerender) SKIP_PRERENDER=1 ;;
             --force-prerender) FORCE_PRERENDER=1 ;;
             --prerender-tenant) PRERENDER_TENANT="${2:-}"; shift ;;
@@ -79,6 +90,75 @@ parse_flags() {
         esac
         shift
     done
+}
+
+write_deploy_status() {
+    local status="$1"
+    local phase="$2"
+    local active="${3:-$(read_active_color 2>/dev/null || echo unknown)}"
+    local target="${4:-}"
+    local commit="${5:-}"
+
+    cat > "$STATUS_FILE" <<STATUS
+status=$status
+phase=$phase
+active=$active
+target=$target
+commit=$commit
+log=$LOG_FILE
+updated_at=$(date -Iseconds)
+STATUS
+    printf '%s\n' "$LOG_FILE" > "$LATEST_LOG_FILE"
+}
+
+phase() {
+    local label="$1"
+    local active="${2:-$(read_active_color 2>/dev/null || echo unknown)}"
+    local target="${3:-}"
+    local commit="${4:-}"
+    write_deploy_status "running" "$label" "$active" "$target" "$commit"
+    log_step "=== $label ==="
+}
+
+deploy_exit_trap() {
+    local code=$?
+    if [ "$code" -eq 0 ]; then
+        write_deploy_status "success" "complete" "${CURRENT_TARGET:-$(read_active_color 2>/dev/null || echo unknown)}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+    else
+        write_deploy_status "failed" "failed" "${CURRENT_ACTIVE:-$(read_active_color 2>/dev/null || echo unknown)}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+    fi
+    cleanup
+    exit "$code"
+}
+
+detach_if_requested() {
+    local mode="$1"
+    shift || true
+
+    if [ "$DETACH" != "1" ] || [ -n "${__NEXUS_BLUEGREEN_DETACHED__:-}" ]; then
+        return 0
+    fi
+
+    local child_args=("$mode")
+    [ "$LARAVEL_MIGRATE" = "1" ] && child_args+=("--migrate")
+    [ "$SKIP_PRERENDER" = "1" ] && child_args+=("--skip-prerender")
+    [ "$FORCE_PRERENDER" = "1" ] && child_args+=("--force-prerender")
+    [ -n "$PRERENDER_TENANT" ] && child_args+=("--prerender-tenant" "$PRERENDER_TENANT")
+    [ -n "$PRERENDER_ROUTES" ] && child_args+=("--prerender-routes" "$PRERENDER_ROUTES")
+
+    LOG_FILE="$LOG_DIR/bluegreen-deploy-$TIMESTAMP.log"
+    export LOG_FILE __NEXUS_BLUEGREEN_DETACHED__=1
+    printf '%s\n' "$LOG_FILE" > "$LATEST_LOG_FILE"
+    write_deploy_status "starting" "detached deploy queued" "$(read_active_color)" "" ""
+
+    nohup bash "$0" "${child_args[@]}" > "$LOG_FILE" 2>&1 &
+    local pid=$!
+
+    log_ok "Blue/green deploy started in background (PID $pid)"
+    log_info "Log: $LOG_FILE"
+    log_info "Watch: sudo bash scripts/deploy/bluegreen-deploy.sh monitor"
+    log_info "Tail:  sudo bash scripts/deploy/bluegreen-deploy.sh logs -f"
+    exit 0
 }
 
 read_active_color() {
@@ -177,7 +257,7 @@ wait_for_color() {
 }
 
 prepare_release() {
-    log_step "=== Prepare Release Worktree ==="
+    phase "Prepare Release Worktree" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
 
     mkdir -p "$RELEASES_DIR"
     git fetch origin main
@@ -202,6 +282,7 @@ prepare_release() {
 
     PREPARED_COMMIT="$commit"
     PREPARED_RELEASE_DIR="$release_dir"
+    CURRENT_COMMIT="$commit"
 }
 
 color_release_file() {
@@ -231,7 +312,7 @@ optimize_candidate_laravel() {
     local app_container
     app_container="$(container_name "$color" app)"
 
-    log_step "=== Candidate Laravel Cache ($color) ==="
+    phase "Candidate Laravel Cache ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     docker exec "$app_container" php /var/www/html/artisan config:clear
     docker exec "$app_container" php /var/www/html/artisan route:clear
     docker exec "$app_container" php /var/www/html/artisan event:clear
@@ -254,6 +335,7 @@ run_candidate_migrations() {
     fi
 
     log_step "=== Candidate Laravel Migrations ($color) ==="
+    write_deploy_status "running" "Candidate Laravel Migrations ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     log_warn "Running migrations online. Only expand/contract-safe migrations belong in this path."
     docker exec "$app_container" php /var/www/html/artisan migrate --force
     log_ok "Laravel migrations completed"
@@ -264,6 +346,7 @@ free_target_color_ports() {
     local release_dir="$2"
 
     log_step "=== Free Inactive Color ($color) ==="
+    write_deploy_status "running" "Free Inactive Color ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     compose_for_release "$release_dir" down --remove-orphans >/dev/null 2>&1 || true
 
     if [ "$color" = "blue" ]; then
@@ -300,6 +383,7 @@ ROUTES
     rm -f "$tmp_file"
 
     log_info "Testing Apache configuration..."
+    write_deploy_status "running" "Apache configtest for $color" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     if ! bash -lc "$APACHE_CONFIGTEST"; then
         log_err "Apache configtest failed; restoring previous route file"
         if [ -s "$backup_file" ]; then
@@ -311,6 +395,7 @@ ROUTES
         return 1
     fi
     log_info "Gracefully reloading Apache..."
+    write_deploy_status "running" "Apache graceful reload to $color" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     if ! bash -lc "$APACHE_RELOAD"; then
         log_err "Apache reload failed; restoring previous route file"
         if [ -s "$backup_file" ]; then
@@ -334,6 +419,7 @@ smoke_color() {
     read -r api_port frontend_port sales_port < <(ports_for_color "$color")
 
     log_step "=== Candidate Smoke Tests ($color) ==="
+    write_deploy_status "running" "Candidate Smoke Tests ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
 
     curl -sf "http://127.0.0.1:$api_port/health.php" >/dev/null
     log_ok "API health passed on $api_port"
@@ -363,7 +449,7 @@ deploy_candidate() {
     local api_port frontend_port sales_port
     read -r api_port frontend_port sales_port < <(ports_for_color "$color")
 
-    log_step "=== Build Candidate ($color) ==="
+    phase "Build Candidate ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
     log_info "Release: ${commit:0:12}"
     log_info "Inactive ports: API=$api_port frontend=$frontend_port sales=$sales_port"
 
@@ -395,7 +481,7 @@ start_workers_for_color() {
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
-    log_step "=== Worker Cutover ($color) ==="
+    phase "Worker Cutover ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
     compose_for_release "$release_dir" up -d queue scheduler
     wait_for_container_health "$(container_name "$color" queue)"
     wait_for_container_health "$(container_name "$color" scheduler)"
@@ -408,7 +494,7 @@ start_workers_for_color() {
 }
 
 post_cutover_smoke() {
-    log_step "=== Public Post-Cutover Smoke Tests ==="
+    phase "Public Post-Cutover Smoke Tests" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
 
     curl -sf https://api.project-nexus.ie/health.php >/dev/null
     log_ok "Public API health passed"
@@ -439,7 +525,7 @@ run_prerender_for_color() {
         return 0
     fi
 
-    log_step "=== Per-Tenant Pre-Rendering ($color) ==="
+    phase "Per-Tenant Pre-Rendering ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
 
     if [ ! -f "$release_dir/scripts/deploy/phases/prerender-tenants.sh" ]; then
         log_warn "Pre-render phase not found; run manually if needed"
@@ -476,12 +562,76 @@ cmd_status() {
     read -r api_port frontend_port sales_port < <(ports_for_color "$active")
     log_info "Active color: $active"
     log_info "Active ports: API=$api_port frontend=$frontend_port sales=$sales_port"
+    if [ -f "$STATUS_FILE" ]; then
+        log_info "Latest deployment status:"
+        sed -n '1,20p' "$STATUS_FILE"
+    else
+        log_warn "No blue/green deployment status file yet"
+    fi
     if [ -n "$APACHE_ROUTES_FILE" ] && [ -f "$APACHE_ROUTES_FILE" ]; then
         log_info "Apache route file: $APACHE_ROUTES_FILE"
         sed -n '1,20p' "$APACHE_ROUTES_FILE"
     else
         log_warn "NEXUS_APACHE_ROUTES_FILE not configured or file does not exist"
     fi
+}
+
+latest_log_path() {
+    if [ -f "$LATEST_LOG_FILE" ]; then
+        cat "$LATEST_LOG_FILE"
+    else
+        ls -t "$LOG_DIR"/bluegreen-deploy-*.log 2>/dev/null | head -n 1 || true
+    fi
+}
+
+cmd_logs() {
+    local follow="${1:-}"
+    local log_path
+    log_path="$(latest_log_path)"
+    if [ -z "$log_path" ] || [ ! -f "$log_path" ]; then
+        log_err "No blue/green deploy log found"
+        exit 1
+    fi
+
+    log_info "Log: $log_path"
+    if [ "$follow" = "-f" ] || [ "$follow" = "--follow" ]; then
+        tail -n 80 -f "$log_path"
+    else
+        tail -n 120 "$log_path"
+    fi
+}
+
+cmd_monitor() {
+    local log_path status
+    while true; do
+        echo ""
+        echo "===== Project NEXUS Blue/Green Deploy Monitor $(date -Iseconds) ====="
+        if [ -f "$STATUS_FILE" ]; then
+            cat "$STATUS_FILE"
+            status="$(grep '^status=' "$STATUS_FILE" | cut -d= -f2- || true)"
+        else
+            echo "status=unknown"
+            status="unknown"
+        fi
+
+        echo ""
+        echo "Containers:"
+        docker ps --format '{{.Names}}\t{{.Status}}' | grep -E 'nexus-(blue|green)|nexus-php-(db|redis)|nexus-meilisearch' || true
+
+        log_path="$(latest_log_path)"
+        if [ -n "$log_path" ] && [ -f "$log_path" ]; then
+            echo ""
+            echo "Recent log lines: $log_path"
+            tail -n 18 "$log_path"
+        fi
+
+        case "$status" in
+            success|failed)
+                exit 0
+                ;;
+        esac
+        sleep 5
+    done
 }
 
 cmd_deploy() {
@@ -491,18 +641,22 @@ cmd_deploy() {
     state_set MAINTENANCE_ENABLED_BY_US 0
     check_lock
     create_lock
-    trap cleanup EXIT
+    trap deploy_exit_trap EXIT
 
     local active target commit release_dir release_meta
     active="$(read_active_color)"
     target="$(inactive_color "$active")"
+    CURRENT_ACTIVE="$active"
+    CURRENT_TARGET="$target"
 
     log_info "Current active color: $active"
     log_info "Deploy target color: $target"
+    write_deploy_status "running" "starting deploy" "$active" "$target" ""
 
     prepare_release
     commit="$PREPARED_COMMIT"
     release_dir="$PREPARED_RELEASE_DIR"
+    CURRENT_COMMIT="$commit"
 
     deploy_candidate "$target" "$release_dir" "$commit"
     smoke_color "$target"
@@ -537,18 +691,22 @@ cmd_rollback() {
     state_set MAINTENANCE_ENABLED_BY_US 0
     check_lock
     create_lock
-    trap cleanup EXIT
+    trap deploy_exit_trap EXIT
 
     local active target release_meta commit release_dir
     active="$(read_active_color)"
     target="$(inactive_color "$active")"
+    CURRENT_ACTIVE="$active"
+    CURRENT_TARGET="$target"
 
     log_warn "Rolling back from $active to $target"
+    write_deploy_status "running" "starting rollback" "$active" "$target" ""
     smoke_color "$target"
     write_apache_routes "$target"
     if release_meta="$(read_color_release "$target")"; then
         commit="${release_meta%%|*}"
         release_dir="${release_meta#*|}"
+        CURRENT_COMMIT="$commit"
         start_workers_for_color "$target" "$release_dir" "$commit"
     else
         log_warn "No release metadata found for $target workers; trying legacy containers"
@@ -562,9 +720,11 @@ cmd_rollback() {
 }
 
 case "${1:-}" in
-    deploy) parse_flags "$@"; cmd_deploy ;;
-    rollback) parse_flags "$@"; cmd_rollback ;;
+    deploy) parse_flags "$@"; detach_if_requested deploy "$@"; cmd_deploy ;;
+    rollback) parse_flags "$@"; detach_if_requested rollback "$@"; cmd_rollback ;;
     status) cmd_status ;;
+    logs) shift; cmd_logs "${1:-}" ;;
+    monitor) cmd_monitor ;;
     -h|--help|help|"") usage ;;
     *)
         usage

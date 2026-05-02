@@ -44,6 +44,19 @@ export NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams
 sudo bash scripts/deploy/bluegreen-deploy.sh deploy
 ```
 
+Detached deploy with built-in monitoring:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
+sudo bash scripts/deploy/bluegreen-deploy.sh monitor
+```
+
+Tail the latest deploy log:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh logs -f
+```
+
 **What it does:**
 1. Leaves the current site live.
 2. Fetches `origin/main` without resetting the live working tree.
@@ -55,7 +68,8 @@ sudo bash scripts/deploy/bluegreen-deploy.sh deploy
 8. Starts the matching queue worker and scheduler, then stops the previous worker containers.
 9. Runs public smoke tests after cutover.
 10. Refreshes per-tenant pre-rendered HTML when public-facing files changed.
-11. Schedules the normal delayed post-deploy health check.
+11. Writes a live deployment status file with phase, active color, target color, commit, and log path.
+12. Schedules the normal delayed post-deploy health check.
 
 Run backwards-compatible Laravel migrations only when needed:
 
@@ -68,6 +82,21 @@ Rollback does not rebuild:
 ```bash
 sudo bash scripts/deploy/bluegreen-deploy.sh rollback
 ```
+
+Deployment status:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh status
+```
+
+Monitoring commands:
+
+| Command | Purpose |
+|---------|---------|
+| `sudo bash scripts/deploy/bluegreen-deploy.sh monitor` | Shows phase, target color, relevant containers, and recent log lines every 5 seconds until success/failure. |
+| `sudo bash scripts/deploy/bluegreen-deploy.sh logs` | Prints the latest blue/green deployment log. |
+| `sudo bash scripts/deploy/bluegreen-deploy.sh logs -f` | Follows the latest blue/green deployment log live. |
+| `sudo bash scripts/deploy/bluegreen-deploy.sh status` | Prints the active color, active ports, latest status file, and Apache route file. |
 
 ### Full Deploy (fallback only)
 

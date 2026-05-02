@@ -151,6 +151,14 @@ export NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams
 sudo bash scripts/deploy/bluegreen-deploy.sh deploy
 ```
 
+Detached deploy with built-in monitoring:
+
+```bash
+export NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams.conf
+sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
+sudo bash scripts/deploy/bluegreen-deploy.sh monitor
+```
+
 Normal deploy with backwards-compatible Laravel migrations:
 
 ```bash
@@ -169,6 +177,12 @@ Status:
 
 ```bash
 sudo bash scripts/deploy/bluegreen-deploy.sh status
+```
+
+Logs:
+
+```bash
+sudo bash scripts/deploy/bluegreen-deploy.sh logs -f
 ```
 
 Fallback, only when explicitly needed:
