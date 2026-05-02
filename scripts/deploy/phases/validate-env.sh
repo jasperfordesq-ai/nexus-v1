@@ -72,6 +72,25 @@ validate_environment() {
     # Check required env vars first — fail fast before touching containers
     validate_required_env_vars
 
+    # Validate critical variable values (not just presence)
+    local APP_ENV_VAL
+    APP_ENV_VAL=$(grep "^APP_ENV=" "$DEPLOY_DIR/.env" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"'"'" | xargs)
+    if [ "${APP_ENV_VAL}" != "production" ]; then
+        log_err "APP_ENV is '${APP_ENV_VAL}' — must be 'production' for a production deploy"
+        VALIDATION_FAILED=1
+    else
+        log_ok "APP_ENV=production"
+    fi
+
+    local APP_DEBUG_VAL
+    APP_DEBUG_VAL=$(grep "^APP_DEBUG=" "$DEPLOY_DIR/.env" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"'"'" | xargs)
+    if [ "${APP_DEBUG_VAL}" != "false" ]; then
+        log_err "APP_DEBUG is '${APP_DEBUG_VAL}' — must be 'false' to prevent stack traces leaking to users"
+        VALIDATION_FAILED=1
+    else
+        log_ok "APP_DEBUG=false"
+    fi
+
     # Check disk space
     AVAILABLE_MB=$(df -m "$DEPLOY_DIR" | tail -1 | awk '{print $4}')
     if [ "$AVAILABLE_MB" -lt "$MIN_DISK_SPACE_MB" ]; then

@@ -292,6 +292,62 @@ services:
           memory: 256M
 
   # ---------------------------------------------------------------------------
+  # Scheduler (Laravel schedule:run — cron-style tasks every 60s)
+  # Runs scheduled jobs: emails, Horizon metric snapshots, etc.
+  # ---------------------------------------------------------------------------
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: nexus-php-scheduler
+    command: sh -c "php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    restart: unless-stopped
+    stop_grace_period: 90s
+    healthcheck:
+      test: ["CMD-SHELL", "tr '\\0' ' ' < /proc/1/cmdline | grep -q 'schedule:run' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    volumes:
+      - ./app:/var/www/html/app:ro
+      - ./src:/var/www/html/src:ro
+      - ./config:/var/www/html/config:ro
+      - ./vendor:/var/www/html/vendor:ro
+      - ./artisan:/var/www/html/artisan:ro
+      - ./bootstrap:/var/www/html/bootstrap:ro
+      - ./routes:/var/www/html/routes:ro
+      - ./database:/var/www/html/database:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./lang:/var/www/html/lang:ro
+      - nexus-php-storage:/var/www/html/storage
+      - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://api.project-nexus.ie
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexus-php-internal
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
   # Sales Site (project-nexus.ie) - Marketing/Landing Page
   # ---------------------------------------------------------------------------
   sales:
