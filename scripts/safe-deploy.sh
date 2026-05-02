@@ -96,7 +96,7 @@ if [ -z "${NEXUS_APACHE_ROUTES_FILE:-}" ]; then
     _CANDIDATE="/etc/apache2/conf-enabled/nexus-active-upstreams.conf"
     if [ -f "$_CANDIDATE" ]; then
         export NEXUS_APACHE_ROUTES_FILE="$_CANDIDATE"
-        log_info "Auto-detected NEXUS_APACHE_ROUTES_FILE=$NEXUS_APACHE_ROUTES_FILE (sudo stripped env)"
+        echo "[INFO] Auto-detected NEXUS_APACHE_ROUTES_FILE=$NEXUS_APACHE_ROUTES_FILE (sudo stripped env)"
     fi
     unset _CANDIDATE
 fi
