@@ -7,8 +7,9 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Build
 # -----------------------------------------------------------------------------
-# Using Debian (not Alpine) because Playwright's Chromium requires glibc.
-# The postbuild step pre-renders public pages with Playwright for SEO.
+# Using Debian (not Alpine) for broad native dependency compatibility.
+# Production tenant HTML is refreshed after deploy into a persistent volume,
+# so the image build skips generic build-time Playwright pre-rendering.
 # Production stage stays nginx:alpine — only the build image is larger.
 FROM node:20-bookworm-slim AS builder
 
@@ -45,16 +46,12 @@ ENV BUILD_COMMIT=$BUILD_COMMIT
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit
 
-# Install Playwright Chromium + system deps for the postbuild prerender step.
-# Required because the React frontend's `postbuild` runs scripts/prerender.mjs
-# which uses Playwright Chromium to pre-render public pages for SEO.
-RUN npx playwright install chromium --with-deps
-
 # Copy source and build
 # NODE_OPTIONS: tsc's overload resolution peaks above the default 2GB heap on
 # this codebase and crashes with "Debug Failure. No error for last overload
 # signature" (really an OOM mid-inference). Bump to 4GB.
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NEXUS_SKIP_PRERENDER=1
 COPY . .
 RUN npm run build
 

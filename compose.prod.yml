@@ -118,6 +118,11 @@ services:
     restart: unless-stopped
     ports:
       - "3000:80"
+    volumes:
+      # Persist per-tenant pre-rendered HTML across frontend container rebuilds.
+      # Deploys can then serve the previous good render immediately and refresh
+      # only when public-facing output may have changed.
+      - nexus-php-prerendered:/usr/share/nginx/html/prerendered
     networks:
       - nexus-php-internal
     healthcheck:
@@ -335,3 +340,5 @@ volumes:
     name: nexus-php-storage
   nexus-php-bootstrap-cache:
     name: nexus-php-bootstrap-cache
+  nexus-php-prerendered:
+    name: nexus-php-prerendered

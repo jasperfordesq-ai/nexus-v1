@@ -9,8 +9,10 @@
 # container. Works for ALL tenants — current and future.
 #
 # Usage:
-#   sudo bash scripts/prerender-tenants.sh           # All tenants
-#   sudo bash scripts/prerender-tenants.sh --tenant hour-timebank  # One tenant
+#   sudo bash scripts/prerender-tenants.sh                              # All tenants/routes
+#   sudo bash scripts/prerender-tenants.sh --tenant hour-timebank       # One tenant/all routes
+#   sudo bash scripts/prerender-tenants.sh --routes /about,/privacy     # All tenants/specific routes
+#   sudo bash scripts/prerender-tenants.sh --tenant hour-timebank --routes /about
 #
 # Requirements:
 #   - All containers must be running and healthy
@@ -26,6 +28,8 @@ PRERENDER_DIR="/usr/share/nginx/html/prerendered"
 PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.59.1-noble"
 WORKER_SCRIPT="$DEPLOY_DIR/scripts/prerender-worker.mjs"
 OUTPUT_DIR="/tmp/nexus-prerender-$$"
+WORK_DIR="$DEPLOY_DIR/.prerender-worker"
+PRERENDER_CONCURRENCY="${PRERENDER_CONCURRENCY:-4}"
 
 # Public routes to pre-render for each tenant
 PUBLIC_ROUTES=(
@@ -64,11 +68,30 @@ log_err()  { echo -e "${RED}[FAIL]${NC} $*"; }
 
 # --- Parse args ---
 FILTER_TENANT=""
+FILTER_ROUTES=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --tenant) FILTER_TENANT="$2"; shift 2 ;;
+        --routes) FILTER_ROUTES="$2"; shift 2 ;;
         *) shift ;;
     esac
+done
+
+if [ -n "$FILTER_ROUTES" ]; then
+    IFS=',' read -r -a PUBLIC_ROUTES <<< "$FILTER_ROUTES"
+fi
+
+if [ -n "$FILTER_TENANT" ] && [[ ! "$FILTER_TENANT" =~ ^[A-Za-z0-9_-]+$ ]]; then
+    log_err "Invalid tenant slug for pre-rendering: $FILTER_TENANT"
+    exit 1
+fi
+
+ROUTE_RE='^/[A-Za-z0-9._~/%:@!$()*+,;=-]*$'
+for ROUTE in "${PUBLIC_ROUTES[@]}"; do
+    if [[ ! "$ROUTE" =~ $ROUTE_RE ]]; then
+        log_err "Invalid route for pre-rendering: $ROUTE"
+        exit 1
+    fi
 done
 
 # --- Cleanup on exit ---
@@ -125,8 +148,9 @@ build_manifest() {
             fi
 
             local FULL_URL="https://${HOST}${PREFIX}${ROUTE}"
-            local OUT_PATH="/output/${HOST}${ROUTE}/index.html"
-            if [ "$ROUTE" = "/" ]; then
+            local OUT_ROUTE="${PREFIX}${ROUTE}"
+            local OUT_PATH="/output/${HOST}${OUT_ROUTE}/index.html"
+            if [ "$OUT_ROUTE" = "/" ]; then
                 OUT_PATH="/output/${HOST}/index.html"
             fi
 
@@ -180,25 +204,23 @@ main() {
     # Run the Playwright worker in a Docker container
     # --network host: so it can reach the live site via public URLs
     # -v: mount the worker script and output directory
-    # -w /work: writable dir for npm install (mounted script is read-only)
-    # npm install playwright: the Docker image has browsers but not the npm package
-    # Create a temp working dir with the worker script so npm install + node
-    # resolve from the same location (NODE_PATH doesn't work with ES modules)
-    local WORK_DIR
-    WORK_DIR=$(mktemp -d)
+    # -w /work: persistent dir for node_modules so Playwright is installed once
+    # The Docker image has browsers but not always the npm package.
+    mkdir -p "$WORK_DIR"
     cp "$WORKER_SCRIPT" "$WORK_DIR/worker.mjs"
 
+    set +e
     echo "$MANIFEST" | docker run --rm -i \
         --network host \
         -v "$WORK_DIR:/work" \
         -v "$OUTPUT_DIR:/output" \
         -w /work \
+        -e "PRERENDER_CONCURRENCY=$PRERENDER_CONCURRENCY" \
         "$PLAYWRIGHT_IMAGE" \
-        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && node worker.mjs" 2>&1
-
-    rm -rf "$WORK_DIR" 2>/dev/null || true
+        bash -c "if [ ! -d node_modules/playwright ]; then npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1; fi; node worker.mjs" 2>&1
 
     local EXIT_CODE=$?
+    set -e
 
     if [ $EXIT_CODE -ne 0 ]; then
         log_warn "Playwright worker exited with code $EXIT_CODE (some pages may have failed)"
@@ -224,6 +246,11 @@ main() {
 
     # Reload nginx config (not strictly needed — try_files checks filesystem)
     docker exec "$NGINX_CONTAINER" nginx -s reload 2>/dev/null || true
+
+    if [ $EXIT_CODE -ne 0 ]; then
+        log_warn "Pre-rendering completed with partial output; success marker will not be updated"
+        exit $EXIT_CODE
+    fi
 
     log_ok "Pre-rendering complete"
 }

@@ -5,7 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Prerender Worker — runs inside a Playwright Docker container.
+ * Prerender Worker - runs inside a Playwright Docker container.
  *
  * Reads a JSON manifest from stdin:
  *   { "urls": [{ "url": "https://hour-timebank.ie/about", "output": "/out/hour-timebank.ie/about/index.html" }, ...] }
@@ -20,6 +20,7 @@ import { dirname } from 'path';
 
 const TIMEOUT = 30000;
 const SETTLE_TIME = 2000; // Wait for React hydration + API calls
+const CONCURRENCY = Math.max(1, Number.parseInt(process.env.PRERENDER_CONCURRENCY || '4', 10) || 4);
 
 async function renderPage(page, url) {
   await page.goto(url, { waitUntil: 'networkidle', timeout: TIMEOUT });
@@ -30,16 +31,9 @@ async function renderPage(page, url) {
   // Extra settle time for tenant bootstrap + content rendering
   await page.waitForTimeout(SETTLE_TIME);
 
-  // Strip dynamically injected Google Maps assets — they're added at runtime
+  // Strip dynamically injected Google Maps assets. They are added at runtime
   // by APIProvider. Leaving them in the prerendered HTML causes double-loading
-  // when the SPA boots, which breaks the Maps API with "loaded multiple times"
-  // and "Element with name gmp-internal-* already defined" custom-element clashes.
-  //
-  // We remove (a) <script> tags for maps.googleapis.com / maps-api-v3 / maps.gstatic.com,
-  // (b) <link rel="preload|modulepreload|prefetch"> hints for the same hosts (these
-  // would otherwise fetch Maps chunks before the bootstrap on cold load, producing
-  // "google is not defined" in main.js / common.js / map.js / util.js), and
-  // (c) <link rel="preconnect"|"dns-prefetch"> for those hosts.
+  // when the SPA boots.
   await page.evaluate(() => {
     const HOST_RE = /maps\.googleapis\.com|maps-api-v3|maps\.gstatic\.com/;
     document.querySelectorAll('script[src]').forEach((s) => {
@@ -63,7 +57,6 @@ async function renderPage(page, url) {
 }
 
 async function main() {
-  // Read manifest from stdin
   const input = readFileSync('/dev/stdin', 'utf-8');
   const manifest = JSON.parse(input);
 
@@ -72,7 +65,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Pre-rendering ${manifest.urls.length} pages...`);
+  console.log(`Pre-rendering ${manifest.urls.length} pages with concurrency ${CONCURRENCY}...`);
 
   const browser = await chromium.launch({
     headless: true,
@@ -84,40 +77,51 @@ async function main() {
     viewport: { width: 1280, height: 720 },
   });
 
-  let success = 0;
-  let failed = 0;
+  const results = { success: 0, failed: 0 };
+  let nextIndex = 0;
 
-  for (const entry of manifest.urls) {
+  async function renderEntry(entry) {
     const page = await context.newPage();
     try {
       const html = await renderPage(page, entry.url);
       const size = Buffer.byteLength(html, 'utf-8');
 
-      // Skip if too small (likely error page or empty)
       if (size < 3000) {
-        console.log(`  ✗ ${entry.url} — too small (${size}B), skipped`);
-        failed++;
-        await page.close();
-        continue;
+        console.log(`  skipped ${entry.url} - too small (${size}B)`);
+        results.failed++;
+        return;
       }
 
       const outputDir = dirname(entry.output);
       mkdirSync(outputDir, { recursive: true });
       writeFileSync(entry.output, html, 'utf-8');
 
-      console.log(`  ✓ ${entry.url} (${(size / 1024).toFixed(1)}KB)`);
-      success++;
+      console.log(`  rendered ${entry.url} (${(size / 1024).toFixed(1)}KB)`);
+      results.success++;
     } catch (err) {
-      console.log(`  ✗ ${entry.url} — ${err.message}`);
-      failed++;
+      console.log(`  failed ${entry.url} - ${err.message}`);
+      results.failed++;
+    } finally {
+      await page.close();
     }
-    await page.close();
   }
+
+  async function worker() {
+    while (nextIndex < manifest.urls.length) {
+      const entry = manifest.urls[nextIndex];
+      nextIndex++;
+      await renderEntry(entry);
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, manifest.urls.length) }, () => worker())
+  );
 
   await browser.close();
 
-  console.log(`\nDone: ${success} succeeded, ${failed} failed`);
-  process.exit(failed > 0 ? 1 : 0);
+  console.log(`\nDone: ${results.success} succeeded, ${results.failed} failed`);
+  process.exit(results.failed > 0 ? 1 : 0);
 }
 
 main();

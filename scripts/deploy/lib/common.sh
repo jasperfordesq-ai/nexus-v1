@@ -12,6 +12,7 @@
 LOCK_FILE="$DEPLOY_DIR/.deploy.lock"
 LOG_DIR="$DEPLOY_DIR/logs"
 LAST_DEPLOY_FILE="$DEPLOY_DIR/.last-successful-deploy"
+LAST_PRERENDER_FILE="$DEPLOY_DIR/.last-successful-prerender"
 MIN_DISK_SPACE_MB=1024  # 1GB minimum free space
 
 # --- Maintenance Mode ---

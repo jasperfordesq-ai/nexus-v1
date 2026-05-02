@@ -2,7 +2,7 @@
 # =============================================================================
 # Project NEXUS - Safe Production Deploy Script (Orchestrator)
 # =============================================================================
-# Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--detach]
+# Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--detach] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]
 #
 # Modes:
 #   auto      - AUTO-DETECT: inspects git diff vs origin/main, picks quick or full (RECOMMENDED)
@@ -21,6 +21,10 @@
 #   --migrate  - Also run `php artisan migrate --force` (Laravel migrations)
 #   --no-cache - Force Docker builds without layer caching (default for full mode)
 #   --detach   - Run deploy in background, detached from terminal/SSH.
+#   --skip-prerender  - Skip post-deploy per-tenant pre-rendering
+#   --force-prerender - Re-render all tenant public pages even if no relevant files changed
+#   --prerender-tenant slug - Limit post-deploy pre-rendering to one tenant
+#   --prerender-routes csv  - Limit post-deploy pre-rendering to comma-separated routes
 # =============================================================================
 
 set -eo pipefail
@@ -49,14 +53,23 @@ MODE="${1:-quick}"
 LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
 DETACH=0
 FORCE_NO_CACHE=0
+SKIP_PRERENDER="${SKIP_PRERENDER:-0}"
+FORCE_PRERENDER="${FORCE_PRERENDER:-0}"
+PRERENDER_TENANT="${PRERENDER_TENANT:-}"
+PRERENDER_ROUTES="${PRERENDER_ROUTES:-}"
 
 shift 2>/dev/null || true
-for arg in "$@"; do
-    case "$arg" in
+while [ "$#" -gt 0 ]; do
+    case "$1" in
         --migrate) LARAVEL_MIGRATE=1 ;;
         --detach|-d) DETACH=1 ;;
         --no-cache) FORCE_NO_CACHE=1 ;;
+        --skip-prerender) SKIP_PRERENDER=1 ;;
+        --force-prerender) FORCE_PRERENDER=1 ;;
+        --prerender-tenant) PRERENDER_TENANT="${2:-}"; shift ;;
+        --prerender-routes) PRERENDER_ROUTES="${2:-}"; shift ;;
     esac
+    shift 2>/dev/null || true
 done
 
 # Handle logs and status subcommands (read-only, no lock/cleanup needed)
@@ -74,6 +87,10 @@ if [ "$DETACH" = "1" ] && [ -z "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
     CHILD_ARGS=""
     [ "$LARAVEL_MIGRATE" = "1" ] && CHILD_ARGS="$CHILD_ARGS --migrate"
     [ "$FORCE_NO_CACHE" = "1" ] && CHILD_ARGS="$CHILD_ARGS --no-cache"
+    [ "$SKIP_PRERENDER" = "1" ] && CHILD_ARGS="$CHILD_ARGS --skip-prerender"
+    [ "$FORCE_PRERENDER" = "1" ] && CHILD_ARGS="$CHILD_ARGS --force-prerender"
+    [ -n "$PRERENDER_TENANT" ] && CHILD_ARGS="$CHILD_ARGS --prerender-tenant $PRERENDER_TENANT"
+    [ -n "$PRERENDER_ROUTES" ] && CHILD_ARGS="$CHILD_ARGS --prerender-routes $PRERENDER_ROUTES"
     bash "$DEPLOY_SCRIPTS/subcommands/detach.sh" "$MODE" $CHILD_ARGS
     exit 0
 fi
@@ -87,7 +104,7 @@ if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
 else
     LOG_FILE="$LOG_DIR/deploy-$TIMESTAMP.log"
 fi
-export LOG_FILE MODE LARAVEL_MIGRATE FORCE_NO_CACHE
+export LOG_FILE MODE LARAVEL_MIGRATE FORCE_NO_CACHE SKIP_PRERENDER FORCE_PRERENDER PRERENDER_TENANT PRERENDER_ROUTES
 
 echo "============================================" | tee "$LOG_FILE"
 echo "  Project NEXUS - Safe Production Deploy"    | tee -a "$LOG_FILE"
@@ -160,7 +177,7 @@ case "$MODE" in
         ;;
     *)
         log_err "Invalid mode: $MODE"
-        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate]"
+        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]"
         exit 1
         ;;
 esac
@@ -172,6 +189,11 @@ fi
 
 # Verify production images (catches dev-on-prod bug) — hard failure
 run_phase "$DEPLOY_SCRIPTS/phases/verify-images.sh"
+
+# Capture the pre-deploy commit before write-build-version updates
+# .last-successful-deploy. The pre-render phase uses this for change detection.
+PRERENDER_BASE_COMMIT="$(cat "$LAST_DEPLOY_FILE" 2>/dev/null || true)"
+export PRERENDER_BASE_COMMIT
 
 # Run smoke tests
 if run_phase "$DEPLOY_SCRIPTS/phases/smoke-tests.sh"; then
