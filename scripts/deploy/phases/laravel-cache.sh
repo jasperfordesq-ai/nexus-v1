@@ -23,9 +23,13 @@ run_laravel_cache() {
 
     # Rebuild caches for production
     log_info "Rebuilding Laravel caches..."
-    docker exec nexus-php-app php /var/www/html/artisan config:cache 2>&1 | tee -a "$LOG_FILE" || true
-    docker exec nexus-php-app php /var/www/html/artisan route:cache 2>&1 | tee -a "$LOG_FILE" || true
-    docker exec nexus-php-app php /var/www/html/artisan event:cache 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan config:cache 2>&1 | tee -a "$LOG_FILE"
+    docker exec nexus-php-app php /var/www/html/artisan route:cache 2>&1 | tee -a "$LOG_FILE"
+    docker exec nexus-php-app php /var/www/html/artisan event:cache 2>&1 | tee -a "$LOG_FILE"
+    docker exec nexus-php-app php /var/www/html/artisan view:cache 2>&1 | tee -a "$LOG_FILE"
+
+    # Signal queue workers to gracefully reload new code (workers finish current job then restart)
+    docker exec nexus-php-app php /var/www/html/artisan queue:restart 2>&1 | tee -a "$LOG_FILE" || true
 
     # Ensure storage:link exists
     docker exec nexus-php-app php /var/www/html/artisan storage:link 2>&1 | tee -a "$LOG_FILE" || true

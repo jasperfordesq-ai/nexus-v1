@@ -22,6 +22,15 @@ run_smoke_tests() {
         TESTS_FAILED=1
     fi
 
+    # Test Laravel /up endpoint — validates full framework bootstrap (routes, config, app key)
+    # This is the Laravel 12 standard liveness probe, distinct from the raw health.php check
+    if curl -sf http://127.0.0.1:8090/up > /dev/null 2>&1; then
+        log_ok "Laravel /up framework check passed"
+    else
+        log_err "Laravel /up check failed — framework may not be fully bootstrapped"
+        TESTS_FAILED=1
+    fi
+
     # Test API bootstrap endpoint (with tenant context for real validation)
     local BOOTSTRAP
     BOOTSTRAP=$(curl -sf -H "X-Tenant-Slug: hour-timebank" http://127.0.0.1:8090/api/v2/tenant/bootstrap 2>/dev/null || echo "")
@@ -54,7 +63,7 @@ run_smoke_tests() {
     fi
 
     # Check database connectivity (read password from .env)
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d '"'"'"')
     if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqladmin ping -h localhost -unexus > /dev/null 2>&1; then
         log_ok "Database still accessible"
     else
