@@ -162,20 +162,32 @@ detach_if_requested() {
 }
 
 read_active_color() {
+    local color
     if [ -f "$STATE_FILE" ]; then
-        tr -d '[:space:]' < "$STATE_FILE"
+        color="$(tr -d '[:space:]' < "$STATE_FILE")"
     else
-        echo "$ACTIVE_COLOR_DEFAULT"
+        color="$ACTIVE_COLOR_DEFAULT"
     fi
+
+    case "$color" in
+        blue|green) echo "$color" ;;
+        *)
+            log_warn "Invalid active color '$color'; defaulting to $ACTIVE_COLOR_DEFAULT"
+            echo "$ACTIVE_COLOR_DEFAULT"
+            ;;
+    esac
 }
 
 inactive_color() {
     local active="$1"
-    if [ "$active" = "blue" ]; then
-        echo "green"
-    else
-        echo "blue"
-    fi
+    case "$active" in
+        blue) echo "green" ;;
+        green) echo "blue" ;;
+        *)
+            log_err "Invalid active color: $active"
+            return 1
+            ;;
+    esac
 }
 
 ports_for_color() {
@@ -661,21 +673,25 @@ cmd_deploy() {
     deploy_candidate "$target" "$release_dir" "$commit"
     smoke_color "$target"
     write_apache_routes "$target"
-    write_color_release "$target" "$commit" "$release_dir"
-    start_workers_for_color "$target" "$release_dir" "$commit"
     if ! post_cutover_smoke; then
         log_err "Public smoke failed after cutover; reverting traffic to $active"
+        write_apache_routes "$active"
+        exit 1
+    fi
+    write_color_release "$target" "$commit" "$release_dir"
+    if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
+        log_err "Worker cutover failed; reverting web traffic to $active"
         write_apache_routes "$active"
         if release_meta="$(read_color_release "$active")"; then
             commit="${release_meta%%|*}"
             release_dir="${release_meta#*|}"
-            start_workers_for_color "$active" "$release_dir" "$commit"
+            start_workers_for_color "$active" "$release_dir" "$commit" || true
         else
             docker start nexus-php-queue >/dev/null 2>&1 || true
             docker start nexus-php-scheduler >/dev/null 2>&1 || true
-            docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
-            docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
         fi
+        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
+        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
         exit 1
     fi
     run_prerender_for_color "$target" "$release_dir"
@@ -707,7 +723,11 @@ cmd_rollback() {
         commit="${release_meta%%|*}"
         release_dir="${release_meta#*|}"
         CURRENT_COMMIT="$commit"
-        start_workers_for_color "$target" "$release_dir" "$commit"
+        if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
+            log_err "Rollback worker cutover failed; restoring web traffic to $active"
+            write_apache_routes "$active"
+            exit 1
+        fi
     else
         log_warn "No release metadata found for $target workers; trying legacy containers"
         docker start nexus-php-queue >/dev/null 2>&1 || true
@@ -715,7 +735,16 @@ cmd_rollback() {
         docker stop "$(container_name "$active" queue)" >/dev/null 2>&1 || true
         docker stop "$(container_name "$active" scheduler)" >/dev/null 2>&1 || true
     fi
-    post_cutover_smoke
+    if ! post_cutover_smoke; then
+        log_err "Rollback public smoke failed; restoring web traffic to $active"
+        write_apache_routes "$active"
+        if release_meta="$(read_color_release "$active")"; then
+            commit="${release_meta%%|*}"
+            release_dir="${release_meta#*|}"
+            start_workers_for_color "$active" "$release_dir" "$commit" || true
+        fi
+        exit 1
+    fi
     state_set DEPLOY_SUCCESS 1
 }
 

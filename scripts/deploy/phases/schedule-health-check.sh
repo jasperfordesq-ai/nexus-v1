@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # pressure that only manifest once real traffic hits the new containers.
 # This is OBSERVABILITY — a failure here does NOT fail the deploy (the
 # deploy is already done). We log a warning for the operator to follow up.
-if [ -x "$DEPLOY_DIR/scripts/check-container-health.sh" ]; then
+if [ -f "$DEPLOY_DIR/scripts/check-container-health.sh" ]; then
     log_info "Scheduling post-deploy health check in 5 minutes (background)"
     (
         # CRITICAL: disable the parent's EXIT trap in this subshell. Otherwise
@@ -32,5 +32,5 @@ if [ -x "$DEPLOY_DIR/scripts/check-container-health.sh" ]; then
     disown 2>/dev/null || true
     log_ok "Post-deploy check scheduled (PID $!) — results in $LOG_DIR/health-checks.log"
 else
-    log_warn "Post-deploy health check script not found or not executable: $DEPLOY_DIR/scripts/check-container-health.sh"
+    log_warn "Post-deploy health check script not found: $DEPLOY_DIR/scripts/check-container-health.sh"
 fi

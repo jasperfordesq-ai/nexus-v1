@@ -20,7 +20,8 @@
 #   2 = SSH/docker failure (unable to collect data)
 #
 # Called by:
-#   - scripts/safe-deploy.sh (post-deploy-check, 5 min after deploy)
+#   - scripts/deploy/bluegreen-deploy.sh (post-deploy-check, 5 min after deploy)
+#   - scripts/safe-deploy.sh fallback deploy path (post-deploy-check)
 #   - Manual ops / runbook
 #   - Can be wired to cron (e.g. every 15 min) for continuous monitoring
 # =============================================================================
@@ -64,7 +65,12 @@ FAIL=0
 WARN=0
 
 echo -e "${BOLD}Project NEXUS - Container Health Check${NC}"
-echo "Host: ${SSH_HOST}  |  Mode: ${LOCAL_MODE:+local}${LOCAL_MODE:-ssh}"
+if [ "${LOCAL_MODE:-0}" = "1" ]; then
+    MODE_LABEL="local"
+else
+    MODE_LABEL="ssh"
+fi
+echo "Host: ${SSH_HOST}  |  Mode: ${MODE_LABEL}"
 echo "Mem threshold: ${MEM_THRESHOLD_PCT}%  |  OOM lookback: ${OOM_LOOKBACK}"
 echo "============================================================"
 
@@ -158,10 +164,10 @@ if [ $FAIL -gt 0 ]; then
     log_err "Health check FAILED: ${FAIL} critical issue(s), ${WARN} warning(s)"
     echo ""
     echo "Runbook:"
-    echo "  1. Inspect logs:   sudo docker logs --tail 200 nexus-php-app"
-    echo "  2. Check limits:   grep -A3 'deploy:' compose.prod.yml"
-    echo "  3. Raise limit:    edit compose.prod.yml → mem_limit / memory"
-    echo "  4. Redeploy:       sudo bash scripts/safe-deploy.sh full --detach"
+    echo "  1. Inspect logs:   sudo docker logs --tail 200 <container-from-output>"
+    echo "  2. Check limits:   grep 'mem_limit:' compose.bluegreen.yml"
+    echo "  3. Raise limit:    edit compose.bluegreen.yml -> memory"
+    echo "  4. Redeploy:       sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
     exit 1
 elif [ $WARN -gt 0 ]; then
     log_warn "Health check passed with ${WARN} warning(s)"

@@ -65,8 +65,8 @@ sudo bash scripts/deploy/bluegreen-deploy.sh logs -f
 5. Starts the inactive color on private local ports.
 6. Waits for Docker health checks and private HTTP smoke tests.
 7. Updates the Apache route include and runs a graceful Apache reload.
-8. Starts the matching queue worker and scheduler, then stops the previous worker containers.
-9. Runs public smoke tests after cutover.
+8. Runs public smoke tests after cutover.
+9. Starts the matching queue worker and scheduler, then stops the previous worker containers.
 10. Refreshes per-tenant pre-rendered HTML when public-facing files changed.
 11. Writes a live deployment status file with phase, active color, target color, commit, and log path.
 12. Schedules the normal delayed post-deploy health check.
@@ -389,7 +389,7 @@ Two automated guardrails run around every production deploy to catch regressions
 - Runs `docker inspect` on each container to read the `OOMKilled` flag, `RestartCount`, and `RestartPolicy`.
 - Exits non-zero if any container OOM'd or is above the threshold.
 
-**Automatic invocation:** `safe-deploy.sh` schedules this check to run 5 minutes after a successful deploy (in the background, so it does NOT delay the deploy finish). Results are appended to `/opt/nexus-php/logs/health-checks.log`; a detailed log is written to `/opt/nexus-php/logs/post-deploy-health-YYYYMMDD-HHMMSS.log`. A failure is additionally logged to syslog with tag `nexus-deploy`.
+**Automatic invocation:** `bluegreen-deploy.sh` schedules this check to run 5 minutes after a successful deploy (in the background, so it does NOT delay the deploy finish). Results are appended to `/opt/nexus-php/logs/health-checks.log`; a detailed log is written to `/opt/nexus-php/logs/post-deploy-health-YYYYMMDD-HHMMSS.log`. A failure is additionally logged to syslog with tag `nexus-deploy`.
 
 **Why 5 minutes?** OOMKills on the PHP container typically happen after Apache workers ramp up and start handling real traffic — a just-booted container consumes ~200 MB and won't trip the limit.
 
@@ -416,23 +416,22 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 
 **Runbook — OOMKill detected:**
 
-1. **Identify the container** from the health check output (`nexus-php-app` is the usual suspect).
+1. **Identify the container** from the health check output. In blue/green deploys this is usually a color-specific container such as `nexus-blue-php-app` or `nexus-green-php-app`.
 2. **Inspect recent logs** for memory-hungry requests:
    ```bash
-   sudo docker logs --tail 500 nexus-php-app | grep -iE 'memory|fatal|allowed memory size'
+   sudo docker logs --tail 500 <container-from-output> | grep -iE 'memory|fatal|allowed memory size'
    ```
-3. **Check current limits** in `compose.prod.yml`:
+3. **Check current limits** in `compose.bluegreen.yml`:
    ```yaml
    services:
-     php:
-       deploy:
-         resources:
-           limits:
-             memory: 768M   # bumped from 512M 2026-04-12
+     app:
+       mem_limit: ${NEXUS_APP_MEMORY_LIMIT:-1024m}
+     queue:
+       mem_limit: ${NEXUS_QUEUE_MEMORY_LIMIT:-512m}
    ```
-4. **Raise the limit** (e.g. 768M → 1024M), commit, redeploy:
+4. **Raise the limit** (e.g. 1024m to 1280m), commit, redeploy:
    ```bash
-   sudo bash scripts/safe-deploy.sh full --detach
+   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
    ```
 5. **Verify** with another health check 5 min into the deploy.
 
@@ -440,17 +439,17 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 
 | Metric | Value |
 |--------|-------|
-| Container memory limit | 768 MB (raised from 512 MB) |
+| API container memory limit | 1024 MB (`NEXUS_APP_MEMORY_LIMIT`, overrideable) |
 | Apache MPM workers (peak) | ~10 active, ~50 MB each → ~500 MB RSS peak |
-| OPcache | 128 MB |
-| `memory_limit` per PHP request | 512 MB |
+| OPcache | 256 MB |
+| `memory_limit` per PHP request | 1 GB |
 | Idle container RSS | ~200 MB |
 
 ### 2. Artisan Cache Fail-Fast (TD15)
 
-**Why it exists:** `Dockerfile.prod` runs `artisan config:cache`, `route:cache`, and `event:cache` in its startup CMD with `|| { echo '[FATAL]'; exit 1; }`. If any of these fail — typically because a new `env('NEW_KEY')` call was added to `config/*.php` without a corresponding entry in `.env.production` — the container crash-loops and the site stays stuck in maintenance mode.
+**Why it exists:** `Dockerfile.bluegreen` runs `php artisan optimize` before Apache starts. The active queue and scheduler containers also run `php artisan optimize` before their long-running processes. If optimization fails, the inactive color fails health checks and is never cut over to public traffic.
 
-The TD15 guardrails catch these failures **before deploy** rather than at container startup.
+The TD15 guardrails catch these failures in CI and again inside the inactive color before public cutover.
 
 **Scripts:**
 
@@ -479,11 +478,11 @@ bash scripts/pre-push-checks.sh
 
 **Recovery — artisan cache fails during deploy:**
 
-1. **Read the error** in `docker logs nexus-php-app` — it names the missing key or bad config file.
+1. **Read the error** in `docker logs <candidate-container>`; it names the missing key or bad config file.
 2. **Fix the root cause:**
    - Missing env var → add to `.env.production` on the server AND add to `.env.example` (empty placeholder) so future validations pass.
    - Bad default in `config/foo.php` → commit the fix, redeploy.
-3. **Redeploy:** `sudo bash scripts/safe-deploy.sh full --detach`
+3. **Redeploy:** `sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach`
 4. **Or, as an emergency fallback**, switch to the soft-fail entrypoint (below).
 
 **Adding a new required env var — correct sequence:**
@@ -498,7 +497,7 @@ bash scripts/pre-push-checks.sh
 
 **File:** `docker/entrypoint-cache.sh`
 
-This alternate entrypoint runs the three `artisan *:cache` commands at **container start** but **logs** and **continues** instead of failing. It is **NOT wired into `Dockerfile.prod` by default** — it is kept as an emergency fallback if build-/startup-time fail-fast caching proves too fragile in production.
+This alternate entrypoint runs the three `artisan *:cache` commands at **container start** but **logs** and **continues** instead of failing. It is **NOT wired into `Dockerfile.bluegreen` by default**; it is kept as an emergency fallback if startup-time fail-fast caching proves too fragile in production.
 
 **Tradeoff:**
 
@@ -509,7 +508,7 @@ This alternate entrypoint runs the three `artisan *:cache` commands at **contain
 
 **To switch to fail-soft mode** (only in emergencies, with explicit operator approval):
 
-1. Edit `Dockerfile.prod` and replace the `CMD ["sh", "-c", "..."]` block with:
+1. Edit `Dockerfile.bluegreen` and replace the `CMD ["sh", "-c", "..."]` block with:
 
    ```dockerfile
    COPY docker/entrypoint-cache.sh /usr/local/bin/entrypoint-cache.sh
@@ -517,8 +516,8 @@ This alternate entrypoint runs the three `artisan *:cache` commands at **contain
    CMD ["/usr/local/bin/entrypoint-cache.sh"]
    ```
 
-2. Rebuild + deploy: `sudo bash scripts/safe-deploy.sh full --detach`.
-3. Monitor `sudo docker logs -f nexus-php-app | grep -E 'WARN|artisan'` for cache warnings.
+2. Rebuild + deploy: `sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach`.
+3. Monitor `sudo docker logs -f <active-api-container> | grep -E 'WARN|artisan'` for cache warnings.
 4. **Revert** to fail-fast mode once the underlying config issue is fixed.
 
 ### Gotchas

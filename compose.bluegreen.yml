@@ -10,6 +10,7 @@ services:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-app
     restart: unless-stopped
+    mem_limit: ${NEXUS_APP_MEMORY_LIMIT:-1024m}
     ports:
       - "${NEXUS_API_PORT:-8190}:80"
     volumes:
@@ -56,6 +57,7 @@ services:
     image: nexus-react-prod:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-react
     restart: unless-stopped
+    mem_limit: ${NEXUS_FRONTEND_MEMORY_LIMIT:-256m}
     ports:
       - "${NEXUS_FRONTEND_PORT:-3100}:80"
     environment:
@@ -78,6 +80,7 @@ services:
     image: nexus-sales-site:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-sales
     restart: unless-stopped
+    mem_limit: ${NEXUS_SALES_MEMORY_LIMIT:-128m}
     ports:
       - "${NEXUS_SALES_PORT:-3103}:80"
     networks:
@@ -92,8 +95,9 @@ services:
   queue:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-queue
-    command: php artisan queue:work --queue=federation-high,federation,default --sleep=3 --tries=3 --timeout=60
+    command: sh -c "php artisan optimize && php artisan queue:work --queue=federation-high,federation,default --sleep=3 --tries=3 --timeout=60"
     restart: unless-stopped
+    mem_limit: ${NEXUS_QUEUE_MEMORY_LIMIT:-512m}
     volumes:
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
@@ -111,7 +115,7 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan queue:work' > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "tr '\\0' ' ' < /proc/1/cmdline | grep -q 'queue:work'"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -120,8 +124,9 @@ services:
   scheduler:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-scheduler
-    command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    command: sh -c "php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     restart: unless-stopped
+    mem_limit: ${NEXUS_SCHEDULER_MEMORY_LIMIT:-384m}
     volumes:
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
@@ -139,7 +144,7 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan schedule:run|sleep 60' > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "tr '\\0' ' ' < /proc/1/cmdline | grep -q 'schedule:run'"]
       interval: 30s
       timeout: 5s
       retries: 3
