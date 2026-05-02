@@ -49,6 +49,7 @@ import CheckCircle from 'lucide-react/icons/check-circle';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Download from 'lucide-react/icons/download';
 import Eye from 'lucide-react/icons/eye';
+import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Users from 'lucide-react/icons/users';
 import XCircle from 'lucide-react/icons/x-circle';
@@ -400,6 +401,34 @@ export default function MunicipalSurveyAdminPage() {
 
   return (
     <>
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20 mb-4" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Municipal Surveys collect structured feedback from residents, municipal contacts, and
+                partners about the community care programme. Use surveys to measure resident
+                satisfaction, coordinator workload, and municipal partner sentiment. Survey responses
+                feed directly into the Pilot Scoreboard and KPI metrics. Results are anonymous unless
+                the respondent opts to be identified.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Draft:</strong> Not yet sent — you can still edit questions.</p>
+                <p><strong>Active:</strong> Live — respondents can submit responses.</p>
+                <p><strong>Closed:</strong> No longer accepting responses — results are finalised.</p>
+              </div>
+              <p className="text-default-500 pt-1">
+                Response data can be exported as CSV for analysis in Excel or statistical tools. The
+                platform calculates average scores and sentiment breakdowns automatically.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">

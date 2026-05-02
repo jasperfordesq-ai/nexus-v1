@@ -30,6 +30,7 @@ import {
 } from '@heroui/react';
 import Inbox from 'lucide-react/icons/inbox';
 import Download from 'lucide-react/icons/download';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import XCircle from 'lucide-react/icons/x-circle';
@@ -286,7 +287,7 @@ export default function MunicipalityFeedbackAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Municipality Feedback Inbox"
-        subtitle="AG92 — resident-to-municipality questions, ideas, issues"
+        subtitle="Receive, triage, and resolve resident feedback — questions, ideas, issues, and complaints routed to the municipality or community team."
         icon={<Inbox size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -313,6 +314,23 @@ export default function MunicipalityFeedbackAdminPage() {
           </div>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                This inbox collects feedback submitted by residents through the platform. Each item is categorised (question, idea, issue, complaint) and assigned a sentiment score. Use the triage controls to assign ownership, add internal notes, and track resolution. Items visible to all residents are marked as public — replies may be seen by the submitter and other members.
+              </p>
+              <p className="text-default-500 text-xs pt-1">
+                Status workflow — <span className="font-medium">submitted</span>: received, not yet reviewed; <span className="font-medium">triaged</span>: reviewed and assigned to an owner; <span className="font-medium">in_progress</span>: actively being worked on; <span className="font-medium">resolved</span>: closed with a documented resolution; <span className="font-medium">closed</span>: closed without resolution (with reason).
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Dashboard chips */}
       {stats && (
@@ -588,6 +606,7 @@ export default function MunicipalityFeedbackAdminPage() {
                     <Textarea
                       label="Triage Notes"
                       placeholder="Internal notes for the triage team"
+                      description="Internal only — not visible to the submitter. Use for team coordination, links to related issues, or escalation context."
                       value={triageNotes}
                       onValueChange={setTriageNotes}
                       variant="bordered"
@@ -597,6 +616,7 @@ export default function MunicipalityFeedbackAdminPage() {
                     <Textarea
                       label="Resolution Notes (required for Resolve)"
                       placeholder="What was done to address this?"
+                      description="Required when resolving. Summarise what action was taken. May be shown to the submitter depending on the item's public visibility setting."
                       value={resolutionNotes}
                       onValueChange={setResolutionNotes}
                       variant="bordered"

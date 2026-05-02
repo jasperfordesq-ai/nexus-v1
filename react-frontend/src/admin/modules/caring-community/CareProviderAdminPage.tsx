@@ -15,6 +15,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Button,
+  Card,
+  CardBody,
   Chip,
   Input,
   Modal,
@@ -34,6 +36,7 @@ import {
   Textarea,
 } from '@heroui/react';
 import BadgeCheck from 'lucide-react/icons/badge-check';
+import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -348,6 +351,29 @@ export default function CareProviderAdminPage() {
           </Button>
         </div>
       </div>
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Care Providers are external organisations (home care agencies, social enterprises,
+                charities) that participate in the community care network alongside individual
+                volunteers. They can be assigned help requests, receive time credit payments, and
+                appear in the provider directory visible to members. Verify each provider's
+                credentials before listing them.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Verification:</strong> Verified providers display a badge in the directory. Verification requires a check of their registration, insurance, and safeguarding policies. Use the shield icon in the Actions column to mark a provider as verified.</p>
+                <p><strong>Provider types:</strong> Spitex (home care), Tagesstätte (day centre), Private service, Verein (association), Volunteer group. Add the description field to list the types of care offered — members and coordinators use this to find the right provider for each request.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Duplicates Panel */}
       {duplicatesOpen && (

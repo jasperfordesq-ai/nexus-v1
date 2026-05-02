@@ -191,7 +191,7 @@ export default function HourTransferAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Cooperative Hour Transfers"
-        description="Members moving between cooperatives can transfer their banked hours. Review pending outbound requests and approve once you've confirmed the member has registered at the destination."
+        description="When a member moves to a different cooperative that also runs NEXUS, they can transfer their banked hours with them. Review outbound requests here and approve once you have confirmed the member has registered at the destination cooperative. Approving immediately debits the source wallet and credits the destination — this cannot be undone."
         actions={
           <Button
             size="sm"
@@ -225,8 +225,12 @@ export default function HourTransferAdminPage() {
           }
         >
           <Card className="mt-4">
-            <CardHeader className="text-base font-semibold">
-              Awaiting your approval
+            <CardHeader className="flex flex-col items-start gap-1">
+              <span className="text-base font-semibold">Awaiting your approval</span>
+              <p className="text-sm text-default-500">
+                Each transfer must be manually approved by an admin. Check that the destination member email
+                matches the member&rsquo;s new account before approving.
+              </p>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">
@@ -323,8 +327,12 @@ export default function HourTransferAdminPage() {
           }
         >
           <Card className="mt-4">
-            <CardHeader className="text-base font-semibold">
-              Received from other cooperatives (last 90 days)
+            <CardHeader className="flex flex-col items-start gap-1">
+              <span className="text-base font-semibold">Received from other cooperatives (last 90 days)</span>
+              <p className="text-sm text-default-500">
+                This is an audit log only — inbound transfers are processed automatically when the source
+                cooperative approves them. No action is required here.
+              </p>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">

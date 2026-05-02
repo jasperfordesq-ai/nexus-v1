@@ -256,13 +256,25 @@ export default function PilotScoreboardAdminPage() {
         }
       />
 
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
-            Metrics use a 90-day rolling window. Capture a pre-pilot baseline before onboarding residents, then
-            run a quarterly review snapshot every 3 months. Cost offset uses CHF 35/hr × 2 (Age-Stiftung methodology).
-          </p>
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                All metrics use a 90-day rolling window. Capture a pre-pilot baseline before
+                onboarding real residents, then run a quarterly review snapshot every 3 months.
+                The comparison table shows how each metric has moved relative to that baseline.
+              </p>
+              <p className="text-default-600">
+                Cost offset is calculated using the KISS/Age-Stiftung methodology: hours of informal
+                care × CHF 35/hr (Swiss formal-care assistant rate) × 2 (prevention multiplier
+                reflecting avoided formal care costs). This methodology is recognised by Swiss
+                cantonal social services for pilot reporting.
+              </p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
@@ -408,8 +420,9 @@ export default function PilotScoreboardAdminPage() {
           <ModalHeader>Capture pre-pilot baseline</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              This freezes the current 90-day metrics as the canonical pre-pilot baseline. Use this once,
-              before onboarding residents. All future quarterly reviews will compare against this snapshot.
+              Capture this ONCE before onboarding real residents. It freezes the current 90-day
+              metrics as your comparison baseline. All future quarterly reviews will calculate
+              delta against this snapshot. This action cannot be undone.
             </p>
             <Textarea
               label="Notes (optional)"
@@ -435,14 +448,17 @@ export default function PilotScoreboardAdminPage() {
           <ModalHeader>Capture quarterly review</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              Snapshot the current 90-day metrics for the quarterly review cadence. Defaults to{' '}
-              <span className="font-mono text-xs">quarterly_YYYY_MM</span>.
+              Run every 3 months after pilot launch. The snapshot label defaults to the current
+              quarter (e.g. Q2_2026) but you can customise it. Add notes to record what changed
+              since the last review — milestones reached, policy changes, resident feedback.
+              Snapshot covers the most recent 90-day window from today.
             </p>
             <Input
               label="Label (optional)"
               placeholder="quarterly_2026_07"
               value={quarterlyLabel}
               onValueChange={setQuarterlyLabel}
+              description="Use a recognisable label such as Q2_2026 or 2026_Q3. Defaults to quarterly_YYYY_MM."
             />
             <Textarea
               label="Notes (optional)"

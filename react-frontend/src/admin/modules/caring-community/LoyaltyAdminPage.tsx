@@ -34,6 +34,7 @@ import {
   Textarea,
 } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Wallet from 'lucide-react/icons/wallet';
@@ -264,6 +265,30 @@ export default function LoyaltyAdminPage() {
           </Button>
         }
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Loyalty programme rewards members for sustained participation beyond direct care
+                exchanges — attending events, completing training, contributing to surveys, or
+                achieving milestones. Rewards are funded by time credits redeemed at participating
+                marketplace sellers. Configure per-seller settings (exchange rate and max discount)
+                and review redemption history here. The programme is optional and can be disabled
+                without affecting core timebank functionality.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Per-seller exchange rate:</strong> How many CHF a member saves for each hour they apply. Set this to match the seller's pricing and the community's standard care credit value.</p>
+                <p><strong>Max discount per order (%):</strong> Cap on how much of the order total can be paid in time credits. Prevents members from redeeming more than the seller intends to accept.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* ── Stats ─────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

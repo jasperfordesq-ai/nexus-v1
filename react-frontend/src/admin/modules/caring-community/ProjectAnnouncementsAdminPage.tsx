@@ -33,6 +33,7 @@ import {
 } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Flag from 'lucide-react/icons/flag';
+import Info from 'lucide-react/icons/info';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Milestone from 'lucide-react/icons/milestone';
 import PauseCircle from 'lucide-react/icons/pause-circle';
@@ -253,6 +254,29 @@ export default function ProjectAnnouncementsAdminPage() {
 
   return (
     <>
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20 mb-4" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Project Announcements are non-urgent updates posted to the community feed and member
+                notification centre. Use them for programme news, volunteer recruitment, event
+                notices, and impact updates. Unlike Emergency Alerts, announcements are queued and
+                delivered on the platform's normal notification schedule.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Draft:</strong> Not visible to members — edit freely before publishing.</p>
+                <p><strong>Active:</strong> Published and visible in the community feed. Use "Add update" to post milestone updates to subscribers.</p>
+                <p><strong>Paused / Completed:</strong> Archived from the active feed. Subscribers are notified on completion.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">

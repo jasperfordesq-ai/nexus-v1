@@ -28,6 +28,7 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import PlugZap from 'lucide-react/icons/plug-zap';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -354,6 +355,30 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           </>
         }
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                External Integrations is a backlog tracker for partner-dependent connections —
+                banking, AHV submission, postal address verification, and cantonal data feeds. Each
+                entry tracks the integration owner, data sharing agreement (DSA) status, and sandbox
+                readiness. Use this to coordinate with external partners and report progress to
+                stakeholders.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>DSA (Data Sharing Agreement):</strong> Must be signed before any live data exchange. Draft agreements using the Research Partnerships templates.</p>
+                <p><strong>Sandbox URL:</strong> Link to the partner's test environment. Validate the integration in sandbox before promoting to live.</p>
+                <p><strong>Statuses:</strong> Proposed → Scoping → Sandbox → Live. Blocked means an external dependency is unresolved.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading ? (
         <Card shadow="sm">

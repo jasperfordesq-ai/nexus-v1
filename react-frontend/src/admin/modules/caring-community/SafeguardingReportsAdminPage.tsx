@@ -29,6 +29,7 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
@@ -234,6 +235,84 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         title="Safeguarding Reports"
         description="Review, assign, and resolve safeguarding concerns raised by members."
       />
+
+      {/* About card */}
+      <Card className="border-l-4 border-l-danger bg-danger-50 dark:bg-danger-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-danger" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-danger-800 dark:text-danger-200">About this page</p>
+              <p className="text-default-600">
+                This page manages formal safeguarding incidents — situations where a member's welfare, safety, or
+                dignity may be at risk. Reports are submitted by members, coordinators, or administrators. All reports
+                must be triaged within the SLA configured in Operating Policy. Critical and High severity reports
+                require immediate attention. Reports are tenant-scoped and cannot be seen by other communities.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Severity legend */}
+      <Card shadow="none" className="border border-divider">
+        <CardHeader>
+          <p className="text-sm font-semibold">Severity levels</p>
+        </CardHeader>
+        <Divider />
+        <CardBody className="py-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+            <div className="flex items-start gap-2">
+              <Chip size="sm" color="danger" variant="flat" className="shrink-0 mt-0.5">Critical</Chip>
+              <p className="text-default-600">Immediate physical risk — escalate within 1 hour</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip size="sm" color="warning" variant="flat" className="shrink-0 mt-0.5">High</Chip>
+              <p className="text-default-600">Serious concern — triage within 24 hours</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip size="sm" color="default" variant="flat" className="shrink-0 mt-0.5">Medium</Chip>
+              <p className="text-default-600">Significant but non-urgent — triage within 72 hours</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip size="sm" color="success" variant="flat" className="shrink-0 mt-0.5">Low</Chip>
+              <p className="text-default-600">Minor concern — review at next coordinator meeting</p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Status workflow guide */}
+      <Card shadow="none" className="border border-divider">
+        <CardHeader>
+          <p className="text-sm font-semibold">Status workflow</p>
+        </CardHeader>
+        <Divider />
+        <CardBody className="py-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5 text-sm">
+            <div>
+              <Chip size="sm" color="primary" variant="flat" className="mb-1">Submitted</Chip>
+              <p className="text-xs text-default-500">Report received, not yet reviewed by a coordinator</p>
+            </div>
+            <div>
+              <Chip size="sm" color="primary" variant="flat" className="mb-1">Triaged</Chip>
+              <p className="text-xs text-default-500">Coordinator has assessed severity and assigned ownership</p>
+            </div>
+            <div>
+              <Chip size="sm" color="warning" variant="flat" className="mb-1">Investigating</Chip>
+              <p className="text-xs text-default-500">Active investigation or support intervention underway</p>
+            </div>
+            <div>
+              <Chip size="sm" color="success" variant="flat" className="mb-1">Resolved</Chip>
+              <p className="text-xs text-default-500">Closed with documented resolution notes — action taken</p>
+            </div>
+            <div>
+              <Chip size="sm" color="default" variant="flat" className="mb-1">Dismissed</Chip>
+              <p className="text-xs text-default-500">Closed with no further action — a reason must be recorded</p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       <Card shadow="sm">
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
@@ -472,6 +551,13 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       Update
                     </Button>
                   </div>
+                  {(statusToSet === 'resolved' || statusToSet === 'dismissed') && (
+                    <p className="text-xs text-default-500 mt-1">
+                      {statusToSet === 'resolved'
+                        ? '"Resolved" closes this report with documented resolution notes. Use when action has been taken.'
+                        : '"Dismissed" closes this report with no further action. A reason must be recorded in the notes above.'}
+                    </p>
+                  )}
 
                   <div className="flex flex-col gap-2">
                     <Textarea

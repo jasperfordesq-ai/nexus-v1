@@ -31,6 +31,7 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
+import Info from 'lucide-react/icons/info';
 import Pencil from 'lucide-react/icons/pencil';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -351,7 +352,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
     <div className="space-y-6">
       <PageHeader
         title="Success Stories"
-        subtitle="AG91 — proof cards tied to live metrics"
+        subtitle="Create and manage proof cards that demonstrate the community's impact — designed for sharing with procurement officers, funders, and municipal partners."
         icon={<Award size={24} />}
         actions={
           <>
@@ -375,6 +376,20 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           </>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Proof cards are structured impact stories tied to live metrics from the platform. Each card shows a before/after comparison with a cited evidence source and methodology note. Cards marked as "Demo" are illustrative only; mark a card as "Real evidence" once you have verified the data. Published cards appear in the Municipal Impact Report and the public-facing impact page.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading ? (
         <Card shadow="sm">
@@ -554,6 +569,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 <Select
                   label="Metric source"
                   variant="bordered"
+                  description="pilot_scoreboard: auto-pulls from AG83; municipal_roi: auto-pulls from AG76; manual: you enter values by hand."
                   selectedKeys={[form.metric_source]}
                   onChange={(e) =>
                     setForm({
@@ -627,7 +643,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <Textarea
                 label="Method caveat"
                 placeholder='e.g. "Pilot region only; n=42 members; 90-day window"'
-                description="Required — keeps claims honest."
+                description="Required — a one-sentence note on methodology limitations. Keeps claims honest with funders. Example: 'Based on self-reported hours; external audit pending.'"
                 variant="bordered"
                 isRequired
                 minRows={2}
@@ -638,7 +654,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <Input
                 label="Evidence source"
                 placeholder='e.g. "AG83 pilot scoreboard 2026-04-30 baseline"'
-                description="Required — where the number comes from."
+                description="Required — where the number comes from. Example: 'NEXUS platform data, 90-day rolling window ending 2026-04-01' or 'Swiss Federal Statistical Office 2023.'"
                 variant="bordered"
                 isRequired
                 value={form.evidence_source}

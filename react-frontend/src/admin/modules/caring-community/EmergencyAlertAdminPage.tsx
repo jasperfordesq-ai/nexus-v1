@@ -199,6 +199,28 @@ export default function EmergencyAlertAdminPage() {
 
   return (
     <>
+      {/* Prominent intro/warning card */}
+      <Card className="border-l-4 border-l-danger bg-danger-50 dark:bg-danger-900/20 mb-4" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-danger-800 dark:text-danger-200">About this page — use with caution</p>
+              <p className="text-default-600">
+                Emergency Alerts are urgent broadcasts sent to all members (or a targeted sub-group)
+                immediately. Use this only for genuine emergencies — severe weather, community safety
+                incidents, or urgent care coverage gaps. Alerts are sent as push notifications and
+                in-app banners. They cannot be unsent once dispatched.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Targeting:</strong> Selecting severity "Danger" or "Warning" sends to all members. Draft carefully — there is no recall once broadcast.</p>
+                <p><strong>Delivery:</strong> Alerts are delivered within 60 seconds of dispatch.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       <Card>
         <CardHeader className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">

@@ -30,6 +30,7 @@ import {
   Textarea,
 } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Plus from 'lucide-react/icons/plus';
@@ -242,6 +243,31 @@ export default function RegionalPointsAdminPage() {
           </Button>
         }
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Regional Points are supplementary credits used to recognise contributions that don't
+                fit the standard hour exchange model — for example, attending community events,
+                participating in surveys, or completing training. They are distinct from time credits
+                (care hours) and cannot be converted to them. Use them to encourage broader community
+                participation beyond direct care.
+              </p>
+              <p className="text-default-500">
+                Allocate points manually to individual members using the issue or adjust tools below.
+                Points appear in the member's wallet alongside their time credit balance. Members can
+                redeem Regional Points for local rewards defined in the Loyalty programme. Points
+                expire after 12 months unless the expiry setting is set to 0 (never expire).
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

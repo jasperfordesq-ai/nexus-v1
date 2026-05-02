@@ -175,15 +175,28 @@ export default function CategoryCoefficientsAdminPage() {
         }
       />
 
-      {/* Methodology card */}
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
-            Substitution coefficients reflect Age-Stiftung methodology. Companionship hours
-            typically substitute formal care at 0.40, transport at 0.70, direct personal
-            care at 1.00. Update these per your municipality&rsquo;s evaluation framework.
-          </p>
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Substitution Coefficients control how much social value each care category is worth
+                in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour
+                of formal Spitex/Pflege care (CHF&nbsp;35). A coefficient of 0.5 means it substitutes
+                for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal
+                care — for example, intensive personal care or specialist support. The
+                Age-Stiftung/KISS methodology recommends starting all categories at 1.0 and adjusting
+                based on observed care intensity.
+              </p>
+              <p className="text-default-500">
+                Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on
+                the next ROI report refresh.
+              </p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
@@ -201,6 +214,10 @@ export default function CategoryCoefficientsAdminPage() {
                   docker exec nexus-php-app php artisan migrate
                 </code>{' '}
                 to enable per-category coefficients.
+              </p>
+              <p className="mt-1">
+                A database migration is pending — save your changes after the migration completes to
+                avoid them being overwritten.
               </p>
             </div>
           </CardBody>

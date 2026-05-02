@@ -78,7 +78,7 @@ const FIELD_HELP: Partial<Record<keyof OperatingPolicy, string>> = {
   chf_hourly_rate:                    'CHF value per care hour for ROI reporting (Swiss formal-care assistant rate).',
   chf_prevention_multiplier:          'Multiplier applied to formal-care offset (Age-Stiftung / KISS methodology).',
   statement_cadence:                  'How often members receive a per-member hour statement.',
-  policy_appendix_url:                'Public URL of the signed policy appendix for the pilot.',
+  policy_appendix_url:                'Paste the public URL of the signed policy agreement between your cooperative and the municipality. This appears in audit reports and the municipal reporting pack.',
 };
 
 export default function OperatingPolicyAdminPage() {
@@ -225,13 +225,26 @@ export default function OperatingPolicyAdminPage() {
         }
       />
 
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
-            These settings encode the human rules each pilot must agree before launch. They drive trust-tier promotion,
-            SLA monitoring, hour-estate handling, balance interventions, ROI computation, and safeguarding escalation.
-          </p>
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Operating Policy defines the rules of your community care programme — who can approve
+                hours, how quickly coordinators must respond, how social value is calculated, and what
+                the monthly reporting cycle looks like. Configure this before launching the pilot.
+                Changes take effect immediately and are logged for audit purposes.
+              </p>
+              <p className="text-default-600">
+                The CHF hourly rate and prevention multiplier fields use the KISS methodology
+                (Koordination und Innovation für Soziales, Schwyz) developed with Age-Stiftung. If you
+                are not running a Swiss KISS/AGORIS pilot, set the rate to your local formal-care hourly
+                equivalent and the multiplier to 1.0.
+              </p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 

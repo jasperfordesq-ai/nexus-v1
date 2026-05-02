@@ -25,6 +25,7 @@ import {
 } from '@heroui/react';
 import AlarmClock from 'lucide-react/icons/alarm-clock';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Settings from 'lucide-react/icons/settings';
 import { usePageTitle } from '@/hooks';
@@ -185,6 +186,38 @@ export default function HelpRequestSlaAdminPage() {
         }
       />
 
+      {/* About card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Service Level Agreements (SLAs) set the maximum expected response and resolution times for help
+                requests. When a request approaches or exceeds its SLA, it is flagged as overdue in this dashboard.
+                SLAs help you maintain consistent service quality and generate accurate pilot metrics.
+              </p>
+              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2 text-default-600">
+                <p>
+                  <span className="font-medium">First response:</span> time from request submission to first
+                  coordinator contact (status moves out of <code className="text-xs bg-default-100 px-1 rounded">pending</code>)
+                </p>
+                <p>
+                  <span className="font-medium">Resolution:</span> time from first response to the request being
+                  matched and confirmed (status reaches <code className="text-xs bg-default-100 px-1 rounded">closed</code>)
+                </p>
+              </div>
+              <p className="text-default-500 text-xs mt-1">
+                SLA windows are set in the AG81 Operating Policy. Edit them using the "Edit policy" button above.
+                Set tighter SLAs for urgent care categories (e.g. medical transport) and looser ones for social
+                activities.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {loading && (
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
@@ -196,16 +229,21 @@ export default function HelpRequestSlaAdminPage() {
           <Card className="border border-[var(--color-border)]">
             <CardBody className="py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-sm">
-                  <span className="font-semibold">SLA windows:</span>{' '}
-                  first response{' '}
-                  <Chip size="sm" variant="flat" color="primary">
-                    {policy.first_response_hours}h
-                  </Chip>{' '}
-                  · resolution{' '}
-                  <Chip size="sm" variant="flat" color="primary">
-                    {policy.resolution_hours}h
-                  </Chip>
+                <div className="space-y-1 text-sm">
+                  <div>
+                    <span className="font-semibold">First response:</span>{' '}
+                    <Chip size="sm" variant="flat" color="primary">
+                      {policy.first_response_hours}h
+                    </Chip>{' '}
+                    <span className="text-default-500">— time from submission to first coordinator contact</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Resolution:</span>{' '}
+                    <Chip size="sm" variant="flat" color="primary">
+                      {policy.resolution_hours}h
+                    </Chip>{' '}
+                    <span className="text-default-500">— time from first response to request being matched and confirmed</span>
+                  </div>
                 </div>
                 <div>
                   {policy.source === 'platform_defaults' ? (

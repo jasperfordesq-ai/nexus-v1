@@ -16,6 +16,7 @@ import {
 } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Clock from 'lucide-react/icons/clock';
+import Info from 'lucide-react/icons/info';
 import Search from 'lucide-react/icons/search';
 import Shield from 'lucide-react/icons/shield';
 import Star from 'lucide-react/icons/star';
@@ -96,6 +97,24 @@ export function WarmthPassAdminPage() {
         icon={<Shield className="h-5 w-5" aria-hidden="true" />}
       />
 
+      {/* About card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                A Warmth Pass is a portable trust credential showing that a member has reached Trusted tier (tier 2+),
+                has received peer reviews, and is eligible to provide informal neighbourhood care. Recipients can
+                request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a
+                member's credential on request, or to assist a member who is unsure of their eligibility.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* Lookup form */}
       <Card>
         <CardHeader>
@@ -174,8 +193,12 @@ export function WarmthPassAdminPage() {
             {/* Not eligible notice */}
             {result.tier < 2 && (
               <div className="rounded-lg border border-warning-200 bg-warning-50 p-3 dark:border-warning-800 dark:bg-warning-900/20">
-                <p className="text-sm text-warning-700 dark:text-warning-400">
+                <p className="text-sm font-semibold text-warning-700 dark:text-warning-400">
                   Member is not yet at Trusted tier and does not hold a Warmth Pass.
+                </p>
+                <p className="mt-1 text-sm text-warning-700 dark:text-warning-400">
+                  To become eligible, they need to log more care hours and receive at least one peer review.
+                  They can check their own progress on the Trust profile page.
                 </p>
               </div>
             )}

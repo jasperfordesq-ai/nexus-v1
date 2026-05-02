@@ -32,6 +32,7 @@ import Database from 'lucide-react/icons/database';
 import FileCheck2 from 'lucide-react/icons/file-check-2';
 import FileText from 'lucide-react/icons/file-text';
 import FlaskConical from 'lucide-react/icons/flask-conical';
+import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldOff from 'lucide-react/icons/shield-off';
@@ -300,6 +301,29 @@ export default function ResearchPartnershipsAdminPage() {
           </div>
         }
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Research Partnerships give approved academic or policy researchers controlled access
+                to anonymised platform data for evaluation purposes. Each partnership defines a
+                specific data scope (which metrics can be accessed), a duration, and a data sharing
+                agreement. All access is logged. Partners never see individual member data — only
+                aggregated or anonymised datasets.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Data scope:</strong> Define exactly what data the researcher can access — e.g. aggregate monthly care hours by sub-region, excluding all personal identifiers. The scope is contractually binding and audited quarterly.</p>
+                <p><strong>Download history:</strong> Every data export is logged with a timestamp and the researcher's details. This log is available to your Data Protection Officer on request. Use Revoke to withdraw a previously issued dataset.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader className="flex items-center gap-2">

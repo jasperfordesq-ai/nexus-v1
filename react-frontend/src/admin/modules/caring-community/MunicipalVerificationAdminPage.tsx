@@ -37,6 +37,7 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -240,6 +241,30 @@ export default function MunicipalVerificationAdminPage() {
           </Button>
         }
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Municipal Verification records the formal sign-off from a municipality or canton
+                partner that this community care programme meets their requirements. Verification is
+                required for the Pilot Launch Readiness check and unlocks the Municipal Impact
+                Report. Use DNS TXT verification for official municipal domains, or apply an admin
+                attestation if DNS control is not available.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Pending DNS:</strong> Verification token generated — awaiting DNS propagation and confirmation.</p>
+                <p><strong>Verified:</strong> Formally verified — the municipal reporting pack is unlocked.</p>
+                <p><strong>Revoked:</strong> Verification was removed — re-verify to restore access.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Current status */}
       <Card>

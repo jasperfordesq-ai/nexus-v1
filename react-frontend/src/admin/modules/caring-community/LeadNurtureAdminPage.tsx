@@ -31,6 +31,7 @@ import {
 } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import Filter from 'lucide-react/icons/filter';
+import Info from 'lucide-react/icons/info';
 import Mailbox from 'lucide-react/icons/mailbox';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UserMinus from 'lucide-react/icons/user-minus';
@@ -209,7 +210,7 @@ export default function LeadNurtureAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Lead Nurture"
-        subtitle="AG94 — segmented top-of-funnel capture for municipalities, investors, businesses, residents, and partners"
+        subtitle="Track and nurture prospective partners — municipalities, investors, businesses, residents, and community organisations — from first contact through to onboarding."
         icon={<Mailbox size={20} />}
         actions={
           <div className="flex gap-2">
@@ -229,6 +230,20 @@ export default function LeadNurtureAdminPage() {
           </div>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Lead Nurture tracker is a lightweight CRM for NEXUS deployment opportunities. When a municipality, potential funder, or business partner expresses interest, add them here and track their progress through the funnel. Use the stage field to record where each contact is in the conversation, and the follow-up date to ensure no one goes cold. Export to CSV for reporting or import into an external CRM.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {summary && (
         <Card>
@@ -268,6 +283,7 @@ export default function LeadNurtureAdminPage() {
               size="sm"
               label="Segment"
               className="max-w-[200px]"
+              description="municipality: local gov; investor: funder; business: sponsorship; resident: individual; partner: NGO/charity."
               selectedKeys={segmentFilter ? [segmentFilter] : []}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
@@ -384,6 +400,7 @@ export default function LeadNurtureAdminPage() {
                 <p className="text-sm text-default-500">{editing.name ?? '—'} · {editing.email}</p>
                 <Select
                   label="Stage"
+                  description="captured: first contact; contacted: reached out; engaged: active conversation; qualified: interest and budget confirmed; converted: signed up; dormant: gone quiet; unsubscribed: opted out."
                   selectedKeys={[draftStage]}
                   onSelectionChange={(keys) => {
                     const v = Array.from(keys)[0];

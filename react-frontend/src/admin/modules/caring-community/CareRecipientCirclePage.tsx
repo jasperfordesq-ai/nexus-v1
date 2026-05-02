@@ -23,6 +23,7 @@ import {
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Clock from 'lucide-react/icons/clock';
 import Heart from 'lucide-react/icons/heart';
+import Info from 'lucide-react/icons/info';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Users2 from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
@@ -129,6 +130,29 @@ export default function CareRecipientCirclePage() {
         subtitle="View the full support network around any member"
         icon={<Users2 size={20} />}
       />
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                A Care Recipient Circle is a private support group around an individual who receives
+                care. This view shows their full support network: all helpers, total hours received,
+                open help requests, and any safeguarding flags. Enter the member's user ID to look
+                up their circle.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Trust tiers:</strong> Newcomer, Member, Trusted, Verified, Coordinator — shown for the recipient and each supporter.</p>
+                <p><strong>Safeguarding flags:</strong> A non-zero flag count indicates active safeguarding concerns recorded against this member. Review them in the Safeguarding section.</p>
+                <p><strong>Privacy:</strong> Circle data is visible only to circle members and tenant administrators. It is not included in community-wide reports or the member directory.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Lookup bar */}
       <Card>

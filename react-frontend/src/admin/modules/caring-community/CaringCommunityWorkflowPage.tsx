@@ -1537,7 +1537,7 @@ export default function CaringCommunityWorkflowPage() {
     <div className="mx-auto max-w-7xl px-4 pb-8">
       <PageHeader
         title="Caring Community Workflow"
-        description="End-to-end pipeline from intake through verified support hours and statements."
+        description="This is your daily operations dashboard. Use it to review pending hour approvals, monitor overdue items, manage coordinator assignments, generate member statements, and configure workflow policy. Pending items that have exceeded their SLA appear highlighted in amber."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -1582,8 +1582,12 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold">Review queue</h2>
-                <p className="mt-1 text-sm text-default-500">Hours awaiting coordinator review and approval.</p>
+                <h2 className="text-lg font-semibold">Pending Reviews</h2>
+                <p className="mt-1 text-sm text-default-500">
+                  Hours awaiting coordinator review and approval. Items marked <span className="font-medium text-warning-600">Needs review</span> have
+                  exceeded the review SLA; items marked <span className="font-medium text-danger-600">Escalate now</span> have exceeded the escalation SLA.
+                  Approve or decline each submission, or assign it to a specific coordinator.
+                </p>
               </div>
               {(stats?.overdue_count ?? 0) > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -2117,7 +2121,10 @@ export default function CaringCommunityWorkflowPage() {
               <CardHeader className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold">Workflow policy</h2>
-                  <p className="mt-1 text-sm text-default-500">Configure SLAs, approval rules and reporting defaults.</p>
+                  <p className="mt-1 text-sm text-default-500">
+                    Configure SLAs, approval rules, and reporting defaults. Changes take effect immediately on save
+                    and apply to all new hour submissions from that point forward.
+                  </p>
                 </div>
                 <Button
                   color="primary"
@@ -2137,6 +2144,7 @@ export default function CaringCommunityWorkflowPage() {
                     min={1}
                     max={30}
                     label="Review SLA (days)"
+                    description="Hours not reviewed within this many days will be flagged as overdue in the queue."
                     value={String(summary.policy.review_sla_days)}
                     onValueChange={(value) => updatePolicyField('review_sla_days', Number(value || 1))}
                   />
@@ -2145,6 +2153,7 @@ export default function CaringCommunityWorkflowPage() {
                     min={1}
                     max={60}
                     label="Escalation SLA (days)"
+                    description="Overdue items not actioned within this many additional days will be escalated automatically."
                     value={String(summary.policy.escalation_sla_days)}
                     onValueChange={(value) => updatePolicyField('escalation_sla_days', Number(value || 1))}
                   />
@@ -2153,6 +2162,7 @@ export default function CaringCommunityWorkflowPage() {
                     min={1}
                     max={28}
                     label="Monthly statement day"
+                    description="Day of the month on which member statements are generated (e.g. 1 = 1st of each month)."
                     value={String(summary.policy.monthly_statement_day)}
                     onValueChange={(value) => updatePolicyField('monthly_statement_day', Number(value || 1))}
                   />
@@ -2161,6 +2171,7 @@ export default function CaringCommunityWorkflowPage() {
                     min={0}
                     max={500}
                     label="Default hour value (CHF)"
+                    description="Used to calculate estimated social value on statements and municipal reports."
                     value={String(summary.policy.default_hour_value_chf)}
                     onValueChange={(value) => updatePolicyField('default_hour_value_chf', Number(value || 0))}
                   />
@@ -2213,8 +2224,12 @@ export default function CaringCommunityWorkflowPage() {
           <Card shadow="sm">
             <CardHeader>
               <div>
-                <h2 className="text-lg font-semibold">Member statement</h2>
-                <p className="mt-1 text-sm text-default-500">Generate a hours-and-impact statement for a single member.</p>
+                <h2 className="text-lg font-semibold">Member Statements</h2>
+                <p className="mt-1 text-sm text-default-500">
+                  Generate a hours-and-impact statement for a single member. Use this to share a formal record of
+                  their support hours, wallet balance, and estimated social value — useful for grant applications,
+                  reviews, or member queries. Enter a member ID and an optional date range, then Preview or Export CSV.
+                </p>
               </div>
             </CardHeader>
             <Divider />
@@ -2302,7 +2317,10 @@ export default function CaringCommunityWorkflowPage() {
             <CardHeader>
               <div>
                 <h2 className="text-lg font-semibold">Coordinator signals</h2>
-                <p className="mt-1 text-sm text-default-500">A snapshot of activity that needs coordinator attention.</p>
+                <p className="mt-1 text-sm text-default-500">
+                  A real-time snapshot of activity that may need coordinator attention — open requests, available
+                  offers, trusted organisations, and recent declines.
+                </p>
               </div>
             </CardHeader>
             <Divider />
@@ -2356,7 +2374,10 @@ export default function CaringCommunityWorkflowPage() {
             <CardHeader className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold">Role presets</h2>
-                <p className="mt-1 text-sm text-default-500">{roleCountLabel}</p>
+                <p className="mt-1 text-sm text-default-500">
+                  Pre-configured permission sets for each caring community role. Install the full role pack to
+                  quickly set up your coordinators with the correct access. {roleCountLabel}.
+                </p>
               </div>
               <Button
                 color="primary"

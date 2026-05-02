@@ -195,14 +195,28 @@ export default function DisclosurePackAdminPage() {
         }
       />
 
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
-            This pack is a working draft you must review with FADP/nDSG counsel before publishing. Edit the controller
-            details, incident-response owner, and isolated-node configuration, then export the Markdown for the legal
-            handover document. Defaults reflect platform-side commitments.
-          </p>
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Disclosure Pack (AG80) is the FADP/nDSG data-protection disclosure document
+                that residents must be made aware of before participating in the community care
+                programme. It covers the data controller and processor identities, data categories
+                processed, lawful basis, data-subject rights, incident response contacts, and
+                cross-border transfer safeguards.
+              </p>
+              <p className="text-default-600">
+                This pack is a working draft — review it with FADP/nDSG counsel before publishing.
+                Edit the controller details, incident-response owner, and isolated-node
+                configuration for your deployment, then use <strong>Export Markdown</strong> to
+                produce the legal handover document. Defaults reflect platform-side commitments.
+                Save any changes before exporting.
+              </p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
@@ -334,16 +348,27 @@ export default function DisclosurePackAdminPage() {
               <Card>
                 <CardHeader className="pb-2"><span className="font-semibold text-sm">Isolated-node configuration</span></CardHeader>
                 <CardBody className="pt-0 space-y-3">
+                  <p className="text-xs text-default-500">
+                    These fields are only relevant if this deployment runs on canton-controlled
+                    infrastructure. For standard hosted deployments, leave as defaults. Each owner
+                    field identifies the legal entity responsible for that infrastructure component
+                    under FADP/nDSG Article 9.
+                  </p>
                   <Input label="Hosting owner" value={draft.isolated_node.hosting_owner}
-                    onValueChange={(v) => setIsolatedField('hosting_owner', v)} />
+                    onValueChange={(v) => setIsolatedField('hosting_owner', v)}
+                    description="Legal entity that controls the server infrastructure (e.g. the canton IT department)." />
                   <Input label="SMTP owner" value={draft.isolated_node.smtp_owner}
-                    onValueChange={(v) => setIsolatedField('smtp_owner', v)} />
+                    onValueChange={(v) => setIsolatedField('smtp_owner', v)}
+                    description="Legal entity responsible for outbound email delivery." />
                   <Input label="Storage owner" value={draft.isolated_node.storage_owner}
-                    onValueChange={(v) => setIsolatedField('storage_owner', v)} />
+                    onValueChange={(v) => setIsolatedField('storage_owner', v)}
+                    description="Legal entity controlling file/blob storage (uploads, exports)." />
                   <Input label="Backup owner" value={draft.isolated_node.backup_owner}
-                    onValueChange={(v) => setIsolatedField('backup_owner', v)} />
+                    onValueChange={(v) => setIsolatedField('backup_owner', v)}
+                    description="Legal entity responsible for database backup storage and retention." />
                   <Input label="Update cadence" value={draft.isolated_node.update_cadence}
-                    onValueChange={(v) => setIsolatedField('update_cadence', v)} />
+                    onValueChange={(v) => setIsolatedField('update_cadence', v)}
+                    description="How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')." />
                 </CardBody>
               </Card>
             </div>

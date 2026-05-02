@@ -199,14 +199,49 @@ export default function DataQualityAdminPage() {
         }
       />
 
-      {/* Methodology / context note */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Data Quality checks scan your platform data for issues that could distort pilot
+                metrics or cause reporting errors — for example, members with duplicate profiles,
+                hours logged against deleted listings, or exchange records missing required fields.
+                Run this monthly before generating reports. Resolve all Critical and Warning items
+                before submitting reports to funders or municipal partners.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Severity legend */}
       <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
-            These checks identify issues to resolve before launching a real pilot from this tenant.
-            Run repeatedly during pre-launch — every red or amber row should be reviewed and either
-            fixed or knowingly accepted before residents are onboarded.
+        <CardBody className="py-3 px-4">
+          <p className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">Severity guide</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
+            <div className="flex items-start gap-2">
+              <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={11} />}>Danger</Chip>
+              <span className="text-default-600 text-xs">Errors that will cause incorrect numbers in reports — must fix before exporting.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={11} />}>Warning</Chip>
+              <span className="text-default-600 text-xs">Potential issues that may affect metric accuracy — review and confirm or fix.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip color="default" variant="flat" size="sm" startContent={<Info size={11} />}>Info</Chip>
+              <span className="text-default-600 text-xs">Informational notices — no action required.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle2 size={11} />}>OK</Chip>
+              <span className="text-default-600 text-xs">No issues detected in this category.</span>
+            </div>
+          </div>
+          <p className="text-xs text-default-500 mt-2">
+            Click <strong>View affected rows</strong> on any card to see the specific records. Some
+            issues can be corrected in the platform; others require manual review of the underlying data.
           </p>
         </CardBody>
       </Card>

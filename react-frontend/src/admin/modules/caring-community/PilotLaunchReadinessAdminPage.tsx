@@ -28,6 +28,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Rocket from 'lucide-react/icons/rocket';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -212,6 +213,27 @@ export default function PilotLaunchReadinessAdminPage() {
         }
       />
 
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                This is the go/no-go gate before your Caring Community pilot goes live. Each section
+                below corresponds to a configuration or evaluation module (AG80–AG87). All sections
+                must reach 'Ready' status before the Launch button is enabled. Once launched, this is
+                a one-way action — the launch timestamp and operator are recorded permanently.
+              </p>
+              <p className="text-default-600 mt-1">
+                Sections showing 'Needs review' have missing or incomplete configuration. Click
+                through to the relevant module to resolve the listed items.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {!loading && report && (
         isLaunched ? (
           <Card className="border border-success-300 bg-success-50/50 dark:bg-success-900/10">
@@ -313,12 +335,11 @@ export default function PilotLaunchReadinessAdminPage() {
                 color={STATUS_COLORS[overall.status]}
                 className="max-w-full"
               />
-              {!report.isolated_node_required && (
-                <p className="text-xs text-default-500 italic">
-                  Isolated-node gate is informational for hosted deployments. It only blocks launch
-                  when AG85 deployment_mode is set to <code>canton_isolated_node</code>.
-                </p>
-              )}
+              <p className="text-xs text-default-500 italic">
+                {report.isolated_node_required
+                  ? 'Isolated-node gate is active — this deployment is configured as a canton-isolated node (AG85). All items must reach Decided status before launch.'
+                  : 'Isolated-node gate is informational for standard hosted deployments. It only blocks launch when AG85 deployment_mode is set to canton_isolated_node. If your municipality has not specified an isolated-node requirement, you can disregard items in this section.'}
+              </p>
             </CardBody>
           </Card>
 

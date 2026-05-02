@@ -30,6 +30,7 @@ import {
 import BarChart2 from 'lucide-react/icons/bar-chart-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Database from 'lucide-react/icons/database';
+import Info from 'lucide-react/icons/info';
 import Minus from 'lucide-react/icons/minus';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -314,6 +315,28 @@ export default function KpiBaselineAdminPage() {
         }
       />
 
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                KPI Baselines record the state of your community before the Caring Community
+                programme begins. They are compared against current metrics at each quarterly review
+                to demonstrate impact. Capture baselines for every KPI before onboarding residents —
+                once the pilot starts, the baseline is frozen and cannot be backdated.
+              </p>
+              <p className="text-default-600">
+                Click <strong>Compare</strong> on any baseline row to see a side-by-side comparison
+                against current platform data. Metrics showing 25%+ change on key impact indicators
+                are highlighted as 'Impact achieved'.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* Baselines Table */}
       <Card>
         <CardBody className="p-0">
@@ -444,12 +467,13 @@ export default function KpiBaselineAdminPage() {
                   />
                 </div>
                 <Textarea
-                  label="Notes (optional)"
-                  placeholder="Context for this snapshot — e.g. 'Captured before platform rollout to all Gemeinden'"
+                  label="Notes / source (optional)"
+                  placeholder="e.g. 'GP referral data Q1 2026, member survey March 2026, captured before platform rollout to all Gemeinden'"
                   value={captureNotes}
                   onValueChange={setCaptureNotes}
                   variant="bordered"
                   minRows={2}
+                  description="Document where these numbers come from (e.g. 'GP referral data Q1 2026', 'member survey March 2026'). Cited sources make the baseline defensible in grant reporting."
                 />
                 <Divider />
                 <p className="text-xs text-[var(--color-text-muted)]">

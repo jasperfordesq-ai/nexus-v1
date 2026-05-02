@@ -15,6 +15,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
+  Card,
+  CardBody,
   Chip,
   Input,
   Modal,
@@ -33,6 +35,7 @@ import {
   TableRow,
   Textarea,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -318,6 +321,30 @@ export default function SubRegionsAdminPage() {
           Add Sub-Region
         </Button>
       </div>
+
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Sub-Regions divide your community into geographical areas (neighbourhoods, districts,
+                or wards). They are used to assign coordinators to specific areas, filter help
+                requests by location, and break down pilot metrics by neighbourhood. Adding
+                sub-regions is optional but strongly recommended for larger communities with multiple
+                coordinator teams.
+              </p>
+              <p className="text-default-500">
+                For the Postal codes field: enter a postcode list, neighbourhood name, or freeform
+                description. Precise boundaries are not required — this is for coordinator assignment
+                and reporting filters, not mapping.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">

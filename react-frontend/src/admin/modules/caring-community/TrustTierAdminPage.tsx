@@ -14,6 +14,7 @@ import {
   Spinner,
   Switch,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -180,17 +181,23 @@ export function TrustTierAdminPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button
-            color="default"
-            variant="bordered"
-            size="sm"
-            startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
-            onPress={() => void handleRecompute()}
-            isLoading={recomputing}
-            isDisabled={recomputing || saving}
-          >
-            Recompute All Tiers
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              color="default"
+              variant="bordered"
+              size="sm"
+              startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+              onPress={() => void handleRecompute()}
+              isLoading={recomputing}
+              isDisabled={recomputing || saving}
+            >
+              Recompute All Tiers
+            </Button>
+            <p className="text-xs text-foreground-400 max-w-xs text-right">
+              Use Recompute when you change thresholds and want existing members re-evaluated immediately.
+              Runs in the background — may take 30–60 seconds.
+            </p>
+          </div>
           <Button
             color="primary"
             size="sm"
@@ -203,6 +210,25 @@ export function TrustTierAdminPage() {
           </Button>
         </div>
       </div>
+
+      {/* About card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Trust Tiers are a reputation ladder that unlocks privileges as members become more active and verified.
+                Members advance automatically when they meet the criteria thresholds below — no manual action required
+                unless you run "Recompute All Tiers" to force an immediate recalculation for all members. Tier
+                progression affects the Warmth Pass (Trusted tier and above), coordinator eligibility (Coordinator
+                tier), and visibility in the member directory.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Loading */}
       {isLoading && (
@@ -256,21 +282,23 @@ export function TrustTierAdminPage() {
                 <th className="px-4 py-3 text-left font-semibold">Level</th>
                 <th className="px-4 py-3 text-left font-semibold">Color</th>
                 <th className="px-4 py-3 text-left font-semibold">Description</th>
+                <th className="px-4 py-3 text-left font-semibold">What it unlocks</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { level: 0, name: 'Newcomer',    color: 'Grey',   desc: 'Just joined, no activity required' },
-                { level: 1, name: 'Member',      color: 'Blue',   desc: 'Has logged hours' },
-                { level: 2, name: 'Trusted',     color: 'Green',  desc: 'Active with reviews' },
-                { level: 3, name: 'Verified',    color: 'Purple', desc: 'Identity verified' },
-                { level: 4, name: 'Coordinator', color: 'Amber',  desc: 'Highly active, verified identity' },
+                { level: 0, name: 'Newcomer',    color: 'Grey',   desc: 'Just joined, no activity required',      unlocks: 'Basic member access' },
+                { level: 1, name: 'Member',      color: 'Blue',   desc: 'Has logged hours',                        unlocks: 'Can post help listings, receive care hours' },
+                { level: 2, name: 'Trusted',     color: 'Green',  desc: 'Active with reviews',                     unlocks: 'Eligible for Warmth Pass, can be recommended for care' },
+                { level: 3, name: 'Verified',    color: 'Purple', desc: 'Identity verified',                       unlocks: 'Full care coordinator visibility, identity badge' },
+                { level: 4, name: 'Coordinator', color: 'Amber',  desc: 'Highly active, verified identity',        unlocks: 'Eligible to approve hours and coordinate matches' },
               ].map((row) => (
                 <tr key={row.level} className="border-b border-divider last:border-0">
                   <td className="px-4 py-3 font-mono text-xs">{row.level}</td>
                   <td className="px-4 py-3 font-medium">{row.name}</td>
                   <td className="px-4 py-3 text-foreground-500">{row.color}</td>
                   <td className="px-4 py-3 text-foreground-500">{row.desc}</td>
+                  <td className="px-4 py-3 text-foreground-500">{row.unlocks}</td>
                 </tr>
               ))}
             </tbody>

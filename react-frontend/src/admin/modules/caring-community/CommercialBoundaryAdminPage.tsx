@@ -267,21 +267,28 @@ export default function CommercialBoundaryAdminPage() {
         }
       />
 
-      {/* How to read this */}
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <div className="text-sm text-default-600 space-y-1">
-            <p>
-              This map answers the question "is X part of the open-source NEXUS package?" for
-              every Caring Community-adjacent capability. Use the per-row override to record a
-              tenant-specific classification (for example, a private deployment that has a
-              commercial bundle).
-            </p>
-            <p className="text-xs text-default-500">
-              Overrides are stored in tenant settings only — they never alter the canonical
-              public classification shipped with the AGPL repo.
-            </p>
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Commercial Boundary defines which types of paid work are permitted within the
+                community care programme and which must remain unpaid time credits. This boundary is
+                a requirement of the KISS/AGORIS methodology and must be agreed with your municipal
+                partner before the pilot launches. The matrix below lists activity categories and
+                their permitted exchange type.
+              </p>
+              <p className="text-default-600">
+                Use the per-row override to record a tenant-specific classification (for example, a
+                private deployment that has a commercial bundle). Overrides are stored in tenant
+                settings only — they never alter the canonical public classification shipped with the
+                AGPL repo. Once you confirm the boundary matrix, the agreement is recorded with a
+                timestamp and your user ID, forming part of the pilot governance documentation that
+                appears in the Pilot Launch Readiness check.
+              </p>
+            </div>
           </div>
         </CardBody>
       </Card>

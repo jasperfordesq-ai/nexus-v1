@@ -21,6 +21,7 @@ import Newspaper from 'lucide-react/icons/newspaper';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -36,17 +37,17 @@ const OPTIONS: { value: Cadence; label: string; description: string }[] = [
   {
     value: 'off',
     label: 'Off',
-    description: 'No tenant default. Members can still opt in via their own preference.',
+    description: 'No digest is sent. Members see updates only when they visit the platform.',
   },
   {
     value: 'daily',
     label: 'Daily',
-    description: 'Members default to a daily civic digest of the freshest items.',
+    description: 'A digest is sent each morning with the previous day\'s activity.',
   },
   {
     value: 'weekly',
     label: 'Weekly',
-    description: 'Members default to a weekly digest summarising the past 7 days.',
+    description: 'A digest is sent every Monday covering the previous week.',
   },
 ];
 
@@ -102,7 +103,7 @@ export default function CivicDigestAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Civic Digest Cadence"
-        subtitle="AG97 — tenant default cadence for the AG90 personalised civic digest"
+        subtitle="Configure the default delivery cadence for the personalised civic digest that members receive. The digest aggregates relevant community content — safety alerts, project updates, event notices, and announcements — into a single summary."
         icon={<Newspaper size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -130,6 +131,20 @@ export default function CivicDigestAdminPage() {
           </div>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Civic Digest replaces the need for members to check multiple pages by delivering a personalised summary of what's relevant to them. You set the tenant default here. Members can override the cadence (or opt out entirely) from their own settings. Changing the tenant default only affects members who have never customised their preference.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading && (
         <div className="flex justify-center py-16">

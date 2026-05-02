@@ -46,6 +46,7 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
+import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import Send from 'lucide-react/icons/send';
@@ -268,6 +269,30 @@ export default function SmartNudgesAdminPage() {
         }
       />
 
+      {/* About card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Smart Nudges are automated prompts sent to members when a high-fit tandem-match partner is detected.
+                Members who would benefit from a peer connection are identified by the matching engine and sent an
+                in-app notification (and optionally email) suggesting they connect. Nudges respect a cooldown window
+                so no member is contacted too frequently. Use the dry-run to preview who would be nudged before
+                dispatching for real.
+              </p>
+              <ul className="mt-1 space-y-0.5 text-default-500 list-disc list-inside">
+                <li><span className="font-medium text-default-600">Inactivity:</span> triggered when a member hasn't logged in for the configured number of days</li>
+                <li><span className="font-medium text-default-600">Unmatched request:</span> triggered when a help request has no offers after the cooldown window passes</li>
+                <li><span className="font-medium text-default-600">Follow-up:</span> sent to the coordinator after an approved exchange hasn't been marked complete</li>
+              </ul>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard icon={Bell} label="Sent (30d)" value={String(stats.sent_30d)} color="primary" />
@@ -364,7 +389,7 @@ export default function SmartNudgesAdminPage() {
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end gap-1">
             <Button
               color="primary"
               startContent={<Save className="w-4 h-4" />}
@@ -373,6 +398,9 @@ export default function SmartNudgesAdminPage() {
             >
               Save configuration
             </Button>
+            <p className="text-xs text-default-400">
+              Changes take effect immediately — the next scheduled nudge run will apply the new settings.
+            </p>
           </div>
         </CardBody>
       </Card>

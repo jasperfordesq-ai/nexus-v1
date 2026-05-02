@@ -25,6 +25,7 @@ import {
   Tooltip,
 } from '@heroui/react';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
+import Info from 'lucide-react/icons/info';
 import Pencil from 'lucide-react/icons/pencil';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Server from 'lucide-react/icons/server';
@@ -276,6 +277,46 @@ export default function IsolatedNodeAdminPage() {
           </Tooltip>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                An Isolated Node deployment runs NEXUS on infrastructure controlled entirely by the
+                canton or municipality — no data leaves the canton boundary. This configuration is
+                required for AGORIS deployments under strict Swiss cantonal data protection rules.
+                Most communities run as standard hosted deployments and do not need to configure this
+                section.
+              </p>
+              <p className="text-default-600">
+                Work through each decision item below: set the value, assign an owner, and mark it
+                as 'Decided' when agreed. The gate closes (and the Pilot Launch Readiness check
+                passes) once every item is in 'Decided' status.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      <Card className="border border-warning-300 bg-warning-50/50 dark:bg-warning-900/10" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning-600" aria-hidden="true" />
+            <div className="text-sm">
+              <p className="font-semibold text-warning-800 dark:text-warning-200">Important — only configure if required</p>
+              <p className="text-default-600 mt-0.5">
+                Only change these settings if your municipality has explicitly specified an
+                isolated-node requirement. Changing the deployment mode after pilot launch requires
+                coordination with the NEXUS technical team. Do not change this setting without
+                agreement from your cantonal data protection officer.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading && (
         <div className="flex justify-center py-16">

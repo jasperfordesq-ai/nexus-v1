@@ -21,6 +21,7 @@ import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
 import FileCode from 'lucide-react/icons/file-code';
 import FileJson from 'lucide-react/icons/file-json';
+import Info from 'lucide-react/icons/info';
 import KeyRound from 'lucide-react/icons/key-round';
 import Network from 'lucide-react/icons/network';
 import Plug from 'lucide-react/icons/plug';
@@ -111,7 +112,7 @@ export default function IntegrationShowcaseAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Integration Showcase"
-        subtitle="AG93 — every public API, webhook, federation, and OAuth surface in one place"
+        subtitle="A single-page reference of every public API, webhook, federation endpoint, and OAuth surface available in this deployment — ready to hand to a technical integration partner."
         icon={<Plug size={20} />}
         actions={
           <Tooltip content="Refresh">
@@ -129,13 +130,18 @@ export default function IntegrationShowcaseAdminPage() {
         }
       />
 
-      <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <CardBody className="py-3">
-          <p className="text-sm text-default-600">
-            Hand this page to a prospective integration partner. Every URL is live in this
-            deployment. Sample payloads are illustrative — real values depend on the tenant
-            and partner credentials. Last refreshed {updatedLabel}.
-          </p>
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Use this page when setting up an integration with a third-party service, a municipality's data system, or a federated NEXUS network. Every endpoint listed here is live and scoped to this deployment. Sample payloads are illustrative — real values depend on your tenant slug and partner credentials. Share this URL with integration partners rather than pointing them to the raw API docs.
+              </p>
+              <p className="text-default-500 text-xs">Last refreshed {updatedLabel}.</p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 

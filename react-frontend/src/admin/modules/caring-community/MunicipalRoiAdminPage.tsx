@@ -264,6 +264,31 @@ export default function MunicipalRoiAdminPage() {
         }
       />
 
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info size={16} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                The Municipal ROI Report calculates the social and economic value of your community
+                care programme using the KISS/Age-Stiftung methodology. It shows the estimated cost
+                offset to formal care services (Spitex/Pflege), the social value generated, and trend
+                data across reporting periods. This report is designed to be shared with municipal
+                partners and funders as evidence of the programme's impact.
+              </p>
+              <p className="text-default-500">
+                Cost offset = total approved care hours × CHF hourly rate × prevention multiplier.
+                The prevention multiplier (default: 2.0) reflects that one hour of informal care
+                prevents approximately two hours of formal care intervention, based on Age-Stiftung
+                research.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* Filters */}
       <Card className="border border-[var(--color-border)]">
         <CardBody className="flex flex-row flex-wrap items-end gap-3 py-3">
@@ -470,7 +495,14 @@ export default function MunicipalRoiAdminPage() {
           {sortedBreakdown.length > 0 && (
             <Card>
               <CardHeader className="pb-2">
-                <span className="font-semibold text-sm">Breakdown by sub-region</span>
+                <div className="space-y-0.5">
+                  <span className="font-semibold text-sm">Breakdown by sub-region</span>
+                  <p className="text-xs text-default-500">
+                    Sub-region breakdown shows which neighbourhoods are generating the most care
+                    activity. Use this to identify areas that may need more coordinator support or
+                    volunteer recruitment.
+                  </p>
+                </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <Table aria-label="Sub-region breakdown" removeWrapper>

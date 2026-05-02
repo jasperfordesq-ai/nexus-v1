@@ -40,6 +40,7 @@ import {
   Tooltip,
 } from '@heroui/react';
 import Copy from 'lucide-react/icons/copy';
+import Info from 'lucide-react/icons/info';
 import KeyRound from 'lucide-react/icons/key-round';
 import Plus from 'lucide-react/icons/plus';
 import Power from 'lucide-react/icons/power';
@@ -238,15 +239,30 @@ export default function FederationPeersAdminPage() {
         }
       />
 
-      <div className="rounded-xl border border-default-200 bg-default-50 dark:bg-default-100/30 p-4">
-        <p className="text-sm">
-          A federation peer is a separate NEXUS install (different domain, different
-          tenancy) that you have agreed to federate hour transfers with. The remote
-          side must register your base URL and the same shared secret. Once both
-          sides set status to <strong>active</strong>, members can transfer hours
-          using the peer slug as the destination cooperative.
-        </p>
-      </div>
+      {/* Intro card */}
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                Federation Peers are other NEXUS cooperatives that your community has agreed to share
+                members and hours with. Once a peer connection is established, members can transfer
+                hours between communities and view federated listings. Each peer connection requires
+                a shared secret that both sides must configure — contact the peer cooperative's
+                administrator to exchange credentials.
+              </p>
+              <div className="space-y-0.5 pt-1 text-default-500">
+                <p><strong>Shared secret:</strong> A cryptographic token used to authenticate peer-to-peer API calls. It must match exactly on both sides. Rotate it periodically (every 6–12 months) and always rotate immediately if you suspect it has been compromised.</p>
+                <p><strong>Pending:</strong> Credentials set, awaiting first successful API call.</p>
+                <p><strong>Active:</strong> Connected and syncing.</p>
+                <p><strong>Suspended:</strong> Last sync failed or manually suspended — check that the peer's base URL is correct and reachable.</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader className="flex items-center gap-2">
