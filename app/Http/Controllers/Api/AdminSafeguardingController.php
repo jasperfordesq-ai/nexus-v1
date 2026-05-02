@@ -735,16 +735,22 @@ class AdminSafeguardingController extends BaseApiController
                         'consent_given_at' => $row->consent_given_at,
                         'options' => [],
                         'has_triggers' => false,
+                        'is_declination_only' => true, // flipped to false the moment any real option is present
                     ];
                 }
                 $triggers = json_decode($row->triggers ?? '{}', true) ?: [];
                 $hasTriggers = !empty(array_filter($triggers, fn ($v) => $v === true));
+                $isDeclination = $row->option_key === 'none_apply';
                 $grouped[$uid]['options'][] = [
                     'option_key' => $row->option_key,
                     'label' => $row->option_label,
+                    'is_declination' => $isDeclination,
                 ];
                 if ($hasTriggers) {
                     $grouped[$uid]['has_triggers'] = true;
+                }
+                if (!$isDeclination) {
+                    $grouped[$uid]['is_declination_only'] = false;
                 }
             }
 

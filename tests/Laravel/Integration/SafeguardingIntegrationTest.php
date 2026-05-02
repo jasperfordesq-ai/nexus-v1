@@ -206,6 +206,68 @@ class SafeguardingIntegrationTest extends TestCase
     // Test 5: Preference save creates audit log
     // =========================================================================
 
+    public function test_none_apply_option_creates_no_restrictions_and_audit_row(): void
+    {
+        $user = $this->authenticatedMember();
+
+        // Create a none_apply option (the "I have reviewed and none apply" declination)
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id'    => $this->testTenantId,
+            'option_key'   => 'none_apply',
+            'option_type'  => 'checkbox',
+            'label'        => 'None of these apply to me',
+            'description'  => 'Declination option',
+            'is_active'    => 1,
+            'is_required'  => 0,
+            'sort_order'   => 999,
+            'triggers'     => json_encode([]), // empty — no protections
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+
+        DB::table('activity_log')
+            ->where('action', 'safeguarding_preferences_updated')
+            ->where('user_id', $user->id)
+            ->delete();
+
+        $response = $this->apiPost('/v2/onboarding/safeguarding', [
+            'preferences' => [
+                ['option_id' => $optionId, 'value' => '1'],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+
+        // No messaging restriction should be created or activated
+        $restriction = DB::table('user_messaging_restrictions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($restriction) {
+            $this->assertEquals(0, (int) $restriction->under_monitoring, 'none_apply must not activate monitoring');
+            $this->assertEquals(0, (int) $restriction->requires_broker_approval, 'none_apply must not require broker approval');
+        }
+
+        // Preference row should exist with consent timestamp
+        $pref = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('option_id', $optionId)
+            ->first();
+
+        $this->assertNotNull($pref, 'Declination preference row should be persisted');
+        $this->assertNotNull($pref->consent_given_at, 'consent_given_at must be recorded for GDPR audit trail');
+
+        // Audit log entry should exist
+        $log = DB::table('activity_log')
+            ->where('action', 'safeguarding_preferences_updated')
+            ->where('user_id', $user->id)
+            ->first();
+
+        $this->assertNotNull($log, 'Audit log must be created even for a declination');
+    }
+
     public function test_preference_save_creates_audit_log(): void
     {
         $user = $this->authenticatedMember();

@@ -122,9 +122,10 @@ interface MemberSafeguardingEntry {
   user_id: number;
   user_name: string;
   user_avatar?: string | null;
-  options: { option_key: string; label: string; }[];
+  options: { option_key: string; label: string; is_declination: boolean; }[];
   consent_given_at: string;
   has_triggers: boolean;
+  is_declination_only: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -713,15 +714,23 @@ export function SafeguardingDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {entry.options.map((opt) => (
-                            <Chip key={opt.option_key} size="sm" variant="flat" color="primary">
-                              {opt.label}
-                            </Chip>
-                          ))}
+                          {entry.is_declination_only ? (
+                            <Chip size="sm" variant="flat" color="default">{"Declined — none apply"}</Chip>
+                          ) : (
+                            entry.options
+                              .filter(opt => !opt.is_declination)
+                              .map((opt) => (
+                                <Chip key={opt.option_key} size="sm" variant="flat" color="primary">
+                                  {opt.label}
+                                </Chip>
+                              ))
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {entry.has_triggers ? (
+                        {entry.is_declination_only ? (
+                          <Chip size="sm" variant="flat" color="default">{"Declined"}</Chip>
+                        ) : entry.has_triggers ? (
                           <Chip size="sm" variant="flat" color="warning">{"Active"}</Chip>
                         ) : (
                           <Chip size="sm" variant="flat" color="default">{"None"}</Chip>

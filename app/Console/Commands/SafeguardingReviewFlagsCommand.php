@@ -73,8 +73,10 @@ class SafeguardingReviewFlagsCommand extends Command
         $dueRows = DB::table('user_safeguarding_preferences as p')
             ->join('users as u', 'u.id', '=', 'p.user_id')
             ->join('tenants as t', 't.id', '=', 'p.tenant_id')
+            ->join('tenant_safeguarding_options as o', 'o.id', '=', 'p.option_id')
             ->whereNull('p.revoked_at')
             ->whereNull('p.review_reminder_sent_at')
+            ->where('o.option_key', '!=', 'none_apply') // declination rows need no annual re-confirmation
             ->where(function ($q) use ($olderThan) {
                 $q->where('p.consent_given_at', '<', $olderThan)
                   ->orWhere(function ($q2) use ($olderThan) {
@@ -148,11 +150,13 @@ class SafeguardingReviewFlagsCommand extends Command
     {
         $dueRows = DB::table('user_safeguarding_preferences as p')
             ->join('users as u', 'u.id', '=', 'p.user_id')
+            ->join('tenant_safeguarding_options as o', 'o.id', '=', 'p.option_id')
             ->whereNull('p.revoked_at')
             ->whereNull('p.review_confirmed_at')
             ->whereNull('p.review_escalated_at')
             ->whereNotNull('p.review_reminder_sent_at')
             ->where('p.review_reminder_sent_at', '<', $olderThan)
+            ->where('o.option_key', '!=', 'none_apply') // declination rows need no annual re-confirmation
             ->where('u.status', 'active')
             ->select([
                 'p.id as preference_id',

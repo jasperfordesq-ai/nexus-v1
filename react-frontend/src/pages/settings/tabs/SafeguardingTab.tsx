@@ -27,6 +27,7 @@ import {
 import Shield from 'lucide-react/icons/shield';
 import Trash2 from 'lucide-react/icons/trash-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
+import MinusCircle from 'lucide-react/icons/circle-minus';
 import Lock from 'lucide-react/icons/lock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -167,15 +168,20 @@ export function SafeguardingTab() {
                 activationChips.push(t('safeguarding.chip_vetted_only'));
               }
 
+              const isDeclination = pref.option_key === 'none_apply';
+
               return (
                 <div
                   key={pref.preference_id}
                   className="p-4 rounded-lg border border-theme-default bg-theme-surface"
                 >
                   <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    {isDeclination
+                      ? <MinusCircle className="w-5 h-5 text-theme-muted shrink-0 mt-0.5" />
+                      : <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    }
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-theme-primary">
+                      <p className={`font-medium text-sm ${isDeclination ? 'text-theme-muted' : 'text-theme-primary'}`}>
                         {pref.label}
                       </p>
                       {pref.description && (
@@ -190,7 +196,8 @@ export function SafeguardingTab() {
                           })}
                         </p>
                       )}
-                      {activationChips.length > 0 && (
+                      {/* Never show activation chips for the declination option */}
+                      {!isDeclination && activationChips.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {activationChips.map((label, idx) => (
                             <Chip key={idx} size="sm" variant="flat" color="warning">

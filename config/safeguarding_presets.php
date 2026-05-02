@@ -105,6 +105,15 @@ return [
                 'description' => 'National Vetting Bureau disclosure. You can upload proof in your profile settings.',
                 'triggers' => [],
             ],
+
+            // ── DECLINATION (always last) ─────────────────────────────────
+            [
+                'option_key' => 'none_apply',
+                'option_type' => 'checkbox',
+                'label' => 'None of these apply to me',
+                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'triggers' => [],
+            ],
         ],
     ],
 
@@ -185,6 +194,15 @@ return [
                 'option_type' => 'checkbox',
                 'label' => 'I have a current DBS check',
                 'description' => 'Disclosure and Barring Service check. You can upload proof in your profile settings.',
+                'triggers' => [],
+            ],
+
+            // ── DECLINATION (always last) ─────────────────────────────────
+            [
+                'option_key' => 'none_apply',
+                'option_type' => 'checkbox',
+                'label' => 'None of these apply to me',
+                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
                 'triggers' => [],
             ],
         ],
@@ -269,6 +287,15 @@ return [
                 'description' => 'Protecting Vulnerable Groups scheme via Disclosure Scotland. You can upload proof in your profile settings.',
                 'triggers' => [],
             ],
+
+            // ── DECLINATION (always last) ─────────────────────────────────
+            [
+                'option_key' => 'none_apply',
+                'option_type' => 'checkbox',
+                'label' => 'None of these apply to me',
+                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'triggers' => [],
+            ],
         ],
     ],
 
@@ -349,6 +376,15 @@ return [
                 'option_type' => 'checkbox',
                 'label' => 'I have a current AccessNI check',
                 'description' => 'AccessNI criminal record check. You can upload proof in your profile settings.',
+                'triggers' => [],
+            ],
+
+            // ── DECLINATION (always last) ─────────────────────────────────
+            [
+                'option_key' => 'none_apply',
+                'option_type' => 'checkbox',
+                'label' => 'None of these apply to me',
+                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
                 'triggers' => [],
             ],
         ],

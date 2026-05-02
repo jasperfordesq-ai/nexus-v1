@@ -145,10 +145,32 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
   useEffect(() => { loadOptions(); }, [loadOptions]);
 
   // ── Toggle a checkbox ────────────────────────────────────────────────────
+  // none_apply is mutually exclusive with everything else:
+  //   • ticking none_apply clears all other selections
+  //   • ticking any other option clears none_apply
 
   const toggleOption = useCallback((optionId: number) => {
-    setSelections(prev => ({ ...prev, [optionId]: !prev[optionId] }));
-  }, []);
+    const option = options.find(o => o.id === optionId);
+    const isNoneApply = option?.option_key === 'none_apply';
+
+    setSelections(prev => {
+      if (isNoneApply) {
+        // Untick everything else, toggle none_apply
+        const next: Record<number, boolean> = {};
+        options.forEach(o => { next[o.id] = false; });
+        next[optionId] = !prev[optionId];
+        return next;
+      } else {
+        // Untick none_apply when any real option is ticked
+        const noneApplyOption = options.find(o => o.option_key === 'none_apply');
+        const next = { ...prev, [optionId]: !prev[optionId] };
+        if (noneApplyOption) {
+          next[noneApplyOption.id] = false;
+        }
+        return next;
+      }
+    });
+  }, [options]);
 
   // ── Save and proceed ─────────────────────────────────────────────────────
 
@@ -429,21 +451,25 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         </div>
 
         {/* Options */}
-        <div className="space-y-3">
-          {options.map((option) => (
+        {(() => {
+          const regularOptions = options.filter(o => o.option_key !== 'none_apply');
+          const noneApplyOption = options.find(o => o.option_key === 'none_apply');
+
+          const renderOption = (option: SafeguardingOption, isNoneApply = false) => (
             <div
               key={option.id}
               className={`
                 p-4 rounded-lg border transition-all cursor-pointer
-                ${selections[option.id]
-                  ? 'border-blue-500 bg-blue-500/5 dark:bg-blue-500/10'
-                  : 'border-theme-default bg-theme-surface hover:border-blue-300 dark:hover:border-blue-700'
+                ${isNoneApply
+                  ? selections[option.id]
+                    ? 'border-theme-muted bg-theme-elevated'
+                    : 'border-theme-default bg-theme-surface hover:border-theme-muted'
+                  : selections[option.id]
+                    ? 'border-blue-500 bg-blue-500/5 dark:bg-blue-500/10'
+                    : 'border-theme-default bg-theme-surface hover:border-blue-300 dark:hover:border-blue-700'
                 }
               `}
               onClick={() => option.option_type === 'checkbox' && toggleOption(option.id)}
-              role={option.option_type === 'checkbox' ? 'button' : undefined}
-              tabIndex={option.option_type === 'checkbox' ? 0 : undefined}
-              onKeyDown={(e) => { if (option.option_type === 'checkbox' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleOption(option.id); } }}
             >
               <div className="flex items-start gap-3">
                 {option.option_type === 'checkbox' && (
@@ -455,7 +481,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-theme-primary">
+                  <p className={`font-medium text-sm ${isNoneApply ? 'text-theme-muted' : 'text-theme-primary'}`}>
                     {option.label}
                     {option.is_required && (
                       <span className="text-danger-500 ml-1">*</span>
@@ -505,8 +531,24 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          );
+
+          return (
+            <div className="space-y-3">
+              {regularOptions.map(option => renderOption(option, false))}
+              {noneApplyOption && (
+                <>
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="flex-1 border-t border-theme-default" />
+                    <span className="text-xs text-theme-muted shrink-0">or</span>
+                    <div className="flex-1 border-t border-theme-default" />
+                  </div>
+                  {renderOption(noneApplyOption, true)}
+                </>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Required field notice */}
         {options.some(o => o.is_required) && (
