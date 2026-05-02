@@ -29,11 +29,13 @@ export const ABBR_TERMS: Record<string, string> = {
   ISCO: 'International Standard Classification of Occupations — used to categorise care service types',
 };
 
+import type { ReactNode } from 'react';
+
 interface AbbrProps {
   /** Key from ABBR_TERMS dictionary */
   term: keyof typeof ABBR_TERMS;
-  /** Override the displayed text; defaults to the term key itself */
-  children?: string;
+  /** Override the displayed content; defaults to the term key itself */
+  children?: ReactNode;
   /** Extra CSS classes on the inner span */
   className?: string;
 }
@@ -59,8 +61,7 @@ export function Abbr({ term, children, className }: AbbrProps) {
     >
       <abbr
         title={definition}
-        className={`cursor-help border-b border-dotted border-current no-underline ${className ?? ''}`}
-        style={{ textDecorationLine: 'none' }}
+        className={`cursor-help border-b border-dotted border-current no-underline decoration-transparent ${className ?? ''}`}
       >
         {children ?? term}
       </abbr>

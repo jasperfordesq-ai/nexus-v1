@@ -12,8 +12,8 @@ import type { ReactNode } from 'react';
 
 interface PageHeaderProps {
   title: string;
-  description?: string;
-  subtitle?: string;
+  description?: ReactNode;
+  subtitle?: ReactNode;
   icon?: ReactNode;
   actions?: ReactNode;
 }
