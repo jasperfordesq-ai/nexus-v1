@@ -56,6 +56,8 @@ if [ -f "$STATE_FILE" ]; then
     esac
 fi
 
+BOOTSTRAP_MODE=0   # 1 = first-ever blue-green deploy, legacy container still in place
+
 if [ -z "${ACTIVE_COLOR:-}" ]; then
     # No state file yet — detect from running containers
     if docker ps --format "{{.Names}}" | grep -q "^nexus-green-php-app$"; then
@@ -63,10 +65,18 @@ if [ -z "${ACTIVE_COLOR:-}" ]; then
     elif docker ps --format "{{.Names}}" | grep -q "^nexus-blue-php-app$"; then
         ACTIVE_COLOR="blue"
     elif docker ps --format "{{.Names}}" | grep -q "^nexus-php-app$"; then
-        log_warn "Only the legacy single-color container is running (nexus-php-app)."
-        log_warn "Run a blue-green deploy first, then re-run this setup script."
-        log_info "  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
-        exit 1
+        # ── Bootstrap mode ───────────────────────────────────────────────────
+        # The server has never had a blue-green deployment.  We cannot point
+        # the routes file at blue-green containers that don't exist yet, but
+        # we CAN create the file now pointing at the legacy blue ports (8090 /
+        # 3000 / 3003).  Once the Plesk vhost includes are in place and Apache
+        # is reloaded, bluegreen-deploy.sh will build the green containers,
+        # verify them on ports 8190/3100/3103, then atomically switch Apache.
+        log_warn "Bootstrap mode: only the legacy nexus-php-app container is running."
+        log_warn "Creating routes file pointing at legacy (blue) ports so the first"
+        log_warn "blue-green deploy can proceed."
+        ACTIVE_COLOR="blue"
+        BOOTSTRAP_MODE=1
     else
         log_err "No running PHP app container found."
         log_err "Start the application first, then run this script."
@@ -84,7 +94,11 @@ else
     SALES_PORT="$GREEN_SALES_PORT"
 fi
 
-log_ok "Active color: $ACTIVE_COLOR (API=$API_PORT frontend=$FRONTEND_PORT sales=$SALES_PORT)"
+if [ "$BOOTSTRAP_MODE" = "1" ]; then
+    log_ok "Bootstrap: routes file will use blue ports (API=$API_PORT frontend=$FRONTEND_PORT sales=$SALES_PORT)"
+else
+    log_ok "Active color: $ACTIVE_COLOR (API=$API_PORT frontend=$FRONTEND_PORT sales=$SALES_PORT)"
+fi
 
 # ── 2. Write the routes file ────────────────────────────────────────────────
 log_step "=== Writing Apache routes file ==="
@@ -165,6 +179,10 @@ fi
 # ── 5. Smoke-test the current active containers ──────────────────────────────
 log_step "=== Smoke-testing active containers on their ports ==="
 
+if [ "$BOOTSTRAP_MODE" = "1" ]; then
+    log_info "Bootstrap mode: testing legacy nexus-php-app on port $API_PORT"
+fi
+
 SMOKE_FAILED=0
 
 if curl -sf "http://127.0.0.1:$API_PORT/up" >/dev/null 2>&1; then
@@ -208,8 +226,8 @@ else
     log_info "Skipping Apache reload (vhost includes not yet configured or smoke tests failed)."
 fi
 
-# ── 7. Write state file if missing ───────────────────────────────────────────
-if [ ! -f "$STATE_FILE" ]; then
+# ── 7. Write state file if missing (skip in bootstrap — bluegreen-deploy writes it) ──
+if [ ! -f "$STATE_FILE" ] && [ "$BOOTSTRAP_MODE" = "0" ]; then
     echo "$ACTIVE_COLOR" > "$STATE_FILE"
     log_ok "State file written: $STATE_FILE = $ACTIVE_COLOR"
 fi
@@ -223,8 +241,21 @@ log_info "State file:    $STATE_FILE"
 echo ""
 if [ "$VHOST_HAS_INCLUDE" = "0" ]; then
     log_warn "NEXT STEP: Add the Include + ProxyPass directives in Plesk (see above)."
-    log_warn "Until that is done, Apache will continue to use its current hardcoded ports."
+    if [ "$BOOTSTRAP_MODE" = "1" ]; then
+        log_warn "After saving in Plesk and reloading Apache, run the first blue-green deploy:"
+        log_warn "  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
+        log_warn "Then watch progress:"
+        log_warn "  sudo bash scripts/deploy/bluegreen-deploy.sh logs -f"
+    else
+        log_warn "Until that is done, Apache will continue to use its current hardcoded ports."
+    fi
 else
-    log_ok "Blue-green routing is fully configured."
-    log_ok "Future deploys via safe-deploy.sh will use zero-downtime blue-green automatically."
+    if [ "$BOOTSTRAP_MODE" = "1" ]; then
+        log_ok "Apache routes file in place. Now run the first blue-green deploy:"
+        log_ok "  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
+        log_ok "  sudo bash scripts/deploy/bluegreen-deploy.sh logs -f"
+    else
+        log_ok "Blue-green routing is fully configured."
+        log_ok "Future deploys via safe-deploy.sh will use zero-downtime blue-green automatically."
+    fi
 fi
