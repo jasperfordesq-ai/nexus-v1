@@ -11,7 +11,7 @@ backup_database_before_migrate() {
     mkdir -p "$BACKUP_DIR"
 
     local DB_PASS
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d '"'"'"')
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
 
     local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S).sql.gz"
     log_info "Taking pre-migration database snapshot → $BACKUP_FILE"
