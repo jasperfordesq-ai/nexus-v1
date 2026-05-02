@@ -1,0 +1,149 @@
+# =============================================================================
+# Project NEXUS PHP Stack - CI Docker Compose
+# =============================================================================
+# Used exclusively by GitHub Actions CI for E2E/API integration tests.
+#
+# Differences from compose.prod.yml:
+#   - APP_ENV=testing, APP_DEBUG=true
+#   - QUEUE_CONNECTION=sync (jobs run inline — no separate queue worker needed)
+#   - No ports exposed to host (internal-only)
+#   - No Meilisearch (tests mock search)
+#   - No frontend (tested separately with npm)
+#   - Uses .env.ci (not .env)
+#   - Shorter healthcheck timeouts (CI runners are fast, no warm-up penalty)
+#   - Lightweight MariaDB tuning (CI doesn't need production buffer sizes)
+# =============================================================================
+
+name: nexus-ci
+
+services:
+  # ---------------------------------------------------------------------------
+  # PHP Application (Apache + PHP 8.2)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: nexus-ci-app
+    volumes:
+      # Source mounts (same pattern as prod — read-only)
+      - ./httpdocs:/var/www/html/httpdocs:ro
+      - ./src:/var/www/html/src:ro
+      - ./views:/var/www/html/views:ro
+      - ./config:/var/www/html/config:ro
+      - ./vendor:/var/www/html/vendor:ro
+      - ./artisan:/var/www/html/artisan:ro
+      - ./bootstrap:/var/www/html/bootstrap:ro
+      - ./routes:/var/www/html/routes:ro
+      - ./app:/var/www/html/app:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./database:/var/www/html/database:ro
+      - ./lang:/var/www/html/lang:ro
+      # Writable volumes
+      - nexus-ci-storage:/var/www/html/storage
+      - nexus-ci-bootstrap-cache:/var/www/html/bootstrap/cache
+    env_file:
+      - .env.ci
+    environment:
+      - APP_ENV=testing
+      - APP_DEBUG=true
+      - APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      - DB_HOST=nexus-ci-db
+      - DB_PORT=3306
+      - DB_DATABASE=nexus_test
+      - DB_NAME=nexus_test
+      - DB_USER=nexus_ci
+      - DB_PASS=nexus_ci_pass
+      - REDIS_HOST=nexus-ci-redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=sync
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      # Disable external integrations in tests
+      - MEILISEARCH_HOST=
+      - MEILISEARCH_KEY=
+      - PUSHER_APP_ID=
+      - PUSHER_KEY=
+      - PUSHER_SECRET=
+      - OPENAI_API_KEY=
+      - STRIPE_SECRET_KEY=
+      - SENDGRID_API_KEY=
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexus-ci-internal
+    # No ports — tests reach the app via Docker network or docker exec
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # MariaDB 10.11 Database (CI-tuned: lighter buffer pool, faster startup)
+  # ---------------------------------------------------------------------------
+  db:
+    image: mariadb:10.11
+    container_name: nexus-ci-db
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=256M
+      - --innodb-log-file-size=64M
+      - --max-connections=50
+      - --skip-name-resolve
+    environment:
+      MARIADB_ROOT_PASSWORD: ci_root_pass
+      MARIADB_DATABASE: nexus_test
+      MARIADB_USER: nexus_ci
+      MARIADB_PASSWORD: nexus_ci_pass
+    volumes:
+      # tmpfs-backed ephemeral storage — fast I/O, wiped on container removal
+      - nexus-ci-db-data:/var/lib/mysql
+    networks:
+      - nexus-ci-internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Redis 7 (Sessions & Cache)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-ci-redis
+    command: redis-server --appendonly no --maxmemory 128mb --maxmemory-policy allkeys-lru
+    networks:
+      - nexus-ci-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  nexus-ci-internal:
+    name: nexus-ci-internal
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  nexus-ci-db-data:
+    name: nexus-ci-db-data
+  nexus-ci-storage:
+    name: nexus-ci-storage
+  nexus-ci-bootstrap-cache:
+    name: nexus-ci-bootstrap-cache

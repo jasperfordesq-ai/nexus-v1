@@ -260,8 +260,14 @@ jobs:
         working-directory: react-frontend
         shell: bash
         run: |
-          # Same Vitest hang workaround as above — use timeout for coverage run
-          timeout 120 npx vitest run --coverage --coverage.thresholds.100=false 2>&1 | tail -50 || true
+          # Same Vitest hang workaround as above — use timeout for coverage run.
+          # Thresholds are enforced by vitest.config.ts (statements:55, branches:50,
+          # functions:50, lines:55). A non-zero exit from vitest fails the step.
+          set -o pipefail
+          timeout 120 npx vitest run --coverage 2>&1 | tee /tmp/vitest-coverage.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          tail -50 /tmp/vitest-coverage.txt
+          exit $EXIT_CODE
         timeout-minutes: 4
 
       - name: Post Coverage Report as PR Comment
@@ -273,7 +279,7 @@ jobs:
           message: |
             ## Vitest Coverage Report
 
-            Coverage thresholds: statements 30%, branches 25%, functions 25%, lines 30%
+            Coverage thresholds (enforced): statements 55%, branches 50%, functions 50%, lines 55%
 
             <details>
             <summary>View full coverage output</summary>
@@ -605,22 +611,40 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
-      # --- Start application stack for E2E tests ---
-      # Uncomment and adjust once compose.ci.yml is created:
-      #
-      # - name: Start Application Stack
-      #   run: |
-      #     docker compose -f compose.ci.yml up -d --wait
-      #     echo "Waiting for services to be healthy..."
-      #     timeout 60 bash -c 'until curl -sf http://localhost:5173 > /dev/null 2>&1; do sleep 2; done'
-      #     echo "React frontend is up."
-      #     timeout 60 bash -c 'until curl -sf http://localhost:8090/health.php > /dev/null 2>&1; do sleep 2; done'
-      #     echo "PHP API is up."
+      - name: Create .env.ci
+        run: |
+          cat > .env.ci <<'EOF'
+          APP_ENV=testing
+          APP_DEBUG=true
+          APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          APP_URL=http://localhost
+          DB_HOST=nexus-ci-db
+          DB_PORT=3306
+          DB_DATABASE=nexus_test
+          DB_NAME=nexus_test
+          DB_USER=nexus_ci
+          DB_PASS=nexus_ci_pass
+          REDIS_HOST=nexus-ci-redis
+          REDIS_PORT=6379
+          QUEUE_CONNECTION=sync
+          CACHE_DRIVER=redis
+          SESSION_DRIVER=redis
+          MEILISEARCH_HOST=
+          MEILISEARCH_KEY=
+          PUSHER_APP_ID=
+          PUSHER_KEY=
+          PUSHER_SECRET=
+          OPENAI_API_KEY=
+          STRIPE_SECRET_KEY=
+          SENDGRID_API_KEY=
+          EOF
+
+      - name: Start Application Stack
+        run: |
+          docker compose -f compose.ci.yml up -d --wait
+          echo "CI stack is healthy — all services passed their healthchecks."
 
       - name: Run Playwright Smoke Tests
-        # continue-on-error until compose.ci.yml is created and the app stack
-        # can be started in CI — tests require a running http://localhost:5173.
-        continue-on-error: true
         run: npx playwright test --grep @smoke --project=chromium-modern
         env:
           E2E_BASE_URL: http://localhost:5173
@@ -636,10 +660,9 @@ jobs:
             e2e/test-results/
           retention-days: 14
 
-      # Uncomment once compose.ci.yml is created:
-      # - name: Stop Application Stack
-      #   if: always()
-      #   run: docker compose -f compose.ci.yml down -v
+      - name: Stop Application Stack
+        if: always()
+        run: docker compose -f compose.ci.yml down -v
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 8: Accessibility Checks (blocking)
