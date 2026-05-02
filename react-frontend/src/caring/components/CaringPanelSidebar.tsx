@@ -41,6 +41,7 @@ import Sliders from 'lucide-react/icons/sliders-horizontal';
 import PanelLeftClose from 'lucide-react/icons/panel-left-close';
 import PanelLeft from 'lucide-react/icons/panel-left';
 import Settings from 'lucide-react/icons/settings';
+import HelpCircle from 'lucide-react/icons/help-circle';
 
 interface CaringPanelSidebarProps {
   collapsed: boolean;
@@ -239,29 +240,53 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
         ))}
       </nav>
 
-      {/* Footer — back to full admin panel */}
-      {hasAdminAccess && (
-        <div className="border-t border-divider px-2 py-3">
-          {collapsed ? (
-            <Tooltip content="Full Admin" placement="right">
+      {/* Footer — help centre + back to full admin */}
+      <div className="border-t border-divider px-2 py-3 space-y-1">
+        {collapsed ? (
+          <Tooltip content="Help Centre" placement="right">
+            <Link
+              to={tenantPath('/admin/help')}
+              className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors hover:bg-default-100 ${
+                location.pathname.includes('/admin/help') ? 'text-primary' : 'text-default-400 hover:text-foreground'
+              }`}
+            >
+              <HelpCircle size={18} />
+            </Link>
+          </Tooltip>
+        ) : (
+          <Link
+            to={tenantPath('/admin/help')}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-default-100 ${
+              location.pathname.includes('/admin/help') ? 'text-primary font-medium' : 'text-default-400 hover:text-foreground'
+            }`}
+          >
+            <HelpCircle size={18} />
+            <span>Help Centre</span>
+          </Link>
+        )}
+        {hasAdminAccess && (
+          <>
+            {collapsed ? (
+              <Tooltip content="Full Admin" placement="right">
+                <Link
+                  to={tenantPath('/admin')}
+                  className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+                >
+                  <Settings size={18} />
+                </Link>
+              </Tooltip>
+            ) : (
               <Link
                 to={tenantPath('/admin')}
-                className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
               >
                 <Settings size={18} />
+                <span>Full Admin</span>
               </Link>
-            </Tooltip>
-          ) : (
-            <Link
-              to={tenantPath('/admin')}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
-            >
-              <Settings size={18} />
-              <span>Full Admin</span>
-            </Link>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </aside>
   );
 }
