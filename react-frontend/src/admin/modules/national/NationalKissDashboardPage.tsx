@@ -58,7 +58,7 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader, StatCard, Abbr } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -274,7 +274,7 @@ export function NationalKissDashboardPage() {
               <p className="text-default-600">
                 KISS (Koordination und Innovation für Soziales) is a Swiss methodology for community-based care
                 coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every
-                NEXUS cooperative running the Caring Community programme nationally — giving the Fondation KISS
+                NEXUS cooperative running the Caring Community programme nationally — giving the Fondation <Abbr term="KISS">KISS</Abbr>
                 a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member
                 counts are shown as privacy-preserving brackets (e.g. "50–99") rather than exact numbers.
               </p>
@@ -416,8 +416,17 @@ export function NationalKissDashboardPage() {
                 <ComposedChart data={trend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e5e7eb)" />
                   <XAxis dataKey="month" stroke="var(--color-text-muted, #6b7280)" />
-                  <YAxis yAxisId="left" stroke="var(--color-text-muted, #6b7280)" />
-                  <YAxis yAxisId="right" orientation="right" stroke="var(--color-text-muted, #6b7280)" />
+                  <YAxis
+                    yAxisId="left"
+                    stroke="var(--color-text-muted, #6b7280)"
+                    label={{ value: 'Hours', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    stroke="var(--color-text-muted, #6b7280)"
+                    label={{ value: 'Cooperatives', angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
+                  />
                   <Tooltip />
                   <Legend />
                   <Area
@@ -457,7 +466,7 @@ export function NationalKissDashboardPage() {
             </div>
           ) : sortedRows.length === 0 ? (
             <p className="text-sm text-default-500">
-              No KISS cooperatives configured yet. Go to <strong>Super Admin → Tenants</strong> and set the
+              No <Abbr term="KISS">KISS</Abbr> cooperatives configured yet. Go to <strong>Super Admin → Tenants</strong> and set the
               tenant category to <strong>kiss_cooperative</strong> on at least one tenant to populate this dashboard.
             </p>
           ) : (

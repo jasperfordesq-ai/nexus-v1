@@ -49,7 +49,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard, PageHeader, Abbr } from '../../components';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -247,7 +247,7 @@ function InquiryDetailModal({
               <p>{inquiry.population?.toLocaleString() ?? '—'}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">KISS Cooperative</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> Cooperative</p>
               <p>{inquiry.has_kiss_cooperative ? 'Yes' : 'No'}</p>
             </div>
             <div>
@@ -472,7 +472,7 @@ export function PilotInquiryAdminPage() {
               <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
               <p className="text-default-600">
                 This is the top-of-funnel pipeline for municipalities (<em>Gemeinden</em>) and regions interested
-                in running a NEXUS/KISS pilot. Each inquiry is submitted via the public interest form and scored
+                in running a NEXUS/<Abbr term="KISS">KISS</Abbr> pilot. Each inquiry is submitted via the public interest form and scored
                 automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness,
                 budget indication, and timeline). Use this board to move inquiries through the pipeline, assign
                 them to a sales or community contact, and track when proposals are sent and pilots go live.
@@ -493,7 +493,7 @@ export function PilotInquiryAdminPage() {
         <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="flat">60–100</Chip>Good match — prioritise outreach</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="flat">40–59</Chip>Potential — investigate further</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="flat">0–39</Chip>Weak fit — low priority</span>
-        <span className="ml-3 text-default-400">Score factors: population size, existing KISS cooperative, digital readiness, budget, timeline.</span>
+        <span className="ml-3 text-default-400">Score factors: population size, existing <Abbr term="KISS">KISS</Abbr> cooperative, digital readiness, budget, timeline.</span>
       </div>
 
       {/* Stats row */}

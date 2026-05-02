@@ -43,7 +43,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader, StatCard, Abbr } from '../../components';
 import { VerifiedMunicipalityBadge } from '@/components/badges/VerifiedMunicipalityBadge';
 
 const reportCards = [
@@ -413,6 +413,11 @@ export default function MunicipalImpactReportsPage() {
         }
       />
 
+      <p className="mb-2 text-xs text-default-400">
+        <strong>PDF export</strong> is formatted for sharing with municipal partners and funders.{' '}
+        <strong>CSV export</strong> gives raw data for spreadsheet analysis or grant reporting.
+      </p>
+
       <Card className="mb-4 border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
@@ -422,8 +427,8 @@ export default function MunicipalImpactReportsPage() {
               <p className="text-default-600">
                 The Municipal Impact Report is the evidence pack you share with municipal partners, cantons, and
                 funders to demonstrate the programme's value. It shows verified care hours, active members,
-                partner organisations, and — using the KISS/Age-Stiftung methodology — an estimated cost offset
-                to formal care services (CHF value of hours × prevention multiplier).
+                partner organisations, and — using the <Abbr term="KISS">KISS</Abbr>/Age-Stiftung methodology — an estimated cost offset
+                to formal care services (<Abbr term="CHF">CHF</Abbr> value of hours × prevention multiplier).
               </p>
               <p className="text-default-500">
                 Use the <strong>Audience</strong> toggle to switch the narrative framing: <strong>Canton</strong> —

@@ -9,7 +9,7 @@
  * ADMIN IS ENGLISH-ONLY — NO t() calls.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   Chip,
@@ -43,6 +43,7 @@ import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { Abbr } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -394,7 +395,7 @@ export default function KiAgentAdminPage() {
               review and approve or reject pending suggestions.
             </p>
             <p className="text-default-500">
-              <strong>Tandem Matching</strong> — suggests KISS-style one-to-one care pairings based on skills,
+              <strong>Tandem Matching</strong> — suggests <Abbr term="KISS">KISS</Abbr>-style one-to-one care pairings based on skills,
               location, and availability.{' '}
               <strong>Nudge Dispatch</strong> — sends targeted prompts to members who have been inactive or
               have unmatched requests.{' '}
@@ -441,12 +442,12 @@ export default function KiAgentAdminPage() {
                 <p className="font-semibold text-sm text-default-700">Agent Types</p>
                 {(
                   [
-                    ['tandem_matching_enabled', 'Tandem Matching', 'Suggest KISS-style support pairings'],
+                    ['tandem_matching_enabled', 'Tandem Matching', <><Abbr term="KISS">KISS</Abbr>-style support pairings</>],
                     ['nudge_dispatch_enabled', 'Nudge Dispatch', 'Smart engagement nudges to members'],
                     ['activity_summary_enabled', 'Activity Summary', 'Weekly vol-log summary to coordinators'],
                     ['demand_forecast_enabled', 'Demand Forecast', 'Predict care demand from vol-log trends'],
                     ['help_routing_enabled', 'Help Routing', 'Auto-route open help requests'],
-                  ] as [keyof AgentConfig, string, string][]
+                  ] as [keyof AgentConfig, string, React.ReactNode][]
                 ).map(([key, label, desc]) => (
                   <div key={key} className="flex items-center justify-between">
                     <div>

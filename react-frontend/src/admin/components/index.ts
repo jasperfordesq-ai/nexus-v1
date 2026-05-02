@@ -17,3 +17,4 @@ export { LegalDocEditor } from './LegalDocEditor';
 export { IconPicker } from './IconPicker';
 export { VisibilityRulesEditor } from './VisibilityRulesEditor';
 export { MemberSearchPicker, type MemberSearchMember } from './MemberSearchPicker';
+export { Abbr, ABBR_TERMS } from './Abbr';
