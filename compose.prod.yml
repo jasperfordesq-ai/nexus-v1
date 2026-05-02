@@ -246,7 +246,7 @@ services:
     container_name: nexus-php-queue
     command: sh -c "php artisan optimize && php artisan horizon"
     restart: unless-stopped
-    stop_grace_period: 90s
+    stop_grace_period: 120s
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null || exit 1"]
       interval: 30s

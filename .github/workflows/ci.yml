@@ -153,6 +153,27 @@ jobs:
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
 
+      - name: PHPUnit Coverage Threshold
+        run: |
+          COVERAGE=$(php -r "
+            \$xml = simplexml_load_file('coverage/clover.xml');
+            \$metrics = \$xml->project->metrics;
+            \$total = (int)\$metrics['coveredstatements'] + (int)\$metrics['statements'];
+            if (\$total === 0) { echo '0'; exit; }
+            echo round((int)\$metrics['coveredstatements'] / max(1, (int)\$metrics['statements']) * 100, 1);
+          ")
+          echo "PHP statement coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 40" | bc -l) )); then
+            echo "Coverage ${COVERAGE}% is below the 40% threshold"
+            exit 1
+          fi
+          echo "Coverage threshold met: ${COVERAGE}%"
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: nexus_test
+          DB_USER: nexus
+
       - name: "BLOCKING: PHPStan static analysis (level 3)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
 
