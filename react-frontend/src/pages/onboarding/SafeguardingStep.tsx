@@ -28,6 +28,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import SkipForward from 'lucide-react/icons/skip-forward';
 import ExternalLink from 'lucide-react/icons/external-link';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
+import MinusCircle from 'lucide-react/icons/circle-minus';
 import Eye from 'lucide-react/icons/eye';
 import Zap from 'lucide-react/icons/zap';
 import SettingsIcon from 'lucide-react/icons/settings';
@@ -170,6 +171,12 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         return next;
       }
     });
+
+    // Clear any select-type values when none_apply is chosen so they
+    // don't get submitted alongside the declination.
+    if (isNoneApply) {
+      setSelectValues({});
+    }
   }, [options]);
 
   // ── Save and proceed ─────────────────────────────────────────────────────
@@ -287,6 +294,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
   // plain-English summary of what they chose, who sees it, and what activates.
 
   if (confirmationShown) {
+    const isDecliningOnly = selectedOptions.length > 0 && selectedOptions.every(o => o.option_key === 'none_apply');
     const activations: string[] = [];
     if (aggregatedTriggers.requires_broker_approval) {
       activations.push(t('safeguarding.confirmation.activation_broker_review'));
@@ -308,15 +316,24 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
       <div className="space-y-6">
         <GlassCard className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-emerald-500/20">
-              <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <div className={`p-3 rounded-xl ${isDecliningOnly ? 'bg-theme-elevated' : 'bg-emerald-500/20'}`}>
+              {isDecliningOnly
+                ? <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                : <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              }
             </div>
             <div>
               <h2 className="text-lg font-semibold text-theme-primary">
-                {t('safeguarding.confirmation.title')}
+                {isDecliningOnly
+                  ? t('safeguarding.confirmation.declination_title')
+                  : t('safeguarding.confirmation.title')
+                }
               </h2>
               <p className="text-sm text-theme-muted">
-                {t('safeguarding.confirmation.intro')}
+                {isDecliningOnly
+                  ? t('safeguarding.confirmation.declination_intro')
+                  : t('safeguarding.confirmation.intro')
+                }
               </p>
             </div>
           </div>
@@ -337,8 +354,11 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                     key={opt.id}
                     className="flex items-start gap-2 p-3 rounded-lg bg-theme-elevated border border-theme-default"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-sm text-theme-secondary">{opt.label}</span>
+                    {opt.option_key === 'none_apply'
+                      ? <MinusCircle className="w-4 h-4 text-theme-muted shrink-0 mt-0.5" />
+                      : <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                    }
+                    <span className={`text-sm ${opt.option_key === 'none_apply' ? 'text-theme-muted' : 'text-theme-secondary'}`}>{opt.label}</span>
                   </li>
                 ))}
               </ul>
@@ -360,23 +380,25 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
             </div>
           </section>
 
-          {/* What activates */}
-          <section className="mb-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-[var(--color-warning)]" />
-              <h3 className="text-sm font-semibold text-theme-primary">
-                {t('safeguarding.confirmation.what_activates_heading')}
-              </h3>
-            </div>
-            <ul className="space-y-2">
-              {activations.map((activation, idx) => (
-                <li key={idx} className="flex items-start gap-2 pl-1">
-                  <span className="text-[var(--color-warning)] mt-1">•</span>
-                  <span className="text-sm text-theme-secondary">{activation}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {/* What activates — only shown when real protections are selected */}
+          {!isDecliningOnly && (
+            <section className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-4 h-4 text-[var(--color-warning)]" />
+                <h3 className="text-sm font-semibold text-theme-primary">
+                  {t('safeguarding.confirmation.what_activates_heading')}
+                </h3>
+              </div>
+              <ul className="space-y-2">
+                {activations.map((activation, idx) => (
+                  <li key={idx} className="flex items-start gap-2 pl-1">
+                    <span className="text-[var(--color-warning)] mt-1">•</span>
+                    <span className="text-sm text-theme-secondary">{activation}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {/* Revoke info */}
           <section className="p-4 rounded-lg border border-theme-default bg-theme-elevated">
@@ -540,7 +562,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                 <>
                   <div className="flex items-center gap-3 pt-1">
                     <div className="flex-1 border-t border-theme-default" />
-                    <span className="text-xs text-theme-muted shrink-0">or</span>
+                    <span className="text-xs text-theme-muted shrink-0">{t('safeguarding.or_separator')}</span>
                     <div className="flex-1 border-t border-theme-default" />
                   </div>
                   {renderOption(noneApplyOption, true)}

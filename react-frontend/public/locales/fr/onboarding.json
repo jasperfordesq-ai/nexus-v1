@@ -118,8 +118,11 @@
       "revoke_heading": "Comment les modifier ou les révoquer à tout moment",
       "revoke_body": "Vous pouvez consulter ou révoquer ces préférences à tout moment depuis les paramètres de votre profil. Aucune demande à un·e administrateur·trice n'est nécessaire.",
       "revoke_cta": "Accéder aux paramètres de protection",
-      "continue_cta": "Continuer"
-    }
+      "continue_cta": "Continuer",
+      "declination_title": "Noted — your response is recorded",
+      "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
+    },
+    "or_separator": "or"
   },
   "page_meta": {
     "title": "Onboarding"

@@ -102,6 +102,7 @@
     "save_continue": "Save & Continue",
     "required_fields": "Required fields",
     "select_option": "Choose an option",
+    "or_separator": "or",
     "confirmation": {
       "title": "Your safeguarding preferences have been saved",
       "intro": "Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.",
@@ -118,7 +119,9 @@
       "revoke_heading": "How to change or revoke these at any time",
       "revoke_body": "You can review or revoke any of these preferences any time from your profile settings. You do not need to ask an administrator to do this.",
       "revoke_cta": "Go to safeguarding settings",
-      "continue_cta": "Continue"
+      "continue_cta": "Continue",
+      "declination_title": "Noted — your response is recorded",
+      "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
     }
   },
   "page_meta": {
