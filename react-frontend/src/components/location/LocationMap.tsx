@@ -33,6 +33,7 @@ import {
 } from '@googlemaps/markerclusterer';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
+import { GoogleMapsProvider } from './GoogleMapsProvider';
 
 export interface MapMarker {
   id: number | string;
@@ -320,5 +321,9 @@ function LocationMapInner({
 export function LocationMap(props: LocationMapProps) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   if (!apiKey) return null;
-  return <LocationMapInner {...props} />;
+  return (
+    <GoogleMapsProvider>
+      <LocationMapInner {...props} />
+    </GoogleMapsProvider>
+  );
 }

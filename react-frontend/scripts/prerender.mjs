@@ -190,6 +190,12 @@ function createStaticServer() {
   });
 }
 
+function stripRuntimeMapsAssets(html) {
+  return html
+    .replace(/<script[^>]+(?:maps\.googleapis\.com|maps-api-v3|maps\.gstatic\.com)[^>]*><\/script>/gi, '')
+    .replace(/<link[^>]+(?:maps\.googleapis\.com|maps-api-v3|maps\.gstatic\.com)[^>]*>/gi, '');
+}
+
 // ─── Pre-render a single route ───────────────────────────────────────────────
 async function prerenderRoute(page, route) {
   const url = `http://localhost:${PORT}${route}`;
@@ -210,6 +216,7 @@ async function prerenderRoute(page, route) {
 
     // Clean up: remove Vite HMR scripts that shouldn't be in static output
     html = html.replace(/<script[^>]*type="module"[^>]*src="\/src\/[^"]*"[^>]*><\/script>/g, '');
+    html = stripRuntimeMapsAssets(html);
 
     // Write the static HTML file
     const outputPath = route === '/'

@@ -31,6 +31,7 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
+import { GoogleMapsProvider } from './GoogleMapsProvider';
 
 /** Debounce delay for autocomplete requests (ms). */
 const DEBOUNCE_MS = 300;
@@ -338,7 +339,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
           {/* Google attribution — required by Terms of Service */}
           <li className="px-3 py-1.5 text-right" aria-hidden="true">
             <span className="text-[10px] text-theme-subtle">
-              Powered by Google
+              {t('location.powered_by_google')}
             </span>
           </li>
         </ul>
@@ -351,19 +352,21 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
  * PlaceAutocompleteInput — the public API.
  *
  * Renders the Google-powered autocomplete when APIProvider is available.
- * The GoogleMapsProvider in App.tsx gracefully skips APIProvider when no
- * API key is set, so useMapsLibrary will return null and the component
- * works as a plain text input (suggestions just never appear).
+ * The component wraps its Google-powered branch in GoogleMapsProvider only
+ * when rendered, so public pages do not load Maps globally.
  */
 export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
-  // If no API key configured, GoogleMapsProvider renders without APIProvider.
-  // In that case, useMapsLibrary isn't available, so we render a plain fallback.
+  // If no API key is configured, render a plain fallback without loading Maps.
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   if (!apiKey) {
     return <PlaceAutocompleteFallback {...props} />;
   }
 
-  return <PlaceAutocompleteWithGoogle {...props} />;
+  return (
+    <GoogleMapsProvider>
+      <PlaceAutocompleteWithGoogle {...props} />
+    </GoogleMapsProvider>
+  );
 }
 
 /**
