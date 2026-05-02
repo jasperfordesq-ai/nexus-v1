@@ -93,11 +93,27 @@ function statusIcon(status: SectionStatus) {
   return <AlertTriangle size={20} className="text-warning" />;
 }
 
+function isReadinessReport(value: unknown): value is ReadinessReport {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<ReadinessReport>;
+
+  return (
+    !!candidate.overall &&
+    typeof candidate.overall === 'object' &&
+    typeof candidate.overall.status === 'string' &&
+    typeof candidate.overall.summary === 'string' &&
+    typeof candidate.overall.ready_section_count === 'number' &&
+    typeof candidate.overall.total_section_count === 'number' &&
+    Array.isArray(candidate.sections)
+  );
+}
+
 export default function PilotLaunchReadinessAdminPage() {
   usePageTitle('Pilot Launch Readiness');
   const { showToast } = useToast();
 
   const [report, setReport] = useState<ReadinessReport | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [acknowledging, setAcknowledging] = useState(false);
   const [launching, setLaunching] = useState(false);
@@ -105,10 +121,25 @@ export default function PilotLaunchReadinessAdminPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await api.get<ReadinessReport>('/v2/admin/caring-community/launch-readiness');
-      setReport(res.data ?? null);
+      if (!res.success) {
+        setReport(null);
+        setLoadError(res.error ?? 'The launch-readiness report could not be loaded.');
+        return;
+      }
+
+      if (!isReadinessReport(res.data)) {
+        setReport(null);
+        setLoadError('The launch-readiness report returned an unexpected response.');
+        return;
+      }
+
+      setReport(res.data);
     } catch {
+      setReport(null);
+      setLoadError('The launch-readiness report could not be loaded.');
       showToast('Failed to load launch-readiness report', 'error');
     } finally {
       setLoading(false);
@@ -126,7 +157,7 @@ export default function PilotLaunchReadinessAdminPage() {
         '/v2/admin/caring-community/launch-readiness/acknowledge-boundary',
         {},
       );
-      if (res.data?.report) setReport(res.data.report);
+      if (isReadinessReport(res.data?.report)) setReport(res.data.report);
       showToast('Commercial boundary acknowledged', 'success');
     } catch {
       showToast('Failed to acknowledge boundary', 'error');
@@ -144,7 +175,7 @@ export default function PilotLaunchReadinessAdminPage() {
         report: ReadinessReport;
       }>('/v2/admin/caring-community/launch-readiness/launch', {});
       if (res.success) {
-        if (res.data?.report) {
+        if (isReadinessReport(res.data?.report)) {
           setReport(res.data.report);
         } else {
           await load();
@@ -175,7 +206,7 @@ export default function PilotLaunchReadinessAdminPage() {
       ? Math.round((overall.ready_section_count / overall.total_section_count) * 100)
       : 0;
   const isLaunched = !!report?.launched;
-  const canLaunch = !!report?.can_launch;
+  const canLaunch = !!report?.can_launch && !!overall && (report?.sections?.length ?? 0) > 0;
   const blockerCount = report?.blockers?.length ?? 0;
 
   return (
@@ -295,6 +326,28 @@ export default function PilotLaunchReadinessAdminPage() {
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
+      )}
+
+      {!loading && loadError && (
+        <Card className="border border-danger-300 bg-danger-50/50 dark:bg-danger-900/10">
+          <CardBody className="space-y-3 py-5">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={22} className="mt-0.5 shrink-0 text-danger" />
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-semibold">Readiness report unavailable</p>
+                <p className="mt-1 text-sm text-default-600">{loadError}</p>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                startContent={<RefreshCw size={14} />}
+                onPress={load}
+              >
+                Retry
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
       )}
 
       {!loading && report && overall && (
