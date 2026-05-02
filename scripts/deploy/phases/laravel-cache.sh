@@ -21,12 +21,10 @@ run_laravel_cache() {
     docker exec nexus-php-app php /var/www/html/artisan event:clear 2>&1 | tee -a "$LOG_FILE" || true
     docker exec nexus-php-app php /var/www/html/artisan view:clear 2>&1 | tee -a "$LOG_FILE" || true
 
-    # Rebuild caches for production
+    # Rebuild caches for production via optimize (runs config/route/event/view:cache
+    # plus any app-registered Artisan::optimizeUsing() callbacks in correct order)
     log_info "Rebuilding Laravel caches..."
-    docker exec nexus-php-app php /var/www/html/artisan config:cache 2>&1 | tee -a "$LOG_FILE"
-    docker exec nexus-php-app php /var/www/html/artisan route:cache 2>&1 | tee -a "$LOG_FILE"
-    docker exec nexus-php-app php /var/www/html/artisan event:cache 2>&1 | tee -a "$LOG_FILE"
-    docker exec nexus-php-app php /var/www/html/artisan view:cache 2>&1 | tee -a "$LOG_FILE"
+    docker exec nexus-php-app php /var/www/html/artisan optimize 2>&1 | tee -a "$LOG_FILE"
 
     # Signal queue workers to gracefully reload new code (workers finish current job then restart)
     docker exec nexus-php-app php /var/www/html/artisan queue:restart 2>&1 | tee -a "$LOG_FILE" || true

@@ -140,10 +140,10 @@ jobs:
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
 
-      - name: PHPUnit Coverage Report (informational)
+      - name: PHPUnit Coverage Report
         run: |
-          vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=coverage/clover.xml 2>&1 | tail -30 || true
-          echo "Coverage report generated. Review for threshold tracking."
+          vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=coverage/clover.xml 2>&1 | tail -30
+          echo "Coverage report generated."
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
@@ -616,7 +616,7 @@ jobs:
           cat > .env.ci <<'EOF'
           APP_ENV=testing
           APP_DEBUG=true
-          APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          APP_KEY=${{ secrets.CI_APP_KEY }}
           APP_URL=http://localhost
           DB_HOST=nexus-ci-db
           DB_PORT=3306
