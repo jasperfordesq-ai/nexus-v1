@@ -37,9 +37,11 @@ run_smoke_tests() {
     if echo "$BOOTSTRAP" | grep -q '"tenant"'; then
         log_ok "API bootstrap returns valid tenant data"
     elif [ -n "$BOOTSTRAP" ]; then
-        log_warn "API bootstrap responded but missing tenant data"
+        log_err "API bootstrap responded but missing tenant key — tenant data may be broken"
+        TESTS_FAILED=1
     else
-        log_warn "API bootstrap endpoint failed (may require tenant header)"
+        log_err "API bootstrap endpoint failed — multi-tenant API is not serving requests"
+        TESTS_FAILED=1
     fi
 
     # Test frontend — verify it serves the React app, not an error page

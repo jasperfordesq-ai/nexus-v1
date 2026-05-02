@@ -129,6 +129,37 @@ services:
       retries: 10
       start_period: 5s
 
+  # ---------------------------------------------------------------------------
+  # React Frontend (Nginx serving built SPA — E2E Playwright target)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./react-frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE: http://nexus-ci-app/api
+        VITE_GOOGLE_MAPS_API_KEY: ""
+        VITE_GOOGLE_MAPS_MAP_ID: ""
+        VITE_SENTRY_DSN: ""
+        VITE_SENTRY_ENVIRONMENT: ci
+        VITE_SENTRY_TRACES_SAMPLE_RATE: "0"
+        VITE_PUSHER_KEY: ""
+        VITE_PUSHER_CLUSTER: "eu"
+        VITE_GIPHY_API_KEY: ""
+        VITE_STRIPE_PUBLISHABLE_KEY: ""
+        BUILD_COMMIT: "ci"
+    container_name: nexus-ci-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - nexus-ci-internal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
 # =============================================================================
 # Networks
 # =============================================================================

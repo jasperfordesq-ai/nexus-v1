@@ -647,7 +647,7 @@ jobs:
       - name: Run Playwright Smoke Tests
         run: npx playwright test --grep @smoke --project=chromium-modern
         env:
-          E2E_BASE_URL: http://localhost:5173
+          E2E_BASE_URL: http://localhost:3000
           CI: true
 
       - name: Upload Smoke Test Results
