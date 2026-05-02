@@ -43,14 +43,14 @@ run_pending_migrations() {
     DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
     # Ensure the migrations tracking table exists
-    docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e "
-        CREATE TABLE IF NOT EXISTS migrations (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            migration_name VARCHAR(255) NOT NULL UNIQUE,
-            backups VARCHAR(255) DEFAULT NULL,
-            executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    " 2>/dev/null
+    docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" 2>/dev/null <<'EOSQL'
+CREATE TABLE IF NOT EXISTS migrations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    migration_name VARCHAR(255) NOT NULL UNIQUE,
+    backups VARCHAR(255) DEFAULT NULL,
+    executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+EOSQL
 
     # Get list of already-applied migrations
     local APPLIED
