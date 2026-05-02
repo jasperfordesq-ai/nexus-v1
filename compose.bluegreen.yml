@@ -32,7 +32,7 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      test: ["CMD", "curl", "-f", "http://localhost/up"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -95,8 +95,9 @@ services:
   queue:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-queue
-    command: sh -c "php artisan optimize && php artisan queue:work --queue=federation-high,federation,default --sleep=3 --tries=3 --timeout=60"
+    command: sh -c "php artisan optimize && php artisan horizon"
     restart: unless-stopped
+    stop_grace_period: 90s
     mem_limit: ${NEXUS_QUEUE_MEMORY_LIMIT:-512m}
     volumes:
       - nexus-php-logs:/var/log
@@ -115,7 +116,7 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD-SHELL", "tr '\\0' ' ' < /proc/1/cmdline | grep -q 'queue:work'"]
+      test: ["CMD-SHELL", "php artisan horizon:status 2>/dev/null | grep -q running || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -126,6 +127,7 @@ services:
     container_name: nexus-${NEXUS_COLOR:-green}-php-scheduler
     command: sh -c "php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     restart: unless-stopped
+    stop_grace_period: 90s
     mem_limit: ${NEXUS_SCHEDULER_MEMORY_LIMIT:-384m}
     volumes:
       - nexus-php-logs:/var/log

@@ -184,7 +184,8 @@ services:
       redis-server
       --appendonly yes
       --maxmemory 400mb
-      --maxmemory-policy allkeys-lru
+      --maxmemory-policy volatile-lru
+      --maxmemory-samples 10
       --save 900 1
       --save 300 10
     volumes:
@@ -241,10 +242,11 @@ services:
       context: .
       dockerfile: Dockerfile.prod
     container_name: nexus-php-queue
-    command: php artisan queue:work --queue=federation-high,federation,default --sleep=3 --tries=3 --timeout=60
+    command: sh -c "php artisan optimize && php artisan horizon"
     restart: unless-stopped
+    stop_grace_period: 90s
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan queue:work' > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "php artisan horizon:status 2>/dev/null | grep -q running || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

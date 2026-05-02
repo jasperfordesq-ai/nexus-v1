@@ -15,6 +15,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         \App\Providers\RouteServiceProvider::class,
         \App\Providers\EventServiceProvider::class,
         \App\Providers\BroadcastServiceProvider::class,
+        \App\Providers\HorizonServiceProvider::class,
     ])
     ->withCommands([
         __DIR__ . '/../app/Console/Commands',

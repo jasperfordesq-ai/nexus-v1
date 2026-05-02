@@ -178,6 +178,10 @@ RUN mkdir -p /var/www/html/storage/app/public \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Pre-publish Horizon dashboard assets so they're baked into the image.
+# The '|| true' ensures a build failure here never blocks a deploy.
+RUN php artisan horizon:publish 2>/dev/null || true
+
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \

@@ -47,6 +47,7 @@
         "sendgrid/sendgrid": "^8.1",
         "sentry/sentry": "^4.0",
         "spomky-labs/otphp": "^11.4",
+        "laravel/horizon": "^5.0",
         "stripe/stripe-php": "^16.0"
     },
     "require-dev": {
