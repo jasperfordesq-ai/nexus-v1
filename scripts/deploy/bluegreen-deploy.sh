@@ -809,6 +809,15 @@ cmd_rollback() {
         fi
         exit 1
     fi
+    # Purge Cloudflare cache after rollback traffic switch — prevents CF from
+    # continuing to serve cached responses from the broken new deployment
+    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
+        phase "Cloudflare Cache Purge" "${CURRENT_ACTIVE:-}" "$target" "${CURRENT_COMMIT:-}"
+        bash "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" 2>&1 | tee -a "$LOG_FILE" || \
+            log_warn "Cloudflare purge had errors — run manually: sudo bash scripts/purge-cloudflare-cache.sh"
+    else
+        log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
+    fi
     state_set DEPLOY_SUCCESS 1
 }
 

@@ -10,7 +10,7 @@ services:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-app
     restart: unless-stopped
-    stop_grace_period: 30s
+    stop_grace_period: 60s
     deploy:
       resources:
         limits:
@@ -63,6 +63,7 @@ services:
     image: nexus-react-prod:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-react
     restart: unless-stopped
+    stop_grace_period: 30s
     deploy:
       resources:
         limits:
@@ -91,6 +92,7 @@ services:
     image: nexus-sales-site:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-sales
     restart: unless-stopped
+    stop_grace_period: 30s
     deploy:
       resources:
         limits:

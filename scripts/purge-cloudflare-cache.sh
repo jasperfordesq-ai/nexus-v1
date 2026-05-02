@@ -55,7 +55,7 @@ PURGE_SUCCESS=0
 for DOMAIN in "${!ZONES[@]}"; do
     ZONE_ID="${ZONES[$DOMAIN]}"
 
-    RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+    RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 15 --connect-timeout 5 -X POST \
         "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
         -H "Authorization: Bearer ${CF_TOKEN}" \
         -H "Content-Type: application/json" \

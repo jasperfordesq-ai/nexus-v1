@@ -187,4 +187,4 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost/up || exit 1
 
-CMD ["sh", "-c", "php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; apache2-foreground"]
+CMD ["sh", "-c", "php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; php artisan horizon:publish 2>/dev/null || true && apache2-foreground"]

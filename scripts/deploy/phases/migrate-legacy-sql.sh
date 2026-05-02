@@ -97,6 +97,9 @@ run_pending_migrations() {
         if grep -qiE '(DROP TABLE|DROP DATABASE|TRUNCATE)' "$SQL_FILE" 2>/dev/null; then
             log_warn "$BASENAME contains DROP/TRUNCATE operations"
         fi
+        if grep -qiE "DROP\s+COLUMN|RENAME\s+COLUMN|ALTER\s+TABLE.+DROP" "$SQL_FILE" 2>/dev/null; then
+            log_warn "Migration $BASENAME contains DROP COLUMN or RENAME COLUMN — verify old app code is no longer reading these columns before deploying"
+        fi
 
         log_info "Running: $BASENAME"
         if docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" < "$SQL_FILE" 2>&1 | tee -a "$LOG_FILE"; then

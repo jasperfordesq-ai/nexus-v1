@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: nexus-php-app
     restart: unless-stopped
-    stop_grace_period: 30s
+    stop_grace_period: 60s
     ports:
       - "8090:80"
     volumes:
