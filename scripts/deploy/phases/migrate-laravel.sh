@@ -19,7 +19,7 @@ run_laravel_artisan_migrate() {
     mkdir -p "$BACKUP_DIR"
     local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S)-laravel.sql.gz"
     local DB_PASS
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d '"'"'"')
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
     if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
         log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
         find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete

@@ -37,7 +37,7 @@ notify_deploy() {
     # Read webhook URL from .env or environment
     local WEBHOOK_URL
     WEBHOOK_URL="$(grep "^NEXUS_DEPLOY_WEBHOOK_URL=" "$DEPLOY_DIR/.env" 2>/dev/null \
-        | sed 's/^NEXUS_DEPLOY_WEBHOOK_URL=//' | tr -d '"'"'"' || true)"
+        | sed 's/^NEXUS_DEPLOY_WEBHOOK_URL=//' | tr -d "\"'" || true)"
     WEBHOOK_URL="${WEBHOOK_URL:-${NEXUS_DEPLOY_WEBHOOK_URL:-}}"
 
     if [ -z "$WEBHOOK_URL" ]; then
