@@ -17,9 +17,9 @@
 
 | Service | URL | Container | Port |
 |---------|-----|-----------|------|
-| React Frontend | https://app.project-nexus.ie | `nexus-react-prod` | 3000 |
-| PHP API | https://api.project-nexus.ie | `nexus-php-app` | 8090 |
-| Sales Site | https://project-nexus.ie | `nexus-sales-site` | 3003 |
+| React Frontend | https://app.project-nexus.ie | `nexus-{blue|green}-react` | 3000 or 3100 |
+| PHP API | https://api.project-nexus.ie | `nexus-{blue|green}-php-app` | 8090 or 8190 |
+| Sales Site | https://project-nexus.ie | `nexus-{blue|green}-sales` | 3003 or 3103 |
 
 All traffic routes through Cloudflare and the Apache/Plesk reverse proxy on the VM.
 
@@ -52,8 +52,10 @@ sudo bash scripts/deploy/bluegreen-deploy.sh deploy
 5. Starts the inactive color on private local ports.
 6. Waits for Docker health checks and private HTTP smoke tests.
 7. Updates the Apache route include and runs a graceful Apache reload.
-8. Starts the matching queue worker and stops the previous queue worker.
+8. Starts the matching queue worker and scheduler, then stops the previous worker containers.
 9. Runs public smoke tests after cutover.
+10. Refreshes per-tenant pre-rendered HTML when public-facing files changed.
+11. Schedules the normal delayed post-deploy health check.
 
 Run backwards-compatible Laravel migrations only when needed:
 
@@ -99,7 +101,7 @@ sudo bash scripts/safe-deploy.sh full --detach
 Rebuilds **frontend + sales site** and restarts PHP. Faster than full but still ensures React changes deploy.
 
 ```bash
-sudo bash scripts/safe-deploy.sh quick
+sudo bash scripts/safe-deploy.sh quick --detach
 ```
 
 **What it does:**
@@ -116,7 +118,7 @@ sudo bash scripts/safe-deploy.sh quick
 Reverts to the last successful deployment commit and does a full rebuild.
 
 ```bash
-sudo bash scripts/safe-deploy.sh rollback
+sudo bash scripts/safe-deploy.sh rollback --detach
 ```
 
 ### Status Check
@@ -131,7 +133,17 @@ sudo bash scripts/safe-deploy.sh status
 
 ## Container Architecture
 
-### Our Containers (managed by `compose.prod.yml`)
+### Blue/Green Runtime Containers (managed by `compose.bluegreen.yml`)
+
+| Container | Image | Purpose |
+|-----------|-------|---------|
+| `nexus-blue-php-app` / `nexus-green-php-app` | `nexus-php-app:{commit}` | API backend |
+| `nexus-blue-react` / `nexus-green-react` | `nexus-react-prod:{commit}` | React SPA |
+| `nexus-blue-sales` / `nexus-green-sales` | `nexus-sales-site:{commit}` | Sales site |
+| `nexus-blue-php-queue` / `nexus-green-php-queue` | `nexus-php-app:{commit}` | Laravel queue worker |
+| `nexus-blue-php-scheduler` / `nexus-green-php-scheduler` | `nexus-php-app:{commit}` | Laravel scheduler |
+
+### Fallback Containers (managed by `compose.prod.yml`)
 
 | Container | Image | Dockerfile | Purpose |
 |-----------|-------|-----------|---------|
@@ -196,7 +208,7 @@ If any check fails, the deploy logs a clear error with remediation steps.
 
 **Fix:** Always use `full` deploy:
 ```bash
-sudo bash scripts/safe-deploy.sh full
+sudo bash scripts/safe-deploy.sh full --detach
 ```
 
 ### PHP changes not appearing after deploy
@@ -217,7 +229,7 @@ The deploy script does this automatically.
 ```bash
 cd /opt/nexus-php
 cp compose.prod.yml compose.yml
-sudo bash scripts/safe-deploy.sh full
+sudo bash scripts/safe-deploy.sh full --detach
 ```
 
 ### Cloudflare serving stale content
@@ -307,7 +319,9 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 
 ## Scheduled Jobs
 
-Laravel's scheduler runs via `php artisan schedule:run` every minute inside `nexus-php-app` (triggered by the host crontab). Scheduled jobs are defined in `bootstrap/app.php` under `withSchedule()`.
+In the zero-downtime deployment path, Laravel's scheduler runs as the active color's `nexus-{blue|green}-php-scheduler` container. The old host crontab entry that runs `php artisan schedule:run` inside `nexus-php-app` must be disabled once blue/green is enabled, otherwise the legacy container can run stale scheduled code.
+
+Fallback `safe-deploy.sh` deployments may still use the old `nexus-php-app` scheduler arrangement until the server has fully moved to blue/green.
 
 ### Log Retention (`nexus:prune-logs`)
 

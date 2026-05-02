@@ -23,12 +23,14 @@
 set -euo pipefail
 
 DEPLOY_DIR="${DEPLOY_DIR:-/opt/nexus-php}"
+PRERENDER_CONFIG_DIR="${PRERENDER_CONFIG_DIR:-$DEPLOY_DIR}"
+PRERENDER_CODE_DIR="${PRERENDER_CODE_DIR:-$DEPLOY_DIR}"
 NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
 PRERENDER_DIR="/usr/share/nginx/html/prerendered"
 PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.59.1-noble"
-WORKER_SCRIPT="$DEPLOY_DIR/scripts/prerender-worker.mjs"
+WORKER_SCRIPT="$PRERENDER_CODE_DIR/scripts/prerender-worker.mjs"
 OUTPUT_DIR="/tmp/nexus-prerender-$$"
-WORK_DIR="$DEPLOY_DIR/.prerender-worker"
+WORK_DIR="$PRERENDER_CONFIG_DIR/.prerender-worker"
 PRERENDER_CONCURRENCY="${PRERENDER_CONCURRENCY:-4}"
 
 # Public routes to pre-render for each tenant
@@ -103,9 +105,9 @@ trap cleanup EXIT
 # --- Get active tenants from the database ---
 get_tenants() {
     local DB_USER DB_PASS DB_NAME
-    DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
-    DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    DB_USER=$(grep "^DB_USER=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    DB_PASS=$(grep "^DB_PASS=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+    DB_NAME=$(grep "^DB_NAME=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
     local QUERY="SELECT slug, COALESCE(domain, '') as domain FROM tenants WHERE is_active = 1"
     if [ -n "$FILTER_TENANT" ]; then
@@ -120,7 +122,7 @@ get_tenants() {
 build_manifest() {
     local TENANTS="$1"
     local FRONTEND_URL
-    FRONTEND_URL=$(grep "^FRONTEND_URL=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "https://app.project-nexus.ie")
+    FRONTEND_URL=$(grep "^FRONTEND_URL=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "https://app.project-nexus.ie")
     local APP_HOST
     APP_HOST=$(echo "$FRONTEND_URL" | sed 's|https\?://||' | sed 's|/.*||')
 

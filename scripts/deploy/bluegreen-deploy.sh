@@ -17,6 +17,11 @@ export DEPLOY_DIR
 . "$SELF_DIR/lib/state.sh"
 . "$SELF_DIR/lib/lock.sh"
 
+mkdir -p "$LOG_DIR"
+TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
+LOG_FILE="${NEXUS_BLUEGREEN_LOG_FILE:-$LOG_DIR/bluegreen-deploy-$TIMESTAMP.log}"
+export LOG_FILE
+
 STATE_FILE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
 RELEASES_DIR="${NEXUS_RELEASES_DIR:-$(dirname "$DEPLOY_DIR")/nexus-releases}"
 APACHE_ROUTES_FILE="${NEXUS_APACHE_ROUTES_FILE:-}"
@@ -128,6 +133,7 @@ container_name() {
         frontend) echo "nexus-$color-react" ;;
         sales) echo "nexus-$color-sales" ;;
         queue) echo "nexus-$color-php-queue" ;;
+        scheduler) echo "nexus-$color-php-scheduler" ;;
         *)
             log_err "Unknown service: $service"
             return 1
@@ -271,9 +277,10 @@ free_target_color_ports() {
 
 write_apache_routes() {
     local color="$1"
-    local api_port frontend_port sales_port tmp_file
+    local api_port frontend_port sales_port tmp_file backup_file
     read -r api_port frontend_port sales_port < <(ports_for_color "$color")
     tmp_file="$(mktemp)"
+    backup_file="$(mktemp)"
 
     cat > "$tmp_file" <<ROUTES
 # Managed by scripts/deploy/bluegreen-deploy.sh
@@ -283,14 +290,39 @@ Define NEXUS_FRONTEND_PORT $frontend_port
 Define NEXUS_SALES_PORT $sales_port
 ROUTES
 
+    if [ -f "$APACHE_ROUTES_FILE" ]; then
+        cp "$APACHE_ROUTES_FILE" "$backup_file"
+    else
+        : > "$backup_file"
+    fi
+
     install -m 0644 "$tmp_file" "$APACHE_ROUTES_FILE"
     rm -f "$tmp_file"
 
     log_info "Testing Apache configuration..."
-    bash -lc "$APACHE_CONFIGTEST"
-
+    if ! bash -lc "$APACHE_CONFIGTEST"; then
+        log_err "Apache configtest failed; restoring previous route file"
+        if [ -s "$backup_file" ]; then
+            install -m 0644 "$backup_file" "$APACHE_ROUTES_FILE"
+        else
+            rm -f "$APACHE_ROUTES_FILE"
+        fi
+        rm -f "$backup_file"
+        return 1
+    fi
     log_info "Gracefully reloading Apache..."
-    bash -lc "$APACHE_RELOAD"
+    if ! bash -lc "$APACHE_RELOAD"; then
+        log_err "Apache reload failed; restoring previous route file"
+        if [ -s "$backup_file" ]; then
+            install -m 0644 "$backup_file" "$APACHE_ROUTES_FILE"
+            bash -lc "$APACHE_CONFIGTEST" >/dev/null 2>&1 || true
+        else
+            rm -f "$APACHE_ROUTES_FILE"
+        fi
+        rm -f "$backup_file"
+        return 1
+    fi
+    rm -f "$backup_file"
 
     echo "$color" > "$STATE_FILE"
     log_ok "Traffic switched to $color ($api_port/$frontend_port/$sales_port)"
@@ -349,7 +381,7 @@ deploy_candidate() {
     run_candidate_migrations "$color"
 }
 
-start_queue_for_color() {
+start_workers_for_color() {
     local color="$1"
     local release_dir="$2"
     local commit="$3"
@@ -363,13 +395,16 @@ start_queue_for_color() {
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
-    log_step "=== Queue Cutover ($color) ==="
-    compose_for_release "$release_dir" up -d queue
+    log_step "=== Worker Cutover ($color) ==="
+    compose_for_release "$release_dir" up -d queue scheduler
     wait_for_container_health "$(container_name "$color" queue)"
+    wait_for_container_health "$(container_name "$color" scheduler)"
 
     docker stop nexus-php-queue >/dev/null 2>&1 || true
+    docker stop nexus-php-scheduler >/dev/null 2>&1 || true
     docker stop "$(container_name "$(inactive_color "$color")" queue)" >/dev/null 2>&1 || true
-    log_ok "Queue worker is running for $color"
+    docker stop "$(container_name "$(inactive_color "$color")" scheduler)" >/dev/null 2>&1 || true
+    log_ok "Queue and scheduler workers are running for $color"
 }
 
 post_cutover_smoke() {
@@ -395,6 +430,7 @@ post_cutover_smoke() {
 
 run_prerender_for_color() {
     local color="$1"
+    local release_dir="$2"
     local frontend_container
     frontend_container="$(container_name "$color" frontend)"
 
@@ -405,7 +441,7 @@ run_prerender_for_color() {
 
     log_step "=== Per-Tenant Pre-Rendering ($color) ==="
 
-    if [ ! -f "$DEPLOY_DIR/scripts/deploy/phases/prerender-tenants.sh" ]; then
+    if [ ! -f "$release_dir/scripts/deploy/phases/prerender-tenants.sh" ]; then
         log_warn "Pre-render phase not found; run manually if needed"
         return 0
     fi
@@ -419,10 +455,19 @@ run_prerender_for_color() {
 
     FRONTEND_CONTAINER="$frontend_container" \
     NGINX_CONTAINER="$frontend_container" \
+    PRERENDER_DEPLOY_DIR="$release_dir" \
+    PRERENDER_CODE_DIR="$release_dir" \
+    PRERENDER_CONFIG_DIR="$DEPLOY_DIR" \
     FORCE_PRERENDER="$FORCE_PRERENDER" \
     PRERENDER_TENANT="$PRERENDER_TENANT" \
     PRERENDER_ROUTES="$PRERENDER_ROUTES" \
-    bash "$DEPLOY_DIR/scripts/deploy/phases/prerender-tenants.sh" || true
+    bash "$release_dir/scripts/deploy/phases/prerender-tenants.sh" || true
+}
+
+schedule_followup_health_check() {
+    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/schedule-health-check.sh" ]; then
+        bash "$DEPLOY_DIR/scripts/deploy/phases/schedule-health-check.sh" || true
+    fi
 }
 
 cmd_status() {
@@ -463,21 +508,24 @@ cmd_deploy() {
     smoke_color "$target"
     write_apache_routes "$target"
     write_color_release "$target" "$commit" "$release_dir"
-    start_queue_for_color "$target" "$release_dir" "$commit"
+    start_workers_for_color "$target" "$release_dir" "$commit"
     if ! post_cutover_smoke; then
         log_err "Public smoke failed after cutover; reverting traffic to $active"
         write_apache_routes "$active"
         if release_meta="$(read_color_release "$active")"; then
             commit="${release_meta%%|*}"
             release_dir="${release_meta#*|}"
-            start_queue_for_color "$active" "$release_dir" "$commit"
+            start_workers_for_color "$active" "$release_dir" "$commit"
         else
             docker start nexus-php-queue >/dev/null 2>&1 || true
+            docker start nexus-php-scheduler >/dev/null 2>&1 || true
             docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
+            docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
         fi
         exit 1
     fi
-    run_prerender_for_color "$target"
+    run_prerender_for_color "$target" "$release_dir"
+    schedule_followup_health_check
     git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
     state_set DEPLOY_SUCCESS 1
 }
@@ -501,11 +549,13 @@ cmd_rollback() {
     if release_meta="$(read_color_release "$target")"; then
         commit="${release_meta%%|*}"
         release_dir="${release_meta#*|}"
-        start_queue_for_color "$target" "$release_dir" "$commit"
+        start_workers_for_color "$target" "$release_dir" "$commit"
     else
-        log_warn "No release metadata found for $target queue; trying legacy queue container"
+        log_warn "No release metadata found for $target workers; trying legacy containers"
         docker start nexus-php-queue >/dev/null 2>&1 || true
+        docker start nexus-php-scheduler >/dev/null 2>&1 || true
         docker stop "$(container_name "$active" queue)" >/dev/null 2>&1 || true
+        docker stop "$(container_name "$active" scheduler)" >/dev/null 2>&1 || true
     fi
     post_cutover_smoke
     state_set DEPLOY_SUCCESS 1

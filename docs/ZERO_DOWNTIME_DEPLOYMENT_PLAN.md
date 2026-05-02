@@ -63,7 +63,7 @@ Shared stateful services:
   MariaDB, Redis, Meilisearch, uploads, storage, logs, prerendered volume
 ```
 
-Only stateless web containers are blue/green. Database, Redis, Meilisearch, uploads, storage, logs, and persistent pre-render volumes stay shared. Queue workers are cut over after web traffic is switched.
+Only stateless runtime containers are blue/green. Database, Redis, Meilisearch, uploads, storage, logs, and persistent pre-render volumes stay shared. Queue and scheduler workers are cut over with the active color.
 
 ## Release Rules
 
@@ -83,9 +83,9 @@ Only stateless web containers are blue/green. Database, Redis, Meilisearch, uplo
 ## Implemented Files
 
 - `Dockerfile.bluegreen` builds an immutable PHP/Apache image with Composer dependencies and application code inside the image.
-- `compose.bluegreen.yml` starts the inactive API, React frontend, sales site, and queue worker with color-specific container names and ports.
+- `compose.bluegreen.yml` starts the inactive API, React frontend, sales site, queue worker, and scheduler with color-specific container names and ports.
 - `react-frontend/Dockerfile.bluegreen` and `react-frontend/nginx.bluegreen.conf` build a frontend image that proxies uploads to the matching color API container.
-- `scripts/deploy/bluegreen-deploy.sh` prepares a release worktree under `/opt/nexus-releases` by default, starts the inactive color, waits for health checks, runs private smoke tests, switches Apache routes, starts the matching queue worker, and runs public smoke tests.
+- `scripts/deploy/bluegreen-deploy.sh` prepares a release worktree under `/opt/nexus-releases` by default, starts the inactive color, waits for health checks, runs private smoke tests, switches Apache routes, starts matching worker containers, runs public smoke tests, refreshes pre-rendered HTML when needed, and schedules the delayed health check.
 - `scripts/deploy/apache/*.example` documents the Apache/Plesk include shape expected by the route switch.
 
 ## Server Setup
@@ -111,6 +111,8 @@ systemctl reload apache2
 ```
 
 If Plesk stores per-domain Apache includes elsewhere, use that path instead. The important rule is that the switch is a configtest plus graceful reload, not container recreation.
+
+Disable the old host cron scheduler after the blue/green scheduler container is installed. Scheduled jobs should run in `nexus-{blue|green}-php-scheduler`, not by `docker exec nexus-php-app ...`.
 
 ## Candidate Stack
 

@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/../lib/common.sh"
 
 FRONTEND_CONTAINER="${FRONTEND_CONTAINER:-nexus-react-prod}"
+PRERENDER_DEPLOY_DIR="${PRERENDER_DEPLOY_DIR:-$DEPLOY_DIR}"
 PRERENDER_DIR="/usr/share/nginx/html/prerendered"
 
 has_existing_prerendered_html() {
@@ -25,12 +26,12 @@ changed_files_since_last_deploy() {
         BASE_COMMIT="$(cat "$LAST_DEPLOY_FILE" 2>/dev/null || true)"
     fi
 
-    if [ -n "$BASE_COMMIT" ] && git cat-file -e "$BASE_COMMIT^{commit}" 2>/dev/null; then
-        git diff --name-only "$BASE_COMMIT"..HEAD
+    if [ -n "$BASE_COMMIT" ] && git -C "$PRERENDER_DEPLOY_DIR" cat-file -e "$BASE_COMMIT^{commit}" 2>/dev/null; then
+        git -C "$PRERENDER_DEPLOY_DIR" diff --name-only "$BASE_COMMIT"..HEAD
         return 0
     fi
 
-    git diff --name-only HEAD~1..HEAD 2>/dev/null || git ls-files
+    git -C "$PRERENDER_DEPLOY_DIR" diff --name-only HEAD~1..HEAD 2>/dev/null || git -C "$PRERENDER_DEPLOY_DIR" ls-files
 }
 
 needs_prerender_for_changes() {
@@ -89,7 +90,7 @@ prerender_tenants() {
         return 0
     fi
 
-    if [ ! -f "$DEPLOY_DIR/scripts/prerender-tenants.sh" ]; then
+    if [ ! -f "$PRERENDER_DEPLOY_DIR/scripts/prerender-tenants.sh" ]; then
         log_warn "prerender-tenants.sh not found; pre-rendering skipped"
         log_warn "Run manually: sudo bash scripts/prerender-tenants.sh"
         return 1
@@ -103,9 +104,9 @@ prerender_tenants() {
         ARGS+=(--routes "$PRERENDER_ROUTES")
     fi
 
-    if bash "$DEPLOY_DIR/scripts/prerender-tenants.sh" "${ARGS[@]}" 2>&1 | tee -a "$LOG_FILE"; then
+    if bash "$PRERENDER_DEPLOY_DIR/scripts/prerender-tenants.sh" "${ARGS[@]}" 2>&1 | tee -a "$LOG_FILE"; then
         if [ -z "${PRERENDER_TENANT:-}" ] && [ -z "${PRERENDER_ROUTES:-}" ]; then
-            git rev-parse HEAD > "$LAST_PRERENDER_FILE"
+            git -C "$PRERENDER_DEPLOY_DIR" rev-parse HEAD > "$LAST_PRERENDER_FILE"
         fi
         log_ok "Per-tenant pre-rendering complete"
         return 0
