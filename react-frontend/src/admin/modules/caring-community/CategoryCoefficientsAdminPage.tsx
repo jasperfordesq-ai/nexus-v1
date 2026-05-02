@@ -36,7 +36,7 @@ import Sliders from 'lucide-react/icons/sliders';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -185,15 +185,15 @@ export default function CategoryCoefficientsAdminPage() {
               <p className="text-default-600">
                 Substitution Coefficients control how much social value each care category is worth
                 in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour
-                of formal Spitex/Pflege care (CHF&nbsp;35). A coefficient of 0.5 means it substitutes
+                of formal Spitex/Pflege care (<Abbr term="CHF">CHF&nbsp;35</Abbr>). A coefficient of 0.5 means it substitutes
                 for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal
                 care — for example, intensive personal care or specialist support. The
-                Age-Stiftung/KISS methodology recommends starting all categories at 1.0 and adjusting
+                Age-Stiftung/<Abbr term="KISS">KISS</Abbr> methodology recommends starting all categories at 1.0 and adjusting
                 based on observed care intensity.
               </p>
               <p className="text-default-500">
                 Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on
-                the next ROI report refresh.
+                the next <Abbr term="ROI" /> report refresh.
               </p>
             </div>
           </div>
@@ -268,6 +268,8 @@ export default function CategoryCoefficientsAdminPage() {
                           onValueChange={(v) => handleDraftChange(row.id, v)}
                           aria-label={`Coefficient for ${row.name}`}
                           className="max-w-[140px]"
+                          isInvalid={Number.parseFloat(draft) < COEFFICIENT_MIN || Number.parseFloat(draft) > COEFFICIENT_MAX}
+                          errorMessage="Must be between 0.00 and 9.99"
                         />
                       </TableCell>
                       <TableCell className="text-right">

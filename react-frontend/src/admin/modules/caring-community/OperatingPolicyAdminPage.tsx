@@ -23,7 +23,7 @@ import ScrollText from 'lucide-react/icons/scroll-text';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 interface FieldSchema {
   type: 'int' | 'int_nullable' | 'float' | 'enum' | 'url_nullable';
@@ -124,7 +124,7 @@ export default function OperatingPolicyAdminPage() {
       const res = await api.put<OperatingPolicy>('/v2/admin/caring-community/operating-policy', draft);
       setData((prev) => (prev ? { ...prev, policy: res.data ?? prev.policy } : prev));
       setDraft(res.data ?? draft);
-      showToast('Operating policy saved', 'success');
+      showToast('Operating policy saved. Changes apply to all new exchanges immediately.', 'success');
     } catch (err) {
       const msg = (err as { message?: string })?.message ?? 'Failed to save operating policy';
       showToast(msg, 'error');
@@ -238,9 +238,10 @@ export default function OperatingPolicyAdminPage() {
                 Changes take effect immediately and are logged for audit purposes.
               </p>
               <p className="text-default-600">
-                The CHF hourly rate and prevention multiplier fields use the KISS methodology
+                The <Abbr term="CHF" /> hourly rate and prevention multiplier fields use the{' '}
+                <Abbr term="KISS">KISS</Abbr> methodology
                 (Koordination und Innovation für Soziales, Schwyz) developed with Age-Stiftung. If you
-                are not running a Swiss KISS/AGORIS pilot, set the rate to your local formal-care hourly
+                are not running a Swiss KISS/<Abbr term="AGORIS">AGORIS</Abbr> pilot, set the rate to your local formal-care hourly
                 equivalent and the multiplier to 1.0.
               </p>
             </div>
@@ -298,7 +299,7 @@ export default function OperatingPolicyAdminPage() {
 
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
-              <span className="font-semibold text-sm">CHF social-value methodology</span>
+              <span className="font-semibold text-sm"><Abbr term="CHF" /> social-value methodology</span>
             </CardHeader>
             <CardBody className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {renderField('chf_hourly_rate')}

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -35,7 +35,7 @@ import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
-import { PageHeader, StatCard } from '../../components';
+import { Abbr, PageHeader, StatCard } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -272,14 +272,14 @@ export default function MunicipalRoiAdminPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
               <p className="text-default-600">
-                The Municipal ROI Report calculates the social and economic value of your community
-                care programme using the KISS/Age-Stiftung methodology. It shows the estimated cost
+                The Municipal <Abbr term="ROI" /> Report calculates the social and economic value of your community
+                care programme using the <Abbr term="KISS">KISS</Abbr>/Age-Stiftung methodology. It shows the estimated cost
                 offset to formal care services (Spitex/Pflege), the social value generated, and trend
                 data across reporting periods. This report is designed to be shared with municipal
                 partners and funders as evidence of the programme's impact.
               </p>
               <p className="text-default-500">
-                Cost offset = total approved care hours × CHF hourly rate × prevention multiplier.
+                Cost offset = total approved care hours × <Abbr term="CHF" /> hourly rate × prevention multiplier.
                 The prevention multiplier (default: 2.0) reflects that one hour of informal care
                 prevents approximately two hours of formal care intervention, based on Age-Stiftung
                 research.
@@ -349,20 +349,20 @@ export default function MunicipalRoiAdminPage() {
           <p className="text-sm text-default-600">
             {data?.methodology ? (
               <>
-                Hours valued at CHF {NUM.format(data.methodology.hourly_rate_chf)}/hr (
+                Hours valued at <Abbr term="CHF">CHF {NUM.format(data.methodology.hourly_rate_chf)}/hr</Abbr> (
                 {data.methodology.hourly_rate_source === 'tenant_setting'
                   ? 'configured for this tenant'
                   : 'Swiss formal care assistant rate, SECO 2024'}
                 ). Prevention value applies a {data.methodology.prevention_multiplier}× multiplier
-                per Age-Stiftung/KISS evaluation methodology.{' '}
+                per Age-Stiftung/<Abbr term="KISS">KISS</Abbr> evaluation methodology.{' '}
                 {data.methodology.substitution_applied
                   ? 'Hours are weighted by per-category substitution coefficients.'
                   : 'All hours weighted at 1.0×.'}
               </>
             ) : (
               <>
-                Hours are valued at CHF 35/hr (Swiss formal care assistant rate, SECO 2024).
-                Prevention value applies a 2× multiplier per Age-Stiftung/KISS evaluation
+                Hours are valued at <Abbr term="CHF">CHF 35/hr</Abbr> (Swiss formal care assistant rate, SECO 2024).
+                Prevention value applies a 2× multiplier per Age-Stiftung/<Abbr term="KISS">KISS</Abbr> evaluation
                 methodology.
               </>
             )}
@@ -476,13 +476,13 @@ export default function MunicipalRoiAdminPage() {
             </CardHeader>
             <CardBody className="pt-0">
               <ul className="space-y-2">
-                {[
-                  'Every hour of community caring time saves approximately CHF 35 in formal care costs',
-                  'Preventative community support can reduce residential care needs — estimated 2× multiplier',
-                  'NEXUS makes this impact measurable, auditable, and reportable for cantonal and municipal procurement',
-                  'CSV export available — use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting.',
-                ].map((point) => (
-                  <li key={point} className="flex items-start gap-2 text-sm text-default-700">
+                {([
+                  <>Every hour of community caring time saves approximately <Abbr term="CHF">CHF 35</Abbr> in formal care costs</>,
+                  <>Preventative community support can reduce residential care needs — estimated 2× multiplier</>,
+                  <><Abbr term="NEXUS">NEXUS</Abbr> makes this impact measurable, auditable, and reportable for cantonal and municipal procurement</>,
+                  <>CSV export available — use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting.</>,
+                ] as React.ReactNode[]).map((point, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-default-700">
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     {point}
                   </li>

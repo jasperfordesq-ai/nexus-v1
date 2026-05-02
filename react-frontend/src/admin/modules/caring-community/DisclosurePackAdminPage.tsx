@@ -27,7 +27,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 interface DisclosurePack {
   controller: { name: string; address: string; contact_email: string; data_protection_officer: string };
@@ -202,14 +202,14 @@ export default function DisclosurePackAdminPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
               <p className="text-default-600">
-                The Disclosure Pack (AG80) is the FADP/nDSG data-protection disclosure document
+                The Disclosure Pack (AG80) is the <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> data-protection disclosure document
                 that residents must be made aware of before participating in the community care
                 programme. It covers the data controller and processor identities, data categories
                 processed, lawful basis, data-subject rights, incident response contacts, and
                 cross-border transfer safeguards.
               </p>
               <p className="text-default-600">
-                This pack is a working draft — review it with FADP/nDSG counsel before publishing.
+                This pack is a working draft — review it with <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> counsel before publishing.
                 Edit the controller details, incident-response owner, and isolated-node
                 configuration for your deployment, then use <strong>Export Markdown</strong> to
                 produce the legal handover document. Defaults reflect platform-side commitments.
@@ -352,7 +352,7 @@ export default function DisclosurePackAdminPage() {
                     These fields are only relevant if this deployment runs on canton-controlled
                     infrastructure. For standard hosted deployments, leave as defaults. Each owner
                     field identifies the legal entity responsible for that infrastructure component
-                    under FADP/nDSG Article 9.
+                    under <Abbr term="FADP">FADP</Abbr>/<Abbr term="nDSG">nDSG</Abbr> Article 9.
                   </p>
                   <Input label="Hosting owner" value={draft.isolated_node.hosting_owner}
                     onValueChange={(v) => setIsolatedField('hosting_owner', v)}

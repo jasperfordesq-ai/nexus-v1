@@ -29,7 +29,7 @@ import Wrench from 'lucide-react/icons/wrench';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -276,7 +276,7 @@ export default function CommercialBoundaryAdminPage() {
               <p className="text-default-600">
                 The Commercial Boundary defines which types of paid work are permitted within the
                 community care programme and which must remain unpaid time credits. This boundary is
-                a requirement of the KISS/AGORIS methodology and must be agreed with your municipal
+                a requirement of the <Abbr term="KISS">KISS</Abbr>/<Abbr term="AGORIS">AGORIS</Abbr> methodology and must be agreed with your municipal
                 partner before the pilot launches. The matrix below lists activity categories and
                 their permitted exchange type.
               </p>
@@ -284,7 +284,7 @@ export default function CommercialBoundaryAdminPage() {
                 Use the per-row override to record a tenant-specific classification (for example, a
                 private deployment that has a commercial bundle). Overrides are stored in tenant
                 settings only — they never alter the canonical public classification shipped with the
-                AGPL repo. Once you confirm the boundary matrix, the agreement is recorded with a
+                <Abbr term="AGPL">AGPL</Abbr> repo. Once you confirm the boundary matrix, the agreement is recorded with a
                 timestamp and your user ID, forming part of the pilot governance documentation that
                 appears in the Pilot Launch Readiness check.
               </p>
@@ -405,7 +405,7 @@ function CapabilityRow({ capability, saving, onChange, onReset }: CapabilityRowP
                 size="sm"
                 startContent={<ShieldCheck size={10} />}
               >
-                AGPL module
+                <Abbr term="AGPL">AGPL</Abbr> module
               </Chip>
             ) : (
               <Chip color="secondary" variant="dot" size="sm" startContent={<Wrench size={10} />}>

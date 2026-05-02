@@ -33,7 +33,7 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { Abbr, PageHeader } from '../../components';
 
 type ItemStatus = 'pending' | 'in_progress' | 'decided' | 'blocked';
 type ItemType = 'enum' | 'text' | 'url' | 'choice';
@@ -285,9 +285,9 @@ export default function IsolatedNodeAdminPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
               <p className="text-default-600">
-                An Isolated Node deployment runs NEXUS on infrastructure controlled entirely by the
+                An Isolated Node deployment runs <Abbr term="NEXUS">NEXUS</Abbr> on infrastructure controlled entirely by the
                 canton or municipality — no data leaves the canton boundary. This configuration is
-                required for AGORIS deployments under strict Swiss cantonal data protection rules.
+                required for <Abbr term="AGORIS">AGORIS</Abbr> deployments under strict Swiss cantonal data protection rules.
                 Most communities run as standard hosted deployments and do not need to configure this
                 section.
               </p>
@@ -310,7 +310,7 @@ export default function IsolatedNodeAdminPage() {
               <p className="text-default-600 mt-0.5">
                 Only change these settings if your municipality has explicitly specified an
                 isolated-node requirement. Changing the deployment mode after pilot launch requires
-                coordination with the NEXUS technical team. Do not change this setting without
+                coordination with the <Abbr term="NEXUS">NEXUS</Abbr> technical team. Do not change this setting without
                 agreement from your cantonal data protection officer.
               </p>
             </div>
