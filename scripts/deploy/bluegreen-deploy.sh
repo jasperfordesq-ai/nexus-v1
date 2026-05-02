@@ -27,6 +27,18 @@ STATUS_FILE="${NEXUS_BLUEGREEN_STATUS_FILE:-$DEPLOY_DIR/.bluegreen-status}"
 LATEST_LOG_FILE="${NEXUS_BLUEGREEN_LATEST_LOG_FILE:-$DEPLOY_DIR/.bluegreen-latest-log}"
 RELEASES_DIR="${NEXUS_RELEASES_DIR:-$(dirname "$DEPLOY_DIR")/nexus-releases}"
 APACHE_ROUTES_FILE="${NEXUS_APACHE_ROUTES_FILE:-}"
+
+# Auto-detect routes file — sudo strips environment variables, so we cannot
+# rely on NEXUS_APACHE_ROUTES_FILE being present. Check the canonical path.
+if [ -z "$APACHE_ROUTES_FILE" ]; then
+    _CANDIDATE="/etc/apache2/conf-enabled/nexus-active-upstreams.conf"
+    if [ -f "$_CANDIDATE" ]; then
+        APACHE_ROUTES_FILE="$_CANDIDATE"
+        export NEXUS_APACHE_ROUTES_FILE="$_CANDIDATE"
+    fi
+    unset _CANDIDATE
+fi
+
 APACHE_CONFIGTEST="${NEXUS_APACHE_CONFIGTEST:-apachectl configtest}"
 APACHE_RELOAD="${NEXUS_APACHE_RELOAD:-systemctl reload apache2}"
 ACTIVE_COLOR_DEFAULT="${NEXUS_ACTIVE_COLOR_DEFAULT:-blue}"
