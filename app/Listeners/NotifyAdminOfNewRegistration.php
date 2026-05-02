@@ -37,10 +37,6 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
             // user-facing /profile/{id} route which works for everyone.
             $profileUrl = $baseUrl . $basePath . '/profile/' . $user->id;
 
-            $newUserName  = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''))
-                ?: ($user->name ?? 'Unknown');
-            $newUserEmail = $user->email ?? '';
-
             $admins = DB::table('users')
                 ->where('tenant_id', $event->tenantId)
                 ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
@@ -62,10 +58,10 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 }
 
                 try {
-                    LocaleContext::withLocale($admin, function () use ($admin, $user, $newUserName, $newUserEmail, $profileUrl, $tenantName, $adminEmail, $mailer) {
+                    LocaleContext::withLocale($admin, function () use ($admin, $user, $profileUrl, $tenantName, $adminEmail, $mailer) {
                         $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
-                        $bellContent = __('emails_misc.admin_notify.new_user_bell', ['name' => $newUserName]);
+                        $bellContent = __('emails_misc.admin_notify.new_user_bell');
                         // Bell goes to broker/coordinator recipients too (line 43).
                         // Use the broker panel members list which all admin-tier
                         // and broker-tier roles can access.
@@ -79,11 +75,6 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                             ->previewText(__('emails_misc.admin_notify.new_user_preview', ['community' => $tenantName]))
                             ->greeting($adminName)
                             ->paragraph(__('emails_misc.admin_notify.new_user_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                            ->highlight(htmlspecialchars($newUserName, ENT_QUOTES, 'UTF-8'))
-                            ->bulletList(array_filter([
-                                __('emails_misc.admin_notify.new_user_email_label') . ': ' . htmlspecialchars($newUserEmail, ENT_QUOTES, 'UTF-8'),
-                                __('emails_misc.admin_notify.new_user_status_label') . ': ' . ucfirst($user->status ?? 'pending'),
-                            ]))
                             ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
                             ->render();
 
