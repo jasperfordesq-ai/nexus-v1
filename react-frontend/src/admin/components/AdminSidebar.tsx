@@ -165,7 +165,7 @@ const ZONES: NavZone[] = [
     // What your community does: content, activities, commerce
     key: 'content_commerce',
     label: 'zone_community',
-    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
+    sectionKeys: ['caring_community', 'community', 'listings', 'content', 'jobs', 'marketplace', 'advertising'],
   },
   {
     // Keeping the platform safe: content + user safety together
@@ -643,6 +643,8 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const sections = useAdminNav();
   const location = useLocation();
   const { tenantPath, hasFeature } = useTenant();
+  const brokerPanelLabel = t('broker_panel');
+  const caringPanelLabel = t('caring_community');
 
   // ── Expanded sections (accordion per zone) ──────────────────────────────
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -1034,7 +1036,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                 <Link
                   to={tenantPath('/broker')}
                   className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
-                  title={"Broker Panel"}
+                  title={brokerPanelLabel}
                 >
                   <ShieldCheck size={18} />
                 </Link>
@@ -1044,19 +1046,19 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <ShieldCheck size={18} className="shrink-0" />
-                  <span>{"Broker Panel"}</span>
+                  <span>{brokerPanelLabel}</span>
                 </Link>
               )}
             </li>
 
-            {/* Community Caring Panel — pinned below Broker Panel, gated by caring_community feature */}
+            {/* Caring Community panel — pinned below Broker Panel, gated by caring_community feature */}
             {hasFeature('caring_community') && (
               <li>
                 {collapsed ? (
                   <Link
                     to={tenantPath('/caring')}
                     className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
-                    title={"Community Caring Panel"}
+                    title={caringPanelLabel}
                   >
                     <Heart size={18} />
                   </Link>
@@ -1066,7 +1068,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                   >
                     <Heart size={18} className="shrink-0" />
-                    <span>{"Community Caring Panel"}</span>
+                    <span>{caringPanelLabel}</span>
                   </Link>
                 )}
               </li>
