@@ -26,6 +26,10 @@ set -euo pipefail
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEPLOY_DIR="$(cd "$SELF_DIR/.." && pwd)"
 
+# common.sh requires LOG_FILE to be set before it is sourced
+LOG_FILE="/dev/null"
+export LOG_FILE DEPLOY_DIR
+
 . "$SELF_DIR/deploy/lib/common.sh"
 
 ROUTES_FILE="/etc/apache2/conf-enabled/nexus-active-upstreams.conf"
