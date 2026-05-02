@@ -474,7 +474,7 @@ smoke_color() {
     log_ok "API health passed on $api_port"
 
     bootstrap="$(curl -sf -H "X-Tenant-Slug: hour-timebank" "http://127.0.0.1:$api_port/api/v2/tenant/bootstrap" || true)"
-    if ! echo "$bootstrap" | grep -q '"tenant"'; then
+    if ! echo "$bootstrap" | grep -q '"hour-timebank"'; then
         log_err "Tenant bootstrap failed on candidate API"
         return 1
     fi
@@ -550,7 +550,7 @@ post_cutover_smoke() {
 
     local bootstrap
     bootstrap="$(curl -sf -H "X-Tenant-Slug: hour-timebank" https://api.project-nexus.ie/api/v2/tenant/bootstrap || true)"
-    if ! echo "$bootstrap" | grep -q '"tenant"'; then
+    if ! echo "$bootstrap" | grep -q '"hour-timebank"'; then
         log_err "Public tenant bootstrap failed"
         return 1
     fi
