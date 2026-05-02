@@ -4,9 +4,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-use Laravel\Horizon\Horizon;
-
-Horizon::routeMailNotificationsTo(env('ADMIN_NOTIFICATION_EMAIL', 'funding@hour-timebank.ie'));
+if (class_exists(\Laravel\Horizon\Horizon::class)) {
+    \Laravel\Horizon\Horizon::routeMailNotificationsTo(env('ADMIN_NOTIFICATION_EMAIL', 'funding@hour-timebank.ie'));
+}
 
 return [
     'domain' => null,
