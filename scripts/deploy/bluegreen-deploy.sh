@@ -24,6 +24,10 @@ APACHE_CONFIGTEST="${NEXUS_APACHE_CONFIGTEST:-apachectl configtest}"
 APACHE_RELOAD="${NEXUS_APACHE_RELOAD:-systemctl reload apache2}"
 ACTIVE_COLOR_DEFAULT="${NEXUS_ACTIVE_COLOR_DEFAULT:-blue}"
 LARAVEL_MIGRATE=0
+SKIP_PRERENDER=0
+FORCE_PRERENDER=0
+PRERENDER_TENANT=""
+PRERENDER_ROUTES=""
 PREPARED_COMMIT=""
 PREPARED_RELEASE_DIR=""
 
@@ -39,6 +43,8 @@ usage() {
 Usage:
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy
   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --migrate
+  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --skip-prerender
+  sudo bash scripts/deploy/bluegreen-deploy.sh deploy --force-prerender
   sudo bash scripts/deploy/bluegreen-deploy.sh rollback
   sudo bash scripts/deploy/bluegreen-deploy.sh status
 
@@ -56,6 +62,10 @@ parse_flags() {
     while [ "$#" -gt 0 ]; do
         case "$1" in
             --migrate) LARAVEL_MIGRATE=1 ;;
+            --skip-prerender) SKIP_PRERENDER=1 ;;
+            --force-prerender) FORCE_PRERENDER=1 ;;
+            --prerender-tenant) PRERENDER_TENANT="${2:-}"; shift ;;
+            --prerender-routes) PRERENDER_ROUTES="${2:-}"; shift ;;
             *)
                 log_err "Unknown flag: $1"
                 usage
@@ -383,6 +393,38 @@ post_cutover_smoke() {
     log_ok "Public sales site passed"
 }
 
+run_prerender_for_color() {
+    local color="$1"
+    local frontend_container
+    frontend_container="$(container_name "$color" frontend)"
+
+    if [ "$SKIP_PRERENDER" = "1" ]; then
+        log_info "Skipping per-tenant pre-rendering (--skip-prerender set)"
+        return 0
+    fi
+
+    log_step "=== Per-Tenant Pre-Rendering ($color) ==="
+
+    if [ ! -f "$DEPLOY_DIR/scripts/deploy/phases/prerender-tenants.sh" ]; then
+        log_warn "Pre-render phase not found; run manually if needed"
+        return 0
+    fi
+
+    export PRERENDER_BASE_COMMIT="${PRERENDER_BASE_COMMIT:-}"
+    if [ -z "$PRERENDER_BASE_COMMIT" ] && [ -f "$LAST_PRERENDER_FILE" ]; then
+        PRERENDER_BASE_COMMIT="$(cat "$LAST_PRERENDER_FILE" 2>/dev/null || true)"
+    elif [ -z "$PRERENDER_BASE_COMMIT" ] && [ -f "$LAST_DEPLOY_FILE" ]; then
+        PRERENDER_BASE_COMMIT="$(cat "$LAST_DEPLOY_FILE" 2>/dev/null || true)"
+    fi
+
+    FRONTEND_CONTAINER="$frontend_container" \
+    NGINX_CONTAINER="$frontend_container" \
+    FORCE_PRERENDER="$FORCE_PRERENDER" \
+    PRERENDER_TENANT="$PRERENDER_TENANT" \
+    PRERENDER_ROUTES="$PRERENDER_ROUTES" \
+    bash "$DEPLOY_DIR/scripts/deploy/phases/prerender-tenants.sh" || true
+}
+
 cmd_status() {
     local active api_port frontend_port sales_port
     active="$(read_active_color)"
@@ -435,6 +477,8 @@ cmd_deploy() {
         fi
         exit 1
     fi
+    run_prerender_for_color "$target"
+    git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
     state_set DEPLOY_SUCCESS 1
 }
 

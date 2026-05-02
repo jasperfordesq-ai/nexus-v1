@@ -22,8 +22,8 @@
 
 set -euo pipefail
 
-DEPLOY_DIR="/opt/nexus-php"
-NGINX_CONTAINER="nexus-react-prod"
+DEPLOY_DIR="${DEPLOY_DIR:-/opt/nexus-php}"
+NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
 PRERENDER_DIR="/usr/share/nginx/html/prerendered"
 PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.59.1-noble"
 WORKER_SCRIPT="$DEPLOY_DIR/scripts/prerender-worker.mjs"
