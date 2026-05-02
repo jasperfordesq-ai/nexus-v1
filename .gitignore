@@ -105,6 +105,7 @@ compose.prod.yml
 # ─── Docker Config (local dev, contains credentials) ──────────────────────────
 /docker/
 !/docker/entrypoint-cache.sh
+!/docker/preload.php
 
 # ─── Downloads & Binary Assets ─────────────────────────────────────────────────
 /httpdocs/downloads/
