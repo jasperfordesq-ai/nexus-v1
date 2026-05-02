@@ -35,6 +35,7 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
+import Info from 'lucide-react/icons/info';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -462,6 +463,29 @@ export function PilotInquiryAdminPage() {
           </div>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="text-default-600">
+                This is the top-of-funnel pipeline for municipalities (<em>Gemeinden</em>) and regions interested
+                in running a NEXUS/KISS pilot. Each inquiry is submitted via the public interest form and scored
+                automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness,
+                budget indication, and timeline). Use this board to move inquiries through the pipeline, assign
+                them to a sales or community contact, and track when proposals are sent and pilots go live.
+              </p>
+              <p className="text-default-500">
+                <strong>Pipeline stages:</strong> New → Contacted → Qualified → Proposal sent → Pilot agreed → Live → Rejected / Withdrawn.
+                The <strong>Fit score</strong> (0–100) is calculated automatically — 70+ is a strong match. Click any
+                card to view full details, update the stage, or add internal notes.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

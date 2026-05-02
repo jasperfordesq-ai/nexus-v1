@@ -32,6 +32,7 @@ import {
 } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
+import Info from 'lucide-react/icons/info';
 import Zap from 'lucide-react/icons/zap';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import XCircle from 'lucide-react/icons/x-circle';
@@ -376,6 +377,33 @@ export default function KiAgentAdminPage() {
             )}
           </div>
         )}
+      </div>
+
+      <div className="rounded-xl border-l-4 border-l-primary bg-primary-50 px-4 py-3 dark:bg-primary-900/20">
+        <div className="flex gap-3">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <div className="space-y-1 text-sm">
+            <p className="font-semibold text-primary-800 dark:text-primary-200">About KI-Agenten</p>
+            <p className="text-default-600">
+              KI-Agenten (AI Agents) automate routine coordination tasks — finding good care pairings, nudging
+              inactive members, summarising coordinator workloads, and routing open help requests. Every agent
+              works on a <strong>propose-then-approve</strong> model: agents generate proposals, but nothing is
+              applied until a human approves it (unless the proposal's confidence score exceeds the auto-apply
+              threshold you configure). Use the <strong>Config</strong> tab to enable agents and set thresholds,
+              the <strong>Runs</strong> tab to see execution history, and the <strong>Proposals</strong> tab to
+              review and approve or reject pending suggestions.
+            </p>
+            <p className="text-default-500">
+              <strong>Tandem Matching</strong> — suggests KISS-style one-to-one care pairings based on skills,
+              location, and availability.{' '}
+              <strong>Nudge Dispatch</strong> — sends targeted prompts to members who have been inactive or
+              have unmatched requests.{' '}
+              <strong>Demand Forecast</strong> — predicts upcoming care demand from historical patterns.{' '}
+              <strong>Help Routing</strong> — automatically suggests the best coordinator for open help requests.{' '}
+              <strong>Activity Summary</strong> — emails coordinators a weekly digest of volunteer activity.
+            </p>
+          </div>
+        </div>
       </div>
 
       <Tabs aria-label="KI-Agenten tabs" variant="underlined" color="primary">

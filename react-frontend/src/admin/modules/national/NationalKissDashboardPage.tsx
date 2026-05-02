@@ -51,6 +51,7 @@ import Landmark from 'lucide-react/icons/landmark';
 import Building2 from 'lucide-react/icons/building-2';
 import Activity from 'lucide-react/icons/activity';
 import Clock from 'lucide-react/icons/clock';
+import Info from 'lucide-react/icons/info';
 import Users from 'lucide-react/icons/users';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import TrendingDown from 'lucide-react/icons/trending-down';
@@ -263,6 +264,30 @@ export function NationalKissDashboardPage() {
           </span>
         }
       />
+
+      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+        <CardBody className="px-4 py-3">
+          <div className="flex gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-primary-800 dark:text-primary-200">About this dashboard</p>
+              <p className="text-default-600">
+                KISS (Koordination und Innovation für Soziales) is a Swiss methodology for community-based care
+                coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every
+                NEXUS cooperative running the Caring Community programme nationally — giving the Fondation KISS
+                a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member
+                counts are shown as privacy-preserving brackets (e.g. "50–99") rather than exact numbers.
+              </p>
+              <p className="text-default-500">
+                Use the period selector to compare quarters. The comparative table ranks cooperatives by hours,
+                members, or health status. Health status is derived from activity trends: <strong>Thriving</strong> =
+                growing fast, <strong>Growing</strong> = steady increase, <strong>Stable</strong> = flat activity,{' '}
+                <strong>Struggling</strong> = declining activity or very low engagement.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Period selector */}
       <Card>
