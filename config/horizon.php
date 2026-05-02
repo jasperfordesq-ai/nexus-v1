@@ -6,16 +6,14 @@
 
 use Laravel\Horizon\Horizon;
 
-Horizon::routeSmsNotificationsTo('');
-Horizon::routeMailNotificationsTo('');
-Horizon::routeSlackNotificationsTo('', '#horizon');
+Horizon::routeMailNotificationsTo(env('ADMIN_NOTIFICATION_EMAIL', 'funding@hour-timebank.ie'));
 
 return [
     'domain' => null,
     'path' => 'horizon',
     'use' => 'default',
     'prefix' => env('HORIZON_PREFIX', 'horizon:'),
-    'middleware' => ['web'],
+    'middleware' => ['web', 'auth'],
     'waits' => [
         'redis:default' => 60,
     ],

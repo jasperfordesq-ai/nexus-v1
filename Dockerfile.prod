@@ -130,12 +130,12 @@ RUN echo 'ServerTokens Prod' >> /etc/apache2/conf-available/security.conf \
 # CSP intentionally omitted — requires per-app tuning (Pusher, Stripe, Google Maps, etc.)
 # and must be tested before rollout. Add in a follow-up PR.
 RUN a2enmod headers \
-    && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"\n\
+    && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"\n\
 Header always set X-Frame-Options "SAMEORIGIN"\n\
 Header always set X-Content-Type-Options "nosniff"\n\
 Header always set Referrer-Policy "strict-origin-when-cross-origin"\n\
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n\
-Header always set Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"' https://js.stripe.com https://maps.googleapis.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' data: https:; connect-src '"'"'self'"'"' wss: https://api.stripe.com https://maps.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; report-uri /api/v2/csp-report"\n' \
+Header always set Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"' https://js.stripe.com https://maps.googleapis.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' data: https:; connect-src '"'"'self'"'"' wss: https://api.stripe.com https://maps.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; report-uri /api/v2/csp-report"\n' \
     > /etc/apache2/conf-available/security-headers.conf \
     && a2enconf security-headers
 
