@@ -76,6 +76,7 @@ firebase-service-account.json
 
 # Legacy docker folder (using root compose.yml now)
 docker/
+!docker/preload.php
 
 # Temp files
 *.tmp
