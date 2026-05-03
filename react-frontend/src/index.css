@@ -422,6 +422,21 @@
 }
 
 /* ─────────────────────────────────────────────
+   MOBILE TAB BAR — auto-hide when overlays open
+   ─────────────────────────────────────────────
+   The fixed bottom MobileTabBar (z-300) sits above HeroUI's modal/drawer
+   z-index, which would otherwise cover the bottom of any dialog on mobile.
+   Slide it off-screen whenever a HeroUI overlay is open so dialog footers,
+   close affordances, and bottom-anchored sheets are fully visible.
+   Matches the existing isMenuOpen transform so the motion is consistent. */
+@media (max-width: 767px) {
+  body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar] {
+    transform: translateY(calc(100% + 12px));
+    pointer-events: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
    SHIMMER ANIMATION (skeleton loaders)
    ───────────────────────────────────────────── */
 @keyframes shimmer {

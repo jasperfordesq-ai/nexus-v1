@@ -87,6 +87,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
       <div className="md:hidden" aria-hidden="true" style={{ height: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }} />
 
       <nav
+        data-mobile-tabbar
         className={`fixed bottom-0 left-0 right-0 z-300 md:hidden transition-all duration-200 ${isMenuOpen ? 'translate-y-[calc(100%+12px)] pointer-events-none' : ''}`}
         aria-label={t('aria.mobile_navigation')}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
