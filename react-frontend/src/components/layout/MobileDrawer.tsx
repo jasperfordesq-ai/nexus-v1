@@ -81,18 +81,37 @@ interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
 
+// Per-tab cache so opening/closing the drawer doesn't refetch on every cycle.
+const IDENTITY_CACHE_KEY = (uid: number) => `nexus.identity_status.${uid}`;
+
+function readCachedVerified(userId: number): boolean | null {
+  if (typeof sessionStorage === 'undefined') return null;
+  const raw = sessionStorage.getItem(IDENTITY_CACHE_KEY(userId));
+  return raw === 'true' ? true : raw === 'false' ? false : null;
+}
+
+function writeCachedVerified(userId: number, value: boolean): void {
+  if (typeof sessionStorage === 'undefined') return;
+  sessionStorage.setItem(IDENTITY_CACHE_KEY(userId), String(value));
+}
+
 // Identity verification CTA for mobile menu — shows "Verify Identity" if not verified
 function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: number; tenantPath: (p: string) => string; onClose: () => void }) {
-  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean | null>(() => readCachedVerified(userId));
   const navigate = useNavigate();
   const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!userId) return;
+    if (readCachedVerified(userId) !== null) return; // already cached for this tab
     let cancelled = false;
     import('@/lib/api').then(({ api }) => {
       api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
-        if (!cancelled) setIsVerified(res?.data?.has_id_verified_badge === true);
+        const verified = res?.data?.has_id_verified_badge === true;
+        if (!cancelled) {
+          writeCachedVerified(userId, verified);
+          setIsVerified(verified);
+        }
       }).catch(() => { if (!cancelled) setIsVerified(false); });
     }).catch(() => { if (!cancelled) setIsVerified(false); });
     return () => { cancelled = true; };
@@ -105,9 +124,9 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
     <Button
       variant="flat"
       onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
-      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-500/20 h-auto"
+      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 h-auto"
     >
-      <Fingerprint className="w-4 h-4" />
+      <Fingerprint className="w-5 h-5" />
       {t('nav.verify_identity', 'Verify Your Identity')}
     </Button>
   );
@@ -132,6 +151,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
+  // Match this to the drawer's exit animation; lets the drawer slide closed before route changes.
+  const DRAWER_CLOSE_MS = 150;
+  const navigateAndClose = (path: string) => {
+    onClose();
+    setTimeout(() => navigate(tenantPath(path)), DRAWER_CLOSE_MS);
+  };
+
   // Use mobile-specific menus if available, fall back to header menus
   const apiMenus = mobileMenus.length > 0 ? mobileMenus : headerMenus;
 
@@ -145,6 +171,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
     { label: t('nav.explore', 'Explore'), href: '/explore', icon: Compass },
     { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
+    { label: t('nav.saved', 'Saved'), href: '/saved', icon: Bookmark, auth: true },
+    { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity, auth: true },
   ];
 
   const timebankingNavItems = [
@@ -177,19 +205,19 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.nexus_score', 'NexusScore'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
     { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
-    { label: t('nav.saved', 'Saved'), href: '/saved', icon: Bookmark, auth: true },
-    { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
   ];
 
+  // Section header is "Partner Communities" — drop the redundant "Federated" / "Federation" prefix on each item.
+  // Fallback strings on t() let i18next show the short label until translators add proper keys.
   const federationNavItems = [
-    { label: t('nav.federation_hub'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.partner_communities'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federated_members'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federated_messages'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federated_listings'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federated_events'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_settings'), href: '/federation/settings', icon: Settings, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_hub_short', 'Hub'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_partners_short', 'Communities'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_members_short', 'Members'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_messages_short', 'Messages'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_listings_short', 'Listings'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_events_short', 'Events'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
+    { label: t('nav.federation_settings_short', 'Settings'), href: '/federation/settings', icon: Settings, feature: 'federation' as keyof TenantFeatures },
   ];
 
   const aboutNavItems = [
@@ -251,14 +279,15 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       <Button
         key={item.href}
         variant="light"
-        onPress={() => { onClose(); setTimeout(() => navigate(resolvedHref), 150); }}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start h-auto justify-start ${
+        onPress={() => navigateAndClose(item.href)}
+        style={{ minHeight: 'var(--nav-row-min-h, 48px)', paddingTop: 'var(--nav-row-py, 0.875rem)', paddingBottom: 'var(--nav-row-py, 0.875rem)' }}
+        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start h-auto justify-start ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
         }`}
       >
-        <Icon className="w-4 h-4" aria-hidden="true" />
+        <Icon className="w-5 h-5" aria-hidden="true" />
         <span>{item.label}</span>
       </Button>
     );
@@ -276,14 +305,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const visibleFederation = federationNavItems.filter(i => !i.feature || hasFeature(i.feature));
 
   // Accordion section header style
-  const sectionTitleClass = 'text-xs font-semibold uppercase tracking-wider text-theme-subtle';
+  const sectionTitleClass = 'text-sm font-semibold uppercase tracking-wider text-theme-muted';
 
   return (
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
       placement="right"
-      size="sm"
+      size="md"
       hideCloseButton
       classNames={{
         base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl',
@@ -298,7 +327,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
           <Button
             isIconOnly
             variant="light"
-            className="text-theme-muted hover:text-theme-primary"
+            className="text-theme-muted hover:text-theme-primary min-w-[48px] min-h-[48px]"
             onPress={onClose}
             aria-label={t('accessibility.close_menu')}
           >
@@ -313,11 +342,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <Button
                 variant="flat"
                 fullWidth
-                className="flex items-center justify-start gap-3 px-4 py-2.5 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-sm text-theme-subtle h-auto"
+                className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-base text-theme-muted h-auto"
                 onPress={() => { onClose(); onSearchOpen(); }}
                 aria-label={t('aria.open_search')}
               >
-                <Search className="w-4 h-4" aria-hidden="true" />
+                <Search className="w-5 h-5" aria-hidden="true" />
                 <span>{t('search.placeholder')}</span>
               </Button>
             </div>
@@ -328,8 +357,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             <div className="p-4 border-b border-[var(--border-default)]">
               <Button
                 variant="light"
-                onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/profile')), 150); }}
-                className="flex items-center gap-3 w-full text-start h-auto p-0 justify-start"
+                onPress={() => navigateAndClose('/profile')}
+                className="flex items-center gap-3 w-full text-start h-auto p-2 min-h-[56px] justify-start rounded-xl hover:bg-theme-hover"
               >
                 <Avatar
                   name={`${user.first_name} ${user.last_name}`}
@@ -337,11 +366,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   size="lg"
                   showFallback
                 />
-                <div>
-                  <p className="font-semibold text-theme-primary">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-theme-primary truncate">
                     {user.first_name} {user.last_name}
                   </p>
-                  <p className="text-sm text-theme-subtle">{user.email}</p>
+                  <p className="text-sm text-theme-muted truncate">{user.email}</p>
                 </div>
               </Button>
 
@@ -353,36 +382,36 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <div className="grid grid-cols-3 gap-2 mt-3">
                 <Button
                   variant="flat"
-                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/wallet')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col"
+                  onPress={() => navigateAndClose('/wallet')}
+                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">{t('stats.credits')}</p>
+                  <p className="text-sm text-theme-muted">{t('stats.credits')}</p>
                 </Button>
                 <Button
                   variant="flat"
-                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/messages')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
+                  onPress={() => navigateAndClose('/messages')}
+                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">{t('stats.messages')}</p>
+                  <p className="text-sm text-theme-muted">{t('stats.messages')}</p>
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
                 </Button>
                 <Button
                   variant="flat"
-                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/notifications')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
+                  onPress={() => navigateAndClose('/notifications')}
+                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
                   </p>
-                  <p className="text-xs text-theme-subtle">{t('stats.alerts')}</p>
+                  <p className="text-sm text-theme-muted">{t('stats.alerts')}</p>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
@@ -404,16 +433,16 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               onSelectionChange={(keys) => setExpandedKeys(keys as Set<string>)}
               className="px-2 py-2"
               itemClasses={{
-                base: 'py-0',
+                base: 'py-0.5',
                 title: sectionTitleClass,
-                trigger: 'py-2 px-2',
+                trigger: 'py-3 px-2 min-h-[48px]',
                 content: 'pb-2 pt-0',
-                indicator: 'text-theme-subtle',
+                indicator: 'text-theme-muted',
               }}
             >
               {/* Main Navigation */}
               <AccordionItem key="main" title={t('sections.main', 'Main')} aria-label={t('aria.main_navigation')}>
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {mainNavItems.map(renderNavLink)}
                 </div>
               </AccordionItem>
@@ -421,7 +450,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               {/* Timebanking */}
               {visibleTimebanking.length > 0 ? (
                 <AccordionItem key="timebanking" title={t('nav.timebanking', 'Timebanking')} aria-label={t('aria.timebanking_navigation')}>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {timebankingNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
@@ -430,7 +459,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               {/* Community */}
               {visibleCommunity.length > 0 ? (
                 <AccordionItem key="community" title={t('sections.community')} aria-label={t('aria.community_navigation')}>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {communityNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
@@ -439,7 +468,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               {/* Engage */}
               {visibleEngage.length > 0 ? (
                 <AccordionItem key="engage" title={t('sections.engage', 'Engage')} aria-label={t('aria.engage_navigation')}>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {engageNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
@@ -448,25 +477,20 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               {/* Explore / Activity */}
               {visibleExplore.length > 0 ? (
                 <AccordionItem key="explore" title={t('sections.explore')} aria-label={t('aria.explore_navigation')}>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {exploreNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
               ) : null}
 
-              {/* Federation */}
+              {/* Partner Communities (federation) */}
               {visibleFederation.length > 0 && isAuthenticated ? (
                 <AccordionItem
                   key="federation"
-                  title={
-                    <span className="flex items-center gap-1.5">
-                      <Globe className="w-3 h-3" aria-hidden="true" />
-                      {t('sections.federation')}
-                    </span>
-                  }
-                  aria-label={t('aria.federation_navigation')}
+                  title={t('sections.partner_communities')}
+                  aria-label={t('aria.partner_communities_navigation', 'Partner communities navigation')}
                 >
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {federationNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
@@ -474,7 +498,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* About */}
               <AccordionItem key="about" title={t('sections.about')} aria-label={t('aria.about_navigation')}>
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {aboutNavItems.map(renderNavLink)}
                   {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
                   {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
@@ -487,14 +511,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Legal */}
               <AccordionItem key="legal" title={t('sections.legal')} aria-label={t('aria.legal_navigation')}>
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {legalNavItems.map(renderNavLink)}
                   <Button
                     variant="light"
                     onPress={() => { resetConsent(); onClose(); }}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start h-auto"
+                    className="flex items-center gap-3 px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start h-auto"
                   >
-                    <Settings className="w-4 h-4" aria-hidden="true" />
+                    <Settings className="w-5 h-5" aria-hidden="true" />
                     <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
                   </Button>
                 </div>
@@ -511,30 +535,30 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     <Button
                       variant="light"
                       size="sm"
-                      className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                      onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/help')), 150); }}
+                      className="text-theme-muted hover:text-theme-primary h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
+                      onPress={() => navigateAndClose('/help')}
                     >
-                      <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                      <HelpCircle className="w-4 h-4" aria-hidden="true" />
                       {t('user_menu.help_center')}
                     </Button>
                   )}
                   <Button
                     variant="light"
                     size="sm"
-                    className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-8 min-w-0 px-2 gap-1.5 text-xs"
-                    onPress={() => { onClose(); setTimeout(() => navigate(tenantPath(RELEASE_STATUS.readMorePath)), 150); }}
+                    className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
+                    onPress={() => navigateAndClose(RELEASE_STATUS.readMorePath)}
                   >
-                    <FlaskConical className="w-3.5 h-3.5" aria-hidden="true" />
+                    <FlaskConical className="w-4 h-4" aria-hidden="true" />
                     {t('dev_banner.dev_notice', 'Dev Notice')}
                   </Button>
                   {!isAuthenticated && (
                     <Button
                       variant="light"
                       size="sm"
-                      className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                      onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/contact')), 150); }}
+                      className="text-theme-muted hover:text-theme-primary h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
+                      onPress={() => navigateAndClose('/contact')}
                     >
-                      <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
+                      <MessageSquare className="w-4 h-4" aria-hidden="true" />
                       {t('support.contact')}
                     </Button>
                   )}
@@ -543,10 +567,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       <Button
                         variant="light"
                         size="sm"
-                        className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                        onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/admin')), 150); }}
+                        className="text-theme-muted hover:text-theme-primary h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
+                        onPress={() => navigateAndClose('/admin')}
                       >
-                        <Shield className="w-3.5 h-3.5" aria-hidden="true" />
+                        <Shield className="w-4 h-4" aria-hidden="true" />
                         {t('user_menu.admin_panel')}
                       </Button>
                     </>
@@ -580,18 +604,18 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <div className="flex items-center gap-2">
                   <Button
                     variant="light"
-                    onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/settings')), 150); }}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all h-auto"
+                    onPress={() => navigateAndClose('/settings')}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all h-auto"
                   >
-                    <Settings className="w-4 h-4" aria-hidden="true" />
+                    <Settings className="w-5 h-5" aria-hidden="true" />
                     <span>{t('account.settings')}</span>
                   </Button>
                   <Button
                     variant="light"
                     onPress={handleLogout}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-[var(--color-error)] hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-[var(--color-error)] hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
                   >
-                    <LogOut className="w-4 h-4" aria-hidden="true" />
+                    <LogOut className="w-5 h-5" aria-hidden="true" />
                     <span>{t('account.log_out')}</span>
                   </Button>
                 </div>
@@ -603,13 +627,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <div className="px-4 py-3 border-t border-[var(--border-default)] space-y-2">
                 <Button
                   variant="flat"
-                  className="w-full bg-theme-elevated text-theme-secondary"
+                  className="w-full bg-theme-elevated text-theme-secondary min-h-[48px] text-base"
                   onPress={() => { onClose(); navigate(tenantPath('/login')); }}
                 >
                   {t('auth.log_in')}
                 </Button>
                 <Button
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium min-h-[48px] text-base"
                   onPress={() => { onClose(); navigate(tenantPath('/register')); }}
                 >
                   {t('auth.sign_up')}
@@ -624,25 +648,25 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 href="https://github.com/jasperfordesq-ai/nexus-v1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-center text-xs text-theme-subtle hover:text-theme-primary transition-colors"
+                className="block text-center text-sm text-theme-muted hover:text-theme-primary transition-colors py-2 min-h-[44px] flex items-center justify-center"
               >
                 Built on Project NEXUS by Jasper Ford
               </a>
-              <div className="flex justify-center gap-2 mt-2">
+              <div className="flex justify-center items-center gap-1 mt-1">
                 <Button
                   variant="light"
                   size="sm"
-                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/terms')), 150); }}
-                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                  onPress={() => navigateAndClose('/platform/terms')}
+                  className="text-sm text-theme-muted hover:text-theme-primary transition-colors h-11 min-h-[44px] px-3"
                 >
                   Platform Terms
                 </Button>
-                <span className="text-theme-subtle/30">&middot;</span>
+                <span className="text-theme-muted/40" aria-hidden="true">&middot;</span>
                 <Button
                   variant="light"
                   size="sm"
-                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/privacy')), 150); }}
-                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                  onPress={() => navigateAndClose('/platform/privacy')}
+                  className="text-sm text-theme-muted hover:text-theme-primary transition-colors h-11 min-h-[44px] px-3"
                 >
                   Privacy
                 </Button>

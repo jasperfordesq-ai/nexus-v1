@@ -291,6 +291,15 @@ html {
   font-size: var(--font-size-base);
 }
 
+/*
+ * Drawer/nav row sizing — honours --spacing-multiplier with a 48px floor (WCAG 2.5.5 AAA).
+ * Compact (0.75) clamps to 48px; comfortable (1) = 48px; spacious (1.25) = 60px.
+ */
+:root {
+  --nav-row-min-h: max(48px, calc(48px * var(--spacing-multiplier, 1)));
+  --nav-row-py: calc(0.875rem * var(--spacing-multiplier, 1));
+}
+
 /* Accent color fallbacks — use var(--accent-color) where brand primary is used */
 :root {
   --accent-color-hover: color-mix(in srgb, var(--accent-color) 85%, white);

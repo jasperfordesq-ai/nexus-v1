@@ -73,7 +73,19 @@ const i18nMap: Record<string, string> = {
   'sections.main': 'Main',
   'sections.about': 'About', 'sections.support': 'Support', 'sections.legal': 'Legal',
   'sections.community': 'Community', 'sections.explore': 'Explore',
-  'sections.federation': 'Federation', 'sections.account': 'Account',
+  'sections.federation': 'Federation', 'sections.partner_communities': 'Partner Communities',
+  'sections.account': 'Account',
+  'accessibility.close_menu': 'Close menu',
+  'aria.open_search': 'Open search',
+  'aria.mobile_navigation': 'Mobile navigation',
+  'aria.main_navigation': 'Main navigation',
+  'aria.timebanking_navigation': 'Timebanking navigation',
+  'aria.community_navigation': 'Community navigation',
+  'aria.engage_navigation': 'Engage navigation',
+  'aria.explore_navigation': 'Explore navigation',
+  'aria.federation_navigation': 'Federation navigation',
+  'aria.about_navigation': 'About navigation',
+  'aria.legal_navigation': 'Legal navigation',
   'sections.language': 'Language',
   'nav.timebanking': 'Timebanking',
   'support.help_center': 'Help Center', 'support.contact': 'Contact',
@@ -325,7 +337,7 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       expect(screen.getByText('Admin Panel')).toBeInTheDocument();
-      expect(screen.getByText('Legacy Admin')).toBeInTheDocument();
+      // Legacy Admin (PHP /admin-legacy/) was decommissioned — see root CLAUDE.md.
     });
 
     it('does NOT show Admin Tools for regular members', () => {
@@ -454,6 +466,75 @@ describe('MobileDrawer', () => {
         'href',
         'https://github.com/jasperfordesq-ai/nexus-v1',
       );
+    });
+  });
+
+  describe('Accessibility — tap target sizing (WCAG 2.5.5 AAA)', () => {
+    // Reads min-h / h-* / min-h-[Npx] from each interactive element and asserts >= 44px.
+    // Catches regressions where a button is shrunk below the AAA target-size threshold.
+    function extractMinHeightPx(el: Element): number {
+      const cls = el.getAttribute('class') ?? '';
+      const style = el.getAttribute('style') ?? '';
+      // Inline style: min-height: var(--nav-row-min-h, 48px) — extract fallback
+      const styleFallback = style.match(/min-height:\s*[^;]*?(\d+)px/);
+      if (styleFallback) return parseInt(styleFallback[1], 10);
+      // Tailwind arbitrary: min-h-[48px] / min-w-[44px]
+      const arbMin = cls.match(/min-h-\[(\d+)px\]/);
+      if (arbMin) return parseInt(arbMin[1], 10);
+      // Tailwind h-N (rem-based, 1 = 0.25rem = 4px @ 16px root)
+      const hN = cls.match(/(?:^|\s)h-(\d+)(?:\s|$)/);
+      if (hN) return parseInt(hN[1], 10) * 4;
+      return 0;
+    }
+
+    it('every nav-link button is at least 44px tall (AAA)', () => {
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com' }, isAuthenticated: true, logout: vi.fn() },
+        tenant: { hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true), tenantPath: (p: string) => p, tenant: { id: 2, slug: 'test', name: 'T' }, branding: { name: 'T', logo: null, tagline: '' } },
+      });
+      render(<MobileDrawer {...defaultProps} />);
+      const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[];
+      const offenders = buttons
+        .map((b) => ({ el: b, px: extractMinHeightPx(b), label: (b.getAttribute('aria-label') ?? b.textContent ?? '').trim().slice(0, 60) }))
+        .filter((row) => row.px > 0 && row.px < 44);
+      expect(offenders, `Buttons under 44px: ${JSON.stringify(offenders.map((o) => ({ px: o.px, label: o.label })), null, 2)}`).toEqual([]);
+    });
+
+    it('header close button has min-w/min-h of 48px', () => {
+      render(<MobileDrawer {...defaultProps} />);
+      const close = screen.getByLabelText('Close menu');
+      expect(close.className).toMatch(/min-w-\[48px\]/);
+      expect(close.className).toMatch(/min-h-\[48px\]/);
+    });
+
+    it('drawer contains zero text-xs or text-[10px] sizing', () => {
+      render(<MobileDrawer {...defaultProps} />);
+      const root = document.querySelector('[role="dialog"]') ?? document.body;
+      const all = Array.from(root.querySelectorAll('*'));
+      const tooSmall = all.filter((el) => {
+        const c = el.getAttribute('class') ?? '';
+        return /(?:^|\s)text-xs(?:\s|$)/.test(c) || /text-\[10px\]/.test(c) || /text-\[11px\]/.test(c);
+      });
+      expect(tooSmall.length, `Elements with sub-12px text classes: ${tooSmall.length}`).toBe(0);
+    });
+
+    it('drawer uses zero text-theme-subtle (which fails 4.5:1 contrast)', () => {
+      render(<MobileDrawer {...defaultProps} />);
+      const root = document.querySelector('[role="dialog"]') ?? document.body;
+      const subtle = Array.from(root.querySelectorAll('.text-theme-subtle'));
+      expect(subtle.length).toBe(0);
+    });
+  });
+
+  describe('Federation section labelling', () => {
+    it('renders the Partner Communities section header (not "Federation")', () => {
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com' }, isAuthenticated: true, logout: vi.fn() },
+        tenant: { hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true), tenantPath: (p: string) => p, tenant: { id: 2, slug: 'test', name: 'T' }, branding: { name: 'T', logo: null, tagline: '' } },
+      });
+      render(<MobileDrawer {...defaultProps} />);
+      const headers = screen.getAllByText('Partner Communities');
+      expect(headers.length).toBeGreaterThan(0);
     });
   });
 });
