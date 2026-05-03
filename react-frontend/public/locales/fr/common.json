@@ -1885,5 +1885,8 @@
     "type_municipality": "Municipality",
     "type_canton": "Canton",
     "type_other": "Area"
+  },
+  "location": {
+    "powered_by_google": "Powered by Google"
   }
 }

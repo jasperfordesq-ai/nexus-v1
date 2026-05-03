@@ -52,8 +52,8 @@ export interface ReactionSummaryProps {
   total: number;
   /** Names of a few top reactors for the summary text */
   topReactors?: Array<{ id: number; name: string; avatar_url?: string | null }>;
-  /** Entity type (post or comment) */
-  entityType: 'post' | 'comment';
+  /** Entity type — any polymorphic feed item type (post, comment, listing, event, etc.) */
+  entityType: string;
   /** Entity ID for loading reactor details */
   entityId: number;
 }

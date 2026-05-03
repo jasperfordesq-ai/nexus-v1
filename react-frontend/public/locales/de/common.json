@@ -1885,5 +1885,8 @@
   "landing_links": {
     "title": "Explore this community",
     "aria_label": "Explore community sections"
+  },
+  "location": {
+    "powered_by_google": "Powered by Google"
   }
 }
