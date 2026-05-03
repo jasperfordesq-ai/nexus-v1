@@ -18,23 +18,7 @@ composer.phar
 .build-version
 
 # ─── Documentation (private — not for public repo) ───────────────────────────
-/docs/*
-!/docs/legal/
-!/docs/database-migrations.md
-!/docs/DEPLOYMENT.md
-!/docs/SYSTEM_AUDIT_*.md
-!/docs/API_REFERENCE.md
-!/docs/FEDERATION.md
-!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
-!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.html
-!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
-!/docs/SERVICE_LAYER.md
-!/docs/MIGRATIONS.md
-!/docs/DOCKER.md
-!/docs/ZERO_DOWNTIME_DEPLOYMENT_PLAN.md
-!/docs/database/
-!/docs/database/*.md
-!/docs/AGORIS_MARTIN_RESPONSE_PACK.md
+/docs/
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
@@ -47,6 +31,7 @@ CLAUDE.md
 !CONTRIBUTORS.md
 !CONTRIBUTING.md
 !CHANGELOG.md
+!OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
 
 # ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/*
@@ -172,7 +157,7 @@ dump.sql
 *.sql.gz
 *.rar
 *.pdf
-!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
+!OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
 
 # ─── Temporary Files ─────────────────────────────────────────────────────────
 *.tmp
