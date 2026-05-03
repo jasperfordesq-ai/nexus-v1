@@ -140,7 +140,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label={t('lightbox.aria_label', 'Image viewer')}
+      aria-label={t('lightbox.aria_label')}
       tabIndex={-1}
     >
       {/* Close button — large, high contrast, always visible */}
@@ -151,7 +151,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         className="absolute top-4 right-4 z-10 bg-theme-elevated text-theme-primary rounded-full shadow-lg"
         onPress={onClose}
         onClick={(e) => e.stopPropagation()}
-        aria-label={t('lightbox.close', 'Close image viewer')}
+        aria-label={t('lightbox.close')}
       >
         <X className="w-6 h-6 stroke-[2.5]" />
       </Button>
@@ -162,7 +162,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         download
         className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-black/60 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
         onClick={(e) => e.stopPropagation()}
-        aria-label={t('lightbox.download', 'Download image')}
+        aria-label={t('lightbox.download')}
       >
         <Download className="w-5 h-5" />
       </a>
@@ -170,7 +170,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       {/* Counter (screen reader live region) */}
       {total > 1 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium" aria-live="polite" aria-atomic="true">
-          {t('lightbox.counter', '{{current}} of {{total}}', { current: currentIndex + 1, total })}
+          {t('lightbox.counter', { current: currentIndex + 1, total })}
         </div>
       )}
 
@@ -206,13 +206,13 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                 autoPlay
                 playsInline
                 className="max-w-full max-h-full object-contain select-none rounded-lg"
-                aria-label={current.alt_text || t('carousel.video_of', 'Video {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                aria-label={current.alt_text || t('carousel.video_of', { current: currentIndex + 1, total })}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
               <img
                 src={resolveAssetUrl(current.file_url)}
-                alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                alt={current.alt_text || t('carousel.image_of', { current: currentIndex + 1, total })}
                 className="max-w-full max-h-full object-contain select-none rounded-lg"
                 draggable={false}
               />
@@ -239,7 +239,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
           onPress={goPrev}
           onClick={(e) => e.stopPropagation()}
-          aria-label={t('carousel.previous', 'Previous image')}
+          aria-label={t('carousel.previous')}
         >
           <ChevronLeft className="w-6 h-6" />
         </Button>
@@ -254,7 +254,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
           onPress={goNext}
           onClick={(e) => e.stopPropagation()}
-          aria-label={t('carousel.next', 'Next image')}
+          aria-label={t('carousel.next')}
         >
           <ChevronRight className="w-6 h-6" />
         </Button>
@@ -282,7 +282,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                   }`}
                   onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
                   onClick={(e) => e.stopPropagation()}
-                  aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                  aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}
                 />
               );
@@ -300,7 +300,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                 }`}
                 onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
                 onClick={(e) => e.stopPropagation()}
-                aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                 aria-current={idx === currentIndex ? 'true' : undefined}
               />
             );

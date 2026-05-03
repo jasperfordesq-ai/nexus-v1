@@ -139,7 +139,7 @@ export function BookmarkButton({
         } transition-colors min-w-0 ${className}`}
         onPress={handlePress}
         isDisabled={isLoading}
-        aria-label={bookmarked ? t('bookmark.remove', 'Remove from saved') : t('bookmark.save', 'Save')}
+        aria-label={bookmarked ? t('bookmark.remove') : t('bookmark.save')}
         onTouchStart={longPressHandlers.onTouchStart}
         onTouchMove={longPressHandlers.onTouchMove}
         onTouchEnd={longPressHandlers.onTouchEnd}

@@ -68,7 +68,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
       ) : (
         <img
           src={resolveAssetUrl(item.thumbnail_url || item.file_url)}
-          alt={item.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: index + 1, total })}
+          alt={item.alt_text || t('carousel.image_of', { current: index + 1, total })}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           loading={index === 0 ? 'eager' : 'lazy'}
           draggable={false}
@@ -81,7 +81,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         />
       )}
       {extraOverlay && extraCount > 0 && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={t('carousel.more_images', '{{count}} more images', { count: extraCount })}>
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={t('carousel.more_images', { count: extraCount })}>
           <span className="text-white text-2xl font-bold" aria-hidden="true">+{extraCount}</span>
         </div>
       )}

@@ -179,7 +179,7 @@ export function SaveButton({
           isIconOnly
           size={size}
           variant="light"
-          aria-label={saved ? t('collections.remove', 'Remove from saved') : t('collections.save', 'Save')}
+          aria-label={saved ? t('collections.remove') : t('collections.save')}
           onPress={handleTriggerPress}
           className={`min-w-0 ${className}`}
         >
@@ -194,7 +194,7 @@ export function SaveButton({
       <PopoverContent className="p-2 min-w-[240px]">
         <div className="w-full">
           <p className="text-xs font-semibold uppercase tracking-wider px-2 pt-1 pb-2 text-[var(--text-muted)]">
-            {t('collections.save_to', 'Save to collection')}
+            {t('collections.save_to')}
           </p>
 
           {isLoading ? (
@@ -208,7 +208,7 @@ export function SaveButton({
                 onPress={() => saveTo(null)}
               >
                 <Bookmark className="w-4 h-4 mr-2" />
-                {t('collections.default', 'Default')}
+                {t('collections.default')}
               </Button>
 
               {collections.map((col) => (
@@ -235,7 +235,7 @@ export function SaveButton({
                   <Input
                     size="sm"
                     variant="bordered"
-                    placeholder={t('collections.name_placeholder', 'Collection name')}
+                    placeholder={t('collections.name_placeholder')}
                     value={newName}
                     onValueChange={setNewName}
                     autoFocus
@@ -257,7 +257,7 @@ export function SaveButton({
                   onPress={() => setCreating(true)}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  {t('collections.new', 'New collection')}
+                  {t('collections.new')}
                 </Button>
               )}
             </>

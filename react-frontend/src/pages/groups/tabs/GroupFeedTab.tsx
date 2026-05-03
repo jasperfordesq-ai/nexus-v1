@@ -66,8 +66,8 @@ export function GroupFeedTab({
       <GlassCard className="p-6">
         <EmptyState
           icon={<Lock className="w-12 h-12" aria-hidden="true" />}
-          title={t('detail.join_to_see_feed_title', 'Join to see the feed')}
-          description={t('detail.join_to_see_feed_desc', 'Join this group to view posts and participate in conversations.')}
+          title={t('detail.join_to_see_feed_title')}
+          description={t('detail.join_to_see_feed_desc')}
           action={
             isAuthenticated && (
               <Button
@@ -129,8 +129,8 @@ export function GroupFeedTab({
       ) : feedItems.length === 0 ? (
         <EmptyState
           icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
-          title={t('detail.feed_empty_title', 'No posts yet')}
-          description={t('detail.feed_empty_desc', 'Be the first to share something with this group!')}
+          title={t('detail.feed_empty_title')}
+          description={t('detail.feed_empty_desc')}
           action={
             isAuthenticated && (
               <Button
@@ -138,7 +138,7 @@ export function GroupFeedTab({
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 onPress={onComposeOpen}
               >
-                {t('detail.feed_create_post', 'Create Post')}
+                {t('detail.feed_create_post')}
               </Button>
             )
           }
@@ -173,7 +173,7 @@ export function GroupFeedTab({
                 isLoading={feedLoadingMore}
                 startContent={!feedLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
               >
-                {t('detail.feed_load_more', 'Load More')}
+                {t('detail.feed_load_more')}
               </Button>
             </div>
           )}

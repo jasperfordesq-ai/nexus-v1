@@ -396,7 +396,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                   className="w-6 h-6 min-w-0 bg-emerald-500/20 text-emerald-500"
                   onPress={handleSaveEdit}
                   isLoading={isSubmittingEdit}
-                  aria-label={t('card.save', 'Save')}
+                  aria-label={t('card.save')}
                 >
                   <Check className="w-3 h-3" />
                 </Button>
@@ -406,7 +406,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                   variant="flat"
                   className="w-6 h-6 min-w-0 bg-red-500/10 text-[var(--color-error)]"
                   onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
-                  aria-label={t('card.cancel', 'Cancel')}
+                  aria-label={t('card.cancel')}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -442,7 +442,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 className="text-[10px] text-theme-subtle hover:text-theme-primary flex items-center gap-0.5 h-auto p-0 min-w-0"
                 startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
               >
-                {t('card.edit', 'Edit')}
+                {t('card.edit')}
               </Button>
               <Button
                 variant="light"
@@ -451,7 +451,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
                 startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
               >
-                {t('card.delete', 'Delete')}
+                {t('card.delete')}
               </Button>
             </>
           )}
@@ -916,7 +916,7 @@ const FeedCard = React.memo(function FeedCard({
                       startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
                       className="text-[10px] h-5"
                     >
-                      {t('card.scheduled', 'Scheduled')}
+                      {t('card.scheduled')}
                     </Chip>
                   </Tooltip>
                 )}
@@ -950,12 +950,12 @@ const FeedCard = React.memo(function FeedCard({
                       size="sm"
                       variant="light"
                       className="text-theme-subtle hover:text-theme-primary min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label={t('card.post_options', 'Post options')}
+                      aria-label={t('card.post_options')}
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </Button>
                   </DropdownTrigger>
-                  <DropdownMenu aria-label={t('card.post_actions', 'Post actions')}>
+                  <DropdownMenu aria-label={t('card.post_actions')}>
                     {isOwnPost ? (
                       <>
                         <DropdownItem
@@ -963,7 +963,7 @@ const FeedCard = React.memo(function FeedCard({
                           startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => setShowAnalytics(true)}
                         >
-                          {t('card.view_analytics', 'View Analytics')}
+                          {t('card.view_analytics')}
                         </DropdownItem>
                         {onEditPost && item.type === 'post' && (
                           <DropdownItem
@@ -971,7 +971,7 @@ const FeedCard = React.memo(function FeedCard({
                             startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onEditPost(item)}
                           >
-                            {t('card.edit_post', 'Edit Post')}
+                            {t('card.edit_post')}
                           </DropdownItem>
                         )}
                         {item.type === 'post' && (
@@ -1003,7 +1003,7 @@ const FeedCard = React.memo(function FeedCard({
                             startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onNotInterested(item)}
                           >
-                            {t('card.not_interested', 'Not interested')}
+                            {t('card.not_interested')}
                           </DropdownItem>
                         )}
                         {onMuteUser && (
@@ -1034,7 +1034,7 @@ const FeedCard = React.memo(function FeedCard({
                             color="danger"
                             onPress={() => onAdminDeletePost(item)}
                           >
-                            {t('card.admin_delete', 'Delete (Admin)')}
+                            {t('card.admin_delete')}
                           </DropdownItem>
                         )}
                       </>
@@ -1049,7 +1049,7 @@ const FeedCard = React.memo(function FeedCard({
                 size="sm"
                 variant="light"
                 className="sm:hidden text-theme-subtle hover:text-theme-primary min-w-0"
-                aria-label={t('card.post_options', 'Post options')}
+                aria-label={t('card.post_options')}
                 onPress={() => setIsOptionsSheetOpen(true)}
               >
                 <MoreHorizontal className="w-4 h-4" />
@@ -1059,7 +1059,7 @@ const FeedCard = React.memo(function FeedCard({
               <BottomSheet
                 isOpen={isOptionsSheetOpen}
                 onClose={() => setIsOptionsSheetOpen(false)}
-                title={t('card.post_options', 'Post options')}
+                title={t('card.post_options')}
                 snapPoints={['auto']}
               >
                 <div className="flex flex-col gap-1">
@@ -1071,7 +1071,7 @@ const FeedCard = React.memo(function FeedCard({
                         startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => { setIsOptionsSheetOpen(false); setShowAnalytics(true); }}
                       >
-                        {t('card.view_analytics', 'View Analytics')}
+                        {t('card.view_analytics')}
                       </Button>
                       {onEditPost && item.type === 'post' && (
                         <Button
@@ -1080,7 +1080,7 @@ const FeedCard = React.memo(function FeedCard({
                           startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => { setIsOptionsSheetOpen(false); onEditPost(item); }}
                         >
-                          {t('card.edit_post', 'Edit Post')}
+                          {t('card.edit_post')}
                         </Button>
                       )}
                       {item.type === 'post' && (
@@ -1113,7 +1113,7 @@ const FeedCard = React.memo(function FeedCard({
                           startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => { setIsOptionsSheetOpen(false); onNotInterested(item); }}
                         >
-                          {t('card.not_interested', 'Not interested')}
+                          {t('card.not_interested')}
                         </Button>
                       )}
                       {onMuteUser && (
@@ -1144,7 +1144,7 @@ const FeedCard = React.memo(function FeedCard({
                           startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => { setIsOptionsSheetOpen(false); onAdminDeletePost(item); }}
                         >
-                          {t('card.admin_delete', 'Delete (Admin)')}
+                          {t('card.admin_delete')}
                         </Button>
                       )}
                     </>
@@ -1220,8 +1220,8 @@ const FeedCard = React.memo(function FeedCard({
             if (!isImminent || deltaMs == null) return null;
             const hours = Math.floor(deltaMs / 3600000);
             const minutes = Math.floor(deltaMs / 60000);
-            if (minutes < 60) return t('card.event.starts_in_minutes', 'Starts in {{minutes}}m', { minutes });
-            return t('card.event.starts_in_hours', 'Starts in {{hours}}h', { hours });
+            if (minutes < 60) return t('card.event.starts_in_minutes', { minutes });
+            return t('card.event.starts_in_hours', { hours });
           })();
           const dateForChip = item.start_date ? new Date(item.start_date) : null;
 
@@ -1324,7 +1324,7 @@ const FeedCard = React.memo(function FeedCard({
                 startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
                 className="h-6 text-[11px] font-medium"
               >
-                {t('card.volunteer.credits_offered', '{{count}} time credits', { count: item.credits_offered })}
+                {t('card.volunteer.credits_offered', { count: item.credits_offered })}
               </Chip>
             )}
             {item.organization && (
@@ -1351,8 +1351,8 @@ const FeedCard = React.memo(function FeedCard({
                   className="h-6 text-[11px] font-medium"
                 >
                   {isClosingSoon
-                    ? t('card.challenge.closing_soon', 'Closing soon')
-                    : t('card.challenge.closes_on', 'Closes {{date}}', {
+                    ? t('card.challenge.closing_soon')
+                    : t('card.challenge.closes_on', {
                         date: formatDate(item.submission_deadline!, { month: 'short', day: 'numeric' }),
                       })}
                 </Chip>
@@ -1366,7 +1366,7 @@ const FeedCard = React.memo(function FeedCard({
                 startContent={<Target className="w-3 h-3" aria-hidden="true" />}
                 className="h-6 text-[11px] font-medium"
               >
-                {t('card.challenge.ideas_count', '{{count}} ideas', { count: item.ideas_count })}
+                {t('card.challenge.ideas_count', { count: item.ideas_count })}
               </Chip>
             )}
           </div>
@@ -1382,7 +1382,7 @@ const FeedCard = React.memo(function FeedCard({
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doubleTapHandler(); } }}
             role="button"
             tabIndex={0}
-            aria-label={t('card.like_action', 'Like')}
+            aria-label={t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
             {item.media.length <= 4 ? (
@@ -1399,7 +1399,7 @@ const FeedCard = React.memo(function FeedCard({
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doubleTapHandler(); } }}
             role="button"
             tabIndex={0}
-            aria-label={t('card.like_action', 'Like')}
+            aria-label={t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
             {item.media[0].media_type === 'video' ? (
@@ -1415,14 +1415,14 @@ const FeedCard = React.memo(function FeedCard({
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doubleTapHandler(); } }}
             role="button"
             tabIndex={0}
-            aria-label={t('card.like_action', 'Like')}
+            aria-label={t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
             {detailPath ? (
               <Link to={tenantPath(detailPath)}>
                 <img
                   src={resolveAssetUrl(item.image_url)}
-                  alt={t('card.image_alt', '{{type}} image by {{name}}', { type: typeLabel ?? t('card.type_post', 'Post'), name: author.name })}
+                  alt={t('card.image_alt', { type: typeLabel ?? t('card.type_post'), name: author.name })}
                   className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
                   width={800}
@@ -1433,7 +1433,7 @@ const FeedCard = React.memo(function FeedCard({
             ) : (
               <img
                 src={resolveAssetUrl(item.image_url)}
-                alt={t('card.image_alt', '{{type}} image by {{name}}', { type: t('card.type_post', 'Post'), name: author.name })}
+                alt={t('card.image_alt', { type: t('card.type_post'), name: author.name })}
                 className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
                 width={800}
@@ -1508,7 +1508,7 @@ const FeedCard = React.memo(function FeedCard({
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-500/20">
                           <BarChart3 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                           <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
-                            {t('card.type_poll', 'Poll')}
+                            {t('card.type_poll')}
                           </span>
                         </div>
                         {!pollExpired && (
@@ -1517,13 +1517,13 @@ const FeedCard = React.memo(function FeedCard({
                               <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 animate-ping" />
                               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                             </span>
-                            {t('poll.live', 'Live')}
+                            {t('poll.live')}
                           </span>
                         )}
                       </div>
                       {pollExpired ? (
                         <Chip size="sm" variant="flat" color="default" startContent={<Clock className="w-3 h-3" />} className="h-6 text-[11px]">
-                          {t('poll.closed', 'Closed')}
+                          {t('poll.closed')}
                         </Chip>
                       ) : timeRemaining ? (
                         <Chip size="sm" variant="flat" color="warning" startContent={<Clock className="w-3 h-3" />} className="h-6 text-[11px]">
@@ -1595,12 +1595,12 @@ const FeedCard = React.memo(function FeedCard({
                                   )}
                                   {option.vote_count != null && (
                                     <span className="text-[10px] text-theme-subtle tabular-nums">
-                                      {option.vote_count} {option.vote_count === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
+                                      {option.vote_count} {option.vote_count === 1 ? t('card.vote') : t('card.votes')}
                                     </span>
                                   )}
                                   {isVoted && resultsHidden && (
                                     <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-                                      {t('poll.your_vote', 'Your vote')}
+                                      {t('poll.your_vote')}
                                     </span>
                                   )}
                                 </div>
@@ -1632,21 +1632,21 @@ const FeedCard = React.memo(function FeedCard({
                           <span className="inline-flex items-center gap-1.5 min-w-0">
                             <EyeOff className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                             <span className="truncate">
-                              {t('poll.results_hidden_until_close', 'Results revealed when poll closes')}
+                              {t('poll.results_hidden_until_close')}
                             </span>
                           </span>
                         ) : pollData.total_votes == null ? (
                           <span className="inline-flex items-center gap-1.5 min-w-0">
                             <EyeOff className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                             <span className="truncate">
-                              {t('poll.vote_to_see_results', 'Vote to see results')}
+                              {t('poll.vote_to_see_results')}
                             </span>
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1">
                             <Users className="w-3.5 h-3.5" aria-hidden="true" />
                             <span className="tabular-nums font-medium">
-                              {totalVotes} {totalVotes === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
+                              {totalVotes} {totalVotes === 1 ? t('card.vote') : t('card.votes')}
                             </span>
                           </span>
                         )}
@@ -1660,7 +1660,7 @@ const FeedCard = React.memo(function FeedCard({
                         endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
                         className="h-8 font-semibold"
                       >
-                        {t('poll.view_full', 'View full poll')}
+                        {t('poll.view_full')}
                       </Button>
                     </div>
                   </div>
@@ -1693,7 +1693,7 @@ const FeedCard = React.memo(function FeedCard({
                     </div>
                   </div>
                 </Link>
-                <div className="flex items-center gap-1" aria-label={t('card.review.rating_aria', '{{rating}} out of 5 stars', { rating: item.rating })}>
+                <div className="flex items-center gap-1" aria-label={t('card.review.rating_aria', { rating: item.rating })}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
@@ -1722,7 +1722,7 @@ const FeedCard = React.memo(function FeedCard({
                 {item.badge_icon || '\uD83C\uDFC6'}
               </div>
               <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-[0.2em] mb-1">
-                {t('card.milestone.badge_unlocked', 'Badge unlocked')}
+                {t('card.milestone.badge_unlocked')}
               </p>
               <p className="text-base font-bold text-theme-primary leading-snug">
                 {t('card.badge_earned_message', {
@@ -1744,7 +1744,7 @@ const FeedCard = React.memo(function FeedCard({
                 <Zap className="w-10 h-10 text-white fill-white" />
               </div>
               <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-[0.2em] mb-1">
-                {t('card.milestone.level_reached', 'Level reached')}
+                {t('card.milestone.level_reached')}
               </p>
               <p className="text-base font-bold text-theme-primary leading-snug">
                 {t('card.level_up_message', {
@@ -1941,7 +1941,7 @@ const FeedCard = React.memo(function FeedCard({
                         className="text-primary min-w-0 w-auto h-auto p-0 disabled:opacity-30"
                         onPress={handleSubmitComment}
                         isDisabled={!newComment.trim() || isSubmittingComment}
-                        aria-label={t('card.send_comment', 'Send comment')}
+                        aria-label={t('card.send_comment')}
                       >
                         <Send className="w-4 h-4" />
                       </Button>

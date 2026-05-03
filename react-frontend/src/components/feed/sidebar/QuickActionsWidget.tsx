@@ -27,7 +27,7 @@ export function QuickActionsWidget() {
 
   const secondaryActions = [
     {
-      label: t('sidebar.actions.host_event', 'Host Event'),
+      label: t('sidebar.actions.host_event'),
       icon: CalendarDays,
       path: '/events/create',
       color: 'text-pink-500',
@@ -35,7 +35,7 @@ export function QuickActionsWidget() {
       feature: 'events' as const,
     },
     {
-      label: t('sidebar.actions.create_poll', 'Create Poll'),
+      label: t('sidebar.actions.create_poll'),
       icon: BarChart3,
       path: '/polls',
       color: 'text-indigo-500',
@@ -43,7 +43,7 @@ export function QuickActionsWidget() {
       feature: 'polls' as const,
     },
     {
-      label: t('sidebar.actions.set_goal', 'Set Goal'),
+      label: t('sidebar.actions.set_goal'),
       icon: Target,
       path: '/goals',
       color: 'text-[var(--color-warning)]',
@@ -51,7 +51,7 @@ export function QuickActionsWidget() {
       feature: 'goals' as const,
     },
     {
-      label: t('sidebar.actions.groups', 'Groups'),
+      label: t('sidebar.actions.groups'),
       icon: UsersRound,
       path: '/groups',
       color: 'text-emerald-500',
@@ -71,7 +71,7 @@ export function QuickActionsWidget() {
         className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow font-medium"
         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
       >
-        {t('sidebar.actions.create_listing', 'Create New Listing')}
+        {t('sidebar.actions.create_listing')}
       </Button>
 
       {/* Secondary actions grid */}

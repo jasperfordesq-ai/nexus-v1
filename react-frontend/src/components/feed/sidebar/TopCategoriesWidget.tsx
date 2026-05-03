@@ -46,14 +46,14 @@ export function TopCategoriesWidget({ categories }: TopCategoriesWidgetProps) {
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-orange-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.categories.title', 'Top Categories')}
+            {t('sidebar.categories.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/listings')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.categories.all_listings', 'All Listings')}
+          {t('sidebar.categories.all_listings')}
         </Link>
       </div>
 

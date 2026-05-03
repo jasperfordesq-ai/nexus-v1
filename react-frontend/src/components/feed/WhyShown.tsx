@@ -44,14 +44,14 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           variant="light"
           size="sm"
           className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-70 sm:opacity-40 sm:group-hover:opacity-100 focus-visible:opacity-100 min-w-0 min-h-0 w-auto h-auto p-0.5"
-          aria-label={t('why_shown.label', 'Why am I seeing this?')}
+          aria-label={t('why_shown.label')}
         >
           <Info className="w-3.5 h-3.5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-3 max-w-[240px]">
         <p className="text-xs font-semibold text-[var(--text-primary)] mb-2">
-          {t('why_shown.title', 'Why you\'re seeing this')}
+          {t('why_shown.title')}
         </p>
         <ul className="space-y-1">
           {reasons.map((reason, i) => (

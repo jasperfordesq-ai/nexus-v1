@@ -37,14 +37,14 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
         tab: 'px-0 h-8',
         tabContent: 'group-data-[selected=true]:text-[var(--text-primary)] text-[var(--text-muted)]',
       }}
-      aria-label={t('mode.label', 'Feed mode')}
+      aria-label={t('mode.label')}
     >
       <Tab
         key="ranking"
         title={
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{t('mode.for_you', 'For You')}</span>
+            <span>{t('mode.for_you')}</span>
           </div>
         }
       />
@@ -53,7 +53,7 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
         title={
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
-            <span>{t('mode.recent', 'Recent')}</span>
+            <span>{t('mode.recent')}</span>
           </div>
         }
       />

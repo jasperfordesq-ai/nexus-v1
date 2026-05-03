@@ -99,7 +99,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
         }
       } catch (err) {
         logError('Failed to load connection suggestions', err);
-        toast.error(t('suggestions.load_failed', 'Failed to load suggestions'));
+        toast.error(t('suggestions.load_failed'));
       } finally {
         setIsLoading(false);
       }
@@ -115,10 +115,10 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
       setSuggestions((prev) =>
         prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: 'pending' } : s)
       );
-      toast.success(t('suggestions.connect_sent', 'Connection request sent!'));
+      toast.success(t('suggestions.connect_sent'));
     } catch (err) {
       logError('Failed to send connection request', err);
-      toast.error(t('suggestions.connect_failed', 'Failed to send request'));
+      toast.error(t('suggestions.connect_failed'));
     } finally {
       setConnectingIds((prev) => {
         const next = new Set(prev);
@@ -174,7 +174,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
         <div className="flex items-center gap-2 mb-3">
           <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('suggestions.title', 'People You May Know')}
+            {t('suggestions.title')}
           </h3>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
@@ -190,7 +190,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                   variant="light"
                   className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)]"
                   onPress={() => handleDismiss(suggestion.id)}
-                  aria-label={t('suggestions.dismiss', 'Dismiss')}
+                  aria-label={t('suggestions.dismiss')}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -210,7 +210,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                 </Link>
                 {suggestion.mutual_connections_count > 0 && (
                   <p className="text-[10px] text-[var(--text-muted)]">
-                    {t('suggestions.mutual', '{{count}} mutual', { count: suggestion.mutual_connections_count })}
+                    {t('suggestions.mutual', { count: suggestion.mutual_connections_count })}
                   </p>
                 )}
                 {suggestion.connection_status === 'pending' ? (
@@ -220,7 +220,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                     className="w-full text-[10px] bg-amber-500/10 text-amber-600"
                     isDisabled
                   >
-                    {t('suggestions.pending', 'Pending')}
+                    {t('suggestions.pending')}
                   </Button>
                 ) : (
                   <Button
@@ -231,7 +231,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                     onPress={() => handleConnect(suggestion)}
                     isLoading={connectingIds.has(suggestion.id)}
                   >
-                    {t('suggestions.connect', 'Connect')}
+                    {t('suggestions.connect')}
                   </Button>
                 )}
               </CardBody>
@@ -249,14 +249,14 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('suggestions.title', 'People You May Know')}
+            {t('suggestions.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/members')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('suggestions.see_all', 'See All')}
+          {t('suggestions.see_all')}
         </Link>
       </div>
 
@@ -272,7 +272,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
               variant="light"
               className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)] opacity-0 group-hover:opacity-100 transition-opacity"
               onPress={() => handleDismiss(suggestion.id)}
-              aria-label={t('suggestions.dismiss', 'Dismiss')}
+              aria-label={t('suggestions.dismiss')}
             >
               <X className="w-3 h-3" />
             </Button>
@@ -294,7 +294,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
               </Link>
               {suggestion.mutual_connections_count > 0 && (
                 <p className="text-[10px] text-[var(--text-muted)]">
-                  {t('suggestions.mutual', '{{count}} mutual connections', { count: suggestion.mutual_connections_count })}
+                  {t('suggestions.mutual', { count: suggestion.mutual_connections_count })}
                 </p>
               )}
               {suggestion.shared_skills.length > 0 && (
@@ -320,7 +320,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                 className="text-[10px] bg-amber-500/10 text-amber-600 flex-shrink-0"
                 isDisabled
               >
-                {t('suggestions.pending', 'Pending')}
+                {t('suggestions.pending')}
               </Button>
             ) : (
               <Button
@@ -331,7 +331,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                 onPress={() => handleConnect(suggestion)}
                 isLoading={connectingIds.has(suggestion.id)}
               >
-                {t('suggestions.connect', 'Connect')}
+                {t('suggestions.connect')}
               </Button>
             )}
           </div>

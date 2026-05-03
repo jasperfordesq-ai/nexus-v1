@@ -216,12 +216,12 @@ export function GoalsPage() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(tRef.current('goals.load_error', 'Failed to load goals. Please try again.'));
+        if (!append) setError(tRef.current('goals.load_error'));
       }
     } catch (err) {
       if (controller?.signal.aborted) return;
       logError('Failed to load goals', err);
-      if (!append) setError(tRef.current('goals.load_error', 'Failed to load goals. Please try again.'));
+      if (!append) setError(tRef.current('goals.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -450,7 +450,7 @@ export function GoalsPage() {
               startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
               onPress={onTemplateOpen}
             >
-              {t('goals.from_template', 'From Template')}
+              {t('goals.from_template')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -511,7 +511,7 @@ export function GoalsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4" aria-label={t('goals.loading', 'Loading goals')} aria-busy="true">
+            <div className="space-y-4" aria-label={t('goals.loading')} aria-busy="true">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="space-y-3">

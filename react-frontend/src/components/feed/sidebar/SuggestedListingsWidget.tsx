@@ -39,14 +39,14 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-purple-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.suggested.title', 'Suggested For You')}
+            {t('sidebar.suggested.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/listings')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.suggested.see_all', 'See All')}
+          {t('sidebar.suggested.see_all')}
         </Link>
       </div>
 
@@ -71,7 +71,7 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
                 {listing.title}
               </p>
               <p className="text-xs text-[var(--text-muted)] truncate">
-                {t('sidebar.by_owner', 'by {{name}}', { name: listing.owner_name })}
+                {t('sidebar.by_owner', { name: listing.owner_name })}
               </p>
             </div>
             <Chip
@@ -83,8 +83,8 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
               }
             >
               {listing.type === 'offer'
-                ? t('sidebar.offer', 'Offer')
-                : t('sidebar.suggested.request', 'Request')
+                ? t('sidebar.offer')
+                : t('sidebar.suggested.request')
               }
             </Chip>
           </Link>

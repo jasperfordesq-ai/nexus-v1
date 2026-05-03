@@ -98,15 +98,15 @@ export function ProfileCardWidget() {
               <p className="text-sm font-bold text-[var(--text-primary)] group-hover:text-indigo-500">
                 {stats.listings_count}
               </p>
-              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.listings', 'Listings')}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.listings')}</p>
             </Link>
             <div className="text-center">
               <p className="text-sm font-bold text-emerald-500">{stats.given_count}</p>
-              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.given', 'Given')}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.given')}</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-bold text-orange-500">{stats.received_count}</p>
-              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.received', 'Received')}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.received')}</p>
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export function ProfileCardWidget() {
                 <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   {stats.offers_count}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)]">{t('sidebar.profile.offers', 'Offers')}</p>
+                <p className="text-[10px] text-[var(--text-muted)]">{t('sidebar.profile.offers')}</p>
               </div>
             </Link>
             <Link
@@ -133,7 +133,7 @@ export function ProfileCardWidget() {
                 <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">
                   {stats.requests_count}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)]">{t('sidebar.profile.requests', 'Requests')}</p>
+                <p className="text-[10px] text-[var(--text-muted)]">{t('sidebar.profile.requests')}</p>
               </div>
             </Link>
           </div>

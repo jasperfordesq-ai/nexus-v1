@@ -128,13 +128,13 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
 
       if (response.success) {
         setSentTo((prev) => new Set(prev).add(user.id));
-        toast.success(t('share.dm_sent', 'Post shared with {{name}}', { name: user.name }));
+        toast.success(t('share.dm_sent', { name: user.name }));
       } else {
-        toast.error(response.error || t('share.dm_failed', 'Failed to send message'));
+        toast.error(response.error || t('share.dm_failed'));
       }
     } catch (err) {
       logError('Failed to share via DM', err);
-      toast.error(t('share.dm_failed', 'Failed to send message'));
+      toast.error(t('share.dm_failed'));
     } finally {
       setIsSending(false);
       setSelectedUser(null);
@@ -157,11 +157,11 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
     >
       <ModalContent>
         <ModalHeader className="text-[var(--text-primary)]">
-          {t('share.dm_title', 'Send via Message')}
+          {t('share.dm_title')}
         </ModalHeader>
         <ModalBody className="gap-3">
           <Input
-            placeholder={t('share.dm_search_placeholder', 'Search for a member...')}
+            placeholder={t('share.dm_search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-[var(--text-subtle)]" />}
@@ -182,13 +182,13 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
 
             {!isSearching && query.length >= 2 && users.length === 0 && (
               <p className="text-sm text-[var(--text-subtle)] text-center py-4">
-                {t('share.dm_no_results', 'No members found')}
+                {t('share.dm_no_results')}
               </p>
             )}
 
             {!isSearching && query.length < 2 && (
               <p className="text-sm text-[var(--text-subtle)] text-center py-4">
-                {t('share.dm_hint', 'Type at least 2 characters to search')}
+                {t('share.dm_hint')}
               </p>
             )}
 
@@ -222,7 +222,7 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
                     }
                     className="min-w-[80px]"
                   >
-                    {alreadySent ? t('share.dm_sent_label', 'Sent') : t('share.dm_send', 'Send')}
+                    {alreadySent ? t('share.dm_sent_label') : t('share.dm_send')}
                   </Button>
                 </div>
               );
@@ -235,7 +235,7 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
             onPress={onClose}
             className="text-[var(--text-muted)]"
           >
-            {t('share.dm_done', 'Done')}
+            {t('share.dm_done')}
           </Button>
         </ModalFooter>
       </ModalContent>

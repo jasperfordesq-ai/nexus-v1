@@ -104,7 +104,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
         ref={carouselRef}
         className={`relative overflow-hidden rounded-xl group ${className}`}
         role="region"
-        aria-label={t('carousel.aria_label', 'Image carousel, {{current}} of {{total}}', { current: currentIndex + 1, total })}
+        aria-label={t('carousel.aria_label', { current: currentIndex + 1, total })}
         aria-roledescription="carousel"
         tabIndex={0}
         onKeyDown={handleKeyDown}
@@ -138,13 +138,13 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                   playsInline
                   preload="metadata"
                   className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
-                  aria-label={current.alt_text || t('carousel.video_of', 'Video {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                  aria-label={current.alt_text || t('carousel.video_of', { current: currentIndex + 1, total })}
                   onClick={(e) => e.stopPropagation()}
                 />
               ) : (
                 <img
                   src={resolveAssetUrl(current.file_url)}
-                  alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                  alt={current.alt_text || t('carousel.image_of', { current: currentIndex + 1, total })}
                   className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
                   draggable={false}
                   loading={currentIndex === 0 ? 'eager' : 'lazy'}
@@ -175,7 +175,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
             onPress={goPrev}
             onClick={(e) => e.stopPropagation()}
-            aria-label={t('carousel.previous', 'Previous image')}
+            aria-label={t('carousel.previous')}
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -191,7 +191,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
             onPress={goNext}
             onClick={(e) => e.stopPropagation()}
-            aria-label={t('carousel.next', 'Next image')}
+            aria-label={t('carousel.next')}
           >
             <ChevronRight className="w-5 h-5" />
           </Button>
@@ -222,7 +222,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                     goTo(idx, idx > currentIndex ? 1 : -1);
                     setTimeout(() => carouselRef.current?.focus(), 50);
                   }}
-                  aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                  aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}
                 >
                   <span

@@ -74,21 +74,21 @@ export function AppreciationModal({
         is_public: isPublic,
       });
       if (res.success) {
-        toast.success(t('appreciations.sent_success', 'Thank-you sent!'));
+        toast.success(t('appreciations.sent_success'));
         onSent?.();
         setMessage('');
         onClose();
       } else {
         const err = (res as unknown as { error?: string }).error || '';
         if (err.includes('rate_limit')) {
-          toast.error(t('appreciations.rate_limited', 'Daily thank-you limit reached'));
+          toast.error(t('appreciations.rate_limited'));
         } else {
-          toast.error(t('appreciations.send_failed', 'Could not send thank-you'));
+          toast.error(t('appreciations.send_failed'));
         }
       }
     } catch (err) {
       logError('AppreciationModal: send failed', err);
-      toast.error(t('appreciations.send_failed', 'Could not send thank-you'));
+      toast.error(t('appreciations.send_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -96,8 +96,8 @@ export function AppreciationModal({
 
   const remaining = MAX_LEN - message.length;
   const titleStr = receiverName
-    ? t('appreciations.title_to', 'Thank {{name}}', { name: receiverName })
-    : t('appreciations.title', 'Send a thank-you');
+    ? t('appreciations.title_to', { name: receiverName })
+    : t('appreciations.title');
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} placement="center" size="md">
@@ -108,29 +108,29 @@ export function AppreciationModal({
         </ModalHeader>
         <ModalBody>
           <Textarea
-            label={t('appreciations.message_label', 'Your message')}
-            placeholder={t('appreciations.message_placeholder', 'What are you thanking them for?')}
+            label={t('appreciations.message_label')}
+            placeholder={t('appreciations.message_placeholder')}
             value={message}
             onValueChange={setMessage}
             maxLength={MAX_LEN}
             minRows={4}
             variant="bordered"
-            description={t('appreciations.chars_remaining', '{{n}} characters left', { n: remaining })}
+            description={t('appreciations.chars_remaining', { n: remaining })}
           />
           <div className="flex items-center justify-between pt-2">
             <span className="text-sm text-[var(--text-muted)]">
               {isPublic
-                ? t('appreciations.public_hint', 'Visible on their profile')
-                : t('appreciations.private_hint', 'Only they can see this')}
+                ? t('appreciations.public_hint')
+                : t('appreciations.private_hint')}
             </span>
             <Switch isSelected={isPublic} onValueChange={setIsPublic} size="sm">
-              {t('appreciations.public_toggle', 'Public')}
+              {t('appreciations.public_toggle')}
             </Switch>
           </div>
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={handleClose} isDisabled={submitting}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             color="primary"
@@ -138,7 +138,7 @@ export function AppreciationModal({
             isLoading={submitting}
             isDisabled={!message.trim() || message.length > MAX_LEN}
           >
-            {t('appreciations.send', 'Send thanks')}
+            {t('appreciations.send')}
           </Button>
         </ModalFooter>
       </ModalContent>

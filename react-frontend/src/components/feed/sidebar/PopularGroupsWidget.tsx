@@ -37,14 +37,14 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-violet-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.groups.title', 'Popular Groups')}
+            {t('sidebar.groups.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/groups')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.groups.see_all', 'See All')}
+          {t('sidebar.groups.see_all')}
         </Link>
       </div>
 
@@ -76,7 +76,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
                 {group.name}
               </p>
               <p className="text-xs text-[var(--text-muted)]">
-                {t('sidebar.groups.members', '{{count}} members', { count: group.member_count })}
+                {t('sidebar.groups.members', { count: group.member_count })}
               </p>
             </div>
           </Link>

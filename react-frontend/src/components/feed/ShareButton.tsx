@@ -35,6 +35,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FeedItem } from './types';
+import { getItemDetailPath } from './types';
 import { QuotePostModal } from './QuotePostModal';
 import { ExternalShareModal } from './ExternalShareModal';
 import { ShareViaDMModal } from './ShareViaDMModal';
@@ -89,27 +90,26 @@ export function ShareButton({
   const resolvedType: FeedItem['type'] = type ?? 'post';
   const resolvedId: number = id ?? postId ?? 0;
   const isNativePost = resolvedType === 'post';
+  // Achievement items (badge_earned, level_up) have no shareable destination —
+  // they're personal milestones, not content. Hide the share menu entirely.
+  const isShareable = resolvedType !== 'badge_earned' && resolvedType !== 'level_up';
 
-  // Deep-link URL varies by type. Posts live in /feed?post=, typed items have dedicated detail pages.
+  // Deep-link URL strategy:
+  //   1. Prefer getItemDetailPath(post) — canonical detail route for typed items
+  //      (listing, event, goal, job, blog, challenge, volunteer, review→profile).
+  //   2. For native posts, link to the dedicated PostDetailPage at /feed/posts/:id.
+  //   3. Fallback to the polymorphic /feed/item/:type/:id route for any other
+  //      reactable type without a module-specific page (poll, discussion, etc.).
   const postUrl = (() => {
     const base = `${window.location.origin}/${tenantSlug}`;
-    switch (resolvedType) {
-      case 'post':
-      case 'poll':
-      case 'discussion':
-      case 'badge_earned':
-      case 'level_up':
-        return `${base}/feed?post=${resolvedId}`;
-      case 'listing':    return `${base}/listings/${resolvedId}`;
-      case 'event':      return `${base}/events/${resolvedId}`;
-      case 'job':        return `${base}/jobs/${resolvedId}`;
-      case 'blog':       return `${base}/blog/${resolvedId}`;
-      case 'goal':       return `${base}/goals`;
-      case 'challenge':  return `${base}/ideation/${resolvedId}`;
-      case 'volunteer':  return `${base}/volunteering/opportunities/${resolvedId}`;
-      case 'review':     return `${base}/feed?post=${resolvedId}`;
-      default:           return `${base}/feed?post=${resolvedId}`;
+    if (post) {
+      const detailPath = getItemDetailPath(post);
+      if (detailPath) return `${base}${detailPath}`;
     }
+    if (resolvedType === 'post') {
+      return `${base}/feed/posts/${resolvedId}`;
+    }
+    return `${base}/feed/item/${resolvedType}/${resolvedId}`;
   })();
   const postTitle = post.title || post.content?.slice(0, 80) || 'Post';
   const postText = post.content?.slice(0, 200) || '';
@@ -141,7 +141,7 @@ export function ShareButton({
         // generic share-failed string so unknown codes still give the user feedback.
         const code = (response as { code?: string }).code;
         if (code === 'SELF_SHARE') {
-          toast.error(t('share.cannot_share_own_post', 'You cannot share your own post'));
+          toast.error(t('share.cannot_share_own_post'));
         } else {
           toast.error(response.error || t('toast.share_failed'));
         }
@@ -172,9 +172,9 @@ export function ShareButton({
   const handleCopyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(postUrl);
-      toast.success(t('share.link_copied', 'Link copied to clipboard'));
+      toast.success(t('share.link_copied'));
     } catch {
-      toast.error(t('share.copy_failed', 'Failed to copy link'));
+      toast.error(t('share.copy_failed'));
     }
   }, [postUrl, toast, t]);
 
@@ -216,6 +216,10 @@ export function ShareButton({
         break;
     }
   }, [handleRepost, handleCopyLink, handleExternalShare]);
+
+  if (!isShareable) {
+    return null;
+  }
 
   return (
     <>
@@ -274,7 +278,7 @@ export function ShareButton({
           )}
         </DropdownTrigger>
         <DropdownMenu
-          aria-label={t('share.menu_label', 'Share options')}
+          aria-label={t('share.menu_label')}
           onAction={handleDropdownAction}
           disabledKeys={isNativePost ? [] : ['quote']}
         >
@@ -282,10 +286,10 @@ export function ShareButton({
             key="repost"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             description={localIsShared
-              ? t('share.repost_remove_desc', 'Remove repost from your feed')
-              : t('share.repost_desc', 'Share to your feed')}
+              ? t('share.repost_remove_desc')
+              : t('share.repost_desc')}
           >
-            {localIsShared ? t('share.repost_remove', 'Remove Repost') : t('share.repost', 'Repost')}
+            {localIsShared ? t('share.repost_remove') : t('share.repost')}
           </DropdownItem>
           {/*
             Quote Post requires the original to be a feed_posts row (quoted_post_id FK).
@@ -296,28 +300,28 @@ export function ShareButton({
             <DropdownItem
               key="quote"
               startContent={<Quote className="w-4 h-4" aria-hidden="true" />}
-              description={t('share.quote_desc', 'Repost with your commentary')}
+              description={t('share.quote_desc')}
             >
-              {t('share.quote', 'Quote Post')}
+              {t('share.quote')}
             </DropdownItem>
           ) : null}
           <DropdownItem
             key="copy"
             startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('share.copy_link', 'Copy Link')}
+            {t('share.copy_link')}
           </DropdownItem>
           <DropdownItem
             key="external"
             startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('share.external', 'Share...')}
+            {t('share.external')}
           </DropdownItem>
           <DropdownItem
             key="dm"
             startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('share.send_dm', 'Send via Message')}
+            {t('share.send_dm')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -373,7 +377,7 @@ export function SharedByAttribution({
         className="inline-flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
       >
         <span className="font-semibold text-[var(--text-muted)]">{user.name}</span>
-        <span>{t('share.shared_by_text', 'shared this')}</span>
+        <span>{t('share.shared_by_text')}</span>
       </Link>
     </div>
   );

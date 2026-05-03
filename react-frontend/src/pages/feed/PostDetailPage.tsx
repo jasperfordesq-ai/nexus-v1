@@ -136,7 +136,7 @@ export function PostDetailPage() {
       navigate(tenantPath('/feed'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toast.error(t('toast.hide_failed', 'Failed to hide post'));
+      toast.error(t('toast.hide_failed'));
     }
   };
 
@@ -145,11 +145,11 @@ export function PostDetailPage() {
     if (!authorId) return;
     try {
       await api.post(`/v2/feed/users/${authorId}/mute`);
-      toast.success(t('toast.user_muted', 'User muted'));
+      toast.success(t('toast.user_muted'));
       navigate(tenantPath('/feed'));
     } catch (err) {
       logError('Failed to mute user', err);
-      toast.error(t('toast.mute_failed', 'Failed to mute user'));
+      toast.error(t('toast.mute_failed'));
     }
   };
 
@@ -161,7 +161,7 @@ export function PostDetailPage() {
 
   const handleReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toast.error(t('toast.provide_reason', 'Please provide a reason'));
+      toast.error(t('toast.provide_reason'));
       return;
     }
     try {
@@ -172,10 +172,10 @@ export function PostDetailPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toast.success(t('toast.reported', 'Post reported'));
+      toast.success(t('toast.reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toast.error(t('toast.report_failed', 'Failed to report post'));
+      toast.error(t('toast.report_failed'));
     } finally {
       setIsReporting(false);
     }
@@ -184,11 +184,11 @@ export function PostDetailPage() {
   const handleDeletePost = async (feedItem: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${feedItem.id}/delete`);
-      toast.success(t('toast.deleted', 'Post deleted'));
+      toast.success(t('toast.deleted'));
       navigate(tenantPath('/feed'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error(t('toast.delete_failed', 'Failed to delete post'));
+      toast.error(t('toast.delete_failed'));
     }
   };
 
@@ -197,14 +197,14 @@ export function PostDetailPage() {
       await api.post(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
     } catch (err) {
       logError('Failed to vote on poll', err);
-      toast.error(t('toast.vote_failed', 'Failed to submit vote'));
+      toast.error(t('toast.vote_failed'));
     }
   };
 
   const handleNotInterested = useCallback(async (feedItem: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${feedItem.id}/not-interested`, { type: feedItem.type });
-      toast.success(t('toast.not_interested', 'We\'ll show you less like this'));
+      toast.success(t('toast.not_interested'));
       navigate(tenantPath('/feed'));
     } catch (err) {
       logError('Failed to record not-interested', err);
@@ -214,7 +214,7 @@ export function PostDetailPage() {
   return (
     <>
       <PageMeta
-        title={item?.content?.substring(0, 60) || t('post_detail.title', 'Post')}
+        title={item?.content?.substring(0, 60) || t('post_detail.title')}
         description={item?.content?.substring(0, 160)}
         noIndex
       />
@@ -226,7 +226,7 @@ export function PostDetailPage() {
               startContent={<ArrowLeft className="w-4 h-4" />}
               className="text-theme-muted hover:text-theme-primary -ml-2"
             >
-              {t('post_detail.back', 'Back to Feed')}
+              {t('post_detail.back')}
             </Button>
           </Link>
         </div>
@@ -239,7 +239,7 @@ export function PostDetailPage() {
             <p className="text-theme-muted">{error}</p>
             <Link to={tenantPath('/feed')} className="mt-4 inline-block">
               <Button variant="flat" className="bg-theme-elevated text-theme-primary">
-                {t('post_detail.back', 'Back to Feed')}
+                {t('post_detail.back')}
               </Button>
             </Link>
           </GlassCard>
@@ -276,16 +276,16 @@ export function PostDetailPage() {
               <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
                 <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
               </div>
-              {t('report.title', 'Report Post')}
+              {t('report.title')}
             </div>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-[var(--text-muted)] mb-3">
-              {t('report.description', 'Please describe why you are reporting this post.')}
+              {t('report.description')}
             </p>
             <Textarea
-              label={t('report.reason_label', 'Reason')}
-              placeholder={t('report.reason_placeholder', 'Describe the issue...')}
+              label={t('report.reason_label')}
+              placeholder={t('report.reason_placeholder')}
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
               minRows={3}
@@ -302,7 +302,7 @@ export function PostDetailPage() {
               onPress={onReportClose}
               className="text-[var(--text-muted)]"
             >
-              {t('report.cancel', 'Cancel')}
+              {t('report.cancel')}
             </Button>
             <Button
               color="danger"
@@ -312,7 +312,7 @@ export function PostDetailPage() {
               isDisabled={!reportReason.trim()}
               className="font-medium"
             >
-              {t('report.submit', 'Report')}
+              {t('report.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>

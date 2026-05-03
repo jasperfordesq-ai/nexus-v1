@@ -91,7 +91,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
           className={`absolute z-50 w-full max-w-xs bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden ${className}`}
           style={style}
           role="listbox"
-          aria-label={t('mention.suggestions_aria', 'Mention suggestions, {{count}} results', { count: suggestions.length })}
+          aria-label={t('mention.suggestions_aria', { count: suggestions.length })}
         >
           {isLoading ? (
             /* Loading skeleton */
@@ -109,7 +109,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
           ) : suggestions.length === 0 ? (
             /* Empty state */
             <div className="px-3 py-4 text-center">
-              <p className="text-xs text-[var(--text-subtle)]">{t('mention.no_users', 'No users found')}</p>
+              <p className="text-xs text-[var(--text-subtle)]">{t('mention.no_users')}</p>
             </div>
           ) : (
             /* Results list */
@@ -149,7 +149,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
                     )}
                   </div>
                   {user.is_connection && (
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label={t('mention.connected', 'Connected')} />
+                    <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label={t('mention.connected')} />
                   )}
                 </Button>
               ))}

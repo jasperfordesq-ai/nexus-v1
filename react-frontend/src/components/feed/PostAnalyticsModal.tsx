@@ -92,11 +92,11 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
   }, [isOpen, postId]) // t is stable — excluded to avoid re-fetch on language changes
 
   const stats = data ? [
-    { label: t('analytics.views', 'Views'), value: data.views_count, icon: Eye, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
-    { label: t('analytics.likes', 'Likes'), value: data.likes_count, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
-    { label: t('analytics.comments', 'Comments'), value: data.comments_count, icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: t('analytics.shares', 'Shares'), value: data.shares_count, icon: Repeat2, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    { label: t('analytics.reach', 'Reach'), value: data.reach_estimate, icon: Users, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
+    { label: t('analytics.views'), value: data.views_count, icon: Eye, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
+    { label: t('analytics.likes'), value: data.likes_count, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+    { label: t('analytics.comments'), value: data.comments_count, icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { label: t('analytics.shares'), value: data.shares_count, icon: Repeat2, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: t('analytics.reach'), value: data.reach_estimate, icon: Users, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
   ] : [];
 
   return (
@@ -104,14 +104,14 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-[var(--color-primary)]" aria-hidden="true" />
-          {t('analytics.title', 'Post Analytics')}
+          {t('analytics.title')}
         </ModalHeader>
         <ModalBody className="pb-6">
           {loading ? (
             <div
               className="flex justify-center py-12"
               role="status"
-              aria-label={t('analytics.loading', 'Loading analytics...')}
+              aria-label={t('analytics.loading')}
             >
               <Spinner size="lg" aria-hidden="true" />
             </div>
@@ -145,7 +145,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
               {Object.keys(data.reactions_breakdown).length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
-                    {t('analytics.reactions_breakdown', 'Reactions Breakdown')}
+                    {t('analytics.reactions_breakdown')}
                   </h4>
                   <div className="space-y-2">
                     {Object.entries(data.reactions_breakdown)

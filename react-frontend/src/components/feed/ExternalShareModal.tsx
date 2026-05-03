@@ -114,10 +114,10 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success(t('share.link_copied', 'Link copied to clipboard'));
+      toast.success(t('share.link_copied'));
       timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error(t('share.copy_failed', 'Failed to copy link'));
+      toast.error(t('share.copy_failed'));
     }
   };
 
@@ -143,7 +143,7 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
     >
       <ModalContent>
         <ModalHeader className="text-[var(--text-primary)]">
-          {t('share.external_title', 'Share Post')}
+          {t('share.external_title')}
         </ModalHeader>
         <ModalBody className="pb-6">
           {/* Copy link button */}
@@ -160,8 +160,8 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
             onPress={handleCopyLink}
           >
             {copied
-              ? t('share.link_copied', 'Link copied to clipboard')
-              : t('share.copy_link', 'Copy link')}
+              ? t('share.link_copied')
+              : t('share.copy_link')}
           </Button>
 
           {/* Share target grid */}
@@ -173,7 +173,7 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
                   size="sm"
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl ${target.color} text-white hover:opacity-80 transition-opacity w-full h-auto`}
                   onPress={() => handleShareTarget(target)}
-                  aria-label={t('share.share_via', 'Share via {{platform}}', { platform: target.label })}
+                  aria-label={t('share.share_via', { platform: target.label })}
                 >
                   {target.icon}
                 </Button>

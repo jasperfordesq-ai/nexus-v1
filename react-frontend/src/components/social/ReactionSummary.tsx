@@ -162,7 +162,7 @@ export function ReactionSummary({
   // Build summary text
   const summaryText = (() => {
     if (topReactors.length === 0) {
-      return `${total} ${total === 1 ? t('card.reaction', 'reaction') : t('card.reactions', 'reactions')}`;
+      return `${total} ${total === 1 ? t('card.reaction') : t('card.reactions')}`;
     }
     const names = topReactors.map((r) => r.name);
     const remaining = total - names.length;
@@ -170,9 +170,9 @@ export function ReactionSummary({
       return names.join(', ');
     }
     if (names.length === 1) {
-      return `${names[0]} ${t('card.and', 'and')} ${remaining} ${remaining === 1 ? t('card.other', 'other') : t('card.others', 'others')}`;
+      return `${names[0]} ${t('card.and')} ${remaining} ${remaining === 1 ? t('card.other') : t('card.others')}`;
     }
-    return `${names.join(', ')}, ${t('card.and', 'and')} ${remaining} ${remaining === 1 ? t('card.other', 'other') : t('card.others', 'others')}`;
+    return `${names.join(', ')}, ${t('card.and')} ${remaining} ${remaining === 1 ? t('card.other') : t('card.others')}`;
   })();
 
   /* ───── Render inline summary ───── */
@@ -236,7 +236,7 @@ export function ReactionSummary({
                   </span>
                 ))}
               </div>
-              {t('card.reactions_title', 'Reactions')} ({total})
+              {t('card.reactions_title')} ({total})
             </div>
           </ModalHeader>
           <ModalBody className="pb-4 pt-2">
@@ -251,7 +251,7 @@ export function ReactionSummary({
                 tab: 'text-xs px-2',
               }}
             >
-              <Tab key="all" title={`${t('card.all', 'All')} ${total}`} />
+              <Tab key="all" title={`${t('card.all')} ${total}`} />
               {sortedTypes.map(([type, count]) => (
                 <Tab
                   key={type}
@@ -272,7 +272,7 @@ export function ReactionSummary({
                 </div>
               ) : reactors.length === 0 ? (
                 <p className="text-sm text-[var(--text-subtle)] text-center py-6 italic">
-                  {t('card.no_reactions', 'No reactions yet')}
+                  {t('card.no_reactions')}
                 </p>
               ) : (
                 <div className="space-y-1">
@@ -311,7 +311,7 @@ export function ReactionSummary({
                         onPress={handleLoadMore}
                         isLoading={isLoadingReactors}
                       >
-                        {t('card.load_more', 'Load More')}
+                        {t('card.load_more')}
                       </Button>
                     </div>
                   )}

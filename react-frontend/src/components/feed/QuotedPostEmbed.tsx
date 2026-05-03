@@ -93,7 +93,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
               onClick={(e) => e.stopPropagation()}
               onPress={() => setExpanded(true)}
             >
-              {t('card.read_more', 'Read more')}
+              {t('card.read_more')}
             </Button>
           )}
         </div>
@@ -102,7 +102,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
           <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
             <img
               src={thumbnailUrl}
-              alt={t('quoted_post_image', 'Quoted post image')}
+              alt={t('quoted_post_image')}
               className="w-full h-full object-cover"
               loading="lazy"
             />

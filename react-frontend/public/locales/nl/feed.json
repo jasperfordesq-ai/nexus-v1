@@ -479,7 +479,8 @@
     "previous": "Vorige afbeelding",
     "next": "Volgende afbeelding",
     "go_to_image": "Ga naar afbeelding {{number}}",
-    "more_images": "{{count}} meer afbeeldingen"
+    "more_images": "{{count}} meer afbeeldingen",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "Afbeelding viewer",
@@ -505,7 +506,10 @@
     "invalid_type": "Ongeldig videoformaat. Ondersteund: MP4, WebM, MOV",
     "remove": "Video verwijderen",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "Waarom zie ik dit?",

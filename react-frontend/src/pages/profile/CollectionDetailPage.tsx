@@ -61,7 +61,7 @@ export default function CollectionDetailPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  usePageTitle(data?.collection.name ?? t('collections.detail_title', 'Collection'));
+  usePageTitle(data?.collection.name ?? t('collections.detail_title'));
 
   const load = useCallback(async (p: number) => {
     if (!id) return;
@@ -87,10 +87,10 @@ export default function CollectionDetailPage() {
       const res = await api.delete(`/v2/me/saved-items/${savedItemId}`);
       if (res.success) {
         setData((prev) => prev ? { ...prev, items: prev.items.filter((i) => i.id !== savedItemId) } : prev);
-        toast.success(t('collections.item_removed', 'Removed'));
+        toast.success(t('collections.item_removed'));
       }
     } catch {
-      toast.error(t('common.error', 'Something went wrong'));
+      toast.error(t('common.error'));
     }
   }, [toast, t]);
 
@@ -100,7 +100,7 @@ export default function CollectionDetailPage() {
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <Link to="/me/collections" className="inline-flex items-center gap-2 mb-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
         <ArrowLeft className="w-4 h-4" />
-        {t('collections.back_to_my', 'Back to my collections')}
+        {t('collections.back_to_my')}
       </Link>
 
       {data?.collection && (
@@ -112,15 +112,15 @@ export default function CollectionDetailPage() {
           />
           <h1 className="text-2xl font-bold">{data.collection.name}</h1>
           <span className="text-[var(--text-muted)]">
-            {t('collections.items_count', '{{n}} items', { n: data.collection.items_count })}
+            {t('collections.items_count', { n: data.collection.items_count })}
           </span>
         </div>
       )}
 
       {data?.items.length === 0 ? (
         <EmptyState
-          title={t('collections.no_items', 'No saved items yet')}
-          description={t('collections.no_items_desc', 'Save items into this collection from anywhere on the platform.')}
+          title={t('collections.no_items')}
+          description={t('collections.no_items_desc')}
         />
       ) : (
         <div className="space-y-3">
@@ -144,7 +144,7 @@ export default function CollectionDetailPage() {
                     isIconOnly
                     size="sm"
                     variant="light"
-                    aria-label={t('collections.remove_item', 'Remove from collection')}
+                    aria-label={t('collections.remove_item')}
                     onPress={() => handleRemove(item.id)}
                   >
                     <Trash2 className="w-4 h-4 text-[var(--color-danger)]" />

@@ -192,7 +192,7 @@ export function HashtagPage() {
 
   const handleReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toast.error(t('toast.provide_reason', 'Please provide a reason'));
+      toast.error(t('toast.provide_reason'));
       return;
     }
     try {
@@ -203,10 +203,10 @@ export function HashtagPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toast.success(t('toast.reported', 'Post reported'));
+      toast.success(t('toast.reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toast.error(t('toast.report_failed', 'Failed to report post'));
+      toast.error(t('toast.report_failed'));
     } finally {
       setIsReporting(false);
     }
@@ -328,16 +328,16 @@ export function HashtagPage() {
             <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
               <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
             </div>
-            {t('report.title', 'Report Post')}
+            {t('report.title')}
           </div>
         </ModalHeader>
         <ModalBody>
           <p className="text-sm text-[var(--text-muted)] mb-3">
-            {t('report.description', 'Please describe why you are reporting this post.')}
+            {t('report.description')}
           </p>
           <Textarea
-            label={t('report.reason_label', 'Reason')}
-            placeholder={t('report.reason_placeholder', 'Describe the issue...')}
+            label={t('report.reason_label')}
+            placeholder={t('report.reason_placeholder')}
             value={reportReason}
             onChange={(e) => setReportReason(e.target.value)}
             minRows={3}
@@ -354,7 +354,7 @@ export function HashtagPage() {
             onPress={onReportClose}
             className="text-[var(--text-muted)]"
           >
-            {t('report.cancel', 'Cancel')}
+            {t('report.cancel')}
           </Button>
           <Button
             color="danger"
@@ -364,7 +364,7 @@ export function HashtagPage() {
             isDisabled={!reportReason.trim()}
             className="font-medium"
           >
-            {t('report.submit', 'Report')}
+            {t('report.submit')}
           </Button>
         </ModalFooter>
       </ModalContent>

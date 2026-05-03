@@ -85,7 +85,7 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
               <Heart className="w-4 h-4 text-rose-500 fill-rose-500" aria-hidden="true" />
             </div>
-            {t('likers_title', 'Liked by')} {totalCount > 0 && `(${totalCount})`}
+            {t('likers_title')} {totalCount > 0 && `(${totalCount})`}
           </div>
         </ModalHeader>
         <ModalBody className="pb-4">
@@ -95,7 +95,7 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
             </div>
           ) : likers.length === 0 ? (
             <p className="text-sm text-[var(--text-subtle)] text-center py-6 italic">
-              {t('no_likes', 'No likes yet')}
+              {t('no_likes')}
             </p>
           ) : (
             <div className="space-y-2">
@@ -136,7 +136,7 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
                     onPress={handleLoadMore}
                     isLoading={isLoading}
                   >
-                    {t('load_more', 'Load More')}
+                    {t('load_more')}
                   </Button>
                 </div>
               )}

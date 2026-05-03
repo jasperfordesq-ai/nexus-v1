@@ -585,7 +585,7 @@ export function ProfilePage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary truncate max-w-xs sm:max-w-sm lg:max-w-md">{profile.name || profile.first_name || t('member_fallback', 'Member')}</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary truncate max-w-xs sm:max-w-sm lg:max-w-md">{profile.name || profile.first_name || t('member_fallback')}</h1>
                 {/* Verification badges */}
                 <VerificationBadgeRow userId={profile.id} size="md" />
                 {/* Cross-federation reputation badge */}

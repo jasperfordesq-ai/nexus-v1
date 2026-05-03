@@ -479,7 +479,8 @@
     "previous": "Image précédente",
     "next": "Image suivante",
     "go_to_image": "Aller à l'image {{number}}",
-    "more_images": "{{count}} images supplémentaires"
+    "more_images": "{{count}} images supplémentaires",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "Visionneuse d'images",
@@ -505,7 +506,10 @@
     "invalid_type": "Format vidéo invalide. Formats pris en charge : MP4, WebM, MOV",
     "remove": "Supprimer la vidéo",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "Pourquoi est-ce que je vois ça ?",

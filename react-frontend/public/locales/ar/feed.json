@@ -479,7 +479,8 @@
     "previous": "الصورة السابقة",
     "next": "الصورة التالية",
     "go_to_image": "اذهب إلى الصورة {{number}}",
-    "more_images": "{{count}} صور إضافية"
+    "more_images": "{{count}} صور إضافية",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "عارض الصور",
@@ -505,7 +506,10 @@
     "invalid_type": "تنسيق الفيديو غير صالح. المدعوم: MP4، WebM، MOV",
     "remove": "إزالة الفيديو",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "لماذا أرى هذا؟",

@@ -47,13 +47,13 @@ export function ShareButton({
     try {
       const ok = await shareToFeed();
       if (ok) {
-        toast.success(t('shared_to_feed', 'Shared to your feed'));
+        toast.success(t('shared_to_feed'));
       } else {
-        toast.error(t('share_failed', 'Failed to share'));
+        toast.error(t('share_failed'));
       }
     } catch (err) {
       logError('Failed to share to feed', err);
-      toast.error(t('share_failed', 'Failed to share'));
+      toast.error(t('share_failed'));
     } finally {
       setIsSharing(false);
     }
@@ -62,9 +62,9 @@ export function ShareButton({
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success(t('link_copied', 'Link copied to clipboard'));
+      toast.success(t('link_copied'));
     } catch {
-      toast.error(t('copy_failed', 'Failed to copy link'));
+      toast.error(t('copy_failed'));
     }
   };
 
@@ -97,17 +97,17 @@ export function ShareButton({
           startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
           isLoading={isSharing}
         >
-          {t('share', 'Share')}
+          {t('share')}
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label={t('share_options', 'Share options')}>
+      <DropdownMenu aria-label={t('share_options')}>
         {isAuthenticated ? (
           <DropdownItem
             key="feed"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             onPress={handleShareToFeed}
           >
-            {t('share_to_feed', 'Share to Feed')}
+            {t('share_to_feed')}
           </DropdownItem>
         ) : (
           <DropdownItem
@@ -115,7 +115,7 @@ export function ShareButton({
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             isDisabled
           >
-            {t('login_to_share', 'Log in to share')}
+            {t('login_to_share')}
           </DropdownItem>
         )}
         <DropdownItem
@@ -123,7 +123,7 @@ export function ShareButton({
           startContent={<Link2 className="w-4 h-4" aria-hidden="true" />}
           onPress={handleNativeShare}
         >
-          {t('copy_link', 'Copy Link')}
+          {t('copy_link')}
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

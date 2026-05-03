@@ -40,14 +40,14 @@ export function FriendsWidget({ friends }: FriendsWidgetProps) {
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.friends.title', 'Friends')}
+            {t('sidebar.friends.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/connections')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.friends.see_all', 'See All')}
+          {t('sidebar.friends.see_all')}
         </Link>
       </div>
 
@@ -69,7 +69,7 @@ export function FriendsWidget({ friends }: FriendsWidgetProps) {
                   className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[var(--glass-bg)] ${
                     friend.is_online ? 'bg-emerald-500' : 'bg-amber-500'
                   }`}
-                  aria-label={friend.is_online ? t('sidebar.friends.online', 'Online now') : t('sidebar.friends.active_today', 'Active today')}
+                  aria-label={friend.is_online ? t('sidebar.friends.online') : t('sidebar.friends.active_today')}
                 />
               )}
             </div>

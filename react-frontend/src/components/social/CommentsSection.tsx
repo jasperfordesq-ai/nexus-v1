@@ -137,7 +137,7 @@ function CommentItemInner({
             </UserHoverCard>
             {comment.edited && (
               <span className="text-[10px] text-[var(--text-subtle)] italic">
-                ({t('edited', 'edited')})
+                ({t('edited')})
               </span>
             )}
           </div>
@@ -163,7 +163,7 @@ function CommentItemInner({
                   className="w-6 h-6 min-w-0 bg-emerald-500/20 text-emerald-500"
                   onPress={handleSaveEdit}
                   isLoading={isSubmittingEdit}
-                  aria-label={t('save', 'Save')}
+                  aria-label={t('save')}
                 >
                   <Check className="w-3 h-3" />
                 </Button>
@@ -173,7 +173,7 @@ function CommentItemInner({
                   variant="flat"
                   className="w-6 h-6 min-w-0 bg-red-500/10 text-[var(--color-error)]"
                   onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
-                  aria-label={t('cancel', 'Cancel')}
+                  aria-label={t('cancel')}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -205,7 +205,7 @@ function CommentItemInner({
                   className="text-[10px] text-[var(--color-primary)] hover:underline flex items-center gap-0.5 h-auto p-0 min-w-0"
                   startContent={<CornerDownRight className="w-2.5 h-2.5" aria-hidden="true" />}
                 >
-                  {t('reply', 'Reply')}
+                  {t('reply')}
                 </Button>
               )}
 
@@ -215,7 +215,7 @@ function CommentItemInner({
                 onPress={() => setShowReactions(!showReactions)}
                 className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] h-auto p-0 min-w-0"
               >
-                {t('react', 'React')}
+                {t('react')}
               </Button>
 
               {isOwn && (
@@ -227,7 +227,7 @@ function CommentItemInner({
                     className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] flex items-center gap-0.5 h-auto p-0 min-w-0"
                     startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
-                    {t('edit', 'Edit')}
+                    {t('edit')}
                   </Button>
                   <Button
                     variant="light"
@@ -236,7 +236,7 @@ function CommentItemInner({
                     className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
                     startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
-                    {t('delete', 'Delete')}
+                    {t('delete')}
                   </Button>
                 </>
               )}
@@ -327,11 +327,11 @@ function CommentItemInner({
       >
         <ModalContent>
           <ModalHeader className="text-[var(--text-primary)]">
-            {t('delete_comment_title', 'Delete comment')}
+            {t('delete_comment_title')}
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-[var(--text-secondary)]">
-              {t('delete_comment_body', 'Are you sure you want to delete this comment? This cannot be undone.')}
+              {t('delete_comment_body')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -340,14 +340,14 @@ function CommentItemInner({
               size="sm"
               onPress={() => setShowDeleteModal(false)}
             >
-              {t('cancel', 'Cancel')}
+              {t('cancel')}
             </Button>
             <Button
               color="danger"
               size="sm"
               onPress={() => { void handleDeleteConfirm(); }}
             >
-              {t('delete', 'Delete')}
+              {t('delete')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -461,7 +461,7 @@ function MentionInput({
       <Input
         ref={inputRef}
         placeholder={placeholder}
-        aria-label={placeholder || t('write_comment', 'Write a comment...')}
+        aria-label={placeholder || t('write_comment')}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -566,7 +566,7 @@ export function CommentsSection({
       {/* Header */}
       <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
         <MessageCircle className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
-        {t('comments_title', 'Comments')} {commentsCount > 0 && `(${commentsCount})`}
+        {t('comments_title')} {commentsCount > 0 && `(${commentsCount})`}
       </h3>
 
       {/* New comment input */}
@@ -579,7 +579,7 @@ export function CommentsSection({
             className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
           />
           <MentionInput
-            placeholder={t('write_comment', 'Write a comment...')}
+            placeholder={t('write_comment')}
             value={newComment}
             onChange={setNewComment}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmit(); } }}
@@ -598,7 +598,7 @@ export function CommentsSection({
                 className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
                 onPress={handleSubmit}
                 isDisabled={!newComment.trim() || isSubmitting}
-                aria-label={t('send_comment', 'Send comment')}
+                aria-label={t('send_comment')}
               >
                 <Send className="w-4 h-4" />
               </Button>
@@ -622,7 +622,7 @@ export function CommentsSection({
         </div>
       ) : comments.length === 0 ? (
         <p className="text-xs text-[var(--text-subtle)] text-center py-3 italic">
-          {t('no_comments', 'No comments yet. Be the first to comment!')}
+          {t('no_comments')}
         </p>
       ) : (
         <div className="space-y-3">
@@ -648,7 +648,7 @@ export function CommentsSection({
                 >
                   <div className="flex gap-2 items-end">
                     <MentionInput
-                      placeholder={t('write_reply', 'Write a reply...')}
+                      placeholder={t('write_reply')}
                       value={replyContent}
                       onChange={setReplyContent}
                       onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmitReply(); } }}
@@ -669,7 +669,7 @@ export function CommentsSection({
                             className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
                             onPress={handleSubmitReply}
                             isDisabled={!replyContent.trim() || isSubmittingReply}
-                            aria-label={t('send_reply', 'Send reply')}
+                            aria-label={t('send_reply')}
                           >
                             <Send className="w-3.5 h-3.5" />
                           </Button>
@@ -679,7 +679,7 @@ export function CommentsSection({
                             variant="light"
                             className="text-[var(--text-subtle)] min-w-0 w-auto h-auto p-0"
                             onPress={() => setReplyingTo(null)}
-                            aria-label={t('cancel', 'Cancel')}
+                            aria-label={t('cancel')}
                           >
                             <X className="w-3.5 h-3.5" />
                           </Button>

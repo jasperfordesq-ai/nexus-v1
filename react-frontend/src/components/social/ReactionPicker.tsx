@@ -183,7 +183,7 @@ export function ReactionPicker({
 
   const currentConfig = userReaction ? REACTION_CONFIGS.find((r) => r.type === userReaction) : null;
 
-  const buttonLabel = currentConfig ? t(currentConfig.label) : t('card.like_action', 'Like');
+  const buttonLabel = currentConfig ? t(currentConfig.label) : t('card.like_action');
   const buttonEmoji = currentConfig ? currentConfig.emoji : null;
 
   // Color based on reaction type
@@ -301,7 +301,7 @@ export function ReactionPicker({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         isDisabled={!isAuthenticated || isDisabled}
-        aria-label={userReaction ? t('reaction.click_to_remove', '{{label}} (click to remove)', { label: buttonLabel }) : t('reaction.react_to_post', 'React to this post')}
+        aria-label={userReaction ? t('reaction.click_to_remove', { label: buttonLabel }) : t('reaction.react_to_post')}
       >
         {buttonLabel}
       </Button>

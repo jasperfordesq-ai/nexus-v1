@@ -47,7 +47,7 @@ export default function AppreciationWallPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  usePageTitle(t('appreciations.wall_title', 'Appreciations'));
+  usePageTitle(t('appreciations.wall_title'));
 
   const load = useCallback(async (p: number) => {
     if (!userId) return;
@@ -99,13 +99,13 @@ export default function AppreciationWallPage() {
     <div className="container mx-auto px-4 py-6 max-w-2xl">
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
         <MessageCircleHeart className="w-6 h-6 text-[var(--color-primary)]" />
-        {t('appreciations.wall_title', 'Appreciations')}
+        {t('appreciations.wall_title')}
       </h1>
 
       {items.length === 0 ? (
         <EmptyState
-          title={t('appreciations.empty_title', 'No appreciations yet')}
-          description={t('appreciations.empty_desc', 'Thank-you notes will appear here.')}
+          title={t('appreciations.empty_title')}
+          description={t('appreciations.empty_desc')}
         />
       ) : (
         <div className="space-y-3">
@@ -115,7 +115,7 @@ export default function AppreciationWallPage() {
                 <div className="flex items-center gap-2">
                   <Avatar src={a.sender?.avatar_url ?? undefined} name={a.sender?.name ?? ''} size="sm" />
                   <Link to={`/profile/${a.sender_id}`} className="font-medium hover:underline">
-                    {a.sender?.name ?? t('common.someone', 'Someone')}
+                    {a.sender?.name ?? t('common.someone')}
                   </Link>
                   <span className="text-xs text-[var(--text-muted)] ml-auto">
                     {new Date(a.created_at).toLocaleDateString()}
@@ -134,9 +134,9 @@ export default function AppreciationWallPage() {
                       startContent={<Icon className="w-4 h-4" />}
                       aria-label={t(`appreciations.reaction_${key}`, key)}
                     >
-                      {key === 'heart' ? t('appreciations.react_heart', 'Heart') :
-                       key === 'clap' ? t('appreciations.react_clap', 'Clap') :
-                       t('appreciations.react_star', 'Star')}
+                      {key === 'heart' ? t('appreciations.react_heart') :
+                       key === 'clap' ? t('appreciations.react_clap') :
+                       t('appreciations.react_star')}
                     </Button>
                   ))}
                   {a.reactions_count > 0 && (

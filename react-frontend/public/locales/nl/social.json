@@ -61,7 +61,8 @@
     "emoji_label": "Emoji",
     "status_label": "Status",
     "status_placeholder": "In een vergadering",
-    "char_count": "{{current}}/80 tekens"
+    "char_count": "{{current}}/80 tekens",
+    "offline": "Offline"
   },
   "endorse": {
     "tooltip_remove": "Verwijder goedkeuring voor {{skillName}}",
@@ -117,5 +118,15 @@
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create"
+  },
+  "verified": "Verified",
+  "hover_card": {
+    "connected": "Connected",
+    "pending": "Pending",
+    "connect": "Connect",
+    "message": "Message",
+    "hours_given": "{{count}} hrs given",
+    "connections": "{{count}} connections",
+    "listings": "{{count}} listings"
   }
 }

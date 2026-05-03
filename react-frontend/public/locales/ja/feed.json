@@ -479,7 +479,8 @@
     "previous": "前の画像",
     "next": "次の画像",
     "go_to_image": "画像 {{number}} に移動",
-    "more_images": "{{count}} 枚の画像がさらにあります"
+    "more_images": "{{count}} 枚の画像がさらにあります",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "画像ビューア",
@@ -505,7 +506,10 @@
     "invalid_type": "無効な動画形式です。サポートされている形式: MP4, WebM, MOV",
     "remove": "動画を削除",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "なぜこれを見ているのですか？",

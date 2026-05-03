@@ -61,7 +61,8 @@
     "emoji_label": "Émoji",
     "status_label": "Statut",
     "status_placeholder": "En réunion",
-    "char_count": "{{current}}/80 caractères"
+    "char_count": "{{current}}/80 caractères",
+    "offline": "Offline"
   },
   "endorse": {
     "tooltip_remove": "Retirer la recommandation pour {{skillName}}",
@@ -117,5 +118,15 @@
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create"
+  },
+  "verified": "Verified",
+  "hover_card": {
+    "connected": "Connected",
+    "pending": "Pending",
+    "connect": "Connect",
+    "message": "Message",
+    "hours_given": "{{count}} hrs given",
+    "connections": "{{count}} connections",
+    "listings": "{{count}} listings"
   }
 }

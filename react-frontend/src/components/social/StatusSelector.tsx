@@ -123,19 +123,19 @@ export function StatusSelector({ children }: StatusSelectorProps) {
           : 'fill-gray-400 text-gray-400';
   const statusLabel =
     currentStatusKey === 'online'
-      ? t('status.online', 'Online')
+      ? t('status.online')
       : currentStatusKey === 'away'
-        ? t('status.away', 'Away')
+        ? t('status.away')
         : currentStatusKey === 'dnd'
-          ? t('status.dnd', 'DND')
-          : t('status.offline', 'Offline');
+          ? t('status.dnd')
+          : t('status.offline');
 
   const trigger = children ?? (
     <Button
       variant="light"
       size="sm"
       className="min-w-0 px-2 gap-1.5"
-      aria-label={t('status.set_status', 'Set status')}
+      aria-label={t('status.set_status')}
     >
       <Circle className={`w-3.5 h-3.5 ${statusColorClass}`} />
       <span className="text-xs font-medium hidden sm:block">{statusLabel}</span>
@@ -147,7 +147,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
       <Dropdown placement="bottom-end" shouldBlockScroll={false}>
         <DropdownTrigger>{trigger}</DropdownTrigger>
         <DropdownMenu
-          aria-label={t('status.set_status', 'Set status')}
+          aria-label={t('status.set_status')}
           onAction={(key) => {
             if (key === 'custom') {
               setCustomText(currentStatus?.custom_status ?? '');
@@ -160,7 +160,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
             }
           }}
         >
-          <DropdownSection title={t('status.section_status', 'Status')} showDivider>
+          <DropdownSection title={t('status.section_status')} showDivider>
             {STATUS_OPTIONS.map((option) => (
               <DropdownItem
                 key={option.key}
@@ -172,15 +172,15 @@ export function StatusSelector({ children }: StatusSelectorProps) {
               </DropdownItem>
             ))}
           </DropdownSection>
-          <DropdownSection title={t('status.section_custom', 'Custom')}>
+          <DropdownSection title={t('status.section_custom')}>
             <DropdownItem
               key="custom"
               startContent={<MessageSquare className="w-3 h-3 text-theme-subtle" />}
-              description={t('status.set_custom_desc', 'Set a custom status message')}
+              description={t('status.set_custom_desc')}
             >
               {currentStatus?.custom_status
                 ? `${currentStatus.status_emoji ?? ''} ${currentStatus.custom_status}`.trim()
-                : t('status.set_custom', 'Set custom status...')}
+                : t('status.set_custom')}
             </DropdownItem>
             {currentStatus?.custom_status ? (
               <DropdownItem
@@ -188,7 +188,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
                 startContent={<X className="w-3 h-3 text-theme-subtle" />}
                 className="text-danger"
               >
-                {t('status.clear_custom', 'Clear custom status')}
+                {t('status.clear_custom')}
               </DropdownItem>
             ) : (
               // HeroUI DropdownSection requires at least the items declared;
@@ -209,11 +209,11 @@ export function StatusSelector({ children }: StatusSelectorProps) {
         placement="center"
       >
         <ModalContent>
-          <ModalHeader>{t('status.set_custom_title', 'Set Custom Status')}</ModalHeader>
+          <ModalHeader>{t('status.set_custom_title')}</ModalHeader>
           <ModalBody>
             <div className="flex gap-2">
               <Input
-                label={t('status.emoji_label', 'Emoji')}
+                label={t('status.emoji_label')}
                 placeholder="📅"
                 value={customEmoji}
                 onValueChange={setCustomEmoji}
@@ -222,8 +222,8 @@ export function StatusSelector({ children }: StatusSelectorProps) {
                 variant="bordered"
               />
               <Input
-                label={t('status.status_label', 'Status')}
-                placeholder={t('status.status_placeholder', 'In a meeting')}
+                label={t('status.status_label')}
+                placeholder={t('status.status_placeholder')}
                 value={customText}
                 onValueChange={setCustomText}
                 maxLength={80}
@@ -233,7 +233,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
               />
             </div>
             <p className="text-xs text-theme-subtle">
-              {t('status.char_count', '{{current}}/80 characters', { current: customText.length })}
+              {t('status.char_count', { current: customText.length })}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -241,13 +241,13 @@ export function StatusSelector({ children }: StatusSelectorProps) {
               variant="flat"
               onPress={() => setIsCustomModalOpen(false)}
             >
-              {t('cancel', 'Cancel')}
+              {t('cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleCustomStatusSubmit}
             >
-              {t('save', 'Save')}
+              {t('save')}
             </Button>
           </ModalFooter>
         </ModalContent>

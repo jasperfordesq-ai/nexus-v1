@@ -64,7 +64,7 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
 
   const handleSubmit = async () => {
     if (!content.trim()) {
-      toast.error(t('share.quote_content_required', 'Please add your commentary'));
+      toast.error(t('share.quote_content_required'));
       return;
     }
 
@@ -76,16 +76,16 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
       });
 
       if (response.success) {
-        toast.success(t('share.quote_posted', 'Quote post created'));
+        toast.success(t('share.quote_posted'));
         setContent('');
         onClose();
         onSuccess?.();
       } else {
-        toast.error(response.error || t('share.quote_failed', 'Failed to create quote post'));
+        toast.error(response.error || t('share.quote_failed'));
       }
     } catch (err) {
       logError('Failed to create quote post', err);
-      toast.error(t('share.quote_failed', 'Failed to create quote post'));
+      toast.error(t('share.quote_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -104,11 +104,11 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
     >
       <ModalContent>
         <ModalHeader className="text-[var(--text-primary)]">
-          {t('share.quote_title', 'Quote Post')}
+          {t('share.quote_title')}
         </ModalHeader>
         <ModalBody className="gap-4">
           <Textarea
-            placeholder={t('share.quote_placeholder', 'Add your thoughts...')}
+            placeholder={t('share.quote_placeholder')}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             minRows={3}
@@ -127,7 +127,7 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
             onPress={onClose}
             className="text-[var(--text-muted)]"
           >
-            {t('compose.cancel', 'Cancel')}
+            {t('compose.cancel')}
           </Button>
           <Button
             color="primary"
@@ -136,7 +136,7 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
             isDisabled={!content.trim()}
             startContent={!isSubmitting ? <Send className="w-4 h-4" /> : undefined}
           >
-            {t('share.quote_submit', 'Post')}
+            {t('share.quote_submit')}
           </Button>
         </ModalFooter>
       </ModalContent>

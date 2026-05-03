@@ -478,7 +478,8 @@
     "previous": "Íomhá roimhe",
     "next": "Íomhá ar aghaidh",
     "go_to_image": "Téigh chuig íomhá {{number}}",
-    "more_images": "{{count}} íomhá eile"
+    "more_images": "{{count}} íomhá eile",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "Amharcóir íomhánna",
@@ -504,7 +505,10 @@
     "invalid_type": "Formáid físeáin neamhbhailí. Tacaithe: MP4, WebM, MOV",
     "remove": "Bain físeán",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "quoted_post_image": "Quoted post image",
   "why_shown": {

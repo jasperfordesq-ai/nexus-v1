@@ -33,7 +33,7 @@ interface Collection {
 export default function MyCollectionsPage() {
   const { t } = useTranslation('common');
   const toast = useToast();
-  usePageTitle(t('collections.my_title', 'My Collections'));
+  usePageTitle(t('collections.my_title'));
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,14 +70,14 @@ export default function MyCollectionsPage() {
       });
       if (res.success && res.data) {
         setCollections((prev) => [...prev, res.data as Collection]);
-        toast.success(t('collections.created', 'Collection created'));
+        toast.success(t('collections.created'));
         setNewName('');
         setNewDescription('');
         setNewPublic(false);
         setShowCreate(false);
       }
     } catch {
-      toast.error(t('common.error', 'Something went wrong'));
+      toast.error(t('common.error'));
     } finally {
       setCreating(false);
     }
@@ -90,18 +90,18 @@ export default function MyCollectionsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Bookmark className="w-6 h-6 text-[var(--color-warning)]" />
-          {t('collections.my_title', 'My Collections')}
+          {t('collections.my_title')}
         </h1>
         <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={() => setShowCreate(true)}>
-          {t('collections.new', 'New collection')}
+          {t('collections.new')}
         </Button>
       </div>
 
       {collections.length === 0 ? (
         <EmptyState
           icon={<FolderOpen className="w-12 h-12 text-[var(--text-muted)]" />}
-          title={t('collections.empty_title', 'No collections yet')}
-          description={t('collections.empty_desc', 'Save items from across the platform into your own collections.')}
+          title={t('collections.empty_title')}
+          description={t('collections.empty_desc')}
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -123,7 +123,7 @@ export default function MyCollectionsPage() {
                   )}
                   {c.is_public && (
                     <span className="text-xs text-[var(--color-primary)]">
-                      {t('collections.public_label', 'Public')}
+                      {t('collections.public_label')}
                     </span>
                   )}
                 </CardBody>
@@ -135,31 +135,31 @@ export default function MyCollectionsPage() {
 
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)}>
         <ModalContent>
-          <ModalHeader>{t('collections.new', 'New collection')}</ModalHeader>
+          <ModalHeader>{t('collections.new')}</ModalHeader>
           <ModalBody className="space-y-3">
             <Input
-              label={t('collections.name_label', 'Name')}
+              label={t('collections.name_label')}
               value={newName}
               onValueChange={setNewName}
               variant="bordered"
               autoFocus
             />
             <Input
-              label={t('collections.description_label', 'Description (optional)')}
+              label={t('collections.description_label')}
               value={newDescription}
               onValueChange={setNewDescription}
               variant="bordered"
             />
             <Switch isSelected={newPublic} onValueChange={setNewPublic}>
-              {t('collections.make_public', 'Make public')}
+              {t('collections.make_public')}
             </Switch>
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={() => setShowCreate(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </Button>
             <Button color="primary" onPress={handleCreate} isLoading={creating}>
-              {t('collections.create', 'Create')}
+              {t('collections.create')}
             </Button>
           </ModalFooter>
         </ModalContent>

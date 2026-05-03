@@ -62,7 +62,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
   return (
     <div className="min-w-[220px] max-w-[280px]">
       <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider px-3 pt-2 pb-1">
-        {t('bookmark.save_to', 'Save to collection')}
+        {t('bookmark.save_to')}
       </p>
 
       {/* "No collection" option */}
@@ -72,7 +72,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
       >
         <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
-        <span className="flex-1 text-left">{t('bookmark.no_collection', 'General (no collection)')}</span>
+        <span className="flex-1 text-left">{t('bookmark.no_collection')}</span>
         {selectedId === null && <Check className="w-4 h-4 text-[var(--color-primary)]" />}
       </Button>
 
@@ -99,7 +99,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
           <Input
             size="sm"
             variant="bordered"
-            placeholder={t('bookmark.collection_name', 'Collection name')}
+            placeholder={t('bookmark.collection_name')}
             value={newName}
             onValueChange={setNewName}
             onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setIsCreating(false); }}
@@ -117,7 +117,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
         >
           <Plus className="w-4 h-4" />
-          <span>{t('bookmark.new_collection', 'New collection')}</span>
+          <span>{t('bookmark.new_collection')}</span>
         </Button>
       )}
     </div>

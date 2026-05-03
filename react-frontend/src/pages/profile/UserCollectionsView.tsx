@@ -31,7 +31,7 @@ export default function UserCollectionsView() {
   const { userId } = useParams<{ userId: string }>();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  usePageTitle(t('collections.public_title', 'Public Collections'));
+  usePageTitle(t('collections.public_title'));
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -56,13 +56,13 @@ export default function UserCollectionsView() {
     <div className="container mx-auto px-4 py-6 max-w-5xl">
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
         <Bookmark className="w-6 h-6 text-[var(--color-warning)]" />
-        {t('collections.public_title', 'Public Collections')}
+        {t('collections.public_title')}
       </h1>
 
       {collections.length === 0 ? (
         <EmptyState
-          title={t('collections.no_public', 'No public collections')}
-          description={t('collections.no_public_desc', 'This member has not made any collections public.')}
+          title={t('collections.no_public')}
+          description={t('collections.no_public_desc')}
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

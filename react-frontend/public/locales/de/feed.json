@@ -479,7 +479,8 @@
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
     "go_to_image": "Zu Bild {{number}} gehen",
-    "more_images": "{{count}} weitere Bilder"
+    "more_images": "{{count}} weitere Bilder",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "Bildansicht",
@@ -505,7 +506,10 @@
     "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
     "remove": "Video entfernen",
     "mute": "Stummschalten",
-    "unmute": "Stummschaltung aufheben"
+    "unmute": "Stummschaltung aufheben",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "Warum sehe ich das?",

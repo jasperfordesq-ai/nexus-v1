@@ -399,8 +399,7 @@
     "dm_failed": "Failed to send message",
     "dm_sent_label": "Sent",
     "dm_send": "Send",
-    "dm_done": "Done",
-    "shared_by_text": "shared this"
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -501,7 +500,8 @@
     "previous": "Previous image",
     "next": "Next image",
     "go_to_image": "Go to image {{number}}",
-    "more_images": "{{count}} more images"
+    "more_images": "{{count}} more images",
+    "video_of": "Video {{current}} of {{total}}"
   },
   "lightbox": {
     "aria_label": "Image viewer",
@@ -527,7 +527,10 @@
     "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
     "remove": "Remove video",
     "mute": "Mute",
-    "unmute": "Unmute"
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video"
   },
   "why_shown": {
     "label": "Why am I seeing this?",

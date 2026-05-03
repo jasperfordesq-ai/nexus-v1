@@ -128,7 +128,7 @@ export function FeedContentRenderer({
             to={detailPath}
             className="text-[var(--color-primary)] hover:underline text-sm font-medium"
           >
-            ...{t('card.read_more', 'read more')}
+            ...{t('card.read_more')}
           </Link>
         )}
       </div>
@@ -144,7 +144,7 @@ export function FeedContentRenderer({
           to={detailPath}
           className="text-[var(--color-primary)] hover:underline ms-1 text-sm font-medium"
         >
-          {t('card.read_more', 'read more')}
+          {t('card.read_more')}
         </Link>
       )}
     </p>

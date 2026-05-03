@@ -97,7 +97,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
       ref={containerRef}
       className={`relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 group cursor-pointer ${className}`}
       onClick={handlePlayPause}
-      aria-label={isPlaying ? t('video.pause', 'Pause') : t('video.play', 'Play')}
+      aria-label={isPlaying ? t('video.pause') : t('video.play')}
     >
       <video
         ref={videoRef}
@@ -108,7 +108,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         playsInline
         preload="metadata"
         className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain"
-        aria-label={media.alt_text || t('video.aria_label', 'Video')}
+        aria-label={media.alt_text || t('video.aria_label')}
         onPlay={handlePlay}
         onPause={handlePause}
       />
@@ -129,7 +129,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         size="sm"
         className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
         onClick={handleToggleMute}
-        aria-label={isMuted ? t('video.unmute', 'Unmute') : t('video.mute', 'Mute')}
+        aria-label={isMuted ? t('video.unmute') : t('video.mute')}
       >
         {isMuted ? (
           <VolumeX className="w-4 h-4" />

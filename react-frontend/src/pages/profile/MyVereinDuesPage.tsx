@@ -61,7 +61,7 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
 
 export function MyVereinDuesPage() {
   const { t } = useTranslation('common');
-  usePageTitle(t('verein_dues.my_page_title', 'My Verein membership dues'));
+  usePageTitle(t('verein_dues.my_page_title'));
   const toast = useToast();
 
   const [rows, setRows] = useState<DuesRow[]>([]);
@@ -82,11 +82,11 @@ export function MyVereinDuesPage() {
       if (res.success && res.data) {
         setRows(Array.isArray(res.data.items) ? res.data.items : []);
       } else {
-        setError(t('verein_dues.errors.load_failed', 'Failed to load membership dues.'));
+        setError(t('verein_dues.errors.load_failed'));
       }
     } catch (err) {
       logError('MyVereinDuesPage load failed', err);
-      setError(t('verein_dues.errors.load_failed', 'Failed to load membership dues.'));
+      setError(t('verein_dues.errors.load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -104,16 +104,16 @@ export function MyVereinDuesPage() {
         setPayCurrency(row.currency);
         setPayTitle(`${row.organization_name ?? ''} — ${row.membership_year}`);
       } else {
-        toast.error(t('verein_dues.errors.start_payment_failed', 'Could not start payment. Please try again.'));
+        toast.error(t('verein_dues.errors.start_payment_failed'));
       }
     } catch (err) {
       logError('MyVereinDuesPage pay failed', err);
-      toast.error(t('verein_dues.errors.start_payment_failed', 'Could not start payment. Please try again.'));
+      toast.error(t('verein_dues.errors.start_payment_failed'));
     }
   }, [toast, t]);
 
   const onPaymentSuccess = useCallback(() => {
-    toast.success(t('verein_dues.payment_success', 'Payment received. Your membership is now active.'));
+    toast.success(t('verein_dues.payment_success'));
     setActivePayDuesId(null);
     setClientSecret(null);
     void load();
@@ -133,10 +133,10 @@ export function MyVereinDuesPage() {
         <Receipt className="w-7 h-7 text-primary" />
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            {t('verein_dues.my_page_heading', 'My Verein membership dues')}
+            {t('verein_dues.my_page_heading')}
           </h1>
           <p className="text-sm text-default-500">
-            {t('verein_dues.my_page_subtitle', 'Pay your annual membership dues for the Vereine you belong to.')}
+            {t('verein_dues.my_page_subtitle')}
           </p>
         </div>
       </div>
@@ -154,7 +154,7 @@ export function MyVereinDuesPage() {
 
       {!isLoading && !error && rows.length === 0 && (
         <Card><CardBody className="text-center py-10 text-default-500">
-          {t('verein_dues.empty_state', 'You do not have any membership dues records yet.')}
+          {t('verein_dues.empty_state')}
         </CardBody></Card>
       )}
 
@@ -167,10 +167,10 @@ export function MyVereinDuesPage() {
                 <div className="flex items-center gap-3">
                   <div>
                     <div className="font-semibold text-foreground">
-                      {row.organization_name ?? t('verein_dues.unnamed_verein', 'Verein')}
+                      {row.organization_name ?? t('verein_dues.unnamed_verein')}
                     </div>
                     <div className="text-xs text-default-500">
-                      {t('verein_dues.year_label', 'Year')} {row.membership_year}
+                      {t('verein_dues.year_label')} {row.membership_year}
                     </div>
                   </div>
                 </div>
@@ -183,19 +183,19 @@ export function MyVereinDuesPage() {
                   <div className="text-lg font-semibold">{formatAmount(row.amount_cents, row.currency)}</div>
                   {row.due_date && row.status !== 'paid' && (
                     <div className="text-xs text-default-500">
-                      {t('verein_dues.due_label', 'Due')} {row.due_date}
+                      {t('verein_dues.due_label')} {row.due_date}
                     </div>
                   )}
                   {row.paid_at && (
                     <div className="text-xs text-success flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
-                      {t('verein_dues.paid_label', 'Paid')} {new Date(row.paid_at).toLocaleDateString()}
+                      {t('verein_dues.paid_label')} {new Date(row.paid_at).toLocaleDateString()}
                     </div>
                   )}
                 </div>
                 {isPayable && (
                   <Button color="primary" startContent={<CreditCard className="w-4 h-4" />} onPress={() => onPayClick(row)}>
-                    {t('verein_dues.cta_pay_now', 'Pay now')}
+                    {t('verein_dues.cta_pay_now')}
                   </Button>
                 )}
               </CardBody>

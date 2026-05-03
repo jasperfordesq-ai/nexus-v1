@@ -238,7 +238,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                 >
                   {displayName}
                   {userData.is_verified && (
-                    <span className="ml-1 text-[var(--color-primary)]" title={t('verified', 'Verified')}>
+                    <span className="ml-1 text-[var(--color-primary)]" title={t('verified')}>
                       &#10003;
                     </span>
                   )}
@@ -258,11 +258,11 @@ export const UserHoverCard = memo(function UserHoverCard({
 
             {/* Stats */}
             <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
-              <span>{t('hover_card.hours_given', '{{count}} hrs given', { count: hoursGiven })}</span>
+              <span>{t('hover_card.hours_given', { count: hoursGiven })}</span>
               <span className="text-[var(--border-default)]">|</span>
-              <span>{t('hover_card.connections', '{{count}} connections', { count: connectionsCount })}</span>
+              <span>{t('hover_card.connections', { count: connectionsCount })}</span>
               <span className="text-[var(--border-default)]">|</span>
-              <span>{t('hover_card.listings', '{{count}} listings', { count: listingsCount })}</span>
+              <span>{t('hover_card.listings', { count: listingsCount })}</span>
             </div>
 
             {/* Skills */}
@@ -291,7 +291,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                   startContent={<UserCheck className="w-3.5 h-3.5" />}
                   isDisabled
                 >
-                  {t('hover_card.connected', 'Connected')}
+                  {t('hover_card.connected')}
                 </Button>
               ) : userData.connection_status === 'pending' ? (
                 <Button
@@ -300,7 +300,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                   className="flex-1 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                   isDisabled
                 >
-                  {t('hover_card.pending', 'Pending')}
+                  {t('hover_card.pending')}
                 </Button>
               ) : (
                 <Button
@@ -311,7 +311,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                   onPress={handleConnect}
                   isLoading={isConnecting}
                 >
-                  {t('hover_card.connect', 'Connect')}
+                  {t('hover_card.connect')}
                 </Button>
               )}
               <Button
@@ -322,7 +322,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                 className="flex-1 bg-[var(--surface-elevated)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
                 startContent={<MessageCircle className="w-3.5 h-3.5" />}
               >
-                {t('hover_card.message', 'Message')}
+                {t('hover_card.message')}
               </Button>
             </div>
           </div>

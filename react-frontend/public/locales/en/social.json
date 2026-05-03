@@ -61,7 +61,8 @@
     "emoji_label": "Emoji",
     "status_label": "Status",
     "status_placeholder": "In a meeting",
-    "char_count": "{{current}}/80 characters"
+    "char_count": "{{current}}/80 characters",
+    "offline": "Offline"
   },
   "endorse": {
     "tooltip_remove": "Remove endorsement for {{skillName}}",
@@ -117,5 +118,15 @@
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create"
+  },
+  "verified": "Verified",
+  "hover_card": {
+    "connected": "Connected",
+    "pending": "Pending",
+    "connect": "Connect",
+    "message": "Message",
+    "hours_given": "{{count}} hrs given",
+    "connections": "{{count}} connections",
+    "listings": "{{count}} listings"
   }
 }

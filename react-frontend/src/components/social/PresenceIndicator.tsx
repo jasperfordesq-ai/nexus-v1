@@ -139,7 +139,7 @@ export const PresenceIndicator = memo(function PresenceIndicator({
     tooltipLines.push(statusLabel);
   }
   if (status === 'away' && last_seen_at) {
-    tooltipLines.push(t('presence.last_seen', 'Last seen {{time}}', { time: formatLastSeen(last_seen_at) }));
+    tooltipLines.push(t('presence.last_seen', { time: formatLastSeen(last_seen_at) }));
   }
 
   const tooltipContent = tooltipLines.join(' \u2022 ');

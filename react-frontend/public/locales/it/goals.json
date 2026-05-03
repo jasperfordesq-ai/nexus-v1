@@ -76,5 +76,8 @@
     "private_description": "Only the goal owner can view this goal.",
     "overdue_chip": "Overdue",
     "checkin_frequency": "Check-in frequency"
+  },
+  "goals": {
+    "load_error": "Failed to load goals. Please try again."
   }
 }

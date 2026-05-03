@@ -43,20 +43,20 @@ export function LocationRadiusFilter({
       isDisabled={!hasLocation}
       aria-label={
         isNearby
-          ? t('location.nearby', 'Near Me')
-          : t('location.global', 'Global')
+          ? t('location.nearby')
+          : t('location.global')
       }
     >
       {isNearby
-        ? t('location.nearby', 'Near Me')
-        : t('location.global', 'Global')}
+        ? t('location.nearby')
+        : t('location.global')}
     </Button>
   );
 
   return (
     <div className="flex items-center gap-3">
       {!hasLocation ? (
-        <Tooltip content={t('location.add_location', 'Add location in profile')}>
+        <Tooltip content={t('location.add_location')}>
           <div>{toggleButton}</div>
         </Tooltip>
       ) : (
@@ -73,7 +73,7 @@ export function LocationRadiusFilter({
             value={radiusKm}
             onChange={(val) => onRadiusChange(val as number)}
             className="flex-1"
-            aria-label={t('location.radius', 'Radius')}
+            aria-label={t('location.radius')}
             classNames={{
               track: 'bg-[var(--border-default)]',
               filler: 'bg-gradient-to-r from-indigo-500 to-purple-500',
@@ -84,7 +84,7 @@ export function LocationRadiusFilter({
             className="text-xs font-medium whitespace-nowrap min-w-[40px] text-right"
             style={{ color: 'var(--text-muted)' }}
           >
-            {radiusKm} {t('location.km', 'km')}
+            {radiusKm} {t('location.km')}
           </span>
         </div>
       )}
