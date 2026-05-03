@@ -43,7 +43,13 @@ if [ "$DEPLOY_MODE" = "bluegreen" ]; then
     _APP_CONTAINER="nexus-$_BG_COLOR-php-app"
     _TMP_FILE="$(mktemp)"
     printf '%s\n' "$VERSION_JSON" > "$_TMP_FILE"
+    chmod 644 "$_TMP_FILE"
     if docker cp "$_TMP_FILE" "$_APP_CONTAINER:/var/www/html/httpdocs/.build-version" 2>/dev/null; then
+        # docker cp preserves the source perms but drops to root-owned inside the
+        # container. Apache runs as www-data and needs world-readable to read it,
+        # otherwise version.php silently falls back to 'unknown' and the drift
+        # watchdog spams Telegram with "VERSION.PHP BROKEN".
+        docker exec "$_APP_CONTAINER" chmod 644 /var/www/html/httpdocs/.build-version 2>/dev/null || true
         log_ok "Build version written into container $_APP_CONTAINER"
     else
         log_warn "docker cp failed for $_APP_CONTAINER — version.php will show 'unknown'"
