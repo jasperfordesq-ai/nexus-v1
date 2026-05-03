@@ -92,7 +92,10 @@ export function TranslateButton({
         setTranslated(resp.data.translated_text);
         setShowing('translated');
       } else {
-        toast.error(t('translate.failed', 'Translation failed. Please try again.'));
+        const message = resp.error?.trim()
+          ? resp.error
+          : t('translate.failed', 'Translation failed. Please try again.');
+        toast.error(message);
       }
     } catch {
       toast.showToast(t('translate.failed', 'Translation failed. Please try again.'), 'error');

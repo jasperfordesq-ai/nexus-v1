@@ -1022,6 +1022,7 @@ return [
     'ai_rate_limit'                        => 'Usage limit reached',
     'ai_original_message_required'         => 'Original message is required',
     'ai_error_generic'                     => 'AI service encountered an error. Please try again.',
+    'ai_not_configured'                    => 'This tenant is not connected to AI. Please contact the administrator.',
 
     // ============================================
     // USER-FACING — MESSAGES (additional)

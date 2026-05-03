@@ -655,6 +655,7 @@ return [
     'ai_rate_limit' => 'Usage limit reached',
     'ai_original_message_required' => 'Original message is required',
     'ai_error_generic' => 'AI service encountered an error. Please try again.',
+    'ai_not_configured' => 'This tenant is not connected to AI. Please contact the administrator.',
     'message_recipient_required' => 'recipient_id is required',
     'message_body_or_voice_required' => 'Message body or voice message is required',
     'message_too_long' => 'Message is too long (max 10000 characters)',

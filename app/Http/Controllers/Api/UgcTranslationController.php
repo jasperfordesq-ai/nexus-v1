@@ -70,6 +70,21 @@ class UgcTranslationController extends BaseApiController
             );
         }
 
+        // Surface a clear error when the platform / tenant has no AI provider
+        // configured, instead of silently returning the original text or a
+        // generic "Translation failed" toast.
+        if (empty(config('services.openai.api_key'))) {
+            // Status 422: 503 is intercepted by the frontend api client as
+            // maintenance-mode and the body would be replaced with a generic
+            // string before our message reaches the user.
+            return $this->respondWithError(
+                'AI_NOT_CONFIGURED',
+                __('api.ai_not_configured'),
+                null,
+                422,
+            );
+        }
+
         $result = $this->ugcTranslationService->translate(
             $contentType,
             is_int($contentId) ? $contentId : (string) $contentId,
