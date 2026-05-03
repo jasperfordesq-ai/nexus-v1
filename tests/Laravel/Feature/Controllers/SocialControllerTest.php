@@ -412,6 +412,63 @@ class SocialControllerTest extends TestCase
         ])->assertStatus(400);
     }
 
+    /**
+     * Loud-failure guard: a misrouted client posting (target_type='post',
+     * target_id=<listing's id>) must 404, not silently pollute the reactions
+     * table. This is the structural fix for the "reactions don't persist"
+     * class of bug — turn silent miswires into hard failures.
+     */
+    public function test_reactions_endpoint_404s_when_target_doesnt_exist(): void
+    {
+        $this->authenticatedUser();
+        $this->apiPost('/v2/reactions', [
+            'target_type' => 'post',
+            'target_id' => 9999999,
+            'reaction_type' => 'like',
+        ])->assertStatus(404);
+    }
+
+    /**
+     * The 404 guard is tenant-scoped — a row in another tenant must not
+     * satisfy the existence check.
+     */
+    public function test_reactions_endpoint_404s_for_cross_tenant_target(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // Insert a post in a DIFFERENT tenant than the one the user is in
+        $otherTenantId = $this->testTenantId + 9999;
+        // Use an existing tenant if one is present, else just use a fake id
+        $existingOther = DB::table('tenants')->where('id', '!=', $this->testTenantId)->value('id');
+        $tenantToUse = $existingOther ?: $otherTenantId;
+
+        try {
+            $crossTenantPostId = DB::table('feed_posts')->insertGetId([
+                'tenant_id'  => $tenantToUse,
+                'user_id'    => $user->id,
+                'content'    => 'Cross-tenant post',
+                'type'       => 'post',
+                'visibility' => 'public',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('Could not seed cross-tenant post: ' . $e->getMessage());
+        }
+
+        $this->apiPost('/v2/reactions', [
+            'target_type' => 'post',
+            'target_id' => $crossTenantPostId,
+            'reaction_type' => 'like',
+        ])->assertStatus(404);
+
+        // Ensure no row was written despite the validation passing
+        $this->assertDatabaseMissing('reactions', [
+            'user_id'   => $user->id,
+            'target_id' => $crossTenantPostId,
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  POST /social/feed (legacy)
     // ------------------------------------------------------------------

@@ -84,6 +84,11 @@ class PollService
             return null;
         }
 
+        // Tenant scope is enforced via the Poll model's HasTenantScope global
+        // scope. The poll_options/poll_votes tables also carry tenant_id and
+        // are explicitly scoped below for defense in depth.
+        $tenantId = \App\Core\TenantContext::getId();
+
         $data = $poll->toArray();
 
         // Replace eager-loaded user relation with safe public fields only
@@ -110,19 +115,28 @@ class PollService
 
         $optionRows = DB::table('poll_options')
             ->where('poll_id', $id)
+            ->where('tenant_id', $tenantId)
             ->get()
             ->map(fn ($o) => [
                 'id'         => $o->id,
                 'text'       => $o->label ?? $o->option_text ?? '',
                 'label'      => $o->label ?? $o->option_text ?? '',
-                'vote_count' => $canSeeCounts ? (int) DB::table('poll_votes')->where('option_id', $o->id)->count() : null,
+                'vote_count' => $canSeeCounts
+                    ? (int) DB::table('poll_votes')
+                        ->where('option_id', $o->id)
+                        ->where('tenant_id', $tenantId)
+                        ->count()
+                    : null,
             ])->all();
 
         // total_votes is safe to expose (only reveals participation volume,
         // not the distribution) — but per-option numbers stay hidden.
         $totalVotes = $canSeeCounts
             ? array_sum(array_column($optionRows, 'vote_count'))
-            : (int) DB::table('poll_votes')->where('poll_id', $id)->count();
+            : (int) DB::table('poll_votes')
+                ->where('poll_id', $id)
+                ->where('tenant_id', $tenantId)
+                ->count();
 
         $data['options'] = array_map(function (array $opt) use ($totalVotes, $canSeeCounts) {
             if ($canSeeCounts) {
@@ -140,13 +154,18 @@ class PollService
         $data['results_visible'] = $canSeeCounts;
 
         $data['has_voted'] = $currentUserId
-            ? DB::table('poll_votes')->where('poll_id', $id)->where('user_id', $currentUserId)->exists()
+            ? DB::table('poll_votes')
+                ->where('poll_id', $id)
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $currentUserId)
+                ->exists()
             : false;
 
         $votedOptionId = null;
         if ($currentUserId) {
             $vote = DB::table('poll_votes')
                 ->where('poll_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->where('user_id', $currentUserId)
                 ->first();
             $votedOptionId = $vote ? (int) $vote->option_id : null;
@@ -291,9 +310,13 @@ class PollService
             // Use INSERT IGNORE to atomically prevent double-votes.
             // The idx_vote_unique (poll_id, user_id) constraint enforces uniqueness;
             // INSERT IGNORE silently skips if the row already exists.
+            //
+            // tenant_id MUST be set explicitly — column defaults to 0, and the
+            // unique key is (tenant_id, poll_id, user_id). Without this every
+            // tenant's votes would collide at tenant_id=0.
             $affected = DB::affectingStatement(
-                'INSERT IGNORE INTO poll_votes (poll_id, option_id, user_id, created_at) VALUES (?, ?, ?, NOW())',
-                [$pollId, $optionId, $userId]
+                'INSERT IGNORE INTO poll_votes (tenant_id, poll_id, option_id, user_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                [$tenantId, $pollId, $optionId, $userId]
             );
 
             return $affected > 0;

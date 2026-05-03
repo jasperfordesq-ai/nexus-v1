@@ -1151,13 +1151,21 @@ class SocialController extends BaseApiController
         }
 
         try {
+            // Canonical types match feed_activity.source_type and the post-
+            // normalisation form in VALID_LIKE_TARGETS. 'volunteering' is
+            // accepted as a legacy alias and rewritten before lookup.
+            if ($targetType === 'volunteering') {
+                $targetType = 'volunteer';
+            }
             $tableMap = [
-                'post'         => ['table' => 'feed_posts', 'owner_col' => 'user_id'],
-                'listing'      => ['table' => 'listings', 'owner_col' => 'user_id'],
-                'event'        => ['table' => 'events', 'owner_col' => 'user_id'],
-                'poll'         => ['table' => 'polls', 'owner_col' => 'user_id'],
-                'goal'         => ['table' => 'goals', 'owner_col' => 'user_id'],
-                'volunteering' => ['table' => 'vol_opportunities', 'owner_col' => 'created_by'],
+                'post'      => ['table' => 'feed_posts', 'owner_col' => 'user_id'],
+                'listing'   => ['table' => 'listings', 'owner_col' => 'user_id'],
+                'event'     => ['table' => 'events', 'owner_col' => 'user_id'],
+                'poll'      => ['table' => 'polls', 'owner_col' => 'user_id'],
+                'goal'      => ['table' => 'goals', 'owner_col' => 'user_id'],
+                'volunteer' => ['table' => 'vol_opportunities', 'owner_col' => 'created_by'],
+                'challenge' => ['table' => 'ideation_challenges', 'owner_col' => 'user_id'],
+                'review'    => ['table' => 'reviews', 'owner_col' => 'reviewer_id'],
             ];
 
             if (! isset($tableMap[$targetType])) {

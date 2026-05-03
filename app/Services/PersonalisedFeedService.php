@@ -122,8 +122,20 @@ class PersonalisedFeedService
         return (bool) Cache::remember($cacheKey, 300, function () use ($userId, $tenantId) {
             $count = 0;
             try {
-                if (\Illuminate\Support\Facades\Schema::hasTable('feed_post_likes')) {
-                    $count += (int) DB::table('feed_post_likes')
+                // Likes live in the unified `likes` table (target_type='post')
+                // — there is no `feed_post_likes` table. The previous reference
+                // to it caused hasTable() to short-circuit to false, leaving
+                // every user permanently in cold-start mode and AG35
+                // personalisation effectively dead.
+                if (\Illuminate\Support\Facades\Schema::hasTable('likes')) {
+                    $count += (int) DB::table('likes')
+                        ->where('tenant_id', $tenantId)
+                        ->where('user_id', $userId)
+                        ->limit(self::MIN_ENGAGEMENT_EVENTS)
+                        ->count();
+                }
+                if ($count < self::MIN_ENGAGEMENT_EVENTS && \Illuminate\Support\Facades\Schema::hasTable('reactions')) {
+                    $count += (int) DB::table('reactions')
                         ->where('tenant_id', $tenantId)
                         ->where('user_id', $userId)
                         ->limit(self::MIN_ENGAGEMENT_EVENTS)
@@ -361,13 +373,15 @@ class PersonalisedFeedService
         $cacheKey = "pfs:engaged_authors:{$tenantId}:{$userId}";
         return Cache::remember($cacheKey, 900, function () use ($similarUserIds, $tenantId) {
             try {
-                if (!\Illuminate\Support\Facades\Schema::hasTable('feed_post_likes')) {
+                // Likes are in the polymorphic `likes` table (target_type='post').
+                if (!\Illuminate\Support\Facades\Schema::hasTable('likes')) {
                     return [];
                 }
-                $rows = DB::table('feed_post_likes as fpl')
-                    ->join('feed_posts as fp', 'fp.id', '=', 'fpl.post_id')
-                    ->where('fpl.tenant_id', $tenantId)
-                    ->whereIn('fpl.user_id', $similarUserIds)
+                $rows = DB::table('likes as l')
+                    ->join('feed_posts as fp', 'fp.id', '=', 'l.target_id')
+                    ->where('l.tenant_id', $tenantId)
+                    ->where('l.target_type', 'post')
+                    ->whereIn('l.user_id', $similarUserIds)
                     ->limit(500)
                     ->pluck('fp.user_id')
                     ->all();

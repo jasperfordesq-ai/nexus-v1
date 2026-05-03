@@ -6,10 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Services\ReactionService;
 use App\Services\RealtimeService;
 use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -166,6 +168,21 @@ class ReactionController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'target_id must be positive', 'target_id', 400);
         }
 
+        // Loud-failure guard: verify (target_type, target_id) resolves to a
+        // real row in the right tenant before recording the reaction. Without
+        // this check, a misrouted client (e.g. POSTing target_type='post' with
+        // a listing's ID) would silently succeed and pollute the reactions
+        // table with rows that never read back. This is the structural fix
+        // that turns the "reactions don't persist" class of bug into a 404.
+        if (!$this->targetExists($targetType, $targetId)) {
+            return $this->respondWithError(
+                'NOT_FOUND',
+                "No {$targetType} found with id {$targetId} in this tenant",
+                null,
+                404
+            );
+        }
+
         try {
             $result = $this->reactionService->toggleReaction($targetId, $targetType, $reactionType, $userId);
 
@@ -216,6 +233,56 @@ class ReactionController extends BaseApiController
             );
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', __('api.failed_get_reactors'), null, 500);
+        }
+    }
+
+    /**
+     * Map of reactable target_type → backing table for tenant-scoped existence
+     * checks. MUST stay in sync with ReactionService::VALID_TARGET_TYPES.
+     *
+     * Returning false for any unknown type is a fail-closed default — if the
+     * type ever drifts, the request 404s rather than silently writing to the
+     * polymorphic reactions table.
+     */
+    private const TARGET_TABLES = [
+        'post'      => 'feed_posts',
+        'comment'   => 'comments',
+        'listing'   => 'listings',
+        'event'     => 'events',
+        'goal'      => 'goals',
+        'poll'      => 'polls',
+        'review'    => 'reviews',
+        'volunteer' => 'vol_opportunities',
+        'challenge' => 'ideation_challenges',
+        'resource'  => 'resources',
+    ];
+
+    /**
+     * Verify that the (target_type, target_id) pair resolves to a real row
+     * in the current tenant. The reactions table itself can't enforce this
+     * via FK because it's polymorphic, so we enforce it at the controller.
+     */
+    private function targetExists(string $targetType, int $targetId): bool
+    {
+        $table = self::TARGET_TABLES[$targetType] ?? null;
+        if (!$table) {
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        if (!$tenantId) {
+            return false;
+        }
+
+        try {
+            return DB::table($table)
+                ->where('id', $targetId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+        } catch (\Throwable $e) {
+            // If the table is missing in this environment, fail closed
+            Log::warning("[reactions] target existence check failed for {$targetType}: " . $e->getMessage());
+            return false;
         }
     }
 

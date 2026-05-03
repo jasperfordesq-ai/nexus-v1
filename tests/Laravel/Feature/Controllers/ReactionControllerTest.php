@@ -52,16 +52,19 @@ class ReactionControllerTest extends TestCase
     }
 
     /**
-     * Insert a feed_comments row and return its ID.
+     * Insert a comments row and return its ID. Comments live in `comments`
+     * (polymorphic via target_type/target_id), not `feed_comments`.
      */
     private function createComment(int $postId, int $userId): int
     {
-        return DB::table('feed_comments')->insertGetId([
-            'tenant_id' => $this->testTenantId,
-            'post_id' => $postId,
-            'user_id' => $userId,
-            'content' => 'Test comment for reactions',
-            'created_at' => now(),
+        return DB::table('comments')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id'   => $postId,
+            'user_id'     => $userId,
+            'content'     => 'Test comment for reactions',
+            'created_at'  => now(),
+            'updated_at'  => now(),
         ]);
     }
 
