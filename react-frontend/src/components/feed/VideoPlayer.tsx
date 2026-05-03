@@ -127,7 +127,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         isIconOnly
         variant="flat"
         size="sm"
-        className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+        className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
         onClick={handleToggleMute}
         aria-label={isMuted ? t('video.unmute', 'Unmute') : t('video.mute', 'Mute')}
       >

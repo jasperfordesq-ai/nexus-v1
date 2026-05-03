@@ -102,7 +102,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load profile feed', err);
-      if (!cursor) setError(tRef.current('feed_error', 'Failed to load activity'));
+      if (!cursor) setError(tRef.current('feed_error'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -164,8 +164,10 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     try {
       await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toast.success(t('post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
+      toast.error(t('hide_failed'));
     }
   };
 
@@ -185,18 +187,28 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('vote_failed', 'Vote failed'));
+      toast.error(t('vote_failed'));
     }
   };
 
+  // Delete behaviour mirrors FeedPage: only feed posts have a polymorphic
+  // /v2/feed/posts/{id}/delete endpoint. For non-post types (listing, event,
+  // goal, poll, etc.) we hide the item from the feed rather than deleting the
+  // underlying entity — that matches the user's expectation when clicking
+  // "Remove from feed" from a profile timeline and avoids destroying records
+  // that have their own dedicated delete flows.
   const handleDeletePost = async (item: FeedItem) => {
+    if (item.type !== 'post') {
+      await handleHidePost(item);
+      return;
+    }
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('post_deleted', 'Post deleted'));
+      toast.success(t('post_deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error(t('delete_failed', 'Delete failed'));
+      toast.error(t('delete_failed'));
     }
   };
 
@@ -223,7 +235,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={() => void loadFeed()}
         >
-          {t('retry', 'Retry')}
+          {t('retry')}
         </Button>
       </GlassCard>
     );
@@ -233,11 +245,11 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     return (
       <EmptyState
         icon={<Rss className="w-10 h-10" aria-hidden="true" />}
-        title={t('no_activity_title', 'No activity yet')}
+        title={t('no_activity_title')}
         description={
           isOwnProfile
-            ? t('no_activity_own', 'Share your first post or create a listing to get started!')
-            : t('no_activity_other', "This member hasn't posted anything yet.")
+            ? t('no_activity_own')
+            : t('no_activity_other')
         }
       />
     );
@@ -271,7 +283,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
             isLoading={isLoadingMore}
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
           >
-            {t('load_more', 'Load more')}
+            {t('load_more')}
           </Button>
         </div>
       )}

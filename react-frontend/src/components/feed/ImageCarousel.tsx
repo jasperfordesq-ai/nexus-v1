@@ -172,7 +172,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             radius="full"
             size="sm"
             variant="flat"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
             onPress={goPrev}
             onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.previous', 'Previous image')}
@@ -188,7 +188,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             radius="full"
             size="sm"
             variant="flat"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity"
             onPress={goNext}
             onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.next', 'Next image')}
@@ -197,55 +197,43 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
           </Button>
         )}
 
-        {/* Dot indicators — collapses to max 7 visible dots for 8+ images */}
+        {/* Dot indicators — 44×44 tap target with centered 8×8 visible dot (WCAG 2.5.5) */}
         {total > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center">
             {media.map((_, idx) => {
               // For 8+ images, only show dots near the current index (Instagram-style)
-              if (total > 7) {
-                const distance = Math.abs(idx - currentIndex);
-                if (distance > 3) return null;
-                const scale = distance <= 1 ? '' : distance === 2 ? 'scale-75' : 'scale-50 opacity-50';
-                return (
-                  <Button
-                    key={idx}
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 transition-all ${scale} ${
+              const isCollapsed = total > 7;
+              const distance = Math.abs(idx - currentIndex);
+              if (isCollapsed && distance > 3) return null;
+              const scale = !isCollapsed
+                ? ''
+                : distance <= 1
+                  ? ''
+                  : distance === 2
+                    ? 'scale-75'
+                    : 'scale-50 opacity-50';
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center bg-transparent p-0 border-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goTo(idx, idx > currentIndex ? 1 : -1);
+                    setTimeout(() => carouselRef.current?.focus(), 50);
+                  }}
+                  aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                  aria-current={idx === currentIndex ? 'true' : undefined}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full transition-all ${scale} ${
                       idx === currentIndex
                         ? 'bg-white scale-110'
                         : 'bg-white/60 hover:bg-white/80'
                     }`}
-                    onPress={() => {
-                      goTo(idx, idx > currentIndex ? 1 : -1);
-                      setTimeout(() => carouselRef.current?.focus(), 50);
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
-                    aria-current={idx === currentIndex ? 'true' : undefined}
+                    aria-hidden="true"
                   />
-                );
-              }
-              return (
-                <Button
-                  key={idx}
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 transition-all ${
-                    idx === currentIndex
-                      ? 'bg-white scale-110'
-                      : 'bg-white/60 hover:bg-white/80'
-                  }`}
-                  onPress={() => {
-                    goTo(idx, idx > currentIndex ? 1 : -1);
-                    setTimeout(() => carouselRef.current?.focus(), 50);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
-                  aria-current={idx === currentIndex ? 'true' : undefined}
-                />
+                </button>
               );
             })}
           </div>

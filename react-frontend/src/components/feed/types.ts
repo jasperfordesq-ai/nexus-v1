@@ -198,7 +198,7 @@ export function getItemDetailPath(item: FeedItem): string | null {
     case 'event':
       return `/events/${item.id}`;
     case 'goal':
-      return '/goals';
+      return `/goals/${item.id}`;
     case 'review':
       return item.receiver ? `/profile/${item.receiver.id}` : null;
     case 'job':

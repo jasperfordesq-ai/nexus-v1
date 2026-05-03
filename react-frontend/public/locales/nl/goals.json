@@ -66,5 +66,15 @@
     "try_again": "Probeer het opnieuw",
     "none_available": "Er zijn nog geen sjablonen beschikbaar.",
     "none_in_category": "Geen sjablonen in deze categorie."
+  },
+  "detail": {
+    "back_to_goals": "Back to goals",
+    "view_all_goals": "View all goals",
+    "not_found_title": "Goal not found",
+    "not_found_description": "This goal may have been deleted or never existed.",
+    "private_title": "This goal is private",
+    "private_description": "Only the goal owner can view this goal.",
+    "overdue_chip": "Overdue",
+    "checkin_frequency": "Check-in frequency"
   }
 }

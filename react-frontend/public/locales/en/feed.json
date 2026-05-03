@@ -569,5 +569,11 @@
   },
   "failed_to_load_analytics": "Failed to load analytics",
   "you": "You",
-  "items_loaded": "{{count}} posts"
+  "items_loaded": "{{count}} posts",
+  "post_detail": {
+    "title": "Post",
+    "back": "Back to Feed",
+    "not_found": "Item not found",
+    "load_failed": "Failed to load item"
+  }
 }

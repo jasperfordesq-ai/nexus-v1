@@ -206,6 +206,14 @@ class FeedService
                   ->where('feed_activity.source_type', 'post');
         }
 
+        // Polymorphic single-item lookup: feed_activity.source_id + source_type.
+        // Used by the polymorphic detail endpoint so deep-links to listings,
+        // events, polls, etc. resolve through the same feed shape as feedV2.
+        if (isset($filters['entity_id']) && isset($filters['entity_type'])) {
+            $query->where('feed_activity.source_id', (int) $filters['entity_id'])
+                  ->where('feed_activity.source_type', (string) $filters['entity_type']);
+        }
+
         if ($subtype !== null) {
             $query->whereRaw(
                 "JSON_UNQUOTE(JSON_EXTRACT(feed_activity.metadata, '$.listing_type')) = ?",
@@ -873,6 +881,7 @@ class FeedService
             'goal'      => 'goals',
             'challenge' => 'ideation_challenges',
             'volunteer' => 'vol_opportunities',
+            'review'    => 'reviews',
         ];
 
         $idsByType = [];
@@ -1098,9 +1107,8 @@ class FeedService
         }
 
         // Allowlist emoji (decorative post emoji) to prevent arbitrary Unicode injection
-        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '🎉', '✨', '💡', '🙌', '😍'];
         $emoji = isset($data['emoji']) ? $data['emoji'] : null;
-        if ($emoji !== null && !in_array($emoji, $allowedEmojis, true)) {
+        if ($emoji !== null && !in_array($emoji, \App\Support\EmojiConstants::POST_DECORATIVE, true)) {
             $emoji = null;
         }
 

@@ -141,6 +141,7 @@ const LeaderboardPage = lazyWithRetry(() => import('@/pages/leaderboard/Leaderbo
 const AchievementsPage = lazyWithRetry(() => import('@/pages/achievements/AchievementsPage'));
 const NexusScorePage = lazyWithRetry(() => import('@/pages/nexus-score/NexusScorePage'));
 const GoalsPage = lazyWithRetry(() => import('@/pages/goals/GoalsPage'));
+const GoalDetailPage = lazyWithRetry(() => import('@/pages/goals/GoalDetailPage'));
 const PollsPage = lazyWithRetry(() => import('@/pages/polls/PollsPage'));
 const JobsPage = lazyWithRetry(() => import('@/pages/jobs/JobsPage'));
 const JobDetailPage = lazyWithRetry(() => import('@/pages/jobs/JobDetailPage'));
@@ -1207,6 +1208,13 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="goals/:id" element={
+            <FeatureGate feature="goals" fallback={<ComingSoonPage feature="Goals" />}>
+              <FeatureErrorBoundary featureName="Goals">
+                <GoalDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
 
           {/* Feature-gated: Polls */}
           <Route path="polls" element={
@@ -1458,6 +1466,13 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="feed/posts/:id" element={
+            <FeatureGate module="feed" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Feed">
+                <PostDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="feed/item/:type/:id" element={
             <FeatureGate module="feed" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Feed">
                 <PostDetailPage />

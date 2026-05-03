@@ -568,5 +568,11 @@
     "end_of_feed": "Sie sind auf dem neuesten Stand!"
   },
   "you": "Sie",
-  "items_loaded": "{{count}} Beiträge"
+  "items_loaded": "{{count}} Beiträge",
+  "post_detail": {
+    "title": "Post",
+    "back": "Back to Feed",
+    "not_found": "Item not found",
+    "load_failed": "Failed to load item"
+  }
 }

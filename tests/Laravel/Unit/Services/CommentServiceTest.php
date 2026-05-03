@@ -120,7 +120,7 @@ class CommentServiceTest extends TestCase
         DB::shouldReceive('pluck')->andReturn(collect([]));
         DB::shouldReceive('all')->andReturn([]);
 
-        $result = CommentService::toggleReaction(1, 2, 1, '👍');
+        $result = CommentService::toggleReaction(1, 2, 1, 'like');
         $this->assertSame('added', $result['action']);
     }
 

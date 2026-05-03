@@ -66,5 +66,15 @@
     "try_again": "Réessayer",
     "none_available": "Aucun modèle disponible pour le moment.",
     "none_in_category": "Aucun modèle dans cette catégorie."
+  },
+  "detail": {
+    "back_to_goals": "Back to goals",
+    "view_all_goals": "View all goals",
+    "not_found_title": "Goal not found",
+    "not_found_description": "This goal may have been deleted or never existed.",
+    "private_title": "This goal is private",
+    "private_description": "Only the goal owner can view this goal.",
+    "overdue_chip": "Overdue",
+    "checkin_frequency": "Check-in frequency"
   }
 }

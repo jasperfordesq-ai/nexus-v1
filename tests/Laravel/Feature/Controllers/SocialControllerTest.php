@@ -494,4 +494,105 @@ class SocialControllerTest extends TestCase
         $data = $response->json();
         $this->assertIsArray($data);
     }
+
+    // ------------------------------------------------------------------
+    //  GET /v2/feed/items/{type}/{id}  — polymorphic feed item endpoint
+    // ------------------------------------------------------------------
+
+    public function test_feed_item_endpoint_rejects_invalid_type(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/feed/items/badge_earned/1');
+
+        // Route allows the segment, controller rejects unknown reactable type.
+        $response->assertStatus(400);
+    }
+
+    public function test_feed_item_endpoint_404s_for_missing_listing(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/feed/items/listing/999999999');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_feed_item_endpoint_404s_for_missing_event(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/feed/items/event/999999999');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_feed_item_endpoint_returns_listing_with_reactions(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $listing = \App\Models\Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+        ]);
+
+        // The polymorphic endpoint reads from feed_activity, so seed an activity row
+        // for the listing the same way FeedActivityService would.
+        \App\Models\FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'listing',
+            'source_id'   => $listing->id,
+            'user_id'     => $user->id,
+            'is_visible'  => true,
+            'is_hidden'   => false,
+        ]);
+
+        $response = $this->apiGet('/v2/feed/items/listing/' . $listing->id);
+
+        $response->assertStatus(200);
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+        $this->assertSame('listing', $data['type'] ?? null);
+        $this->assertSame((int) $listing->id, (int) ($data['id'] ?? 0));
+        $this->assertArrayHasKey('reactions', $data);
+        $this->assertArrayHasKey('counts', $data['reactions']);
+        $this->assertArrayHasKey('total', $data['reactions']);
+        $this->assertArrayHasKey('user_reaction', $data['reactions']);
+    }
+
+    public function test_feed_item_endpoint_returns_event_with_reactions(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // Insert via the Schema-driven column list to dodge legacy column drift
+        // in the test schema (factory-created Events trip on optional cols).
+        $eventColumns = \Illuminate\Support\Facades\Schema::getColumnListing('events');
+        $eventRow = array_intersect_key([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
+            'title'       => 'Test event',
+            'description' => 'desc',
+            'location'    => 'somewhere',
+            'start_date'  => date('Y-m-d H:i:s', strtotime('+1 day')),
+            'is_virtual'  => 0,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ], array_flip($eventColumns));
+        $eventId = (int) DB::table('events')->insertGetId($eventRow);
+
+        \App\Models\FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'event',
+            'source_id'   => $eventId,
+            'user_id'     => $user->id,
+            'is_visible'  => true,
+            'is_hidden'   => false,
+        ]);
+
+        $response = $this->apiGet('/v2/feed/items/event/' . $eventId);
+
+        $response->assertStatus(200);
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+        $this->assertSame('event', $data['type'] ?? null);
+        $this->assertSame($eventId, (int) ($data['id'] ?? 0));
+        $this->assertArrayHasKey('reactions', $data);
+    }
 }

@@ -4,13 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * PostDetailPage - View a single feed post by ID.
+ * PostDetailPage - View a single feed item by ID.
  *
- * API: GET /api/v2/feed/posts/{id}
+ * Supports two routes:
+ *   /feed/posts/:id            — legacy, treats target as a feed post
+ *   /feed/item/:type/:id       — polymorphic (listing/event/poll/goal/etc.)
+ *
+ * APIs:
+ *   GET /api/v2/feed/posts/{id}            (post-only, legacy)
+ *   GET /api/v2/feed/items/{type}/{id}     (any reactable feed item)
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Button,
   Modal,
@@ -37,14 +43,31 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
 
+// Reactable feed-item types supported by the polymorphic backend endpoint.
+// Must stay in sync with the allowlist in SocialController::showItem.
+const POLYMORPHIC_TYPES = new Set<FeedItem['type']>([
+  'post', 'listing', 'event', 'poll', 'goal', 'review',
+  'volunteer', 'challenge', 'blog', 'discussion', 'job',
+]);
+
 export function PostDetailPage() {
   const { t } = useTranslation('feed');
-  const { id } = useParams<{ id: string }>();
+  const { id, type: typeParam } = useParams<{ id: string; type?: string }>();
+  const [searchParams] = useSearchParams();
   const { tenantPath } = useTenant();
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  usePageTitle(t('post_detail.title', 'Post'));
+  usePageTitle(t('post_detail.title'));
+
+  // Resolve target type from either route segment (/feed/item/:type/:id)
+  // or query string (?type=listing on the legacy /feed/posts/:id route).
+  // Falls back to 'post' for backward compat with the original detail URL.
+  const queryType = searchParams.get('type');
+  const rawType = typeParam ?? queryType ?? 'post';
+  const itemType: FeedItem['type'] = POLYMORPHIC_TYPES.has(rawType as FeedItem['type'])
+    ? (rawType as FeedItem['type'])
+    : 'post';
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -67,26 +90,32 @@ export function PostDetailPage() {
     setIsLoading(true);
     setError(null);
 
-    api.get<FeedItem>(`/v2/feed/posts/${id}`)
+    // Use polymorphic endpoint for non-post types (listings, events, polls, etc.)
+    // Posts continue to hit the existing /v2/feed/posts/{id} route for back-compat.
+    const url = itemType === 'post'
+      ? `/v2/feed/posts/${id}`
+      : `/v2/feed/items/${itemType}/${id}`;
+
+    api.get<FeedItem>(url)
       .then((response) => {
         if (controller.signal.aborted) return;
         if (response.success && response.data) {
           setItem(response.data);
         } else {
-          setError(t('post_detail.not_found', 'Post not found'));
+          setError(t('post_detail.not_found'));
         }
       })
       .catch((err) => {
         if (controller.signal.aborted) return;
-        logError('Failed to load post', err);
-        setError(t('post_detail.load_failed', 'Failed to load post'));
+        logError('Failed to load feed item', err);
+        setError(t('post_detail.load_failed'));
       })
       .finally(() => {
         if (!controller.signal.aborted) setIsLoading(false);
       });
 
     return () => { abortRef.current?.abort(); };
-  }, [id, t]);
+  }, [id, itemType, t]);
 
   const handleToggleLike = async (feedItem: FeedItem) => {
     const newIsLiked = !feedItem.is_liked;

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 
@@ -274,12 +275,20 @@ class ShareService
             $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
             $linkPath = $type === 'post' ? "/feed/post/{$id}" : "/{$type}s/{$id}";
 
-            Notification::createNotification(
-                $ownerId,
-                __('api_controllers_3.feed.post_shared', ['name' => $sharerName]),
-                $linkPath,
-                'post_shared'
-            );
+            $owner = DB::table('users')
+                ->where('id', $ownerId)
+                ->where('tenant_id', $tenantId)
+                ->select('id', 'preferred_language')
+                ->first();
+
+            LocaleContext::withLocale($owner, function () use ($ownerId, $sharerName, $linkPath) {
+                Notification::createNotification(
+                    $ownerId,
+                    __('api_controllers_3.feed.post_shared', ['name' => $sharerName]),
+                    $linkPath,
+                    'post_shared'
+                );
+            });
         } catch (\Throwable $e) {
             // Never let a notification failure block the share.
         }

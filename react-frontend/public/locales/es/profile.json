@@ -178,5 +178,7 @@
   "show_less": "Show less",
   "read_more": "Read more",
   "read_less": "Read less",
-  "hours_abbrev": "{{hours}}h"
+  "hours_abbrev": "{{hours}}h",
+  "post_hidden": "Hidden from your feed",
+  "hide_failed": "Failed to hide"
 }

@@ -343,8 +343,7 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_emoji_required'), 'emoji', 400);
         }
 
-        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
-        if (!in_array($emoji, $allowedEmojis, true)) {
+        if (!in_array($emoji, \App\Support\EmojiConstants::MESSAGE_REACTIONS, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_invalid_emoji'), 'emoji', 400);
         }
 

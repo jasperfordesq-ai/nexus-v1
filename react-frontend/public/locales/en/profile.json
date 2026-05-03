@@ -156,6 +156,8 @@
   "vote_failed": "Vote failed",
   "delete_failed": "Delete failed",
   "post_deleted": "Post deleted",
+  "post_hidden": "Hidden from your feed",
+  "hide_failed": "Failed to hide",
   "retry": "Retry",
   "load_more": "Load more",
   "disconnect_confirm_title": "Remove connection?",

@@ -248,6 +248,90 @@ class SocialController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/feed/items/{type}/{id}
+     *
+     * Polymorphic single-feed-item lookup. Returns a feed item of any
+     * reactable source_type with the same shape as feedV2 (media, reactions,
+     * like state, etc.). Used by the React PostDetailPage so deep-links to
+     * listings, events, polls, goals, etc. resolve correctly instead of 404ing
+     * when only feed_posts is consulted.
+     */
+    public function showItem(string $type, int $id): JsonResponse
+    {
+        $userId = $this->getOptionalUserId();
+        $tenantId = $this->getTenantId();
+
+        // Restrict to canonical reactable types. Excludes notification cards
+        // (badge_earned, level_up) and 'comment' (which has its own endpoint).
+        $allowed = ['post', 'listing', 'event', 'poll', 'goal', 'review',
+                    'volunteer', 'challenge', 'blog', 'discussion', 'job'];
+        if (!in_array($type, $allowed, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'type', 400);
+        }
+
+        // Verify the entity exists in the current tenant before hitting the
+        // feed query, so non-existent IDs cleanly 404 rather than returning
+        // an empty feed result (defence-in-depth — feed_activity also scopes
+        // by tenant, but the source table is the source of truth).
+        $sourceTables = [
+            'post'      => 'feed_posts',
+            'listing'   => 'listings',
+            'event'     => 'events',
+            'poll'      => 'polls',
+            'goal'      => 'goals',
+            'review'    => 'reviews',
+            'volunteer' => 'vol_opportunities',
+            'challenge' => 'ideation_challenges',
+            'blog'      => 'blog_posts',
+            'discussion' => 'group_discussions',
+            'job'       => 'job_vacancies',
+        ];
+        if (isset($sourceTables[$type])) {
+            $exists = DB::table($sourceTables[$type])
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$exists) {
+                return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+            }
+        }
+
+        $result = $this->feedService->getFeed($userId, [
+            'entity_id' => $id,
+            'entity_type' => $type,
+            'limit' => 1,
+        ]);
+
+        if (empty($result['items'])) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        }
+
+        $item = $result['items'][0];
+
+        // Attach media for posts (feed posts carry multi-image media)
+        if ($type === 'post') {
+            $mediaByPost = $this->postMediaService->getMediaForPosts([$id]);
+            $item['media'] = $mediaByPost[$id] ?? [];
+        }
+
+        // Polymorphic reactions — same pattern as feedV2 + showPost
+        $itemType = (string) ($item['type'] ?? $type);
+        $itemId = (int) ($item['id'] ?? $id);
+        if ($itemId > 0 && in_array($itemType, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+            $reactionsByKey = $this->reactionService->getReactionsForItems(
+                [['type' => $itemType, 'id' => $itemId]],
+                $userId
+            );
+            $item['reactions'] = $reactionsByKey[$itemType . ':' . $itemId]
+                ?? ['counts' => [], 'total' => 0, 'user_reaction' => null];
+        }
+
+        unset($item['_activity_id'], $item['_activity_created_at']);
+
+        return $this->respondWithData($item);
+    }
+
+    /**
      * POST /api/v2/feed/like
      *
      * Toggle like on content. Native Eloquent — no delegation.
@@ -868,13 +952,12 @@ class SocialController extends BaseApiController
 
                 $action = 'unliked';
             } else {
-                DB::table('likes')->insert([
-                    'user_id'     => $userId,
-                    'target_type' => $targetType,
-                    'target_id'   => $targetId,
-                    'tenant_id'   => $tenantId,
-                    'created_at'  => now(),
-                ]);
+                // Use INSERT IGNORE to prevent duplicates from concurrent requests
+                // (protected by uk_likes_user_target unique constraint)
+                DB::affectingStatement(
+                    'INSERT IGNORE INTO likes (user_id, target_type, target_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                    [$userId, $targetType, $targetId, $tenantId]
+                );
 
                 if ($targetType === 'post') {
                     DB::table('feed_posts')
@@ -1245,9 +1328,10 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_reaction'), null, 400);
         }
 
-        // H4: Allowlist emoji reactions to prevent storage of arbitrary Unicode/XSS payloads
-        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '🎉', '😍', '🤔', '😡', '💯'];
-        if (!in_array($emoji, $allowedEmojis, true)) {
+        // Standardise on ReactionService::VALID_TYPES (named types) — comment reactions
+        // share the same `reactions` table as polymorphic post reactions, so the type
+        // alphabet must match (love, like, laugh, wow, sad, celebrate, clap, time_credit).
+        if (!in_array($emoji, \App\Services\ReactionService::VALID_TYPES, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction'), null, 422);
         }
 

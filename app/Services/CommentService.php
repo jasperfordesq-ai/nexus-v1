@@ -22,7 +22,13 @@ use Illuminate\Support\Facades\Log;
  */
 class CommentService
 {
-    private static array $availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
+    /**
+     * Comment reactions share the same `reactions` table as post/listing/event
+     * reactions, so the named-type alphabet from ReactionService::VALID_TYPES
+     * is the canonical list. Frontend ReactionPicker and FeedRankingService
+     * also use these named types — never raw emoji.
+     */
+    private static array $availableReactions = ReactionService::VALID_TYPES;
 
     /**
      * Get comments for a given entity, threaded by parent_id.
@@ -32,6 +38,7 @@ class CommentService
     public static function getForEntity(string $targetType, int $targetId, int $currentUserId = 0): array
     {
         $rows = Comment::with(['user:id,first_name,last_name,avatar_url'])
+            ->where('tenant_id', TenantContext::getId())
             ->where('target_type', $targetType)
             ->where('target_id', $targetId)
             ->orderBy('created_at')
@@ -509,10 +516,20 @@ class CommentService
     }
 
     /**
-     * Toggle an emoji reaction on a comment.
+     * Toggle a reaction on a comment.
+     *
+     * The `$emoji` argument is now a NAMED reaction type from
+     * ReactionService::VALID_TYPES (love, like, laugh, wow, sad, celebrate,
+     * clap, time_credit) — NOT a raw emoji glyph. The legacy parameter name
+     * is kept only because the same string is what gets stored in the
+     * `reactions.emoji` column and returned to the frontend.
      */
     public static function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array
     {
+        if (!in_array($emoji, ReactionService::VALID_TYPES, true)) {
+            throw new \InvalidArgumentException('Invalid reaction type: ' . $emoji);
+        }
+
         $existing = DB::table('reactions')
             ->where('tenant_id', $tenantId)
             ->where('target_type', 'comment')
@@ -590,8 +607,8 @@ class CommentService
             'blog_post'  => ['blog_posts',    'author_id'],
             'blog'       => ['blog_posts',    'author_id'],
             'listing'    => ['listings',       'user_id'],
-            'feed_post'  => ['feed_activity',  'user_id'],
-            'post'       => ['feed_activity',  'user_id'],
+            'feed_post'  => ['feed_posts',     'user_id'],
+            'post'       => ['feed_posts',     'user_id'],
             'event'      => ['events',         'user_id'],
         ];
 
