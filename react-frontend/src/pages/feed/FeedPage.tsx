@@ -552,7 +552,15 @@ export function FeedPage() {
     );
 
     try {
-      const res = await api.post(`/v2/posts/${item.id}/reactions`, { reaction_type: reactionType });
+      // Polymorphic — works for post, listing, event, goal, poll, review, etc.
+      // Previously hardcoded /v2/posts/{id}/reactions, which silently wrote
+      // every non-post reaction against target_type='post' and made them
+      // disappear on reload (the recurring "like doesn't persist" bug).
+      const res = await api.post('/v2/reactions', {
+        target_type: item.type,
+        target_id: item.id,
+        reaction_type: reactionType,
+      });
       const resData = res.data as Record<string, unknown> | undefined;
       if (resData?.reactions) {
         const serverReactions = resData.reactions as FeedItem['reactions'];

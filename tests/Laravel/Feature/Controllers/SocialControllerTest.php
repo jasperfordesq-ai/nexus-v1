@@ -261,6 +261,157 @@ class SocialControllerTest extends TestCase
         $this->assertGreaterThan(0, $post['likes_count'] ?? 0);
     }
 
+    /**
+     * Seed a row in the right backing table for a given feed item type and
+     * return its insert id. Each type's table has different required columns,
+     * so we hand-roll a minimal valid row per type.
+     *
+     * MUST stay in sync with the source-table mapping in
+     * `FeedService::filterToValidSources()`.
+     */
+    private function seedReactableEntity(string $type, int $userId): ?int
+    {
+        $tenantId = $this->testTenantId;
+        $now = now();
+
+        try {
+            return match ($type) {
+                'listing' => DB::table('listings')->insertGetId([
+                    'tenant_id' => $tenantId, 'user_id' => $userId,
+                    'title' => 'Test listing', 'description' => 'x',
+                    'type' => 'offer', 'status' => 'active',
+                    'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'event' => DB::table('events')->insertGetId([
+                    'tenant_id' => $tenantId, 'user_id' => $userId,
+                    'title' => 'Test event', 'description' => 'x',
+                    'start_date' => '2030-01-01 12:00:00',
+                    'start_time' => '12:00:00', 'end_time' => '13:00:00',
+                    'is_online'  => 0, 'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'goal' => DB::table('goals')->insertGetId([
+                    'tenant_id' => $tenantId, 'user_id' => $userId,
+                    'title' => 'Test goal', 'description' => 'x',
+                    'is_public' => 1, 'status' => 'active',
+                    'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'review' => DB::table('reviews')->insertGetId([
+                    'tenant_id' => $tenantId,
+                    'reviewer_id' => $userId, 'receiver_id' => $userId,
+                    'rating' => 5, 'comment' => 'Great',
+                    'review_type' => 'local', 'status' => 'approved',
+                    'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'volunteer' => DB::table('vol_opportunities')->insertGetId([
+                    'tenant_id' => $tenantId, 'organization_id' => 0, 'created_by' => $userId,
+                    'title' => 'Test volunteer', 'description' => 'x',
+                    'is_active' => 1, 'status' => 'active',
+                    'created_at' => $now,
+                ]),
+                'challenge' => DB::table('ideation_challenges')->insertGetId([
+                    'tenant_id' => $tenantId, 'user_id' => $userId,
+                    'title' => 'Test challenge', 'description' => 'x',
+                    'status' => 'open',
+                    'created_at' => $now, 'updated_at' => $now,
+                ]),
+                default => null,
+            };
+        } catch (\Throwable $e) {
+            // Surface failures so missing columns aren't silently swallowed.
+            // Re-throw on CI so the test author sees the schema mismatch.
+            if (getenv('CI')) {
+                throw $e;
+            }
+            fwrite(STDERR, "[seedReactableEntity:{$type}] " . $e->getMessage() . "\n");
+            return null;
+        }
+    }
+
+    /**
+     * Polymorphic reaction persistence — the bug class this fix is targeting.
+     *
+     * Before 2026-05-03 the React frontend posted ALL reactions to
+     * /v2/posts/{id}/reactions and the backend hardcoded target_type='post'.
+     * Reactions on listings/events/goals/etc. were stored against the wrong
+     * type and never read back on reload — the recurring "like doesn't
+     * persist" bug.
+     *
+     * If a new reactable type is added (e.g. 'discussion'), add it here AND
+     * to ReactionService::VALID_TARGET_TYPES AND extend seedReactableEntity().
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function reactableFeedTypeProvider(): array
+    {
+        return [
+            'listing'   => ['listing'],
+            'event'     => ['event'],
+            'goal'      => ['goal'],
+            'review'    => ['review'],
+            'volunteer' => ['volunteer'],
+            'challenge' => ['challenge'],
+        ];
+    }
+
+    /**
+     * @dataProvider reactableFeedTypeProvider
+     */
+    public function test_reactions_persist_across_reload_for_all_feed_types(string $type): void
+    {
+        $user = $this->authenticatedUser();
+
+        $entityId = $this->seedReactableEntity($type, $user->id);
+        if ($entityId === null) {
+            $this->markTestSkipped("Could not seed {$type} entity in this schema");
+        }
+
+        DB::table('feed_activity')->insert([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
+            'source_type' => $type,
+            'source_id'   => $entityId,
+            'content'     => "Regression test {$type}",
+            'is_hidden'   => 0,
+            'is_visible'  => 1,
+            'created_at'  => now(),
+        ]);
+
+        $this->apiPost('/v2/reactions', [
+            'target_type' => $type,
+            'target_id' => $entityId,
+            'reaction_type' => 'like',
+        ])->assertStatus(200);
+
+        $response = $this->apiGet('/v2/feed');
+        $response->assertStatus(200);
+
+        $items = $response->json('data') ?? [];
+        $item  = collect($items)->first(
+            fn ($i) => ($i['type'] ?? null) === $type && (int) ($i['id'] ?? 0) === (int) $entityId
+        );
+
+        $this->assertNotNull($item, "{$type}:{$entityId} should appear in the feed");
+        $this->assertEquals(
+            'like',
+            $item['reactions']['user_reaction'] ?? null,
+            "Reaction must survive a feed reload for type={$type}"
+        );
+        $this->assertGreaterThan(0, $item['reactions']['total'] ?? 0);
+    }
+
+    /**
+     * Polymorphic toggle endpoint validates target_type whitelist.
+     */
+    public function test_reactions_endpoint_rejects_invalid_target_type(): void
+    {
+        $this->authenticatedUser();
+        $this->apiPost('/v2/reactions', [
+            'target_type' => 'unknown_type',
+            'target_id' => 1,
+            'reaction_type' => 'like',
+        ])->assertStatus(400);
+    }
+
     // ------------------------------------------------------------------
     //  POST /social/feed (legacy)
     // ------------------------------------------------------------------

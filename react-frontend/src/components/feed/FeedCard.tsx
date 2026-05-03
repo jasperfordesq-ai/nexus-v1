@@ -152,6 +152,25 @@ const SHAREABLE_TYPES = new Set<FeedItem['type']>([
 ]);
 
 /**
+ * Feed item types that support emoji reactions.
+ * MUST stay in sync with `App\Services\ReactionService::VALID_TARGET_TYPES`.
+ *
+ * Notification-style cards (`badge_earned`, `level_up`) are not user-authored
+ * content and are intentionally excluded — there is no entity to react against.
+ */
+const REACTABLE_FEED_TYPES = new Set<string>([
+  'post',
+  'listing',
+  'event',
+  'goal',
+  'poll',
+  'review',
+  'volunteer',
+  'challenge',
+  'resource',
+]);
+
+/**
  * Per-type card config.
  * - `softGradient` is used for the subtle body tint (e.g. view-detail CTA, milestone card backgrounds).
  * - `accentGradient` is the saturated top accent strip — matches the pattern established by the poll card redesign.
@@ -1762,7 +1781,7 @@ const FeedCard = React.memo(function FeedCard({
                   counts={item.reactions.counts}
                   total={item.reactions.total}
                   topReactors={item.reactions.top_reactors}
-                  entityType="post"
+                  entityType={item.type}
                   entityId={item.id}
                 />
               ) : item.likes_count > 0 ? (
@@ -1801,7 +1820,14 @@ const FeedCard = React.memo(function FeedCard({
         {/* Action Buttons — reactions + comment as primary; share + bookmark as ghost icon-only secondary actions */}
         <div className="flex items-center justify-between gap-1 -mx-1">
           <div className="flex items-center gap-1 min-w-0 flex-1">
-            {onReact ? (
+            {/*
+              ReactionPicker is shown for reactable feed item types only.
+              Notification-style cards (level_up, badge_earned) are not user-authored
+              content and have no entity to react against — they get the simple Like
+              button instead (which is no-op for them but keeps the UI consistent).
+              REACTABLE_TYPES MUST stay in sync with ReactionService::VALID_TARGET_TYPES.
+            */}
+            {onReact && REACTABLE_FEED_TYPES.has(item.type) ? (
               <ReactionPicker
                 userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
                 onReact={(type) => onReact(item, type)}

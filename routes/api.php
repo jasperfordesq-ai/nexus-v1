@@ -491,7 +491,13 @@ Route::delete('/v2/shares', [\App\Http\Controllers\Api\FeedSocialController::cla
 Route::get('/v2/feed/hashtags/trending', [\App\Http\Controllers\Api\FeedSocialController::class, 'getTrendingHashtags']);
 Route::get('/v2/feed/hashtags/search', [\App\Http\Controllers\Api\FeedSocialController::class, 'searchHashtags']);
 Route::get('/v2/feed/hashtags/{tag}', [\App\Http\Controllers\Api\FeedSocialController::class, 'getHashtagPosts']);
-// Reactions (emoji reactions on posts and comments)
+// Reactions — polymorphic (canonical) + legacy aliases
+//   Reactions are polymorphic: post, listing, event, goal, poll, review,
+//   volunteer, challenge, resource, comment.
+Route::post('/v2/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'toggle']);
+Route::get('/v2/reactions/{type}/{id}', [\App\Http\Controllers\Api\ReactionController::class, 'show']);
+Route::get('/v2/reactions/{type}/{id}/users/{reactionType}', [\App\Http\Controllers\Api\ReactionController::class, 'reactors']);
+// Legacy aliases (kept for backward compatibility — delegate to polymorphic impl)
 Route::post('/v2/posts/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'togglePostReaction']);
 Route::get('/v2/posts/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'getPostReactions']);
 Route::get('/v2/posts/{id}/reactions/{type}/users', [\App\Http\Controllers\Api\ReactionController::class, 'getPostReactors']);

@@ -548,4 +548,97 @@ class ReactionControllerTest extends TestCase
         $this->assertArrayHasKey('avatar_url', $data[0]);
         $this->assertArrayHasKey('reacted_at', $data[0]);
     }
+
+    // ========================================================================
+    // Polymorphic POST /v2/reactions — canonical endpoint for the unified
+    // reaction system. Covers post + listing to prove the route handles
+    // arbitrary target_types end-to-end.
+    // ========================================================================
+
+    public function test_polymorphic_toggle_route_adds_reaction_on_post(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->createPost($user->id);
+
+        $response = $this->apiPost('/v2/reactions', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'reaction_type' => 'love',
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.action', 'added')
+                 ->assertJsonPath('data.reaction_type', 'love');
+
+        $this->assertDatabaseHas('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'emoji' => 'love',
+        ]);
+    }
+
+    public function test_polymorphic_toggle_route_adds_reaction_on_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id'   => $user->id,
+            'title'     => 'Test listing',
+            'description' => 'x',
+            'type'      => 'offer',
+            'status'    => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/reactions', [
+            'target_type' => 'listing',
+            'target_id' => $listingId,
+            'reaction_type' => 'celebrate',
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.action', 'added');
+
+        $this->assertDatabaseHas('reactions', [
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
+            'target_type' => 'listing',
+            'target_id'   => $listingId,
+            'emoji'       => 'celebrate',
+        ]);
+    }
+
+    public function test_polymorphic_show_route_returns_counts(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->createPost($user->id);
+
+        $this->apiPost('/v2/reactions', [
+            'target_type' => 'post', 'target_id' => $postId, 'reaction_type' => 'wow',
+        ])->assertStatus(200);
+
+        $response = $this->apiGet("/v2/reactions/post/{$postId}");
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.user_reaction', 'wow')
+                 ->assertJsonPath('data.total', 1);
+    }
+
+    public function test_polymorphic_reactors_route_returns_users(): void
+    {
+        $user = $this->authenticatedUser(['first_name' => 'Anna', 'last_name' => 'Tester']);
+        $postId = $this->createPost($user->id);
+
+        $this->apiPost('/v2/reactions', [
+            'target_type' => 'post', 'target_id' => $postId, 'reaction_type' => 'clap',
+        ])->assertStatus(200);
+
+        $response = $this->apiGet("/v2/reactions/post/{$postId}/users/clap");
+        $response->assertStatus(200);
+        $data = $response->json('data');
+        $this->assertCount(1, $data);
+        $this->assertEquals($user->id, $data[0]['id']);
+    }
 }

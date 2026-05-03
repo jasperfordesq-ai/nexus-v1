@@ -81,10 +81,13 @@ export function ReactionSummary({
     async (type: string, page = 1, append = false) => {
       setIsLoadingReactors(true);
       try {
+        // Use the polymorphic /v2/reactions/{type}/{id} endpoints. The legacy
+        // /v2/{entityType}s/{entityId}/reactions form only had post + comment
+        // routes registered, so listing/event/etc. reactor lookups were 404ing.
         const endpoint =
           type === 'all'
-            ? `/v2/${entityType}s/${entityId}/reactions`
-            : `/v2/${entityType}s/${entityId}/reactions/${type}/users?page=${page}&per_page=20`;
+            ? `/v2/reactions/${entityType}/${entityId}`
+            : `/v2/reactions/${entityType}/${entityId}/users/${type}?page=${page}&per_page=20`;
 
         if (type === 'all') {
           // For "all" tab, we show the summary data (top reactors from existing data)

@@ -13,14 +13,22 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 /**
- * ReactionController — Handles emoji reactions on posts and comments.
+ * ReactionController — Handles emoji reactions across the platform.
  *
- * Endpoints:
- *   POST   /v2/posts/{id}/reactions        — toggle reaction on a post
- *   GET    /v2/posts/{id}/reactions        — get reaction counts for a post
- *   GET    /v2/posts/{id}/reactions/{type}/users — get users who reacted
- *   POST   /v2/comments/{id}/reactions     — toggle reaction on a comment
- *   GET    /v2/comments/{id}/reactions     — get reaction counts for a comment
+ * Reactions are polymorphic — any feed item type (post, listing, event, goal,
+ * poll, review, volunteer, challenge, resource) plus comments can be reacted to.
+ *
+ * Canonical endpoints:
+ *   POST   /v2/reactions                          — toggle reaction (body: target_type, target_id, reaction_type)
+ *   GET    /v2/reactions/{type}/{id}              — get reaction counts
+ *   GET    /v2/reactions/{type}/{id}/users/{rxn}  — paginated reactors
+ *
+ * Legacy aliases (kept for backward compat — thin wrappers):
+ *   POST   /v2/posts/{id}/reactions               — toggle on a post
+ *   GET    /v2/posts/{id}/reactions               — get post reactions
+ *   GET    /v2/posts/{id}/reactions/{type}/users  — post reactors
+ *   POST   /v2/comments/{id}/reactions            — toggle on a comment
+ *   GET    /v2/comments/{id}/reactions            — get comment reactions
  */
 class ReactionController extends BaseApiController
 {
@@ -31,7 +39,45 @@ class ReactionController extends BaseApiController
     ) {}
 
     // ========================================================================
-    // Post Reactions
+    // Polymorphic Reactions (canonical)
+    // ========================================================================
+
+    /**
+     * POST /v2/reactions
+     *
+     * Toggle a reaction on any reactable entity.
+     * Body: { "target_type": "post|listing|event|...", "target_id": int, "reaction_type": "love" }
+     */
+    public function toggle(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('reaction_toggle', 120, 60);
+
+        $targetType   = (string) $this->input('target_type');
+        $targetId     = (int) $this->input('target_id');
+        $reactionType = (string) $this->input('reaction_type');
+
+        return $this->doToggle($userId, $targetType, $targetId, $reactionType);
+    }
+
+    /**
+     * GET /v2/reactions/{type}/{id}
+     */
+    public function show(string $type, int $id): JsonResponse
+    {
+        return $this->doShow($type, $id);
+    }
+
+    /**
+     * GET /v2/reactions/{type}/{id}/users/{reactionType}
+     */
+    public function reactors(string $type, int $id, string $reactionType): JsonResponse
+    {
+        return $this->doReactors($type, $id, $reactionType);
+    }
+
+    // ========================================================================
+    // Post Reactions (legacy — delegate to polymorphic implementation)
     // ========================================================================
 
     /**
@@ -44,73 +90,25 @@ class ReactionController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('reaction_toggle', 120, 60);
 
-        $reactionType = $this->input('reaction_type');
+        $reactionType = (string) $this->input('reaction_type');
 
-        if (empty($reactionType) || !in_array($reactionType, ReactionService::VALID_TYPES, true)) {
-            return $this->respondWithError(
-                'VALIDATION_ERROR',
-                'Invalid reaction_type. Valid types: ' . implode(', ', ReactionService::VALID_TYPES),
-                'reaction_type',
-                400
-            );
-        }
-
-        try {
-            $result = $this->reactionService->toggleReaction($id, 'post', $reactionType, $userId);
-
-            // Notify the post owner (only on 'added', not 'removed' or 'updated')
-            if ($result['action'] === 'added') {
-                $this->notifyReaction($userId, 'post', $id, $reactionType);
-            }
-
-            return $this->respondWithData($result);
-        } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', __('api.reaction_toggle_failed'), null, 500);
-        }
+        return $this->doToggle($userId, 'post', $id, $reactionType);
     }
 
     /**
      * GET /v2/posts/{id}/reactions
-     *
-     * Get reaction counts for a post.
      */
     public function getPostReactions(int $id): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
-
-        try {
-            $reactions = $this->reactionService->getReactions($id, 'post', $userId);
-            return $this->respondWithData($reactions);
-        } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', __('api.failed_fetch_reactions'), null, 500);
-        }
+        return $this->doShow('post', $id);
     }
 
     /**
      * GET /v2/posts/{id}/reactions/{type}/users
-     *
-     * Get paginated list of users who reacted with a specific type on a post.
      */
     public function getPostReactors(int $id, string $type): JsonResponse
     {
-        if (!in_array($type, ReactionService::VALID_TYPES, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'type', 400);
-        }
-
-        $page = $this->queryInt('page', 1, 1);
-        $perPage = $this->queryInt('per_page', 20, 1, 50);
-
-        try {
-            $result = $this->reactionService->getReactors($id, 'post', $type, $page, $perPage);
-            return $this->respondWithPaginatedCollection(
-                $result['users'],
-                $result['total'],
-                $page,
-                $perPage
-            );
-        } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', __('api.failed_get_reactors'), null, 500);
-        }
+        return $this->doReactors('post', $id, $type);
     }
 
     // ========================================================================
@@ -127,8 +125,25 @@ class ReactionController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('reaction_toggle', 120, 60);
 
-        $reactionType = $this->input('reaction_type');
+        $reactionType = (string) $this->input('reaction_type');
 
+        return $this->doToggle($userId, 'comment', $id, $reactionType);
+    }
+
+    /**
+     * GET /v2/comments/{id}/reactions
+     */
+    public function getCommentReactions(int $id): JsonResponse
+    {
+        return $this->doShow('comment', $id);
+    }
+
+    // ========================================================================
+    // Shared toggle/show/reactors implementation
+    // ========================================================================
+
+    private function doToggle(int $userId, string $targetType, int $targetId, string $reactionType): JsonResponse
+    {
         if (empty($reactionType) || !in_array($reactionType, ReactionService::VALID_TYPES, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
@@ -138,12 +153,24 @@ class ReactionController extends BaseApiController
             );
         }
 
-        try {
-            $result = $this->reactionService->toggleReaction($id, 'comment', $reactionType, $userId);
+        if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid target_type. Valid types: ' . implode(', ', ReactionService::VALID_TARGET_TYPES),
+                'target_type',
+                400
+            );
+        }
 
-            // Notify the comment owner (only on 'added')
+        if ($targetId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'target_id must be positive', 'target_id', 400);
+        }
+
+        try {
+            $result = $this->reactionService->toggleReaction($targetId, $targetType, $reactionType, $userId);
+
             if ($result['action'] === 'added') {
-                $this->notifyReaction($userId, 'comment', $id, $reactionType);
+                $this->notifyReaction($userId, $targetType, $targetId, $reactionType);
             }
 
             return $this->respondWithData($result);
@@ -152,20 +179,43 @@ class ReactionController extends BaseApiController
         }
     }
 
-    /**
-     * GET /v2/comments/{id}/reactions
-     *
-     * Get reaction counts for a comment.
-     */
-    public function getCommentReactions(int $id): JsonResponse
+    private function doShow(string $targetType, int $id): JsonResponse
     {
+        if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target_type', 'target_type', 400);
+        }
         $userId = $this->getOptionalUserId();
 
         try {
-            $reactions = $this->reactionService->getReactions($id, 'comment', $userId);
+            $reactions = $this->reactionService->getReactions($id, $targetType, $userId);
             return $this->respondWithData($reactions);
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', __('api.failed_fetch_reactions'), null, 500);
+        }
+    }
+
+    private function doReactors(string $targetType, int $id, string $reactionType): JsonResponse
+    {
+        if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target_type', 'target_type', 400);
+        }
+        if (!in_array($reactionType, ReactionService::VALID_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'type', 400);
+        }
+
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+
+        try {
+            $result = $this->reactionService->getReactors($id, $targetType, $reactionType, $page, $perPage);
+            return $this->respondWithPaginatedCollection(
+                $result['users'],
+                $result['total'],
+                $page,
+                $perPage
+            );
+        } catch (\Exception $e) {
+            return $this->respondWithError('REACTION_ERROR', __('api.failed_get_reactors'), null, 500);
         }
     }
 

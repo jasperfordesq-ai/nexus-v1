@@ -228,7 +228,7 @@ describe('ReactionSummary', () => {
     fireEvent.click(screen.getByRole('button', { name: /View reactions/i }));
 
     await waitFor(() => {
-      expect(mockApiGet).toHaveBeenCalledWith('/v2/posts/42/reactions');
+      expect(mockApiGet).toHaveBeenCalledWith('/v2/reactions/post/42');
     });
   });
 

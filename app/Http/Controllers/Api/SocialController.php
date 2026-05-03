@@ -32,10 +32,17 @@ class SocialController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** Valid target types for likes */
+    /**
+     * Valid target types for likes.
+     *
+     * MUST stay aligned with feed_activity.source_type values so a like applied
+     * from the feed reaches the same row that the feed query reads. 'volunteer'
+     * is the canonical name (singular, matching feed_activity); 'volunteering'
+     * is accepted as a legacy alias and normalised in likeV2().
+     */
     private const VALID_LIKE_TARGETS = [
         'post', 'listing', 'event', 'poll', 'goal',
-        'resource', 'volunteering', 'review', 'comment',
+        'resource', 'volunteer', 'volunteering', 'review', 'challenge', 'comment',
     ];
 
     public function __construct(
@@ -97,11 +104,22 @@ class SocialController extends BaseApiController
             $result['items'] = $this->personalisedFeedService->rank($userId, 'feed', $result['items']);
         }
 
-        // Collect post IDs for batch media loading
+        // Collect post IDs for batch media loading + a polymorphic items list
+        // for batch reaction loading (post, listing, event, goal, poll, review,
+        // volunteer, challenge, resource — all reactable feed types).
         $postIds = [];
+        $reactableItems = [];
         foreach ($result['items'] as $item) {
-            if (($item['type'] ?? '') === 'post' && !empty($item['id'])) {
-                $postIds[] = (int) $item['id'];
+            $type = $item['type'] ?? '';
+            $id = (int) ($item['id'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+            if ($type === 'post') {
+                $postIds[] = $id;
+            }
+            if (in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+                $reactableItems[] = ['type' => $type, 'id' => $id];
             }
         }
 
@@ -111,19 +129,29 @@ class SocialController extends BaseApiController
             $mediaByPost = $this->postMediaService->getMediaForPosts($postIds);
         }
 
-        // Batch load reactions for all post items (restores user_reaction after page refresh)
-        $reactionsByPost = !empty($postIds)
-            ? $this->reactionService->getReactionsForPosts($postIds, $userId)
+        // Batch load reactions for ALL reactable items (polymorphic).
+        // This restores user_reaction across page refresh for every type, not
+        // just posts — see project_recipient_locale_rollout.md and the
+        // ReactionPersistenceTest regression suite.
+        $reactionsByKey = !empty($reactableItems)
+            ? $this->reactionService->getReactionsForItems($reactableItems, $userId)
             : [];
 
         // Strip internal cursor fields and attach media + reactions
         foreach ($result['items'] as &$item) {
             unset($item['_activity_id'], $item['_activity_created_at']);
 
-            // Attach media array and reactions for post items
-            if (($item['type'] ?? '') === 'post' && isset($item['id'])) {
-                $item['media'] = $mediaByPost[(int) $item['id']] ?? [];
-                $item['reactions'] = $reactionsByPost[(int) $item['id']]
+            $type = $item['type'] ?? '';
+            $id = (int) ($item['id'] ?? 0);
+
+            // Media is post-only
+            if ($type === 'post' && $id > 0) {
+                $item['media'] = $mediaByPost[$id] ?? [];
+            }
+
+            // Reactions for any reactable type
+            if ($id > 0 && in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+                $item['reactions'] = $reactionsByKey[$type . ':' . $id]
                     ?? ['counts' => [], 'total' => 0, 'user_reaction' => null];
             }
         }
@@ -201,6 +229,19 @@ class SocialController extends BaseApiController
         $mediaByPost = $this->postMediaService->getMediaForPosts([$id]);
         $item['media'] = $mediaByPost[$id] ?? [];
 
+        // Polymorphic reactions — same pattern as feedV2. The detail page must
+        // surface user_reaction so the heart stays filled on refresh.
+        $type = (string) ($item['type'] ?? 'post');
+        $itemId = (int) ($item['id'] ?? $id);
+        if ($itemId > 0 && in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+            $reactionsByKey = $this->reactionService->getReactionsForItems(
+                [['type' => $type, 'id' => $itemId]],
+                $userId
+            );
+            $item['reactions'] = $reactionsByKey[$type . ':' . $itemId]
+                ?? ['counts' => [], 'total' => 0, 'user_reaction' => null];
+        }
+
         unset($item['_activity_id'], $item['_activity_created_at']);
 
         return $this->respondWithData($item);
@@ -219,7 +260,7 @@ class SocialController extends BaseApiController
         $tenantId = $this->getTenantId();
         $this->rateLimit('feed_like', 60, 60);
 
-        $targetType = $this->input('target_type');
+        $targetType = (string) $this->input('target_type');
         $targetId = $this->inputInt('target_id');
 
         if (empty($targetType) || ! $targetId) {
@@ -230,17 +271,26 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
         }
 
-        // Verify the target belongs to this tenant before recording the like
+        // Normalise legacy alias — feed_activity emits 'volunteer' for opportunities,
+        // so the canonical likes target_type is 'volunteer'. Old clients sending
+        // 'volunteering' get rewritten to keep DB rows consistent.
+        if ($targetType === 'volunteering') {
+            $targetType = 'volunteer';
+        }
+
+        // Verify the target belongs to this tenant before recording the like.
+        // Table names use the canonical (post-normalisation) target_type as the key.
         $targetTables = [
-            'post'         => 'feed_posts',
-            'listing'      => 'listings',
-            'event'        => 'events',
-            'poll'         => 'polls',
-            'goal'         => 'goals',
-            'resource'     => 'resources',
-            'volunteering' => 'volunteering_opportunities',
-            'review'       => 'reviews',
-            'comment'      => 'comments',
+            'post'      => 'feed_posts',
+            'listing'   => 'listings',
+            'event'     => 'events',
+            'poll'      => 'polls',
+            'goal'      => 'goals',
+            'resource'  => 'resources',
+            'volunteer' => 'vol_opportunities',
+            'review'    => 'reviews',
+            'challenge' => 'ideation_challenges',
+            'comment'   => 'comments',
         ];
         if (isset($targetTables[$targetType])) {
             $targetExists = DB::table($targetTables[$targetType])

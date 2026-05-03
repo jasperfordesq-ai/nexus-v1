@@ -23,8 +23,29 @@ class ReactionService
     /** Valid reaction types */
     public const VALID_TYPES = ['love', 'like', 'laugh', 'wow', 'sad', 'celebrate', 'clap', 'time_credit'];
 
-    /** Valid target types for the reactions table */
-    private const VALID_TARGET_TYPES = ['post', 'comment'];
+    /**
+     * Valid target types for the reactions table.
+     *
+     * Reactions are polymorphic — any module that surfaces a card in the feed
+     * (post, listing, event, goal, poll, review, volunteer opportunity, challenge)
+     * can be reacted to, plus comments. This list MUST stay in sync with
+     * `feed_activity.source_type` values so the feed reload finds them.
+     *
+     * Notification-style cards (level_up, badge_earned) are intentionally excluded —
+     * they're not user-authored content.
+     */
+    public const VALID_TARGET_TYPES = [
+        'post',
+        'comment',
+        'listing',
+        'event',
+        'goal',
+        'poll',
+        'review',
+        'volunteer',
+        'challenge',
+        'resource',
+    ];
 
     /**
      * Toggle a reaction on a post or comment.
@@ -222,51 +243,94 @@ class ReactionService
     /**
      * Get reaction data for multiple posts at once (for feed listing).
      *
+     * @deprecated Use getReactionsForItems() — this hardcodes target_type='post'
+     *             and silently returns empty for listing/event/goal/etc. items,
+     *             which is the root cause of the "reactions don't persist" bug
+     *             that has regressed repeatedly.
+     *
      * @param int[] $postIds
      * @return array<int, array{counts: array, total: int, user_reaction: string|null}>
      */
     public function getReactionsForPosts(array $postIds, ?int $userId = null): array
     {
-        if (empty($postIds)) {
-            return [];
+        $items = array_map(fn ($id) => ['type' => 'post', 'id' => (int) $id], $postIds);
+        $byKey = $this->getReactionsForItems($items, $userId);
+        $result = [];
+        foreach ($postIds as $pid) {
+            $result[(int) $pid] = $byKey['post:' . (int) $pid]
+                ?? ['counts' => [], 'total' => 0, 'user_reaction' => null];
+        }
+        return $result;
+    }
+
+    /**
+     * Get reaction data for a heterogeneous batch of feed items at once.
+     *
+     * This is THE method to use from feed loaders — it correctly handles
+     * polymorphic feed items (post, listing, event, goal, poll, review,
+     * volunteer, challenge, resource). Returned map is keyed by "type:id".
+     *
+     * @param array<int, array{type: string, id: int}> $items
+     * @param int|null $userId Current viewer (for user_reaction)
+     * @return array<string, array{counts: array<string,int>, total: int, user_reaction: string|null}>
+     */
+    public function getReactionsForItems(array $items, ?int $userId = null): array
+    {
+        // Filter to reactable types and dedupe
+        $byType = [];
+        $resultKeys = [];
+        foreach ($items as $item) {
+            $type = (string) ($item['type'] ?? '');
+            $id   = (int) ($item['id'] ?? 0);
+            if ($id <= 0 || !in_array($type, self::VALID_TARGET_TYPES, true)) {
+                continue;
+            }
+            $byType[$type] ??= [];
+            $byType[$type][$id] = true;
+            $resultKeys[] = $type . ':' . $id;
+        }
+
+        $result = [];
+        foreach ($resultKeys as $k) {
+            $result[$k] = ['counts' => [], 'total' => 0, 'user_reaction' => null];
+        }
+
+        if (empty($byType)) {
+            return $result;
         }
 
         $tenantId = TenantContext::getId();
-        $placeholders = implode(',', array_fill(0, count($postIds), '?'));
 
-        // Get all reaction counts grouped by target_id and emoji
-        $rows = DB::select(
-            "SELECT target_id, emoji, COUNT(*) as count
-             FROM reactions
-             WHERE tenant_id = ? AND target_type = 'post' AND target_id IN ({$placeholders})
-             GROUP BY target_id, emoji",
-            array_merge([$tenantId], $postIds)
-        );
+        // Per-type batch queries — keeps the WHERE clause simple and uses the
+        // (target_type, target_id) index efficiently.
+        foreach ($byType as $type => $idMap) {
+            $ids = array_keys($idMap);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-        // Build result map
-        $result = [];
-        foreach ($postIds as $pid) {
-            $result[$pid] = ['counts' => [], 'total' => 0, 'user_reaction' => null];
-        }
-
-        foreach ($rows as $row) {
-            $pid = (int) $row->target_id;
-            $result[$pid]['counts'][$row->emoji] = (int) $row->count;
-            $result[$pid]['total'] += (int) $row->count;
-        }
-
-        // Get current user's reactions
-        if ($userId) {
-            $userRows = DB::select(
-                "SELECT target_id, emoji
+            $rows = DB::select(
+                "SELECT target_id, emoji, COUNT(*) as count
                  FROM reactions
-                 WHERE tenant_id = ? AND target_type = 'post' AND target_id IN ({$placeholders}) AND user_id = ?",
-                array_merge([$tenantId], $postIds, [$userId])
+                 WHERE tenant_id = ? AND target_type = ? AND target_id IN ({$placeholders})
+                 GROUP BY target_id, emoji",
+                array_merge([$tenantId, $type], $ids)
             );
+            foreach ($rows as $row) {
+                $key = $type . ':' . (int) $row->target_id;
+                $result[$key]['counts'][$row->emoji] = (int) $row->count;
+                $result[$key]['total'] += (int) $row->count;
+            }
 
-            foreach ($userRows as $row) {
-                $pid = (int) $row->target_id;
-                $result[$pid]['user_reaction'] = $row->emoji;
+            if ($userId) {
+                $userRows = DB::select(
+                    "SELECT target_id, emoji
+                     FROM reactions
+                     WHERE tenant_id = ? AND target_type = ? AND target_id IN ({$placeholders}) AND user_id = ?",
+                    array_merge([$tenantId, $type], $ids, [$userId])
+                );
+                foreach ($userRows as $row) {
+                    $key = $type . ':' . (int) $row->target_id;
+                    $result[$key]['user_reaction'] = $row->emoji;
+                }
             }
         }
 
