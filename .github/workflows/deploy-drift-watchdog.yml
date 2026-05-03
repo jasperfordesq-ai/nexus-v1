@@ -137,6 +137,7 @@ jobs:
             exit 1
           fi
 
-      - name: Fail workflow when alert sent
-        if: steps.decide.outputs.alert == 'true'
-        run: exit 1
+      # The Telegram alert above IS the signal. We deliberately do NOT fail the
+      # workflow on drift — drift is expected (we don't auto-deploy on push) and
+      # leaving every scheduled run red just creates notification noise. If the
+      # Telegram alert fails to send, that step itself will already fail.
