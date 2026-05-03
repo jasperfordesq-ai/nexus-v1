@@ -117,7 +117,9 @@ export function PostDetailPage() {
     return () => { abortRef.current?.abort(); };
   }, [id, itemType, t]);
 
-  const handleToggleLike = async (feedItem: FeedItem) => {
+  // Handlers wrapped in useCallback so FeedCard's React.memo isn't defeated by
+  // inline arrows being recreated every render.
+  const handleToggleLike = useCallback(async (feedItem: FeedItem) => {
     const newIsLiked = !feedItem.is_liked;
     const newLikesCount = newIsLiked ? feedItem.likes_count + 1 : feedItem.likes_count - 1;
     setItem((prev) => prev ? { ...prev, is_liked: newIsLiked, likes_count: newLikesCount } : null);
@@ -128,9 +130,9 @@ export function PostDetailPage() {
       logError('Failed to toggle like', err);
       setItem((prev) => prev ? { ...prev, is_liked: feedItem.is_liked, likes_count: feedItem.likes_count } : null);
     }
-  };
+  }, []);
 
-  const handleHidePost = async (feedItem: FeedItem) => {
+  const handleHidePost = useCallback(async (feedItem: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${feedItem.id}/hide`, { type: feedItem.type });
       navigate(tenantPath('/feed'));
@@ -138,9 +140,9 @@ export function PostDetailPage() {
       logError('Failed to hide post', err);
       toast.error(t('toast.hide_failed'));
     }
-  };
+  }, [navigate, tenantPath, toast, t]);
 
-  const handleMuteUser = async (feedItem: FeedItem) => {
+  const handleMuteUser = useCallback(async (feedItem: FeedItem) => {
     const authorId = getAuthor(feedItem).id;
     if (!authorId) return;
     try {
@@ -151,15 +153,15 @@ export function PostDetailPage() {
       logError('Failed to mute user', err);
       toast.error(t('toast.mute_failed'));
     }
-  };
+  }, [navigate, tenantPath, toast, t]);
 
-  const openReportModal = (feedItem: FeedItem) => {
+  const openReportModal = useCallback((feedItem: FeedItem) => {
     setReportPostId(feedItem.id);
     setReportReason('');
     onReportOpen();
-  };
+  }, [onReportOpen]);
 
-  const handleReport = async () => {
+  const handleReport = useCallback(async () => {
     if (!reportPostId || !reportReason.trim()) {
       toast.error(t('toast.provide_reason'));
       return;
@@ -179,9 +181,9 @@ export function PostDetailPage() {
     } finally {
       setIsReporting(false);
     }
-  };
+  }, [reportPostId, reportReason, onReportClose, toast, t]);
 
-  const handleDeletePost = async (feedItem: FeedItem) => {
+  const handleDeletePost = useCallback(async (feedItem: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${feedItem.id}/delete`);
       toast.success(t('toast.deleted'));
@@ -190,16 +192,16 @@ export function PostDetailPage() {
       logError('Failed to delete post', err);
       toast.error(t('toast.delete_failed'));
     }
-  };
+  }, [navigate, tenantPath, toast, t]);
 
-  const handleVotePoll = async (pollId: number, optionId: number) => {
+  const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
     try {
       await api.post(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
     } catch (err) {
       logError('Failed to vote on poll', err);
       toast.error(t('toast.vote_failed'));
     }
-  };
+  }, [toast, t]);
 
   const handleNotInterested = useCallback(async (feedItem: FeedItem) => {
     try {

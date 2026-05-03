@@ -595,4 +595,87 @@ class SocialControllerTest extends TestCase
         $this->assertSame($eventId, (int) ($data['id'] ?? 0));
         $this->assertArrayHasKey('reactions', $data);
     }
+
+    // ------------------------------------------------------------------
+    //  POST /v2/feed/impression — polymorphic CTR tracking
+    // ------------------------------------------------------------------
+
+    /**
+     * Polymorphic impression tracking accepts non-post types so EdgeRank
+     * gets a CTR signal across listings, events, etc. — the post-only
+     * endpoint missed every other reactable surface.
+     */
+    public function test_polymorphic_impression_records_for_listing(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $listing = \App\Models\Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->apiPost('/v2/feed/impression', [
+            'target_type' => 'listing',
+            'target_id'   => $listing->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.recorded', true);
+    }
+
+    public function test_polymorphic_impression_rejects_invalid_target_type(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/feed/impression', [
+            'target_type' => 'not_a_real_type',
+            'target_id'   => 1,
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    // ------------------------------------------------------------------
+    //  POST /v2/feed/posts/{id}/not-interested — tenant existence guard
+    // ------------------------------------------------------------------
+
+    /**
+     * notInterested must verify the (target_type, target_id) pair exists in
+     * the current tenant before writing to feed_hidden. Without this guard a
+     * client could poison feed_hidden with arbitrary IDs to bias the
+     * EdgeRank negative signal against unrelated content.
+     */
+    public function test_not_interested_404s_for_cross_tenant_target(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $existingOther = DB::table('tenants')->where('id', '!=', $this->testTenantId)->value('id');
+        $tenantToUse = $existingOther ?: ($this->testTenantId + 9999);
+
+        try {
+            $crossTenantPostId = DB::table('feed_posts')->insertGetId([
+                'tenant_id'  => $tenantToUse,
+                'user_id'    => $user->id,
+                'content'    => 'Cross-tenant post',
+                'type'       => 'post',
+                'visibility' => 'public',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('Could not seed cross-tenant post: ' . $e->getMessage());
+        }
+
+        $response = $this->apiPost("/v2/feed/posts/{$crossTenantPostId}/not-interested", [
+            'type' => 'post',
+        ]);
+
+        $response->assertStatus(404);
+
+        // Confirm no feed_hidden poisoning happened
+        $this->assertDatabaseMissing('feed_hidden', [
+            'user_id'   => $user->id,
+            'target_id' => $crossTenantPostId,
+            'tenant_id' => $this->testTenantId,
+        ]);
+    }
 }

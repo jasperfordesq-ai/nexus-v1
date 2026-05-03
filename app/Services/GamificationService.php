@@ -519,8 +519,7 @@ class GamificationService
             $tenantId = TenantContext::getId();
             /** @var FeedActivityService $feedActivityService */
             $feedActivityService = app(FeedActivityService::class);
-            $feedActivityService->logActivity($tenantId, $userId, 'badge_earned', [
-                'source_id' => 0,
+            $feedActivityService->recordActivity($tenantId, $userId, 'badge_earned', 0, [
                 'title' => $badge['name'],
                 'content' => "Earned the \"{$badge['name']}\" badge!",
                 'metadata' => [
@@ -660,8 +659,7 @@ class GamificationService
                     $tenantId = TenantContext::getId();
                     /** @var FeedActivityService $feedActivityService */
                     $feedActivityService = app(FeedActivityService::class);
-                    $feedActivityService->logActivity($tenantId, $userId, 'level_up', [
-                        'source_id' => 0,
+                    $feedActivityService->recordActivity($tenantId, $userId, 'level_up', 0, [
                         'title' => "Level $newLevel",
                         'content' => "Reached Level $newLevel!",
                         'metadata' => [

@@ -180,5 +180,6 @@
   "read_less": "Read less",
   "hours_abbrev": "{{hours}}h",
   "post_hidden": "Hidden from your feed",
-  "hide_failed": "Failed to hide"
+  "hide_failed": "Failed to hide",
+  "like_failed": "Failed to update like"
 }

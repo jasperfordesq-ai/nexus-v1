@@ -13,11 +13,15 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
+vi.mock('@/contexts/CookieConsentContext', () => ({
+  readStoredConsent: () => ({ necessary: true, analytics: true, marketing: false, preferences: true }),
+}));
+
 import { api } from '@/lib/api';
 const mockApi = api as unknown as { post: ReturnType<typeof vi.fn> };
 
-// Access the module-level impressedIds set indirectly
-// Each test uses a unique postId to avoid cross-test contamination
+// Each test uses a unique postId to avoid cross-test contamination of the
+// process-wide impressedIds dedup set.
 let postIdCounter = 10000;
 function uniquePostId() {
   return ++postIdCounter;
@@ -25,7 +29,7 @@ function uniquePostId() {
 
 describe('useFeedTracking', () => {
   let observerCallbacks: Map<Element, IntersectionObserverCallback>;
-  let mockObserverInstances: { observe: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }[];
+  let mockObserverInstances: { observe: ReturnType<typeof vi.fn>; unobserve: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }[];
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -34,11 +38,13 @@ describe('useFeedTracking', () => {
     observerCallbacks = new Map();
     mockObserverInstances = [];
 
-    // Mock IntersectionObserver
     vi.stubGlobal('IntersectionObserver', vi.fn((callback: IntersectionObserverCallback) => {
       const instance = {
         observe: vi.fn((el: Element) => {
           observerCallbacks.set(el, callback);
+        }),
+        unobserve: vi.fn((el: Element) => {
+          observerCallbacks.delete(el);
         }),
         disconnect: vi.fn(),
       };
@@ -55,62 +61,48 @@ describe('useFeedTracking', () => {
   function triggerIntersection(el: Element, isIntersecting: boolean) {
     const cb = observerCallbacks.get(el);
     if (cb) {
-      cb([{ isIntersecting } as IntersectionObserverEntry], {} as IntersectionObserver);
+      cb([{ target: el, isIntersecting } as IntersectionObserverEntry], {} as IntersectionObserver);
     }
   }
 
-  it('returns a ref and recordClick function', () => {
+  it('returns a ref callback and recordClick function', () => {
     const postId = uniquePostId();
     const { result } = renderHook(() => useFeedTracking(postId, true));
-    expect(result.current.ref).toBeDefined();
+    expect(typeof result.current.ref).toBe('function');
     expect(typeof result.current.recordClick).toBe('function');
-  });
-
-  it('does not set up observer when unauthenticated', () => {
-    const postId = uniquePostId();
-    renderHook(() => useFeedTracking(postId, false));
-    expect(IntersectionObserver).not.toHaveBeenCalled();
   });
 
   it('records impression after 1 second of visibility', async () => {
     const postId = uniquePostId();
     const { result } = renderHook(() => useFeedTracking(postId, true));
 
-    // Simulate the ref being attached to a DOM element
     const div = document.createElement('div');
-    Object.defineProperty(result.current.ref, 'current', { value: div, writable: true });
+    act(() => { result.current.ref(div); });
 
-    // Re-render to trigger the effect with the ref attached
-    // Since we can't easily set ref.current before mount, we'll trigger the observer directly
-    if (mockObserverInstances[0]) {
-      triggerIntersection(div, true);
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-      await Promise.resolve();
-      expect(mockApi.post).toHaveBeenCalledWith(`/v2/feed/posts/${postId}/impression`, {});
-    }
+    triggerIntersection(div, true);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    await Promise.resolve();
+    expect(mockApi.post).toHaveBeenCalledWith(`/v2/feed/posts/${postId}/impression`, {});
   });
 
   it('cancels impression timer if element leaves viewport', () => {
     const postId = uniquePostId();
-    renderHook(() => useFeedTracking(postId, true));
+    const { result } = renderHook(() => useFeedTracking(postId, true));
 
     const div = document.createElement('div');
+    act(() => { result.current.ref(div); });
 
-    if (mockObserverInstances[0]) {
-      // Enter viewport
-      triggerIntersection(div, true);
-      // Leave before 1 second
-      act(() => {
-        vi.advanceTimersByTime(500);
-        triggerIntersection(div, false);
-      });
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-      expect(mockApi.post).not.toHaveBeenCalled();
-    }
+    triggerIntersection(div, true);
+    act(() => {
+      vi.advanceTimersByTime(500);
+      triggerIntersection(div, false);
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(mockApi.post).not.toHaveBeenCalled();
   });
 
   it('recordClick fires POST to click endpoint', () => {
@@ -139,12 +131,13 @@ describe('useFeedTracking', () => {
     expect(mockApi.post).not.toHaveBeenCalled();
   });
 
-  it('disconnects observer on unmount', () => {
+  it('unobserves the element on unmount', () => {
     const postId = uniquePostId();
-    const { unmount } = renderHook(() => useFeedTracking(postId, true));
+    const { result, unmount } = renderHook(() => useFeedTracking(postId, true));
+    const div = document.createElement('div');
+    act(() => { result.current.ref(div); });
+    expect(observerCallbacks.has(div)).toBe(true);
     unmount();
-    if (mockObserverInstances[0]) {
-      expect(mockObserverInstances[0].disconnect).toHaveBeenCalled();
-    }
+    expect(observerCallbacks.has(div)).toBe(false);
   });
 });

@@ -10,6 +10,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\FeedSocialService;
 use App\Services\ShareService;
+use App\Support\CursorSigner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -317,9 +318,12 @@ class FeedSocialController extends BaseApiController
             ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if ($cursor !== null) {
-            $decoded = base64_decode($cursor, true);
-            if ($decoded !== false) {
-                $query->where('fp.id', '<', (int) $decoded);
+            // HMAC-signed cursor — same scheme as FeedService::getFeedItems().
+            // Prevents tampering (skipping to arbitrary post ids) and reverse-
+            // iteration scraping by clients constructing their own cursors.
+            $payload = CursorSigner::decode($cursor);
+            if ($payload !== null && isset($payload['id'])) {
+                $query->where('fp.id', '<', (int) $payload['id']);
             }
         }
 
@@ -330,7 +334,7 @@ class FeedSocialController extends BaseApiController
         }
 
         $nextCursor = $hasMore && $items->isNotEmpty()
-            ? base64_encode((string) $items->last()->id)
+            ? CursorSigner::encode(['id' => (int) $items->last()->id])
             : null;
 
         return $this->respondWithCollection(

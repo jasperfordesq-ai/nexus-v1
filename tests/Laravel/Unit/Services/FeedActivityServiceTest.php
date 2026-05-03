@@ -20,27 +20,20 @@ class FeedActivityServiceTest extends TestCase
         $this->service = new FeedActivityService();
     }
 
-    public function test_getActivity_returns_array(): void
+    public function test_recordActivity_rejects_invalid_source_type(): void
     {
-        DB::shouldReceive('select')->andReturn([]);
+        // Should silently no-op (logs error) rather than throw or write a row.
+        DB::shouldReceive('statement')->never();
 
-        $result = $this->service->getActivity(2, 1);
-        $this->assertIsArray($result);
+        $this->service->recordActivity(2, 1, 'not_a_real_type', 5);
+        $this->assertTrue(true);
     }
 
-    public function test_logActivity_returns_true_on_success(): void
+    public function test_recordActivity_writes_for_valid_type(): void
     {
-        DB::shouldReceive('insert')->once()->andReturn(true);
+        DB::shouldReceive('statement')->once();
 
-        $result = $this->service->logActivity(2, 1, 'post', ['title' => 'Hello', 'source_id' => 5]);
-        $this->assertTrue($result);
-    }
-
-    public function test_logActivity_returns_false_on_error(): void
-    {
-        DB::shouldReceive('insert')->andThrow(new \Exception('error'));
-
-        $result = $this->service->logActivity(2, 1, 'post');
-        $this->assertFalse($result);
+        $this->service->recordActivity(2, 1, 'post', 5, ['title' => 'Hi']);
+        $this->assertTrue(true);
     }
 }

@@ -11,11 +11,16 @@
  * is visible for >=1 second. Each post is tracked at most once per page load.
  *
  * Provides recordClick() to fire POST /v2/feed/posts/{id}/click.
+ *
+ * The IntersectionObserver is shared across every feed card via
+ * `useSharedFeedObserver`, so a 50-card feed registers ONE observer instead
+ * of 50 + entries.
  */
 
 import { useRef, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { readStoredConsent } from '@/contexts/CookieConsentContext';
+import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 
 /** Set of post IDs already tracked this session (prevents duplicates) */
 const impressedIds = new Set<number>();
@@ -26,59 +31,49 @@ export function resetImpressions(): void {
 }
 
 export function useFeedTracking(postId: number, isAuthenticated: boolean) {
-  const ref = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    // GDPR: feed tracking is analytics — only fire if user has granted analytics consent
-    const consent = readStoredConsent();
-    if (!consent?.analytics) return;
+  // Consent + auth gate. Read once per render — readStoredConsent is sync and cheap.
+  const consent = readStoredConsent();
+  const enabled = Boolean(consent?.analytics) && isAuthenticated && Boolean(postId);
 
-    if (!isAuthenticated || !postId || impressedIds.has(postId)) return;
-
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          // Start 1-second timer
-          timerRef.current = setTimeout(() => {
-            if (!impressedIds.has(postId)) {
-              impressedIds.add(postId);
-              // Fire-and-forget — don't block UI
-              api.post(`/v2/feed/posts/${postId}/impression`, {}).catch(() => {});
-            }
-          }, 1000);
-        } else {
-          // Left viewport before 1s — cancel
-          if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
+  const handleEntry = useCallback(
+    (entry: IntersectionObserverEntry) => {
+      if (entry.isIntersecting) {
+        if (impressedIds.has(postId)) return;
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          if (!impressedIds.has(postId)) {
+            impressedIds.add(postId);
+            api.post(`/v2/feed/posts/${postId}/impression`, {}).catch(() => {});
           }
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-      if (timerRef.current) {
+        }, 1000);
+      } else if (timerRef.current) {
         clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
+    },
+    [postId]
+  );
+
+  const setRef = useSharedFeedObserver(handleEntry, {
+    threshold: 0.5,
+    enabled,
+  });
+
+  // Clear pending timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [postId, isAuthenticated]);
+  }, []);
 
   const recordClick = useCallback(() => {
-    // GDPR: click tracking is analytics — only fire if user has granted analytics consent
-    const consent = readStoredConsent();
-    if (!consent?.analytics) return;
-
+    const c = readStoredConsent();
+    if (!c?.analytics) return;
     if (!isAuthenticated || !postId) return;
     api.post(`/v2/feed/posts/${postId}/click`, {}).catch(() => {});
   }, [postId, isAuthenticated]);
 
-  return { ref, recordClick };
+  return { ref: setRef, recordClick };
 }

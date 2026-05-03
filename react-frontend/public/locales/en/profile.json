@@ -158,6 +158,7 @@
   "post_deleted": "Post deleted",
   "post_hidden": "Hidden from your feed",
   "hide_failed": "Failed to hide",
+  "like_failed": "Failed to update like",
   "retry": "Retry",
   "load_more": "Load more",
   "disconnect_confirm_title": "Remove connection?",

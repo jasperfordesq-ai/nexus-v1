@@ -508,7 +508,9 @@
     "unmute": "Unmute",
     "pause": "Pause",
     "play": "Play",
-    "aria_label": "Video"
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "quoted_post_image": "Quoted post image",
   "why_shown": {

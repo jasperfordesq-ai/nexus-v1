@@ -480,6 +480,10 @@ Route::post('/v2/feed/posts/{id}/delete', [\App\Http\Controllers\Api\SocialContr
 Route::post('/v2/feed/users/{id}/mute', [\App\Http\Controllers\Api\SocialController::class, 'muteUserV2']);
 Route::post('/v2/feed/posts/{id}/impression', [\App\Http\Controllers\Api\SocialController::class, 'recordImpression']);
 Route::post('/v2/feed/posts/{id}/click', [\App\Http\Controllers\Api\SocialController::class, 'recordClick']);
+// Polymorphic CTR tracking — covers listings, events, polls, etc. so EdgeRank
+// gets click-through signal across every reactable feed surface.
+Route::post('/v2/feed/impression', [\App\Http\Controllers\Api\SocialController::class, 'recordImpressionV2']);
+Route::post('/v2/feed/click', [\App\Http\Controllers\Api\SocialController::class, 'recordClickV2']);
 // Feed Sidebar
 Route::get('/v2/community/stats', [\App\Http\Controllers\Api\FeedSidebarController::class, 'communityStats']);
 Route::get('/v2/members/suggested', [\App\Http\Controllers\Api\FeedSidebarController::class, 'suggestedMembers']);

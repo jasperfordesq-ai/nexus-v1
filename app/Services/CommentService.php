@@ -655,16 +655,19 @@ class CommentService
             ->first();
 
         foreach ($usernames as $username) {
-            // Escape LIKE wildcards so a malicious @mention like "@%_" can't
-            // broadly match every user and spam unrelated people with mention
-            // notifications.
-            $likeName = '%' . addcslashes($username, '\\%_') . '%';
+            // Strict-only matching to prevent a privacy/spam regression where
+            // `@John` notified every John in the tenant. Resolution order:
+            //   1. username exact (case-insensitive)
+            //   2. email local-part exact (case-insensitive) — `@alice` => alice@…
+            //   3. display name (`name`) exact (case-insensitive)
+            // Any non-resolving mention is silently dropped — better to miss a
+            // notification than spam unrelated users.
             $user = DB::table('users')
                 ->where('tenant_id', $tenantId)
-                ->where(function ($q) use ($username, $likeName) {
-                    $q->where('username', $username)
-                      ->orWhere('name', 'LIKE', $likeName)
-                      ->orWhere('first_name', $username);
+                ->where(function ($q) use ($username) {
+                    $q->whereRaw('LOWER(username) = ?', [strtolower($username)])
+                      ->orWhereRaw('LOWER(SUBSTRING_INDEX(email, "@", 1)) = ?', [strtolower($username)])
+                      ->orWhereRaw('LOWER(name) = ?', [strtolower($username)]);
                 })
                 ->select(['id'])
                 ->first();

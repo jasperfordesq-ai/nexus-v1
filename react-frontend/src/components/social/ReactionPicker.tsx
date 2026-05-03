@@ -12,7 +12,7 @@
  * Tapping the same reaction again removes it.
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Tooltip } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
@@ -75,11 +75,15 @@ export function ReactionPicker({
   size = 'md',
 }: ReactionPickerProps) {
   const { t } = useTranslation('feed');
+  const pickerId = useId();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const isLongPressRef = useRef(false);
 
   // Cleanup timeouts on unmount
@@ -179,6 +183,64 @@ export function ReactionPicker({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isPickerOpen]);
 
+  /* ───── Keyboard navigation: arrows, Enter, Escape ───── */
+
+  // Focus the first or current reaction when picker opens via keyboard
+  useEffect(() => {
+    if (!isPickerOpen) {
+      setFocusedIndex(null);
+      return;
+    }
+    if (focusedIndex !== null) {
+      itemRefs.current[focusedIndex]?.focus();
+    }
+  }, [isPickerOpen, focusedIndex]);
+
+  const handleTriggerKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (!isAuthenticated || isDisabled) return;
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const startIdx = userReaction
+          ? Math.max(0, REACTION_CONFIGS.findIndex((r) => r.type === userReaction))
+          : 0;
+        setIsPickerOpen(true);
+        setFocusedIndex(startIdx);
+      } else if (e.key === 'Escape' && isPickerOpen) {
+        e.preventDefault();
+        setIsPickerOpen(false);
+        triggerRef.current?.focus();
+      }
+    },
+    [isAuthenticated, isDisabled, isPickerOpen, userReaction]
+  );
+
+  const handlePickerKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsPickerOpen(false);
+        triggerRef.current?.focus();
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setFocusedIndex((idx) => {
+          const cur = idx ?? 0;
+          const len = REACTION_CONFIGS.length;
+          return e.key === 'ArrowRight' ? (cur + 1) % len : (cur - 1 + len) % len;
+        });
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        setFocusedIndex(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        setFocusedIndex(REACTION_CONFIGS.length - 1);
+      }
+    },
+    []
+  );
+
   /* ───── Button content based on current reaction ───── */
 
   const currentConfig = userReaction ? REACTION_CONFIGS.find((r) => r.type === userReaction) : null;
@@ -241,9 +303,15 @@ export function ReactionPicker({
                 closeTimeoutRef.current = null;
               }
             }}
+            onKeyDown={handlePickerKeyDown}
           >
-            <div className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20">
-              {REACTION_CONFIGS.map((config) => (
+            <div
+              id={pickerId}
+              role="menu"
+              aria-label={t('reaction.react_to_post')}
+              className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20"
+            >
+              {REACTION_CONFIGS.map((config, idx) => (
                 <Tooltip
                   key={config.type}
                   content={t(config.label)}
@@ -253,6 +321,7 @@ export function ReactionPicker({
                   placement="top"
                 >
                   <motion.button
+                    ref={(el) => { itemRefs.current[idx] = el; }}
                     whileHover={{ scale: 1.35, y: -4 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
@@ -263,6 +332,9 @@ export function ReactionPicker({
                       }`}
                     onClick={() => handleSelectReaction(config.type)}
                     aria-label={t(config.label)}
+                    aria-pressed={userReaction === config.type}
+                    role="menuitem"
+                    tabIndex={focusedIndex === idx ? 0 : -1}
                     type="button"
                   >
                     {config.type === 'time_credit' ? (
@@ -280,6 +352,7 @@ export function ReactionPicker({
 
       {/* Main reaction button */}
       <Button
+        ref={triggerRef}
         size={size}
         variant="light"
         className={`flex-1 max-w-[140px] ${getReactionColor(userReaction)} transition-colors`}
@@ -300,8 +373,13 @@ export function ReactionPicker({
         onPress={handleQuickTap}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onKeyDown={handleTriggerKeyDown}
         isDisabled={!isAuthenticated || isDisabled}
         aria-label={userReaction ? t('reaction.click_to_remove', { label: buttonLabel }) : t('reaction.react_to_post')}
+        aria-haspopup="menu"
+        aria-expanded={isPickerOpen}
+        aria-controls={pickerId}
+        aria-pressed={userReaction !== null}
       >
         {buttonLabel}
       </Button>

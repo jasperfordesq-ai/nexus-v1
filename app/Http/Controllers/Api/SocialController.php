@@ -17,6 +17,7 @@ use App\Services\PostMediaService;
 use App\Services\ReactionService;
 use App\Services\SocialNotificationService;
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -678,9 +679,16 @@ class SocialController extends BaseApiController
 
         $targetType = $this->input('type', 'post');
         $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
-                       'challenge', 'volunteer', 'blog', 'discussion', 'badge_earned', 'level_up'];
+                       'challenge', 'volunteer', 'blog', 'discussion'];
         if (!in_array($targetType, $validTypes, true)) {
             $targetType = 'post';
+        }
+
+        // Verify the target actually exists in this tenant before writing to
+        // feed_hidden. Otherwise a malicious client could poison the table
+        // with arbitrary IDs to bias EdgeRank against unrelated content.
+        if (!FeedItemTables::exists($targetType, $id)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.post_not_found'), null, 404);
         }
 
         // Record as hidden (reuses feed_hidden table — the EdgeRank negative signal
@@ -706,9 +714,14 @@ class SocialController extends BaseApiController
         // can be hidden correctly. Falls back to 'post' for backward compatibility.
         $targetType = $this->input('type', 'post');
         $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
-                       'challenge', 'volunteer', 'blog', 'discussion', 'badge_earned', 'level_up'];
+                       'challenge', 'volunteer', 'blog', 'discussion'];
         if (!in_array($targetType, $validTypes, true)) {
             $targetType = 'post';
+        }
+
+        // Tenant-scoped existence check — see notInterested() above.
+        if (!FeedItemTables::exists($targetType, $id)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.post_not_found'), null, 404);
         }
 
         DB::table('feed_hidden')->insertOrIgnore([
@@ -755,14 +768,57 @@ class SocialController extends BaseApiController
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
 
-    /** POST /api/v2/feed/posts/{id}/impression */
+    /**
+     * POST /api/v2/feed/posts/{id}/impression — legacy post-only wrapper.
+     *
+     * Accepts an optional `type` body param so callers that already know the
+     * target type can fan out to listings/events/etc. without hitting a
+     * different route. Falls back to 'post' for backward-compat.
+     */
     public function recordImpression(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $targetType = $this->resolvePolymorphicType($this->input('type', 'post'));
         if ($userId && $id > 0) {
-            $this->feedRankingService->recordImpression($id, $userId);
+            $this->feedRankingService->recordImpression($id, $userId, $targetType);
         }
         return $this->respondWithData(['recorded' => true]);
+    }
+
+    /**
+     * POST /api/v2/feed/impression — polymorphic impression tracking.
+     *
+     * Body: { target_type: string, target_id: int }
+     * Validates target_type against ReactionService::VALID_TARGET_TYPES so
+     * EdgeRank gets a CTR signal across every reactable surface.
+     */
+    public function recordImpressionV2(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $targetType = $this->input('target_type', 'post');
+        $targetId = $this->inputInt('target_id');
+
+        if (!in_array($targetType, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
+        }
+        if ($targetId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target'), 'target_id', 400);
+        }
+
+        if ($userId) {
+            $this->feedRankingService->recordImpression($targetId, $userId, $targetType);
+        }
+        return $this->respondWithData(['recorded' => true]);
+    }
+
+    /**
+     * Normalise a free-form `type` body param to a value the ranking service
+     * can persist — anything not in ReactionService::VALID_TARGET_TYPES
+     * collapses to 'post' to keep the legacy endpoint forgiving.
+     */
+    private function resolvePolymorphicType(string $type): string
+    {
+        return in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true) ? $type : 'post';
     }
 
     /** POST /api/v2/feed/polls */
@@ -879,12 +935,40 @@ class SocialController extends BaseApiController
         return $this->respondWithData(['muted' => true, 'user_id' => (int) $id]);
     }
 
-    /** POST /api/v2/feed/posts/{id}/click */
+    /**
+     * POST /api/v2/feed/posts/{id}/click — legacy post-only wrapper.
+     * Accepts an optional `type` body param; see recordImpression() above.
+     */
     public function recordClick($id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $targetType = $this->resolvePolymorphicType($this->input('type', 'post'));
         if ($userId && (int) $id > 0) {
-            $this->feedRankingService->recordClick((int) $id, $userId);
+            $this->feedRankingService->recordClick((int) $id, $userId, $targetType);
+        }
+        return $this->respondWithData(['recorded' => true]);
+    }
+
+    /**
+     * POST /api/v2/feed/click — polymorphic click tracking.
+     *
+     * Body: { target_type: string, target_id: int }
+     */
+    public function recordClickV2(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $targetType = $this->input('target_type', 'post');
+        $targetId = $this->inputInt('target_id');
+
+        if (!in_array($targetType, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
+        }
+        if ($targetId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target'), 'target_id', 400);
+        }
+
+        if ($userId) {
+            $this->feedRankingService->recordClick($targetId, $userId, $targetType);
         }
         return $this->respondWithData(['recorded' => true]);
     }
@@ -1074,34 +1158,11 @@ class SocialController extends BaseApiController
     {
         try {
             $userId = $this->getOptionalUserId() ?? 0;
-
-            if (true /* CommentService injected via DI */) {
-                $comments = $this->commentService->fetchComments($targetType, $targetId, $userId);
-                return $this->respondWithData([
-                    'comments'            => $comments,
-                    'available_reactions' => $this->commentService->getAvailableReactions(),
-                ]);
-            }
-
-            $tenantId = $this->getTenantId();
-            $comments = DB::select(
-                "SELECT c.id, c.content, c.created_at, c.user_id,
-                    COALESCE(u.name, u.first_name, 'Unknown') as author_name,
-                    COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar
-                 FROM comments c LEFT JOIN users u ON c.user_id = u.id
-                 WHERE c.target_type = ? AND c.target_id = ? AND c.tenant_id = ? ORDER BY c.created_at ASC",
-                [$targetType, $targetId, $tenantId]
-            );
-
-            $comments = array_map(function ($c) use ($userId) {
-                $c = (array) $c;
-                $c['is_owner'] = ($userId && $c['user_id'] == $userId);
-                $c['reactions'] = [];
-                $c['replies'] = [];
-                return $c;
-            }, $comments);
-
-            return $this->respondWithData(['comments' => $comments]);
+            $comments = $this->commentService->fetchComments($targetType, $targetId, $userId);
+            return $this->respondWithData([
+                'comments'            => $comments,
+                'available_reactions' => $this->commentService->getAvailableReactions(),
+            ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Fetch Comments Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comments_failed'), null, 500);
@@ -1120,40 +1181,13 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content);
+            $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content);
 
-                if (($result['status'] ?? '') === 'success') {
-                    $this->notifyComment($userId, $targetType, $targetId, $content);
-                }
-
-                return $this->respondWithData($result);
+            if (($result['status'] ?? '') === 'success') {
+                $this->notifyComment($userId, $targetType, $targetId, $content);
             }
 
-            DB::table('comments')->insert([
-                'user_id'     => $userId,
-                'tenant_id'   => $tenantId,
-                'target_type' => $targetType,
-                'target_id'   => $targetId,
-                'content'     => $content,
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ]);
-
-            $this->notifyComment($userId, $targetType, $targetId, $content);
-
-            $user = DB::selectOne(
-                "SELECT COALESCE(name, CONCAT(first_name, ' ', last_name)) as name, avatar_url FROM users WHERE id = ?",
-                [$userId]
-            );
-
-            return $this->respondWithData([
-                'comment' => [
-                    'author_name'   => $user->name ?? 'Me',
-                    'author_avatar' => $user->avatar_url ?? '/assets/img/defaults/default_avatar.png',
-                    'content'       => $content,
-                ],
-            ]);
+            return $this->respondWithData($result);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Submit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comment_post_failed'), null, 500);
@@ -1336,34 +1370,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);
-                return $this->respondWithData($result);
-            }
-
-            $existing = DB::table('reactions')
-                ->where('user_id', $userId)
-                ->where('target_type', 'comment')
-                ->where('target_id', $commentId)
-                ->where('emoji', $emoji)
-                ->first();
-
-            if ($existing) {
-                DB::table('reactions')->where('id', $existing->id)->where('tenant_id', $tenantId)->delete();
-                $action = 'removed';
-            } else {
-                DB::table('reactions')->insert([
-                    'user_id'     => $userId,
-                    'tenant_id'   => $tenantId,
-                    'target_type' => 'comment',
-                    'target_id'   => $commentId,
-                    'emoji'       => $emoji,
-                    'created_at'  => now(),
-                ]);
-                $action = 'added';
-            }
-
-            return $this->respondWithData(['action' => $action]);
+            $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);
+            return $this->respondWithData($result);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Reaction Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reaction_failed'), null, 500);
@@ -1387,28 +1395,13 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
+            $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
 
-                if (($result['status'] ?? '') === 'success') {
-                    $this->notifyComment($userId, $targetType, $targetId, $content);
-                }
-
-                return $this->respondWithData($result);
+            if (($result['status'] ?? '') === 'success') {
+                $this->notifyComment($userId, $targetType, $targetId, $content);
             }
 
-            DB::table('comments')->insert([
-                'user_id'     => $userId,
-                'tenant_id'   => $tenantId,
-                'target_type' => $targetType,
-                'target_id'   => $targetId,
-                'parent_id'   => $parentId,
-                'content'     => $content,
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ]);
-
-            return $this->respondWithData(['message' => __('api.reply_posted')]);
+            return $this->respondWithData($result);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Reply Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reply_failed'), null, 500);
@@ -1429,22 +1422,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $result = $this->commentService->editComment($commentId, $userId, $content);
-                return $this->respondWithData($result);
-            }
-
-            $comment = DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->first();
-            if (! $comment || $comment->user_id != $userId) {
-                return $this->respondWithError('FORBIDDEN', __('api.social_edit_unauthorized'), null, 403);
-            }
-
-            DB::table('comments')
-                ->where('id', $commentId)
-                ->where('tenant_id', $tenantId)
-                ->update(['content' => $content, 'updated_at' => now()]);
-
-            return $this->respondWithData(['is_edited' => true]);
+            $result = $this->commentService->editComment($commentId, $userId, $content);
+            return $this->respondWithData($result);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Edit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_edit_failed'), null, 500);
@@ -1464,22 +1443,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $result = $this->commentService->deleteComment($commentId, $userId, $this->isUserAdmin());
-                return $this->respondWithData($result);
-            }
-
-            $comment = DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->first();
-            if (! $comment) {
-                return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
-            }
-            if ($comment->user_id != $userId && ! $this->isUserAdmin()) {
-                return $this->respondWithError('FORBIDDEN', __('api.social_comment_delete_unauthorized'), null, 403);
-            }
-
-            DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->delete();
-
-            return $this->respondWithData(['message' => __('api.comment_deleted_user')]);
+            $result = $this->commentService->deleteComment($commentId, $userId, $this->isUserAdmin());
+            return $this->respondWithData($result);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Delete Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comment_delete_failed'), null, 500);
@@ -1500,17 +1465,7 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (true /* CommentService injected via DI */) {
-                $users = $this->commentService->searchUsersForMention($query, $tenantId, 10);
-            } else {
-                $searchTerm = "%{$query}%";
-                $users = DB::select(
-                    "SELECT id, COALESCE(name, first_name) as name, avatar_url
-                     FROM users WHERE tenant_id = ? AND (name LIKE ? OR first_name LIKE ? OR username LIKE ?) LIMIT 10",
-                    [$tenantId, $searchTerm, $searchTerm, $searchTerm]
-                );
-                $users = array_map(fn ($u) => (array) $u, $users);
-            }
+            $users = $this->commentService->searchUsersForMention($query, $tenantId, 10);
 
             return $this->respondWithData(['users' => $users]);
         } catch (\Exception $e) {

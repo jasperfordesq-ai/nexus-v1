@@ -49,6 +49,7 @@ interface GroupTabContentProps {
   feedLoadingMore: boolean;
   onComposeOpen: () => void;
   onLoadMoreFeed: () => void;
+  onRefreshFeed?: () => void | Promise<void>;
   onToggleLike: (item: FeedItem) => void;
   onHidePost: (item: FeedItem) => void;
   onMuteUser: (userId: number) => void;
@@ -103,6 +104,7 @@ export function GroupTabContent({
   feedLoadingMore,
   onComposeOpen,
   onLoadMoreFeed,
+  onRefreshFeed,
   onToggleLike,
   onHidePost,
   onMuteUser,
@@ -168,6 +170,7 @@ export function GroupTabContent({
           onJoinLeave={onJoinLeave}
           onComposeOpen={onComposeOpen}
           onLoadMore={onLoadMoreFeed}
+          onRefresh={onRefreshFeed}
           onToggleLike={onToggleLike}
           onHidePost={onHidePost}
           onMuteUser={onMuteUser}

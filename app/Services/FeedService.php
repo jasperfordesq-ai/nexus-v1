@@ -337,53 +337,56 @@ class FeedService
             $sourcesByType[$row->source_type][] = (int) $row->source_id;
         }
 
-        // Batch load like counts
+        // Build a polymorphic where helper: (target_type=? AND target_id IN (...)) OR ... per type.
+        // One query covers every source_type in the feed page, replacing N per-type round trips.
+        $applyPolymorphicTargetFilter = function ($q) use ($sourcesByType) {
+            $q->where(function ($outer) use ($sourcesByType) {
+                foreach ($sourcesByType as $sType => $sIds) {
+                    $outer->orWhere(function ($inner) use ($sType, $sIds) {
+                        $inner->where('target_type', $sType)
+                              ->whereIn('target_id', $sIds);
+                    });
+                }
+            });
+        };
+
+        // Batch load like counts (single polymorphic query).
         $likeCounts = [];
-        foreach ($sourcesByType as $sType => $sIds) {
-            $counts = DB::table('likes')
-                ->selectRaw('target_id, COUNT(*) as cnt')
-                ->where('target_type', $sType)
-                ->whereIn('target_id', $sIds)
-                ->where('tenant_id', $tenantId)
-                ->groupBy('target_id')
-                ->pluck('cnt', 'target_id');
-            foreach ($counts as $targetId => $cnt) {
-                $likeCounts[$sType . ':' . $targetId] = (int) $cnt;
-            }
+        $likeCountRows = DB::table('likes')
+            ->selectRaw('target_type, target_id, COUNT(*) as cnt')
+            ->where('tenant_id', $tenantId)
+            ->tap($applyPolymorphicTargetFilter)
+            ->groupBy('target_type', 'target_id')
+            ->get();
+        foreach ($likeCountRows as $row) {
+            $likeCounts[$row->target_type . ':' . (int) $row->target_id] = (int) $row->cnt;
         }
 
-        // Batch load comment counts
+        // Batch load comment counts (single polymorphic query).
         $commentCounts = [];
-        foreach ($sourcesByType as $sType => $sIds) {
-            $countsQuery = DB::table('comments')
-                ->selectRaw('target_id, COUNT(*) as cnt')
-                ->where('target_type', $sType)
-                ->whereIn('target_id', $sIds)
-                ->where('tenant_id', $tenantId);
-            if ($commentsHasDeletedAt) {
-                $countsQuery->whereNull('deleted_at');
-            }
-            $counts = $countsQuery
-                ->groupBy('target_id')
-                ->pluck('cnt', 'target_id');
-            foreach ($counts as $targetId => $cnt) {
-                $commentCounts[$sType . ':' . $targetId] = (int) $cnt;
-            }
+        $commentCountQuery = DB::table('comments')
+            ->selectRaw('target_type, target_id, COUNT(*) as cnt')
+            ->where('tenant_id', $tenantId)
+            ->tap($applyPolymorphicTargetFilter)
+            ->groupBy('target_type', 'target_id');
+        if ($commentsHasDeletedAt) {
+            $commentCountQuery->whereNull('deleted_at');
+        }
+        foreach ($commentCountQuery->get() as $row) {
+            $commentCounts[$row->target_type . ':' . (int) $row->target_id] = (int) $row->cnt;
         }
 
-        // Batch load liked status for current user
+        // Batch load liked status for current user (single polymorphic query).
         $likedSet = [];
         if ($currentUserId) {
-            foreach ($sourcesByType as $sType => $sIds) {
-                $liked = DB::table('likes')
-                    ->where('user_id', $currentUserId)
-                    ->where('target_type', $sType)
-                    ->where('tenant_id', $tenantId)
-                    ->whereIn('target_id', $sIds)
-                    ->pluck('target_id');
-                foreach ($liked as $targetId) {
-                    $likedSet[$sType . ':' . $targetId] = true;
-                }
+            $likedRows = DB::table('likes')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $currentUserId)
+                ->tap($applyPolymorphicTargetFilter)
+                ->select('target_type', 'target_id')
+                ->get();
+            foreach ($likedRows as $row) {
+                $likedSet[$row->target_type . ':' . (int) $row->target_id] = true;
             }
         }
 
@@ -557,29 +560,44 @@ class FeedService
             // Single grouped query per type keeps hydration O(types).
             $sharerIdsToResolve = []; // user_id => true
             $latestSharerByItem = []; // "type:id" => ['user_id' => int, 'shared_at' => string]
+
+            // Collapse per-type loops into TWO polymorphic queries (profile + fallback)
+            // using a UNION-style approach via per-type OR clauses on a single SELECT.
+            $typesWithShares = []; // type => [ids...]
             foreach ($shareTypeToIds as $type => $ids) {
-                if (empty($ids)) {
-                    continue;
-                }
-                $idsWithShares = array_filter(
+                $idsWithShares = array_values(array_filter(
                     $ids,
                     fn ($id) => ($countMap[$type][$id] ?? 0) > 0
-                );
-                if (empty($idsWithShares)) {
-                    continue;
+                ));
+                if (!empty($idsWithShares)) {
+                    $typesWithShares[$type] = $idsWithShares;
                 }
-                // If the profile feed belongs to a specific user, prefer *their*
-                // shares so attribution on their profile reads "Shared by them".
+            }
+
+            if (!empty($typesWithShares)) {
+                // Helper: build a where-group that applies (original_type=? AND original_post_id IN (...))
+                // OR'd across each type — single query covers every shareable type at once.
+                $applyTypeFilter = function ($q) use ($typesWithShares) {
+                    $q->where(function ($outer) use ($typesWithShares) {
+                        foreach ($typesWithShares as $type => $ids) {
+                            $outer->orWhere(function ($inner) use ($type, $ids) {
+                                $inner->where('original_type', $type)
+                                      ->whereIn('original_post_id', $ids);
+                            });
+                        }
+                    });
+                };
+
+                // Profile-feed pass: prefer the profile owner's own reposts.
                 if ($profileUserId !== null) {
                     $profileRows = DB::table('post_shares')
                         ->where('tenant_id', $tenantId)
-                        ->where('original_type', $type)
-                        ->whereIn('original_post_id', array_values($idsWithShares))
                         ->where('user_id', (int) $profileUserId)
-                        ->select('original_post_id', 'user_id', 'created_at')
+                        ->tap($applyTypeFilter)
+                        ->select('original_type', 'original_post_id', 'user_id', 'created_at')
                         ->get();
                     foreach ($profileRows as $row) {
-                        $key = $type . ':' . (int) $row->original_post_id;
+                        $key = $row->original_type . ':' . (int) $row->original_post_id;
                         $latestSharerByItem[$key] = [
                             'user_id'   => (int) $row->user_id,
                             'shared_at' => (string) $row->created_at,
@@ -588,17 +606,16 @@ class FeedService
                     }
                 }
 
-                // Fallback: most recent non-self sharer for items we haven't covered yet.
-                $rows = DB::table('post_shares')
+                // Fallback pass: most-recent non-self sharer for each (type, id).
+                $fallbackRows = DB::table('post_shares')
                     ->where('tenant_id', $tenantId)
-                    ->where('original_type', $type)
-                    ->whereIn('original_post_id', array_values($idsWithShares))
                     ->when($currentUserId, fn ($q) => $q->where('user_id', '!=', $currentUserId))
-                    ->select('original_post_id', 'user_id', 'created_at')
+                    ->tap($applyTypeFilter)
+                    ->select('original_type', 'original_post_id', 'user_id', 'created_at')
                     ->orderByDesc('created_at')
                     ->get();
-                foreach ($rows as $row) {
-                    $key = $type . ':' . (int) $row->original_post_id;
+                foreach ($fallbackRows as $row) {
+                    $key = $row->original_type . ':' . (int) $row->original_post_id;
                     if (!isset($latestSharerByItem[$key])) {
                         $latestSharerByItem[$key] = [
                             'user_id'    => (int) $row->user_id,
@@ -658,24 +675,27 @@ class FeedService
                 }
             }
             if (!empty($typeIdPairs)) {
-                $bookmarkedByType = [];
-                foreach ($typeIdPairs as $bkType => $ids) {
-                    if (empty($ids)) {
-                        continue;
-                    }
-                    $rows = DB::table('bookmarks')
-                        ->where('user_id', $currentUserId)
-                        ->where('tenant_id', $tenantId)
-                        ->where('bookmarkable_type', $bkType)
-                        ->whereIn('bookmarkable_id', array_unique($ids))
-                        ->pluck('bookmarkable_id')
-                        ->all();
-                    $bookmarkedByType[$bkType] = array_flip($rows);
+                // Single polymorphic query across all bookmarkable types.
+                $bookmarkRows = DB::table('bookmarks')
+                    ->where('user_id', $currentUserId)
+                    ->where('tenant_id', $tenantId)
+                    ->where(function ($outer) use ($typeIdPairs) {
+                        foreach ($typeIdPairs as $bkType => $ids) {
+                            $outer->orWhere(function ($inner) use ($bkType, $ids) {
+                                $inner->where('bookmarkable_type', $bkType)
+                                      ->whereIn('bookmarkable_id', array_unique($ids));
+                            });
+                        }
+                    })
+                    ->select('bookmarkable_type', 'bookmarkable_id')
+                    ->get();
+                $bookmarkedSet = [];
+                foreach ($bookmarkRows as $row) {
+                    $bookmarkedSet[$row->bookmarkable_type . ':' . (int) $row->bookmarkable_id] = true;
                 }
                 foreach ($items as &$item) {
                     if (in_array($item['type'], $bookmarkableTypes, true)) {
-                        $set = $bookmarkedByType[$item['type']] ?? [];
-                        $item['is_bookmarked'] = isset($set[$item['id']]);
+                        $item['is_bookmarked'] = isset($bookmarkedSet[$item['type'] . ':' . (int) $item['id']]);
                     }
                 }
                 unset($item);

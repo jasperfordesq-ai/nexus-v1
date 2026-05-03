@@ -113,21 +113,34 @@ class PollService
         $isCreator = $currentUserId !== null && (int) $poll->user_id === (int) $currentUserId;
         $canSeeCounts = $isClosed || $isCreator;
 
-        $optionRows = DB::table('poll_options')
+        $rawOptions = DB::table('poll_options')
             ->where('poll_id', $id)
             ->where('tenant_id', $tenantId)
-            ->get()
-            ->map(fn ($o) => [
-                'id'         => $o->id,
-                'text'       => $o->label ?? $o->option_text ?? '',
-                'label'      => $o->label ?? $o->option_text ?? '',
-                'vote_count' => $canSeeCounts
-                    ? (int) DB::table('poll_votes')
-                        ->where('option_id', $o->id)
-                        ->where('tenant_id', $tenantId)
-                        ->count()
-                    : null,
-            ])->all();
+            ->get();
+
+        // Single GROUP BY query replaces 1-per-option count(): scoped to this poll's
+        // option ids AND tenant_id so cross-tenant rows can't leak in.
+        $voteCountByOption = [];
+        if ($canSeeCounts && $rawOptions->isNotEmpty()) {
+            $optionIds = $rawOptions->pluck('id')->all();
+            $voteCountByOption = DB::table('poll_votes')
+                ->where('tenant_id', $tenantId)
+                ->where('poll_id', $id)
+                ->whereIn('option_id', $optionIds)
+                ->selectRaw('option_id, COUNT(*) as cnt')
+                ->groupBy('option_id')
+                ->pluck('cnt', 'option_id')
+                ->all();
+        }
+
+        $optionRows = $rawOptions->map(fn ($o) => [
+            'id'         => $o->id,
+            'text'       => $o->label ?? $o->option_text ?? '',
+            'label'      => $o->label ?? $o->option_text ?? '',
+            'vote_count' => $canSeeCounts
+                ? (int) ($voteCountByOption[$o->id] ?? 0)
+                : null,
+        ])->all();
 
         // total_votes is safe to expose (only reveals participation volume,
         // not the distribution) — but per-option numbers stay hidden.

@@ -982,7 +982,14 @@ export function FeedPage() {
             <div className="flex-1 bg-theme-elevated rounded-full px-4 py-2.5 text-theme-subtle text-sm border border-theme-default hover:border-primary/30 transition-colors">
               {t('whats_on_your_mind')}
             </div>
-            <div className="flex gap-1">
+            {/*
+              Inner buttons must NOT bubble their click to the outer composer-trigger
+              row — otherwise tapping "image" or "poll" fires both inner and outer
+              handlers (opening the composer twice). stopPropagation on the wrapper
+              keeps inner button activations local while preserving keyboard support
+              on the outer surface.
+            */}
+            <div className="flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
               <Button
                 isIconOnly
                 size="sm"

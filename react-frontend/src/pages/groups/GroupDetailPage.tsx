@@ -1075,6 +1075,7 @@ export function GroupDetailPage() {
         feedLoadingMore={feedLoadingMore}
         onComposeOpen={onComposeOpen}
         onLoadMoreFeed={() => loadGroupFeed(true)}
+        onRefreshFeed={() => { feedCursorRef.current = undefined; return loadGroupFeed(false); }}
         onToggleLike={handleFeedToggleLike}
         onHidePost={handleFeedHidePost}
         onMuteUser={handleFeedMuteUser}

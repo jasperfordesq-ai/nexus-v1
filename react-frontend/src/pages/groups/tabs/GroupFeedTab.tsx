@@ -14,10 +14,14 @@ import Lock from 'lucide-react/icons/lock';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Plus from 'lucide-react/icons/plus';
 import TrendingUp from 'lucide-react/icons/trending-up';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useCallback } from 'react';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem } from '@/components/feed/types';
@@ -33,6 +37,8 @@ interface GroupFeedTabProps {
   onJoinLeave: () => void;
   onComposeOpen: () => void;
   onLoadMore: () => void;
+  /** Optional pull-to-refresh handler — when provided, mobile pull gesture refreshes the feed */
+  onRefresh?: () => void | Promise<void>;
   onToggleLike: (item: FeedItem) => void;
   onHidePost: (item: FeedItem) => void;
   onMuteUser: (userId: number) => void;
@@ -51,6 +57,7 @@ export function GroupFeedTab({
   onJoinLeave,
   onComposeOpen,
   onLoadMore,
+  onRefresh,
   onToggleLike,
   onHidePost,
   onMuteUser,
@@ -60,6 +67,21 @@ export function GroupFeedTab({
 }: GroupFeedTabProps) {
   const { t } = useTranslation('groups');
   const { user: currentUser, isAuthenticated } = useAuth();
+
+  // Infinite scroll: auto-trigger onLoadMore when sentinel hits viewport.
+  const handleLoadMore = useCallback(() => onLoadMore(), [onLoadMore]);
+  const infiniteScrollRef = useInfiniteScroll({
+    hasMore: feedHasMore,
+    isLoading: feedLoadingMore,
+    onLoadMore: handleLoadMore,
+  });
+
+  // Pull-to-refresh (mobile only) — no-op when no onRefresh callback supplied.
+  const handlePullRefresh = useCallback(async () => { if (onRefresh) await onRefresh(); }, [onRefresh]);
+  const { pullDistance, isRefreshing } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+    enabled: Boolean(onRefresh) && !feedLoading,
+  });
 
   if (!isMember) {
     return (
@@ -86,6 +108,16 @@ export function GroupFeedTab({
 
   return (
     <div className="space-y-4">
+      {/* Pull-to-refresh indicator (mobile only, only when onRefresh wired) */}
+      {onRefresh && (pullDistance > 0 || isRefreshing) && (
+        <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
+          <RefreshCw
+            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            aria-hidden="true"
+          />
+        </div>
+      )}
+
       {/* Create Post Button */}
       {isAuthenticated && (
         <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onComposeOpen}>
@@ -164,14 +196,16 @@ export function GroupFeedTab({
             ))}
           </AnimatePresence>
 
-          {feedHasMore && (
+          {/* Infinite scroll sentinel */}
+          {feedHasMore && <div ref={infiniteScrollRef} className="h-1" aria-hidden="true" />}
+
+          {feedHasMore && !feedLoadingMore && (
             <div className="pt-4 text-center">
               <Button
                 variant="bordered"
                 className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
                 onPress={onLoadMore}
-                isLoading={feedLoadingMore}
-                startContent={!feedLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+                startContent={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
               >
                 {t('detail.feed_load_more')}
               </Button>

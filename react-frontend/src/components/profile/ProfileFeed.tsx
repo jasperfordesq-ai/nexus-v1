@@ -20,6 +20,8 @@ import { FeedCard } from '@/components/feed/FeedCard';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FeedItem, PollData } from '@/components/feed/types';
@@ -123,9 +125,30 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     };
   }, [userId]);
 
-  // --- Feed action handlers (matching FeedPage patterns) ---
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
-  const handleToggleLike = async (item: FeedItem) => {
+  // Infinite scroll: auto-load when sentinel nears viewport
+  const handleLoadMore = useCallback(() => {
+    if (cursorRef.current) loadFeedRef.current(cursorRef.current);
+  }, []);
+  const infiniteScrollRef = useInfiniteScroll({
+    hasMore,
+    isLoading: isLoadingMore,
+    onLoadMore: handleLoadMore,
+  });
+
+  // Pull-to-refresh: touch gesture on mobile
+  const handlePullRefresh = useCallback(async () => { await loadFeedRef.current(); }, []);
+  const { pullDistance, isRefreshing } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+    enabled: !isLoading,
+  });
+
+  // --- Feed action handlers (matching FeedPage patterns).
+  // Wrapped in useCallback so FeedCard's React.memo isn't defeated by inline arrows.
+
+  const handleToggleLike = useCallback(async (item: FeedItem) => {
     if (!isAuthenticated) return;
     setItems((prev) =>
       prev.map((fi) =>
@@ -157,21 +180,22 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
             : fi
         )
       );
+      toastRef.current.error(tRef.current('like_failed'));
     }
-  };
+  }, [isAuthenticated]);
 
-  const handleHidePost = async (item: FeedItem) => {
+  const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('post_hidden'));
+      toastRef.current.success(tRef.current('post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toast.error(t('hide_failed'));
+      toastRef.current.error(tRef.current('hide_failed'));
     }
-  };
+  }, []);
 
-  const handleVotePoll = async (pollId: number, optionId: number) => {
+  const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
     try {
       const response = await api.post<PollData>(`/v2/feed/polls/${pollId}/vote`, {
         option_id: optionId,
@@ -187,9 +211,9 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('vote_failed'));
+      toastRef.current.error(tRef.current('vote_failed'));
     }
-  };
+  }, []);
 
   // Delete behaviour mirrors FeedPage: only feed posts have a polymorphic
   // /v2/feed/posts/{id}/delete endpoint. For non-post types (listing, event,
@@ -197,20 +221,28 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
   // underlying entity — that matches the user's expectation when clicking
   // "Remove from feed" from a profile timeline and avoids destroying records
   // that have their own dedicated delete flows.
-  const handleDeletePost = async (item: FeedItem) => {
+  const handleDeletePost = useCallback(async (item: FeedItem) => {
     if (item.type !== 'post') {
-      await handleHidePost(item);
+      // Inline the hide flow to avoid coupling to the other useCallback's identity.
+      try {
+        await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('post_hidden'));
+      } catch (err) {
+        logError('Failed to hide post', err);
+        toastRef.current.error(tRef.current('hide_failed'));
+      }
       return;
     }
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('post_deleted'));
+      toastRef.current.success(tRef.current('post_deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error(t('delete_failed'));
+      toastRef.current.error(tRef.current('delete_failed'));
     }
-  };
+  }, []);
 
   // --- Render ---
 
@@ -257,14 +289,24 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
 
   return (
     <div className="space-y-4">
+      {/* Pull-to-refresh indicator (mobile only) */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
+          <RefreshCw
+            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            aria-hidden="true"
+          />
+        </div>
+      )}
+
       <AnimatePresence mode="popLayout">
         {items.map((item) => (
           <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
             <FeedCard
               item={item}
-              onToggleLike={() => void handleToggleLike(item)}
-              onHidePost={() => void handleHidePost(item)}
-              onDeletePost={() => void handleDeletePost(item)}
+              onToggleLike={handleToggleLike}
+              onHidePost={handleHidePost}
+              onDeletePost={handleDeletePost}
               onVotePoll={handleVotePoll}
               feedMode="recent"
               isAuthenticated={isAuthenticated}
@@ -274,17 +316,25 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
         ))}
       </AnimatePresence>
 
-      {hasMore && (
+      {/* Infinite scroll sentinel */}
+      {hasMore && <div ref={infiniteScrollRef} className="h-1" aria-hidden="true" />}
+
+      {hasMore && !isLoadingMore && (
         <div className="pt-6 pb-2 text-center">
           <Button
             variant="bordered"
             className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
             onPress={() => void loadFeed(cursorRef.current)}
-            isLoading={isLoadingMore}
-            startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
+            startContent={<ChevronDown className="w-4 h-4" aria-hidden="true" />}
           >
             {t('load_more')}
           </Button>
+        </div>
+      )}
+
+      {isLoadingMore && (
+        <div className="space-y-4 pt-2">
+          {[1, 2].map((i) => <FeedSkeleton key={`load-more-${i}`} />)}
         </div>
       )}
     </div>

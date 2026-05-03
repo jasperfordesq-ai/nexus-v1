@@ -1020,14 +1020,18 @@ class FeedRankingService
     // TRACKING
     // =========================================================================
 
-    public function recordImpression(int $postId, int $userId): void
+    /**
+     * Polymorphic CTR tracking. $targetType defaults to 'post' for backwards
+     * compatibility — pre-existing post-only callers continue to work.
+     */
+    public function recordImpression(int $targetId, int $userId, string $targetType = 'post'): void
     {
-        if (!self::VIEW_TRACKING_ENABLED || $userId === 0 || $postId === 0) return;
+        if (!self::VIEW_TRACKING_ENABLED || $userId === 0 || $targetId === 0) return;
 
         $tenantId = TenantContext::getId();
 
-        // H2: Per-user per-post debounce — skip duplicate impressions within 5 minutes
-        $debounceKey = "imp:{$tenantId}:{$postId}:{$userId}";
+        // H2: Per-user per-target debounce — skip duplicate impressions within 5 minutes
+        $debounceKey = "imp:{$tenantId}:{$targetType}:{$targetId}:{$userId}";
         if (Cache::has($debounceKey)) return;
 
         // H3: GDPR — only track if user has analytics consent via cookie_consents table
@@ -1053,28 +1057,56 @@ class FeedRankingService
         }
 
         try {
-            DB::statement(
-                "INSERT INTO feed_impressions (post_id, user_id, tenant_id, created_at)
-                 VALUES (?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE view_count = view_count + 1, updated_at = NOW()",
-                [$postId, $userId, $tenantId]
-            );
+            // The target_type column is added by the
+            // 2026_05_03_120000_add_target_type_to_feed_impressions_clicks
+            // migration. Detect it so we don't break environments that
+            // haven't migrated yet.
+            $hasTypeColumn = \Illuminate\Support\Facades\Schema::hasColumn('feed_impressions', 'target_type');
+            if ($hasTypeColumn) {
+                DB::statement(
+                    "INSERT INTO feed_impressions (post_id, target_type, user_id, tenant_id, created_at)
+                     VALUES (?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE view_count = view_count + 1, updated_at = NOW()",
+                    [$targetId, $targetType, $userId, $tenantId]
+                );
+            } else {
+                // Pre-migration fallback: only persist post impressions to
+                // avoid foreign-key collisions across types.
+                if ($targetType !== 'post') return;
+                DB::statement(
+                    "INSERT INTO feed_impressions (post_id, user_id, tenant_id, created_at)
+                     VALUES (?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE view_count = view_count + 1, updated_at = NOW()",
+                    [$targetId, $userId, $tenantId]
+                );
+            }
             Cache::put($debounceKey, 1, now()->addMinutes(5));
         } catch (\Exception $e) {
             // Non-blocking
         }
     }
 
-    public function recordClick(int $postId, int $userId): void
+    public function recordClick(int $targetId, int $userId, string $targetType = 'post'): void
     {
-        if (!self::CLICK_TRACKING_ENABLED || $userId === 0 || $postId === 0) return;
+        if (!self::CLICK_TRACKING_ENABLED || $userId === 0 || $targetId === 0) return;
         try {
-            DB::statement(
-                "INSERT INTO feed_clicks (post_id, user_id, tenant_id, created_at)
-                 VALUES (?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE click_count = click_count + 1, updated_at = NOW()",
-                [$postId, $userId, TenantContext::getId()]
-            );
+            $hasTypeColumn = \Illuminate\Support\Facades\Schema::hasColumn('feed_clicks', 'target_type');
+            if ($hasTypeColumn) {
+                DB::statement(
+                    "INSERT INTO feed_clicks (post_id, target_type, user_id, tenant_id, created_at)
+                     VALUES (?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE click_count = click_count + 1, updated_at = NOW()",
+                    [$targetId, $targetType, $userId, TenantContext::getId()]
+                );
+            } else {
+                if ($targetType !== 'post') return;
+                DB::statement(
+                    "INSERT INTO feed_clicks (post_id, user_id, tenant_id, created_at)
+                     VALUES (?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE click_count = click_count + 1, updated_at = NOW()",
+                    [$targetId, $userId, TenantContext::getId()]
+                );
+            }
         } catch (\Exception $e) {
             // Non-blocking
         }

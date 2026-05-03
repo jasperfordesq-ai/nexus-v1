@@ -40,6 +40,8 @@ import { getAuthor } from '@/components/feed/types';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -122,12 +124,32 @@ export function HashtagPage() {
 
   useEffect(() => {
     cursorRef.current = undefined;
-    loadPostsRef.current(true);
+    setItems([]); // Clear previous tag's items so the user doesn't see stale posts during loading
+    loadPostsRef.current(false);
     return () => { abortRef.current?.abort(); };
   }, [tag]);
 
-  // Feed interactions
-  const handleToggleLike = async (item: FeedItem) => {
+  // Stable refs for toast/t so callbacks don't re-create when i18n loads.
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
+  // Infinite scroll: auto-load when sentinel nears viewport
+  const handleLoadMore = useCallback(() => { loadPostsRef.current(true); }, []);
+  const infiniteScrollRef = useInfiniteScroll({
+    hasMore,
+    isLoading: isLoadingMore,
+    onLoadMore: handleLoadMore,
+  });
+
+  // Pull-to-refresh: touch gesture on mobile
+  const handlePullRefresh = useCallback(async () => { await loadPostsRef.current(false); }, []);
+  const { pullDistance, isRefreshing } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+    enabled: !isLoading,
+  });
+
+  // Feed interactions — wrapped in useCallback to keep FeedCard's React.memo effective.
+  const handleToggleLike = useCallback(async (item: FeedItem) => {
     setItems((prev) =>
       prev.map((fi) =>
         fi.id === item.id && fi.type === item.type
@@ -137,7 +159,8 @@ export function HashtagPage() {
     );
     try {
       await api.post('/v2/feed/like', { target_type: item.type, target_id: item.id });
-    } catch {
+    } catch (err) {
+      logError('Failed to toggle like', err);
       setItems((prev) =>
         prev.map((fi) =>
           fi.id === item.id && fi.type === item.type
@@ -145,31 +168,45 @@ export function HashtagPage() {
             : fi
         )
       );
+      toastRef.current.error(tRef.current('toast.like_failed'));
     }
-  };
+  }, []);
 
-  const handleHidePost = async (item: FeedItem) => {
+  const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-    } catch { /* ignore */ }
-  };
+      toastRef.current.success(tRef.current('toast.post_hidden'));
+    } catch (err) {
+      logError('Failed to hide post', err);
+      toastRef.current.error(tRef.current('toast.hide_failed'));
+    }
+  }, []);
 
-  const handleMuteUser = async (userId: number) => {
+  const handleMuteUser = useCallback(async (item: FeedItem) => {
+    const userId = getAuthor(item).id;
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
       setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
-    } catch { /* ignore */ }
-  };
+      toastRef.current.success(tRef.current('toast.user_muted'));
+    } catch (err) {
+      logError('Failed to mute user', err);
+      toastRef.current.error(tRef.current('toast.mute_failed'));
+    }
+  }, []);
 
-  const handleDeletePost = async (item: FeedItem) => {
+  const handleDeletePost = useCallback(async (item: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
-      setItems((prev) => prev.filter((fi) => fi.id !== item.id));
-    } catch { /* ignore */ }
-  };
+      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toastRef.current.success(tRef.current('toast.deleted'));
+    } catch (err) {
+      logError('Failed to delete post', err);
+      toastRef.current.error(tRef.current('toast.delete_failed'));
+    }
+  }, []);
 
-  const handleVotePoll = async (pollId: number, optionId: number) => {
+  const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
     try {
       const response = await api.post<PollData>(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
       if (response.success && response.data) {
@@ -181,8 +218,11 @@ export function HashtagPage() {
           )
         );
       }
-    } catch { /* ignore */ }
-  };
+    } catch (err) {
+      logError('Failed to vote', err);
+      toastRef.current.error(tRef.current('toast.vote_failed'));
+    }
+  }, []);
 
   const openReportModal = useCallback((item: FeedItem) => {
     setReportPostId(item.id);
@@ -219,6 +259,16 @@ export function HashtagPage() {
       description={t("hashtag.page_description", { tag: tag || "" })}
     />
     <div className="max-w-2xl mx-auto space-y-5">
+      {/* Pull-to-refresh indicator (mobile only) */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
+          <RefreshCw
+            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            aria-hidden="true"
+          />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link to={tenantPath('/feed')}>
@@ -280,11 +330,11 @@ export function HashtagPage() {
                   <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
                     <FeedCard
                       item={item}
-                      onToggleLike={() => handleToggleLike(item)}
-                      onHidePost={() => handleHidePost(item)}
-                      onMuteUser={() => handleMuteUser(getAuthor(item).id)}
+                      onToggleLike={handleToggleLike}
+                      onHidePost={handleHidePost}
+                      onMuteUser={handleMuteUser}
                       onReportPost={openReportModal}
-                      onDeletePost={() => handleDeletePost(item)}
+                      onDeletePost={handleDeletePost}
                       onVotePoll={handleVotePoll}
                       feedMode="recent"
                       isAuthenticated={isAuthenticated}
@@ -294,17 +344,27 @@ export function HashtagPage() {
                 ))}
               </AnimatePresence>
 
-              {hasMore && (
+              {/* Infinite scroll sentinel */}
+              {hasMore && <div ref={infiniteScrollRef} className="h-1" aria-hidden="true" />}
+
+              {/* Manual fallback button for users without IO support / for accessibility */}
+              {hasMore && !isLoadingMore && (
                 <div className="pt-6 pb-2 text-center">
                   <Button
                     variant="bordered"
                     className="border-[var(--border-default)] text-[var(--text-muted)]"
                     onPress={() => loadPosts(true)}
-                    isLoading={isLoadingMore}
-                    startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+                    startContent={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
                   >
                     {t('hashtag.load_more')}
                   </Button>
+                </div>
+              )}
+
+              {/* Pagination loading indicator */}
+              {isLoadingMore && (
+                <div className="space-y-4 pt-2">
+                  {[0, 1].map((i) => <FeedSkeleton key={`load-more-skeleton-${i}`} index={i} />)}
                 </div>
               )}
             </div>

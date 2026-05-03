@@ -66,6 +66,7 @@ import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
+import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 import { useLongPress } from '@/hooks/useLongPress';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
@@ -629,43 +630,38 @@ const FeedCard = React.memo(function FeedCard({
     };
   }, []);
 
-  // View tracking — fire once per session per post when entering viewport
+  // View tracking — fire once per session per post when entering viewport.
+  // Uses the shared IntersectionObserver so a 50-card feed registers ONE observer
+  // for all view-tracking instead of 50 separate ones.
   const viewTrackedRef = useRef(false);
-  const viewTargetRef = useRef<HTMLDivElement | null>(null);
 
+  // Reset tracking flag whenever the item changes.
   useEffect(() => {
-    // Reset tracking flag when item changes
     viewTrackedRef.current = false;
-
-    const el = viewTargetRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && !viewTrackedRef.current) {
-          viewTrackedRef.current = true;
-          api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
-          observer.disconnect();
-
-          // Trigger confetti for milestone items on first view
-          const isMilestone = item.type === 'badge_earned' || item.type === 'level_up';
-          if (isMilestone && !confettiTriggeredRef.current) {
-            confettiTriggeredRef.current = true;
-            const t1 = setTimeout(() => { setShowConfetti(true); }, 300);
-            const t2 = setTimeout(() => {
-              setShowConfetti(false);
-              confettiTimeoutRefs.current = confettiTimeoutRefs.current.filter(id => id !== t1 && id !== t2);
-            }, 2000);
-            confettiTimeoutRefs.current.push(t1, t2);
-          }
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-
-    return () => observer.disconnect();
   }, [item.id, item.type]);
+
+  const handleViewEntry = useCallback(
+    (entry: IntersectionObserverEntry) => {
+      if (!entry.isIntersecting || viewTrackedRef.current) return;
+      viewTrackedRef.current = true;
+      api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
+
+      // Trigger confetti for milestone items on first view
+      const isMilestone = item.type === 'badge_earned' || item.type === 'level_up';
+      if (isMilestone && !confettiTriggeredRef.current) {
+        confettiTriggeredRef.current = true;
+        const t1 = setTimeout(() => { setShowConfetti(true); }, 300);
+        const t2 = setTimeout(() => {
+          setShowConfetti(false);
+          confettiTimeoutRefs.current = confettiTimeoutRefs.current.filter(id => id !== t1 && id !== t2);
+        }, 2000);
+        confettiTimeoutRefs.current.push(t1, t2);
+      }
+    },
+    [item.id, item.type]
+  );
+
+  const setViewRef = useSharedFeedObserver(handleViewEntry, { threshold: 0.5 });
 
   const author = getAuthor(item);
   const isOwnPost = currentUserId === author.id;
@@ -819,7 +815,7 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   return (
-    <GlassCard ref={(el: HTMLDivElement | null) => { (trackingRef as React.MutableRefObject<HTMLDivElement | null>).current = el; viewTargetRef.current = el; }} hoverable className="overflow-hidden group relative">
+    <GlassCard ref={(el: HTMLDivElement | null) => { trackingRef(el); setViewRef(el); }} hoverable className="overflow-hidden group relative">
       {/* Long-press touch target for mobile context menu */}
       <div onTouchStart={longPressHandlers.onTouchStart} onTouchMove={longPressHandlers.onTouchMove} onTouchEnd={longPressHandlers.onTouchEnd}>
       {/* Confetti celebration overlay for milestones */}
