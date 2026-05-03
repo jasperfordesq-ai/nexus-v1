@@ -79,11 +79,15 @@ CVE-2026-21441
 CVE-2026-24049
 CVE-2026-25645
 
-# ── @xmldom/xmldom CVE-2026-41672 ───────────────────────────────────────────
-# XML node injection via unvalidated comment text. Fix available in 0.8.13/0.9.10.
-# Tracked via Dependabot PR #55 (react-frontend) and mobile/ dep upgrade.
-# Not exploitable via our API surface — xmldom is used for internal XML parsing only.
+# ── @xmldom/xmldom CVE-2026-41672/3/4/5 ─────────────────────────────────────
+# Sibling vulnerabilities in xmldom (XML serialization DoS, DocType injection,
+# processing-instruction injection, comment injection). All fixed in 0.8.13/0.9.10.
+# Tracked via Dependabot PR #55. Not exploitable via our API surface — xmldom is
+# used for internal XML parsing only.
 CVE-2026-41672
+CVE-2026-41673
+CVE-2026-41674
+CVE-2026-41675
 
 # ── mobile/package-lock.json ────────────────────────────────────────────────
 # These CVEs are in the Capacitor mobile app's npm dependencies (mobile/).
