@@ -2,7 +2,7 @@
 # =============================================================================
 # Project NEXUS - Safe Production Deploy Script (Orchestrator)
 # =============================================================================
-# Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--detach] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]
+# Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--no-migrate] [--detach] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]
 #
 # Modes:
 #   auto      - AUTO-DETECT: inspects git diff vs origin/main, picks quick or full (RECOMMENDED)
@@ -18,7 +18,8 @@
 #   All other changes → quick (PHP code is volume-mounted, not baked into image)
 #
 # Flags:
-#   --migrate  - Also run `php artisan migrate --force` (Laravel migrations)
+#   --migrate     - Run `php artisan migrate --force` (now the default; flag is a no-op)
+#   --no-migrate  - Skip migrations for this deploy (rare; use only for emergency rollbacks)
 #   --no-cache - Force Docker builds without layer caching (default for full mode)
 #   --detach   - Run deploy in background, detached from terminal/SSH.
 #   --skip-prerender  - Skip post-deploy per-tenant pre-rendering
@@ -50,7 +51,10 @@ mkdir -p "$LOG_DIR"
 
 # Parse mode and flags
 MODE="${1:-quick}"
-LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
+# Migrations run automatically by default. Pass --no-migrate to skip
+# (e.g. emergency rollback). This is the canonical behaviour — schema
+# changes belong in the same deploy unit as the code that depends on them.
+LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-1}"
 DETACH=0
 FORCE_NO_CACHE=0
 SKIP_PRERENDER="${SKIP_PRERENDER:-0}"
@@ -61,7 +65,8 @@ PRERENDER_ROUTES="${PRERENDER_ROUTES:-}"
 shift 2>/dev/null || true
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --migrate) LARAVEL_MIGRATE=1 ;;
+        --migrate) LARAVEL_MIGRATE=1 ;;        # accepted as no-op (default)
+        --no-migrate) LARAVEL_MIGRATE=0 ;;     # opt out (rare)
         --detach|-d) DETACH=1 ;;
         --no-cache) FORCE_NO_CACHE=1 ;;
         --skip-prerender) SKIP_PRERENDER=1 ;;
@@ -227,7 +232,7 @@ case "$MODE" in
         ;;
     *)
         log_err "Invalid mode: $MODE"
-        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]"
+        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--no-migrate] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]"
         exit 1
         ;;
 esac

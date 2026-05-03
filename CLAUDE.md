@@ -489,6 +489,8 @@ sudo bash scripts/maintenance.sh status
 **Blue-green path (production — when `NEXUS_APACHE_ROUTES_FILE` is set):**
 The deploy script does NOT use maintenance mode. The inactive color builds and tests while the live color keeps serving. Maintenance mode is not touched at any point.
 
+**Migrations run automatically.** As of 2026-05-03, `safe-deploy.sh auto` and `bluegreen-deploy.sh deploy` run `php artisan migrate --force` against the new color before the traffic switch. Pass `--no-migrate` only for emergency rollback deploys where the schema must stay frozen. Schema changes belong in the same deploy unit as the code that depends on them.
+
 **Maintenance-mode path (fallback — when `NEXUS_APACHE_ROUTES_FILE` is NOT set):**
 `scripts/safe-deploy.sh` automatically:
 1. **Enables** maintenance mode (both layers) at the start of every deployment

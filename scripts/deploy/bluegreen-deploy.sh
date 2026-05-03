@@ -42,7 +42,10 @@ fi
 APACHE_CONFIGTEST="${NEXUS_APACHE_CONFIGTEST:-apachectl configtest}"
 APACHE_RELOAD="${NEXUS_APACHE_RELOAD:-systemctl reload apache2}"
 ACTIVE_COLOR_DEFAULT="${NEXUS_ACTIVE_COLOR_DEFAULT:-blue}"
-LARAVEL_MIGRATE=0
+# Migrations run automatically by default. Pass --no-migrate to skip
+# (e.g. for emergency rollback deploys where the schema must stay).
+# This is the canonical behaviour — migrations are part of the deploy unit.
+LARAVEL_MIGRATE=1
 DETACH=0
 SKIP_PRERENDER=0
 FORCE_PRERENDER=0
@@ -88,7 +91,8 @@ parse_flags() {
     shift || true
     while [ "$#" -gt 0 ]; do
         case "$1" in
-            --migrate) LARAVEL_MIGRATE=1 ;;
+            --migrate) LARAVEL_MIGRATE=1 ;;        # accepted as no-op (default)
+            --no-migrate) LARAVEL_MIGRATE=0 ;;     # opt out (rare)
             --detach|-d) DETACH=1 ;;
             --skip-prerender) SKIP_PRERENDER=1 ;;
             --force-prerender) FORCE_PRERENDER=1 ;;
