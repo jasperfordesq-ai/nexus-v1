@@ -478,12 +478,12 @@ export function NationalKissDashboardPage() {
             >
               <TableHeader>
                 <TableColumn onClick={() => handleSort('name')} className="cursor-pointer">Cooperative</TableColumn>
-                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right" title="Total verified care hours in the selected period">Hours ↕</TableColumn>
-                <TableColumn title="Active member count shown as a privacy-preserving bracket">Members</TableColumn>
-                <TableColumn title="Care recipients reached (privacy-preserving bracket)">Recipients</TableColumn>
-                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right" title="Recurring helper/recipient pairs with 2+ completed exchanges">Tandems ↕</TableColumn>
-                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right" title="% of members active in both this period and the prior equivalent period">Retention ↕</TableColumn>
-                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right" title="% of supporters who also received hours in the period — indicates mutual exchange health">Reciprocity ↕</TableColumn>
+                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right"><span title="Total verified care hours in the selected period">Hours ↕</span></TableColumn>
+                <TableColumn><span title="Active member count shown as a privacy-preserving bracket">Members</span></TableColumn>
+                <TableColumn><span title="Care recipients reached (privacy-preserving bracket)">Recipients</span></TableColumn>
+                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right"><span title="Recurring helper/recipient pairs with 2+ completed exchanges">Tandems ↕</span></TableColumn>
+                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right"><span title="% of members active in both this period and the prior equivalent period">Retention ↕</span></TableColumn>
+                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right"><span title="% of supporters who also received hours in the period — indicates mutual exchange health">Reciprocity ↕</span></TableColumn>
                 <TableColumn>Status</TableColumn>
               </TableHeader>
               <TableBody>

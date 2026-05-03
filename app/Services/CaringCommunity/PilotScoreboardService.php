@@ -485,10 +485,10 @@ class PilotScoreboardService
             foreach (DB::table('messages')
                 ->where('tenant_id', $tenantId)
                 ->where('created_at', '>=', $windowStart)
-                ->select(['from_user_id', 'to_user_id'])
+                ->select(['sender_id', 'receiver_id'])
                 ->get() as $r) {
-                if (!empty($r->from_user_id)) $engaged[(int) $r->from_user_id] = true;
-                if (!empty($r->to_user_id))   $engaged[(int) $r->to_user_id]   = true;
+                if (!empty($r->sender_id))   $engaged[(int) $r->sender_id]   = true;
+                if (!empty($r->receiver_id)) $engaged[(int) $r->receiver_id] = true;
             }
         }
         if (Schema::hasTable('transactions')) {
@@ -572,11 +572,11 @@ class PilotScoreboardService
             foreach (DB::table('merchant_coupons')
                 ->where('tenant_id', $tenantId)
                 ->where('created_at', '>=', $windowStart)
-                ->select('user_id')
+                ->select('seller_id')
                 ->distinct()
                 ->get() as $r) {
-                if (!empty($r->user_id)) {
-                    $ids['merchant_' . (int) $r->user_id] = true;
+                if (!empty($r->seller_id)) {
+                    $ids['merchant_' . (int) $r->seller_id] = true;
                 }
             }
         }

@@ -87,6 +87,27 @@ const STATUS_LABELS: Record<SectionStatus, string> = {
   blocked: 'Blocked',
 };
 
+const MISSING_LABELS: Record<string, string> = {
+  'controller.name': 'Controller name',
+  'controller.contact_email': 'Controller contact email',
+  'controller.data_protection_officer': 'Data protection officer',
+  'incident_response.contact_email': 'Incident response contact email',
+  workshop_not_run: 'Operating policy workshop not run',
+  policy_appendix_url: 'Policy appendix URL',
+  safeguarding_escalation_user_id: 'Safeguarding escalation contact',
+  acknowledgement: 'Coordinator acknowledgement',
+  pre_pilot_baseline: 'Pre-pilot scoreboard baseline',
+  danger_checks: 'Data quality issues',
+  backlog_empty: 'Integration backlog empty',
+};
+
+function humanizeMissing(slug: string): string {
+  if (MISSING_LABELS[slug]) return MISSING_LABELS[slug];
+  return slug
+    .replace(/[._]/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function statusIcon(status: SectionStatus) {
   if (status === 'ready') return <CheckCircle2 size={20} className="text-success" />;
   if (status === 'blocked') return <ShieldAlert size={20} className="text-danger" />;
@@ -429,7 +450,7 @@ export default function PilotLaunchReadinessAdminPage() {
                           variant="dot"
                           color={section.status === 'blocked' ? 'danger' : 'warning'}
                         >
-                          {item}
+                          {humanizeMissing(item)}
                         </Chip>
                       ))}
                       {section.missing.length > 8 && (
