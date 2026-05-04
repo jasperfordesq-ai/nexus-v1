@@ -277,6 +277,7 @@ container_name() {
 wait_for_container_health() {
     local container="$1"
     local deadline=$((SECONDS + 180))
+    local grace_until=$((SECONDS + 30))
     local status
 
     while [ "$SECONDS" -lt "$deadline" ]; do
@@ -286,12 +287,22 @@ wait_for_container_health() {
                 log_ok "$container is $status"
                 return 0
                 ;;
-            unhealthy|exited|dead|missing)
-                if [ "$status" != "missing" ]; then
-                    log_err "$container is $status"
-                    docker logs --tail 80 "$container" 2>/dev/null || true
-                    return 1
+            unhealthy|exited|dead)
+                # During the first 30s we forgive "unhealthy" — fresh containers
+                # often report stale status from before the new instance had a
+                # chance to run its first health probe. After grace, treat it
+                # as a real failure.
+                if [ "$SECONDS" -lt "$grace_until" ]; then
+                    sleep 3
+                    continue
                 fi
+                log_err "$container is $status"
+                docker logs --tail 80 "$container" 2>/dev/null || true
+                return 1
+                ;;
+            missing)
+                # Docker may briefly report missing during a recreate.
+                : # fall through to sleep
                 ;;
         esac
         sleep 3
@@ -601,7 +612,19 @@ start_workers_for_color() {
     export BUILD_COMMIT="${commit:0:12}"
 
     phase "Start Workers ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
-    compose_for_release "$release_dir" up -d queue scheduler
+
+    # Remove any stale worker containers (e.g. left in Exited state by a prior
+    # aborted deploy or built against an image tag that no longer exists).
+    # `compose up -d` won't recreate a container that's just stopped — it tries
+    # to `docker start` it, which fails if the image is gone, leaving a stuck
+    # "Exited" container that blocks the new one. `docker rm -f` is idempotent.
+    docker rm -f "$(container_name "$color" queue)" >/dev/null 2>&1 || true
+    docker rm -f "$(container_name "$color" scheduler)" >/dev/null 2>&1 || true
+
+    # --force-recreate guarantees a clean container even if compose decides the
+    # config is unchanged. Without it, an existing healthy-but-stale container
+    # could be reused.
+    compose_for_release "$release_dir" up -d --force-recreate queue scheduler
     wait_for_container_health "$(container_name "$color" queue)"
     wait_for_container_health "$(container_name "$color" scheduler)"
     log_ok "Queue and scheduler workers are healthy for $color"
