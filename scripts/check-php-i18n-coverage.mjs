@@ -4,20 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * check-php-i18n-coverage.mjs — Verify every __() and trans() key in PHP
- * code resolves to a value in lang/en/*.json or lang/en/*.php.
- *
- * Catches the class of bug where email listeners call
- * __('emails_misc.admin_notify.new_user_title') but the key is missing
- * or the locale file isn't loaded — rendering raw keys in sent emails.
- *
- * Walks app/ and src/ (both Laravel and legacy dirs).
- * Uses a ratcheting baseline at .github/php-i18n-baseline.json.
+ * Verify every static __(), trans(), and Lang::get() PHP translation key resolves
+ * to lang/en/*.json or lang/en/*.php.
  *
  * Usage:
- *   node scripts/check-php-i18n-coverage.mjs          # check vs baseline
- *   node scripts/check-php-i18n-coverage.mjs --list   # list missing keys
- *   node scripts/check-php-i18n-coverage.mjs --baseline  # regenerate baseline
+ *   node scripts/check-php-i18n-coverage.mjs            # check vs baseline
+ *   node scripts/check-php-i18n-coverage.mjs --list     # list missing keys
+ *   node scripts/check-php-i18n-coverage.mjs --baseline # regenerate baseline
  */
 
 import fs from 'fs';
@@ -33,78 +26,115 @@ const BASELINE = path.join(ROOT, '.github/php-i18n-baseline.json');
 function flatten(obj, prefix = '', out = new Set()) {
   for (const [k, v] of Object.entries(obj)) {
     const p = prefix ? `${prefix}.${k}` : k;
-    if (v !== null && typeof v === 'object' && !Array.isArray(v)) flatten(v, p, out);
-    else out.add(p);
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      flatten(v, p, out);
+    } else {
+      out.add(p);
+    }
   }
   return out;
 }
 
 function parsePhpReturnArray(text) {
-  // Very small heuristic PHP array parser. Extracts top-level and nested string keys.
-  // Good enough for lang files which are "return ['key' => 'value', 'section' => ['nested' => '...']]".
-  // Returns a Set of dotted keys.
   const keys = new Set();
-  // Strip PHP comments
-  const src = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').replace(/#[^\n]*/g, '');
-  // Walk character-by-character tracking depth and key/value positions
-  // We only track keys before '=>'
-  const stack = [];
-  let i = 0;
-  const n = src.length;
-  while (i < n) {
-    const ch = src[i];
-    if (ch === '[') {
-      stack.push({ expectingKey: true, currentKey: null });
-      i++;
-      continue;
-    }
-    if (ch === ']') {
-      stack.pop();
-      i++;
-      continue;
-    }
-    if (!stack.length) { i++; continue; }
-    const top = stack[stack.length - 1];
-    if (ch === "'" || ch === '"') {
-      const q = ch;
-      let j = i + 1;
-      let str = '';
-      while (j < n && src[j] !== q) {
-        if (src[j] === '\\' && j + 1 < n) { str += src[j + 1]; j += 2; }
-        else { str += src[j]; j++; }
+  const src = text
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/[^\n]*/gm, '')
+    .replace(/^\s*#[^\n]*/gm, '');
+  let i = src.indexOf('[');
+
+  function skipWhitespace() {
+    while (i < src.length && /\s/.test(src[i])) i++;
+  }
+
+  function readString() {
+    const quote = src[i];
+    if (quote !== "'" && quote !== '"') return null;
+    i++;
+    let out = '';
+    while (i < src.length) {
+      const ch = src[i++];
+      if (ch === '\\' && i < src.length) {
+        out += src[i++];
+      } else if (ch === quote) {
+        return out;
+      } else {
+        out += ch;
       }
-      i = j + 1;
-      if (top.expectingKey) {
-        top.currentKey = str;
-      }
-      continue;
     }
-    if (ch === '=' && src[i + 1] === '>') {
-      i += 2;
-      if (top.currentKey !== null) {
-        // Look ahead: is value a '[' (nested)?
-        let j = i;
-        while (j < n && /\s/.test(src[j])) j++;
-        const pathSoFar = stack.slice(0, -1).map((f) => f.currentKey).filter(Boolean).concat(top.currentKey).join('.');
-        if (src[j] === '[') {
-          // Nested — push fake frame with current key as prefix will be applied on pop
-          // Don't add to keys yet; descend
-          // Keep currentKey so children frames can see it via stack
+    return out;
+  }
+
+  function skipValue() {
+    let depth = 0;
+    let quote = null;
+    while (i < src.length) {
+      const ch = src[i];
+      if (quote) {
+        i++;
+        if (ch === '\\' && i < src.length) i++;
+        else if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === "'" || ch === '"') {
+        quote = ch;
+        i++;
+        continue;
+      }
+      if (ch === '[') {
+        depth++;
+        i++;
+        continue;
+      }
+      if (ch === ']') {
+        if (depth === 0) return;
+        depth--;
+        i++;
+        continue;
+      }
+      if (ch === ',' && depth === 0) return;
+      i++;
+    }
+  }
+
+  function parseArray(prefix = []) {
+    if (src[i] !== '[') return;
+    i++;
+    while (i < src.length) {
+      skipWhitespace();
+      if (src[i] === ']') {
+        i++;
+        return;
+      }
+
+      const keyStart = i;
+      const key = readString();
+      if (key === null) {
+        skipValue();
+      } else {
+        skipWhitespace();
+        if (src[i] === '=' && src[i + 1] === '>') {
+          i += 2;
+          skipWhitespace();
+          const pathSoFar = [...prefix, key];
+          if (src[i] === '[') {
+            parseArray(pathSoFar);
+          } else {
+            keys.add(pathSoFar.join('.'));
+            skipValue();
+          }
         } else {
-          keys.add(pathSoFar);
+          i = keyStart;
+          skipValue();
         }
       }
-      top.expectingKey = false;
-      continue;
+
+      skipWhitespace();
+      if (src[i] === ',') i++;
     }
-    if (ch === ',') {
-      top.expectingKey = true;
-      top.currentKey = null;
-      i++;
-      continue;
-    }
-    i++;
   }
+
+  if (i >= 0) parseArray();
   return keys;
 }
 
@@ -119,12 +149,10 @@ function loadNamespaces() {
       nss.set(ns, flatten(data));
     } else if (file.endsWith('.php')) {
       const ns = file.replace('.php', '');
-      try {
-        const keys = parsePhpReturnArray(fs.readFileSync(full, 'utf8'));
-        const existing = nss.get(ns) || new Set();
-        for (const k of keys) existing.add(k);
-        nss.set(ns, existing);
-      } catch {}
+      const keys = parsePhpReturnArray(fs.readFileSync(full, 'utf8'));
+      const existing = nss.get(ns) || new Set();
+      for (const k of keys) existing.add(k);
+      nss.set(ns, existing);
     }
   }
   return nss;
@@ -132,12 +160,12 @@ function loadNamespaces() {
 
 function walkPhp(dir, out = []) {
   if (!fs.existsSync(dir)) return out;
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) {
-      if (e.name === 'vendor' || e.name === 'node_modules' || e.name.startsWith('.')) continue;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'vendor' || entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
       walkPhp(p, out);
-    } else if (e.isFile() && e.name.endsWith('.php')) {
+    } else if (entry.isFile() && entry.name.endsWith('.php')) {
       out.push(p);
     }
   }
@@ -146,19 +174,21 @@ function walkPhp(dir, out = []) {
 
 function extractCalls(src) {
   const calls = [];
-  // __('key'...) or trans('key'...) or Lang::get('key'...) — only static strings
+  const scanSrc = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/[^\n]*/gm, '')
+    .replace(/^\s*#[^\n]*/gm, '');
   const re = /(?:\b__|\btrans|Lang::(?:get|has|trans))\(\s*(['"])([^'"\n]+)\1/g;
-  let m;
-  while ((m = re.exec(src)) !== null) {
-    const key = m[2];
-    // Skip keys that don't look like namespaced translation keys
+  let match;
+  while ((match = re.exec(scanSrc)) !== null) {
+    const key = match[2];
     if (!key.includes('.')) continue;
-    // Skip dynamic keys (PHP string interpolation: "foo.{$var}_bar" or "foo.$var")
+    const nextToken = scanSrc.slice(re.lastIndex).match(/^\s*(.)/);
+    if (nextToken?.[1] === '.') continue;
     if (key.includes('{$') || key.includes('{')) continue;
     if (/\$\w/.test(key)) continue;
-    // Skip keys that end in '.' (truncated by concatenation)
     if (key.endsWith('.')) continue;
-    const lineNum = src.slice(0, m.index).split('\n').length;
+    const lineNum = scanSrc.slice(0, match.index).split('\n').length;
     calls.push({ key, line: lineNum });
   }
   return calls;
@@ -169,32 +199,30 @@ const listMode = args.includes('--list');
 const baselineMode = args.includes('--baseline');
 
 const namespaces = loadNamespaces();
-
 const files = PHP_DIRS.flatMap((d) => walkPhp(d));
 const missing = [];
+
 for (const file of files) {
   const rel = path.relative(ROOT, file).replace(/\\/g, '/');
   const src = fs.readFileSync(file, 'utf8');
-  const calls = extractCalls(src);
-  for (const c of calls) {
-    const firstDot = c.key.indexOf('.');
-    const ns = c.key.slice(0, firstDot);
-    const rest = c.key.slice(firstDot + 1);
+  for (const call of extractCalls(src)) {
+    const firstDot = call.key.indexOf('.');
+    const ns = call.key.slice(0, firstDot);
+    const rest = call.key.slice(firstDot + 1);
     const keyset = namespaces.get(ns);
-    if (!keyset) continue; // unknown namespace — don't flag (could be validation.*, auth.*, etc. Laravel built-ins)
+    if (!keyset) continue;
     if (!keyset.has(rest)) {
-      missing.push({ ns, key: rest, full: c.key, file: rel, line: c.line });
+      missing.push({ ns, key: rest, full: call.key, file: rel, line: call.line });
     }
   }
 }
 
 const unique = [];
 const seen = new Set();
-for (const m of missing) {
-  const id = m.full;
-  if (seen.has(id)) continue;
-  seen.add(id);
-  unique.push(m);
+for (const item of missing) {
+  if (seen.has(item.full)) continue;
+  seen.add(item.full);
+  unique.push(item);
 }
 
 if (baselineMode) {
@@ -205,7 +233,9 @@ if (baselineMode) {
 }
 
 if (listMode) {
-  for (const m of unique) console.log(`  [${m.ns}] ${m.full}  (${m.file}:${m.line})`);
+  for (const item of unique) {
+    console.log(`  [${item.ns}] ${item.full}  (${item.file}:${item.line})`);
+  }
 }
 
 const baseline = fs.existsSync(BASELINE) ? JSON.parse(fs.readFileSync(BASELINE, 'utf8')) : { count: 0 };
@@ -219,10 +249,10 @@ console.log(`  Baseline:           ${baseline.count}`);
 
 if (unique.length > baseline.count) {
   console.error('');
-  console.error(`  ✗ FAIL: ${unique.length - baseline.count} new missing PHP translation key(s).`);
+  console.error(`  FAIL: ${unique.length - baseline.count} new missing PHP translation key(s).`);
   console.error('  Run with --list to see gaps.');
   process.exit(1);
 }
 
-console.log('  ✓ No PHP i18n coverage regression.');
+console.log('  No PHP i18n coverage regression.');
 process.exit(0);

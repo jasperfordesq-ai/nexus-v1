@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupDataExportService;
+use App\Services\GroupService;
 
 /**
  * GroupDataExportController — Full data export for groups.
@@ -28,10 +29,19 @@ class GroupDataExportController extends BaseApiController
             return $userId;
         }
 
-        $data = GroupDataExportService::exportAll($id);
+        $group = GroupService::getById($id, $userId, true);
+        if (!$group) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
 
-        if (empty($data)) {
-            return $this->errorResponse('Group not found or no data to export', 404);
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_export_forbidden'), null, 403);
+        }
+
+        $data = GroupDataExportService::exportAll($id, $userId);
+
+        if ($data === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         return $this->successResponse($data);

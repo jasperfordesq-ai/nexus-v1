@@ -349,4 +349,11 @@ return [
     'ideation_status_approved'       => 'approved',
     'ideation_status_rejected'       => 'rejected',
     'ideation_status_implemented'    => 'implemented',
+    'appreciation_someone'            => 'Someone',
+    'appreciation_received'           => ':name sent you a thank-you note',
+
+    'marketplace' => [
+        'low_stock' => 'Low stock for ":title" (:count remaining).',
+        'restocked' => '":title" is back in stock.',
+    ],
 ];

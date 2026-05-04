@@ -59,8 +59,67 @@ class VolunteerExpenseService
             throw new \InvalidArgumentException("Amount must be greater than zero.");
         }
 
+        $organizationId = (int) $data['organization_id'];
+        $opportunityId = !empty($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
+
+        $org = DB::table('vol_organizations')
+            ->where('id', $organizationId)
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['approved', 'active'])
+            ->first(['id']);
+
+        if (!$org) {
+            throw new \RuntimeException(__('api.organization_not_found'), 404);
+        }
+
+        if ($opportunityId !== null) {
+            $opportunity = DB::table('vol_opportunities')
+                ->where('id', $opportunityId)
+                ->where('organization_id', $organizationId)
+                ->where('tenant_id', $tenantId)
+                ->first(['id']);
+
+            if (!$opportunity) {
+                throw new \RuntimeException(__('api.opportunity_not_found'), 404);
+            }
+
+            $hasApprovedApplication = DB::table('vol_applications')
+                ->where('opportunity_id', $opportunityId)
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->exists();
+
+            if (!$hasApprovedApplication) {
+                throw new \RuntimeException(__('api.volunteer_approved_application_required'), 403);
+            }
+        } elseif (!self::userCanClaimAgainstOrganization($tenantId, $userId, $organizationId)) {
+            throw new \RuntimeException(__('api.volunteer_org_relationship_required'), 403);
+        }
+
+        if (!empty($data['shift_id'])) {
+            $shiftQuery = DB::table('vol_shifts')
+                ->where('id', (int) $data['shift_id'])
+                ->where('tenant_id', $tenantId);
+
+            if ($opportunityId !== null) {
+                $shiftQuery->where('opportunity_id', $opportunityId);
+            } else {
+                $shiftQuery->whereIn('opportunity_id', function ($query) use ($organizationId, $tenantId) {
+                    $query->select('id')
+                        ->from('vol_opportunities')
+                        ->where('organization_id', $organizationId)
+                        ->where('tenant_id', $tenantId);
+                });
+            }
+
+            if (!$shiftQuery->exists()) {
+                throw new \RuntimeException(__('api.volunteer_shift_not_found'), 404);
+            }
+        }
+
         // Validate against expense policy
-        $policy = self::getApplicablePolicy($tenantId, (int) $data['organization_id'], $data['expense_type']);
+        $policy = self::getApplicablePolicy($tenantId, $organizationId, $data['expense_type']);
 
         if ($policy) {
             if (!empty($policy->max_amount) && $amount > (float) $policy->max_amount) {
@@ -74,7 +133,7 @@ class VolunteerExpenseService
                 $monthEnd = now()->endOfMonth()->toDateString();
 
                 $monthlyTotal = (float) VolExpense::where('user_id', $userId)
-                    ->where('organization_id', $data['organization_id'])
+                    ->where('organization_id', $organizationId)
                     ->whereBetween('submitted_at', [$monthStart, $monthEnd])
                     ->where('status', '!=', 'rejected')
                     ->sum('amount');
@@ -100,8 +159,8 @@ class VolunteerExpenseService
         $expense = VolExpense::create([
             'tenant_id' => $tenantId,
             'user_id' => $userId,
-            'organization_id' => (int) $data['organization_id'],
-            'opportunity_id' => $data['opportunity_id'] ?? null,
+            'organization_id' => $organizationId,
+            'opportunity_id' => $opportunityId,
             'shift_id' => $data['shift_id'] ?? null,
             'expense_type' => $data['expense_type'],
             'amount' => $amount,
@@ -173,6 +232,9 @@ class VolunteerExpenseService
             $arr['last_name'] = $e->user->last_name ?? '';
             $arr['email'] = $e->user->email ?? '';
             $arr['organization_name'] = $e->organization->name ?? '';
+            $arr['volunteer_name'] = trim(($arr['first_name'] ?? '') . ' ' . ($arr['last_name'] ?? ''));
+            $arr['type'] = $arr['expense_type'] ?? '';
+            $arr['has_receipt'] = !empty($arr['receipt_path']);
             return $arr;
         })->toArray();
 
@@ -401,7 +463,11 @@ class VolunteerExpenseService
         return VolExpensePolicy::orderBy('organization_id')
             ->orderBy('expense_type')
             ->get()
-            ->map(fn ($row) => $row->toArray())
+            ->map(function ($row) {
+                $data = $row->toArray();
+                $data['type'] = $data['expense_type'] ?? '';
+                return $data;
+            })
             ->toArray();
     }
 
@@ -415,7 +481,25 @@ class VolunteerExpenseService
      */
     public static function updatePolicy(int $policyId, array $data, int $tenantId): bool
     {
+        if ($policyId <= 0 && !empty($data['expense_type'])) {
+            $query = VolExpensePolicy::where('tenant_id', $tenantId)
+                ->where('expense_type', $data['expense_type']);
+
+            if (!empty($data['organization_id'])) {
+                $query->where('organization_id', (int) $data['organization_id']);
+            } else {
+                $query->whereNull('organization_id');
+            }
+
+            $policyId = (int) ($query->value('id') ?? 0);
+        }
+
+        if ($policyId <= 0) {
+            return false;
+        }
+
         $affected = VolExpensePolicy::where('id', $policyId)
+            ->where('tenant_id', $tenantId)
             ->update([
                 'max_amount' => $data['max_amount'] ?? null,
                 'max_monthly' => $data['max_monthly'] ?? null,
@@ -446,5 +530,38 @@ class VolunteerExpenseService
         return VolExpensePolicy::whereNull('organization_id')
             ->where('expense_type', $expenseType)
             ->first();
+    }
+
+    private static function userCanClaimAgainstOrganization(int $tenantId, int $userId, int $organizationId): bool
+    {
+        $hasApprovedApplication = DB::table('vol_applications as a')
+            ->join('vol_opportunities as opp', function ($join) {
+                $join->on('opp.id', '=', 'a.opportunity_id')
+                    ->whereColumn('opp.tenant_id', 'a.tenant_id');
+            })
+            ->where('a.user_id', $userId)
+            ->where('a.tenant_id', $tenantId)
+            ->where('a.status', 'approved')
+            ->where('opp.organization_id', $organizationId)
+            ->exists();
+
+        if ($hasApprovedApplication) {
+            return true;
+        }
+
+        return DB::table('vol_organizations as org')
+            ->leftJoin('org_members as om', function ($join) use ($userId) {
+                $join->on('om.organization_id', '=', 'org.id')
+                    ->whereColumn('om.tenant_id', 'org.tenant_id')
+                    ->where('om.user_id', $userId)
+                    ->where('om.status', 'active');
+            })
+            ->where('org.id', $organizationId)
+            ->where('org.tenant_id', $tenantId)
+            ->where(function ($query) use ($userId) {
+                $query->where('org.user_id', $userId)
+                    ->orWhereNotNull('om.user_id');
+            })
+            ->exists();
     }
 }

@@ -67,6 +67,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import type { VolunteeringConfig } from '@/types';
 import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import { RecommendedShiftsTab } from './RecommendedShiftsTab';
 import { EmergencyAlertsTab } from './EmergencyAlertsTab';
@@ -141,6 +142,8 @@ interface HoursSummary {
 
 type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
 
+const VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates', 'alerts', 'wellbeing', 'credentials', 'waitlist', 'swaps', 'group-signups', 'hours-review', 'expenses', 'safeguarding', 'community-projects', 'donations', 'accessibility'];
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function VolunteeringPage() {
@@ -152,11 +155,13 @@ export function VolunteeringPage() {
   // Check if a volunteering tab is enabled via config
   // Config keys use underscores (tab_group_signups), frontend tab keys use hyphens (group-signups)
   const isTabEnabled = useCallback((tabKey: VolunteerTab): boolean => {
-    const configKey = `volunteering.tab_${tabKey.replace(/-/g, '_')}` as keyof import('@/types').VolunteeringConfig;
-    return volunteeringConfig[configKey] !== false;
+    const configKey = `volunteering.tab_${tabKey.replace(/-/g, '_')}` as keyof VolunteeringConfig;
+    const config = volunteeringConfig as Partial<VolunteeringConfig> | undefined;
+    return config?.[configKey] !== false;
   }, [volunteeringConfig]);
 
-  const initialTab = (searchParams.get('tab') as VolunteerTab) ?? 'opportunities';
+  const requestedTab = searchParams.get('tab') as VolunteerTab | null;
+  const initialTab = requestedTab && VOLUNTEER_TABS.includes(requestedTab) ? requestedTab : 'opportunities';
   const [tab, setTabState] = useState<VolunteerTab>(initialTab);
 
   const setTab = useCallback((newTab: VolunteerTab) => {
@@ -173,6 +178,16 @@ export function VolunteeringPage() {
   }, [setSearchParams]);
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
 
+  const isTabAllowed = useCallback((tabKey: VolunteerTab): boolean => (
+    VOLUNTEER_TABS.includes(tabKey) && (tabKey === 'opportunities' || isAuthenticated) && isTabEnabled(tabKey)
+  ), [isAuthenticated, isTabEnabled]);
+
+  useEffect(() => {
+    if (!isTabAllowed(tab) && tab !== 'opportunities') {
+      setTab('opportunities');
+    }
+  }, [tab, isTabAllowed, setTab]);
+
   useEffect(() => {
     if (!hasFeature('volunteering')) return;
     let cancelled = false;
@@ -184,7 +199,7 @@ export function VolunteeringPage() {
             const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
             const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>;
             setHasApprovedOrg(
-              items.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
+              items.some((org) => ['approved', 'active'].includes(org.status) && ['owner', 'admin'].includes(org.member_role)),
             );
           }
         })
@@ -290,6 +305,7 @@ export function VolunteeringPage() {
           if (t.authOnly && !isAuthenticated) return false;
           return isTabEnabled(t.key);
         });
+        const activeTab = visibleTabs.some(({ key }) => key === tab) ? tab : 'opportunities';
 
         return (
           <>
@@ -299,9 +315,9 @@ export function VolunteeringPage() {
                   key={key}
                   role="tab"
                   id={`vol-tab-${key}`}
-                  aria-selected={tab === key}
-                  variant={tab === key ? 'solid' : 'flat'}
-                  className={tab === key ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                  aria-selected={activeTab === key}
+                  variant={activeTab === key ? 'solid' : 'flat'}
+                  className={activeTab === key ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
                   onPress={() => setTab(key)}
                   startContent={<Icon className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -311,25 +327,25 @@ export function VolunteeringPage() {
             </div>
 
             {/* Tab Content */}
-            <div role="tabpanel" aria-labelledby={`vol-tab-${tab}`}>
-              {tab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
-              {tab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
-              {tab === 'hours' && isTabEnabled('hours') && <HoursTab />}
-              {tab === 'recommended' && isTabEnabled('recommended') && <RecommendedShiftsTab />}
-              {tab === 'certificates' && isTabEnabled('certificates') && <CertificatesTab />}
-              {tab === 'alerts' && isTabEnabled('alerts') && <EmergencyAlertsTab />}
-              {tab === 'wellbeing' && isTabEnabled('wellbeing') && <WellbeingTab />}
-              {tab === 'credentials' && isTabEnabled('credentials') && <CredentialVerificationTab />}
-              {tab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
-              {tab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
-              {tab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
-              {tab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
+            <div role="tabpanel" aria-labelledby={`vol-tab-${activeTab}`}>
+              {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
+              {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
+              {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}
+              {activeTab === 'recommended' && isTabEnabled('recommended') && <RecommendedShiftsTab />}
+              {activeTab === 'certificates' && isTabEnabled('certificates') && <CertificatesTab />}
+              {activeTab === 'alerts' && isTabEnabled('alerts') && <EmergencyAlertsTab />}
+              {activeTab === 'wellbeing' && isTabEnabled('wellbeing') && <WellbeingTab />}
+              {activeTab === 'credentials' && isTabEnabled('credentials') && <CredentialVerificationTab />}
+              {activeTab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
+              {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
+              {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
+              {activeTab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
               <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
-                {tab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
-                {tab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
-                {tab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
-                {tab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
-                {tab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
+                {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
+                {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
+                {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
+                {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
+                {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
               </Suspense>
             </div>
           </>
@@ -391,7 +407,8 @@ function OpportunitiesTab() {
       if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
+        const raw = response.data as Application[] | { items?: Application[] };
+        const items = Array.isArray(raw) ? raw : (raw.items ?? []);
 
         if (append) {
           setOpportunities((prev) => [...prev, ...items]);

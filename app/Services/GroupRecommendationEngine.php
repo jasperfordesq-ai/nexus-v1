@@ -369,6 +369,15 @@ class GroupRecommendationEngine
             $scores = array_intersect_key($scores, array_flip($validGroupIds));
         }
 
+        $visibleGroupIds = DB::table('groups')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) {
+                $q->whereNull('visibility')->orWhere('visibility', 'public');
+            })
+            ->pluck('id')
+            ->all();
+        $scores = array_intersect_key($scores, array_flip($visibleGroupIds));
+
         if (count($scores) <= $limit) {
             return array_slice($scores, 0, $limit, true);
         }
@@ -441,6 +450,7 @@ class GroupRecommendationEngine
             LEFT JOIN group_types gt ON g.type_id = gt.id
             LEFT JOIN group_members gm ON g.id = gm.group_id AND gm.status = 'active'
             WHERE g.tenant_id = ? AND g.status = 'active' AND g.id IN ($placeholders)
+            AND (g.visibility IS NULL OR g.visibility = 'public')
             GROUP BY g.id
         ", array_merge([$tenantId], $groupIds));
 
@@ -507,8 +517,8 @@ class GroupRecommendationEngine
                 $count = (int) ($row['connection_count'] ?? 1);
                 $row['recommendation_score'] = min(1.0, 0.5 + $count * 0.1);
                 $row['recommendation_reason'] = $count === 1
-                    ? 'A connection of yours is in this group'
-                    : "{$count} of your connections are in this group";
+                    ? __('api.group_recommendation_connection_one')
+                    : __('api.group_recommendation_connection_many', ['count' => $count]);
                 $result[] = $row;
             }
 
@@ -542,7 +552,7 @@ class GroupRecommendationEngine
 
         foreach ($groups as &$group) {
             $group['recommendation_score'] = 0.5;
-            $group['recommendation_reason'] = 'Popular in your community';
+            $group['recommendation_reason'] = __('api.group_recommendation_popular');
         }
 
         return $groups;
@@ -556,6 +566,7 @@ class GroupRecommendationEngine
                 FROM group_members gm
                 JOIN `groups` g ON gm.group_id = g.id
                 WHERE g.tenant_id = ? AND g.status = 'active'
+                AND (g.visibility IS NULL OR g.visibility = 'public')
                 AND gm.status = 'active'
                 AND gm.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
                 GROUP BY gm.group_id HAVING recent_joins >= 2
@@ -592,9 +603,9 @@ class GroupRecommendationEngine
 
     private function generateReason($group, $score): string
     {
-        if ($score >= 0.8) return 'Highly recommended based on your interests';
-        if ($score >= 0.6) return 'Members like you also joined this group';
-        if ($score >= 0.4) return 'Popular in your area';
-        return 'Might interest you';
+        if ($score >= 0.8) return __('api.group_recommendation_interests');
+        if ($score >= 0.6) return __('api.group_recommendation_similar_members');
+        if ($score >= 0.4) return __('api.group_recommendation_area');
+        return __('api.group_recommendation_interest');
     }
 }

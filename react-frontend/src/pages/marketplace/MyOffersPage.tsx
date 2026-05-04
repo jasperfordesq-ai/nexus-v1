@@ -87,7 +87,7 @@ export function MyOffersPage() {
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(tenantPath('/auth/login'), { replace: true });
+      navigate(tenantPath('/login'), { replace: true });
     }
   }, [isAuthenticated, navigate, tenantPath]);
 

@@ -471,6 +471,7 @@ class CommunityProjectService
             'opportunity_id'    => isset($row->opportunity_id) && $row->opportunity_id !== null ? (int) $row->opportunity_id : null,
             'upvotes'           => (int) ($row->supporter_count ?? 0),
             'supporter_count'   => (int) ($row->supporter_count ?? 0),
+            'supporters_count'  => (int) ($row->supporter_count ?? 0),
             'user_has_supported' => false,
             'created_at'        => $row->created_at,
             'updated_at'        => $row->updated_at ?? null,

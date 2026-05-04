@@ -47,7 +47,7 @@ class MunicipalityFeedbackService
     public function submit(int $tenantId, ?int $userId, array $payload): array
     {
         if (!Schema::hasTable(self::TABLE)) {
-            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => 'Feedback table not yet provisioned.']]];
+            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => __('caring_community.feedback.table_not_found')]]];
         }
 
         $errors = [];
@@ -220,7 +220,7 @@ class MunicipalityFeedbackService
     public function triage(int $tenantId, int $id, array $payload): array
     {
         if (!Schema::hasTable(self::TABLE)) {
-            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => 'Feedback table not yet provisioned.']]];
+            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => __('caring_community.feedback.table_not_found')]]];
         }
 
         $existing = DB::table(self::TABLE)
@@ -228,7 +228,7 @@ class MunicipalityFeedbackService
             ->where('id', $id)
             ->first();
         if (!$existing) {
-            return ['errors' => [['code' => 'NOT_FOUND', 'message' => 'Feedback not found.']]];
+            return ['errors' => [['code' => 'NOT_FOUND', 'message' => __('caring_community.feedback.not_found')]]];
         }
 
         $update = ['updated_at' => now()];
@@ -236,7 +236,7 @@ class MunicipalityFeedbackService
         if (array_key_exists('status', $payload)) {
             $status = (string) $payload['status'];
             if (!in_array($status, self::STATUSES, true)) {
-                return ['errors' => [['code' => 'INVALID_STATUS', 'message' => 'Invalid status.', 'field' => 'status']]];
+                return ['errors' => [['code' => 'INVALID_STATUS', 'message' => __('caring_community.feedback.invalid_status'), 'field' => 'status']]];
             }
             $update['status'] = $status;
         }
@@ -248,7 +248,7 @@ class MunicipalityFeedbackService
             } elseif (is_numeric($aid)) {
                 $update['assigned_user_id'] = (int) $aid;
             } else {
-                return ['errors' => [['code' => 'INVALID_ASSIGNEE', 'message' => 'assigned_user_id must be numeric.', 'field' => 'assigned_user_id']]];
+                return ['errors' => [['code' => 'INVALID_ASSIGNEE', 'message' => __('caring_community.feedback.invalid_assignee'), 'field' => 'assigned_user_id']]];
             }
         }
 
@@ -287,7 +287,7 @@ class MunicipalityFeedbackService
     public function resolve(int $tenantId, int $id, string $resolutionNotes): array
     {
         if (!Schema::hasTable(self::TABLE)) {
-            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => 'Feedback table not yet provisioned.']]];
+            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => __('caring_community.feedback.table_not_found')]]];
         }
 
         $existing = DB::table(self::TABLE)
@@ -295,12 +295,12 @@ class MunicipalityFeedbackService
             ->where('id', $id)
             ->first();
         if (!$existing) {
-            return ['errors' => [['code' => 'NOT_FOUND', 'message' => 'Feedback not found.']]];
+            return ['errors' => [['code' => 'NOT_FOUND', 'message' => __('caring_community.feedback.not_found')]]];
         }
 
         $notes = trim($resolutionNotes);
         if ($notes === '') {
-            return ['errors' => [['code' => 'NOTES_REQUIRED', 'message' => 'Resolution notes are required.', 'field' => 'resolution_notes']]];
+            return ['errors' => [['code' => 'NOTES_REQUIRED', 'message' => __('caring_community.feedback.resolution_notes_required'), 'field' => 'resolution_notes']]];
         }
 
         DB::table(self::TABLE)
@@ -328,7 +328,7 @@ class MunicipalityFeedbackService
     public function close(int $tenantId, int $id): array
     {
         if (!Schema::hasTable(self::TABLE)) {
-            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => 'Feedback table not yet provisioned.']]];
+            return ['errors' => [['code' => 'TABLE_NOT_FOUND', 'message' => __('caring_community.feedback.table_not_found')]]];
         }
 
         $existing = DB::table(self::TABLE)
@@ -336,7 +336,7 @@ class MunicipalityFeedbackService
             ->where('id', $id)
             ->first();
         if (!$existing) {
-            return ['errors' => [['code' => 'NOT_FOUND', 'message' => 'Feedback not found.']]];
+            return ['errors' => [['code' => 'NOT_FOUND', 'message' => __('caring_community.feedback.not_found')]]];
         }
 
         DB::table(self::TABLE)

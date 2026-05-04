@@ -24,10 +24,11 @@ class CreateOpportunityRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'location' => ['nullable', 'string'],
+            'is_remote' => ['nullable', 'boolean'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after:start_date'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'organization_id' => ['nullable', 'integer'],
+            'organization_id' => ['required', 'integer'],
         ];
     }
 }

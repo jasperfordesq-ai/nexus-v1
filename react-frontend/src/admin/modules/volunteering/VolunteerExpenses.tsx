@@ -72,7 +72,9 @@ interface ExpenseStats {
 }
 
 interface ExpensePolicy {
+  id?: number;
   type: string;
+  expense_type?: string;
   max_amount: number;
   max_monthly: number;
   requires_receipt_above: number;
@@ -268,15 +270,13 @@ export function VolunteerExpenses() {
   const handleExport = async () => {
     try {
       const res = await adminVolunteering.exportExpenses();
-      if (res.success && res.data) {
-        const blob = new Blob([res.data as BlobPart], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
+      const blob = res instanceof Blob ? res : new Blob([res as BlobPart], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch {
       toast.error(t('volunteering.export_failed', 'Failed to export expenses'));
     }
@@ -298,7 +298,8 @@ export function VolunteerExpenses() {
     setActionLoading(true);
     try {
       const res = await adminVolunteering.updateExpensePolicies({
-        type: editingPolicy.type,
+        id: editingPolicy.id,
+        expense_type: editingPolicy.expense_type ?? editingPolicy.type,
         max_amount: Number(policyForm.max_amount),
         max_monthly: Number(policyForm.max_monthly),
         requires_receipt_above: Number(policyForm.requires_receipt_above),

@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useAuth } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 
 interface Appreciation {
   id: number;
@@ -42,6 +42,7 @@ const REACTIONS: Array<{ key: string; icon: React.ComponentType<{ className?: st
 export default function AppreciationWallPage() {
   const { t } = useTranslation('common');
   const { userId } = useParams<{ userId: string }>();
+  const { tenantPath } = useTenant();
   const { user } = useAuth();
   const [items, setItems] = useState<Appreciation[]>([]);
   const [page, setPage] = useState(1);
@@ -114,7 +115,7 @@ export default function AppreciationWallPage() {
               <CardBody className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Avatar src={a.sender?.avatar_url ?? undefined} name={a.sender?.name ?? ''} size="sm" />
-                  <Link to={`/profile/${a.sender_id}`} className="font-medium hover:underline">
+                  <Link to={tenantPath(`/profile/${a.sender_id}`)} className="font-medium hover:underline">
                     {a.sender?.name ?? t('common.someone')}
                   </Link>
                   <span className="text-xs text-[var(--text-muted)] ml-auto">

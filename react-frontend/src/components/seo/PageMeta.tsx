@@ -82,7 +82,8 @@ export function PageMeta({
   publishedTime,
   modifiedTime,
 }: PageMetaProps) {
-  const { branding, tenant } = useTenant();
+  const { branding: tenantBranding, tenant } = useTenant();
+  const branding = tenantBranding ?? { name: 'NEXUS', tagline: '', og_image_url: '', logo: '' };
   const location = useLocation();
 
   const settings = tenant?.settings as Record<string, unknown> | undefined;

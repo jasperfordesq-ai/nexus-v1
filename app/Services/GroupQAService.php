@@ -26,9 +26,16 @@ class GroupQAService
     /**
      * List questions for a group.
      */
-    public function listQuestions(int $groupId, array $filters = []): array
+    public function listQuestions(int $groupId, int $userId, array $filters = []): ?array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if (!GroupService::canView($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_member_required')];
+            return null;
+        }
+
         $limit = min($filters['limit'] ?? 20, 100);
         $sort = $filters['sort'] ?? 'newest'; // newest, votes, unanswered
 
@@ -90,7 +97,7 @@ class GroupQAService
     {
         $q['author'] = [
             'id' => (int) ($q['author_id'] ?? 0),
-            'name' => $q['author_name'] ?? 'Unknown',
+            'name' => $q['author_name'] ?? __('api.unknown_user'),
             'avatar' => $q['author_avatar'] ?? null,
         ];
         $q['has_accepted_answer'] = !empty($q['accepted_answer_id']);
@@ -103,7 +110,7 @@ class GroupQAService
     {
         $a['author'] = [
             'id' => (int) ($a['author_id'] ?? 0),
-            'name' => $a['author_name'] ?? 'Unknown',
+            'name' => $a['author_name'] ?? __('api.unknown_user'),
             'avatar' => $a['author_avatar'] ?? null,
         ];
         $a['user_vote'] = 0;
@@ -114,21 +121,35 @@ class GroupQAService
     /**
      * Get a single question with its answers.
      */
-    public function getQuestion(int $questionId): ?array
+    public function getQuestion(int $groupId, int $questionId, int $userId): ?array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if (!GroupService::canView($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_member_required')];
+            return null;
+        }
 
         $question = DB::table('group_questions as gq')
             ->join('users as u', 'gq.user_id', '=', 'u.id')
             ->where('gq.id', $questionId)
+            ->where('gq.group_id', $groupId)
             ->where('gq.tenant_id', $tenantId)
             ->select('gq.*', 'u.id as author_id', 'u.name as author_name', 'u.avatar_url as author_avatar')
             ->first();
 
-        if (!$question) return null;
+        if (!$question) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_qa_question_not_found')];
+            return null;
+        }
 
         // Increment view count
-        DB::table('group_questions')->where('id', $questionId)->increment('view_count');
+        DB::table('group_questions')
+            ->where('id', $questionId)
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->increment('view_count');
 
         $answers = DB::table('group_answers as ga')
             ->join('users as u', 'ga.user_id', '=', 'u.id')
@@ -156,12 +177,12 @@ class GroupQAService
         $tenantId = TenantContext::getId();
 
         if (!$this->isMember($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Must be a member'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_member_required')];
             return null;
         }
 
-        if (strlen($title) < 10) {
-            $this->errors[] = ['code' => 'VALIDATION', 'message' => 'Title must be at least 10 characters'];
+        if (mb_strlen($title) < 10) {
+            $this->errors[] = ['code' => 'VALIDATION', 'message' => __('api.group_qa_title_min')];
             return null;
         }
 
@@ -181,28 +202,29 @@ class GroupQAService
     /**
      * Post an answer to a question.
      */
-    public function postAnswer(int $questionId, int $userId, string $body): ?array
+    public function postAnswer(int $groupId, int $questionId, int $userId, string $body): ?array
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
         $question = DB::table('group_questions')
             ->where('id', $questionId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$question) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Question not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_qa_question_not_found')];
             return null;
         }
 
         if ($question->is_closed) {
-            $this->errors[] = ['code' => 'CLOSED', 'message' => 'Question is closed'];
+            $this->errors[] = ['code' => 'CLOSED', 'message' => __('api.group_qa_question_closed')];
             return null;
         }
 
-        if (!$this->isMember($question->group_id, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Must be a member'];
+        if (!$this->isMember($groupId, $userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_member_required')];
             return null;
         }
 
@@ -218,6 +240,8 @@ class GroupQAService
         // Update answer count
         DB::table('group_questions')
             ->where('id', $questionId)
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->increment('answer_count');
 
         return ['id' => $id, 'question_id' => $questionId];
@@ -226,51 +250,61 @@ class GroupQAService
     /**
      * Accept an answer (asker or group admin).
      */
-    public function acceptAnswer(int $answerId, int $userId): bool
+    public function acceptAnswer(int $groupId, int $answerId, int $userId): bool
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        $answer = DB::table('group_answers')
-            ->where('id', $answerId)
-            ->where('tenant_id', $tenantId)
+        $answer = DB::table('group_answers as ga')
+            ->join('group_questions as gq', 'gq.id', '=', 'ga.question_id')
+            ->where('ga.id', $answerId)
+            ->where('gq.group_id', $groupId)
+            ->where('ga.tenant_id', $tenantId)
+            ->where('gq.tenant_id', $tenantId)
+            ->select('ga.*', 'gq.user_id as question_user_id', 'gq.group_id')
             ->first();
 
         if (!$answer) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Answer not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_qa_answer_not_found')];
             return false;
         }
 
         $question = DB::table('group_questions')
             ->where('id', $answer->question_id)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
-
-        if (!$question) return false;
-
-        // Only asker or admin can accept
-        $isAsker = (int) $question->user_id === $userId;
-        $isAdmin = $this->isAdmin($question->group_id, $userId, $tenantId);
-
-        if (!$isAsker && !$isAdmin) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the asker or admin can accept answers'];
+        if (!$question) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_qa_question_not_found')];
             return false;
         }
 
-        DB::transaction(function () use ($answerId, $answer) {
+        // Only asker or admin can accept
+        $isAsker = (int) $question->user_id === $userId;
+        $isAdmin = GroupService::canModify($groupId, $userId);
+
+        if (!$isAsker && !$isAdmin) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_accept_forbidden')];
+            return false;
+        }
+
+        DB::transaction(function () use ($answerId, $answer, $tenantId) {
             // Unaccept previous answer
             DB::table('group_answers')
                 ->where('question_id', $answer->question_id)
+                ->where('tenant_id', $tenantId)
                 ->where('is_accepted', true)
                 ->update(['is_accepted' => false]);
 
             // Accept this answer
             DB::table('group_answers')
                 ->where('id', $answerId)
+                ->where('tenant_id', $tenantId)
                 ->update(['is_accepted' => true, 'updated_at' => now()]);
 
             DB::table('group_questions')
                 ->where('id', $answer->question_id)
+                ->where('tenant_id', $tenantId)
                 ->update(['accepted_answer_id' => $answerId, 'updated_at' => now()]);
         });
 
@@ -280,18 +314,43 @@ class GroupQAService
     /**
      * Vote on a question or answer.
      */
-    public function vote(int $userId, string $type, int $targetId, int $vote): bool
+    public function vote(int $groupId, int $userId, string $type, int $targetId, int $vote): bool
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
         if (!in_array($type, ['question', 'answer'], true)) {
-            $this->errors[] = ['code' => 'INVALID', 'message' => 'Type must be question or answer'];
+            $this->errors[] = ['code' => 'INVALID', 'message' => __('api.group_qa_invalid_type')];
             return false;
         }
 
         if (!in_array($vote, [1, -1], true)) {
-            $this->errors[] = ['code' => 'INVALID', 'message' => 'Vote must be 1 or -1'];
+            $this->errors[] = ['code' => 'INVALID', 'message' => __('api.group_qa_invalid_vote')];
+            return false;
+        }
+
+        if (!$this->isMember($groupId, $userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_member_required')];
+            return false;
+        }
+
+        $table = $type === 'question' ? 'group_questions' : 'group_answers';
+        $targetExists = $type === 'question'
+            ? DB::table('group_questions')
+                ->where('id', $targetId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->exists()
+            : DB::table('group_answers as ga')
+                ->join('group_questions as gq', 'gq.id', '=', 'ga.question_id')
+                ->where('ga.id', $targetId)
+                ->where('gq.group_id', $groupId)
+                ->where('ga.tenant_id', $tenantId)
+                ->where('gq.tenant_id', $tenantId)
+                ->exists();
+
+        if (!$targetExists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => $type === 'question' ? __('api.group_qa_question_not_found') : __('api.group_qa_answer_not_found')];
             return false;
         }
 
@@ -303,20 +362,18 @@ class GroupQAService
             ->where('votable_id', $targetId)
             ->first();
 
-        $table = $type === 'question' ? 'group_questions' : 'group_answers';
-
         if ($existing) {
             if ((int) $existing->vote === $vote) {
                 // Remove vote (toggle off)
                 DB::table('group_qa_votes')->where('id', $existing->id)->delete();
-                DB::table($table)->where('id', $targetId)->decrement('vote_count', $vote);
+                DB::table($table)->where('id', $targetId)->where('tenant_id', $tenantId)->decrement('vote_count', $vote);
                 return true;
             }
             // Change vote direction
             DB::table('group_qa_votes')
                 ->where('id', $existing->id)
                 ->update(['vote' => $vote]);
-            DB::table($table)->where('id', $targetId)->increment('vote_count', $vote * 2);
+            DB::table($table)->where('id', $targetId)->where('tenant_id', $tenantId)->increment('vote_count', $vote * 2);
         } else {
             DB::table('group_qa_votes')->insert([
                 'tenant_id' => $tenantId,
@@ -326,7 +383,7 @@ class GroupQAService
                 'vote' => $vote,
                 'created_at' => now(),
             ]);
-            DB::table($table)->where('id', $targetId)->increment('vote_count', $vote);
+            DB::table($table)->where('id', $targetId)->where('tenant_id', $tenantId)->increment('vote_count', $vote);
         }
 
         return true;
@@ -334,7 +391,7 @@ class GroupQAService
 
     private function isMember(int $groupId, int $userId, int $tenantId): bool
     {
-        return DB::table('group_members')
+        return GroupService::canModify($groupId, $userId) || DB::table('group_members')
             ->join('groups', 'groups.id', '=', 'group_members.group_id')
             ->where('group_members.group_id', $groupId)
             ->where('group_members.user_id', $userId)

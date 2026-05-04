@@ -20,16 +20,20 @@ class GroupDataExportService
     /**
      * Export all data for a group as a structured array.
      */
-    public static function exportAll(int $groupId): array
+    public static function exportAll(int $groupId, int $actorUserId): ?array
     {
         $tenantId = TenantContext::getId();
+
+        if (!GroupService::canModify($groupId, $actorUserId)) {
+            return null;
+        }
 
         $group = DB::table('groups')
             ->where('id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
-        if (!$group) return [];
+        if (!$group) return null;
 
         return [
             'export_date' => now()->toIso8601String(),

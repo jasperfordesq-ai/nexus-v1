@@ -116,7 +116,7 @@ class FederationAggregateController extends BaseApiController
         return response()->json([
             'success' => false,
             'errors'  => [
-                ['code' => 'not_found', 'message' => 'Aggregates not available.'],
+                ['code' => 'not_found', 'message' => __('api.aggregates_not_available')],
             ],
         ], 404, ['API-Version' => '2.0']);
     }

@@ -582,7 +582,7 @@ class CaringCommunityApiController extends BaseApiController
 
         return $this->respondWithData([
             'success' => true,
-            'message' => 'caring_community.requests.submitted',
+            'message' => __('caring_community.requests.submitted'),
         ], null, 201);
     }
 
@@ -726,7 +726,7 @@ class CaringCommunityApiController extends BaseApiController
 
         return $this->respondWithData([
             'success' => true,
-            'message' => 'caring_community.favour.recorded',
+            'message' => __('caring_community.favour.recorded'),
         ], null, 201);
     }
 

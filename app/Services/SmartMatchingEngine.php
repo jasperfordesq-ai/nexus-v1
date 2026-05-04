@@ -759,9 +759,11 @@ class SmartMatchingEngine
 
         if ($this->userBlocksTableExists()) {
             $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE blocked_user_id = ?)";
+                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
+                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
+            $params[] = $tenantId;
             $params[] = $excludeUserId;
+            $params[] = $tenantId;
             $params[] = $excludeUserId;
         }
 
@@ -824,9 +826,11 @@ class SmartMatchingEngine
 
         if ($this->userBlocksTableExists()) {
             $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE blocked_user_id = ?)";
+                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
+                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
+            $params[] = $tenantId;
             $params[] = $excludeUserId;
+            $params[] = $tenantId;
             $params[] = $excludeUserId;
         }
 
@@ -886,9 +890,11 @@ class SmartMatchingEngine
 
         if ($this->userBlocksTableExists()) {
             $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE blocked_user_id = ?)";
+                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
+                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
+            $params[] = $tenantId;
             $params[] = $userId;
+            $params[] = $tenantId;
             $params[] = $userId;
         }
 

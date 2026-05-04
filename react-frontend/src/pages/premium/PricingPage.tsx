@@ -87,7 +87,7 @@ export function PricingPage() {
 
   const handleSubscribe = async (tier: PremiumTier) => {
     if (!isAuthenticated) {
-      navigate(tenantPath('/auth/login') + '?redirect=' + encodeURIComponent(tenantPath('/premium')));
+      navigate(tenantPath('/login'), { state: { from: tenantPath('/premium') } });
       return;
     }
     setSubmittingTierId(tier.id);

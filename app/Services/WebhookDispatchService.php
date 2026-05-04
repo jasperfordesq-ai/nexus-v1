@@ -200,7 +200,7 @@ class WebhookDispatchService
             throw new \InvalidArgumentException('Webhook URL must not target private or internal IP addresses.');
         }
         if (empty($data['secret'])) {
-            throw new \InvalidArgumentException('Webhook secret is required.');
+            $data['secret'] = bin2hex(random_bytes(24));
         }
         if (empty($data['events']) || !is_array($data['events'])) {
             throw new \InvalidArgumentException('At least one event type is required.');

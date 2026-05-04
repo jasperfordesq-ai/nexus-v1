@@ -52,6 +52,7 @@ class VolunteerFormService
             return $query->orderBy('display_order')
                 ->orderBy('id')
                 ->get()
+                ->map(fn ($field) => self::formatCustomField($field->toArray()))
                 ->toArray();
         } catch (\Exception $e) {
             Log::error('VolunteerFormService::getCustomFields error: ' . $e->getMessage());
@@ -68,22 +69,24 @@ class VolunteerFormService
     public static function createField(array $data): array
     {
         try {
+            $normalized = self::normalizeCustomFieldPayload($data);
+
             $field = VolCustomField::create([
                 'tenant_id' => TenantContext::getId(),
-                'organization_id' => $data['organization_id'] ?? null,
-                'field_key' => $data['field_key'] ?? ($data['field_name'] ?? ''),
-                'field_label' => $data['field_label'] ?? '',
-                'field_type' => $data['field_type'] ?? 'text',
-                'applies_to' => $data['applies_to'] ?? 'application',
-                'is_required' => $data['is_required'] ?? 0,
-                'field_options' => $data['field_options'] ?? ($data['options_json'] ?? null),
-                'display_order' => $data['display_order'] ?? 0,
-                'placeholder' => $data['placeholder'] ?? null,
-                'help_text' => $data['help_text'] ?? null,
+                'organization_id' => $normalized['organization_id'] ?? null,
+                'field_key' => $normalized['field_key'] ?? '',
+                'field_label' => $normalized['field_label'] ?? '',
+                'field_type' => $normalized['field_type'] ?? 'text',
+                'applies_to' => $normalized['applies_to'] ?? 'application',
+                'is_required' => $normalized['is_required'] ?? 0,
+                'field_options' => $normalized['field_options'] ?? null,
+                'display_order' => $normalized['display_order'] ?? 0,
+                'placeholder' => $normalized['placeholder'] ?? null,
+                'help_text' => $normalized['help_text'] ?? null,
                 'is_active' => 1,
             ]);
 
-            return $field->fresh()->toArray();
+            return self::formatCustomField($field->fresh()->toArray());
         } catch (\Exception $e) {
             Log::error('VolunteerFormService::createField error: ' . $e->getMessage());
             return [];
@@ -104,6 +107,8 @@ class VolunteerFormService
             if (!$field) {
                 return false;
             }
+
+            $data = self::normalizeCustomFieldPayload($data);
 
             $allowedFields = [
                 'field_key', 'field_label', 'field_type', 'applies_to',
@@ -126,6 +131,50 @@ class VolunteerFormService
             Log::error('VolunteerFormService::updateField error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function normalizeCustomFieldPayload(array $data): array
+    {
+        if (!isset($data['field_label']) && isset($data['label'])) {
+            $data['field_label'] = $data['label'];
+        }
+
+        if (!isset($data['field_key']) && isset($data['name'])) {
+            $data['field_key'] = $data['name'];
+        }
+
+        if (!isset($data['field_key']) && isset($data['field_name'])) {
+            $data['field_key'] = $data['field_name'];
+        }
+
+        if (!isset($data['field_options']) && array_key_exists('options', $data)) {
+            $data['field_options'] = is_array($data['options']) ? json_encode($data['options']) : $data['options'];
+        }
+
+        if (!isset($data['field_options']) && array_key_exists('options_json', $data)) {
+            $data['field_options'] = $data['options_json'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $field
+     * @return array<string, mixed>
+     */
+    private static function formatCustomField(array $field): array
+    {
+        $options = $field['field_options'] ?? null;
+
+        $field['label'] = $field['label'] ?? ($field['field_label'] ?? '');
+        $field['name'] = $field['name'] ?? ($field['field_key'] ?? '');
+        $field['options'] = is_string($options) ? (json_decode($options, true) ?: $options) : $options;
+
+        return $field;
     }
 
     /**

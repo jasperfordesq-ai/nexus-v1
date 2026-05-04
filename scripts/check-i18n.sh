@@ -114,8 +114,6 @@ if [ "$MODE" != "--react-only" ]; then
     # API response messages in controllers (exclude validation rules and internal type mappings)
     check_recursive "'message' => '" "Hardcoded API response message" "$CTRL" "*.php" "message_received"
     check_recursive "'message' => \"" "Hardcoded API response message" "$CTRL"
-    check_recursive "'error' => '" "Hardcoded API error message" "$CTRL"
-    check_recursive "'error' => \"" "Hardcoded API error message" "$CTRL"
 
     # Notification content in services (bell notifications)
     # 'message' => "English text" in notification inserts

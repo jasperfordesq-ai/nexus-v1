@@ -306,8 +306,8 @@ else
     state_set MAINTENANCE_ENABLED_BY_US 0
     log_warn "The platform remains in maintenance mode for safety."
     log_warn "Fix the issue, then either:"
-    log_warn "  1. Re-deploy:  sudo bash scripts/safe-deploy.sh full"
-    log_warn "  2. Rollback:   sudo bash scripts/safe-deploy.sh rollback"
+    log_warn "  1. Re-deploy:  sudo bash scripts/safe-deploy.sh full --detach"
+    log_warn "  2. Rollback:   sudo bash scripts/safe-deploy.sh rollback --detach"
     log_warn "  3. Force live:  sudo bash scripts/maintenance.sh off"
     log_info "Log saved to: $LOG_FILE"
 

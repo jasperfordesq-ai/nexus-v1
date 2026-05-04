@@ -72,24 +72,24 @@ class PaidPushCampaignController extends BaseApiController
         $errors = [];
 
         if (empty($data['name'])) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Campaign name is required.', 'field' => 'name'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_campaign_name_required'), 'field' => 'name'];
         }
 
         if (empty($data['title'])) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Push notification title is required.', 'field' => 'title'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_title_required'), 'field' => 'title'];
         } elseif (strlen($data['title']) > 100) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must be 100 characters or fewer.', 'field' => 'title'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_title_max'), 'field' => 'title'];
         }
 
         if (empty($data['body'])) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Push notification body is required.', 'field' => 'body'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_body_required'), 'field' => 'body'];
         } elseif (strlen($data['body']) > 400) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Body must be 400 characters or fewer.', 'field' => 'body'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_body_max'), 'field' => 'body'];
         }
 
         $validAdvertiserTypes = ['sme', 'verein', 'gemeinde', 'private'];
         if (isset($data['advertiser_type']) && ! in_array($data['advertiser_type'], $validAdvertiserTypes, true)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid advertiser type.', 'field' => 'advertiser_type'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_invalid_advertiser_type'), 'field' => 'advertiser_type'];
         }
 
         if (! empty($errors)) {
@@ -149,22 +149,22 @@ class PaidPushCampaignController extends BaseApiController
 
         $campaign = PaidPushCampaignService::getCampaignById($id, $tenantId);
         if ($campaign === null) {
-            return $this->respondNotFound('Campaign not found.');
+            return $this->respondNotFound(__('api.paid_push_campaign_not_found'));
         }
 
         if ((int) $campaign['created_by'] !== $userId) {
-            return $this->respondForbidden('You do not own this campaign.');
+            return $this->respondForbidden(__('api.paid_push_campaign_not_owned'));
         }
 
         $data   = $this->getAllInput();
         $errors = [];
 
         if (isset($data['title']) && strlen($data['title']) > 100) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must be 100 characters or fewer.', 'field' => 'title'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_title_max'), 'field' => 'title'];
         }
 
         if (isset($data['body']) && strlen($data['body']) > 400) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Body must be 400 characters or fewer.', 'field' => 'body'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.paid_push_body_max'), 'field' => 'body'];
         }
 
         if (! empty($errors)) {
@@ -197,17 +197,17 @@ class PaidPushCampaignController extends BaseApiController
 
         $campaign = PaidPushCampaignService::getCampaignById($id, $tenantId);
         if ($campaign === null) {
-            return $this->respondNotFound('Campaign not found.');
+            return $this->respondNotFound(__('api.paid_push_campaign_not_found'));
         }
 
         if ((int) $campaign['created_by'] !== $userId) {
-            return $this->respondForbidden('You do not own this campaign.');
+            return $this->respondForbidden(__('api.paid_push_campaign_not_owned'));
         }
 
         if ($campaign['status'] !== 'draft') {
             return $this->respondWithError(
                 'INVALID_STATUS',
-                'Only draft campaigns can be submitted for review.',
+                __('api.paid_push_submit_draft_only'),
                 null,
                 422
             );
@@ -217,7 +217,7 @@ class PaidPushCampaignController extends BaseApiController
         if (empty($campaign['title']) || empty($campaign['body'])) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Campaign must have a title and body before submission.',
+                __('api.paid_push_submit_requires_title_body'),
                 null,
                 422
             );
@@ -258,17 +258,17 @@ class PaidPushCampaignController extends BaseApiController
 
         $campaign = PaidPushCampaignService::getCampaignById($id, $tenantId);
         if ($campaign === null) {
-            return $this->respondNotFound('Campaign not found.');
+            return $this->respondNotFound(__('api.paid_push_campaign_not_found'));
         }
 
         if ((int) $campaign['created_by'] !== $userId) {
-            return $this->respondForbidden('You do not own this campaign.');
+            return $this->respondForbidden(__('api.paid_push_campaign_not_owned'));
         }
 
         if (! in_array($campaign['status'], ['draft', 'pending_review'], true)) {
             return $this->respondWithError(
                 'INVALID_STATUS',
-                'Only draft or pending_review campaigns can be cancelled.',
+                __('api.paid_push_cancel_draft_or_pending_only'),
                 null,
                 422
             );
@@ -341,7 +341,7 @@ class PaidPushCampaignController extends BaseApiController
 
         $campaign = PaidPushCampaignService::getCampaignById($id, $tenantId);
         if ($campaign === null) {
-            return $this->respondNotFound('Campaign not found.');
+            return $this->respondNotFound(__('api.paid_push_campaign_not_found'));
         }
 
         $analytics = PaidPushCampaignService::getCampaignAnalytics($id, $tenantId);

@@ -34,7 +34,7 @@ set -eo pipefail
 
 # --- Configuration ---
 DEPLOY_DIR="/opt/nexus-php"
-PHP_CONTAINER="nexus-php-app"
+PHP_CONTAINER="${PHP_CONTAINER:-}"
 DB_CONTAINER="nexus-php-db"
 REDIS_CONTAINER="nexus-php-redis"
 MAINTENANCE_FILE="/var/www/html/.maintenance"
@@ -54,11 +54,40 @@ log_info() { echo -e "${CYAN}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_err()  { echo -e "${RED}[FAIL]${NC} $1"; }
 
+detect_php_container() {
+    if [ -n "$PHP_CONTAINER" ]; then
+        return
+    fi
+
+    PHP_CONTAINER=$(docker ps --format "{{.Names}}" | grep -E '^nexus-(blue|green)-php-app$' | head -n 1 || true)
+    if [ -z "$PHP_CONTAINER" ]; then
+        PHP_CONTAINER="nexus-php-app"
+    fi
+}
+
 check_container() {
     local container="$1"
-    if ! docker ps --filter "name=$container" --format "{{.Names}}" | grep -q "$container"; then
+    if ! docker ps --format "{{.Names}}" | grep -qx "$container"; then
         log_err "$container container is not running"
         exit 1
+    fi
+}
+
+verify_http_status() {
+    local expected="$1"
+    local label="$2"
+
+    if [ -z "${MAINTENANCE_VERIFY_URL:-}" ]; then
+        log_info "Skipping HTTP verification; set MAINTENANCE_VERIFY_URL to a non-localhost, non-exempt endpoint"
+        return 0
+    fi
+
+    local http_code
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "$MAINTENANCE_VERIFY_URL" 2>/dev/null || echo "000")
+    if [ "$http_code" = "$expected" ]; then
+        log_ok "Verified: HTTP $http_code ($label)"
+    else
+        log_warn "HTTP $http_code from $MAINTENANCE_VERIFY_URL; expected $expected ($label)"
     fi
 }
 
@@ -221,7 +250,10 @@ maintenance_on() {
     # --- Verify ---
     sleep 1
     local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+    HTTP_CODE="skipped"
+    if [ -n "${MAINTENANCE_VERIFY_URL:-}" ]; then
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$MAINTENANCE_VERIFY_URL" 2>/dev/null || echo "000")
+    fi
 
     if [ "$HTTP_CODE" = "503" ]; then
         log_ok "Verified: HTTP 503 (maintenance active)"
@@ -259,7 +291,10 @@ maintenance_off() {
     # --- Verify ---
     sleep 1
     local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+    HTTP_CODE="skipped"
+    if [ -n "${MAINTENANCE_VERIFY_URL:-}" ]; then
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$MAINTENANCE_VERIFY_URL" 2>/dev/null || echo "000")
+    fi
 
     if [ "$HTTP_CODE" = "200" ]; then
         log_ok "Verified: HTTP 200 (platform is live)"
@@ -302,7 +337,10 @@ maintenance_status() {
 
     # HTTP verification
     local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+    HTTP_CODE="skipped"
+    if [ -n "${MAINTENANCE_VERIFY_URL:-}" ]; then
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$MAINTENANCE_VERIFY_URL" 2>/dev/null || echo "000")
+    fi
     echo -e "    HTTP:     $HTTP_CODE"
 
     # Overall status
@@ -343,6 +381,8 @@ maintenance_status() {
 }
 
 # --- Main ---
+detect_php_container
+
 case "${1:-}" in
     on)
         maintenance_on

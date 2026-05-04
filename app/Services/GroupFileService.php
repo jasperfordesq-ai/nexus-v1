@@ -52,7 +52,7 @@ class GroupFileService
         $tenantId = TenantContext::getId();
 
         if (!$this->isMember($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view files'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_files_member_required')];
             return null;
         }
 
@@ -119,24 +119,24 @@ class GroupFileService
         $tenantId = TenantContext::getId();
 
         if (!$this->isMember($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to upload files'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_files_upload_forbidden')];
             return null;
         }
 
         $file = $fileData['file'] ?? null;
         if (!$file || !$file->isValid()) {
-            $this->errors[] = ['code' => 'INVALID_FILE', 'message' => 'No valid file provided'];
+            $this->errors[] = ['code' => 'INVALID_FILE', 'message' => __('api.group_file_required')];
             return null;
         }
 
         if ($file->getSize() > self::MAX_FILE_SIZE) {
-            $this->errors[] = ['code' => 'FILE_TOO_LARGE', 'message' => 'File exceeds maximum size of 25MB'];
+            $this->errors[] = ['code' => 'FILE_TOO_LARGE', 'message' => __('api.group_file_size_exceeded')];
             return null;
         }
 
         $mimeType = $file->getMimeType();
         if (!in_array($mimeType, self::ALLOWED_TYPES, true)) {
-            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => 'File type not allowed: ' . $mimeType];
+            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => __('api.group_file_type_not_allowed', ['type' => $mimeType])];
             return null;
         }
 
@@ -148,7 +148,7 @@ class GroupFileService
         $path = $file->storeAs($storagePath, $storedName, 'local');
 
         if (!$path) {
-            $this->errors[] = ['code' => 'UPLOAD_FAILED', 'message' => 'Failed to store file'];
+            $this->errors[] = ['code' => 'UPLOAD_FAILED', 'message' => __('api.group_file_store_failed')];
             return null;
         }
 
@@ -188,23 +188,24 @@ class GroupFileService
     /**
      * Download a file (returns file path for streaming).
      */
-    public function download(int $fileId, int $userId): ?array
+    public function download(int $groupId, int $fileId, int $userId): ?array
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
         $file = DB::table('group_files')
             ->where('id', $fileId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$file) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'File not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_file_not_found')];
             return null;
         }
 
         if (!$this->isMember($file->group_id, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to download files'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_files_member_required')];
             return null;
         }
 
@@ -224,18 +225,19 @@ class GroupFileService
     /**
      * Delete a file (admin or uploader).
      */
-    public function delete(int $fileId, int $userId): bool
+    public function delete(int $groupId, int $fileId, int $userId): bool
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
         $file = DB::table('group_files')
             ->where('id', $fileId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$file) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'File not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_file_not_found')];
             return false;
         }
 
@@ -243,7 +245,7 @@ class GroupFileService
         $isAdmin = $this->isAdmin($file->group_id, $userId, $tenantId);
 
         if (!$isUploader && !$isAdmin) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the uploader or an admin can delete files'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_file_delete_forbidden')];
             return false;
         }
 
@@ -302,7 +304,7 @@ class GroupFileService
 
     private function isMember(int $groupId, int $userId, int $tenantId): bool
     {
-        return DB::table('group_members')
+        return GroupService::canModify($groupId, $userId) || DB::table('group_members')
             ->join('groups', 'groups.id', '=', 'group_members.group_id')
             ->where('group_members.group_id', $groupId)
             ->where('group_members.user_id', $userId)
@@ -313,13 +315,6 @@ class GroupFileService
 
     private function isAdmin(int $groupId, int $userId, int $tenantId): bool
     {
-        return DB::table('group_members')
-            ->join('groups', 'groups.id', '=', 'group_members.group_id')
-            ->where('group_members.group_id', $groupId)
-            ->where('group_members.user_id', $userId)
-            ->where('group_members.status', 'active')
-            ->whereIn('group_members.role', ['admin', 'owner'])
-            ->where('groups.tenant_id', $tenantId)
-            ->exists();
+        return GroupService::canModify($groupId, $userId);
     }
 }

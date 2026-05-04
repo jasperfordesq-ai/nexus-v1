@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\GroupAnalyticsService;
+use App\Services\GroupService;
 
 /**
  * GroupAnalyticsController — Dashboard, growth, engagement, retention, and export analytics for groups.
@@ -25,18 +26,8 @@ class GroupAnalyticsController extends BaseApiController
      */
     private function requireGroupAdmin(int $groupId, int $userId): ?JsonResponse
     {
-        $tenantId = TenantContext::getId();
-        $isAdmin = DB::table('group_members')
-            ->join('groups', 'groups.id', '=', 'group_members.group_id')
-            ->where('group_members.group_id', $groupId)
-            ->where('group_members.user_id', $userId)
-            ->where('group_members.status', 'active')
-            ->whereIn('group_members.role', ['admin', 'owner'])
-            ->where('groups.tenant_id', $tenantId)
-            ->exists();
-
-        if (!$isAdmin) {
-            return $this->errorResponse('Only group admins can access analytics', 403);
+        if (!GroupService::canModify($groupId, $userId)) {
+            return $this->errorResponse(__('api.group_analytics_admin_required'), 403);
         }
         return null;
     }

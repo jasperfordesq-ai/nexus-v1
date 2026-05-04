@@ -63,6 +63,8 @@ const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard; label: string }
   { key: 'settings', icon: Settings, label: 'Settings' },
 ];
 
+const ORG_DASH_TABS = TAB_DEFS.map((tab) => tab.key);
+
 export default function VolOrgDashboardPage() {
   const { orgId: orgIdParam } = useParams<{ orgId: string }>();
   const orgId = parseInt(orgIdParam || '0', 10);
@@ -72,7 +74,8 @@ export default function VolOrgDashboardPage() {
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
-  const initialTab = (searchParams.get('tab') as OrgDashTab) || 'overview';
+  const requestedTab = searchParams.get('tab') as OrgDashTab | null;
+  const initialTab = requestedTab && ORG_DASH_TABS.includes(requestedTab) ? requestedTab : 'overview';
   const [tab, setTabState] = useState<OrgDashTab>(initialTab);
   const [org, setOrg] = useState<OrgDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,6 +96,12 @@ export default function VolOrgDashboardPage() {
       return next;
     }, { replace: true });
   }, [setSearchParams]);
+
+  useEffect(() => {
+    if (!ORG_DASH_TABS.includes(tab)) {
+      setTab('overview');
+    }
+  }, [tab, setTab]);
 
   const loadOrg = useCallback(async () => {
     abortRef.current?.abort();

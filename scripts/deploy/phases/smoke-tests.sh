@@ -73,14 +73,53 @@ run_smoke_tests() {
         TESTS_FAILED=1
     fi
 
-    # Check container health (only OUR containers, not nexus-backend-*, nexus-frontend-*, etc.)
-    local UNHEALTHY=$(docker ps --filter "name=nexus-php" --filter "name=nexus-react-prod" --filter "name=nexus-sales-site" --format "{{.Names}}: {{.Status}}" | grep -i "unhealthy" || true)
+    # Check container health using exact Project NEXUS container names only.
+    local OWN_CONTAINERS=(
+        nexus-php-app
+        nexus-php-db
+        nexus-php-redis
+        nexus-react-prod
+        nexus-sales-site
+        nexus-meilisearch
+        nexus-blue-php-app
+        nexus-blue-frontend
+        nexus-blue-sales
+        nexus-green-php-app
+        nexus-green-frontend
+        nexus-green-sales
+    )
+    local UNHEALTHY=""
+    local CONTAINER STATUS
+    for CONTAINER in "${OWN_CONTAINERS[@]}"; do
+        if docker ps --format "{{.Names}}" | grep -qx "$CONTAINER"; then
+            STATUS=$(docker ps --filter "name=^/${CONTAINER}$" --format "{{.Names}}: {{.Status}}" | head -n 1)
+            if echo "$STATUS" | grep -qi "unhealthy"; then
+                UNHEALTHY="${UNHEALTHY}${STATUS}"$'\n'
+            fi
+        fi
+    done
     if [ -n "$UNHEALTHY" ]; then
         log_err "Unhealthy containers detected:"
         echo "$UNHEALTHY" | tee -a "$LOG_FILE"
         TESTS_FAILED=1
     else
         log_ok "All containers healthy"
+    fi
+
+    local MEILI_HOST
+    MEILI_HOST=$(grep "^MEILISEARCH_HOST=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2- | tr -d "\"'" || true)
+    if [ -n "$MEILI_HOST" ]; then
+        if ! docker ps --format "{{.Names}}" | grep -qx "nexus-meilisearch"; then
+            log_err "Meilisearch is configured but nexus-meilisearch is not running"
+            TESTS_FAILED=1
+        elif docker exec nexus-meilisearch wget --no-verbose --tries=1 --spider http://127.0.0.1:7700/health > /dev/null 2>&1; then
+            log_ok "Meilisearch health check passed"
+        else
+            log_err "Meilisearch health check failed"
+            TESTS_FAILED=1
+        fi
+    else
+        log_info "Meilisearch health check skipped (MEILISEARCH_HOST not configured)"
     fi
 
     if [ $TESTS_FAILED -eq 1 ]; then

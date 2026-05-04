@@ -72,7 +72,6 @@ jobs:
             exit 0
           fi
           npx playwright test --project=$PROJECT
-        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -121,7 +120,6 @@ jobs:
 
       - name: Run E2E tests
         run: npx playwright test --project=${{ matrix.project }}
-        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -157,11 +155,9 @@ jobs:
 
       - name: Run Modern theme tests
         run: npx playwright test --project=chromium-modern
-        continue-on-error: true
 
       - name: Run CivicOne theme tests
         run: npx playwright test --project=chromium-civicone
-        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

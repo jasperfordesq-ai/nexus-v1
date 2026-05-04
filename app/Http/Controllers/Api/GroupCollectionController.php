@@ -21,6 +21,6 @@ class GroupCollectionController extends BaseApiController
     public function show(int $id): JsonResponse
     {
         $col = GroupCollectionService::get($id);
-        return $col ? $this->successResponse($col) : $this->errorResponse('Not found', 404);
+        return $col ? $this->successResponse($col) : $this->errorResponse(__('api.group_collection_not_found'), 404);
     }
 }

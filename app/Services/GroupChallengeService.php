@@ -145,7 +145,7 @@ class GroupChallengeService
                         'user_id' => $userId,
                         'xp_amount' => $challenge->reward_xp,
                         'action' => 'group_challenge',
-                        'description' => 'Challenge completed: ' . $challenge->title,
+                        'description' => __('api.group_challenge_completed_xp', ['title' => $challenge->title]),
                         'created_at' => now(),
                     ]);
                 } catch (\Exception $e) {
@@ -169,12 +169,13 @@ class GroupChallengeService
     /**
      * Delete a challenge.
      */
-    public static function delete(int $challengeId): bool
+    public static function delete(int $groupId, int $challengeId): bool
     {
         $tenantId = TenantContext::getId();
 
         return DB::table('group_challenges')
             ->where('id', $challengeId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->delete() > 0;
     }

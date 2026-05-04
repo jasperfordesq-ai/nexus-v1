@@ -1,65 +1,62 @@
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
-// Auto-generated files that should not have SPDX headers added
-const EXCLUDED_FILENAMES = ['expo-env.d.ts'];
+import { execFileSync } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
 
-function walk(dir, ext, results = []) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory() && !['node_modules', 'vendor', 'dist', '.git', '.expo'].includes(entry.name)) {
-      walk(full, ext, results);
-    } else if (ext.some(e => entry.name.endsWith(e)) && !EXCLUDED_FILENAMES.includes(entry.name)) {
-      results.push(full);
-    }
-  }
-  return results;
+const EXCLUDED_FILENAMES = new Set([
+  'expo-env.d.ts',
+]);
+
+const EXCLUDED_PATH_PARTS = new Set([
+  'node_modules',
+  'vendor',
+  'dist',
+  'build',
+  '.git',
+  '.expo',
+]);
+
+function isExcluded(path) {
+  const normalized = path.replaceAll('\\', '/');
+  const parts = normalized.split('/');
+  const filename = parts.at(-1);
+
+  return EXCLUDED_FILENAMES.has(filename) || parts.some((part) => EXCLUDED_PATH_PARTS.has(part));
 }
 
-const dirs = [
-  { path: 'src', ext: ['.php'] },
-  { path: 'httpdocs', ext: ['.php'] },
-  { path: 'tests', ext: ['.php'] },
-  { path: 'app', ext: ['.php'] },
-  { path: 'config', ext: ['.php'] },
-  { path: 'routes', ext: ['.php'] },
-  { path: 'views', ext: ['.php'] },
-  { path: 'migrations', ext: ['.php'] },
-  { path: join('database', 'migrations'), ext: ['.php'] },
-  { path: join('react-frontend', 'src'), ext: ['.ts', '.tsx'] },
-  { path: 'e2e', ext: ['.ts', '.tsx'] },
-  { path: 'mobile', ext: ['.ts', '.tsx'] },
-];
+const trackedFiles = execFileSync('git', ['ls-files', '*.php', '*.ts', '*.tsx'], {
+  encoding: 'utf8',
+})
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .filter((path) => !isExcluded(path));
 
-let totalFiles = 0;
-let totalWithHeader = 0;
-let totalMissing = 0;
+const missing = [];
 
-for (const { path: dirPath, ext } of dirs) {
-  if (!existsSync(dirPath)) continue;
-  const files = walk(dirPath, ext);
-  const missing = files.filter(f => {
-    const content = readFileSync(f, 'utf-8');
-    return !content.includes('SPDX-License-Identifier');
-  });
-  const withHeader = files.length - missing.length;
-
-  console.log(`${dirPath}: ${files.length} files, ${withHeader} with header, ${missing.length} missing`);
-  if (missing.length > 0) {
-    missing.forEach(f => console.log(`  MISSING: ${f}`));
+for (const file of trackedFiles) {
+  if (!existsSync(file)) {
+    continue;
   }
-
-  totalFiles += files.length;
-  totalWithHeader += withHeader;
-  totalMissing += missing.length;
+  const content = readFileSync(file, 'utf8');
+  if (!content.includes('SPDX-License-Identifier')) {
+    missing.push(file);
+  }
 }
 
-console.log('');
-console.log(`TOTAL: ${totalFiles} files, ${totalWithHeader} with header, ${totalMissing} missing`);
+const existingFiles = trackedFiles.filter((file) => existsSync(file));
+const withHeader = existingFiles.length - missing.length;
 
-if (totalMissing === 0) {
+console.log(`tracked source: ${existingFiles.length} files, ${withHeader} with header, ${missing.length} missing`);
+if (missing.length > 0) {
+  missing.forEach((file) => console.log(`  MISSING: ${file}`));
+}
+
+if (missing.length === 0) {
   console.log('ALL FILES HAVE SPDX HEADERS');
 } else {
-  console.error(`ERROR: ${totalMissing} files are missing SPDX headers!`);
+  console.error(`ERROR: ${missing.length} files are missing SPDX headers!`);
   process.exitCode = 1;
 }

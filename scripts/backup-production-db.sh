@@ -69,7 +69,7 @@ BACKUP_PATH="/opt/nexus-php/backups/${BACKUP_NAME}"
 info "Creating backup..."
 ssh $SSH_OPTS "$SSH_HOST" \
     "sudo mkdir -p /opt/nexus-php/backups && \
-     sudo docker exec ${DB_CONTAINER} mariadb-dump -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+     sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb-dump -u '${DB_USER}' ${DB_NAME} \
      | sudo tee ${BACKUP_PATH} > /dev/null" || {
     error "Backup failed!"
     exit 1

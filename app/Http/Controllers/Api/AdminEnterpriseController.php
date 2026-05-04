@@ -340,8 +340,8 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
             $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
-            return $this->respondWithData(['data' => $consents, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
-        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
+            return $this->respondWithData($consents, ['total' => $total, 'page' => $page, 'per_page' => $perPage]);
+        } catch (\Exception $e) { return $this->respondWithData([], ['total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
 
     /** GET /api/v2/admin/enterprise/gdpr/breaches */
@@ -357,8 +357,8 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
             $breaches = array_map(fn($r) => (array)$r, DB::select("SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
-            return $this->respondWithData(['data' => $breaches, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
-        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
+            return $this->respondWithData($breaches, ['total' => $total, 'page' => $page, 'per_page' => $perPage]);
+        } catch (\Exception $e) { return $this->respondWithData([], ['total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
 
     /** POST /api/v2/admin/enterprise/gdpr/breaches */

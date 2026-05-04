@@ -48,11 +48,12 @@ class GroupScheduledPostService
             ->toArray();
     }
 
-    public static function cancel(int $postId): bool
+    public static function cancel(int $groupId, int $postId): bool
     {
         $tenantId = TenantContext::getId();
         return DB::table('group_scheduled_posts')
             ->where('id', $postId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'scheduled')
             ->update(['status' => 'cancelled', 'updated_at' => now()]) > 0;
@@ -77,7 +78,7 @@ class GroupScheduledPostService
                     DB::table('group_announcements')->insert([
                         'tenant_id' => $post->tenant_id,
                         'group_id' => $post->group_id,
-                        'title' => $post->title ?? 'Announcement',
+                        'title' => $post->title ?? __('api.group_scheduled_announcement_title'),
                         'content' => $post->content,
                         'created_by' => $post->user_id,
                         'created_at' => now(),
@@ -88,7 +89,7 @@ class GroupScheduledPostService
                         'tenant_id' => $post->tenant_id,
                         'group_id' => $post->group_id,
                         'user_id' => $post->user_id,
-                        'title' => $post->title ?? 'Scheduled Post',
+                        'title' => $post->title ?? __('api.group_scheduled_post_title'),
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

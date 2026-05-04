@@ -14,6 +14,7 @@ import { Avatar, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
+import { useTenant } from '@/contexts';
 
 interface LeaderboardEntry {
   user_id: number;
@@ -30,6 +31,7 @@ interface Props {
 
 export function MostAppreciatedWidget({ period = 'last_30d', limit = 10, className = '' }: Props) {
   const { t } = useTranslation('common');
+  const { tenantPath } = useTenant();
   const [rows, setRows] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +67,7 @@ export function MostAppreciatedWidget({ period = 'last_30d', limit = 10, classNa
           rows.map((r, idx) => (
             <Link
               key={r.user_id}
-              to={`/users/${r.user_id}/appreciations`}
+              to={tenantPath(`/users/${r.user_id}/appreciations`)}
               className="flex items-center gap-2 py-1 px-1 rounded hover:bg-[var(--surface-hover)]"
             >
               <span className="text-sm font-bold w-5 text-center text-[var(--text-muted)]">{idx + 1}</span>

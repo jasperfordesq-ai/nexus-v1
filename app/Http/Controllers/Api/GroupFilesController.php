@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Services\GroupFileService;
+use App\Services\GroupService;
 
 /**
  * GroupFilesController — File upload, download, list, and delete for groups.
@@ -63,7 +64,7 @@ class GroupFilesController extends BaseApiController
         $file = $request->file('file');
 
         if (!$file) {
-            return $this->error('No file provided', 400);
+            return $this->error(__('api.group_file_required'), 400);
         }
 
         $result = $this->fileService->upload($groupId, $userId, [
@@ -95,7 +96,7 @@ class GroupFilesController extends BaseApiController
             return $userId;
         }
 
-        $result = $this->fileService->download($fileId, $userId);
+        $result = $this->fileService->download($groupId, $fileId, $userId);
 
         if ($result === null) {
             $errors = $this->fileService->getErrors();
@@ -109,7 +110,7 @@ class GroupFilesController extends BaseApiController
 
         $disk = Storage::disk('local');
         if (!$disk->exists($result['file_path'])) {
-            return $this->error('File not found on disk', 404);
+            return $this->error(__('api.group_file_missing_on_disk'), 404);
         }
 
         return $disk->download(
@@ -129,7 +130,7 @@ class GroupFilesController extends BaseApiController
             return $userId;
         }
 
-        $success = $this->fileService->delete($fileId, $userId);
+        $success = $this->fileService->delete($groupId, $fileId, $userId);
 
         if (!$success) {
             $errors = $this->fileService->getErrors();
@@ -154,6 +155,10 @@ class GroupFilesController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::isActiveMember($groupId, $userId) && !GroupService::canModify($groupId, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_files_member_required'), null, 403);
+        }
+
         $folders = $this->fileService->getFolders($groupId);
         return $this->respondWithData($folders);
     }
@@ -166,6 +171,10 @@ class GroupFilesController extends BaseApiController
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
+        }
+
+        if (!GroupService::isActiveMember($groupId, $userId) && !GroupService::canModify($groupId, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_files_member_required'), null, 403);
         }
 
         $stats = $this->fileService->getStats($groupId);

@@ -3,6 +3,7 @@
     "description": "Project NEXUS Timebanking Platform",
     "type": "project",
     "version": "1.5.0",
+    "license": "AGPL-3.0-or-later",
     "autoload": {
         "psr-4": {
             "App\\": "app/"

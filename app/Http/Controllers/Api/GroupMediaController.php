@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Core\TenantContext;
+use App\Services\GroupService;
 
 /**
  * GroupMediaController — Media gallery for groups: list, upload, and delete images/videos.
@@ -30,6 +31,10 @@ class GroupMediaController extends BaseApiController
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
+        }
+
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_media_forbidden'), null, 403);
         }
 
         $tenantId = TenantContext::getId();
@@ -96,19 +101,23 @@ class GroupMediaController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_media_upload_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         $file = request()->file('file');
         if (!$file || !$file->isValid()) {
-            return $this->errorResponse('No valid file provided', 400);
+            return $this->errorResponse(__('api.group_media_file_required'), 400);
         }
 
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'];
         if (!in_array($file->getMimeType(), $allowedMimes, true)) {
-            return $this->respondWithError('File type not allowed', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_type_not_allowed'), null, 422);
         }
         if ($file->getSize() > 50 * 1024 * 1024) {
-            return $this->respondWithError('File exceeds maximum allowed size of 50MB', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_size_exceeded'), null, 422);
         }
 
         // Determine type from mime
@@ -118,14 +127,14 @@ class GroupMediaController extends BaseApiController
         } elseif (str_starts_with($mime, 'video/')) {
             $type = 'video';
         } else {
-            return $this->errorResponse('Only image and video files are accepted', 422);
+            return $this->errorResponse(__('api.group_media_images_videos_only'), 422);
         }
 
         $storagePath = "groups/{$tenantId}/{$id}/media";
         $path = $file->store($storagePath, 'public');
 
         if (!$path) {
-            return $this->errorResponse('Failed to store file', 500);
+            return $this->errorResponse(__('api.group_media_store_failed'), 500);
         }
 
         $fileUrl = Storage::disk('public')->url($path);
@@ -167,17 +176,14 @@ class GroupMediaController extends BaseApiController
         );
 
         if (!$media) {
-            return $this->errorResponse('Media not found', 404);
+            return $this->errorResponse(__('api.group_media_not_found'), 404);
         }
 
         // Authorization: only uploader or group admin can delete
-        $isUploader = (int) $media->uploaded_by === $userId;
-        $isAdmin = DB::selectOne(
-            "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active' AND role IN ('admin', 'owner')",
-            [$id, $userId]
-        );
+        $isUploader = (int) $media->uploaded_by === $userId && GroupService::isActiveMember($id, $userId);
+        $isAdmin = GroupService::canModify($id, $userId);
         if (!$isUploader && !$isAdmin) {
-            return $this->errorResponse('Only the uploader or a group admin can delete media', 403);
+            return $this->errorResponse(__('api.group_media_delete_forbidden'), 403);
         }
 
         // Delete file from storage

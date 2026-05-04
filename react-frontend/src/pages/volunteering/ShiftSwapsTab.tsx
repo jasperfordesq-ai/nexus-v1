@@ -476,7 +476,7 @@ export function ShiftSwapsTab() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('volunteering.cancel', 'Cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{t('cancel', 'Cancel')}</Button>
                 <Button color="danger" onPress={handleReject}>{t('swaps.reject', 'Reject')}</Button>
               </ModalFooter>
             </>

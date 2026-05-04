@@ -3265,8 +3265,8 @@ CREATE TABLE `federated_identities` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_fed_identities_tenant_partner_external` (`tenant_id`,`partner_id`,`external_user_id`),
   UNIQUE KEY `uniq_fed_identities_tenant_user_partner` (`tenant_id`,`local_user_id`,`partner_id`),
-  KEY `idx_fed_identities_tenant` (`tenant_id`),
-  KEY `idx_fed_identity_local_user` (`local_user_id`)
+  KEY `idx_fed_identity_local_user` (`local_user_id`),
+  KEY `idx_fed_identities_tenant` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_aggregate_consents`;
@@ -3767,6 +3767,7 @@ CREATE TABLE `federation_messages` (
   `external_receiver_name` varchar(255) DEFAULT NULL,
   `external_message_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_fed_messages_external_idempotency` (`receiver_tenant_id`,`external_partner_id`,`external_message_id`),
   KEY `idx_sender` (`sender_tenant_id`,`sender_user_id`),
   KEY `idx_receiver` (`receiver_tenant_id`,`receiver_user_id`),
   KEY `idx_direction` (`direction`),
@@ -3774,8 +3775,7 @@ CREATE TABLE `federation_messages` (
   KEY `idx_created` (`created_at`),
   KEY `idx_thread` (`sender_tenant_id`,`sender_user_id`,`receiver_tenant_id`,`receiver_user_id`),
   KEY `idx_ref_message` (`reference_message_id`),
-  KEY `idx_external_partner` (`external_partner_id`),
-  UNIQUE KEY `uniq_fed_messages_external_idempotency` (`receiver_tenant_id`,`external_partner_id`,`external_message_id`)
+  KEY `idx_external_partner` (`external_partner_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cross-tenant messages between federated timebank members';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_neighborhood_members`;
@@ -6479,7 +6479,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=219 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12150,10 +12150,10 @@ CREATE TABLE `verein_event_shares` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `verein_event_shares_unique_target` (`tenant_id`,`event_id`,`target_organization_id`),
   KEY `verein_event_shares_target_idx` (`target_organization_id`,`status`),
   KEY `verein_event_shares_event_idx` (`event_id`),
-  KEY `verein_event_shares_source_idx` (`tenant_id`,`source_organization_id`),
-  UNIQUE KEY `verein_event_shares_unique_target` (`tenant_id`,`event_id`,`target_organization_id`)
+  KEY `verein_event_shares_source_idx` (`tenant_id`,`source_organization_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `verein_federation_consents`;
@@ -12664,11 +12664,13 @@ CREATE TABLE `vol_opportunities` (
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `location` varchar(255) DEFAULT NULL,
+  `is_remote` tinyint(1) NOT NULL DEFAULT 0,
   `skills_needed` varchar(255) DEFAULT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
   `status` varchar(20) DEFAULT 'open',
   `credits_offered` int(11) DEFAULT 0,
@@ -13448,9 +13450,10 @@ INSERT INTO `laravel_migrations` VALUES
 (216,'2026_05_04_000001_add_tenant_id_to_user_blocks',96),
 (217,'2026_05_04_120000_enforce_caring_hour_transfer_idempotency',96),
 (218,'2026_05_04_130000_expand_reports_feed_target_types',96),
-(219,'2026_05_04_140000_scope_federated_identities_by_tenant',96),
-(220,'2026_05_04_141000_enforce_federation_message_idempotency',96),
-(221,'2026_05_04_142000_enforce_verein_event_share_idempotency',96);
+(219,'2026_05_04_140000_scope_federated_identities_by_tenant',97),
+(220,'2026_05_04_141000_enforce_federation_message_idempotency',97),
+(221,'2026_05_04_142000_enforce_verein_event_share_idempotency',97),
+(222,'2026_05_04_143000_add_remote_and_updated_at_to_vol_opportunities',97);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

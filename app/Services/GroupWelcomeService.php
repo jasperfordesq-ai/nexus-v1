@@ -56,7 +56,7 @@ class GroupWelcomeService
                 'policy_value' => json_encode($enabled),
                 'category' => 'notifications',
                 'value_type' => 'boolean',
-                'description' => 'Welcome message enabled for group ' . $groupId,
+                'description' => __('api.group_welcome_enabled_description', ['group' => $groupId]),
             ],
             [
                 'tenant_id' => $tenantId,
@@ -64,7 +64,7 @@ class GroupWelcomeService
                 'policy_value' => json_encode($message),
                 'category' => 'notifications',
                 'value_type' => 'string',
-                'description' => 'Welcome message template for group ' . $groupId,
+                'description' => __('api.group_welcome_template_description', ['group' => $groupId]),
             ],
         ];
 
@@ -88,19 +88,23 @@ class GroupWelcomeService
             return false;
         }
 
-        $user = DB::table('users')->where('id', $userId)->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->first();
         $group = DB::table('groups')->where('id', $groupId)->where('tenant_id', $tenantId)->first();
 
         if (!$user || !$group) {
             return false;
         }
 
-        $owner = DB::table('users')->where('id', $group->owner_id)->first();
+        $owner = DB::table('users')->where('id', $group->owner_id)->where('tenant_id', $tenantId)->first();
 
         // Replace template variables
         $message = str_replace(
             ['{member_name}', '{group_name}', '{admin_name}'],
-            [$user->name ?? 'Member', $group->name, $owner->name ?? 'Admin'],
+            [
+                $user->name ?? __('api.group_welcome_member_fallback'),
+                $group->name,
+                $owner->name ?? __('api.group_welcome_admin_fallback'),
+            ],
             $config['message']
         );
 
@@ -110,7 +114,7 @@ class GroupWelcomeService
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'type' => 'group_welcome',
-                'title' => 'Welcome to ' . $group->name,
+                'title' => __('api.group_welcome_notification_title', ['group' => $group->name]),
                 'content' => $message,
                 'link' => '/groups/' . $groupId,
                 'is_read' => 0,

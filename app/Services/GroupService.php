@@ -23,6 +23,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * GroupService — Laravel DI-based service for group operations.
@@ -44,6 +45,7 @@ class GroupService
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
+        $viewerUserId = !empty($filters['viewer_user_id']) ? (int) $filters['viewer_user_id'] : null;
 
         $query = Group::query()
             ->with(['creator:id,first_name,last_name,avatar_url'])
@@ -60,7 +62,40 @@ class GroupService
         }
 
         if (! empty($filters['visibility'])) {
-            $query->where('visibility', $filters['visibility']);
+            $visibility = $filters['visibility'];
+            $query->where('visibility', $visibility);
+            if ($visibility === 'private') {
+                if ($viewerUserId && self::isPlatformAdmin($viewerUserId)) {
+                    // Tenant/platform admins may audit private groups in their tenant.
+                } elseif ($viewerUserId) {
+                    $query->where(function (Builder $q) use ($viewerUserId) {
+                        $q->where('owner_id', $viewerUserId)
+                            ->orWhereIn('id', function ($sub) use ($viewerUserId) {
+                                $sub->select('group_id')
+                                    ->from('group_members')
+                                    ->where('user_id', $viewerUserId)
+                                    ->where('status', 'active');
+                            });
+                    });
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }
+        } else {
+            $query->where(function (Builder $q) use ($viewerUserId) {
+                $q->where('visibility', 'public');
+                if ($viewerUserId && self::isPlatformAdmin($viewerUserId)) {
+                    $q->orWhere('visibility', 'private');
+                } elseif ($viewerUserId) {
+                    $q->orWhere('owner_id', $viewerUserId);
+                    $q->orWhereIn('id', function ($sub) use ($viewerUserId) {
+                        $sub->select('group_id')
+                            ->from('group_members')
+                            ->where('user_id', $viewerUserId)
+                            ->where('status', 'active');
+                    });
+                }
+            });
         }
 
         if (! empty($filters['type_id'])) {
@@ -145,7 +180,7 @@ class GroupService
     /**
      * Get a single group by ID.
      */
-    public static function getById(int $id, ?int $currentUserId = null): ?array
+    public static function getById(int $id, ?int $currentUserId = null, bool $enforceVisibility = false): ?array
     {
         /** @var Group|null $group */
         $group = Group::query()
@@ -154,6 +189,10 @@ class GroupService
             ->find($id);
 
         if (! $group) {
+            return null;
+        }
+
+        if ($enforceVisibility && ! self::canView($id, $currentUserId)) {
             return null;
         }
 
@@ -180,6 +219,18 @@ class GroupService
             ->where('parent_id', $id)
             ->where(function ($q) {
                 $q->where('is_active', 1)->orWhereNull('is_active');
+            })
+            ->where(function ($q) use ($currentUserId) {
+                $q->where('visibility', 'public');
+                if ($currentUserId) {
+                    $q->orWhere('owner_id', $currentUserId);
+                    $q->orWhereIn('id', function ($sub) use ($currentUserId) {
+                        $sub->select('group_id')
+                            ->from('group_members')
+                            ->where('user_id', $currentUserId)
+                            ->where('status', 'active');
+                    });
+                }
             })
             ->orderBy('name')
             ->select(['id', 'name', 'description', 'image_url', 'visibility', 'cached_member_count', 'type_id', 'parent_id'])
@@ -215,25 +266,27 @@ class GroupService
                 'is_admin' => in_array($membership->role ?? '', ['admin', 'owner']),
             ] : null;
 
-            // Recent members (last 5 active members)
-            $recentMembers = DB::table('group_members')
-                ->join('users', 'group_members.user_id', '=', 'users.id')
-                ->whereIn('group_members.group_id', fn ($q) => $q->select('id')->from('groups')->where('tenant_id', $tenantId))
-                ->where('group_members.group_id', $id)
-                ->where('group_members.status', 'active')
-                ->orderByDesc('group_members.created_at')
-                ->limit(5)
-                ->select(['users.id', 'users.first_name', 'users.last_name', 'users.avatar_url'])
-                ->get();
+            if (self::isActiveMember($id, $currentUserId) || self::isPlatformAdmin($currentUserId)) {
+                // Recent members (last 5 active members)
+                $recentMembers = DB::table('group_members')
+                    ->join('users', 'group_members.user_id', '=', 'users.id')
+                    ->whereIn('group_members.group_id', fn ($q) => $q->select('id')->from('groups')->where('tenant_id', $tenantId))
+                    ->where('group_members.group_id', $id)
+                    ->where('group_members.status', 'active')
+                    ->orderByDesc('group_members.created_at')
+                    ->limit(5)
+                    ->select(['users.id', 'users.first_name', 'users.last_name', 'users.avatar_url'])
+                    ->get();
 
-            $data['recent_members'] = $recentMembers->map(fn($m) => [
-                'id'         => (int) $m->id,
-                'first_name' => $m->first_name,
-                'last_name'  => $m->last_name,
-                'name'       => trim(($m->first_name ?? '') . ' ' . ($m->last_name ?? '')),
-                'avatar_url' => $m->avatar_url,
-                'avatar'     => $m->avatar_url,
-            ])->all();
+                $data['recent_members'] = $recentMembers->map(fn($m) => [
+                    'id'         => (int) $m->id,
+                    'first_name' => $m->first_name,
+                    'last_name'  => $m->last_name,
+                    'name'       => trim(($m->first_name ?? '') . ' ' . ($m->last_name ?? '')),
+                    'avatar_url' => $m->avatar_url,
+                    'avatar'     => $m->avatar_url,
+                ])->all();
+            }
         }
 
         return $data;
@@ -254,8 +307,12 @@ class GroupService
     /**
      * Create a new group.
      */
-    public static function create(int $userId, array $data): Group
+    public static function create(int $userId, array $data): ?Group
     {
+        if (! self::validate($data)) {
+            return null;
+        }
+
         $group = DB::transaction(function () use ($userId, $data) {
             $group = new Group([
                 'owner_id'             => $userId,
@@ -347,7 +404,7 @@ class GroupService
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
-            return ['success' => false, 'error' => __('api.group_not_found')];
+            return ['success' => false, 'code' => 'NOT_FOUND', 'error' => __('api.group_not_found')];
         }
 
         $existing = DB::table('group_members')
@@ -358,9 +415,9 @@ class GroupService
         if ($existing) {
             // Prevent banned users from rejoining
             if (($existing->status ?? '') === 'banned') {
-                return ['success' => false, 'error' => __('api.group_banned')];
+                return ['success' => false, 'code' => 'BANNED', 'error' => __('api.group_banned')];
             }
-            return ['success' => false, 'error' => __('api.group_already_member')];
+            return ['success' => false, 'code' => 'ALREADY_MEMBER', 'error' => __('api.group_already_member')];
         }
 
         $status = $group->visibility === 'private' ? 'pending' : 'active';
@@ -398,6 +455,8 @@ class GroupService
      */
     public static function leave(int $groupId, int $userId): bool
     {
+        self::$errors = [];
+
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
@@ -405,10 +464,41 @@ class GroupService
             return false;
         }
 
+        $membership = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (! $membership) {
+            self::$errors[] = ['code' => 'NOT_MEMBER', 'message' => __('api.group_user_not_member')];
+            return false;
+        }
+
+        if ((int) $group->owner_id === $userId) {
+            self::$errors[] = ['code' => 'SOLE_ADMIN', 'message' => __('api.group_owner_transfer_required')];
+            return false;
+        }
+
+        if (($membership->status ?? '') === 'active' && in_array($membership->role ?? '', ['admin', 'owner'], true)) {
+            $adminCount = DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('status', 'active')
+                ->whereIn('role', ['admin', 'owner'])
+                ->count();
+
+            if ($adminCount <= 1) {
+                self::$errors[] = ['code' => 'SOLE_ADMIN', 'message' => __('api.group_sole_admin_transfer_required')];
+                return false;
+            }
+        }
+
+        $wasActive = ($membership->status ?? '') === 'active';
         $detached = $group->members()->detach($userId);
 
         if ($detached > 0) {
-            $group->decrement('cached_member_count');
+            if ($wasActive && (int) $group->cached_member_count > 0) {
+                $group->decrement('cached_member_count');
+            }
             try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_LEFT, ['user_id' => $userId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire member_left webhook', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
             try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_LEFT, $groupId, $userId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log member_left audit', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
 
@@ -492,6 +582,28 @@ class GroupService
             return false;
         }
 
+        if (array_key_exists('name', $data)) {
+            $name = trim((string) $data['name']);
+            if ($name === '') {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.name_required'), 'field' => 'name'];
+            } elseif (mb_strlen($name) > 255) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_name_max_255'), 'field' => 'name'];
+            }
+            $data['name'] = $name;
+        }
+
+        if (
+            array_key_exists('visibility', $data)
+            && $data['visibility'] !== null
+            && ! in_array($data['visibility'], ['public', 'private'], true)
+        ) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_visibility_invalid'), 'field' => 'visibility'];
+        }
+
+        if (! empty(self::$errors)) {
+            return false;
+        }
+
         $allowed = ['name', 'description', 'visibility', 'location', 'latitude', 'longitude', 'federated_visibility'];
         $updates = collect($data)->only($allowed)->all();
 
@@ -558,6 +670,10 @@ class GroupService
                 ->all();
 
             if (! empty($discussionIds)) {
+                if (Schema::hasTable('group_discussion_subscribers')) {
+                    DB::table('group_discussion_subscribers')->whereIn('discussion_id', $discussionIds)->delete();
+                }
+
                 GroupPost::withoutGlobalScopes()
                     ->whereIn('discussion_id', $discussionIds)
                     ->delete();
@@ -585,6 +701,8 @@ class GroupService
                 DB::table('group_chatrooms')->where('group_id', $id)->delete();
             }
 
+            self::deleteRelatedGroupRecords($id);
+
             // Delete the group itself
             $group->delete();
 
@@ -599,6 +717,68 @@ class GroupService
 
             return true;
         });
+    }
+
+    private static function deleteRelatedGroupRecords(int $groupId): void
+    {
+        if (Schema::hasTable('group_wiki_pages')) {
+            $pageIds = DB::table('group_wiki_pages')->where('group_id', $groupId)->pluck('id')->all();
+            if (! empty($pageIds) && Schema::hasTable('group_wiki_revisions')) {
+                DB::table('group_wiki_revisions')->whereIn('page_id', $pageIds)->delete();
+            }
+            DB::table('group_wiki_pages')->where('group_id', $groupId)->delete();
+        }
+
+        if (Schema::hasTable('group_questions')) {
+            $questionIds = DB::table('group_questions')->where('group_id', $groupId)->pluck('id')->all();
+            if (! empty($questionIds)) {
+                if (Schema::hasTable('group_answers')) {
+                    $answerIds = DB::table('group_answers')->whereIn('question_id', $questionIds)->pluck('id')->all();
+                    if (! empty($answerIds) && Schema::hasTable('group_qa_votes')) {
+                        DB::table('group_qa_votes')->where('votable_type', 'answer')->whereIn('votable_id', $answerIds)->delete();
+                    }
+                    DB::table('group_answers')->whereIn('question_id', $questionIds)->delete();
+                }
+                if (Schema::hasTable('group_qa_votes')) {
+                    DB::table('group_qa_votes')->where('votable_type', 'question')->whereIn('votable_id', $questionIds)->delete();
+                }
+            }
+            DB::table('group_questions')->where('group_id', $groupId)->delete();
+        }
+
+        foreach ([
+            'group_announcements',
+            'group_audit_log',
+            'group_approval_requests',
+            'group_challenges',
+            'group_chatrooms',
+            'group_custom_field_values',
+            'group_files',
+            'group_invites',
+            'group_media',
+            'group_notification_preferences',
+            'group_scheduled_posts',
+            'group_tag_assignments',
+            'group_views',
+            'group_webhooks',
+        ] as $table) {
+            if (Schema::hasTable($table)) {
+                DB::table($table)->where('group_id', $groupId)->delete();
+            }
+        }
+
+        if (Schema::hasTable('group_content_flags')) {
+            DB::table('group_content_flags')
+                ->where('content_type', 'group')
+                ->where('content_id', $groupId)
+                ->delete();
+        }
+
+        if (Schema::hasTable('group_policies')) {
+            DB::table('group_policies')
+                ->where('policy_key', 'LIKE', '%_' . $groupId)
+                ->delete();
+        }
     }
 
     // -----------------------------------------------------------------
@@ -709,6 +889,14 @@ class GroupService
             return false;
         }
 
+        if (
+            ($role === 'admin' || in_array($membership->role ?? '', ['admin', 'owner'], true))
+            && ! self::canManageGroupAdmins($group, $actingUserId)
+        ) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_manage_admins_forbidden')];
+            return false;
+        }
+
         DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $targetUserId)
@@ -784,10 +972,28 @@ class GroupService
             return false;
         }
 
+        $membership = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $targetUserId)
+            ->first();
+
+        if (! $membership) {
+            self::$errors[] = ['code' => 'NOT_MEMBER', 'message' => __('api.group_user_not_member')];
+            return false;
+        }
+
+        if (in_array($membership->role ?? '', ['admin', 'owner'], true) && ! self::canManageGroupAdmins($group, $actingUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_manage_admins_forbidden')];
+            return false;
+        }
+
+        $wasActive = ($membership->status ?? '') === 'active';
         $detached = $group->members()->detach($targetUserId);
 
         if ($detached > 0) {
-            $group->decrement('cached_member_count');
+            if ($wasActive && (int) $group->cached_member_count > 0) {
+                $group->decrement('cached_member_count');
+            }
         }
 
         // Email + bell to removed member — both rendered in their locale.
@@ -1283,10 +1489,48 @@ class GroupService
     /**
      * Check if a user can modify a group (is admin/owner).
      */
-    private static function canModify(int $groupId, int $userId): bool
+    public static function canView(int $groupId, ?int $userId = null): bool
+    {
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if (! $group) {
+            return false;
+        }
+
+        if (($group->visibility ?? 'public') !== 'private') {
+            return true;
+        }
+
+        if (! $userId) {
+            return false;
+        }
+
+        if ((int) $group->owner_id === $userId) {
+            return true;
+        }
+
+        return self::isActiveMember($groupId, $userId) || self::isPlatformAdmin($userId);
+    }
+
+    public static function isActiveMember(int $groupId, int $userId): bool
+    {
+        return DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    public static function canModify(int $groupId, int $userId): bool
     {
         // Check if platform admin
         if (self::isPlatformAdmin($userId)) {
+            return true;
+        }
+
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if ($group && (int) $group->owner_id === $userId) {
             return true;
         }
 
@@ -1297,6 +1541,11 @@ class GroupService
             ->first();
 
         return $membership && in_array($membership->role, ['owner', 'admin']);
+    }
+
+    private static function canManageGroupAdmins(Group $group, int $actingUserId): bool
+    {
+        return (int) $group->owner_id === $actingUserId || self::isPlatformAdmin($actingUserId);
     }
 
     /**
@@ -1310,7 +1559,7 @@ class GroupService
         }
 
         $role = $user->role ?? '';
-        return in_array($role, ['admin', 'super_admin', 'god'])
+        return in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])
             || $user->is_super_admin
             || $user->is_tenant_super_admin;
     }

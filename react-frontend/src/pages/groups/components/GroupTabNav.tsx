@@ -83,6 +83,7 @@ export function GroupTabNav({
             variant="light"
             role="tab"
             aria-selected={isActive}
+            aria-label={tab.label}
             onPress={() => onTabChange(tab.key)}
             className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
               isActive

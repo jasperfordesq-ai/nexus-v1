@@ -14,13 +14,13 @@ backup_database_before_migrate() {
     DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
 
     local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S).sql.gz"
-    log_info "Taking pre-migration database snapshot → $BACKUP_FILE"
+    log_info "Taking pre-migration database snapshot -> $BACKUP_FILE"
 
     if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
         log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
         find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete
     else
-        log_err "Database backup failed — aborting migration to prevent unrecoverable data loss"
+        log_err "Database backup failed; aborting migration to prevent unrecoverable data loss"
         rm -f "$BACKUP_FILE"
         exit 1
     fi
@@ -32,17 +32,15 @@ run_pending_migrations() {
     local MIGRATION_DIR="$DEPLOY_DIR/migrations"
 
     if [ ! -d "$MIGRATION_DIR" ]; then
-        log_warn "migrations/ directory not found — skipping"
+        log_warn "migrations/ directory not found; skipping"
         return 0
     fi
 
-    # Read DB credentials from .env
     local DB_USER DB_PASS DB_NAME
     DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
     DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
     DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
-    # Ensure the migrations tracking table exists
     docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" 2>/dev/null <<'EOSQL'
 CREATE TABLE IF NOT EXISTS migrations (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,12 +50,32 @@ CREATE TABLE IF NOT EXISTS migrations (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 EOSQL
 
-    # Get list of already-applied migrations
     local APPLIED
     APPLIED=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
         -N -e "SELECT migration_name FROM migrations WHERE migration_name IS NOT NULL;" 2>/dev/null || echo "")
 
-    # Find pending .sql files (sorted alphabetically)
+    local APPLIED_COUNT LARAVEL_MIGRATION_COUNT
+    APPLIED_COUNT=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
+        -N -e "SELECT COUNT(*) FROM migrations WHERE migration_name IS NOT NULL;" 2>/dev/null || echo "0")
+    LARAVEL_MIGRATION_COUNT=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
+        -N -e "SELECT COUNT(*) FROM laravel_migrations;" 2>/dev/null || echo "0")
+
+    if [ "${APPLIED_COUNT:-0}" = "0" ] && [ "${LARAVEL_MIGRATION_COUNT:-0}" != "0" ]; then
+        log_warn "Legacy migration registry is empty but Laravel schema bootstrap is present"
+        log_warn "Marking committed legacy SQL files as already applied to prevent destructive replay"
+        for SQL_FILE in "$MIGRATION_DIR"/*.sql; do
+            [ -f "$SQL_FILE" ] || continue
+            local BASENAME_ESCAPED
+            BASENAME_ESCAPED=$(basename "$SQL_FILE" | sed "s/'/''/g")
+            docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e "
+                INSERT IGNORE INTO migrations (migration_name, backups, executed_at)
+                VALUES ('$BASENAME_ESCAPED', 'schema-dump-bootstrap', NOW());
+            " 2>/dev/null
+        done
+        APPLIED=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
+            -N -e "SELECT migration_name FROM migrations WHERE migration_name IS NOT NULL;" 2>/dev/null || echo "")
+    fi
+
     local PENDING_COUNT=0
     local PENDING_FILES=()
 
@@ -78,35 +96,36 @@ EOSQL
 
     log_info "$PENDING_COUNT pending migration(s) to run:"
     for F in "${PENDING_FILES[@]}"; do
-        echo "  • $(basename "$F")" | tee -a "$LOG_FILE"
+        echo "  - $(basename "$F")" | tee -a "$LOG_FILE"
     done
     echo "" | tee -a "$LOG_FILE"
 
-    # Take a backup before executing any DDL
     backup_database_before_migrate
 
-    # Execute each pending migration
     local RAN=0
     local FAILED=0
 
     for SQL_FILE in "${PENDING_FILES[@]}"; do
-        local BASENAME
+        local BASENAME BASENAME_ESCAPED
         BASENAME=$(basename "$SQL_FILE")
+        BASENAME_ESCAPED=$(printf '%s' "$BASENAME" | sed "s/'/''/g")
 
-        # Scan for dangerous operations (log only, don't block in automated deploy)
         if grep -qiE '(DROP TABLE|DROP DATABASE|TRUNCATE)' "$SQL_FILE" 2>/dev/null; then
-            log_warn "$BASENAME contains DROP/TRUNCATE operations"
+            log_err "$BASENAME contains DROP/TRUNCATE operations"
+            FAILED=1
+            break
         fi
-        if grep -qiE "DROP\s+COLUMN|RENAME\s+COLUMN|ALTER\s+TABLE.+DROP" "$SQL_FILE" 2>/dev/null; then
-            log_warn "Migration $BASENAME contains DROP COLUMN or RENAME COLUMN — verify old app code is no longer reading these columns before deploying"
+        if grep -qiE 'DROP[[:space:]]+COLUMN|RENAME[[:space:]]+COLUMN|ALTER[[:space:]]+TABLE.+DROP' "$SQL_FILE" 2>/dev/null; then
+            log_err "$BASENAME contains DROP COLUMN, RENAME COLUMN, or ALTER TABLE DROP"
+            FAILED=1
+            break
         fi
 
         log_info "Running: $BASENAME"
         if docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" < "$SQL_FILE" 2>&1 | tee -a "$LOG_FILE"; then
-            # Record as applied
             docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e "
                 INSERT IGNORE INTO migrations (migration_name, backups, executed_at)
-                VALUES ('$BASENAME', '$BASENAME', NOW());
+                VALUES ('$BASENAME_ESCAPED', '$BASENAME_ESCAPED', NOW());
             " 2>/dev/null
             log_ok "Applied: $BASENAME"
             RAN=$((RAN + 1))
@@ -119,7 +138,7 @@ EOSQL
 
     echo "" | tee -a "$LOG_FILE"
     if [ $FAILED -eq 1 ]; then
-        log_err "Migration failed — deploy halted. $RAN migration(s) applied before failure."
+        log_err "Migration failed; deploy halted. $RAN migration(s) applied before failure."
         log_err "Fix the failed migration and re-run the deploy."
         return 1
     fi

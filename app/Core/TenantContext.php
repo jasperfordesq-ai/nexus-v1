@@ -829,15 +829,15 @@ class TenantContext
                     // Look up user to check super admin status
                     $userRow = DB::table('users')
                         ->where('id', $userId)
-                        ->first(['is_super_admin', 'is_tenant_super_admin', 'role']);
+                        ->first(['is_super_admin', 'is_god', 'is_tenant_super_admin', 'role']);
 
                     if ($userRow) {
                         // SECURITY: Only actual super admins can access cross-tenant data.
                         // Regular admins (role=admin, role=tenant_admin) must NOT be allowed
                         // to spoof X-Tenant-ID headers to access other tenants' data.
                         return !empty($userRow->is_super_admin)
-                            || !empty($userRow->is_tenant_super_admin)
-                            || ($userRow->role ?? '') === 'super_admin';
+                            || !empty($userRow->is_god)
+                            || in_array(($userRow->role ?? ''), ['super_admin', 'god'], true);
                     }
                 }
             }

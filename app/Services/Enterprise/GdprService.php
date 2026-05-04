@@ -1018,8 +1018,8 @@ class GdprService
             // 3m. Delete user blocks (in both directions)
             try {
                 $this->query(
-                    "DELETE FROM user_blocks WHERE user_id = ? OR blocked_user_id = ?",
-                    [$userId, $userId]
+                    "DELETE FROM user_blocks WHERE tenant_id = ? AND (user_id = ? OR blocked_user_id = ?)",
+                    [$this->tenantId, $userId, $userId]
                 );
             } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 

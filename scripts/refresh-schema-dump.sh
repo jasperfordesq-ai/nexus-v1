@@ -13,7 +13,7 @@
 #
 # What it does:
 #   1. Dumps the full schema (no data) via mysqldump
-#   2. Appends laravel_migrations table data so fresh migrate skips applied migrations
+#   2. Appends migration registry data so fresh migrate skips applied migrations
 #   3. Writes to database/schema/mysql-schema.sql
 # =============================================================================
 
@@ -78,6 +78,18 @@ $DUMP_CMD \
     --skip-set-charset \
     --no-tablespaces \
     "$DB_NAME" laravel_migrations >> "$DUMP_PATH" 2>/dev/null
+
+echo "" >> "$DUMP_PATH"
+echo "-- Legacy SQL migrations data (prevents replay after schema bootstrap)" >> "$DUMP_PATH"
+
+echo "[schema-dump] Appending legacy migrations data..."
+$DUMP_CMD \
+    --no-create-info \
+    --skip-add-locks \
+    --skip-comments \
+    --skip-set-charset \
+    --no-tablespaces \
+    "$DB_NAME" migrations >> "$DUMP_PATH" 2>/dev/null
 
 LINES=$(wc -l < "$DUMP_PATH")
 TABLES=$(grep -c "^CREATE TABLE" "$DUMP_PATH" || true)

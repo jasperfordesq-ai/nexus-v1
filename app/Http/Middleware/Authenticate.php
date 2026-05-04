@@ -35,7 +35,7 @@ class Authenticate
                 $user = auth()->guard($guard)->user();
                 $tenantId = \App\Core\TenantContext::getId();
                 if ($user && $tenantId && (int) $user->tenant_id !== $tenantId) {
-                    if (!$user->is_super_admin && !$user->is_tenant_super_admin) {
+                    if (!$user->is_super_admin && !$user->is_god && !in_array($user->role ?? '', ['super_admin', 'god'], true)) {
                         \Illuminate\Support\Facades\Log::debug('[Auth] Sanctum user tenant mismatch', [
                             'user_id' => $user->id,
                             'user_tenant' => $user->tenant_id,
@@ -170,8 +170,9 @@ class Authenticate
 
             $tenantId = \App\Core\TenantContext::getId();
             if ($tenantId && (int) $eloquentUser->tenant_id !== $tenantId) {
-                // Allow super admins to access any tenant
-                if (!$eloquentUser->is_super_admin && !$eloquentUser->is_tenant_super_admin) {
+                // Allow platform super admins to access any tenant. Tenant
+                // super-admins are still scoped to their own tenant.
+                if (!$eloquentUser->is_super_admin && !$eloquentUser->is_god && !in_array($eloquentUser->role ?? '', ['super_admin', 'god'], true)) {
                     \Illuminate\Support\Facades\Log::debug('[Auth] User tenant mismatch', ['user_id' => $userId, 'user_tenant' => $eloquentUser->tenant_id, 'request_tenant' => $tenantId]);
                     return false;
                 }

@@ -849,8 +849,20 @@ function AppRoutes() {
         } />
 
         {/* Advertiser self-serve portal (AG56/AG57) */}
-        <Route path="advertise/campaigns" element={<ErrorBoundary><MyAdCampaignsPage /></ErrorBoundary>} />
-        <Route path="advertise/push-campaigns" element={<ErrorBoundary><MyPushCampaignsPage /></ErrorBoundary>} />
+        <Route path="advertise/campaigns" element={
+          <ProtectedRoute>
+            <FeatureGate feature="local_advertising" redirect="/">
+              <ErrorBoundary><MyAdCampaignsPage /></ErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="advertise/push-campaigns" element={
+          <ProtectedRoute>
+            <FeatureGate feature="local_advertising" redirect="/">
+              <ErrorBoundary><MyPushCampaignsPage /></ErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
 
         {/* Public: Caring Community invite redemption — no auth, no feature gate needed */}
         <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />

@@ -307,9 +307,9 @@ class MessageService
             }
         }
 
-        // Check if either user has blocked the other
-        // user_blocks uses user_id (blocker) and blocked_user_id columns, no tenant_id
+        // Check if either user has blocked the other in this tenant.
         $blocked = DB::table('user_blocks')
+            ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($senderId, $receiverId) {
                 $q->where(function ($inner) use ($senderId, $receiverId) {
                     $inner->where('user_id', $senderId)->where('blocked_user_id', $receiverId);

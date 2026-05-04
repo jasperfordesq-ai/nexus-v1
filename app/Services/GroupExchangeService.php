@@ -66,7 +66,10 @@ class GroupExchangeService
         }
 
         $participants = DB::table('group_exchange_participants as p')
-            ->join('users as u', 'p.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('p.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('p.group_exchange_id', $id)
             ->select([
                 'p.id as participant_id',
@@ -444,11 +447,11 @@ class GroupExchangeService
             ->first();
 
         if (! $exchange) {
-            return ['success' => false, 'error' => 'Exchange not found'];
+            return ['success' => false, 'error' => __('api.group_exchange_not_found')];
         }
 
         if ($exchange->status === 'completed') {
-            return ['success' => false, 'error' => 'Exchange is already completed'];
+            return ['success' => false, 'error' => __('api.group_exchange_already_completed')];
         }
 
         if ($exchange->status === 'cancelled') {
@@ -462,12 +465,12 @@ class GroupExchangeService
             ->count();
 
         if ($unconfirmed > 0) {
-            return ['success' => false, 'error' => "Not all participants have confirmed ({$unconfirmed} remaining)"];
+            return ['success' => false, 'error' => __('api.group_exchange_unconfirmed_remaining', ['count' => $unconfirmed])];
         }
 
         $split = $this->calculateSplit($exchangeId);
         if (empty($split)) {
-            return ['success' => false, 'error' => 'No participants to split hours'];
+            return ['success' => false, 'error' => __('api.group_exchange_no_participants')];
         }
 
         $transactionIds = [];
@@ -484,10 +487,10 @@ class GroupExchangeService
                     // Credit the provider: system (sender=0) sends to provider
                     $txnId = DB::table('transactions')->insertGetId([
                         'tenant_id'        => $tenantId,
-                        'sender_id'        => $exchange->created_by,
+                        'sender_id'        => $exchange->organizer_id,
                         'receiver_id'      => $entry['user_id'],
                         'amount'           => (int) $entry['hours'],
-                        'description'      => "Group exchange: {$exchange->title}",
+                        'description'      => __('api.group_exchange_transaction_description', ['title' => $exchange->title]),
                         'status'           => 'completed',
                         'transaction_type' => 'exchange',
                         'listing_id'       => null,

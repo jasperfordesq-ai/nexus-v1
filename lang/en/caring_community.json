@@ -31,7 +31,7 @@
     },
     "helper_churn": {
       "title": "Helper churn",
-      "description": "Share of previously active helpers who haven't logged hours in the last 30 days.",
+      "description": "Share of previously active helpers who have not logged hours in the last 30 days.",
       "overall": "Overall churn rate",
       "by_category": "By category",
       "lapsed": "Lapsed helpers",
@@ -49,13 +49,66 @@
   },
   "nudges": {
     "helper_at_risk": {
-      "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
+      "message": "We have missed you lately. Would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "{name}'s help request has been waiting more than {days} days — could we widen the search?"
+      "message": ":name's help request has been waiting more than :days days. Could we widen the search?"
     },
     "low_coverage_subregion": {
-      "message": "{name} is under-supplied right now — consider recruiting more helpers there."
+      "message": ":name is under-supplied right now. Consider recruiting more helpers there."
     }
+  },
+  "requests": {
+    "submitted": "Request submitted."
+  },
+  "favour": {
+    "recorded": "Favour recorded."
+  },
+  "alerts": {
+    "recipients_without_tandem_title": "Recipients without a regular supporter",
+    "recipients_without_tandem_message": "These members received help in the last six months but have no active recurring tandem. Pair them with a steady supporter to lock in continuity.",
+    "inactive_members_title": "Active members gone quiet",
+    "inactive_members_message": "Members who logged hours in the last six months but nothing in the last 30 days. A friendly check-in often re-engages them.",
+    "overdue_reviews_title": "Hour reviews past SLA",
+    "overdue_reviews_message": "Pending vol logs older than :sla days. Approve or escalate them so members get credited.",
+    "coordinators_overloaded_title": "Coordinators overloaded",
+    "coordinators_overloaded_message": "One or more coordinators have more than 10 pending reviews assigned. Reassign before bottlenecks form.",
+    "overdue_check_ins_title": "Tandem check-ins overdue",
+    "overdue_check_ins_message": "Active recurring relationships whose scheduled check-in has passed. Reach out to confirm both sides are still well.",
+    "low_supply_title": "Categories with unmet demand",
+    "low_supply_message": "Categories where active requests outnumber available offers. Worth highlighting to potential supporters."
+  },
+  "civic_digest": {
+    "cadence_invalid": "cadence must be one of: off, daily, weekly",
+    "preferred_sub_region_invalid": "preferred_sub_region_id must be numeric or null",
+    "opt_out_sources_invalid": "opt_out_sources must be an array of source keys"
+  },
+  "readiness": {
+    "unknown_item": "Unknown decision-gate item: :item",
+    "storage_unavailable": "tenant_settings table is not available",
+    "owner_invalid": "Owner must be a string",
+    "owner_too_long": "Owner must be 255 characters or fewer",
+    "status_invalid": "Status must be one of: :statuses",
+    "notes_invalid": "Notes must be a string",
+    "notes_too_long": "Notes must be 2000 characters or fewer",
+    "value_string": "Value must be a string",
+    "choice_invalid": "Value must be one of: :choices",
+    "url_invalid": "Value must be a valid URL",
+    "url_too_long": "URL must be 1000 characters or fewer",
+    "value_too_long": "Value must be 1000 characters or fewer"
+  },
+  "feedback": {
+    "table_not_found": "Feedback table not yet provisioned.",
+    "not_found": "Feedback not found.",
+    "invalid_status": "Invalid status.",
+    "invalid_assignee": "assigned_user_id must be numeric.",
+    "resolution_notes_required": "Resolution notes are required."
+  },
+  "data_quality": {
+    "missing_language_positive": "These members will receive emails and notifications in the platform default. Set their preferred language for proper localisation.",
+    "missing_language_ok": "Every member has a preferred language set.",
+    "no_sub_region_column": "No users.sub_region_id column on this schema. Sub-region linkage is tracked elsewhere.",
+    "no_sub_regions": "No sub-regions defined for this tenant. Skipping check.",
+    "no_coordinator_column": "No coordinator column on this schema."
   }
 }

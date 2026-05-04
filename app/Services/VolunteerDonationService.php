@@ -190,6 +190,7 @@ class VolunteerDonationService
                 'id', 'title', 'description', 'start_date', 'end_date',
                 'goal_amount', 'raised_amount', 'is_active', 'created_at',
             ])
+            ->map(fn ($row) => self::formatGivingDay($row->toArray()))
             ->toArray();
     }
 
@@ -237,6 +238,7 @@ class VolunteerDonationService
                 'id', 'title', 'description', 'start_date', 'end_date',
                 'goal_amount', 'raised_amount', 'is_active', 'created_at',
             ])
+            ->map(fn ($row) => self::formatGivingDay($row->toArray()))
             ->toArray();
     }
 
@@ -249,11 +251,11 @@ class VolunteerDonationService
      */
     public static function createGivingDay(array $data, int $tenantId): array|false
     {
-        $title = trim($data['title'] ?? '');
+        $title = trim($data['title'] ?? $data['name'] ?? '');
         $description = trim($data['description'] ?? '');
         $startDate = trim($data['start_date'] ?? '');
         $endDate = trim($data['end_date'] ?? '');
-        $goalAmount = (float) ($data['goal_amount'] ?? 0);
+        $goalAmount = (float) ($data['goal_amount'] ?? $data['target_amount'] ?? 0);
 
         if ($title === '') {
             throw new \InvalidArgumentException('Title is required.');
@@ -283,7 +285,7 @@ class VolunteerDonationService
             'created_at' => $now,
         ]);
 
-        return [
+        return self::formatGivingDay([
             'id' => $givingDay->id,
             'title' => $title,
             'description' => $description,
@@ -293,7 +295,7 @@ class VolunteerDonationService
             'raised_amount' => '0.00',
             'is_active' => 1,
             'created_at' => $now->toDateTimeString(),
-        ];
+        ]);
     }
 
     /**
@@ -353,8 +355,8 @@ class VolunteerDonationService
 
         $updates = [];
 
-        if (isset($data['title'])) {
-            $updates['title'] = trim($data['title']);
+        if (isset($data['title']) || isset($data['name'])) {
+            $updates['title'] = trim($data['title'] ?? $data['name']);
         }
         if (isset($data['description'])) {
             $updates['description'] = trim($data['description']);
@@ -365,8 +367,8 @@ class VolunteerDonationService
         if (isset($data['end_date'])) {
             $updates['end_date'] = trim($data['end_date']);
         }
-        if (isset($data['goal_amount'])) {
-            $goalAmount = (float) $data['goal_amount'];
+        if (isset($data['goal_amount']) || isset($data['target_amount'])) {
+            $goalAmount = (float) ($data['goal_amount'] ?? $data['target_amount']);
             if ($goalAmount <= 0) {
                 throw new \InvalidArgumentException('Goal amount must be greater than zero.');
             }
@@ -381,5 +383,23 @@ class VolunteerDonationService
         }
 
         return $givingDay->update($updates);
+    }
+
+    /**
+     * Add frontend-compatible aliases to the canonical giving-day fields.
+     *
+     * @param array<string, mixed> $day
+     * @return array<string, mixed>
+     */
+    private static function formatGivingDay(array $day): array
+    {
+        $goalAmount = (float) ($day['goal_amount'] ?? 0);
+
+        $day['name'] = $day['name'] ?? ($day['title'] ?? '');
+        $day['target_amount'] = (float) ($day['target_amount'] ?? $goalAmount);
+        $day['target_hours'] = (float) ($day['target_hours'] ?? 0);
+        $day['raised_amount'] = (float) ($day['raised_amount'] ?? 0);
+
+        return $day;
     }
 }

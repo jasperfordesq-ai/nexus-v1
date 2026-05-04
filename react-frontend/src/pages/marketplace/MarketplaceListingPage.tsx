@@ -692,7 +692,7 @@ export function MarketplaceListingPage() {
 
               {!isAuthenticated && (
                 <p className="text-xs text-default-400 text-center">
-                  <Link to={tenantPath('/auth/login')} className="text-primary hover:underline">
+                  <Link to={tenantPath('/login')} className="text-primary hover:underline">
                     {t('listing.sign_in', 'Sign in')}
                   </Link>
                   {' '}{t('listing.sign_in_to_contact', 'to contact the seller')}

@@ -30,7 +30,7 @@ class GroupInviteController extends BaseApiController
             return $userId;
         }
 
-        $result = $this->inviteService->getPendingInvites($id);
+        $result = $this->inviteService->getPendingInvites($id, $userId);
 
         if ($result === null) {
             $errors = $this->inviteService->getErrors();
@@ -81,11 +81,11 @@ class GroupInviteController extends BaseApiController
         $emails = request()->input('emails');
 
         if (!is_array($emails) || empty($emails)) {
-            return $this->errorResponse('A valid emails array is required', 422);
+            return $this->errorResponse(__('api.group_invites_emails_required'), 422);
         }
         // Hard ceiling on batch size so one call can't mail 10k addresses.
         if (count($emails) > 50) {
-            return $this->errorResponse('Maximum 50 invites per request', 422);
+            return $this->errorResponse(__('api.group_invites_max_per_request'), 422);
         }
 
         $message = request()->input('message', '');
@@ -110,7 +110,7 @@ class GroupInviteController extends BaseApiController
             return $userId;
         }
 
-        $success = $this->inviteService->revokeInvite($inviteId, $userId);
+        $success = $this->inviteService->revokeInvite($id, $inviteId, $userId);
 
         if (!$success) {
             $errors = $this->inviteService->getErrors();
@@ -143,6 +143,7 @@ class GroupInviteController extends BaseApiController
                 'NOT_FOUND' => 404,
                 'EXPIRED' => 410,
                 'ALREADY_MEMBER' => 409,
+                'FORBIDDEN' => 403,
                 default => 400,
             };
             return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.accept_failed'), $code);

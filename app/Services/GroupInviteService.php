@@ -43,7 +43,7 @@ class GroupInviteService
         $tenantId = TenantContext::getId();
 
         if (!$this->canInvite($groupId, $inviterId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to invite members'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_invite_forbidden')];
             return null;
         }
 
@@ -73,14 +73,14 @@ class GroupInviteService
     /**
      * Send email invitations to one or more email addresses.
      */
-    public function sendEmailInvites(int $groupId, int $inviterId, array $emails, string $message = ''): array
+    public function sendEmailInvites(int $groupId, int $inviterId, array $emails, string $message = ''): ?array
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
         if (!$this->canInvite($groupId, $inviterId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to invite members'];
-            return [];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_invite_forbidden')];
+            return null;
         }
 
         $group = DB::table('groups')
@@ -89,8 +89,8 @@ class GroupInviteService
             ->first();
 
         if (!$group) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
-            return [];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
+            return null;
         }
 
         $inviter = DB::table('users')->where('id', $inviterId)->first();
@@ -100,7 +100,7 @@ class GroupInviteService
         foreach ($emails as $email) {
             $email = strtolower(trim($email));
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $results[] = ['email' => $email, 'status' => 'invalid', 'message' => 'Invalid email'];
+                $results[] = ['email' => $email, 'status' => 'invalid', 'message' => __('api.group_invite_invalid_email')];
                 continue;
             }
 
@@ -187,7 +187,7 @@ class GroupInviteService
                 Log::warning('[GroupInviteService] invite email error: ' . $e->getMessage(), ['email' => $email]);
             }
 
-            $results[] = ['email' => $email, 'status' => 'sent', 'token' => $token];
+            $results[] = ['email' => $email, 'status' => 'sent'];
         }
 
         return $results;
@@ -208,38 +208,55 @@ class GroupInviteService
             ->first();
 
         if (!$invite) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Invite not found or already used'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_invite_not_found')];
             return null;
         }
 
         if ($invite->expires_at && now()->isAfter($invite->expires_at)) {
             DB::table('group_invites')->where('id', $invite->id)->update(['status' => self::STATUS_EXPIRED]);
-            $this->errors[] = ['code' => 'EXPIRED', 'message' => 'This invite has expired'];
+            $this->errors[] = ['code' => 'EXPIRED', 'message' => __('api.group_invite_expired')];
+            return null;
+        }
+
+        $group = DB::table('groups')
+            ->where('id', $invite->group_id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$group) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return null;
         }
 
         // Check if already a member
-        $isMember = DB::table('group_members')
+        $membership = DB::table('group_members')
             ->where('group_id', $invite->group_id)
             ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->exists();
+            ->first();
 
-        if ($isMember) {
-            $this->errors[] = ['code' => 'ALREADY_MEMBER', 'message' => 'You are already a member of this group'];
+        if (($membership->status ?? null) === 'banned') {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_banned')];
+            return null;
+        }
+
+        if (($membership->status ?? null) === 'active') {
+            $this->errors[] = ['code' => 'ALREADY_MEMBER', 'message' => __('api.group_invite_already_member')];
             return null;
         }
 
         // Add to group
         DB::table('group_members')->updateOrInsert(
             ['group_id' => $invite->group_id, 'user_id' => $userId],
-            ['role' => 'member', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]
+            ['tenant_id' => $tenantId, 'role' => 'member', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]
         );
 
         // Update cached member count
-        DB::table('groups')
-            ->where('id', $invite->group_id)
-            ->increment('cached_member_count');
+        if (!$membership || ($membership->status ?? null) !== 'active') {
+            DB::table('groups')
+                ->where('id', $invite->group_id)
+                ->where('tenant_id', $tenantId)
+                ->increment('cached_member_count');
+        }
 
         // Mark invite as accepted (only for email invites, links stay active)
         if ($invite->invite_type === 'email') {
@@ -247,8 +264,6 @@ class GroupInviteService
                 ->where('id', $invite->id)
                 ->update(['status' => self::STATUS_ACCEPTED, 'accepted_by' => $userId, 'accepted_at' => now()]);
         }
-
-        $group = DB::table('groups')->where('id', $invite->group_id)->first();
 
         return [
             'group_id' => $invite->group_id,
@@ -260,17 +275,35 @@ class GroupInviteService
     /**
      * Get pending invites for a group (admin view).
      */
-    public function getPendingInvites(int $groupId): array
+    public function getPendingInvites(int $groupId, int $userId): ?array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
 
+        if (!GroupService::canModify($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_invite_forbidden')];
+            return null;
+        }
+
         return DB::table('group_invites as gi')
-            ->leftJoin('users as u', 'gi.invited_by', '=', 'u.id')
+            ->leftJoin('users as u', function ($join) use ($tenantId) {
+                $join->on('gi.invited_by', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('gi.group_id', $groupId)
             ->where('gi.tenant_id', $tenantId)
             ->where('gi.status', self::STATUS_PENDING)
             ->where('gi.expires_at', '>', now())
-            ->select('gi.*', 'u.name as inviter_name')
+            ->select(
+                'gi.id',
+                'gi.invite_type',
+                'gi.email',
+                'gi.status',
+                'gi.expires_at',
+                'gi.invited_by',
+                'gi.created_at',
+                'u.name as inviter_name'
+            )
             ->orderByDesc('gi.created_at')
             ->get()
             ->map(fn ($row) => (array) $row)
@@ -280,19 +313,25 @@ class GroupInviteService
     /**
      * Revoke an invite.
      */
-    public function revokeInvite(int $inviteId, int $userId): bool
+    public function revokeInvite(int $groupId, int $inviteId, int $userId): bool
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
+        if (!GroupService::canModify($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_invite_forbidden')];
+            return false;
+        }
+
         $affected = DB::table('group_invites')
             ->where('id', $inviteId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->where('status', self::STATUS_PENDING)
             ->update(['status' => self::STATUS_REVOKED, 'updated_at' => now()]);
 
         if ($affected === 0) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Invite not found or already processed'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_invite_revoke_not_found')];
             return false;
         }
 
@@ -301,13 +340,7 @@ class GroupInviteService
 
     private function canInvite(int $groupId, int $userId, int $tenantId): bool
     {
-        return DB::table('group_members')
-            ->join('groups', 'groups.id', '=', 'group_members.group_id')
-            ->where('group_members.group_id', $groupId)
-            ->where('group_members.user_id', $userId)
-            ->where('group_members.status', 'active')
-            ->where('groups.tenant_id', $tenantId)
-            ->exists();
+        return GroupService::canModify($groupId, $userId);
     }
 
     private function buildInviteUrl(string $token): string

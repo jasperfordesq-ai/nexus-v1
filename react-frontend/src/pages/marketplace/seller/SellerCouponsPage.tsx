@@ -28,7 +28,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 
@@ -46,6 +46,7 @@ interface Coupon {
 export default function SellerCouponsPage() {
   const { t } = useTranslation('common');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   usePageTitle(t('coupon.seller.page_title'));
 
   const [items, setItems] = useState<Coupon[]>([]);
@@ -90,7 +91,7 @@ export default function SellerCouponsPage() {
         <h1 className="text-3xl font-bold">{t('coupon.seller.page_title')}</h1>
         <Button
           as={Link}
-          to="/marketplace/seller/coupons/new"
+          to={tenantPath('/marketplace/seller/coupons/new')}
           color="primary"
           startContent={<Plus className="w-4 h-4" />}
         >
@@ -145,7 +146,7 @@ export default function SellerCouponsPage() {
                       <div className="flex gap-1 justify-end">
                         <Button
                           as={Link}
-                          to={`/marketplace/seller/coupons/${c.id}/edit`}
+                          to={tenantPath(`/marketplace/seller/coupons/${c.id}/edit`)}
                           isIconOnly
                           size="sm"
                           variant="light"

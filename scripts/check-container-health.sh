@@ -44,7 +44,7 @@ fi
 SSH_OPTS="-i \"$SSH_KEY\" -o RequestTTY=force -o StrictHostKeyChecking=accept-new"
 MEM_THRESHOLD_PCT="${MEM_THRESHOLD_PCT:-90}"   # percent of limit → WARN/FAIL
 OOM_LOOKBACK="${OOM_LOOKBACK:-1h}"             # docker events window
-CONTAINER_FILTER="${CONTAINER_FILTER:-nexus-}" # only our containers
+CONTAINER_NAME_RE='nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|frontend|sales|queue|scheduler)'
 
 # --- Colors ---
 if [ -t 1 ]; then
@@ -90,13 +90,13 @@ echo "============================================================"
 echo ""
 echo -e "${BOLD}1. Container resource usage${NC}"
 
-STATS_RAW=$(run_remote "sudo docker stats --no-stream --format '{{.Name}}|{{.MemUsage}}|{{.MemPerc}}|{{.CPUPerc}}' | grep '^${CONTAINER_FILTER}' || true") || {
+STATS_RAW=$(run_remote "sudo docker stats --no-stream --format '{{.Name}}|{{.MemUsage}}|{{.MemPerc}}|{{.CPUPerc}}' | grep -E '^(${CONTAINER_NAME_RE})\|' || true") || {
     log_err "Could not collect docker stats (SSH or docker failed)"
     exit 2
 }
 
 if [ -z "$STATS_RAW" ]; then
-    log_err "No containers matching '${CONTAINER_FILTER}*' found on host"
+    log_err "No Project NEXUS containers from the allowlist were found on host"
     exit 2
 fi
 
@@ -122,7 +122,7 @@ done <<< "$STATS_RAW"
 echo ""
 echo -e "${BOLD}2. OOMKill / die events (last ${OOM_LOOKBACK})${NC}"
 
-OOM_EVENTS=$(run_remote "sudo docker events --since ${OOM_LOOKBACK} --until 0s --filter event=oom --filter event=die --format '{{.Time}} {{.Type}} {{.Action}} {{.Actor.Attributes.name}}' 2>/dev/null | grep '${CONTAINER_FILTER}' || true")
+OOM_EVENTS=$(run_remote "sudo docker events --since ${OOM_LOOKBACK} --until 0s --filter event=oom --filter event=die --format '{{.Time}} {{.Type}} {{.Action}} {{.Actor.Attributes.name}}' 2>/dev/null | grep -E ' (${CONTAINER_NAME_RE})$' || true")
 
 if [ -z "$OOM_EVENTS" ]; then
     log_ok "No OOM or die events in last ${OOM_LOOKBACK}"
@@ -148,7 +148,7 @@ fi
 echo ""
 echo -e "${BOLD}3. Container state (OOMKilled / RestartCount / Policy)${NC}"
 
-CONTAINERS=$(run_remote "sudo docker ps --format '{{.Names}}' | grep '^${CONTAINER_FILTER}' || true")
+CONTAINERS=$(run_remote "sudo docker ps --format '{{.Names}}' | grep -E '^(${CONTAINER_NAME_RE})$' || true")
 while read -r CNAME; do
     [ -z "$CNAME" ] && continue
     INSPECT=$(run_remote "sudo docker inspect $CNAME --format '{{.State.OOMKilled}}|{{.State.RestartCount}}|{{.HostConfig.RestartPolicy.Name}}|{{.State.Status}}' 2>/dev/null || echo 'ERR|0|none|unknown'")

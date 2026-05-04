@@ -254,8 +254,12 @@ class AdminGroupsController extends BaseApiController
             }
 
             DB::update(
-                "UPDATE group_members SET status = 'approved', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                "UPDATE group_members SET status = 'active', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
                 [(int) $id, $tenantId]
+            );
+            DB::update(
+                "UPDATE `groups` SET cached_member_count = cached_member_count + 1 WHERE id = ? AND tenant_id = ?",
+                [(int) $membership->group_id, $tenantId]
             );
             ActivityLog::log($adminId, 'admin_approve_group_member', "Approved membership #{$id} for group \"{$membership->group_name}\"");
 
@@ -279,7 +283,7 @@ class AdminGroupsController extends BaseApiController
                 ]);
             }
 
-            return $this->respondWithData(['id' => (int) $id, 'status' => 'approved']);
+            return $this->respondWithData(['id' => (int) $id, 'status' => 'active']);
         } catch (\Exception $e) {
             return $this->respondWithError('GROUPS_APPROVE_ERROR', __('api.approve_failed', ['resource' => 'membership']), null, 500);
         }
@@ -553,8 +557,15 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        DB::delete("DELETE FROM group_members WHERE group_id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
-        DB::delete("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
+        if (!$this->groupService->delete((int) $id, $adminId)) {
+            $errors = $this->groupService->getErrors();
+            $status = match ($errors[0]['code'] ?? '') {
+                'NOT_FOUND' => 404,
+                'FORBIDDEN' => 403,
+                default => 400,
+            };
+            return $this->respondWithErrors($errors, $status);
+        }
         ActivityLog::log($adminId, 'admin_delete_group', "Deleted group #{$id}: {$group->name}");
 
         return $this->respondWithData(['deleted' => true, 'id' => (int) $id]);

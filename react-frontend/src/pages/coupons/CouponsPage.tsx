@@ -13,7 +13,7 @@ import { Card, CardBody, Chip, Spinner, Button } from '@heroui/react';
 import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 
@@ -34,6 +34,7 @@ export default function CouponsPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('coupon.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const [items, setItems] = useState<CouponItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -105,7 +106,7 @@ export default function CouponsPage() {
                     {t('coupon.valid_until')}: {new Date(c.valid_until).toLocaleDateString()}
                   </p>
                 )}
-                <Button as={Link} to={`/coupons/${c.id}`} color="primary" size="sm" fullWidth>
+                <Button as={Link} to={tenantPath(`/coupons/${c.id}`)} color="primary" size="sm" fullWidth>
                   {t('coupon.details')}
                 </Button>
               </CardBody>

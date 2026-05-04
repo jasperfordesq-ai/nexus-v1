@@ -11,12 +11,46 @@ use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobPipelineRule;
 use App\Models\JobVacancy;
+use App\Models\JobVacancyTeam;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class JobPipelineRuleService
 {
+    private static function canManageVacancy(object $vacancy, int $userId, int $tenantId): bool
+    {
+        if ((int) $vacancy->user_id === $userId) {
+            return true;
+        }
+
+        $user = User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($user) {
+            $role = (string) ($user->role ?? '');
+            if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+                || (bool) ($user->is_admin ?? false)
+                || (bool) ($user->is_super_admin ?? false)
+                || (bool) ($user->is_tenant_super_admin ?? false)
+                || (bool) ($user->is_god ?? false)
+            ) {
+                return true;
+            }
+        }
+
+        $vacancyId = (int) ($vacancy->id ?? 0);
+        if ($vacancyId <= 0) {
+            return false;
+        }
+
+        return JobVacancyTeam::where('tenant_id', $tenantId)
+            ->where('vacancy_id', $vacancyId)
+            ->where('user_id', $userId)
+            ->exists();
+    }
+
     /**
      * List rules for a vacancy (employer view).
      */
@@ -44,7 +78,7 @@ class JobPipelineRuleService
         try {
             $vacancy = JobVacancy::find($vacancyId);
             if (!$vacancy || (int) $vacancy->tenant_id !== $tenantId) return false;
-            if ((int) $vacancy->user_id !== $ownerUserId) return false;
+            if (!self::canManageVacancy($vacancy, $ownerUserId, $tenantId)) return false;
 
             $rule = JobPipelineRule::create([
                 'tenant_id'      => $tenantId,
@@ -74,7 +108,7 @@ class JobPipelineRuleService
         try {
             $rule = JobPipelineRule::with('vacancy')->find($ruleId);
             if (!$rule || (int) $rule->tenant_id !== $tenantId) return false;
-            if (!$rule->vacancy || (int) $rule->vacancy->user_id !== $ownerUserId) return false;
+            if (!$rule->vacancy || !self::canManageVacancy($rule->vacancy, $ownerUserId, $tenantId)) return false;
 
             $rule->delete();
             return true;

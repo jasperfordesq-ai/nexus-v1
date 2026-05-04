@@ -95,17 +95,19 @@ jobs:
           fi
           echo "All PHP files passed syntax check."
 
-      # NOTE: PHPUnit steps removed 2026-05-03. The previous config referenced
-      # testsuites Unit/Services/Middleware/Models that no longer exist in
-      # phpunit.xml (the suites were renamed to Laravel/Integration/LaravelMigrated
-      # during the Laravel migration). As a result CI was silently running zero
-      # tests. To re-enable, run vendor/bin/phpunit --testsuite=Laravel locally,
-      # fix any failures, then add a single step here that runs that suite.
+      - name: "BLOCKING: PHPUnit Laravel suite"
+        run: vendor/bin/phpunit --testsuite=Laravel --colors=always
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_NAME: nexus_test
           DB_USER: nexus
+          DB_PASS: nexus_test
+          APP_ENV: testing
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          LOG_CHANNEL: null
 
       - name: "BLOCKING: PHPStan static analysis (level 3)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
@@ -414,12 +416,7 @@ jobs:
       - name: "BLOCKING: Check for translation key mismatches"
         run: node scripts/check-i18n-drift.mjs
 
-      - name: "WARN: Check for hardcoded strings in PHP code"
-        # Downgraded from BLOCKING 2026-05-03: scripts/check-i18n.sh has false
-        # positives (flags machine-readable error codes like 'tenant_required'
-        # as if they were user-facing messages). Until the script is fixed to
-        # distinguish error codes from user messages, this is informational only.
-        continue-on-error: true
+      - name: "BLOCKING: Check for hardcoded strings in PHP code"
         run: bash scripts/check-i18n.sh
 
       # check-admin-i18n REMOVED 2026-04-22 — admin panel is English-only by design.

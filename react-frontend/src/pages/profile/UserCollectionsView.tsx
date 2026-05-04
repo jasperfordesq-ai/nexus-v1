@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { useTenant } from '@/contexts';
 
 interface Collection {
   id: number;
@@ -29,6 +30,7 @@ interface Collection {
 export default function UserCollectionsView() {
   const { t } = useTranslation('common');
   const { userId } = useParams<{ userId: string }>();
+  const { tenantPath } = useTenant();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   usePageTitle(t('collections.public_title'));
@@ -67,7 +69,7 @@ export default function UserCollectionsView() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {collections.map((c) => (
-            <Link key={c.id} to={`/me/collections/${c.id}`} className="block">
+            <Link key={c.id} to={tenantPath(`/me/collections/${c.id}`)} className="block">
               <Card className="hover:shadow-md transition-shadow">
                 <CardBody className="space-y-2">
                   <div className="flex items-center gap-2">

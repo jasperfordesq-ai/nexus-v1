@@ -84,12 +84,16 @@ class GroupExchangeController extends BaseApiController
     /** GET /api/v2/group-exchanges/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+        }
+
+        if (!$this->canViewExchange($exchange, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_exchange_forbidden'), null, 403);
         }
 
         $exchange['calculated_split'] = $this->groupExchangeService->calculateSplit($id);
@@ -147,12 +151,16 @@ class GroupExchangeController extends BaseApiController
     /** POST /api/v2/group-exchanges/{id}/participants */
     public function addParticipant($id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
         $exchange = $this->groupExchangeService->get((int) $id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+        }
+
+        if ((int) $exchange['organizer_id'] !== $userId) {
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_update'), null, 403);
         }
 
         $data = $this->getAllInput();
@@ -181,7 +189,17 @@ class GroupExchangeController extends BaseApiController
     /** DELETE /api/v2/group-exchanges/{id}/participants/{userId} */
     public function removeParticipant($id, $userId): JsonResponse
     {
-        $this->requireAuth();
+        $actingUserId = $this->requireAuth();
+
+        $exchange = $this->groupExchangeService->get((int) $id);
+
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+        }
+
+        if ((int) $exchange['organizer_id'] !== $actingUserId) {
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_update'), null, 403);
+        }
 
         $this->groupExchangeService->removeParticipant((int) $id, (int) $userId);
 
@@ -201,7 +219,13 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
-        $this->groupExchangeService->confirmParticipation($id, $userId);
+        if (!$this->isExchangeParticipant($exchange, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_exchange_participant_required'), null, 403);
+        }
+
+        if (!$this->groupExchangeService->confirmParticipation($id, $userId)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_exchange_confirm_failed'), null, 400);
+        }
 
         $updated = $this->groupExchangeService->get($id);
 
@@ -233,5 +257,21 @@ class GroupExchangeController extends BaseApiController
             'message' => __('api_controllers_1.group_exchange.exchange_completed'),
             'transaction_ids' => $result['transaction_ids'],
         ]);
+    }
+
+    private function canViewExchange(array $exchange, int $userId): bool
+    {
+        return (int) $exchange['organizer_id'] === $userId || $this->isExchangeParticipant($exchange, $userId);
+    }
+
+    private function isExchangeParticipant(array $exchange, int $userId): bool
+    {
+        foreach ($exchange['participants'] ?? [] as $participant) {
+            if ((int) ($participant['user_id'] ?? 0) === $userId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

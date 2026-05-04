@@ -453,7 +453,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        if (empty($data['field_label'])) {
+        if (empty($data['field_label']) && empty($data['label'])) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.vol_field_label_required'), 'field_label', 422);
         }
 
@@ -545,6 +545,25 @@ class VolunteerCommunityController extends BaseApiController
         return $this->respondWithData($result);
     }
 
+    public function adminCommunityProjects(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireAdmin();
+        $this->rateLimit('vol_admin_projects', 60, 60);
+
+        $filters = [
+            'status' => $this->query('status'),
+            'category' => $this->query('category'),
+            'search' => $this->query('search'),
+            'sort' => $this->query('sort') ?: 'newest',
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = $this->communityProjectService->getProposals($filters);
+        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+    }
+
     public function proposeCommunityProject(): JsonResponse
     {
         $this->ensureFeature();
@@ -622,7 +641,7 @@ class VolunteerCommunityController extends BaseApiController
             $result = $this->communityProjectService->review(
                 (int) $id,
                 $data['status'] ?? '',
-                $data['notes'] ?? null,
+                $data['review_notes'] ?? $data['notes'] ?? null,
                 $adminId,
                 $tenantId
             );

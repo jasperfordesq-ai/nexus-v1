@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 
 interface SavedItem {
   id: number;
@@ -57,6 +57,7 @@ export default function CollectionDetailPage() {
   const { t } = useTranslation('common');
   const { id } = useParams<{ id: string }>();
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const [data, setData] = useState<ApiPayload | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -98,7 +99,7 @@ export default function CollectionDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
-      <Link to="/me/collections" className="inline-flex items-center gap-2 mb-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+      <Link to={tenantPath('/me/collections')} className="inline-flex items-center gap-2 mb-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
         <ArrowLeft className="w-4 h-4" />
         {t('collections.back_to_my')}
       </Link>
@@ -126,7 +127,7 @@ export default function CollectionDetailPage() {
         <div className="space-y-3">
           {data?.items.map((item) => {
             const linkBuilder = ITEM_LINKS[item.item_type];
-            const href = linkBuilder ? linkBuilder(item.item_id) : '#';
+            const href = linkBuilder ? tenantPath(linkBuilder(item.item_id)) : '#';
             const title = item.preview?.title || `${item.item_type} #${item.item_id}`;
             return (
               <Card key={item.id}>

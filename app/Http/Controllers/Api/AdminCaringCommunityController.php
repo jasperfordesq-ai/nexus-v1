@@ -2496,11 +2496,11 @@ class AdminCaringCommunityController extends BaseApiController
                     'success' => false,
                     'errors'  => [[
                         'code'    => 'CANNOT_LAUNCH',
-                        'message' => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
+                        'message' => __('api.launch_readiness_gate_not_closed'),
                     ]],
                     'error'   => [
                         'code'     => 'CANNOT_LAUNCH',
-                        'message'  => 'Launch readiness gate is not closed — fix blocker(s) before launching.',
+                        'message'  => __('api.launch_readiness_gate_not_closed'),
                         'blockers' => $result['blockers'] ?? [],
                     ],
                 ], 422);

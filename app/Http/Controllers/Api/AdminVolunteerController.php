@@ -953,22 +953,23 @@ class AdminVolunteerController extends BaseApiController
             $byType = [];
             foreach ($typeStats as $ts) { $byType[$ts->reminder_type] = (int) $ts->count; }
 
-            return response()->json([
-                'success' => true,
-                'data' => $items,
+            return $this->respondWithData($items, [
                 'stats' => [
                     'total_sent' => (int) ($stats->total_sent ?? 0),
                     'by_channel' => ['email' => (int) ($stats->email_count ?? 0), 'push' => (int) ($stats->push_count ?? 0), 'sms' => (int) ($stats->sms_count ?? 0)],
                     'by_type' => $byType,
                 ],
-                'meta' => ['per_page' => $perPage, 'has_more' => $hasMore, 'cursor' => $nextCursor],
+                'per_page' => $perPage,
+                'has_more' => $hasMore,
+                'cursor' => $nextCursor,
             ]);
         } catch (\Exception $e) {
             Log::error("AdminVolunteerController::reminderLogs error: " . $e->getMessage());
-            return response()->json([
-                'success' => true, 'data' => [],
+            return $this->respondWithData([], [
                 'stats' => ['total_sent' => 0, 'by_channel' => ['email' => 0, 'push' => 0, 'sms' => 0], 'by_type' => []],
-                'meta' => ['per_page' => $perPage, 'has_more' => false, 'cursor' => null],
+                'per_page' => $perPage,
+                'has_more' => false,
+                'cursor' => null,
             ]);
         }
     }

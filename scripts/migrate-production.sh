@@ -98,7 +98,7 @@ fi
 info "Step 2: Testing database connectivity..."
 
 CONN_TEST=$(ssh $SSH_OPTS "$SSH_HOST" \
-    "sudo docker exec ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+    "sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb -u '${DB_USER}' ${DB_NAME} \
      -e \"SELECT @@hostname AS host, DATABASE() AS db, NOW() AS time;\"" 2>&1) || {
     error "Cannot connect to production database"
     echo "$CONN_TEST"
@@ -111,7 +111,7 @@ echo "$CONN_TEST" | head -3
 info "Step 3: Checking if migration already applied..."
 
 ALREADY=$(ssh $SSH_OPTS "$SSH_HOST" \
-    "sudo docker exec ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+    "sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb -u '${DB_USER}' ${DB_NAME} \
      -N -e \"SELECT COUNT(*) FROM migrations WHERE migration_name = '${MIGRATION_FILE}';\"" 2>/dev/null || echo "0")
 ALREADY=$(echo "$ALREADY" | tr -d '[:space:]')
 
@@ -142,7 +142,7 @@ BACKUP_PATH="/opt/nexus-php/backups/${BACKUP_NAME}"
 
 ssh $SSH_OPTS "$SSH_HOST" \
     "sudo mkdir -p /opt/nexus-php/backups && \
-     sudo docker exec ${DB_CONTAINER} mariadb-dump -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+     sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb-dump -u '${DB_USER}' ${DB_NAME} \
      | sudo tee ${BACKUP_PATH} > /dev/null" || {
     error "Backup failed!"
     exit 1
@@ -164,7 +164,7 @@ success "File copied to /tmp/${MIGRATION_FILE}"
 
 info "Step 6: Applying migration..."
 ssh $SSH_OPTS "$SSH_HOST" \
-    "cat /tmp/${MIGRATION_FILE} | sudo docker exec -i ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME}" || {
+    "cat /tmp/${MIGRATION_FILE} | sudo docker exec -i -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb -u '${DB_USER}' ${DB_NAME}" || {
     error "Migration FAILED!"
     error "Restore from backup: sudo cat ${BACKUP_PATH} | sudo docker exec -i ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'<PASS>' ${DB_NAME}"
     exit 1
@@ -174,7 +174,7 @@ success "Migration applied successfully"
 # ─── Step 6: Record in tracking table ─────────────────────────
 info "Step 7: Recording migration..."
 ssh $SSH_OPTS "$SSH_HOST" \
-    "sudo docker exec ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+    "sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb -u '${DB_USER}' ${DB_NAME} \
      -e \"INSERT INTO migrations (migration_name, backups, executed_at) VALUES ('${MIGRATION_FILE}', '${MIGRATION_FILE}', NOW());\"" || {
     warn "Could not record migration in tracking table (non-fatal)"
 }
@@ -184,7 +184,7 @@ success "Migration recorded"
 info "Step 8: Verifying..."
 echo ""
 ssh $SSH_OPTS "$SSH_HOST" \
-    "sudo docker exec ${DB_CONTAINER} mariadb -u '${DB_USER}' -p'${DB_PASS}' ${DB_NAME} \
+    "sudo docker exec -e MYSQL_PWD='${DB_PASS}' ${DB_CONTAINER} mariadb -u '${DB_USER}' ${DB_NAME} \
      -e \"SELECT * FROM migrations ORDER BY id DESC LIMIT 5;\""
 
 # Clean up temp file

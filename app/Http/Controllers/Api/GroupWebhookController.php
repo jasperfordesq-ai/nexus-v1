@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use App\Services\GroupService;
 use App\Services\GroupWebhookService;
 
 /**
@@ -28,6 +29,10 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
+        }
+
         $result = GroupWebhookService::list($id);
 
         return $this->successResponse($result);
@@ -46,24 +51,28 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
+        }
+
         $url = request()->input('url');
         $events = request()->input('events');
         $secret = request()->input('secret');
 
         if (empty($url)) {
-            return $this->errorResponse('URL is required', 422);
+            return $this->errorResponse(__('api.group_webhook_url_required'), 422);
         }
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->errorResponse('A valid URL is required', 422);
+            return $this->errorResponse(__('api.group_webhook_url_invalid'), 422);
         }
         if (!is_array($events) || empty($events)) {
-            return $this->errorResponse('A valid events array is required', 422);
+            return $this->errorResponse(__('api.group_webhook_events_required'), 422);
         }
 
         $result = GroupWebhookService::register($id, $url, $events, $secret);
 
         if ($result === null) {
-            return $this->errorResponse('Failed to register webhook', 400);
+            return $this->errorResponse(__('api.group_webhook_register_failed'), 400);
         }
 
         return $this->successResponse($result, 201);
@@ -81,7 +90,11 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
-        $success = GroupWebhookService::delete($webhookId);
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
+        }
+
+        $success = GroupWebhookService::delete($id, $webhookId);
 
         if (!$success) {
             return $this->errorResponse(__('api_controllers_3.group_webhook.webhook_not_found'), 404);
@@ -103,12 +116,16 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
+        }
+
         $isActive = (bool) request()->input('is_active');
 
-        $success = GroupWebhookService::toggle($webhookId, $isActive);
+        $success = GroupWebhookService::toggle($id, $webhookId, $isActive);
 
         if (!$success) {
-            return $this->errorResponse('Webhook not found', 404);
+            return $this->errorResponse(__('api.group_webhook_not_found'), 404);
         }
 
         return $this->successResponse(['is_active' => $isActive]);

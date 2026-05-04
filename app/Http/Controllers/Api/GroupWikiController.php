@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Core\TenantContext;
+use App\Services\GroupService;
 
 /**
  * GroupWikiController — Wiki pages and revisions for groups.
@@ -30,6 +31,10 @@ class GroupWikiController extends BaseApiController
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
+        }
+
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
         }
 
         $tenantId = TenantContext::getId();
@@ -63,6 +68,10 @@ class GroupWikiController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         $title = request()->input('title');
@@ -72,7 +81,7 @@ class GroupWikiController extends BaseApiController
         $isPublished = (bool) request()->input('is_published', true);
 
         if (empty($title)) {
-            return $this->errorResponse('Title is required', 422);
+            return $this->errorResponse(__('api.group_wiki_title_required'), 422);
         }
 
         $slug = Str::slug($title);
@@ -100,7 +109,7 @@ class GroupWikiController extends BaseApiController
         DB::insert(
             "INSERT INTO group_wiki_revisions (page_id, content, edited_by, change_summary, created_at)
              VALUES (?, ?, ?, ?, ?)",
-            [$pageId, $content, $userId, 'Initial version', $now]
+            [$pageId, $content, $userId, __('api.group_wiki_initial_revision'), $now]
         );
 
         $page = DB::selectOne(
@@ -126,6 +135,10 @@ class GroupWikiController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         $page = DB::selectOne(
@@ -137,7 +150,7 @@ class GroupWikiController extends BaseApiController
         );
 
         if (!$page) {
-            return $this->errorResponse('Wiki page not found', 404);
+            return $this->errorResponse(__('api.group_wiki_page_not_found'), 404);
         }
 
         return $this->successResponse($this->nestWikiAuthor($page));
@@ -155,6 +168,10 @@ class GroupWikiController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         $page = DB::selectOne(
@@ -163,7 +180,7 @@ class GroupWikiController extends BaseApiController
         );
 
         if (!$page) {
-            return $this->errorResponse('Wiki page not found', 404);
+            return $this->errorResponse(__('api.group_wiki_page_not_found'), 404);
         }
 
         $content = request()->input('content', $page->content);
@@ -173,6 +190,10 @@ class GroupWikiController extends BaseApiController
         $changeSummary = request()->input('change_summary', '');
 
         $now = now()->toDateTimeString();
+
+        if (trim((string) $title) === '') {
+            return $this->errorResponse(__('api.group_wiki_title_required'), 422);
+        }
 
         // Save old content as a revision
         DB::insert(
@@ -223,6 +244,10 @@ class GroupWikiController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         $page = DB::selectOne(
@@ -231,7 +256,7 @@ class GroupWikiController extends BaseApiController
         );
 
         if (!$page) {
-            return $this->errorResponse('Wiki page not found', 404);
+            return $this->errorResponse(__('api.group_wiki_page_not_found'), 404);
         }
 
         // Delete revisions first, then the page
@@ -260,6 +285,10 @@ class GroupWikiController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_wiki_forbidden'), null, 403);
+        }
+
         $tenantId = TenantContext::getId();
 
         // Verify page belongs to group
@@ -269,7 +298,7 @@ class GroupWikiController extends BaseApiController
         );
 
         if (!$page) {
-            return $this->errorResponse('Wiki page not found', 404);
+            return $this->errorResponse(__('api.group_wiki_page_not_found'), 404);
         }
 
         $revisions = DB::select(

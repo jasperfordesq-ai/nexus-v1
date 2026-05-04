@@ -92,7 +92,9 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         const payload = res.data;
         const items = Array.isArray(payload)
           ? payload
-          : (payload as { announcements?: Announcement[] })?.announcements ?? [];
+          : (payload as { items?: Announcement[]; announcements?: Announcement[] })?.items
+            ?? (payload as { announcements?: Announcement[] })?.announcements
+            ?? [];
         // Sort: pinned first, then by date
         items.sort((a: Announcement, b: Announcement) => {
           if (a.is_pinned && !b.is_pinned) return -1;

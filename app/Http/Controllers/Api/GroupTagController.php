@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use App\Services\GroupService;
 use App\Services\GroupTagService;
 
 /**
@@ -26,6 +27,10 @@ class GroupTagController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_tags_forbidden'), null, 403);
+        }
+
         $tags = GroupTagService::getForGroup($id);
 
         return $this->respondWithData($tags);
@@ -41,10 +46,14 @@ class GroupTagController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
+        }
+
         $tagIds = request()->input('tag_ids');
 
         if (!is_array($tagIds)) {
-            return $this->error('A valid tag_ids array is required', 422);
+            return $this->error(__('api.group_tags_array_required'), 422);
         }
 
         GroupTagService::setForGroup($id, $tagIds);

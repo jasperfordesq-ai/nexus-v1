@@ -58,7 +58,7 @@ class SocialAuthController extends Controller
                 return response()->json([
                     'success' => false,
                     'error' => 'tenant_required',
-                    'message' => 'Tenant must be selected before signing in with a social provider.',
+                    'message' => __('api.social_tenant_required'),
                 ], 400);
             }
             $intent = (string) $request->input('intent', 'login');
@@ -72,7 +72,7 @@ class SocialAuthController extends Controller
                 return response()->json([
                     'success' => false,
                     'error' => 'socialite_not_installed',
-                    'message' => 'OAuth is not currently available. Please use email or passkey sign-in.',
+                    'message' => __('api.social_oauth_unavailable'),
                 ], 503);
             }
 
@@ -87,7 +87,7 @@ class SocialAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'oauth_redirect_failed',
-                'message' => $e->getMessage(),
+                'message' => __('api.social_oauth_redirect_failed'),
             ], 400);
         }
     }
@@ -126,7 +126,7 @@ class SocialAuthController extends Controller
             Log::warning('[SocialAuth] callback failed: ' . $e->getMessage());
             $params = http_build_query([
                 'error' => 'oauth_failed',
-                'message' => $e->getMessage(),
+                'message' => __('api.social_oauth_link_failed'),
                 'provider' => $provider,
             ]);
             return redirect($frontend . '/auth/oauth/callback?' . $params);
@@ -157,7 +157,7 @@ class SocialAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'oauth_link_failed',
-                'message' => $e->getMessage(),
+                'message' => __('api.social_oauth_unlink_failed'),
             ], 400);
         }
     }

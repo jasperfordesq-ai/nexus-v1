@@ -159,7 +159,7 @@ class IsolatedNodeReadinessService
             return [
                 'errors' => [[
                     'code'    => 'INVALID_ITEM_KEY',
-                    'message' => 'Unknown decision-gate item: ' . $itemKey,
+                    'message' => __('caring_community.readiness.unknown_item', ['item' => $itemKey]),
                     'field'   => 'item_key',
                 ]],
             ];
@@ -169,7 +169,7 @@ class IsolatedNodeReadinessService
             return [
                 'errors' => [[
                     'code'    => 'STORAGE_UNAVAILABLE',
-                    'message' => 'tenant_settings table is not available',
+                    'message' => __('caring_community.readiness.storage_unavailable'),
                 ]],
             ];
         }
@@ -197,7 +197,7 @@ class IsolatedNodeReadinessService
             if ($owner !== null && !is_string($owner)) {
                 $errors[] = [
                     'code'    => 'INVALID_OWNER',
-                    'message' => 'Owner must be a string',
+                    'message' => __('caring_community.readiness.owner_invalid'),
                     'field'   => 'owner',
                 ];
             } else {
@@ -205,7 +205,7 @@ class IsolatedNodeReadinessService
                 if ($owner !== null && strlen($owner) > 255) {
                     $errors[] = [
                         'code'    => 'OWNER_TOO_LONG',
-                        'message' => 'Owner must be 255 characters or fewer',
+                        'message' => __('caring_community.readiness.owner_too_long'),
                         'field'   => 'owner',
                     ];
                 } else {
@@ -219,7 +219,7 @@ class IsolatedNodeReadinessService
             if (!is_string($status) || !in_array($status, self::ALLOWED_STATUSES, true)) {
                 $errors[] = [
                     'code'    => 'INVALID_STATUS',
-                    'message' => 'Status must be one of: ' . implode(', ', self::ALLOWED_STATUSES),
+                    'message' => __('caring_community.readiness.status_invalid', ['statuses' => implode(', ', self::ALLOWED_STATUSES)]),
                     'field'   => 'status',
                 ];
             } else {
@@ -232,7 +232,7 @@ class IsolatedNodeReadinessService
             if ($notes !== null && !is_string($notes)) {
                 $errors[] = [
                     'code'    => 'INVALID_NOTES',
-                    'message' => 'Notes must be a string',
+                    'message' => __('caring_community.readiness.notes_invalid'),
                     'field'   => 'notes',
                 ];
             } else {
@@ -240,7 +240,7 @@ class IsolatedNodeReadinessService
                 if ($notes !== null && strlen($notes) > 2000) {
                     $errors[] = [
                         'code'    => 'NOTES_TOO_LONG',
-                        'message' => 'Notes must be 2000 characters or fewer',
+                        'message' => __('caring_community.readiness.notes_too_long'),
                         'field'   => 'notes',
                     ];
                 } else {
@@ -390,7 +390,7 @@ class IsolatedNodeReadinessService
                 if (!is_string($raw)) {
                     $errors[] = [
                         'code'    => 'INVALID_VALUE',
-                        'message' => 'Value must be a string',
+                        'message' => __('caring_community.readiness.value_string'),
                         'field'   => 'value',
                     ];
                     return null;
@@ -400,7 +400,7 @@ class IsolatedNodeReadinessService
                 if (!in_array($val, $choices, true)) {
                     $errors[] = [
                         'code'    => 'INVALID_CHOICE',
-                        'message' => 'Value must be one of: ' . implode(', ', $choices),
+                        'message' => __('caring_community.readiness.choice_invalid', ['choices' => implode(', ', $choices)]),
                         'field'   => 'value',
                     ];
                     return null;
@@ -411,7 +411,7 @@ class IsolatedNodeReadinessService
                 if (!is_string($raw)) {
                     $errors[] = [
                         'code'    => 'INVALID_VALUE',
-                        'message' => 'Value must be a string',
+                        'message' => __('caring_community.readiness.value_string'),
                         'field'   => 'value',
                     ];
                     return null;
@@ -420,7 +420,7 @@ class IsolatedNodeReadinessService
                 if (!filter_var($val, FILTER_VALIDATE_URL)) {
                     $errors[] = [
                         'code'    => 'INVALID_URL',
-                        'message' => 'Value must be a valid URL',
+                        'message' => __('caring_community.readiness.url_invalid'),
                         'field'   => 'value',
                     ];
                     return null;
@@ -428,7 +428,7 @@ class IsolatedNodeReadinessService
                 if (strlen($val) > 1000) {
                     $errors[] = [
                         'code'    => 'URL_TOO_LONG',
-                        'message' => 'URL must be 1000 characters or fewer',
+                        'message' => __('caring_community.readiness.url_too_long'),
                         'field'   => 'value',
                     ];
                     return null;
@@ -440,7 +440,7 @@ class IsolatedNodeReadinessService
                 if (!is_string($raw)) {
                     $errors[] = [
                         'code'    => 'INVALID_VALUE',
-                        'message' => 'Value must be a string',
+                        'message' => __('caring_community.readiness.value_string'),
                         'field'   => 'value',
                     ];
                     return null;
@@ -449,7 +449,7 @@ class IsolatedNodeReadinessService
                 if (strlen($val) > 1000) {
                     $errors[] = [
                         'code'    => 'VALUE_TOO_LONG',
-                        'message' => 'Value must be 1000 characters or fewer',
+                        'message' => __('caring_community.readiness.value_too_long'),
                         'field'   => 'value',
                     ];
                     return null;

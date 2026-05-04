@@ -212,7 +212,7 @@ export function MerchantOnboardingPage() {
   // ── Auth / feature guard ──────────────────────────────────────────────────
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(tenantPath('/auth/login'), { replace: true });
+      navigate(tenantPath('/login'), { replace: true });
       return;
     }
     if (!hasFeature('marketplace')) {

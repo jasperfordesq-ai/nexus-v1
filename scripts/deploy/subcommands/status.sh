@@ -55,7 +55,12 @@ show_status() {
 
     # Container status
     log_info "Container status:"
-    docker ps --filter "name=nexus" --format "table {{.Names}}\t{{.Status}}" | tee -a "$LOG_FILE"
+    {
+        printf "NAMES\tSTATUS\n"
+        docker ps --format "{{.Names}}\t{{.Status}}" \
+            | grep -E '^(nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|frontend|sales|queue|scheduler))\t' \
+            || true
+    } | column -t -s $'\t' | tee -a "$LOG_FILE"
 
     echo "" | tee -a "$LOG_FILE"
 
@@ -90,7 +95,7 @@ show_status() {
     # Maintenance mode check
     local MAINT_FILE=0
     local MAINT_DB="unknown"
-    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+    if docker ps --format "{{.Names}}" | grep -qx "$PHP_CONTAINER"; then
         docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null && MAINT_FILE=1
     fi
     local DB_USER DB_PASS DB_NAME
@@ -100,7 +105,7 @@ show_status() {
     if [ -z "$DB_PASS" ]; then
         DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
     fi
-    if [ -n "$DB_PASS" ] && docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then
+    if [ -n "$DB_PASS" ] && docker ps --format "{{.Names}}" | grep -qx "nexus-php-db"; then
         MAINT_DB=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
             -N -e "SELECT setting_value FROM tenant_settings WHERE setting_key='general.maintenance_mode' LIMIT 1;" 2>/dev/null || echo "unknown")
     fi

@@ -60,7 +60,20 @@ class VolunteerExpenseController extends BaseApiController
         ];
 
         $result = $this->volunteerExpenseService->getExpenses($filters);
-        return $this->respondWithData($result);
+        $stats = [
+            'total_submitted' => array_reduce($result['items'], fn ($sum, $item) => $sum + (float) ($item['amount'] ?? 0), 0.0),
+            'pending_review' => array_reduce($result['items'], fn ($sum, $item) => $sum + (($item['status'] ?? null) === 'pending' ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
+            'approved_total' => array_reduce($result['items'], fn ($sum, $item) => $sum + (in_array(($item['status'] ?? null), ['approved', 'paid'], true) ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
+            'paid_total' => array_reduce($result['items'], fn ($sum, $item) => $sum + (($item['status'] ?? null) === 'paid' ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
+        ];
+
+        return $this->respondWithData([
+            'expenses' => $result['items'],
+            'items' => $result['items'],
+            'stats' => $stats,
+            'cursor' => $result['cursor'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     public function submitExpense(SubmitExpenseRequest $request): JsonResponse
@@ -75,6 +88,12 @@ class VolunteerExpenseController extends BaseApiController
             $result = $this->volunteerExpenseService->submitExpense($userId, $data);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            $status = (int) $e->getCode();
+            if (!in_array($status, [403, 404], true)) {
+                $status = 400;
+            }
+            return $this->respondWithError($status === 403 ? 'FORBIDDEN' : 'NOT_FOUND', $e->getMessage(), null, $status);
         }
 
         if (isset($result['error'])) {
@@ -191,6 +210,12 @@ class VolunteerExpenseController extends BaseApiController
         $this->rateLimit('vol_expense_policy_update', 10, 60);
 
         $data = $this->getAllInput();
+        if (empty($data['expense_type']) && !empty($data['type'])) {
+            $data['expense_type'] = $data['type'];
+        }
+        if (array_key_exists('requires_receipt', $data) && !array_key_exists('requires_receipt_above', $data)) {
+            $data['requires_receipt_above'] = $data['requires_receipt'] ? 0 : null;
+        }
 
         if (empty($data['expense_type'])) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'expense_type']), 'expense_type', 422);

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use App\Services\GroupService;
 use App\Services\GroupCustomFieldService;
 
 /**
@@ -28,6 +29,10 @@ class GroupCustomFieldController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canView($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_custom_fields_forbidden'), null, 403);
+        }
+
         $values = GroupCustomFieldService::getValues($id);
 
         return $this->successResponse($values);
@@ -46,10 +51,14 @@ class GroupCustomFieldController extends BaseApiController
             return $userId;
         }
 
+        if (!GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
+        }
+
         $fields = request()->input('fields', []);
 
         if (!is_array($fields)) {
-            return $this->errorResponse('A valid fields object is required', 422);
+            return $this->errorResponse(__('api.group_custom_fields_object_required'), 422);
         }
 
         GroupCustomFieldService::setValues($id, $fields);

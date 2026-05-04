@@ -72,6 +72,7 @@ class ConnectionSuggestionController extends BaseApiController
             ->toArray();
 
         $blockedIds = DB::table('user_blocks')
+            ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                   ->orWhere('blocked_user_id', $userId);

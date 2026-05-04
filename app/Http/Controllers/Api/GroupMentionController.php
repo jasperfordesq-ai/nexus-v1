@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\GroupMentionService;
+use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -23,7 +24,11 @@ class GroupMentionController extends BaseApiController
      */
     public function suggestions(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+
+        if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_mentions_member_required'), null, 403);
+        }
 
         $q = $this->query('q', '');
         $limit = $this->queryInt('limit', 10, 1, 50);

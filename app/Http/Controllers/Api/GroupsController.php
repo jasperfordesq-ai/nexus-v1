@@ -37,9 +37,11 @@ class GroupsController extends BaseApiController
     public function index(): JsonResponse
     {
         $userId = $this->resolveSanctumUserOptionally();
+        $limitParam = $this->query('per_page') !== null ? 'per_page' : 'limit';
 
         $filters = [
-            'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'limit' => $this->queryInt($limitParam, 20, 1, 100),
+            'viewer_user_id' => $userId,
         ];
 
         if ($this->query('type')) {
@@ -53,6 +55,9 @@ class GroupsController extends BaseApiController
         }
         if ($this->query('user_id')) {
             $filters['user_id'] = $this->queryInt('user_id');
+        }
+        if ($this->query('member') === 'me' && $userId) {
+            $filters['user_id'] = $userId;
         }
         if ($this->query('q')) {
             $filters['search'] = $this->query('q');
@@ -94,7 +99,7 @@ class GroupsController extends BaseApiController
         // the Sanctum guard fails for stateful-domain requests.
         $userId = $this->resolveSanctumUserOptionally();
 
-        $group = $this->groupService->getById($id, $userId);
+        $group = $this->groupService->getById($id, $userId, true);
 
         if (!$group) {
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
@@ -224,9 +229,14 @@ class GroupsController extends BaseApiController
         $result = $this->groupService->join($id, $userId);
 
         if (!($result['success'] ?? false)) {
-            $error = $result['error'] ?? 'Failed to join group';
-            $httpStatus = str_contains($error, 'banned') ? 403
-                : (str_contains($error, 'Already') || str_contains($error, 'pending') ? 409 : 422);
+            $error = $result['error'] ?? __('api.group_join_failed');
+            $errorCode = $result['code'] ?? null;
+            $httpStatus = match ($errorCode) {
+                'NOT_FOUND' => 404,
+                'BANNED' => 403,
+                'ALREADY_MEMBER' => 409,
+                default => 422,
+            };
             return $this->respondWithError('JOIN_FAILED', $error, null, $httpStatus);
         }
 
@@ -309,7 +319,7 @@ class GroupsController extends BaseApiController
 
         // For private groups, only members can view the member list
         if (($group['visibility'] ?? 'public') === 'private') {
-            $userId = $this->getOptionalUserId();
+            $userId = $this->resolveSanctumUserOptionally();
             if (!$userId) {
                 return $this->respondWithError('FORBIDDEN', __('api.private_group_members_only'), null, 403);
             }
@@ -569,7 +579,7 @@ class GroupsController extends BaseApiController
 
         // Notify group members of new discussion
         try {
-            $discussionTitle = $discussion['title'] ?? $data['title'] ?? 'New Discussion';
+            $discussionTitle = $discussion['title'] ?? $data['title'] ?? __('api.group_new_discussion_fallback');
             $discussionId = $discussion['id'] ?? 0;
             $this->groupNotificationService->notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
         } catch (\Throwable $e) {
@@ -672,6 +682,7 @@ class GroupsController extends BaseApiController
             'cursor'          => $this->query('cursor'),
             'limit'           => $this->queryInt('limit', 20, 1, 100),
             'include_expired' => $this->queryBool('include_expired'),
+            'pinned'          => $this->queryBool('pinned'),
         ];
 
         $result = $this->groupAnnouncementService->list($id, $userId, $filters);
@@ -704,7 +715,7 @@ class GroupsController extends BaseApiController
 
         // Notify group members of new announcement
         try {
-            $announcementTitle = $result['title'] ?? $data['title'] ?? 'New Announcement';
+            $announcementTitle = $result['title'] ?? $data['title'] ?? __('api.group_new_announcement_fallback');
             $this->groupNotificationService->notifyNewAnnouncement($id, $userId, $announcementTitle);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Group announcement notification error: " . $e->getMessage());

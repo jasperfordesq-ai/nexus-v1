@@ -22,7 +22,7 @@ import {
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 
@@ -65,6 +65,7 @@ export default function SellerCouponEditPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const isEdit = Boolean(id);
   usePageTitle(isEdit ? t('coupon.seller.edit_title') : t('coupon.seller.create_title'));
 
@@ -132,7 +133,7 @@ export default function SellerCouponEditPage() {
         await api.post('/v2/marketplace/seller/coupons', payload);
       }
       toast.success(t('coupon.seller.saved'));
-      navigate('/marketplace/seller/coupons');
+      navigate(tenantPath('/marketplace/seller/coupons'));
     } catch (err) {
       logError('SellerCouponEditPage.save', err);
       toast.error(t('errors.unexpected', 'Something went wrong'));
@@ -153,7 +154,7 @@ export default function SellerCouponEditPage() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Button
         as={Link}
-        to="/marketplace/seller/coupons"
+        to={tenantPath('/marketplace/seller/coupons')}
         variant="light"
         startContent={<ArrowLeft className="w-4 h-4" />}
         className="mb-4"
@@ -270,7 +271,7 @@ export default function SellerCouponEditPage() {
               onValueChange={(v) => setForm((f) => ({ ...f, min_order_cents: v }))}
             />
             <div className="flex justify-end gap-2 mt-2">
-              <Button as={Link} to="/marketplace/seller/coupons" variant="light">
+              <Button as={Link} to={tenantPath('/marketplace/seller/coupons')} variant="light">
                 {t('common.cancel', 'Cancel')}
               </Button>
               <Button color="primary" type="submit" isLoading={saving}>

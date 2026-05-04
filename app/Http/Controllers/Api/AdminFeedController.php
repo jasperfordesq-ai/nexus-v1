@@ -433,7 +433,7 @@ class AdminFeedController extends BaseApiController
 
         ActivityLog::log($adminId, 'grant_municipality_announcer', "Granted municipality_announcer to user #{$userId} (tenant {$tenantId})");
 
-        return $this->respondWithData(['success' => true, 'message' => 'Municipal Announcer role granted']);
+        return $this->respondWithData(['success' => true, 'message' => __('api.municipal_announcer_role_granted')]);
     }
 
     /**
@@ -460,7 +460,7 @@ class AdminFeedController extends BaseApiController
 
         ActivityLog::log($adminId, 'revoke_municipality_announcer', "Revoked municipality_announcer from user #{$userId} (tenant {$tenantId})");
 
-        return $this->respondWithData(['success' => true, 'message' => 'Municipal Announcer role revoked']);
+        return $this->respondWithData(['success' => true, 'message' => __('api.municipal_announcer_role_revoked')]);
     }
 
     /**

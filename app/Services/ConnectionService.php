@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
+use App\Core\TenantContext;
 use App\Models\Connection;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -98,6 +99,7 @@ class ConnectionService
 
         // Check if either user has blocked the other
         $blocked = DB::table('user_blocks')
+            ->where('tenant_id', TenantContext::getId())
             ->where(function ($q) use ($requesterId, $receiverId) {
                 $q->where(function ($inner) use ($requesterId, $receiverId) {
                     $inner->where('user_id', $requesterId)->where('blocked_user_id', $receiverId);

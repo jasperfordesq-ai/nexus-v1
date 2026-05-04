@@ -75,7 +75,7 @@ class AppreciationService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $senderName = $sender->name ?? 'Someone';
+            $senderName = $sender->name ?? null;
 
             $receiver = DB::table('users')
                 ->where('id', $appreciation->receiver_id)
@@ -88,11 +88,8 @@ class AppreciationService
             $link = '/users/' . $appreciation->receiver_id . '/appreciations';
 
             LocaleContext::withLocale($receiver, function () use ($appreciation, $senderName, $link) {
-                $message = __('notifications.appreciation_received', ['name' => $senderName]);
-                if ($message === 'notifications.appreciation_received') {
-                    // Fallback when key is missing
-                    $message = $senderName . ' sent you a thank-you note';
-                }
+                $displayName = $senderName ?: __('notifications.appreciation_someone');
+                $message = __('notifications.appreciation_received', ['name' => $displayName]);
                 Notification::createNotification((int) $appreciation->receiver_id, $message, $link, 'appreciation');
             });
 

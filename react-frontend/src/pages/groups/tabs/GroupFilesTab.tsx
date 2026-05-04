@@ -77,6 +77,7 @@ interface GroupFilesTabProps {
   groupId: number;
   isAdmin: boolean;
   isMember?: boolean;
+  currentUserId?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,7 +106,7 @@ function getFileIcon(mimeType: string) {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesTabProps) {
+export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId }: GroupFilesTabProps) {
   const { t } = useTranslation('groups');
   const toast = useToast();
   const uploadModal = useDisclosure();
@@ -202,10 +203,9 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
 
   const handleDownload = async (file: GroupFile) => {
     try {
-      window.open(
-        `/api/v2/groups/${groupId}/files/${file.id}/download`,
-        '_blank',
-      );
+      await api.download(`/v2/groups/${groupId}/files/${file.id}/download`, {
+        filename: file.file_name,
+      });
     } catch (err) {
       logError('GroupFilesTab.download', err);
       toast.error(t('files.download_error', 'Failed to download file'));
@@ -363,7 +363,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
                       <Download className="w-4 h-4" />
                     </Button>
 
-                    {(isAdmin || file.uploaded_by === Number(localStorage.getItem('userId'))) && (
+                    {(isAdmin || file.uploaded_by === currentUserId) && (
                       <Dropdown>
                         <DropdownTrigger>
                           <Button

@@ -1256,7 +1256,7 @@ export const adminVolunteering = {
   getExpenses: () => api.get('/v2/admin/volunteering/expenses'),
   reviewExpense: (id: number, data: { status: string; review_notes?: string; payment_reference?: string }) =>
     api.put(`/v2/admin/volunteering/expenses/${id}`, data),
-  exportExpenses: () => api.get('/v2/admin/volunteering/expenses/export'),
+  exportExpenses: (filename?: string) => api.download('/v2/admin/volunteering/expenses/export', { filename }),
   getExpensePolicies: () => api.get('/v2/admin/volunteering/expenses/policies'),
   updateExpensePolicies: (data: Record<string, unknown>) =>
     api.put('/v2/admin/volunteering/expenses/policies', data),
@@ -1270,7 +1270,7 @@ export const adminVolunteering = {
   // Training
   getTraining: () => api.get('/v2/admin/volunteering/training'),
   verifyTraining: (id: number) => api.put(`/v2/admin/volunteering/training/${id}/verify`, {}),
-  rejectTraining: (id: number) => api.put(`/v2/admin/volunteering/training/${id}/reject`, {}),
+  rejectTraining: (id: number, reason: string) => api.put(`/v2/admin/volunteering/training/${id}/reject`, { reason }),
 
   // Incidents
   getIncidents: () => api.get('/v2/admin/volunteering/incidents'),

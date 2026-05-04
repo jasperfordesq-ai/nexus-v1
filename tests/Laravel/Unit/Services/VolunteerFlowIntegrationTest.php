@@ -45,17 +45,19 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
         $orgId    = $this->createOrganization($ownerId, 'approved');
 
         // Create opportunity via service
-        $oppId = VolunteerService::createOpportunity($ownerId, [
+        $opportunity = VolunteerService::createOpportunity($ownerId, [
             'organization_id' => $orgId,
             'title'           => 'Integration Test Opportunity',
             'description'     => 'Test opportunity for lifecycle test',
             'location'        => 'Remote',
         ]);
-        $this->assertNotNull($oppId, 'createOpportunity should succeed');
+        $this->assertNotNull($opportunity, 'createOpportunity should succeed');
+        $oppId = (int) $opportunity->id;
 
         // Apply
-        $appId = VolunteerService::apply($userId, $oppId);
-        $this->assertNotNull($appId, 'apply should succeed');
+        $application = VolunteerService::apply($oppId, $userId);
+        $this->assertNotNull($application, 'apply should succeed');
+        $appId = (int) $application->id;
 
         // Approve application
         $approved = VolunteerService::handleApplication($appId, $ownerId, 'approve');

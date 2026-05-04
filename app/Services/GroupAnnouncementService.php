@@ -30,14 +30,15 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isMember($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view announcements'];
+        if (!$this->isMember($groupId, $userId, $tenantId) && !GroupService::canModify($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcements_member_required')];
             return null;
         }
 
         $limit = min($filters['limit'] ?? 20, 100);
         $cursor = $filters['cursor'] ?? null;
         $includeExpired = $filters['include_expired'] ?? false;
+        $pinnedOnly = (bool) ($filters['pinned'] ?? false);
 
         $cursorId = null;
         if ($cursor) {
@@ -58,6 +59,10 @@ class GroupAnnouncementService
                 $q->whereNull('ga.expires_at')
                   ->orWhere('ga.expires_at', '>', now());
             });
+        }
+
+        if ($pinnedOnly) {
+            $query->where('ga.is_pinned', 1);
         }
 
         if ($cursorId) {
@@ -102,8 +107,8 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isMember($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view announcements'];
+        if (!$this->isMember($groupId, $userId, $tenantId) && !GroupService::canModify($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcements_member_required')];
             return null;
         }
 
@@ -116,7 +121,7 @@ class GroupAnnouncementService
             ->first();
 
         if (!$row) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Announcement not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
             return null;
         }
 
@@ -132,7 +137,7 @@ class GroupAnnouncementService
         $tenantId = TenantContext::getId();
 
         if (!$this->isAdmin($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group admins can create announcements'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_create_forbidden')];
             return null;
         }
 
@@ -140,15 +145,15 @@ class GroupAnnouncementService
         $content = trim($data['content'] ?? '');
 
         if (empty($title)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_title_required'), 'field' => 'title'];
             return null;
         }
         if (mb_strlen($title) > 255) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must be 255 characters or less', 'field' => 'title'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_title_max'), 'field' => 'title'];
             return null;
         }
         if (empty($content)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_content_required'), 'field' => 'content'];
             return null;
         }
 
@@ -171,7 +176,7 @@ class GroupAnnouncementService
 
             return $this->getById($groupId, $id, $userId);
         } catch (\Throwable $e) {
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create announcement'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.group_announcement_create_failed')];
             return null;
         }
     }
@@ -185,7 +190,7 @@ class GroupAnnouncementService
         $tenantId = TenantContext::getId();
 
         if (!$this->isAdmin($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group admins can update announcements'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_update_forbidden')];
             return null;
         }
 
@@ -196,7 +201,7 @@ class GroupAnnouncementService
             ->exists();
 
         if (!$exists) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Announcement not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
             return null;
         }
 
@@ -205,7 +210,11 @@ class GroupAnnouncementService
         if (array_key_exists('title', $data)) {
             $title = trim($data['title']);
             if (empty($title)) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_title_required'), 'field' => 'title'];
+                return null;
+            }
+            if (mb_strlen($title) > 255) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_title_max'), 'field' => 'title'];
                 return null;
             }
             $updates['title'] = $title;
@@ -213,7 +222,7 @@ class GroupAnnouncementService
         if (array_key_exists('content', $data)) {
             $content = trim($data['content']);
             if (empty($content)) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_announcement_content_required'), 'field' => 'content'];
                 return null;
             }
             $updates['content'] = $content;
@@ -232,6 +241,7 @@ class GroupAnnouncementService
             $updates['updated_at'] = now();
             DB::table('group_announcements')
                 ->where('id', $announcementId)
+                ->where('group_id', $groupId)
                 ->where('tenant_id', $tenantId)
                 ->update($updates);
         }
@@ -248,7 +258,7 @@ class GroupAnnouncementService
         $tenantId = TenantContext::getId();
 
         if (!$this->isAdmin($groupId, $userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group admins can delete announcements'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_delete_forbidden')];
             return false;
         }
 
@@ -259,7 +269,7 @@ class GroupAnnouncementService
             ->delete();
 
         if ($deleted === 0) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Announcement not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
             return false;
         }
 
@@ -272,8 +282,11 @@ class GroupAnnouncementService
     private function isMember(int $groupId, int $userId, int $tenantId): bool
     {
         return DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
+            ->join('groups', 'groups.id', '=', 'group_members.group_id')
+            ->where('group_members.group_id', $groupId)
+            ->where('group_members.user_id', $userId)
+            ->where('group_members.status', 'active')
+            ->where('groups.tenant_id', $tenantId)
             ->exists();
     }
 
@@ -282,22 +295,7 @@ class GroupAnnouncementService
      */
     private function isAdmin(int $groupId, int $userId, int $tenantId): bool
     {
-        // Group owner is always admin
-        $isOwner = DB::table('groups')
-            ->where('id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->where('owner_id', $userId)
-            ->exists();
-
-        if ($isOwner) {
-            return true;
-        }
-
-        return DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->whereIn('role', ['admin', 'owner'])
-            ->exists();
+        return GroupService::canModify($groupId, $userId);
     }
 
     /**

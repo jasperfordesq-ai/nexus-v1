@@ -128,6 +128,10 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
         $data['created_by'] = $userId;
         $opportunity = $this->volunteerService->createOpportunity($userId, $data);
+        if (!$opportunity) {
+            $errors = $this->volunteerService->getErrors();
+            return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
+        }
         return $this->respondWithData($opportunity, null, 201);
     }
 
@@ -141,6 +145,7 @@ class VolunteerController extends BaseApiController
         foreach (['title', 'description', 'location', 'skills_needed', 'start_date', 'end_date'] as $field) {
             if ($this->input($field) !== null) $data[$field] = trim($this->input($field));
         }
+        if ($this->input('is_remote') !== null) $data['is_remote'] = $this->inputBool('is_remote');
         if ($this->input('category_id') !== null) $data['category_id'] = $this->inputInt('category_id') ?: null;
 
         $success = $this->volunteerService->updateOpportunity((int) $id, $userId, $data);
@@ -191,7 +196,12 @@ class VolunteerController extends BaseApiController
         try {
             $application = $this->volunteerService->apply($id, $userId, $data);
         } catch (\RuntimeException $e) {
-            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+            $status = (int) $e->getCode();
+            if (!in_array($status, [400, 403, 404, 409, 422], true)) {
+                $status = 404;
+            }
+            $code = $status === 409 ? 'ALREADY_EXISTS' : ($status === 403 ? 'FORBIDDEN' : ($status === 422 ? 'VALIDATION_ERROR' : 'NOT_FOUND'));
+            return $this->respondWithError($code, $e->getMessage(), null, $status);
         }
 
         // Notify the opportunity organizer about the new application
@@ -238,8 +248,12 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_my_apps', 60, 60);
-        $applications = $this->volunteerService->getMyApplications($userId);
-        return $this->respondWithData($applications);
+        $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
+        if ($this->query('status')) $filters['status'] = $this->query('status');
+        if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
+
+        $result = $this->volunteerService->getMyApplications($userId, $filters);
+        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
     public function opportunityApplications($id): JsonResponse
@@ -517,8 +531,11 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_my_orgs', 60, 60);
-        $orgs = $this->volunteerService->getMyOrganizations($userId);
-        return $this->respondWithData($orgs);
+        $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
+        if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
+
+        $result = $this->volunteerService->getMyOrganizations($userId, $filters);
+        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
     public function createOrganisation(CreateOrganisationRequest $request): JsonResponse

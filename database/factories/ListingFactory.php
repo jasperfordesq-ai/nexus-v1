@@ -26,7 +26,7 @@ class ListingFactory extends Factory
     {
         return [
             'tenant_id'    => 2,
-            'user_id'      => User::factory(),
+            'user_id'      => User::factory()->forTenant(2),
             'title'        => fake()->sentence(4),
             'description'  => fake()->paragraph(),
             'type'         => fake()->randomElement(['offer', 'request']),
@@ -70,6 +70,7 @@ class ListingFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'tenant_id' => $id,
+            'user_id'   => $attributes['user_id'] ?? User::factory()->forTenant($id),
         ]);
     }
 }

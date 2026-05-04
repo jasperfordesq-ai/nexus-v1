@@ -41,7 +41,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
       setIsLoading(true);
       try {
         // Fetch only groups the current user is a member of, scoped to the tenant via the API
-        const res = await api.get<Group[]>('/v2/groups?member=me&limit=50');
+        const res = await api.get<Group[]>('/v2/groups?member=me&per_page=50');
         if (!cancelled) {
           if (res.success && res.data) {
             setGroups(Array.isArray(res.data) ? res.data : []);

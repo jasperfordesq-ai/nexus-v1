@@ -27,10 +27,10 @@ interface PinnedAnnouncement {
 
 interface PinnedAnnouncementsBannerProps {
   groupId: number;
-  isMember: boolean;
+  isMember?: boolean;
 }
 
-export function PinnedAnnouncementsBanner({ groupId, isMember }: PinnedAnnouncementsBannerProps) {
+export function PinnedAnnouncementsBanner({ groupId, isMember = true }: PinnedAnnouncementsBannerProps) {
   const { t } = useTranslation('groups');
   const [pinned, setPinned] = useState<PinnedAnnouncement[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -44,7 +44,9 @@ export function PinnedAnnouncementsBanner({ groupId, isMember }: PinnedAnnouncem
           const payload = res.data;
           const items = Array.isArray(payload)
             ? payload
-            : (payload as { announcements?: PinnedAnnouncement[] })?.announcements ?? [];
+            : (payload as { items?: PinnedAnnouncement[]; announcements?: PinnedAnnouncement[] })?.items
+              ?? (payload as { announcements?: PinnedAnnouncement[] })?.announcements
+              ?? [];
           setPinned((items as PinnedAnnouncement[]).filter((a) => a.is_pinned !== false));
         }
       } catch {

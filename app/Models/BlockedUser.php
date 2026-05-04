@@ -6,28 +6,32 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * BlockedUser — represents a block relationship between two users.
  *
- * Uses the legacy `user_blocks` table which does NOT have a tenant_id column.
- * Block checks are global (user IDs are unique across tenants).
+ * Block checks are scoped by tenant.
  */
 class BlockedUser extends Model
 {
+    use HasTenantScope;
+
     protected $table = 'user_blocks';
 
     public $timestamps = false;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
         'blocked_user_id',
         'reason',
     ];
 
     protected $casts = [
+        'tenant_id' => 'integer',
         'user_id' => 'integer',
         'blocked_user_id' => 'integer',
     ];

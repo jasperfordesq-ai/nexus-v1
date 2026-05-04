@@ -224,21 +224,22 @@ export function GroupTabContent({
         />
       )}
 
-      {activeTab === 'files' && (
+      {activeTab === 'files' && (userIsMember ? (
         <GroupFilesTab
           groupId={groupId}
           isAdmin={userIsAdmin}
           isMember={userIsMember}
+          currentUserId={currentUserId}
         />
-      )}
+      ) : MembersOnlyFallback)}
 
-      {activeTab === 'announcements' && (
+      {activeTab === 'announcements' && (userIsMember ? (
         <GroupAnnouncementsTab
           groupId={groupId}
           isAdmin={userIsAdmin}
           isMember={userIsMember}
         />
-      )}
+      ) : MembersOnlyFallback)}
 
       {activeTab === 'chatrooms' && (userIsMember ? (
         <GroupChatroomsTab

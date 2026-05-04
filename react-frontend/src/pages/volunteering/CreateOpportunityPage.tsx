@@ -62,7 +62,7 @@ const initialFormData: FormData = {
 
 export default function CreateOpportunityPage() {
   const { t } = useTranslation('volunteering');
-  usePageTitle(t('volunteering.create_opportunity_title'));
+  usePageTitle(t('create_opportunity_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -80,11 +80,11 @@ export default function CreateOpportunityPage() {
   async function loadMyOrganisations() {
     try {
       setIsLoadingOrgs(true);
-      const response = await api.get<MyOrganisation[]>('/v2/volunteering/my-organisations');
+      const response = await api.get<MyOrganisation[] | { items?: MyOrganisation[] }>('/v2/volunteering/my-organisations');
       if (response.success && response.data) {
-        const orgs = (Array.isArray(response.data) ? response.data : []);
+        const orgs = Array.isArray(response.data) ? response.data : (response.data.items ?? []);
         const approved = orgs.filter(
-          (org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role),
+          (org) => ['approved', 'active'].includes(org.status) && ['owner', 'admin'].includes(org.member_role),
         );
         setApprovedOrgs(approved);
 
@@ -111,13 +111,13 @@ export default function CreateOpportunityPage() {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
 
     if (!formData.organization_id) {
-      newErrors.organization_id = t('volunteering.form_org_required');
+      newErrors.organization_id = t('form_org_required');
     }
 
     if (!formData.title.trim()) {
-      newErrors.title = t('volunteering.form_title_required');
+      newErrors.title = t('form_title_required');
     } else if (formData.title.trim().length < 5) {
-      newErrors.title = t('volunteering.form_title_min_length');
+      newErrors.title = t('form_title_min_length');
     }
 
     setErrors(newErrors);
@@ -150,14 +150,14 @@ export default function CreateOpportunityPage() {
       const response = await api.post('/v2/volunteering/opportunities', payload);
 
       if (response.success) {
-        toast.success(t('volunteering.form_success'));
+        toast.success(t('form_success'));
         navigate(tenantPath('/volunteering'));
       } else {
-        toast.error(t('volunteering.form_save_error'));
+        toast.error(t('form_save_error'));
       }
     } catch (error) {
       logError('Failed to create opportunity', error);
-      toast.error(t('volunteering.form_save_error'));
+      toast.error(t('form_save_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -176,27 +176,27 @@ export default function CreateOpportunityPage() {
         className="max-w-2xl mx-auto space-y-6"
       >
         <Breadcrumbs items={[
-          { label: t('volunteering.heading'), href: '/volunteering' },
-          { label: t('volunteering.create_opportunity_title') },
+          { label: t('heading'), href: tenantPath('/volunteering') },
+          { label: t('create_opportunity_title') },
         ]} />
 
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            {t('volunteering.no_approved_orgs_title')}
+            {t('no_approved_orgs_title')}
           </h2>
           <p className="text-theme-muted mb-6">
-            {t('volunteering.no_approved_orgs_description')}
+            {t('no_approved_orgs_description')}
           </p>
           <div className="flex justify-center gap-3">
             <Link to={tenantPath('/organisations/register')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('volunteering.register_org_link')}
+                {t('register_org_link')}
               </Button>
             </Link>
             <Link to={tenantPath('/volunteering')}>
               <Button variant="flat" className="bg-theme-elevated text-theme-primary">
-                {t('volunteering.form_cancel')}
+                {t('form_cancel')}
               </Button>
             </Link>
           </div>
@@ -214,8 +214,8 @@ export default function CreateOpportunityPage() {
       <PageMeta title={t('page_meta.create_opportunity.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('volunteering.heading'), href: '/volunteering' },
-        { label: t('volunteering.create_opportunity_title') },
+        { label: t('heading'), href: tenantPath('/volunteering') },
+        { label: t('create_opportunity_title') },
       ]} />
 
       {/* Form */}
@@ -223,10 +223,10 @@ export default function CreateOpportunityPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Heart className="w-7 h-7 text-rose-500" aria-hidden="true" />
-            {t('volunteering.create_opportunity_title')}
+            {t('create_opportunity_title')}
           </h1>
           <p className="text-theme-muted mt-1">
-            {t('volunteering.create_opportunity_subtitle')}
+            {t('create_opportunity_subtitle')}
           </p>
         </div>
 
@@ -234,8 +234,8 @@ export default function CreateOpportunityPage() {
           {/* Organisation Selector */}
           {approvedOrgs.length > 1 ? (
             <Select
-              label={t('volunteering.form_org_label')}
-              placeholder={t('volunteering.form_org_placeholder')}
+              label={t('form_org_label')}
+              placeholder={t('form_org_placeholder')}
               selectedKeys={formData.organization_id ? new Set([formData.organization_id]) : new Set()}
               onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) updateField('organization_id', val); }}
               isInvalid={!!errors.organization_id}
@@ -255,7 +255,7 @@ export default function CreateOpportunityPage() {
             </Select>
           ) : (
             <Input
-              label={t('volunteering.form_org_label')}
+              label={t('form_org_label')}
               value={approvedOrgs[0]?.name ?? ''}
               isReadOnly
               startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
@@ -268,8 +268,8 @@ export default function CreateOpportunityPage() {
 
           {/* Title */}
           <Input
-            label={t('volunteering.form_title_label')}
-            placeholder={t('volunteering.form_title_placeholder')}
+            label={t('form_title_label')}
+            placeholder={t('form_title_placeholder')}
             value={formData.title}
             onChange={(e) => updateField('title', e.target.value)}
             isInvalid={!!errors.title}
@@ -283,8 +283,8 @@ export default function CreateOpportunityPage() {
 
           {/* Description */}
           <Textarea
-            label={t('volunteering.form_desc_label')}
-            placeholder={t('volunteering.form_desc_placeholder')}
+            label={t('form_desc_label')}
+            placeholder={t('form_desc_placeholder')}
             value={formData.description}
             onChange={(e) => updateField('description', e.target.value)}
             minRows={4}
@@ -296,8 +296,8 @@ export default function CreateOpportunityPage() {
 
           {/* Location */}
           <PlaceAutocompleteInput
-            label={t('volunteering.form_location_label')}
-            placeholder={t('volunteering.form_location_placeholder')}
+            label={t('form_location_label')}
+            placeholder={t('form_location_placeholder')}
             value={formData.location}
             onChange={(val) => updateField('location', val)}
             onPlaceSelect={(place) => {
@@ -321,8 +321,8 @@ export default function CreateOpportunityPage() {
 
           {/* Skills Needed */}
           <Input
-            label={t('volunteering.form_skills_label')}
-            placeholder={t('volunteering.form_skills_placeholder')}
+            label={t('form_skills_label')}
+            placeholder={t('form_skills_placeholder')}
             value={formData.skills_needed}
             onChange={(e) => updateField('skills_needed', e.target.value)}
             startContent={<Wrench className="w-4 h-4 text-theme-subtle" />}
@@ -334,10 +334,10 @@ export default function CreateOpportunityPage() {
 
           {/* Date Range */}
           <fieldset className="grid sm:grid-cols-2 gap-4">
-            <legend className="sr-only">Opportunity date range</legend>
+            <legend className="sr-only">{t('date_range_sr')}</legend>
             <div>
               <DatePicker
-                label={t('volunteering.form_start_date_label')}
+                label={t('form_start_date_label')}
                 value={formData.start_date}
                 onChange={(val) => updateField('start_date', val)}
                 minValue={today(getLocalTimeZone())}
@@ -349,7 +349,7 @@ export default function CreateOpportunityPage() {
             </div>
             <div>
               <DatePicker
-                label={t('volunteering.form_end_date_label')}
+                label={t('form_end_date_label')}
                 value={formData.end_date}
                 onChange={(val) => updateField('end_date', val)}
                 minValue={formData.start_date || today(getLocalTimeZone())}
@@ -369,7 +369,7 @@ export default function CreateOpportunityPage() {
               startContent={<Save className="w-4 h-4" />}
               isLoading={isSubmitting}
             >
-              {t('volunteering.form_submit_opportunity')}
+              {t('form_submit_opportunity')}
             </Button>
             <Link to={tenantPath('/volunteering')}>
               <Button
@@ -377,7 +377,7 @@ export default function CreateOpportunityPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >
-                {t('volunteering.form_cancel')}
+                {t('form_cancel')}
               </Button>
             </Link>
           </div>

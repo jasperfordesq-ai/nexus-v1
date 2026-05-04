@@ -21,7 +21,7 @@ _deploy_db_maintenance_set() {
         return
     fi
 
-    if docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then
+    if docker ps --format "{{.Names}}" | grep -qx "nexus-php-db"; then
         docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e \
             "UPDATE tenant_settings SET setting_value = '$value' WHERE setting_key = 'general.maintenance_mode';" 2>/dev/null \
             && log_ok "Layer 2: Database maintenance_mode = '$value'" \
@@ -33,7 +33,7 @@ _deploy_db_maintenance_set() {
 
 # Helper: flush Redis bootstrap cache so frontend sees maintenance changes immediately
 _deploy_flush_bootstrap_cache() {
-    if docker ps --filter "name=nexus-php-redis" --format "{{.Names}}" | grep -q "nexus-php-redis"; then
+    if docker ps --format "{{.Names}}" | grep -qx "nexus-php-redis"; then
         local prefix
         prefix=$(grep "^CACHE_PREFIX=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_laravel")
         local keys
@@ -59,7 +59,7 @@ _deploy_flush_bootstrap_cache() {
 # After container rebuild/restart, re-enable maintenance if it was deferred
 # or ensure it persists (container recreate wipes the file)
 re_enable_maintenance_after_rebuild() {
-    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+    if docker ps --format "{{.Names}}" | grep -qx "$PHP_CONTAINER"; then
         docker exec "$PHP_CONTAINER" touch "$MAINTENANCE_FILE" 2>/dev/null || true
         log_ok "Maintenance mode re-confirmed after container rebuild"
     fi

@@ -142,7 +142,7 @@ export default function VolunteerProjects() {
       from_project: String(project.id),
       title: project.title,
     });
-    navigate(`/admin/volunteering/create?${params.toString()}`);
+    navigate(`/volunteering/create?${params.toString()}`);
   };
 
   const columns: Column<CommunityProject>[] = [

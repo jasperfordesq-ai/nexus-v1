@@ -213,8 +213,8 @@ class TenantDataQualityService
             'severity'      => $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
             'count'         => $count,
             'message'       => $count > 0
-                ? 'These members will receive emails and notifications in the platform default — set their preferred language for proper localisation.'
-                : 'Every member has a preferred language set.',
+                ? __('caring_community.data_quality.missing_language_positive')
+                : __('caring_community.data_quality.missing_language_ok'),
             'has_drilldown' => $count > 0,
         ];
     }
@@ -234,7 +234,7 @@ class TenantDataQualityService
                 'label'         => 'Members without sub-region',
                 'severity'      => self::SEVERITY_OK,
                 'count'         => 0,
-                'message'       => 'No users.sub_region_id column on this schema — sub-region linkage tracked elsewhere.',
+                'message'       => __('caring_community.data_quality.no_sub_region_column'),
                 'has_drilldown' => false,
             ];
         }
@@ -249,7 +249,7 @@ class TenantDataQualityService
                 'label'         => 'Members without sub-region',
                 'severity'      => self::SEVERITY_OK,
                 'count'         => 0,
-                'message'       => 'No sub-regions defined for this tenant — skipping check.',
+                'message'       => __('caring_community.data_quality.no_sub_regions'),
                 'has_drilldown' => false,
             ];
         }
@@ -293,7 +293,7 @@ class TenantDataQualityService
                 'label'         => 'Caring relationships without coordinator',
                 'severity'      => self::SEVERITY_OK,
                 'count'         => 0,
-                'message'       => 'no coordinator column on this schema',
+                'message'       => __('caring_community.data_quality.no_coordinator_column'),
                 'has_drilldown' => false,
             ];
         }

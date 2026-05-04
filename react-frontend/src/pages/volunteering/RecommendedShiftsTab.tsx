@@ -54,6 +54,65 @@ interface RecommendedShift {
   match_reasons: string[];
 }
 
+interface FlatRecommendedShift {
+  shift_id: number;
+  opportunity_id: number;
+  title: string;
+  organization_name: string;
+  organization_logo_url?: string | null;
+  location?: string | null;
+  skills_needed?: string | null;
+  start_time: string;
+  end_time: string;
+  capacity?: number | null;
+  required_skills?: string[] | string | null;
+  match_score: number;
+  match_reasons?: string[];
+}
+
+type RecommendedShiftPayload = RecommendedShift | FlatRecommendedShift;
+
+function parseSkills(value: string[] | string | null | undefined): string[] {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  return value.split(',').map((skill) => skill.trim()).filter(Boolean);
+}
+
+function normalizeRecommendedShift(item: RecommendedShiftPayload): RecommendedShift {
+  if ('shift' in item) {
+    return {
+      ...item,
+      match_reasons: item.match_reasons ?? [],
+      shift: {
+        ...item.shift,
+        required_skills: item.shift.required_skills ?? [],
+      },
+    };
+  }
+
+  return {
+    shift: {
+      id: item.shift_id,
+      start_time: item.start_time,
+      end_time: item.end_time,
+      capacity: item.capacity ?? null,
+      required_skills: parseSkills(item.required_skills),
+    },
+    opportunity: {
+      id: item.opportunity_id,
+      title: item.title,
+      location: item.location ?? '',
+      skills_needed: item.skills_needed ?? '',
+    },
+    organization: {
+      name: item.organization_name,
+      logo_url: item.organization_logo_url ?? null,
+    },
+    match_score: item.match_score,
+    match_reasons: item.match_reasons ?? [],
+  };
+}
+
 export function RecommendedShiftsTab() {
   const { t } = useTranslation('volunteering');
   const navigate = useNavigate();
@@ -78,14 +137,15 @@ export function RecommendedShiftsTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ shifts?: RecommendedShift[] }>(
+      const response = await api.get<{ shifts?: RecommendedShiftPayload[] } | RecommendedShiftPayload[]>(
         '/v2/volunteering/recommended-shifts?limit=10'
       );
 
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        const payload = response.data as { shifts?: RecommendedShift[] } | RecommendedShift[];
-        setShifts(Array.isArray(payload) ? payload : (payload.shifts ?? []));
+        const payload = response.data as { shifts?: RecommendedShiftPayload[] } | RecommendedShiftPayload[];
+        const items = Array.isArray(payload) ? payload : (payload.shifts ?? []);
+        setShifts(items.map(normalizeRecommendedShift));
       } else {
         setError(tRef.current('recommendations.error_load', 'Failed to load recommendations'));
       }

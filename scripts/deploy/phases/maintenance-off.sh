@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 disable_maintenance_mode() {
     log_step "=== Disabling Maintenance Mode (both layers) ==="
 
-    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+    if docker ps --format "{{.Names}}" | grep -qx "$PHP_CONTAINER"; then
         # Layer 1: Remove file
         docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
 
@@ -31,7 +31,10 @@ disable_maintenance_mode() {
         # Verify HTTP 200
         sleep 1
         local HTTP_CODE
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+        HTTP_CODE="skipped"
+        if [ -n "${MAINTENANCE_VERIFY_URL:-}" ]; then
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$MAINTENANCE_VERIFY_URL" 2>/dev/null || echo "000")
+        fi
         if [ "$HTTP_CODE" = "200" ]; then
             log_ok "Verified: API returning HTTP 200"
         else

@@ -218,7 +218,7 @@ class CivicDigestService
 
         if (array_key_exists('cadence', $prefs)) {
             if (!is_string($prefs['cadence']) || !in_array($prefs['cadence'], self::ALLOWED_CADENCES, true)) {
-                $errors[] = ['field' => 'cadence', 'message' => 'cadence must be one of: off, daily, weekly'];
+                $errors[] = ['field' => 'cadence', 'message' => __('caring_community.civic_digest.cadence_invalid')];
             } else {
                 $merged['cadence'] = $prefs['cadence'];
                 $merged['enabled'] = $prefs['cadence'] !== 'off';
@@ -231,13 +231,13 @@ class CivicDigestService
             } elseif (is_numeric($prefs['preferred_sub_region_id'])) {
                 $merged['preferred_sub_region_id'] = (int) $prefs['preferred_sub_region_id'];
             } else {
-                $errors[] = ['field' => 'preferred_sub_region_id', 'message' => 'must be numeric or null'];
+                $errors[] = ['field' => 'preferred_sub_region_id', 'message' => __('caring_community.civic_digest.preferred_sub_region_invalid')];
             }
         }
 
         if (array_key_exists('opt_out_sources', $prefs)) {
             if (!is_array($prefs['opt_out_sources'])) {
-                $errors[] = ['field' => 'opt_out_sources', 'message' => 'must be an array of source keys'];
+                $errors[] = ['field' => 'opt_out_sources', 'message' => __('caring_community.civic_digest.opt_out_sources_invalid')];
             } else {
                 $clean = [];
                 foreach ($prefs['opt_out_sources'] as $src) {
@@ -369,7 +369,7 @@ class CivicDigestService
         if (!in_array($cadence, self::ALLOWED_CADENCES, true)) {
             return [
                 'errors' => [
-                    ['field' => 'cadence', 'message' => 'cadence must be one of: off, daily, weekly'],
+                    ['field' => 'cadence', 'message' => __('caring_community.civic_digest.cadence_invalid')],
                 ],
             ];
         }

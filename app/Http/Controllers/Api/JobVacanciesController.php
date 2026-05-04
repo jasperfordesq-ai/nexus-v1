@@ -32,9 +32,11 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Http\Requests\Jobs\ListJobVacanciesRequest;
+use App\Models\JobVacancyTeam;
 use App\Models\JobVacancy;
 use App\Models\Review;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -66,6 +68,56 @@ class JobVacanciesController extends BaseApiController
                 $this->respondWithError('FEATURE_DISABLED', __('api.job_feature_disabled'), null, 403)
             );
         }
+    }
+
+    private function findTenantVacancy(int $vacancyId): ?JobVacancy
+    {
+        return JobVacancy::where('tenant_id', TenantContext::getId())
+            ->where('id', $vacancyId)
+            ->first();
+    }
+
+    private function canManageVacancy(JobVacancy $vacancy, int $userId): bool
+    {
+        if ((int) $vacancy->user_id === $userId) {
+            return true;
+        }
+
+        $tenantId = TenantContext::getId();
+        $user = User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($user) {
+            $role = (string) ($user->role ?? '');
+            if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+                || (bool) ($user->is_admin ?? false)
+                || (bool) ($user->is_super_admin ?? false)
+                || (bool) ($user->is_tenant_super_admin ?? false)
+                || (bool) ($user->is_god ?? false)
+            ) {
+                return true;
+            }
+        }
+
+        return JobVacancyTeam::where('tenant_id', $tenantId)
+            ->where('vacancy_id', $vacancy->id)
+            ->where('user_id', $userId)
+            ->exists();
+    }
+
+    private function rejectIfCannotManageVacancy(int $vacancyId, int $userId): ?JsonResponse
+    {
+        $vacancy = $this->findTenantVacancy($vacancyId);
+        if (!$vacancy) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
+        }
+
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
+        }
+
+        return null;
     }
 
     // =====================================================================
@@ -519,7 +571,7 @@ class JobVacanciesController extends BaseApiController
         $limit = min((int) ($this->query('limit', 10)), 20);
         $jobs = $this->jobService->getRecommended($userId, $limit);
 
-        return $this->respondWithData(['data' => $jobs]);
+        return $this->respondWithData($jobs);
     }
 
     // =====================================================================
@@ -1303,7 +1355,7 @@ class JobVacanciesController extends BaseApiController
         }
 
         $cards = JobScorecardService::getForApplication($id);
-        return $this->respondWithData(['data' => $cards]);
+        return $this->respondWithData($cards);
     }
 
     // ── Team endpoints ─────────────────────────────────────────────────────
@@ -1365,7 +1417,7 @@ class JobVacanciesController extends BaseApiController
         }
 
         $members = JobTeamService::getMembers($id);
-        return $this->respondWithData(['data' => $members]);
+        return $this->respondWithData($members);
     }
 
     // ── Saved profile endpoints ────────────────────────────────────────────
@@ -1406,7 +1458,7 @@ class JobVacanciesController extends BaseApiController
     public function listTemplates(): JsonResponse
     {
         $userId = $this->getUserId();
-        return $this->respondWithData(['data' => JobTemplateService::list($userId)]);
+        return $this->respondWithData(JobTemplateService::list($userId));
     }
 
     /**
@@ -1466,7 +1518,7 @@ class JobVacanciesController extends BaseApiController
     {
         $userId = $this->getUserId();
         $data = JobGdprService::exportUserData($userId);
-        return $this->respondWithData(['data' => $data]);
+        return $this->respondWithData($data);
     }
 
     /** DELETE /v2/jobs/gdpr-erase-me */
@@ -1503,14 +1555,24 @@ class JobVacanciesController extends BaseApiController
     /** GET /v2/jobs/{id}/pipeline-rules */
     public function listPipelineRules(int $id): JsonResponse
     {
-        $this->getUserId();
-        return $this->respondWithData(['data' => JobPipelineRuleService::listForVacancy($id)]);
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
+            return $response;
+        }
+
+        return $this->respondWithData(JobPipelineRuleService::listForVacancy($id));
     }
 
     /** POST /v2/jobs/{id}/pipeline-rules */
     public function createPipelineRule(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
+        if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
+            return $response;
+        }
+
         $data   = $this->getAllInput();
         $result = JobPipelineRuleService::create($id, $userId, $data);
         return $result !== false
@@ -1521,6 +1583,7 @@ class JobVacanciesController extends BaseApiController
     /** DELETE /v2/jobs/pipeline-rules/{id} */
     public function deletePipelineRule(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
         $ok     = JobPipelineRuleService::delete($id, $userId);
         return $ok
@@ -1531,7 +1594,12 @@ class JobVacanciesController extends BaseApiController
     /** POST /v2/jobs/{id}/pipeline-rules/run */
     public function runPipelineRules(int $id): JsonResponse
     {
-        $this->getUserId();
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
+            return $response;
+        }
+
         $count = JobPipelineRuleService::runForVacancy($id);
         return $this->respondWithData(['actioned' => $count]);
     }

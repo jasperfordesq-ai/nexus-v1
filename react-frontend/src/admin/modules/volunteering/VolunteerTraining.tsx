@@ -138,9 +138,12 @@ export function VolunteerTraining() {
   };
 
   const handleReject = async (id: number) => {
+    const reason = window.prompt(t('volunteering.reject_training_reason_prompt', 'Reason for rejecting this training record'))?.trim();
+    if (!reason) return;
+
     setActionId(id);
     try {
-      const res = await adminVolunteering.rejectTraining(id);
+      const res = await adminVolunteering.rejectTraining(id, reason);
       if (res.success) {
         toast.success(t('volunteering.training_rejected', 'Training record rejected'));
         loadData();
