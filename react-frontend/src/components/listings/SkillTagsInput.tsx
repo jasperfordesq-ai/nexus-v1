@@ -99,7 +99,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
     <div className="space-y-2">
       <label className="text-sm font-medium text-theme-muted flex items-center gap-1">
         <Tag className="w-4 h-4" />
-        {t('skill_tags.label', 'Skill Tags')}
+        {t('skill_tags.label')}
         <span className="text-theme-subtle">({tags.length}/{maxTags})</span>
       </label>
 
@@ -125,8 +125,8 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
         <div className="relative">
           <Input
             size="sm"
-            placeholder={t('skill_tags.placeholder', 'Type a skill and press Enter...')}
-            aria-label={t('skill_tags.aria_add', 'Add skill tag')}
+            placeholder={t('skill_tags.placeholder')}
+            aria-label={t('skill_tags.aria_add')}
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}

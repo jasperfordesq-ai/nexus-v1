@@ -97,7 +97,6 @@ export function ListingsPage() {
     }
     return null;
   });
-  const nearMeEnabled = proximityParams !== null;
   const [hoursRange, setHoursRange] = useState(() => {
     const v = searchParams.get('hours');
     return v && validHours.includes(v) ? v : 'any';
@@ -801,6 +800,12 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   const hours = listing.estimated_hours || listing.hours_estimate;
   const avatarSrc = resolveAvatarUrl(listing.author_avatar || listing.user?.avatar);
   const isFavorited = listing.is_favorited === true;
+  const fallbackUserName = t('user_fallback');
+  const imageAlt = listing.title || t('listing_image_alt');
+  const formatDistance = (distanceKm: number) =>
+    distanceKm < 1
+      ? t('distance_meters', { distance: Math.round(distanceKm * 1000) })
+      : t('distance_kilometers', { distance: distanceKm.toFixed(1) });
 
   function handleSaveClick() {
     if (onToggleSave && !isSaving) {
@@ -824,7 +829,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {imageUrl && !imgError ? (
               <img
                 src={imageUrl}
-                alt={listing.title || 'Listing image'}
+                alt={imageAlt}
                 className="w-16 h-16 rounded-lg object-cover shrink-0"
                 width={64}
                 height={64}
@@ -835,7 +840,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             ) : (
               <Avatar
                 src={avatarSrc}
-                name={listing.author_name || 'User'}
+                name={listing.author_name || fallbackUserName}
                 size="md"
                 className="shrink-0 ring-2 ring-theme-muted/20"
               />
@@ -896,9 +901,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               {listing.distance_km !== undefined && (
                 <span className="flex items-center gap-1 text-primary font-medium">
                   <MapPin className="w-3 h-3" aria-hidden="true" />
-                  {listing.distance_km < 1
-                    ? `${Math.round(listing.distance_km * 1000)} m`
-                    : `${listing.distance_km.toFixed(1)} km`}
+                  {formatDistance(listing.distance_km)}
                 </span>
               )}
               {onToggleSave && (
@@ -935,7 +938,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           {imageUrl && !imgError ? (
             <img
               src={imageUrl}
-              alt={listing.title || 'Listing image'}
+              alt={imageAlt}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               width={800}
               height={450}
@@ -1027,7 +1030,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           <div className="flex items-center gap-2 min-w-0">
             <Avatar
               src={avatarSrc}
-              name={listing.author_name || 'User'}
+              name={listing.author_name || fallbackUserName}
               size="sm"
               className="shrink-0 w-8 h-8"
             />
@@ -1055,9 +1058,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {listing.distance_km !== undefined && (
               <span className="flex items-center gap-1 shrink-0 text-primary font-medium">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
-                {listing.distance_km < 1
-                  ? `${Math.round(listing.distance_km * 1000)} m`
-                  : `${listing.distance_km.toFixed(1)} km`}
+                {formatDistance(listing.distance_km)}
               </span>
             )}
           </div>

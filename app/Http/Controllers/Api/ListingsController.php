@@ -69,8 +69,9 @@ class ListingsController extends BaseApiController
             $filters['category_slug'] = $this->query('category');
         }
 
-        if ($this->query('q')) {
-            $filters['search'] = $this->query('q');
+        $search = $this->query('q') ?? $this->query('search');
+        if ($search) {
+            $filters['search'] = $search;
         }
 
         if ($this->query('user_id')) {
@@ -319,7 +320,7 @@ class ListingsController extends BaseApiController
 
         // Award XP for creating a listing
         try {
-            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_listing'], 'create_listing', 'Created a listing');
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_listing'], 'create_listing', __('api.listing_created_activity'));
             \App\Services\GamificationService::runAllBadgeChecks($userId);
         } catch (\Throwable $e) {
             \Log::warning('Gamification XP award failed', ['action' => 'create_listing', 'user' => $userId, 'error' => $e->getMessage()]);
@@ -462,8 +463,9 @@ class ListingsController extends BaseApiController
             $filters['category_slug'] = $this->query('category');
         }
 
-        if ($this->query('q')) {
-            $filters['search'] = $this->query('q');
+        $search = $this->query('q') ?? $this->query('search');
+        if ($search) {
+            $filters['search'] = $search;
         }
 
         if ($this->query('min_hours')) {
@@ -562,6 +564,13 @@ class ListingsController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
+        $tenantId = TenantContext::getId();
+        $alreadySaved = DB::table('user_saved_listings')
+            ->where('user_id', $userId)
+            ->where('listing_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
         $result = $this->listingService->saveListing($userId, $id);
 
         if (!$result) {
@@ -569,15 +578,16 @@ class ListingsController extends BaseApiController
         }
 
         try {
-            $this->listingAnalyticsService->updateSaveCount($id, true);
+            if (!$alreadySaved) {
+                $this->listingAnalyticsService->updateSaveCount($id, true);
+            }
         } catch (\Exception $e) {
             // Non-critical
         }
 
         // Notify listing owner that someone saved their listing (bell only, skip if saver === owner)
         try {
-            $tenantId = TenantContext::getId();
-            $listing = DB::table('listings')
+            $listing = $alreadySaved ? null : DB::table('listings')
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
                 ->select(['user_id', 'title'])
@@ -597,7 +607,7 @@ class ListingsController extends BaseApiController
                     ->first();
 
                 LocaleContext::withLocale($owner, function () use ($saver, $listing, $id) {
-                    $saverName = 'Someone';
+                    $saverName = __('emails.common.fallback_someone');
                     if ($saver) {
                         $saverName = trim(($saver->first_name ?? '') . ' ' . ($saver->last_name ?? ''));
                         if (empty($saverName)) {
@@ -632,10 +642,18 @@ class ListingsController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
+        $wasSaved = DB::table('user_saved_listings')
+            ->where('user_id', $userId)
+            ->where('listing_id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+
         $this->listingService->unsaveListing($userId, $id);
 
         try {
-            $this->listingAnalyticsService->updateSaveCount($id, false);
+            if ($wasSaved) {
+                $this->listingAnalyticsService->updateSaveCount($id, false);
+            }
         } catch (\Exception $e) {
             // Non-critical
         }
@@ -712,8 +730,11 @@ class ListingsController extends BaseApiController
         $result = $this->listingExpiryService->renewListing($id, $userId);
 
         if (!$result['success']) {
-            $status = $result['error'] === 'Listing not found' ? 404
-                : ($result['error'] === 'You do not have permission to renew this listing' ? 403 : 422);
+            $status = match ($result['error_code'] ?? null) {
+                'not_found' => 404,
+                'forbidden' => 403,
+                default => 422,
+            };
             return $this->respondWithError('RENEWAL_FAILED', $result['error'], null, $status);
         }
 
@@ -819,7 +840,7 @@ class ListingsController extends BaseApiController
 
         $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
         if (!in_array($file->getMimeType(), $allowedMimes)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Only JPEG, PNG, WebP, and GIF images are allowed.', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.listing_image_invalid_type'), null, 422);
         }
 
         try {
@@ -962,7 +983,11 @@ class ListingsController extends BaseApiController
         if ($existingCount + count($files) > $maxImages) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Maximum ' . $maxImages . ' images per listing. Currently ' . $existingCount . ' images, trying to add ' . count($files) . '.',
+                __('api.listing_images_limit_exceeded', [
+                    'max' => $maxImages,
+                    'current' => $existingCount,
+                    'attempted' => count($files),
+                ]),
                 'images',
                 422
             );
@@ -1121,7 +1146,7 @@ class ListingsController extends BaseApiController
 
         foreach ($imageIds as $imgId) {
             if (!in_array((int) $imgId, $existingIds)) {
-                return $this->respondWithError('VALIDATION_ERROR', "Image ID {$imgId} does not belong to this listing.", 'image_ids', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.listing_image_id_not_belong', ['id' => $imgId]), 'image_ids', 422);
             }
         }
 

@@ -79,6 +79,8 @@
     "experience_professional": "Professional / certified",
     "experience_some": "Some experience helpful",
     "image_upload_failed": "Image upload failed. Your listing was saved without an image.",
+    "image_preview_alt": "Listing preview",
+    "tags_save_failed": "Skill tags could not be saved. You can edit the listing to try again.",
     "service_details_toggle": "Optional service details",
     "service_type_depends": "Depends on service",
     "service_type_hybrid": "Remote available",
@@ -144,6 +146,7 @@
   "detail_saved": "Saved",
   "detail_save": "Save",
   "detail_share": "Share",
+  "detail_fallback_label": "Listing",
   "detail_this_member": "this member",
   "detail_offered_by": "Offered by",
   "detail_requested_by": "Requested by",
@@ -276,5 +279,9 @@
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
   "community_member": "Community Member",
-  "comments_error": "Comments could not be loaded."
+  "comments_error": "Comments could not be loaded.",
+  "user_fallback": "User",
+  "listing_image_alt": "Listing image",
+  "distance_meters": "{{distance}} m",
+  "distance_kilometers": "{{distance}} km"
 }

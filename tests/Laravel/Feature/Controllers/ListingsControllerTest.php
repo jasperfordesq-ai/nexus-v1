@@ -6,10 +6,12 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Events\ListingCreated;
 use App\Models\Listing;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -94,6 +96,45 @@ class ListingsControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_index_supports_search_query_parameter_alias(): void
+    {
+        $user = $this->authenticatedUser();
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Needle listing audit token',
+            'description' => 'A unique service for search alias coverage.',
+            'hours_estimate' => 1,
+        ]);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Unrelated haystack listing',
+            'description' => 'This should not match the unique query.',
+            'hours_estimate' => 1,
+        ]);
+
+        $response = $this->apiGet('/v2/listings?search=Needle%20listing%20audit%20token&min_hours=0.1');
+
+        $response->assertStatus(200);
+        $titles = collect($response->json('data'))->pluck('title')->all();
+        $this->assertContains('Needle listing audit token', $titles);
+        $this->assertNotContains('Unrelated haystack listing', $titles);
+    }
+
+    public function test_index_returns_empty_for_unknown_category_slug(): void
+    {
+        $user = $this->authenticatedUser();
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Visible listing with no matching category slug',
+        ]);
+
+        $response = $this->apiGet('/v2/listings?category=missing-category-audit-slug');
+
+        $response->assertStatus(200);
+        $this->assertSame([], $response->json('data'));
+        $this->assertSame(0, $response->json('meta.total_items'));
+    }
+
     // ================================================================
     // INDEX — Tenant isolation
     // ================================================================
@@ -161,7 +202,8 @@ class ListingsControllerTest extends TestCase
 
     public function test_store_creates_listing_and_returns_201(): void
     {
-        $user = $this->authenticatedUser();
+        Event::fake([ListingCreated::class]);
+        $user = $this->authenticatedUser(['email' => '']);
 
         // Ensure a category exists for the listing
         DB::table('categories')->insertOrIgnore([
@@ -177,10 +219,11 @@ class ListingsControllerTest extends TestCase
             'category_id' => 1,
             'location' => 'Dublin',
             'price' => 2.0,
-            'service_type' => 'in_person',
+            'service_type' => 'physical_only',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+        Event::assertDispatched(ListingCreated::class);
     }
 
     // ================================================================
@@ -232,6 +275,26 @@ class ListingsControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+    }
+
+    public function test_owner_can_pause_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+        ]);
+
+        $response = $this->apiPut("/v2/listings/{$listing->id}", [
+            'status' => 'paused',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('listings', [
+            'id' => $listing->id,
+            'tenant_id' => $this->testTenantId,
+            'status' => 'paused',
+        ]);
     }
 
     // ================================================================
@@ -357,6 +420,38 @@ class ListingsControllerTest extends TestCase
         $response = $this->apiPost('/v2/listings/1/save');
 
         $this->assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    public function test_duplicate_save_does_not_increment_save_count_twice(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $owner->id,
+            'save_count' => 0,
+        ]);
+        $this->authenticatedUser();
+
+        $first = $this->apiPost("/v2/listings/{$listing->id}/save");
+        $second = $this->apiPost("/v2/listings/{$listing->id}/save");
+
+        $first->assertStatus(200);
+        $second->assertStatus(200);
+        $this->assertSame(1, (int) DB::table('listings')->where('id', $listing->id)->value('save_count'));
+    }
+
+    public function test_unsave_without_saved_record_does_not_decrement_save_count(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $owner->id,
+            'save_count' => 3,
+        ]);
+        $this->authenticatedUser();
+
+        $response = $this->apiDelete("/v2/listings/{$listing->id}/save");
+
+        $response->assertStatus(200);
+        $this->assertSame(3, (int) DB::table('listings')->where('id', $listing->id)->value('save_count'));
     }
 
     // ================================================================
@@ -491,7 +586,7 @@ class ListingsControllerTest extends TestCase
         ]);
 
         // Manually insert a saved-listing record for the other tenant
-        DB::table('saved_listings')->insertOrIgnore([
+        DB::table('user_saved_listings')->insertOrIgnore([
             'user_id' => $otherUser->id,
             'listing_id' => $otherListing->id,
             'tenant_id' => 999,

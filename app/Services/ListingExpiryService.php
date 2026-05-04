@@ -159,7 +159,7 @@ class ListingExpiryService
     /**
      * Renew a listing (extend expiry by RENEWAL_DAYS).
      *
-     * @return array{success: bool, error: string|null, new_expires_at: string|null}
+     * @return array{success: bool, error: string|null, error_code?: string|null, new_expires_at: string|null}
      */
     public function renewListing(int $listingId, int $userId): array
     {
@@ -170,7 +170,7 @@ class ListingExpiryService
             ->first();
 
         if (!$listing) {
-            return ['success' => false, 'error' => 'Listing not found', 'new_expires_at' => null];
+            return ['success' => false, 'error' => __('api.listing_not_found'), 'error_code' => 'not_found', 'new_expires_at' => null];
         }
 
         // Authorization: owner or admin
@@ -182,14 +182,14 @@ class ListingExpiryService
                 ->first();
 
             if (!$user || (!in_array($user->role, ['admin', 'tenant_admin']) && !$user->is_super_admin && !$user->is_tenant_super_admin)) {
-                return ['success' => false, 'error' => 'You do not have permission to renew this listing', 'new_expires_at' => null];
+                return ['success' => false, 'error' => __('api.listing_renew_forbidden'), 'error_code' => 'forbidden', 'new_expires_at' => null];
             }
         }
 
         // Check renewal limit
         $currentCount = (int) ($listing->renewal_count ?? 0);
         if ($currentCount >= self::MAX_RENEWALS) {
-            return ['success' => false, 'error' => 'Maximum renewal limit reached (' . self::MAX_RENEWALS . ' renewals)', 'new_expires_at' => null];
+            return ['success' => false, 'error' => __('api.listing_renewal_limit_reached', ['max' => self::MAX_RENEWALS]), 'error_code' => 'limit_reached', 'new_expires_at' => null];
         }
 
         // Calculate new expiry date
@@ -222,6 +222,7 @@ class ListingExpiryService
         return [
             'success' => true,
             'error' => null,
+            'error_code' => null,
             'new_expires_at' => $newExpiresAt,
         ];
     }

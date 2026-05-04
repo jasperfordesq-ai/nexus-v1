@@ -36,7 +36,7 @@ class ListingFeaturedService
         );
 
         if (!$listing) {
-            return ['success' => false, 'error' => 'Listing not found', 'featured_until' => null];
+            return ['success' => false, 'error' => __('api.listing_not_found'), 'featured_until' => null];
         }
 
         $featuredUntil = null;
@@ -76,7 +76,7 @@ class ListingFeaturedService
         );
 
         if (!$listing) {
-            return ['success' => false, 'error' => 'Listing not found'];
+            return ['success' => false, 'error' => __('api.listing_not_found')];
         }
 
         DB::update(

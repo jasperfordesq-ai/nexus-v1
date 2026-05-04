@@ -70,7 +70,7 @@ export function CreateListingPage() {
   usePageTitle(t('create'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tenantPath, listingConfig } = useTenant();
+  const { tenantPath, listingConfig = {} } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
 
@@ -145,7 +145,7 @@ export function CreateListingPage() {
       } catch (error) {
         if (controller.signal.aborted) return;
         logError('Failed to load listing', error);
-        toast.error(t('form.load_error', 'Failed to load listing'));
+        toast.error(t('form.load_error'));
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -189,7 +189,7 @@ export function CreateListingPage() {
     }
 
     if (formData.accessibility_notes && formData.accessibility_notes.length > 200) {
-      newErrors.accessibility_notes = t('form.accessibility_max_length', 'Accessibility notes must be 200 characters or fewer');
+      newErrors.accessibility_notes = t('form.accessibility_max_length');
     }
 
     setErrors(newErrors);
@@ -210,38 +210,39 @@ export function CreateListingPage() {
       const tFn = tRef.current ?? t;
       if (formData.experience_level) {
         const experienceLabels: Record<string, string> = {
-          beginner_friendly: tFn('form.experience_beginner', 'Beginner-friendly (anyone can learn)'),
-          some_experience: tFn('form.experience_some', 'Some experience helpful'),
-          experienced: tFn('form.experience_experienced', 'Experienced practitioner'),
-          professional: tFn('form.experience_professional', 'Professional / certified'),
+          beginner_friendly: tFn('form.experience_beginner'),
+          some_experience: tFn('form.experience_some'),
+          experienced: tFn('form.experience_experienced'),
+          professional: tFn('form.experience_professional'),
         };
-        details.push(`${tFn('form.experience_label', 'Experience')}: ${experienceLabels[formData.experience_level] || formData.experience_level}`);
+        details.push(`${tFn('form.experience_label')}: ${experienceLabels[formData.experience_level] || formData.experience_level}`);
       }
       if (formData.equipment_provided) {
         const equipmentLabels: Record<string, string> = {
-          provided: tFn('form.equipment_provided_option', "I'll provide everything needed"),
-          partial: tFn('form.equipment_partial', 'Some things needed from you'),
-          bring_own: tFn('form.equipment_bring_own', "You'll need to provide your own"),
-          not_applicable: tFn('form.equipment_na', 'Not applicable'),
+          provided: tFn('form.equipment_provided_option'),
+          partial: tFn('form.equipment_partial'),
+          bring_own: tFn('form.equipment_bring_own'),
+          not_applicable: tFn('form.equipment_na'),
         };
-        details.push(`${tFn('form.equipment_label', 'Equipment')}: ${equipmentLabels[formData.equipment_provided] || formData.equipment_provided}`);
+        details.push(`${tFn('form.equipment_label')}: ${equipmentLabels[formData.equipment_provided] || formData.equipment_provided}`);
       }
       if (formData.accessibility_notes) {
-        details.push(`${tFn('form.accessibility_label', 'Accessibility')}: ${formData.accessibility_notes}`);
+        details.push(`${tFn('form.accessibility_label')}: ${formData.accessibility_notes}`);
       }
       if (details.length > 0) {
         enrichedDescription += '\n\n---\n' + details.join('\n');
       }
 
-      // Strip frontend-only structured fields from the API payload
-      const { experience_level: _el, equipment_provided: _ep, accessibility_notes: _an, ...rest } = formData;
       const payload = {
-        ...rest,
+        title: formData.title,
         description: enrichedDescription,
+        type: formData.type,
+        location: formData.location,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         category_id: formData.category_id ? parseInt(formData.category_id, 10) : undefined,
         hours_estimate: parseFloat(formData.hours_estimate),
         service_type: formData.service_type,
-        skill_tags: formData.skill_tags,
       };
 
       let listingId = id;
@@ -254,13 +255,22 @@ export function CreateListingPage() {
         }
       }
 
+      if (listingId) {
+        try {
+          await api.put(`/v2/listings/${listingId}/tags`, { tags: formData.skill_tags });
+        } catch (tagErr) {
+          logError('Failed to save listing skill tags', tagErr);
+          toast.warning(t('form.tags_save_failed'));
+        }
+      }
+
       // Upload image if selected
       if (imageFile && listingId) {
         try {
           await api.upload(`/v2/listings/${listingId}/image`, imageFile, 'image');
         } catch (imgErr) {
           logError('Failed to upload listing image', imgErr);
-          toast.warning(t('form.image_upload_failed', 'Image upload failed. Your listing was saved without an image.'));
+          toast.warning(t('form.image_upload_failed'));
         }
       } else if (removeExistingImage && listingId) {
         try {
@@ -270,7 +280,7 @@ export function CreateListingPage() {
         }
       }
 
-      toast.success(isEditing ? t('form.update_success', 'Listing updated') : t('form.create_success', 'Listing created'));
+      toast.success(isEditing ? t('form.update_success') : t('form.create_success'));
       navigate(tenantPath(listingId ? `/listings/${listingId}` : '/listings'));
     } catch (error) {
       logError('Failed to save listing', error);
@@ -302,12 +312,12 @@ export function CreateListingPage() {
         const desc = ((response.data as Record<string, unknown>)?.description ?? '') as string;
         if (desc) {
           updateField('description', desc);
-          toast.success(t('form.ai_generated', 'Description generated! Feel free to edit it.'));
+          toast.success(t('form.ai_generated'));
         }
       }
     } catch (error) {
       logError('Failed to generate description', error);
-      toast.error(t('form.ai_generate_failed', 'Could not generate description. Please write one manually.'));
+      toast.error(t('form.ai_generate_failed'));
     } finally {
       setIsGenerating(false);
     }
@@ -336,7 +346,7 @@ export function CreateListingPage() {
           {isEditing ? t('form.edit_title') : t('form.create_title')}
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           {/* Type Selection */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-3">
@@ -414,7 +424,7 @@ export function CreateListingPage() {
                 label: 'text-theme-muted',
               }}
             />
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-col items-stretch gap-2 mt-2 sm:flex-row sm:items-center">
               <Button
                 size="sm"
                 variant="flat"
@@ -425,12 +435,12 @@ export function CreateListingPage() {
                 isDisabled={!formData.title.trim() || isGenerating}
               >
                 {isGenerating
-                  ? t('form.ai_generating', 'Generating...')
-                  : t('form.ai_help_write', 'Help me write this')}
+                  ? t('form.ai_generating')
+                  : t('form.ai_help_write')}
               </Button>
               {!formData.title.trim() && (
                 <span className="text-xs text-theme-subtle">
-                  {t('form.ai_enter_title_first', 'Enter a title first')}
+                  {t('form.ai_enter_title_first')}
                 </span>
               )}
             </div>
@@ -440,13 +450,13 @@ export function CreateListingPage() {
           <details className="group">
             <summary className="cursor-pointer text-sm font-medium text-theme-muted hover:text-theme-primary flex items-center gap-2 select-none">
               <Info className="w-4 h-4" />
-              {t('form.service_details_toggle', 'Add more details about your service (optional)')}
+              {t('form.service_details_toggle')}
             </summary>
-            <div className="mt-3 space-y-4 pl-6">
+            <div className="mt-3 space-y-4 pl-0 sm:pl-6">
               {/* Experience Level */}
               <Select
-                label={t('form.experience_label', 'Experience Level')}
-                placeholder={t('form.experience_placeholder', 'How experienced are you?')}
+                label={t('form.experience_label')}
+                placeholder={t('form.experience_placeholder')}
                 selectedKeys={formData.experience_level ? [formData.experience_level] : []}
                 onChange={(e) => updateField('experience_level', e.target.value)}
                 classNames={{
@@ -456,23 +466,23 @@ export function CreateListingPage() {
                 }}
               >
                 <SelectItem key="beginner_friendly">
-                  {t('form.experience_beginner', 'Beginner-friendly (anyone can learn)')}
+                  {t('form.experience_beginner')}
                 </SelectItem>
                 <SelectItem key="some_experience">
-                  {t('form.experience_some', 'Some experience helpful')}
+                  {t('form.experience_some')}
                 </SelectItem>
                 <SelectItem key="experienced">
-                  {t('form.experience_experienced', 'Experienced practitioner')}
+                  {t('form.experience_experienced')}
                 </SelectItem>
                 <SelectItem key="professional">
-                  {t('form.experience_professional', 'Professional / certified')}
+                  {t('form.experience_professional')}
                 </SelectItem>
               </Select>
 
               {/* Equipment/Tools */}
               <Select
-                label={t('form.equipment_label', 'Equipment / Tools')}
-                placeholder={t('form.equipment_placeholder', 'Do you provide what\'s needed?')}
+                label={t('form.equipment_label')}
+                placeholder={t('form.equipment_placeholder')}
                 selectedKeys={formData.equipment_provided ? [formData.equipment_provided] : []}
                 onChange={(e) => updateField('equipment_provided', e.target.value)}
                 classNames={{
@@ -482,23 +492,23 @@ export function CreateListingPage() {
                 }}
               >
                 <SelectItem key="provided">
-                  {t('form.equipment_provided_option', 'I\'ll provide everything needed')}
+                  {t('form.equipment_provided_option')}
                 </SelectItem>
                 <SelectItem key="partial">
-                  {t('form.equipment_partial', 'Some things needed from you')}
+                  {t('form.equipment_partial')}
                 </SelectItem>
                 <SelectItem key="bring_own">
-                  {t('form.equipment_bring_own', 'You\'ll need to provide your own')}
+                  {t('form.equipment_bring_own')}
                 </SelectItem>
                 <SelectItem key="not_applicable">
-                  {t('form.equipment_na', 'Not applicable')}
+                  {t('form.equipment_na')}
                 </SelectItem>
               </Select>
 
               {/* Accessibility Notes */}
               <Input
-                label={t('form.accessibility_label', 'Accessibility Notes')}
-                placeholder={t('form.accessibility_placeholder', 'e.g., Wheelchair accessible, hearing loop available')}
+                label={t('form.accessibility_label')}
+                placeholder={t('form.accessibility_placeholder')}
                 value={formData.accessibility_notes || ''}
                 onChange={(e) => updateField('accessibility_notes', e.target.value)}
                 isInvalid={!!errors.accessibility_notes}
@@ -516,12 +526,12 @@ export function CreateListingPage() {
           {/* Service Delivery Mode */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-3">
-              {t('form.service_type_label', 'How is this service delivered?')}
+              {t('form.service_type_label')}
             </label>
             <RadioGroup
               value={formData.service_type}
               onValueChange={(value) => updateField('service_type', value as FormData['service_type'])}
-              classNames={{ wrapper: 'grid grid-cols-2 gap-3' }}
+              classNames={{ wrapper: 'grid grid-cols-1 sm:grid-cols-2 gap-3' }}
             >
               <Radio
                 value="physical_only"
@@ -533,7 +543,7 @@ export function CreateListingPage() {
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_physical', 'In-Person Only')}</div>
+                    <div className="font-medium text-sm">{t('form.service_type_physical')}</div>
                   </div>
                 </div>
               </Radio>
@@ -547,7 +557,7 @@ export function CreateListingPage() {
                 <div className="flex items-center gap-2">
                   <Monitor className="w-4 h-4 text-[var(--color-info)] shrink-0" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_remote', 'Remote / Online')}</div>
+                    <div className="font-medium text-sm">{t('form.service_type_remote')}</div>
                   </div>
                 </div>
               </Radio>
@@ -561,7 +571,7 @@ export function CreateListingPage() {
                 <div className="flex items-center gap-2">
                   <ArrowRightLeft className="w-4 h-4 text-teal-500 shrink-0" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_hybrid', 'Either (In-Person or Remote)')}</div>
+                    <div className="font-medium text-sm">{t('form.service_type_hybrid')}</div>
                   </div>
                 </div>
               </Radio>
@@ -575,7 +585,7 @@ export function CreateListingPage() {
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-gray-500 shrink-0" />
                   <div>
-                    <div className="font-medium text-sm">{t('form.service_type_depends', 'Depends on Service')}</div>
+                    <div className="font-medium text-sm">{t('form.service_type_depends')}</div>
                   </div>
                 </div>
               </Radio>
@@ -679,13 +689,13 @@ export function CreateListingPage() {
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">
-              {t('form.image_label', 'Photo (optional)')}
+              {t('form.image_label')}
             </label>
             {(imagePreview || existingImageUrl) ? (
               <div className="relative inline-block">
                 <img
                   src={imagePreview || resolveAssetUrl(existingImageUrl) || ''}
-                  alt="Listing preview"
+                  alt={t('form.image_preview_alt')}
                   className="w-full max-w-sm h-48 object-cover rounded-xl border border-theme-default"
                 />
                 <Button
@@ -694,7 +704,7 @@ export function CreateListingPage() {
                   variant="flat"
                   onPress={() => { setImageFile(null); setImagePreview(null); if (existingImageUrl) setRemoveExistingImage(true); setExistingImageUrl(null); }}
                   className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors min-w-0 w-auto h-auto"
-                  aria-label={t('form.aria_remove_image', 'Remove image')}
+                  aria-label={t('form.aria_remove_image')}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -702,8 +712,8 @@ export function CreateListingPage() {
             ) : (
               <label className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-theme-default hover:border-indigo-500/50 bg-theme-elevated hover:bg-theme-hover transition-colors cursor-pointer">
                 <ImagePlus className="w-8 h-8 text-theme-subtle mb-2" />
-                <span className="text-sm text-theme-muted">{t('form.image_upload_hint', 'Click to add a photo')}</span>
-                <span className="text-xs text-theme-subtle mt-1">{t('form.image_formats', 'JPG, PNG, WebP — max 8MB')}</span>
+                <span className="text-sm text-theme-muted">{t('form.image_upload_hint')}</span>
+                <span className="text-xs text-theme-subtle mt-1">{t('form.image_formats')}</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -712,7 +722,7 @@ export function CreateListingPage() {
                     const file = e.target.files?.[0];
                     if (file) {
                       if (file.size > 8 * 1024 * 1024) {
-                        toast.error(t('form.image_too_large', 'Image must be under 8MB'));
+                        toast.error(t('form.image_too_large'));
                         return;
                       }
                       setImageFile(file);

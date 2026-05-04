@@ -85,7 +85,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
         <div className="flex flex-col items-center justify-center py-6 text-center">
           <AlertTriangle className="w-10 h-10 text-[var(--color-warning)] mb-3" aria-hidden="true" />
           <p className="text-theme-muted mb-4">
-            {t('analytics.load_error', 'Failed to load analytics data.')}
+            {t('analytics.load_error')}
           </p>
           <Button
             variant="flat"
@@ -93,7 +93,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadAnalytics}
           >
-            {t('analytics.retry', 'Retry')}
+            {t('analytics.retry')}
           </Button>
         </div>
       </GlassCard>
@@ -110,45 +110,45 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
 
   return (
     <GlassCard className="p-6">
-      <h3 className="text-lg font-semibold text-theme-primary mb-4">{t('analytics.title', 'Listing Analytics')}</h3>
+      <h3 className="text-lg font-semibold text-theme-primary mb-4">{t('analytics.title')}</h3>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <StatCard
           icon={<Eye className="w-5 h-5 text-[var(--color-info)]" />}
-          label={t('analytics.total_views', 'Total Views')}
+          label={t('analytics.total_views')}
           value={summary.total_views}
-          subtext={t('analytics.unique_viewers', '{{count}} unique', { count: summary.unique_viewers })}
+          subtext={t('analytics.unique_viewers', { count: summary.unique_viewers })}
         />
         <StatCard
           icon={<MessageCircle className="w-5 h-5 text-[var(--color-success)]" />}
-          label={t('analytics.contacts', 'Contacts')}
+          label={t('analytics.contacts')}
           value={summary.total_contacts}
-          subtext={t('analytics.contact_rate', '{{rate}}% rate', { rate: summary.contact_rate })}
+          subtext={t('analytics.contact_rate', { rate: summary.contact_rate })}
         />
         <StatCard
           icon={<Heart className="w-5 h-5 text-rose-500" />}
-          label={t('analytics.saves', 'Saves')}
+          label={t('analytics.saves')}
           value={summary.total_saves}
-          subtext={t('analytics.save_rate', '{{rate}}% rate', { rate: summary.save_rate })}
+          subtext={t('analytics.save_rate', { rate: summary.save_rate })}
         />
         <StatCard
           icon={trendPositive
             ? <TrendingUp className="w-5 h-5 text-emerald-500" />
             : <TrendingDown className="w-5 h-5 text-[var(--color-warning)]" />
           }
-          label={t('analytics.trend_7day', '7-Day Trend')}
+          label={t('analytics.trend_7day')}
           value={`${trendPositive ? '+' : ''}${summary.views_trend_percent}%`}
-          subtext={t('analytics.vs_previous_week', 'vs. previous week')}
+          subtext={t('analytics.vs_previous_week')}
         />
       </div>
 
       {/* Simple sparkline-style visualization using bars */}
       <div>
-        <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
+        <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', { days: analytics.period_days })}</h4>
         {viewsOverTime.length === 0 ? (
           <p className="text-sm text-theme-muted text-center py-4">
-            {t('analytics.no_data', 'No views yet — check back after your listing gets some traffic')}
+            {t('analytics.no_data')}
           </p>
         ) : (
           <>
@@ -162,7 +162,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
                     style={{ height: `${Math.max(height, 4)}%` }}
                     title={`${day.date}: ${day.count} views`}
                     role="img"
-                    aria-label={t('analytics.bar_label', '{{date}}: {{count}} views', { date: day.date, count: day.count })}
+                    aria-label={t('analytics.bar_label', { date: day.date, count: day.count })}
                   />
                 );
               })}

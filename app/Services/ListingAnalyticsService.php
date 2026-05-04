@@ -130,7 +130,7 @@ class ListingAnalyticsService
         );
 
         if (!$listing) {
-            return ['error' => 'Listing not found'];
+            return ['error' => __('api.listing_not_found')];
         }
 
         $listing = (array) $listing;

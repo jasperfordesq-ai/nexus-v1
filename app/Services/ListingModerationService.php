@@ -79,7 +79,10 @@ class ListingModerationService
             return false;
         }
 
-        if ($listing->moderation_status !== 'pending_review') {
+        $isPendingReview = $listing->moderation_status === 'pending_review';
+        $isLegacyPending = $listing->moderation_status === null && $listing->status === 'pending';
+
+        if (! $isPendingReview && ! $isLegacyPending) {
             return false;
         }
 
@@ -144,7 +147,10 @@ class ListingModerationService
             return false;
         }
 
-        if ($listing->moderation_status !== 'pending_review') {
+        $isPendingReview = $listing->moderation_status === 'pending_review';
+        $isLegacyPending = $listing->moderation_status === null && $listing->status === 'pending';
+
+        if (! $isPendingReview && ! $isLegacyPending) {
             return false;
         }
 
@@ -234,11 +240,23 @@ class ListingModerationService
     public function rejectListing(int $id, int $adminId, string $reason = ''): array
     {
         $tenantId = TenantContext::getId();
+        $listing = Listing::where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $listing) {
+            return ['success' => false, 'error' => __('api.listing_not_found')];
+        }
+
+        if (trim($reason) === '') {
+            return ['success' => false, 'error' => __('api.listing_reject_reason_required')];
+        }
+
         $success = $this->reject($tenantId, $id, $adminId, $reason);
 
         return $success
             ? ['success' => true, 'error' => null]
-            : ['success' => false, 'error' => 'Failed to reject listing'];
+            : ['success' => false, 'error' => __('api.listing_reject_failed')];
     }
 
     /**

@@ -321,17 +321,17 @@ export function ListingDetailPage() {
         onReportClose();
         setReportReason('');
         setReportDetails('');
-        toastRef.current.success(tRef.current('report_success', 'Thank you for your report. Our team will review it.'));
+        toastRef.current.success(tRef.current('report_success'));
       } else if (response.code === 'ALREADY_REPORTED') {
         setIsReported(true);
         onReportClose();
-        toastRef.current.info(tRef.current('report_already', 'You have already reported this listing.'));
+        toastRef.current.info(tRef.current('report_already'));
       } else {
-        toastRef.current.error(tRef.current('report_error', 'Failed to submit report. Please try again.'));
+        toastRef.current.error(tRef.current('report_error'));
       }
     } catch (err) {
       logError('Failed to report listing', err);
-      toastRef.current.error(tRef.current('report_error', 'Failed to submit report. Please try again.'));
+      toastRef.current.error(tRef.current('report_error'));
     } finally {
       setIsReporting(false);
     }
@@ -371,7 +371,7 @@ export function ListingDetailPage() {
     origin: window.location.origin,
     pathname: window.location.pathname,
     profileUrl: tenantPath,
-    communityMemberLabel: t('community_member', 'Community Member'),
+    communityMemberLabel: t('community_member'),
   });
 
   return (
@@ -389,7 +389,7 @@ export function ListingDetailPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/listings') },
-        { label: listing?.title || 'Listing' },
+        { label: listing?.title || t('detail_fallback_label') },
       ]} />
 
       {/* Main Content */}
@@ -606,7 +606,7 @@ export function ListingDetailPage() {
                       className="mt-2 text-theme-accent px-0"
                       onPress={() => setShowFullDesc((prev) => !prev)}
                     >
-                      {showFullDesc ? t('show_less', 'Show less') : t('show_more', 'Show more')}
+                      {showFullDesc ? t('show_less') : t('show_more')}
                     </Button>
                   )}
                 </>
@@ -628,7 +628,7 @@ export function ListingDetailPage() {
                 <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
                   <Heart className="w-2.5 h-2.5 text-white fill-white" aria-hidden="true" />
                 </span>
-                {social.likesCount} {social.likesCount === 1 ? t('like', 'like') : t('likes', 'likes')}
+                {social.likesCount} {social.likesCount === 1 ? t('like') : t('likes')}
               </Button>
             )}
             {social.commentsCount > 0 && (
@@ -638,7 +638,7 @@ export function ListingDetailPage() {
                 onPress={toggleComments}
                 className="hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
               >
-                {social.commentsCount} {social.commentsCount === 1 ? t('comment', 'comment') : t('comments', 'comments')}
+                {social.commentsCount} {social.commentsCount === 1 ? t('comment') : t('comments')}
               </Button>
             )}
           </div>
@@ -700,7 +700,7 @@ export function ListingDetailPage() {
               onPress={() => void social.toggleLike()}
               isDisabled={social.isLiking}
             >
-              {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked', 'Liked') : t('detail_like', 'Like')}
+              {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
             </Button>
             <Button
               variant="flat"
@@ -708,7 +708,7 @@ export function ListingDetailPage() {
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
             >
-              {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments', 'Comments')}
+              {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
             </Button>
             <Button
               variant="flat"
@@ -733,7 +733,7 @@ export function ListingDetailPage() {
               onPress={onReportOpen}
               isDisabled={isReported}
             >
-              {isReported ? t('detail_reported', 'Reported') : t('detail_report', 'Report')}
+              {isReported ? t('detail_reported') : t('detail_report')}
             </Button>
           </div>
         )}
@@ -742,14 +742,14 @@ export function ListingDetailPage() {
       {/* Delete Confirmation Modal */}
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose} size="sm">
         <ModalContent>
-          <ModalHeader>{t('delete_confirm_title', 'Delete listing')}</ModalHeader>
+          <ModalHeader>{t('delete_confirm_title')}</ModalHeader>
           <ModalBody>
-            <p className="text-theme-secondary">{t('delete_confirm_body', 'Are you sure you want to delete this listing? This cannot be undone.')}</p>
+            <p className="text-theme-secondary">{t('delete_confirm_body')}</p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onDeleteClose}>{t('cancel', 'Cancel')}</Button>
+            <Button variant="light" onPress={onDeleteClose}>{t('cancel')}</Button>
             <Button color="danger" onPress={() => { onDeleteClose(); void handleDelete(); }} isLoading={isDeleting}>
-              {t('delete_confirm_button', 'Delete listing')}
+              {t('delete_confirm_button')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -758,24 +758,24 @@ export function ListingDetailPage() {
       {/* Report Listing Modal */}
       <Modal isOpen={isReportOpen} onClose={onReportClose} size="md">
         <ModalContent>
-          <ModalHeader className="text-theme-primary">{t('report_title', 'Report this listing')}</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('report_title')}</ModalHeader>
           <ModalBody>
             <RadioGroup
-              label={t('report_reason_label', 'Why are you reporting this listing?')}
+              label={t('report_reason_label')}
               value={reportReason}
               onValueChange={setReportReason}
               classNames={{ label: 'text-theme-secondary' }}
             >
-              <Radio value="inappropriate" autoFocus>{t('report_reason_inappropriate', 'Inappropriate content')}</Radio>
-              <Radio value="safety_concern">{t('report_reason_safety', 'Safety concern')}</Radio>
-              <Radio value="misleading">{t('report_reason_misleading', 'Misleading description')}</Radio>
-              <Radio value="spam">{t('report_reason_spam', 'Spam or scam')}</Radio>
-              <Radio value="not_timebank_service">{t('report_reason_not_timebank', 'Not a timebank service')}</Radio>
-              <Radio value="other">{t('report_reason_other', 'Other')}</Radio>
+              <Radio value="inappropriate" autoFocus>{t('report_reason_inappropriate')}</Radio>
+              <Radio value="safety_concern">{t('report_reason_safety')}</Radio>
+              <Radio value="misleading">{t('report_reason_misleading')}</Radio>
+              <Radio value="spam">{t('report_reason_spam')}</Radio>
+              <Radio value="not_timebank_service">{t('report_reason_not_timebank')}</Radio>
+              <Radio value="other">{t('report_reason_other')}</Radio>
             </RadioGroup>
             <Textarea
-              label={t('report_details_label', 'Additional details')}
-              placeholder={t('report_details_placeholder', 'Tell us more (optional)')}
+              label={t('report_details_label')}
+              placeholder={t('report_details_placeholder')}
               value={reportDetails}
               onValueChange={setReportDetails}
               maxLength={500}
@@ -786,7 +786,7 @@ export function ListingDetailPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onReportClose}>
-              {t('cancel', 'Cancel')}
+              {t('cancel')}
             </Button>
             <Button
               color="danger"
@@ -794,7 +794,7 @@ export function ListingDetailPage() {
               isDisabled={!reportReason || isReporting}
               isLoading={isReporting}
             >
-              {t('report_submit', 'Submit Report')}
+              {t('report_submit')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -840,14 +840,14 @@ export function ListingDetailPage() {
                         <Star className="w-3.5 h-3.5 fill-amber-500 text-[var(--color-warning)]" aria-hidden="true" />
                         <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
                         {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
-                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
+                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review') : t('reviews')})</span>
                         )}
                       </span>
                     )}
                     {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
                       <span className="flex items-center gap-1 text-xs text-theme-muted">
                         <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
+                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange') : t('exchanges_completed')}
                       </span>
                     )}
                   </div>
@@ -875,14 +875,14 @@ export function ListingDetailPage() {
                         <Star className="w-3.5 h-3.5 fill-amber-500 text-[var(--color-warning)]" aria-hidden="true" />
                         <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
                         {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
-                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
+                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review') : t('reviews')})</span>
                         )}
                       </span>
                     )}
                     {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
                       <span className="flex items-center gap-1 text-xs text-theme-muted">
                         <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
+                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange') : t('exchanges_completed')}
                       </span>
                     )}
                   </div>
@@ -918,11 +918,11 @@ export function ListingDetailPage() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <ArrowRightLeft className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-            {t('detail_more_from', { name: listing.author_name || t('detail_this_member', 'this member'), defaultValue: 'More from {{name}}' })}
+            {t('detail_more_from', { name: listing.author_name || t('detail_this_member') })}
           </h2>
           {(listing.member_offers?.length ?? 0) > 0 && (
             <div className="mb-3">
-              <h3 className="text-sm font-medium text-emerald-500 mb-2">{t('detail_also_offers', 'Also offers:')}</h3>
+              <h3 className="text-sm font-medium text-emerald-500 mb-2">{t('detail_also_offers')}</h3>
               <div className="flex flex-wrap gap-2">
                 {listing.member_offers!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
@@ -936,7 +936,7 @@ export function ListingDetailPage() {
           )}
           {(listing.member_requests?.length ?? 0) > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-[var(--color-warning)] mb-2">{t('detail_looking_for', 'Looking for:')}</h3>
+              <h3 className="text-sm font-medium text-[var(--color-warning)] mb-2">{t('detail_looking_for')}</h3>
               <div className="flex flex-wrap gap-2">
                 {listing.member_requests!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
@@ -979,7 +979,7 @@ export function ListingDetailPage() {
       {showComments && (
         <ErrorBoundary fallback={
           <GlassCard className="p-6 text-center text-theme-muted">
-            {t('comments_error', 'Comments could not be loaded.')}
+            {t('comments_error')}
           </GlassCard>
         }>
           <GlassCard className="p-6">

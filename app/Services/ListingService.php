@@ -96,13 +96,11 @@ class ListingService
                 $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
             } elseif (!empty($filters['category_slug'])) {
                 // Resolve slug → id so Meilisearch can apply the category filter
-                $catId = DB::table('categories')
-                    ->where('slug', $filters['category_slug'])
-                    ->where('type', 'listing')
-                    ->where('tenant_id', $tenantId)
-                    ->value('id');
+                $catId = self::resolveCategorySlug((string) $filters['category_slug']);
                 if ($catId) {
                     $meiliFilters[] = 'category_id = ' . $catId;
+                } else {
+                    return ['items' => [], 'cursor' => null, 'has_more' => false];
                 }
             }
 
@@ -239,13 +237,11 @@ class ListingService
 
         // Category slug filter (resolve slug → id, tenant-scoped)
         if (!empty($filters['category_slug'])) {
-            $catId = DB::table('categories')
-                ->where('slug', $filters['category_slug'])
-                ->where('type', 'listing')
-                ->where('tenant_id', \App\Core\TenantContext::getId())
-                ->value('id');
+            $catId = self::resolveCategorySlug((string) $filters['category_slug']);
             if ($catId) {
                 $query->where('category_id', $catId);
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 
@@ -432,13 +428,11 @@ class ListingService
             if (!empty($filters['category_id'])) {
                 $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
             } elseif (!empty($filters['category_slug'])) {
-                $catId = DB::table('categories')
-                    ->where('slug', $filters['category_slug'])
-                    ->where('type', 'listing')
-                    ->where('tenant_id', $tenantId)
-                    ->value('id');
+                $catId = self::resolveCategorySlug((string) $filters['category_slug']);
                 if ($catId) {
                     $meiliFilters[] = 'category_id = ' . $catId;
+                } else {
+                    return 0;
                 }
             }
             if (!empty($filters['type']) && is_string($filters['type'])) {
@@ -485,13 +479,11 @@ class ListingService
 
         // Category slug filter (resolve slug → id, tenant-scoped)
         if (!empty($filters['category_slug'])) {
-            $catId = DB::table('categories')
-                ->where('slug', $filters['category_slug'])
-                ->where('type', 'listing')
-                ->where('tenant_id', \App\Core\TenantContext::getId())
-                ->value('id');
+            $catId = self::resolveCategorySlug((string) $filters['category_slug']);
             if ($catId) {
                 $query->where('category_id', $catId);
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 
@@ -623,7 +615,7 @@ class ListingService
                 $data['author_exchanges_count'] = 0;
             }
         } else {
-            $data['author_name'] = 'Unknown User';
+            $data['author_name'] = __('api.unknown_user');
             $data['author_avatar'] = null;
             $data['user'] = null;
         }
@@ -743,13 +735,11 @@ class ListingService
 
         // Category slug filter (resolve slug → id, tenant-scoped)
         if (!empty($filters['category_slug'])) {
-            $catId = DB::table('categories')
-                ->where('slug', $filters['category_slug'])
-                ->where('type', 'listing')
-                ->where('tenant_id', \App\Core\TenantContext::getId())
-                ->value('id');
+            $catId = self::resolveCategorySlug((string) $filters['category_slug']);
             if ($catId) {
                 $query->where('category_id', $catId);
+            } else {
+                return ['items' => [], 'cursor' => null, 'has_more' => false];
             }
         }
 
@@ -1053,21 +1043,23 @@ class ListingService
 
         // Validate status transitions — prevent un-deleting or setting invalid statuses
         if (isset($data['status'])) {
-            $validStatuses = ['active', 'draft', 'pending', 'suspended', 'expired'];
+            $validStatuses = ['active', 'draft', 'paused', 'pending', 'suspended', 'expired'];
             $currentStatus = $listing->status ?? 'active';
 
             if (!in_array($data['status'], $validStatuses, true)) {
-                throw ValidationException::withMessages(['status' => ['Invalid status value.']]);
+                throw ValidationException::withMessages(['status' => [__('api.listing_invalid_status')]]);
             }
             // Deleted or suspended listings cannot be reactivated by non-admin callers
             // (admin reactivation should go through a dedicated admin endpoint)
-            if (in_array($currentStatus, ['deleted', 'suspended'], true) && $data['status'] === 'active') {
-                throw ValidationException::withMessages(['status' => ['Cannot reactivate a ' . $currentStatus . ' listing.']]);
+            if (!$isAdmin && in_array($currentStatus, ['deleted', 'suspended'], true) && $data['status'] === 'active') {
+                throw ValidationException::withMessages(['status' => [
+                    __('api.listing_cannot_reactivate_status', ['status' => $currentStatus]),
+                ]]);
             }
             // Non-admin callers may only set user-facing statuses
             $userAllowedStatuses = ['active', 'draft', 'paused'];
             if (!$isAdmin && !in_array($data['status'], $userAllowedStatuses, true)) {
-                throw ValidationException::withMessages(['status' => ['You cannot set this status.']]);
+                throw ValidationException::withMessages(['status' => [__('api.listing_status_forbidden')]]);
             }
         }
 
@@ -1160,11 +1152,12 @@ class ListingService
         $listing->status = 'deleted';
         $listing->save();
 
-        // Clean up related records to avoid orphans
-        DB::table('listing_skill_tags')->where('listing_id', $id)->delete();
-        DB::table('user_saved_listings')->where('listing_id', $id)->delete();
-        DB::table('listing_views')->where('listing_id', $id)->delete();
-        DB::table('listing_contacts')->where('listing_id', $id)->delete();
+        // Clean up related records to avoid orphans.
+        $tenantId = TenantContext::getId();
+        DB::table('listing_skill_tags')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('user_saved_listings')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('listing_views')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('listing_contacts')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
 
         // Remove from search index
         try {
@@ -1174,6 +1167,17 @@ class ListingService
         }
 
         return true;
+    }
+
+    private static function resolveCategorySlug(string $slug): ?int
+    {
+        $categoryId = DB::table('categories')
+            ->where('slug', $slug)
+            ->where('type', 'listing')
+            ->where('tenant_id', TenantContext::getId())
+            ->value('id');
+
+        return $categoryId ? (int) $categoryId : null;
     }
 
     // -----------------------------------------------------------------
@@ -1252,14 +1256,14 @@ class ListingService
 
         // title is required and max 255
         if ($title === null || $title === '') {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_required'), 'field' => 'title'];
         } elseif (strlen($title) > 255) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must not exceed 255 characters', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.listing_title_max'), 'field' => 'title'];
         }
 
         // type must be offer or request
         if ($type !== null && !in_array($type, ['offer', 'request'], true)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Type must be offer or request', 'field' => 'type'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.listing_type_invalid'), 'field' => 'type'];
         }
 
         return empty(self::$errors);

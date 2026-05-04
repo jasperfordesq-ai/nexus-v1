@@ -267,7 +267,7 @@ class AdminListingsController extends BaseApiController
         $adminId = $this->requireAdmin();
         $reason = $this->input('reason', '');
 
-        $result = $this->listingModerationService->reject($id, $adminId, $reason);
+        $result = $this->listingModerationService->rejectListing($id, $adminId, $reason);
 
         if (!$result['success']) {
             $status = $result['error'] === __('api.listing_not_found') ? 404 : 422;
