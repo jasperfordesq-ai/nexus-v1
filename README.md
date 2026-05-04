@@ -1,6 +1,6 @@
 # Project NEXUS
 
-> **Production-Ready V1** — Project NEXUS V1 is in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. Contributions and feedback are welcome.
+> **Version 1.5 — Release Candidate** — Project NEXUS V1.5 is a release candidate, in active production use while undergoing final pre-release validation. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. It is currently in use by communities in **Ireland** and being tested by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Contributions and feedback are welcome.
 
 A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 18, and MariaDB.
 
@@ -25,7 +25,7 @@ Time banking is a community-based system where members exchange services using t
 - **Multi-Tenant** — Run multiple communities from one platform, each with its own branding and configuration
 - **PWA & Native Mobile** — Progressive Web App plus Capacitor native apps (iOS & Android)
 - **Real-Time** — Pusher WebSockets for live updates, FCM for mobile push
-- **Internationalisation** — 7 supported languages: English, Irish (Gaeilge), German, French, Italian, Portuguese, Spanish
+- **Internationalisation** — 11 supported languages: English, Irish (Gaeilge), German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, Arabic (with full RTL support)
 - **Light/Dark Theme** — System-aware theme with per-user preference
 
 ## Tech Stack
@@ -81,11 +81,12 @@ A legacy schema dump is also available at [schema.sql](schema.sql) if needed for
 
 ## Project Status
 
-This is **production-ready V1**. The platform is in active production use:
+This is **version 1.5 — release candidate**, in active production use while undergoing final pre-release validation:
 
-- The **React frontend** (`react-frontend/`) is the primary and active UI
-- The **Laravel 12 backend** provides the API — all services are native Laravel implementations
-- The **legacy PHP admin views** (`views/`) remain for `/admin-legacy/` and `/super-admin/`; the React admin panel handles all other admin UI
+- The **React frontend** (`react-frontend/`) is the sole UI for all user-facing and admin pages
+- The **Laravel 12 backend** provides the API — all services are native Laravel implementations (zero stubs)
+- The **legacy PHP admin views** (`/admin-legacy/` and `/super-admin/`) have been decommissioned; the React admin panel handles 100% of admin UI
+- **Zero-downtime blue/green deployments** — production switches between blue and green container stacks with no maintenance window
 - The **mobile app** (`mobile/`) is a Capacitor project targeting iOS and Android
 - **Tests** are in `tests/` — coverage is growing with each release
 
