@@ -94,6 +94,16 @@ class FederationV2Controller extends BaseApiController
         return $cache[$externalPartnerId];
     }
 
+    private function requireFederationOperation(string $operation): ?JsonResponse
+    {
+        $check = $this->federationFeatureService->isOperationAllowed($operation, $this->getTenantId());
+        if ($check['allowed'] ?? false) {
+            return null;
+        }
+
+        return $this->respondWithError('FORBIDDEN', __('api.federation.feature_disabled'), null, 403);
+    }
+
     // =====================================================================
     // STATUS & OPT-IN/OUT
     // =====================================================================
@@ -129,8 +139,9 @@ class FederationV2Controller extends BaseApiController
             try {
                 $msgResult = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM federation_messages
-                     WHERE (sender_user_id = ? OR receiver_user_id = ?)",
-                    [$userId, $userId]
+                     WHERE (sender_user_id = ? AND sender_tenant_id = ?)
+                        OR (receiver_user_id = ? AND receiver_tenant_id = ?)",
+                    [$userId, $tenantId, $userId, $tenantId]
                 );
                 $messagesCount = (int) ($msgResult->cnt ?? 0);
             } catch (\Exception $e) {
@@ -526,6 +537,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/events */
     public function events(): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('events')) {
+            return $blocked;
+        }
+
         $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -550,7 +565,7 @@ class FederationV2Controller extends BaseApiController
                     e.user_id, e.tenant_id, u.first_name, u.last_name, u.avatar_url, t.name as tenant_name,
                     (SELECT COUNT(*) FROM event_rsvps er WHERE er.event_id = e.id AND er.status = 'going') as attendees_count
                 FROM events e
-                JOIN users u ON u.id = e.user_id
+                JOIN users u ON u.id = e.user_id AND u.tenant_id = e.tenant_id
                 JOIN tenants t ON t.id = e.tenant_id
                 JOIN federation_partnerships fp ON (
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = e.tenant_id)
@@ -633,14 +648,184 @@ class FederationV2Controller extends BaseApiController
     }
 
     // =====================================================================
+    // FEDERATED GROUPS
+    // =====================================================================
+
+    /** GET /api/v2/federation/groups */
+    public function groups(): JsonResponse
+    {
+        if ($blocked = $this->requireFederationOperation('groups')) {
+            return $blocked;
+        }
+
+        $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $q = $this->query('q', '');
+        $partnerFilter = $this->parsePartnerFilter();
+        $perPage = $this->queryInt('per_page', 20, 1, 100);
+        $cursorParam = $this->query('cursor');
+        $cursorId = $cursorParam ? $this->decodeCursor($cursorParam) : null;
+
+        if ($partnerFilter && $partnerFilter['type'] === 'external') {
+            $external = $this->fetchExternalGroupsFromCache($partnerFilter['id'], $q, $perPage);
+            return $this->respondWithCollection($external, null, $perPage, false);
+        }
+
+        $partnerId = $partnerFilter ? $partnerFilter['id'] : 0;
+
+        try {
+            $sql = "
+                SELECT
+                    g.id, g.name, g.description, g.visibility,
+                    COALESCE(g.cover_image_url, g.image_url) AS cover_image,
+                    g.cached_member_count AS member_count,
+                    g.tenant_id, g.created_at, t.name AS tenant_name
+                FROM `groups` g
+                JOIN tenants t ON t.id = g.tenant_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = :tid1 AND fp.partner_tenant_id = g.tenant_id)
+                    OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = g.tenant_id)
+                )
+                WHERE fp.status = 'active'
+                  AND fp.groups_enabled = 1
+                  AND g.tenant_id != :tid3
+                  AND g.status = 'active'
+                  AND (g.federated_visibility IN ('listed', 'joinable') OR g.allow_federated_members = 1)
+            ";
+            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+
+            if (!empty($q)) {
+                $sql .= " AND (g.name LIKE :q1 OR g.description LIKE :q2)";
+                $params[':q1'] = "%{$q}%";
+                $params[':q2'] = "%{$q}%";
+            }
+            if ($partnerId) {
+                $sql .= " AND g.tenant_id = :partner_id";
+                $params[':partner_id'] = $partnerId;
+            }
+            if ($cursorId) {
+                $sql .= " AND g.id < :cursor_id";
+                $params[':cursor_id'] = (int) $cursorId;
+            }
+
+            $sql .= " ORDER BY g.id DESC LIMIT :limit";
+            $params[':limit'] = $perPage + 1;
+
+            $stmt = DB::getPdo()->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            }
+            $stmt->execute();
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) {
+                $rows = array_slice($rows, 0, $perPage);
+            }
+
+            $formatted = array_map(fn (array $group): array => [
+                'id' => (int) $group['id'],
+                'name' => $group['name'],
+                'description' => $group['description'] ?? '',
+                'privacy' => $group['visibility'] ?? null,
+                'member_count' => (int) ($group['member_count'] ?? 0),
+                'cover_image' => $group['cover_image'] ?: null,
+                'timebank' => [
+                    'id' => (int) $group['tenant_id'],
+                    'name' => $group['tenant_name'],
+                ],
+                'created_at' => $group['created_at'],
+            ], $rows);
+
+            $nextCursor = null;
+            if ($hasMore && !empty($rows)) {
+                $lastRow = end($rows);
+                $nextCursor = $this->encodeCursor($lastRow['id']);
+            }
+
+            if (!$cursorId && !$partnerId) {
+                $formatted = array_merge(
+                    $formatted,
+                    $this->fetchExternalGroupsFromCache(null, $q, $perPage)
+                );
+            }
+
+            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::groups error: " . $e->getMessage());
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
+    }
+
+    private function fetchExternalGroupsFromCache(?int $externalPartnerId, string $q, int $limit): array
+    {
+        try {
+            $query = DB::table('federation_groups as fg')
+                ->join('federation_external_partners as ep', function ($join): void {
+                    $join->on('ep.id', '=', 'fg.external_partner_id')
+                        ->on('ep.tenant_id', '=', 'fg.tenant_id');
+                })
+                ->where('fg.tenant_id', $this->getTenantId())
+                ->where('ep.status', 'active')
+                ->where('ep.allow_groups', 1);
+
+            if ($externalPartnerId !== null) {
+                $query->where('fg.external_partner_id', $externalPartnerId);
+            }
+            if ($q !== '') {
+                $query->where(function ($where) use ($q): void {
+                    $where->where('fg.name', 'like', "%{$q}%")
+                        ->orWhere('fg.description', 'like', "%{$q}%");
+                });
+            }
+
+            return $query
+                ->select([
+                    'fg.id',
+                    'fg.external_partner_id',
+                    'fg.external_id',
+                    'fg.name',
+                    'fg.description',
+                    'fg.privacy',
+                    'fg.member_count',
+                    'fg.created_at',
+                    'ep.name as partner_name',
+                ])
+                ->orderByDesc('fg.id')
+                ->limit($limit)
+                ->get()
+                ->map(fn ($group): array => [
+                    'id' => 'ext-' . (int) $group->external_partner_id . '-' . ($group->external_id ?? $group->id),
+                    'name' => $group->name,
+                    'description' => $group->description ?? '',
+                    'privacy' => $group->privacy ?? null,
+                    'member_count' => (int) ($group->member_count ?? 0),
+                    'cover_image' => null,
+                    'timebank' => [
+                        'id' => 'ext-' . (int) $group->external_partner_id,
+                        'name' => $group->partner_name ?? __('api.external_partner_fallback'),
+                    ],
+                    'created_at' => $group->created_at,
+                    'external_partner_id' => (int) $group->external_partner_id,
+                    'partner_name' => $group->partner_name ?? __('api.external_partner_fallback'),
+                ])
+                ->all();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::fetchExternalGroupsFromCache error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // =====================================================================
     // FEDERATED LISTINGS
     // =====================================================================
 
     /** GET /api/v2/federation/listings */
     public function listings(): JsonResponse
     {
-        if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return $this->respondWithError('FORBIDDEN', __('errors.federation.feature_disabled'), null, 403);
+        if ($blocked = $this->requireFederationOperation('listings')) {
+            return $blocked;
         }
 
         $this->getUserId();
@@ -668,7 +853,7 @@ class FederationV2Controller extends BaseApiController
                     l.user_id, l.tenant_id, l.created_at,
                     u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
                 FROM listings l
-                JOIN users u ON u.id = l.user_id
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
                 JOIN tenants t ON t.id = l.tenant_id
                 LEFT JOIN categories c ON c.id = l.category_id
                 JOIN federation_partnerships fp ON (
@@ -779,7 +964,7 @@ class FederationV2Controller extends BaseApiController
                 $externalPartnerId,
                 $this->getTenantId()
             );
-            $partnerName = $partner['name'] ?? 'External Partner';
+            $partnerName = $partner['name'] ?? __('api.external_partner_fallback');
             $partnerBaseUrl = rtrim($partner['base_url'] ?? '', '/');
 
             return array_map(function ($l) use ($externalPartnerId, $partnerName, $partnerBaseUrl) {
@@ -851,7 +1036,7 @@ class FederationV2Controller extends BaseApiController
                     ],
                     'timebank' => [
                         'id' => (int) ($l['timebank']['id'] ?? $l['tenant_id'] ?? 0),
-                        'name' => $l['timebank']['name'] ?? $l['partner_name'] ?? 'External Partner',
+                        'name' => $l['timebank']['name'] ?? $l['partner_name'] ?? __('api.external_partner_fallback'),
                     ],
                     'created_at' => $l['created_at'] ?? null,
                     'is_external' => true,
@@ -871,8 +1056,8 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/members */
     public function members(): JsonResponse
     {
-        if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return $this->respondWithError('FORBIDDEN', __('errors.federation.feature_disabled'), null, 403);
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
         }
 
         $this->getUserId();
@@ -1049,7 +1234,7 @@ class FederationV2Controller extends BaseApiController
                 $externalPartnerId,
                 $this->getTenantId()
             );
-            $partnerName = $partner['name'] ?? 'External Partner';
+            $partnerName = $partner['name'] ?? __('api.external_partner_fallback');
             $partnerBaseUrl = rtrim($partner['base_url'] ?? '', '/');
 
             return array_map(function ($m) use ($externalPartnerId, $partnerName, $partnerBaseUrl) {
@@ -1108,10 +1293,10 @@ class FederationV2Controller extends BaseApiController
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool) ($m['accepts_messages'] ?? $m['messaging_enabled'] ?? false),
                     'tenant_id' => (int) ($m['timebank']['id'] ?? $m['tenant_id'] ?? 0),
-                    'tenant_name' => $m['timebank']['name'] ?? $m['partner_name'] ?? 'External Partner',
+                    'tenant_name' => $m['timebank']['name'] ?? $m['partner_name'] ?? __('api.external_partner_fallback'),
                     'timebank' => [
                         'id' => (int) ($m['timebank']['id'] ?? $m['tenant_id'] ?? 0),
-                        'name' => $m['timebank']['name'] ?? $m['partner_name'] ?? 'External Partner',
+                        'name' => $m['timebank']['name'] ?? $m['partner_name'] ?? __('api.external_partner_fallback'),
                     ],
                     'is_external' => true,
                     'partner_name' => $m['partner_name'] ?? null,
@@ -1126,6 +1311,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/members/{id} */
     public function member(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $this->getUserId();
         $tenantId = $this->getTenantId();
         $memberTenantId = $this->queryInt('tenant_id');
@@ -1198,6 +1387,7 @@ class FederationV2Controller extends BaseApiController
                 // local + cross-tenant reviews so reputation follows the user).
                 $aggregate = DB::table('reviews')
                     ->where('receiver_id', (int) $m['id'])
+                    ->where('receiver_tenant_id', (int) $m['tenant_id'])
                     ->where(function ($q) {
                         $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
                     })
@@ -1248,8 +1438,8 @@ class FederationV2Controller extends BaseApiController
     public function memberReviews(string $id): JsonResponse
     {
         // Feature gate — federation feature must be enabled for tenant.
-        if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['success' => false, 'error' => __('api.federation.feature_disabled')], 403);
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
         }
 
         $this->getUserId();
@@ -1283,7 +1473,7 @@ class FederationV2Controller extends BaseApiController
                     return $this->respondWithData([]);
                 }
 
-                $partnerName = $partner['name'] ?? 'External Partner';
+                $partnerName = $partner['name'] ?? __('api.external_partner_fallback');
                 $partnerSlug = $partner['slug'] ?? null;
                 $baseUrl = rtrim($partner['base_url'] ?? '', '/');
 
@@ -1402,6 +1592,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/messages */
     public function messages(): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1419,9 +1613,9 @@ class FederationV2Controller extends BaseApiController
                     ru.avatar_url as receiver_avatar, rt.name as receiver_tenant_name,
                     ep.name as external_partner_name
                 FROM federation_messages fm
-                LEFT JOIN users su ON su.id = fm.sender_user_id
+                LEFT JOIN users su ON su.id = fm.sender_user_id AND su.tenant_id = fm.sender_tenant_id
                 LEFT JOIN tenants st ON st.id = fm.sender_tenant_id
-                LEFT JOIN users ru ON ru.id = fm.receiver_user_id
+                LEFT JOIN users ru ON ru.id = fm.receiver_user_id AND ru.tenant_id = fm.receiver_tenant_id
                 LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
                 LEFT JOIN federation_external_partners ep ON ep.id = fm.external_partner_id
                 WHERE (
@@ -1530,10 +1724,8 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        // Feature gate: tenant must have federation enabled at the tenant-feature
-        // level. Mirrors the idiom used by optIn()/setup().
-        if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['success' => false, 'error' => __('api.federation.feature_disabled')], 403);
+        if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
         }
 
         $input = request()->all();
@@ -1623,8 +1815,8 @@ class FederationV2Controller extends BaseApiController
                 SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
                 FROM users u
                 JOIN tenants t ON t.id = u.tenant_id
-                WHERE u.id = ?
-            ", [$userId]);
+                WHERE u.id = ? AND u.tenant_id = ?
+            ", [$userId, $tenantId]);
             $sender = $senderRow ? (array)$senderRow : [];
 
             $senderName = trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
@@ -1816,7 +2008,7 @@ class FederationV2Controller extends BaseApiController
         }
 
         if (!($result['success'] ?? false)) {
-            $errorMsg = $result['error'] ?? 'External partner rejected the message';
+            $errorMsg = $result['error'] ?? __('api.fed_external_partner_message_rejected');
             return $this->respondWithError('EXTERNAL_SEND_FAILED', $errorMsg, null, 422);
         }
 
@@ -1876,7 +2068,7 @@ class FederationV2Controller extends BaseApiController
                 'name' => $receiverName,
                 'avatar' => null,
                 'tenant_id' => $receiverTenantStr,
-                'tenant_name' => $partner['name'] ?? 'External Partner',
+                'tenant_name' => $partner['name'] ?? __('api.external_partner_fallback'),
             ],
             'reference_message_id' => $referenceMessageId ? (int) $referenceMessageId : null,
             'is_external' => true,
@@ -1887,6 +2079,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/messages/{id}/read */
     public function markMessageRead(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1929,6 +2125,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/messages/mark-read-batch */
     public function markMessagesReadBatch(): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1965,6 +2165,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/messages/{id}/translate */
     public function translateMessage(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1993,10 +2197,10 @@ class FederationV2Controller extends BaseApiController
               AND (
                 (sender_tenant_id = ? AND sender_user_id = ?)
                 OR (receiver_tenant_id = ? AND receiver_user_id = ?)
-                OR (external_partner_id IS NOT NULL AND direction = 'outbound' AND sender_user_id = ?)
-                OR (external_partner_id IS NOT NULL AND direction = 'inbound' AND receiver_user_id = ?)
+                OR (external_partner_id IS NOT NULL AND direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
+                OR (external_partner_id IS NOT NULL AND direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)
               )
-        ", [$id, $tenantId, $userId, $tenantId, $userId, $userId, $userId]);
+        ", [$id, $tenantId, $userId, $tenantId, $userId, $userId, $tenantId, $userId, $tenantId]);
 
         if (!$message) {
             return $this->respondWithError('NOT_FOUND', __('api.fed_message_not_found'), null, 404);
@@ -2132,6 +2336,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/connections */
     public function connections(): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $status = $this->input('status', 'accepted');
         $limit = min($this->queryInt('limit', 50, 1, 100), 100);
@@ -2145,6 +2353,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/connections */
     public function sendConnectionRequest(): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $receiverId = (int) $this->input('receiver_id');
         $receiverTenantId = (int) $this->input('receiver_tenant_id');
@@ -2166,6 +2378,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/connections/{id}/accept */
     public function acceptConnection(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $result = $this->federatedConnectionService->acceptRequest($id, $userId);
 
@@ -2179,6 +2395,10 @@ class FederationV2Controller extends BaseApiController
     /** POST /api/v2/federation/connections/{id}/reject */
     public function rejectConnection(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $result = $this->federatedConnectionService->rejectRequest($id, $userId);
 
@@ -2192,6 +2412,10 @@ class FederationV2Controller extends BaseApiController
     /** DELETE /api/v2/federation/connections/{id} */
     public function removeConnection(int $id): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $userId = $this->getUserId();
         $result = $this->federatedConnectionService->removeConnection($id, $userId);
 
@@ -2205,6 +2429,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/connections/status/{userId}/{tenantId} */
     public function connectionStatus($userId, $tenantId): JsonResponse
     {
+        if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+
         $currentUserId = $this->getUserId();
         $status = $this->federatedConnectionService->getStatus($currentUserId, $userId, $tenantId);
         return $this->respondWithData($status);
@@ -2246,10 +2474,8 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        // Feature gate: tenant must have federation enabled at the tenant-feature
-        // level. Mirrors the idiom used by optIn()/setup().
-        if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['success' => false, 'error' => __('api.federation.feature_disabled')], 403);
+        if ($blocked = $this->requireFederationOperation('transactions')) {
+            return $blocked;
         }
 
         $input = request()->all();
@@ -2433,7 +2659,7 @@ class FederationV2Controller extends BaseApiController
                 'status' => 'pending',
                 'amount' => $amount,
                 'is_external' => true,
-                'external_partner' => $partner['name'] ?? 'External Partner',
+                'external_partner' => $partner['name'] ?? __('api.external_partner_fallback'),
             ], null, 202);
         }
 
@@ -2446,7 +2672,10 @@ class FederationV2Controller extends BaseApiController
                         "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                         [$amount, $userId, $tenantId]
                     );
-                    DB::update("UPDATE transactions SET status = 'failed' WHERE id = ?", [$txId]);
+                    DB::update(
+                        "UPDATE transactions SET status = 'failed' WHERE id = ? AND tenant_id = ? AND sender_id = ?",
+                        [$txId, $tenantId, $userId]
+                    );
                 });
                 $refundOk = true;
             } catch (\Throwable $e) {
@@ -2482,7 +2711,10 @@ class FederationV2Controller extends BaseApiController
         // Partner accepted — finalise local record.
         $externalTxId = $result['data']['transaction_id'] ?? null;
         try {
-            DB::update("UPDATE transactions SET status = 'completed' WHERE id = ?", [$txId]);
+            DB::update(
+                "UPDATE transactions SET status = 'completed' WHERE id = ? AND tenant_id = ? AND sender_id = ?",
+                [$txId, $tenantId, $userId]
+            );
         } catch (\Throwable $e) {
             // Local debit committed and partner accepted, but we couldn't flip
             // the local row to 'completed'. The reconciliation safety-net job
@@ -2511,7 +2743,7 @@ class FederationV2Controller extends BaseApiController
             'status' => 'completed',
             'amount' => $amount,
             'is_external' => true,
-            'external_partner' => $partner['name'] ?? 'External Partner',
+            'external_partner' => $partner['name'] ?? __('api.external_partner_fallback'),
         ], null, 201);
     }
 }

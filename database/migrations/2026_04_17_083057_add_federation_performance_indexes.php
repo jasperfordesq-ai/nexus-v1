@@ -62,6 +62,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('federation_audit_log')) {
         Schema::table('federation_audit_log', function (Blueprint $table) {
             if ($this->indexExists('federation_audit_log', 'idx_fed_audit_source_created')) {
                 $table->dropIndex('idx_fed_audit_source_created');
@@ -70,6 +71,8 @@ return new class extends Migration
                 $table->dropIndex('idx_fed_audit_target_created');
             }
         });
+        }
+        if (Schema::hasTable('federation_partnerships')) {
         Schema::table('federation_partnerships', function (Blueprint $table) {
             if ($this->indexExists('federation_partnerships', 'idx_fed_partner_tenant_status')) {
                 $table->dropIndex('idx_fed_partner_tenant_status');
@@ -78,20 +81,29 @@ return new class extends Migration
                 $table->dropIndex('idx_fed_partner_partner_status');
             }
         });
+        }
+        if (Schema::hasTable('federation_user_settings')) {
         Schema::table('federation_user_settings', function (Blueprint $table) {
             if ($this->indexExists('federation_user_settings', 'idx_fed_user_optin_search')) {
                 $table->dropIndex('idx_fed_user_optin_search');
             }
         });
+        }
+        if (Schema::hasTable('reviews')) {
         Schema::table('reviews', function (Blueprint $table) {
             if ($this->indexExists('reviews', 'idx_reviews_federated')) {
                 $table->dropIndex('idx_reviews_federated');
             }
         });
+        }
     }
 
     private function indexExists(string $table, string $index): bool
     {
+        if (!Schema::hasTable($table)) {
+            return true;
+        }
+
         return collect(DB::select("SHOW INDEX FROM `{$table}`"))
             ->pluck('Key_name')
             ->contains($index);

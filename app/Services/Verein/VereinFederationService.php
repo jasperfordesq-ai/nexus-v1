@@ -280,7 +280,7 @@ class VereinFederationService
                 continue;
             }
 
-            DB::table('verein_event_shares')->insert([
+            $inserted = DB::table('verein_event_shares')->insertOrIgnore([
                 'source_organization_id' => $sourceOrganizationId,
                 'target_organization_id' => $targetId,
                 'event_id' => $eventId,
@@ -290,6 +290,11 @@ class VereinFederationService
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+            if ($inserted === 0) {
+                $skipped++;
+                continue;
+            }
+
             $shared++;
         }
 
@@ -304,9 +309,18 @@ class VereinFederationService
         $tenantId = TenantContext::getId();
 
         $query = DB::table('verein_event_shares as s')
-            ->join('events as e', 'e.id', '=', 's.event_id')
-            ->leftJoin('vol_organizations as so', 'so.id', '=', 's.source_organization_id')
-            ->leftJoin('vol_organizations as to_org', 'to_org.id', '=', 's.target_organization_id')
+            ->join('events as e', function ($join): void {
+                $join->on('e.id', '=', 's.event_id')
+                    ->on('e.tenant_id', '=', 's.tenant_id');
+            })
+            ->leftJoin('vol_organizations as so', function ($join): void {
+                $join->on('so.id', '=', 's.source_organization_id')
+                    ->on('so.tenant_id', '=', 's.tenant_id');
+            })
+            ->leftJoin('vol_organizations as to_org', function ($join): void {
+                $join->on('to_org.id', '=', 's.target_organization_id')
+                    ->on('to_org.tenant_id', '=', 's.tenant_id');
+            })
             ->where('s.tenant_id', $tenantId)
             ->where('s.status', 'active');
 

@@ -170,6 +170,7 @@
   "super_federation_whitelist": "Federation Whitelist",
   "billing": "Billing",
   "federation_activity": "Activity Feed",
+  "federation_aggregates": "Aggregates",
   "federation_api_docs": "API Documentation",
   "federation_credit_agreements": "Credit Agreements",
   "federation_data_management": "Data Management",

@@ -284,47 +284,60 @@ class FederationEmailService
             }
 
             $safeRequestingName = htmlspecialchars($requestingTenantName, ENT_QUOTES, 'UTF-8');
+            $previousTenantId = TenantContext::getId();
 
-            foreach ($admins as $admin) {
-                // Level names and fallbacks must render per-admin so they pick up the admin's locale.
-                LocaleContext::withLocale($admin, function () use ($admin, $requestingTenantName, $safeRequestingName, $requestedLevel, $notes) {
-                    $levelNames = [
-                        1 => __('emails.federation.level_discovery'),
-                        2 => __('emails.federation.level_social'),
-                        3 => __('emails.federation.level_economic'),
-                        4 => __('emails.federation.level_integrated'),
-                    ];
-                    $levelName = $levelNames[$requestedLevel] ?? __('emails.common.fallback_federation_level', ['level' => $requestedLevel]);
+            if (!TenantContext::setById($targetTenantId)) {
+                return false;
+            }
 
-                    $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
+            try {
+                foreach ($admins as $admin) {
+                    // Level names and fallbacks must render per-admin so they pick up the admin's locale.
+                    LocaleContext::withLocale($admin, function () use ($admin, $requestingTenantName, $safeRequestingName, $requestedLevel, $notes) {
+                        $levelNames = [
+                            1 => __('emails.federation.level_discovery'),
+                            2 => __('emails.federation.level_social'),
+                            3 => __('emails.federation.level_economic'),
+                            4 => __('emails.federation.level_integrated'),
+                        ];
+                        $levelName = $levelNames[$requestedLevel] ?? __('emails.common.fallback_federation_level', ['level' => $requestedLevel]);
 
-                    $subject = __('emails.federation.partnership_subject', ['community' => $requestingTenantName]);
+                        $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
 
-                    $builder = EmailTemplateBuilder::make()
-                        ->theme('federation')
-                        ->title(__('emails.federation.partnership_title'))
-                        ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
-                        ->greeting($adminName)
-                        ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
-                        ->infoCard([
-                            __('emails.federation.label_from_community') => $safeRequestingName,
-                            __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
-                        ]);
+                        $subject = __('emails.federation.partnership_subject', ['community' => $requestingTenantName]);
 
-                    if ($notes !== null && $notes !== '') {
-                        $builder->blockquote(
-                            htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
-                            $safeRequestingName
-                        );
-                    }
+                        $builder = EmailTemplateBuilder::make()
+                            ->theme('federation')
+                            ->title(__('emails.federation.partnership_title'))
+                            ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
+                            ->greeting($adminName)
+                            ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
+                            ->infoCard([
+                                __('emails.federation.label_from_community') => $safeRequestingName,
+                                __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
+                            ]);
 
-                    $html = $builder
-                        ->button(__('emails.federation.review_request'), EmailTemplateBuilder::tenantUrl('/admin/federation'))
-                        ->render();
+                        if ($notes !== null && $notes !== '') {
+                            $builder->blockquote(
+                                htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
+                                $safeRequestingName
+                            );
+                        }
 
-                    $mailer = Mailer::forCurrentTenant();
-                    $mailer->send($admin->email, $subject, $html);
-                });
+                        $html = $builder
+                            ->button(__('emails.federation.review_request'), EmailTemplateBuilder::tenantUrl('/admin/federation'))
+                            ->render();
+
+                        $mailer = Mailer::forCurrentTenant();
+                        $mailer->send($admin->email, $subject, $html);
+                    });
+                }
+            } finally {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
 
             Log::info('[FederationEmail] Partnership notification sent', [

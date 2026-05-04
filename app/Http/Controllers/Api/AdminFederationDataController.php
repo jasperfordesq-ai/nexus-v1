@@ -182,6 +182,8 @@ class AdminFederationDataController extends BaseApiController
                     $summary['partnerships']['skipped']++;
                     continue;
                 }
+                $status = in_array($row['status'], ['suspended', 'terminated'], true) ? $row['status'] : 'pending';
+
                 $summary['partnerships']['new']++;
                 if (!$dryRun) {
                     try {
@@ -194,7 +196,7 @@ class AdminFederationDataController extends BaseApiController
                             [
                                 (int) $row['tenant_id'],
                                 (int) $row['partner_tenant_id'],
-                                in_array($row['status'], ['pending', 'active', 'suspended', 'terminated'], true) ? $row['status'] : 'pending',
+                                $status,
                                 (int) ($row['federation_level'] ?? 1),
                                 (int) !empty($row['messaging_enabled']),
                                 (int) !empty($row['transactions_enabled']),

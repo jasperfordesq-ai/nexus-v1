@@ -35,7 +35,31 @@ class FederatedConnectionService
         $message = $message ? htmlspecialchars(substr($message, 0, 1000), ENT_QUOTES, 'UTF-8') : null;
 
         if ($requesterId === $receiverId && $requesterTenantId === $receiverTenantId) {
-            return ['success' => false, 'error' => 'Cannot connect with yourself'];
+            return ['success' => false, 'error' => __('api.cannot_connect_with_yourself')];
+        }
+
+        $requester = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ? AND status = 'active'",
+            [$requesterId, $requesterTenantId]
+        );
+        if (!$requester) {
+            return ['success' => false, 'error' => __('api.cannot_send_request_to_user')];
+        }
+
+        $receiver = DB::selectOne(
+            "SELECT u.id, fus.federation_optin, fus.messaging_enabled_federated
+             FROM users u
+             JOIN federation_user_settings fus ON fus.user_id = u.id
+             WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'",
+            [$receiverId, $receiverTenantId]
+        );
+        if (!$receiver || empty($receiver->federation_optin) || empty($receiver->messaging_enabled_federated)) {
+            return ['success' => false, 'error' => __('api.cannot_send_request_to_user')];
+        }
+
+        $partnership = FederationPartnershipService::getPartnership($requesterTenantId, $receiverTenantId);
+        if (!$partnership || $partnership['status'] !== 'active' || empty($partnership['profiles_enabled'])) {
+            return ['success' => false, 'error' => __('api.cannot_send_request_to_user')];
         }
 
         // Check if connection already exists (in either direction)
@@ -51,17 +75,22 @@ class FederatedConnectionService
 
         if ($existing) {
             if ($existing->status === 'accepted') {
-                return ['success' => false, 'error' => 'Already connected'];
+                return ['success' => false, 'error' => __('api.connection_already_exists')];
             }
             if ($existing->status === 'pending') {
-                return ['success' => false, 'error' => 'Connection request already pending'];
+                return ['success' => false, 'error' => __('api.connection_request_pending')];
             }
         }
 
         try {
             // If a previous rejected request exists, delete it so a new one can be sent
             if ($existing && $existing->status === 'rejected') {
-                DB::delete("DELETE FROM federation_connections WHERE id = ?", [$existing->id]);
+                DB::delete(
+                    "DELETE FROM federation_connections
+                     WHERE id = ? AND requester_user_id = ? AND requester_tenant_id = ?
+                       AND receiver_user_id = ? AND receiver_tenant_id = ?",
+                    [$existing->id, $requesterId, $requesterTenantId, $receiverId, $receiverTenantId]
+                );
             }
 
             DB::insert(
@@ -82,8 +111,8 @@ class FederatedConnectionService
             // Notify the recipient (cross-tenant bell notification)
             try {
                 $sender = DB::selectOne(
-                    "SELECT first_name, last_name FROM users WHERE id = ?",
-                    [$requesterId]
+                    "SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                    [$requesterId, $requesterTenantId]
                 );
                 $community = DB::selectOne(
                     "SELECT name FROM tenants WHERE id = ?",
@@ -118,7 +147,7 @@ class FederatedConnectionService
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] sendRequest failed', ['error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Failed to send connection request'];
+            return ['success' => false, 'error' => __('api.connection_send_failed')];
         }
     }
 
@@ -134,13 +163,15 @@ class FederatedConnectionService
         );
 
         if (!$connection) {
-            return ['success' => false, 'error' => 'Connection request not found or already processed'];
+            return ['success' => false, 'error' => __('api.connection_request_not_found_or_processed')];
         }
 
         try {
             DB::update(
-                "UPDATE federation_connections SET status = 'accepted', updated_at = NOW() WHERE id = ?",
-                [$connectionId]
+                "UPDATE federation_connections
+                 SET status = 'accepted', updated_at = NOW()
+                 WHERE id = ? AND receiver_user_id = ? AND receiver_tenant_id = ? AND status = 'pending'",
+                [$connectionId, $userId, $tenantId]
             );
 
             Log::info('[FederatedConnection] Request accepted', [
@@ -151,8 +182,8 @@ class FederatedConnectionService
             // Notify the original requester (cross-tenant bell notification)
             try {
                 $accepter = DB::selectOne(
-                    "SELECT first_name, last_name FROM users WHERE id = ?",
-                    [$userId]
+                    "SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
                 );
                 $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : __('emails.common.fallback_someone');
 
@@ -182,7 +213,7 @@ class FederatedConnectionService
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] acceptRequest failed', ['error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Failed to accept connection request'];
+            return ['success' => false, 'error' => __('api.connection_accept_failed')];
         }
     }
 
@@ -198,13 +229,15 @@ class FederatedConnectionService
         );
 
         if (!$connection) {
-            return ['success' => false, 'error' => 'Connection request not found or already processed'];
+            return ['success' => false, 'error' => __('api.connection_request_not_found_or_processed')];
         }
 
         try {
             DB::update(
-                "UPDATE federation_connections SET status = 'rejected', updated_at = NOW() WHERE id = ?",
-                [$connectionId]
+                "UPDATE federation_connections
+                 SET status = 'rejected', updated_at = NOW()
+                 WHERE id = ? AND receiver_user_id = ? AND receiver_tenant_id = ? AND status = 'pending'",
+                [$connectionId, $userId, $tenantId]
             );
 
             Log::info('[FederatedConnection] Request rejected', [
@@ -240,7 +273,7 @@ class FederatedConnectionService
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] rejectRequest failed', ['error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Failed to reject connection request'];
+            return ['success' => false, 'error' => __('api.connection_reject_failed')];
         }
     }
 
@@ -256,11 +289,16 @@ class FederatedConnectionService
         );
 
         if (!$connection) {
-            return ['success' => false, 'error' => 'Connection not found'];
+            return ['success' => false, 'error' => __('api.connection_not_found')];
         }
 
         try {
-            DB::delete("DELETE FROM federation_connections WHERE id = ?", [$connectionId]);
+            DB::delete(
+                "DELETE FROM federation_connections
+                 WHERE id = ? AND ((requester_user_id = ? AND requester_tenant_id = ?)
+                    OR (receiver_user_id = ? AND receiver_tenant_id = ?))",
+                [$connectionId, $userId, $tenantId, $userId, $tenantId]
+            );
 
             Log::info('[FederatedConnection] Connection removed', [
                 'connection_id' => $connectionId,
@@ -270,7 +308,7 @@ class FederatedConnectionService
             return ['success' => true];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] removeConnection failed', ['error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Failed to remove connection'];
+            return ['success' => false, 'error' => __('api.connection_remove_failed')];
         }
     }
 
@@ -282,7 +320,7 @@ class FederatedConnectionService
         $tenantId = TenantContext::getId();
 
         $connection = DB::selectOne(
-            "SELECT id, status, requester_user_id, receiver_user_id, created_at
+            "SELECT id, status, requester_user_id, requester_tenant_id, receiver_user_id, receiver_tenant_id, created_at
              FROM federation_connections
              WHERE (requester_user_id = ? AND requester_tenant_id = ? AND receiver_user_id = ? AND receiver_tenant_id = ?)
                 OR (requester_user_id = ? AND requester_tenant_id = ? AND receiver_user_id = ? AND receiver_tenant_id = ?)",
@@ -296,7 +334,9 @@ class FederatedConnectionService
             return ['status' => 'none', 'connection_id' => null];
         }
 
-        $direction = ($connection->requester_user_id === $userId) ? 'outgoing' : 'incoming';
+        $direction = ((int) $connection->requester_user_id === $userId && (int) $connection->requester_tenant_id === $tenantId)
+            ? 'outgoing'
+            : 'incoming';
 
         return [
             'status' => $connection->status,
@@ -311,6 +351,8 @@ class FederatedConnectionService
      */
     public function getConnections(int $userId, string $statusFilter = 'accepted', int $limit = 50, int $offset = 0): array
     {
+        $tenantId = TenantContext::getId();
+
         // Support directional pending filters from frontend tabs
         $directionFilter = null;
         if ($statusFilter === 'pending_received') {
@@ -333,32 +375,44 @@ class FederatedConnectionService
             $sql = "SELECT fc.id, fc.status, fc.message, fc.created_at, fc.updated_at,
                         fc.requester_user_id, fc.requester_tenant_id,
                         fc.receiver_user_id, fc.receiver_tenant_id,
-                        CASE WHEN fc.requester_user_id = ? THEN ru.first_name ELSE qu.first_name END as other_first_name,
-                        CASE WHEN fc.requester_user_id = ? THEN ru.last_name ELSE qu.last_name END as other_last_name,
-                        CASE WHEN fc.requester_user_id = ? THEN ru.avatar_url ELSE qu.avatar_url END as other_avatar,
-                        CASE WHEN fc.requester_user_id = ? THEN ru.id ELSE qu.id END as other_user_id,
-                        CASE WHEN fc.requester_user_id = ? THEN fc.receiver_tenant_id ELSE fc.requester_tenant_id END as other_tenant_id,
-                        CASE WHEN fc.requester_user_id = ? THEN rt.name ELSE qt.name END as other_tenant_name
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN ru.first_name ELSE qu.first_name END as other_first_name,
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN ru.last_name ELSE qu.last_name END as other_last_name,
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN ru.avatar_url ELSE qu.avatar_url END as other_avatar,
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN ru.id ELSE qu.id END as other_user_id,
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN fc.receiver_tenant_id ELSE fc.requester_tenant_id END as other_tenant_id,
+                        CASE WHEN fc.requester_user_id = ? AND fc.requester_tenant_id = ? THEN rt.name ELSE qt.name END as other_tenant_name
                  FROM federation_connections fc
-                 LEFT JOIN users qu ON fc.requester_user_id = qu.id
-                 LEFT JOIN users ru ON fc.receiver_user_id = ru.id
+                 LEFT JOIN users qu ON fc.requester_user_id = qu.id AND fc.requester_tenant_id = qu.tenant_id
+                 LEFT JOIN users ru ON fc.receiver_user_id = ru.id AND fc.receiver_tenant_id = ru.tenant_id
                  LEFT JOIN tenants qt ON fc.requester_tenant_id = qt.id
                  LEFT JOIN tenants rt ON fc.receiver_tenant_id = rt.id
                  WHERE ";
 
-            $params = [$userId, $userId, $userId, $userId, $userId, $userId];
+            $params = [
+                $userId, $tenantId,
+                $userId, $tenantId,
+                $userId, $tenantId,
+                $userId, $tenantId,
+                $userId, $tenantId,
+                $userId, $tenantId,
+            ];
 
             // Apply directional filter for pending tabs
             if ($directionFilter === 'incoming') {
-                $sql .= "fc.receiver_user_id = ? AND fc.status = ?";
+                $sql .= "fc.receiver_user_id = ? AND fc.receiver_tenant_id = ? AND fc.status = ?";
                 $params[] = $userId;
+                $params[] = $tenantId;
             } elseif ($directionFilter === 'outgoing') {
-                $sql .= "fc.requester_user_id = ? AND fc.status = ?";
+                $sql .= "fc.requester_user_id = ? AND fc.requester_tenant_id = ? AND fc.status = ?";
                 $params[] = $userId;
+                $params[] = $tenantId;
             } else {
-                $sql .= "(fc.requester_user_id = ? OR fc.receiver_user_id = ?) AND fc.status = ?";
+                $sql .= "((fc.requester_user_id = ? AND fc.requester_tenant_id = ?)
+                          OR (fc.receiver_user_id = ? AND fc.receiver_tenant_id = ?)) AND fc.status = ?";
                 $params[] = $userId;
+                $params[] = $tenantId;
                 $params[] = $userId;
+                $params[] = $tenantId;
             }
             $params[] = $statusFilter;
 
@@ -369,8 +423,8 @@ class FederatedConnectionService
             $rows = DB::select($sql, $params);
 
             // Map field names to match frontend FederationConnection interface
-            return array_map(function ($row) use ($userId) {
-                $direction = ($row->requester_user_id == $userId) ? 'outgoing' : 'incoming';
+            return array_map(function ($row) use ($userId, $tenantId) {
+                $direction = ($row->requester_user_id == $userId && $row->requester_tenant_id == $tenantId) ? 'outgoing' : 'incoming';
                 return [
                     'id' => (int) $row->id,
                     'user_id' => (int) $row->other_user_id,
@@ -397,9 +451,12 @@ class FederatedConnectionService
     public function getPendingCount(int $userId): int
     {
         try {
+            $tenantId = TenantContext::getId();
             $row = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM federation_connections WHERE receiver_user_id = ? AND status = 'pending'",
-                [$userId]
+                "SELECT COUNT(*) as cnt
+                 FROM federation_connections
+                 WHERE receiver_user_id = ? AND receiver_tenant_id = ? AND status = 'pending'",
+                [$userId, $tenantId]
             );
             return (int) ($row->cnt ?? 0);
         } catch (\Exception $e) {

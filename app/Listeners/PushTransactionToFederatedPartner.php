@@ -13,7 +13,6 @@ use App\Events\TransactionCompleted;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationFeatureService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -55,17 +54,6 @@ class PushTransactionToFederatedPartner implements ShouldQueue
             $partnerId = (int) ($transaction->external_partner_id ?? 0);
 
             if ($partnerId <= 0) {
-                $row = DB::table('federation_transactions')
-                    ->where('local_transaction_id', $transaction->id)
-                    ->whereNotNull('external_partner_id')
-                    ->first();
-
-                if ($row) {
-                    $partnerId = (int) $row->external_partner_id;
-                }
-            }
-
-            if ($partnerId <= 0) {
                 // Nothing to push — transaction is flagged federated but has
                 // no external partner linkage (purely cross-tenant internal).
                 return;
@@ -77,7 +65,12 @@ class PushTransactionToFederatedPartner implements ShouldQueue
                 'description'     => $transaction->description,
                 'sender_id'       => $event->sender->id,
                 'receiver_id'     => $event->receiver->id,
+                'recipient_id'    => $event->receiver->id,
+                'sender_user_id'  => $event->sender->id,
+                'receiver_user_id' => $event->receiver->id,
                 'sender_tenant'   => $event->tenantId,
+                'sender_tenant_id' => $event->tenantId,
+                'receiver_tenant_id' => $transaction->receiver_tenant_id ?? $event->receiver->tenant_id ?? null,
                 'created_at'      => $transaction->created_at?->toISOString(),
             ];
 

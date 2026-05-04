@@ -1402,6 +1402,27 @@ class AdminSuperController extends BaseApiController
         return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, $error, null, 500);
     }
 
+    /** POST /api/v2/admin/super/federation/partnerships/{id}/reactivate */
+    public function federationReactivatePartnership($id): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+
+        $partnershipId = (int) $id;
+
+        if ($partnershipId <= 0) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_partnership_id'), 'id', 400);
+        }
+
+        $result = $this->federationPartnershipService->reactivatePartnership($partnershipId, $userId);
+
+        if (is_array($result) && !empty($result['success'])) {
+            return $this->respondWithData(['reactivated' => true, 'partnership_id' => $partnershipId]);
+        }
+
+        $error = is_array($result) ? ($result['error'] ?? __('api.partnership_reactivate_failed')) : __('api.partnership_reactivate_failed');
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, $error, null, 500);
+    }
+
     /** POST /api/v2/super-admin/federation/partnerships/{id}/terminate */
     public function federationTerminatePartnership($id): JsonResponse
     {

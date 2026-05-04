@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\FederatedIdentity;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 /**
  * FederatedIdentityService — CRUD/lookup for the federated_identities table.
@@ -25,10 +27,13 @@ class FederatedIdentityService
     /**
      * Resolve an external identity on a partner to a local User.
      */
-    public function resolve(int $partnerId, string $externalUserId): ?User
+    public function resolve(int $partnerId, string $externalUserId, ?int $tenantId = null): ?User
     {
+        $tenantId ??= TenantContext::getId();
+
         /** @var FederatedIdentity|null $identity */
         $identity = FederatedIdentity::query()
+            ->where('tenant_id', $tenantId)
             ->where('partner_id', $partnerId)
             ->where('external_user_id', $externalUserId)
             ->first();
@@ -46,9 +51,12 @@ class FederatedIdentityService
         string $externalUserId,
         ?string $handle = null,
     ): FederatedIdentity {
+        $tenantId = (int) (DB::table('users')->where('id', $localUserId)->value('tenant_id') ?? TenantContext::getId());
+
         /** @var FederatedIdentity $identity */
         $identity = FederatedIdentity::query()->updateOrCreate(
             [
+                'tenant_id' => $tenantId,
                 'partner_id' => $partnerId,
                 'external_user_id' => $externalUserId,
             ],
@@ -68,7 +76,10 @@ class FederatedIdentityService
      */
     public function forUser(int $localUserId): array
     {
+        $tenantId = TenantContext::getId();
+
         return FederatedIdentity::query()
+            ->where('tenant_id', $tenantId)
             ->where('local_user_id', $localUserId)
             ->get()
             ->all();
@@ -81,6 +92,7 @@ class FederatedIdentityService
     {
         /** @var FederatedIdentity|null $identity */
         $identity = FederatedIdentity::query()
+            ->where('tenant_id', TenantContext::getId())
             ->where('local_user_id', $localUserId)
             ->where('partner_id', $partnerId)
             ->first();

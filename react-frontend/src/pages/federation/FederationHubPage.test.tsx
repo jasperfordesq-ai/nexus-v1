@@ -142,7 +142,7 @@ describe('FederationHubPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Unable to Load')).toBeInTheDocument();
     });
-    expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
     expect(screen.getByText('Try Again')).toBeInTheDocument();
   });
 
@@ -176,9 +176,9 @@ describe('FederationHubPage', () => {
     render(<FederationHubPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Federation Hub')).toBeInTheDocument();
+      expect(screen.getByText('Federation Network')).toBeInTheDocument();
     });
-    expect(screen.getByText('Connect Beyond Your Community')).toBeInTheDocument();
+    expect(screen.getByText('Connect with Communities Worldwide')).toBeInTheDocument();
     expect(screen.getByText('Enable Federation')).toBeInTheDocument();
   });
 
@@ -198,8 +198,8 @@ describe('FederationHubPage', () => {
       expect(screen.getByText('How It Works')).toBeInTheDocument();
     });
     expect(screen.getByText('Discover Partners')).toBeInTheDocument();
-    expect(screen.getByText('Connect with Members')).toBeInTheDocument();
-    expect(screen.getByText('Exchange Across Communities')).toBeInTheDocument();
+    expect(screen.getByText('Meet Members')).toBeInTheDocument();
+    expect(screen.getByText('Exchange Services')).toBeInTheDocument();
   });
 
   it('shows dashboard when opted in with partner communities', async () => {
@@ -237,10 +237,10 @@ describe('FederationHubPage', () => {
     render(<FederationHubPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Federation Hub')).toBeInTheDocument();
+      expect(screen.getByText('Federation Network')).toBeInTheDocument();
     });
     // Quick links section
-    expect(screen.getByText('Explore the Network')).toBeInTheDocument();
+    expect(screen.getByText('Explore Network')).toBeInTheDocument();
     // Partner communities section
     expect(screen.getByText('Partner Community A')).toBeInTheDocument();
   });
@@ -260,14 +260,14 @@ describe('FederationHubPage', () => {
     render(<FederationHubPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Explore the Network')).toBeInTheDocument();
+      expect(screen.getByText('Explore Network')).toBeInTheDocument();
     });
     // Quick link titles - some may appear in both title and description,
     // so use getAllByText where needed
-    expect(screen.getByText('Federated Members')).toBeInTheDocument();
-    expect(screen.getAllByText(/Federated Messages/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Federated Listings')).toBeInTheDocument();
-    expect(screen.getByText('Federated Events')).toBeInTheDocument();
+    expect(screen.getByText('Federation Members')).toBeInTheDocument();
+    expect(screen.getAllByText(/Federation Messages/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Federation Listings')).toBeInTheDocument();
+    expect(screen.getByText('Federation Events')).toBeInTheDocument();
     expect(screen.getByText('Federation Settings')).toBeInTheDocument();
   });
 });

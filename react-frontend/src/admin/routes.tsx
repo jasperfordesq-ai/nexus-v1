@@ -10,7 +10,7 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { Route, Navigate } from 'react-router-dom';
+import { Route, Navigate, Outlet } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { SuperAdminRoute } from './SuperAdminRoute';
@@ -514,6 +514,11 @@ export function AdminRoutes() {
       <Route path="legal-documents/:id/versions" element={<Lazy><LegalDocVersionList /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
+      <Route element={
+        <FeatureGatedElement feature="federation">
+          <Outlet />
+        </FeatureGatedElement>
+      }>
       <Route path="federation" element={<Lazy><FederationSettings /></Lazy>} />
       <Route path="federation/partnerships" element={<Lazy><Partnerships /></Lazy>} />
       <Route path="federation/directory" element={<Lazy><PartnerDirectory /></Lazy>} />
@@ -530,6 +535,7 @@ export function AdminRoutes() {
       <Route path="federation/activity" element={<Lazy><FederationActivityFeed /></Lazy>} />
       <Route path="federation/cc-config" element={<Lazy><CreditCommonsConfig /></Lazy>} />
       <Route path="federation/aggregates" element={<Lazy><FederationAggregatesPage /></Lazy>} />
+      </Route>
 
       {/* ─── SAFEGUARDING ─── */}
       <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />

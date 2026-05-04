@@ -54,6 +54,7 @@ return new class extends Migration
                 $table->index(['target_organization_id', 'status'], 'verein_event_shares_target_idx');
                 $table->index('event_id', 'verein_event_shares_event_idx');
                 $table->index(['tenant_id', 'source_organization_id'], 'verein_event_shares_source_idx');
+                $table->unique(['tenant_id', 'event_id', 'target_organization_id'], 'verein_event_shares_unique_target');
             });
         }
 

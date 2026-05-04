@@ -79,7 +79,7 @@ class FederatedMessageService
                 return ['success' => false, 'error' => 'No active federation partnership between tenants'];
             }
 
-            $messageId = DB::table('federation_messages')->insertGetId([
+            $messageId = self::insertExternalMessage([
                 'sender_user_id'    => $senderId,
                 'sender_tenant_id'  => $sender->tenant_id,
                 'receiver_user_id'  => $receiverId,
@@ -208,7 +208,7 @@ class FederatedMessageService
                 }
             }
 
-            $messageId = DB::table('federation_messages')->insertGetId([
+            $messageId = self::insertExternalMessage([
                 'sender_user_id'         => $externalSenderId,
                 'sender_tenant_id'       => 0, // External origin — not a real tenant ID
                 'receiver_user_id'       => $receiverUserId,
@@ -249,5 +249,31 @@ class FederatedMessageService
             Log::warning('Failed to store external message', ['error' => $e->getMessage()]);
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Insert a federation message, using an atomic idempotent path for
+     * external partner messages with a stable external_message_id.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private static function insertExternalMessage(array $payload): int
+    {
+        $externalMessageId = $payload['external_message_id'] ?? null;
+        $externalPartnerId = $payload['external_partner_id'] ?? null;
+
+        if (!$externalMessageId || !$externalPartnerId) {
+            return (int) DB::table('federation_messages')->insertGetId($payload);
+        }
+
+        DB::table('federation_messages')->insertOrIgnore($payload);
+
+        $existing = DB::table('federation_messages')
+            ->where('external_partner_id', $externalPartnerId)
+            ->where('external_message_id', $externalMessageId)
+            ->where('receiver_tenant_id', $payload['receiver_tenant_id'])
+            ->first(['id']);
+
+        return (int) ($existing->id ?? 0);
     }
 }

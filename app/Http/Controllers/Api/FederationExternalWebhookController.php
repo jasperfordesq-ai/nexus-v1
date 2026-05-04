@@ -54,6 +54,8 @@ class FederationExternalWebhookController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    private bool $authenticatedWithHmac = false;
+
     /** Maximum age of a webhook timestamp before rejection (seconds) */
     private const TIMESTAMP_TOLERANCE = 300; // 5 minutes
 
@@ -65,6 +67,8 @@ class FederationExternalWebhookController extends BaseApiController
      */
     public function receive(Request $request): JsonResponse
     {
+        $this->authenticatedWithHmac = false;
+
         // ---- Rate limit by IP ----
         $ip = $request->ip();
         $rateLimitKey = "federation_ext_webhook:{$ip}";
@@ -106,6 +110,10 @@ class FederationExternalWebhookController extends BaseApiController
         // (Bearer) to stay backward-compatible with existing partner clients,
         // but strongly recommended — when present it is always enforced.
         $nonce = $request->header('X-Federation-Nonce');
+        if ($this->authenticatedWithHmac && empty($nonce)) {
+            return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_nonce_required'), null, 400);
+        }
+
         if (!empty($nonce)) {
             if (!is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
                 return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_invalid_nonce'), null, 400);
@@ -121,7 +129,7 @@ class FederationExternalWebhookController extends BaseApiController
                         'partner_id' => $partner->id,
                         'nonce_prefix' => substr($nonce, 0, 8),
                     ]);
-                    return $this->respondWithError('REPLAY_DETECTED', 'Nonce already used', null, 409);
+                    return $this->respondWithError('REPLAY_DETECTED', __('api.federation.webhook_replay_detected'), null, 409);
                 }
             } catch (\Throwable $e) {
                 // Nonce store unavailable — fail closed to preserve replay protection.
@@ -156,7 +164,7 @@ class FederationExternalWebhookController extends BaseApiController
         // ---- Set tenant context from partner ----
         if (!TenantContext::setById($partner->tenant_id)) {
             Log::error("[FederationExternalWebhook] Failed to set tenant context for partner #{$partner->id}, tenant #{$partner->tenant_id}");
-            return $this->respondWithError('TENANT_ERROR', 'Unable to resolve tenant for this partner', null, 500);
+            return $this->respondWithError('TENANT_ERROR', __('api.federation.webhook_tenant_error'), null, 500);
         }
 
         // ---- Log the webhook ----
@@ -191,7 +199,7 @@ class FederationExternalWebhookController extends BaseApiController
                 ->where('id', $logId)
                 ->update(['response_code' => 500, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
 
-            return $this->respondWithError('PROCESSING_FAILED', 'Webhook processing failed', null, 500);
+            return $this->respondWithError('PROCESSING_FAILED', __('api.federation.webhook_processing_failed'), null, 500);
         }
     }
 
@@ -261,12 +269,21 @@ class FederationExternalWebhookController extends BaseApiController
         $timestamp = $request->header('X-Webhook-Timestamp')
             ?? $request->header('X-Federation-Timestamp');
 
-        // Timestamp freshness check (if provided)
-        if (!empty($timestamp) && abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+        if (empty($timestamp)) {
+            return null;
+        }
+
+        $requestTime = is_numeric($timestamp) ? (int) $timestamp : strtotime((string) $timestamp);
+        if ($requestTime === false || abs(time() - $requestTime) > self::TIMESTAMP_TOLERANCE) {
             Log::warning('[FederationExternalWebhook] Expired timestamp', [
                 'timestamp' => $timestamp,
                 'now' => time(),
             ]);
+            return null;
+        }
+
+        $nonce = $request->header('X-Federation-Nonce');
+        if (empty($nonce) || !is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
             return null;
         }
 
@@ -281,24 +298,17 @@ class FederationExternalWebhookController extends BaseApiController
             $secret = $this->decryptSecret($partner->signing_secret);
             if (!$secret) continue;
 
-            // Try simple body-only HMAC (TimeOverflow default)
-            $expectedSimple = hash_hmac('sha256', $rawBody, $secret);
-            if (hash_equals($expectedSimple, $signature)) {
+            $stringToSign = implode("\n", [
+                strtoupper($request->method()),
+                $request->getRequestUri(),
+                (string) $timestamp,
+                $nonce,
+                $rawBody,
+            ]);
+            $expectedNexus = hash_hmac('sha256', $stringToSign, $secret);
+            if (hash_equals($expectedNexus, $signature)) {
+                $this->authenticatedWithHmac = true;
                 return $partner;
-            }
-
-            // Try Nexus format: METHOD\nPATH\nTIMESTAMP\nBODY
-            if (!empty($timestamp)) {
-                $stringToSign = implode("\n", [
-                    $request->method(),
-                    $request->getPathInfo(),
-                    $timestamp,
-                    $rawBody,
-                ]);
-                $expectedNexus = hash_hmac('sha256', $stringToSign, $secret);
-                if (hash_equals($expectedNexus, $signature)) {
-                    return $partner;
-                }
             }
         }
 
@@ -919,6 +929,7 @@ class FederationExternalWebhookController extends BaseApiController
         // Update last_message_at on the partner
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
+            ->where('tenant_id', $partner->tenant_id)
             ->update(['last_message_at' => now()]);
 
         return $result;
@@ -1185,9 +1196,14 @@ class FederationExternalWebhookController extends BaseApiController
             ]);
 
             // Auto-credit the recipient's balance
-            DB::table('users')
+            $creditedRows = DB::table('users')
                 ->where('id', $receiverUserId)
+                ->where('tenant_id', TenantContext::getId())
                 ->increment('balance', $amountInHours);
+
+            if ($creditedRows === 0) {
+                throw new \RuntimeException('Receiver balance update failed');
+            }
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -1203,7 +1219,10 @@ class FederationExternalWebhookController extends BaseApiController
         Log::info('[FederationExternalWebhook] Auto-credited user', [
             'user_id' => $receiverUserId,
             'amount_hours' => $amountInHours,
-            'new_balance' => DB::table('users')->where('id', $receiverUserId)->value('balance'),
+            'new_balance' => DB::table('users')
+                ->where('id', $receiverUserId)
+                ->where('tenant_id', TenantContext::getId())
+                ->value('balance'),
         ]);
 
         return [
@@ -1241,6 +1260,7 @@ class FederationExternalWebhookController extends BaseApiController
         }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
+            ->where('tenant_id', $partner->tenant_id)
             ->update(['status' => 'active', 'verified_at' => now(), 'error_count' => 0, 'last_error' => null]);
         return ['status' => 'activated'];
     }
@@ -1252,6 +1272,7 @@ class FederationExternalWebhookController extends BaseApiController
         }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
+            ->where('tenant_id', $partner->tenant_id)
             ->update(['status' => 'suspended']);
         return ['status' => 'suspended'];
     }
@@ -1263,6 +1284,7 @@ class FederationExternalWebhookController extends BaseApiController
         }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
+            ->where('tenant_id', $partner->tenant_id)
             ->update(['status' => 'failed']);
         return ['status' => 'terminated'];
     }

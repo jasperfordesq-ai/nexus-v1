@@ -166,7 +166,11 @@ class FederationPartnershipService
         $permissions = array_merge($defaultPermissions, $permissions);
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('partner_tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->update([
                 'status' => 'active',
                 'approved_at' => now(),
                 'approved_by' => $approvedBy,
@@ -178,6 +182,9 @@ class FederationPartnershipService
                 'groups_enabled' => $permissions['groups'] ? 1 : 0,
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.partnership_no_longer_pending_approval')];
+            }
 
             FederationAuditService::log(
                 'partnership_approved',
@@ -235,7 +242,11 @@ class FederationPartnershipService
             // Store the proposed level in counter_proposed_level only — do NOT
             // update federation_level yet. The level is only applied when the
             // original requester calls acceptCounterProposal().
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('partner_tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->update([
                 'counter_proposed_at' => now(),
                 'counter_proposed_by' => $proposedBy,
                 'counter_proposal_message' => $message,
@@ -243,6 +254,9 @@ class FederationPartnershipService
                 'counter_proposed_permissions' => json_encode($proposedPermissions),
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.partnership_no_longer_pending')];
+            }
 
             FederationAuditService::log(
                 'partnership_counter_proposed',
@@ -294,7 +308,12 @@ class FederationPartnershipService
         $permissions = array_merge($defaultPermissions, $proposedPermissions);
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->whereNotNull('counter_proposed_at')
+                ->update([
                 'status' => 'active',
                 'federation_level' => $acceptedLevel,
                 'approved_at' => now(),
@@ -307,6 +326,9 @@ class FederationPartnershipService
                 'groups_enabled' => $permissions['groups'] ? 1 : 0,
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.counter_proposal_no_longer_available')];
+            }
 
             FederationAuditService::log(
                 'partnership_counter_accepted',
@@ -348,13 +370,20 @@ class FederationPartnershipService
         }
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('partner_tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->update([
                 'status' => 'rejected',
                 'terminated_at' => now(),
                 'terminated_by' => $rejectedBy,
                 'termination_reason' => $reason ?? 'Request rejected',
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.partnership_no_longer_pending_approval')];
+            }
 
             FederationAuditService::log(
                 'partnership_rejected',
@@ -389,13 +418,23 @@ class FederationPartnershipService
         }
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('status', 'active')
+                ->where(function ($query) use ($tenantId): void {
+                    $query->where('tenant_id', $tenantId)
+                        ->orWhere('partner_tenant_id', $tenantId);
+                })
+                ->update([
                 'status' => 'suspended',
                 'termination_reason' => $reason,
                 'suspended_by' => $suspendedBy,
                 'suspended_by_tenant_id' => $tenantId,
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.partnership_cannot_be_suspended')];
+            }
 
             FederationAuditService::log(
                 'partnership_suspended',
@@ -442,13 +481,27 @@ class FederationPartnershipService
         }
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            $updated = DB::table('federation_partnerships')
+                ->where('id', $partnershipId)
+                ->where('status', 'suspended')
+                ->where(function ($query) use ($tenantId): void {
+                    $query->where('tenant_id', $tenantId)
+                        ->orWhere('partner_tenant_id', $tenantId);
+                })
+                ->where(function ($query) use ($tenantId): void {
+                    $query->whereNull('suspended_by_tenant_id')
+                        ->orWhere('suspended_by_tenant_id', $tenantId);
+                })
+                ->update([
                 'status' => 'active',
                 'termination_reason' => null,
                 'suspended_by' => null,
                 'suspended_by_tenant_id' => null,
                 'updated_at' => now(),
             ]);
+            if ($updated === 0) {
+                return ['success' => false, 'error' => __('api.federation.partnership_cannot_be_reactivated')];
+            }
 
             FederationAuditService::log(
                 'partnership_reactivated',
@@ -482,14 +535,24 @@ class FederationPartnershipService
         $partnerTenantId = (int) $partnership['partner_tenant_id'];
 
         try {
-            DB::transaction(function () use ($partnershipId, $partnershipTenantId, $partnerTenantId, $terminatedBy, $reason, $partnership) {
-                DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+            DB::transaction(function () use ($partnershipId, $partnershipTenantId, $partnerTenantId, $terminatedBy, $reason, $partnership, $tenantId) {
+                $updated = DB::table('federation_partnerships')
+                    ->where('id', $partnershipId)
+                    ->whereIn('status', ['active', 'suspended', 'pending', 'rejected'])
+                    ->where(function ($query) use ($tenantId): void {
+                        $query->where('tenant_id', $tenantId)
+                            ->orWhere('partner_tenant_id', $tenantId);
+                    })
+                    ->update([
                     'status' => 'terminated',
                     'terminated_at' => now(),
                     'terminated_by' => $terminatedBy,
                     'termination_reason' => $reason,
                     'updated_at' => now(),
                 ]);
+                if ($updated === 0) {
+                    throw new \RuntimeException(__('api.federation.partnership_cannot_be_terminated'));
+                }
 
                 // Sever cross-tenant connections between these two tenants.
                 // federation_connections status ENUM only supports 'pending','accepted','rejected'

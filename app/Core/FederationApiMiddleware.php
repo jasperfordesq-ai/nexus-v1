@@ -159,7 +159,7 @@ class FederationApiMiddleware
             return self::sendError(401, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
         }
 
-        if (!self::verifyHmacSignature($signature, $partner['signing_secret'], $timestamp)) {
+        if (!self::verifyHmacSignature((int) $partner['id'], $signature, $partner['signing_secret'], $timestamp)) {
             return self::sendError(401, 'Invalid request signature', 'SIGNATURE_INVALID');
         }
 
@@ -238,7 +238,7 @@ class FederationApiMiddleware
     /**
      * Verify HMAC-SHA256 signature.
      */
-    private static function verifyHmacSignature(string $signature, string $secret, string $timestamp): bool
+    private static function verifyHmacSignature(int $partnerId, string $signature, string $secret, string $timestamp): bool
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD']);
         $path = $_SERVER['REQUEST_URI'];
@@ -256,15 +256,16 @@ class FederationApiMiddleware
         // non-atomic has() + put() pattern which has a TOCTOU race condition
         // where two concurrent requests with the same nonce both pass the
         // has() check before either calls put().
-        $cacheKey = "federation_nonce:{$nonce}";
-        if (!Cache::add($cacheKey, true, self::TIMESTAMP_TOLERANCE)) {
-            return false; // Nonce already seen — replay detected
-        }
+        $cacheKey = "federation_nonce:{$partnerId}:{$nonce}";
 
         $stringToSign = implode("\n", [$method, $path, $timestamp, $nonce, $body]);
         $expectedSignature = hash_hmac('sha256', $stringToSign, $secret);
 
-        return hash_equals($expectedSignature, $signature);
+        if (!hash_equals($expectedSignature, $signature)) {
+            return false;
+        }
+
+        return Cache::add($cacheKey, true, self::TIMESTAMP_TOLERANCE);
     }
 
     /**
@@ -386,7 +387,30 @@ class FederationApiMiddleware
         }
 
         $permissions = json_decode(self::$authenticatedPartner['permissions'] ?? '[]', true);
-        return in_array($feature, $permissions) || in_array('*', $permissions);
+        if (!is_array($permissions)) {
+            return false;
+        }
+
+        $family = explode(':', $feature, 2)[0];
+
+        return in_array($feature, $permissions, true)
+            || in_array('*', $permissions, true)
+            || in_array("{$family}:*", $permissions, true)
+            || in_array($family, $permissions, true);
+    }
+
+    /**
+     * @param array<int, string> $features
+     */
+    public static function hasAnyPermission(array $features): bool
+    {
+        foreach ($features as $feature) {
+            if (self::hasPermission($feature)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * FederatedIdentity — maps a local User to an identity on a federation partner.
  *
- * NOT tenant-scoped: federation is cross-tenant by design. Tenant isolation is
- * enforced by the local_user → users.tenant_id relationship.
+ * Tenant-scoped by the local user's tenant so partner identity IDs cannot
+ * collide across communities.
  */
 class FederatedIdentity extends Model
 {
@@ -25,6 +25,7 @@ class FederatedIdentity extends Model
     protected $table = 'federated_identities';
 
     protected $fillable = [
+        'tenant_id',
         'local_user_id',
         'partner_id',
         'external_user_id',
@@ -34,6 +35,7 @@ class FederatedIdentity extends Model
     ];
 
     protected $casts = [
+        'tenant_id' => 'integer',
         'verified_at' => 'datetime',
     ];
 
@@ -45,14 +47,11 @@ class FederatedIdentity extends Model
     /**
      * The federation_external_partners row this identity belongs to.
      *
-     * Note: there is currently no FederationPartner Eloquent model — the
-     * federation code accesses `federation_external_partners` via the DB
-     * facade. We still expose a relationship for future refactors; callers
-     * that need the partner row today should query via DB facade.
+     * The relation targets the federation_external_partners table via
+     * the FederationExternalPartner Eloquent model.
      */
     public function partner(): BelongsTo
     {
-        // Lazy: use a generic Model pointed at federation_external_partners.
-        return $this->belongsTo(Model::class, 'partner_id');
+        return $this->belongsTo(FederationExternalPartner::class, 'partner_id');
     }
 }

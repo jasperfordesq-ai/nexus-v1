@@ -500,6 +500,19 @@ class FederationExternalApiClient
         $apiPath = rtrim($partner['api_path'] ?? '/api/v1', '/');
         $url = $baseUrl . $apiPath . '/' . ltrim($endpoint, '/');
 
+        $ssrfError = FederationExternalPartnerService::validateBaseUrl($baseUrl);
+        if ($ssrfError) {
+            self::logApiCall($partnerId, $endpoint, $method, 0, false, 0, 'Unsafe partner base URL: ' . $ssrfError);
+            return ['success' => false, 'error' => __('api.federation.partner_url_failed_safety_validation'), 'status_code' => 0];
+        }
+
+        if ($method === 'GET' && !empty($data)) {
+            $query = http_build_query($data, '', '&', PHP_QUERY_RFC3986);
+            if ($query !== '') {
+                $url .= (str_contains($url, '?') ? '&' : '?') . $query;
+            }
+        }
+
         // ---- Build body (for signing & sending) ----
         $body = ($method === 'GET') ? '' : json_encode($data);
 
@@ -539,7 +552,7 @@ class FederationExternalApiClient
                     ->acceptJson();
 
                 if ($method === 'GET') {
-                    $lastResponse = $pending->get($url, $data);
+                    $lastResponse = $pending->get($url);
                 } elseif ($method === 'DELETE' && empty($data)) {
                     $lastResponse = $pending->delete($url);
                 } else {
@@ -679,6 +692,15 @@ class FederationExternalApiClient
             $clientId = $partner['oauth_client_id'];
             $clientSecret = self::decryptCredential($partner['oauth_client_secret']);
             $tokenUrl = $partner['oauth_token_url'];
+            $tokenUrlScheme = strtolower((string) parse_url($tokenUrl, PHP_URL_SCHEME));
+            if ($tokenUrlScheme !== 'https') {
+                throw new \RuntimeException(__('api.federation.oauth_token_url_https_required'));
+            }
+
+            $ssrfError = FederationExternalPartnerService::validateBaseUrl($tokenUrl);
+            if ($ssrfError) {
+                throw new \RuntimeException(__('api.federation.oauth_token_url_failed_safety_validation', ['reason' => $ssrfError]));
+            }
 
             $response = Http::timeout(10)->withOptions(['verify' => true])->asForm()->post($tokenUrl, [
                 'grant_type' => 'client_credentials',
@@ -889,7 +911,7 @@ class FederationExternalApiClient
 
         $query = DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->where('status', 'active');
+            ->whereIn('status', ['active', 'failed']);
 
         if ($tenantId) {
             $query->where('tenant_id', $tenantId);

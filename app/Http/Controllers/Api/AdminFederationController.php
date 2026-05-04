@@ -208,6 +208,8 @@ class AdminFederationController extends BaseApiController
                     'show_reviews_federated', 'messaging_enabled_federated',
                     'transactions_enabled_federated', 'email_notifications',
                     'service_reach', 'travel_radius_km',
+                    'allow_inbound_partnerships', 'auto_approve_partners',
+                    'shared_categories', 'max_partnerships',
                 ];
                 $filtered = array_intersect_key($input['settings'], array_flip($allowedSettingKeys));
                 $federationSettings = array_merge($federationSettings, $filtered);

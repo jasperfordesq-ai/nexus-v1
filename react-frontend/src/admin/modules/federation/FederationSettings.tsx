@@ -15,6 +15,7 @@ import Network from 'lucide-react/icons/network';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import KeyRound from 'lucide-react/icons/key-round';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
@@ -32,7 +33,8 @@ interface FedSettings {
 }
 
 export function FederationSettings() {
-  usePageTitle("Federation");
+  const { t } = useTranslation('admin', { keyPrefix: 'federation' });
+  usePageTitle(t('federation_settings_title'));
   const toast = useToast();
 
   const [data, setData] = useState<FedSettings | null>(null);
@@ -54,11 +56,11 @@ export function FederationSettings() {
         setDirty(false);
       }
     } catch {
-      toast.error("Failed to load federation settings");
+      toast.error(t('failed_to_load_federation_settings'));
       setData(null);
     }
     setLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -86,26 +88,26 @@ export function FederationSettings() {
         settings: data.settings,
       });
       if (res.success) {
-        toast.success("Federation settings saved successfully");
+        toast.success(t('federation_settings_saved_successfully'));
         setDirty(false);
       } else {
-        const error = (res as { error?: string }).error || "Save failed";
+        const error = (res as { error?: string }).error || t('save_failed');
         toast.error(error);
       }
     } catch {
-      toast.error("Failed to save federation settings");
+      toast.error(t('failed_to_save_federation_settings'));
     } finally {
       setSaving(false);
     }
-  }, [data, toast])
+  }, [data, t, toast])
 
 
   if (loading) {
     return (
       <div>
         <PageHeader
-          title={"Federation Settings"}
-          description={"Configure federation settings including profile, limits, and permissions"}
+          title={t('federation_settings_title')}
+          description={t('federation_settings_desc')}
         />
         <div className="space-y-6">
           <Card shadow="sm">
@@ -142,19 +144,19 @@ export function FederationSettings() {
     return (
       <div>
         <PageHeader
-          title={"Federation Settings"}
-          description={"Configure federation settings including profile, limits, and permissions"}
+          title={t('federation_settings_title')}
+          description={t('federation_settings_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
-              {"Refresh"}
+              {t('refresh')}
             </Button>
           }
         />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-8 text-default-400">
             <Network size={40} className="mb-2" />
-            <p>{"Not Enabled for Tenant"}</p>
-            <p className="text-xs">{"Enable from Tenant Features"}</p>
+            <p>{t('not_enabled_for_tenant')}</p>
+            <p className="text-xs">{t('enable_from_tenant_features')}</p>
           </CardBody>
         </Card>
       </div>
@@ -164,8 +166,8 @@ export function FederationSettings() {
   return (
     <div>
       <PageHeader
-        title={"Federation Settings"}
-        description={"Configure federation settings including profile, limits, and permissions"}
+        title={t('federation_settings_title')}
+        description={t('federation_settings_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -174,7 +176,7 @@ export function FederationSettings() {
               onPress={loadData}
               size="sm"
             >
-              {"Refresh"}
+              {t('refresh')}
             </Button>
             <Button
               color="primary"
@@ -184,7 +186,7 @@ export function FederationSettings() {
               isDisabled={!dirty}
               size="sm"
             >
-              {"Save Changes"}
+              {t('save_changes')}
             </Button>
           </div>
         }
@@ -199,67 +201,67 @@ export function FederationSettings() {
           <CardBody className="flex flex-row items-start gap-3 text-sm">
             <KeyRound size={18} className="text-default-500 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium">JWT-based federation auth is configured at platform level</p>
+              <p className="font-medium">{t('jwt_federation_auth_platform_title')}</p>
               <p className="text-default-500 mt-1">
-                Most partners authenticate via API key, HMAC, or OAuth2 — those are configured
-                per-partner in <strong>External Partners</strong> and need no platform setup.
-                If a partner specifically requires JWT auth, the platform super-admin must set{' '}
+                {t('jwt_federation_auth_platform_intro')}{' '}
+                <strong>{t('external_partners')}</strong>{' '}
+                {t('jwt_federation_auth_platform_middle')}{' '}
                 <code className="text-xs bg-default-100 px-1 rounded">FEDERATION_JWT_SECRET</code>{' '}
-                in the server environment. Status and setup instructions live under{' '}
-                <strong>Super Admin → Federation Controls</strong>.
+                {t('jwt_federation_auth_platform_suffix')}{' '}
+                <strong>{t('label_super_admin')} / {t('federation_controls')}</strong>.
               </p>
             </div>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Federation Status"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('federation_status')}</h3></CardHeader>
           <CardBody>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Federation Enabled"}</p>
-                <p className="text-sm text-default-500">{"Enable federation to allow this community to partner with others"}</p>
+                <p className="font-medium">{t('federation_enabled')}</p>
+                <p className="text-sm text-default-500">{t('federation_enabled_desc')}</p>
               </div>
               <Switch
                 isSelected={data.federation_enabled}
                 onValueChange={(val) => updateField('federation_enabled', val)}
-                aria-label={"Federation Enabled"}
+                aria-label={t('federation_enabled')}
               />
             </div>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{"Partnership Preferences"}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('partnership_preferences')}</h3></CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Allow Inbound Partnerships"}</p>
-                <p className="text-sm text-default-500">{"Allow other communities to send partnership requests to this community"}</p>
+                <p className="font-medium">{t('allow_inbound_partnerships')}</p>
+                <p className="text-sm text-default-500">{t('allow_inbound_partnerships_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.allow_inbound_partnerships ?? true}
                 onValueChange={(val) => updateField('allow_inbound_partnerships', val)}
-                aria-label={"Allow Inbound Partnerships"}
+                aria-label={t('allow_inbound_partnerships')}
               />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{"Auto Approve Partners"}</p>
-                <p className="text-sm text-default-500">{"Automatically approve incoming partnership requests without manual review"}</p>
+                <p className="font-medium">{t('auto_approve_partners')}</p>
+                <p className="text-sm text-default-500">{t('auto_approve_partners_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
                 onValueChange={(val) => updateField('auto_approve_partners', val)}
-                aria-label={"Auto Approve Partners"}
+                aria-label={t('auto_approve_partners')}
               />
             </div>
             <Divider />
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium">{"Max Partnerships"}</p>
-                <p className="text-sm text-default-500">{"Maximum number of active partnerships this community can maintain"}</p>
+                <p className="font-medium">{t('max_partnerships')}</p>
+                <p className="text-sm text-default-500">{t('max_partnerships_desc')}</p>
               </div>
               <Input
                 type="number"
@@ -270,7 +272,7 @@ export function FederationSettings() {
                 className="w-24"
                 min={1}
                 max={100}
-                aria-label={"Max Partnerships"}
+                aria-label={t('max_partnerships')}
               />
             </div>
           </CardBody>

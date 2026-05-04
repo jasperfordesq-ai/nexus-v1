@@ -12,7 +12,6 @@ use App\Core\TenantContext;
 use App\Events\UserFederatedOptOut;
 use App\Models\FederatedIdentity;
 use App\Services\FederationExternalApiClient;
-use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -53,6 +52,7 @@ class PushFederationDataRetraction implements ShouldQueue
 
             // Find all federated identities for this user (cross-partner links)
             $identities = FederatedIdentity::query()
+                ->where('tenant_id', $tenantId)
                 ->where('local_user_id', $userId)
                 ->get();
 
@@ -60,16 +60,10 @@ class PushFederationDataRetraction implements ShouldQueue
                 return;
             }
 
-            // Get all active partners that allow member sync — they are the
-            // ones most likely to have a cached copy of the profile.
-            // We also attempt retraction for any partner with a federated
-            // identity, even without allow_member_sync, to be safe.
-            $allowedPartners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_member_sync');
-            $allowedPartnerIds = array_flip(array_map(fn ($p) => (int) $p['id'], $allowedPartners));
-
+            // Notify every linked partner, even if member-sync is currently disabled.
             foreach ($identities as $identity) {
                 $partnerId = (int) $identity->partner_id;
-                if ($partnerId <= 0 || !isset($allowedPartnerIds[$partnerId])) {
+                if ($partnerId <= 0) {
                     continue;
                 }
 

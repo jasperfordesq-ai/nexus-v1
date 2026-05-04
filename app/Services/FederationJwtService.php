@@ -255,8 +255,30 @@ class FederationJwtService
 
             $requestedScope = $request->input('scope', '');
             if (!empty($requestedScope)) {
-                $requestedScopes = explode(' ', $requestedScope);
-                $scopes = array_intersect($requestedScopes, $scopes) ?: $scopes;
+                $requestedScopes = array_values(array_filter(explode(' ', $requestedScope)));
+                if (in_array('*', $scopes, true)) {
+                    $scopes = $requestedScopes;
+                } else {
+                    $expandedScopes = [];
+                    foreach ($requestedScopes as $requested) {
+                        $family = explode(':', $requested, 2)[0];
+                        if (
+                            in_array($requested, $scopes, true)
+                            || in_array("{$family}:*", $scopes, true)
+                            || in_array($family, $scopes, true)
+                        ) {
+                            $expandedScopes[] = $requested;
+                        }
+                    }
+
+                    $scopes = array_values(array_unique($expandedScopes));
+                    if (empty($scopes)) {
+                        return [
+                            'error' => 'invalid_scope',
+                            'error_description' => __('api.federation.oauth_invalid_scope'),
+                        ];
+                    }
+                }
             }
 
             // Generate token

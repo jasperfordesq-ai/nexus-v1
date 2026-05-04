@@ -67,6 +67,7 @@ class PushMessageToFederatedPartner implements ShouldQueue
                 // Try the federation_messages shadow row
                 $row = DB::table('federation_messages')
                     ->where('reference_message_id', $message->id)
+                    ->where('sender_tenant_id', $event->tenantId)
                     ->where('direction', 'outbound')
                     ->whereNotNull('external_partner_id')
                     ->first();
@@ -85,8 +86,12 @@ class PushMessageToFederatedPartner implements ShouldQueue
 
             $payload = [
                 'sender_id'         => $event->sender->id,
+                'sender_user_id'    => $event->sender->id,
                 'sender_tenant_id'  => $event->tenantId,
                 'receiver_id'       => $externalReceiverId,
+                'receiver_user_id'  => $externalReceiverId,
+                'recipient_id'      => $externalReceiverId,
+                'external_receiver_id' => $externalReceiverId,
                 'subject'           => $message->subject ?? '',
                 'body'              => $message->body ?? '',
                 'message_id'        => $message->id,

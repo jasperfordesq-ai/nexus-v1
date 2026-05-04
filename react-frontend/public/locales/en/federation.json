@@ -345,6 +345,8 @@
     "load_more": "Load More",
     "load_error": "Could not load groups. Please try again.",
     "load_more_error": "Could not load more groups.",
+    "member_count": "{{count}} member",
+    "member_count_plural": "{{count}} members",
     "private": "Private"
   },
 
