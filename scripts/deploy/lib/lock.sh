@@ -6,39 +6,52 @@
 # Requires common.sh and state.sh already sourced. Maintenance helpers
 # sourced lazily inside cleanup() to avoid load-order issues.
 
-check_lock() {
-    if [ -f "$LOCK_FILE" ]; then
-        LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "0")
+# Atomic lock using mkdir(2). On all POSIX filesystems mkdir is atomic — only
+# ONE caller wins when two scripts race. This eliminates the TOCTOU window in
+# the previous "stat then echo $$ >" approach.
+LOCK_DIR="${LOCK_FILE}.d"
 
-        # Lock files older than 2 hours are always stale (no legitimate deploy takes that long,
-        # even with --no-cache full rebuilds + migrations). This is a safety net — the EXIT trap
-        # should already have removed the lock in normal failure paths.
-        LOCK_AGE=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo "0") ))
-        if [ "$LOCK_AGE" -gt 7200 ]; then
-            log_warn "Lock file is $((LOCK_AGE / 60))m old (>2h) — removing stale lock"
-            rm -f "$LOCK_FILE"
+check_lock() {
+    # Stale-recovery sweep BEFORE attempting to acquire. If the lock dir is
+    # >2 h old or the recorded PID is dead/recycled, drop it.
+    if [ -d "$LOCK_DIR" ]; then
+        local lock_age recorded_pid
+        lock_age=$(( $(date +%s) - $(stat -c %Y "$LOCK_DIR" 2>/dev/null || echo 0) ))
+
+        if [ "$lock_age" -gt 7200 ]; then
+            log_warn "Lock dir is $((lock_age / 60))m old (>2h) — removing stale lock"
+            rm -rf "$LOCK_DIR"
             return
         fi
 
-        if ps -p "$LOCK_PID" > /dev/null 2>&1; then
-            # Verify it's actually a deploy process, not a recycled PID
-            PROC_CMD=$(ps -p "$LOCK_PID" -o args= 2>/dev/null || echo "")
-            if echo "$PROC_CMD" | grep -Eq "safe-deploy|bluegreen-deploy"; then
-                log_err "Another deployment is running (PID: $LOCK_PID, age: $((LOCK_AGE / 60))m)"
-                exit 1
-            else
-                log_warn "Stale lock (PID $LOCK_PID recycled to different process) — removing"
-                rm -f "$LOCK_FILE"
-            fi
-        else
-            log_warn "Stale lock file found (PID $LOCK_PID dead) — removing"
-            rm -f "$LOCK_FILE"
+        recorded_pid="$(cat "$LOCK_DIR/pid" 2>/dev/null || echo "0")"
+        if ! ps -p "$recorded_pid" > /dev/null 2>&1; then
+            log_warn "Stale lock (PID $recorded_pid dead) — removing"
+            rm -rf "$LOCK_DIR"
+            return
+        fi
+        local proc_cmd
+        proc_cmd="$(ps -p "$recorded_pid" -o args= 2>/dev/null || echo "")"
+        if ! echo "$proc_cmd" | grep -Eq "safe-deploy|bluegreen-deploy"; then
+            log_warn "Stale lock (PID $recorded_pid recycled) — removing"
+            rm -rf "$LOCK_DIR"
+            return
         fi
     fi
 }
 
 create_lock() {
-    echo $$ > "$LOCK_FILE"
+    # mkdir is atomic — the loser sees EEXIST and we exit cleanly.
+    if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+        local recorded_pid age
+        recorded_pid="$(cat "$LOCK_DIR/pid" 2>/dev/null || echo unknown)"
+        age=$(( $(date +%s) - $(stat -c %Y "$LOCK_DIR" 2>/dev/null || echo 0) ))
+        log_err "Another deployment is running (PID: $recorded_pid, age: $((age / 60))m)"
+        exit 1
+    fi
+    echo "$$" > "$LOCK_DIR/pid"
+    # Mirror to legacy LOCK_FILE for any external watcher that still polls it.
+    echo "$$" > "$LOCK_FILE"
     log_info "Deployment lock created (PID: $$)"
 }
 
@@ -66,8 +79,9 @@ cleanup() {
             || log_err "Could not auto-disable maintenance mode — run: sudo bash scripts/maintenance.sh off"
     fi
 
-    if [ -f "$LOCK_FILE" ]; then
-        rm -f "$LOCK_FILE"
+    if [ -d "$LOCK_DIR" ] || [ -f "$LOCK_FILE" ]; then
+        rm -rf "$LOCK_DIR" 2>/dev/null || true
+        rm -f "$LOCK_FILE" 2>/dev/null || true
         log_info "Deployment lock released"
     fi
 }

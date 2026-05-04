@@ -5,32 +5,33 @@ set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/../lib/common.sh"
+. "$SCRIPT_DIR/../lib/db-backup.sh"
 
 run_laravel_artisan_migrate() {
     log_step "=== Laravel Artisan Migrations ==="
 
-    if ! docker exec nexus-php-app test -f /var/www/html/artisan 2>/dev/null; then
+    local app_container="${PHP_CONTAINER:-nexus-php-app}"
+
+    if ! docker exec "$app_container" test -f /var/www/html/artisan 2>/dev/null; then
         log_info "artisan not found — skipping Laravel migrations"
         return 0
     fi
 
-    log_info "Taking pre-migration database snapshot..."
-    local BACKUP_DIR="/opt/nexus-php/backups"
-    mkdir -p "$BACKUP_DIR"
-    local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S)-laravel.sql.gz"
-    local DB_PASS
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
-    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
-        log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
-        find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete
-    else
-        log_err "Database backup failed — aborting migration to prevent unrecoverable data loss"
-        rm -f "$BACKUP_FILE"
+    local pending
+    pending="$(db_pending_migration_count "$app_container")"
+    if [ "${pending:-0}" -eq 0 ]; then
+        log_ok "No pending migrations — skipping backup and migrate"
+        return 0
+    fi
+
+    log_warn "$pending pending migration(s) detected. Backing up before migrate."
+    if ! db_backup_with_offsite "$app_container"; then
+        log_err "Pre-migration backup failed — aborting migration to prevent unrecoverable data loss"
         return 1
     fi
 
     log_info "Running php artisan migrate --force..."
-    if docker exec nexus-php-app php /var/www/html/artisan migrate --force 2>&1 | tee -a "$LOG_FILE"; then
+    if docker exec "$app_container" php /var/www/html/artisan migrate --force 2>&1 | tee -a "$LOG_FILE"; then
         log_ok "Laravel artisan migrations completed"
     else
         log_err "Laravel artisan migrate failed"

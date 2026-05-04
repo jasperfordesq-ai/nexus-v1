@@ -33,12 +33,18 @@ VEOF
 # docker cp the file in directly.  In legacy mode httpdocs IS bind-mounted, so
 # writing to the host path is enough.
 if [ "$DEPLOY_MODE" = "bluegreen" ]; then
-    # Determine the active container from the bluegreen state file
-    _BG_STATE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
-    if [ -f "$_BG_STATE" ]; then
-        _BG_COLOR="$(tr -d '[:space:]' < "$_BG_STATE" 2>/dev/null || echo blue)"
+    # Allow the orchestrator to target a specific color (used to bake the build
+    # version into the candidate BEFORE cutover, so post-cutover smoke tests
+    # can assert the public endpoint serves the new commit).
+    if [ -n "${NEXUS_BUILD_VERSION_COLOR:-}" ]; then
+        _BG_COLOR="$NEXUS_BUILD_VERSION_COLOR"
     else
-        _BG_COLOR="blue"
+        _BG_STATE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
+        if [ -f "$_BG_STATE" ]; then
+            _BG_COLOR="$(tr -d '[:space:]' < "$_BG_STATE" 2>/dev/null || echo blue)"
+        else
+            _BG_COLOR="blue"
+        fi
     fi
     _APP_CONTAINER="nexus-$_BG_COLOR-php-app"
     _TMP_FILE="$(mktemp)"

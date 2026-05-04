@@ -16,6 +16,7 @@ export DEPLOY_DIR
 . "$SELF_DIR/lib/common.sh"
 . "$SELF_DIR/lib/state.sh"
 . "$SELF_DIR/lib/lock.sh"
+. "$SELF_DIR/lib/db-backup.sh"
 
 mkdir -p "$LOG_DIR"
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
@@ -138,19 +139,34 @@ phase() {
 
 deploy_exit_trap() {
     local code=$?
+    local _end_ts duration_s
+    _end_ts="$(date +%s)"
+    duration_s=$(( _end_ts - ${DEPLOY_START_TS:-_end_ts} ))
+
     if [ "$code" -eq 0 ]; then
         write_deploy_status "success" "complete" "${CURRENT_TARGET:-$(read_active_color 2>/dev/null || echo unknown)}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
     else
         write_deploy_status "failed" "failed" "${CURRENT_ACTIVE:-$(read_active_color 2>/dev/null || echo unknown)}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
     fi
+
+    # Append telemetry record (deploys.jsonl) — change-failure-rate / MTTR source
+    local _status _subcommand _color
+    [ "$code" -eq 0 ] && _status="success" || _status="failed"
+    _subcommand="${CURRENT_SUBCOMMAND:-deploy}"
+    _color="${CURRENT_TARGET:-}"
+    bash "$SELF_DIR/phases/record-deploy-metrics.sh" \
+        "$_status" "$_subcommand" \
+        "${CURRENT_COMMIT:-}" "${CURRENT_PREV_COMMIT:-}" \
+        "$_color" "$duration_s" \
+        2>/dev/null || true
+
     # Post-deploy notification (non-blocking)
-    local _notify_status
-    [ "$code" -eq 0 ] && _notify_status="success" || _notify_status="failure"
     bash "$SELF_DIR/phases/notify-deploy.sh" \
-        "$_notify_status" \
+        "$_status" \
         "${CURRENT_COMMIT:0:12}" \
         "$(git -C "$DEPLOY_DIR" log -1 --format='%s' "${CURRENT_COMMIT:-HEAD}" 2>/dev/null || true)" \
         "${CURRENT_TARGET:-}" \
+        "${duration_s}s" \
         2>/dev/null || true
     cleanup
     exit "$code"
@@ -367,26 +383,26 @@ run_candidate_migrations() {
     app_container="$(container_name "$color" app)"
 
     if [ "$LARAVEL_MIGRATE" != "1" ]; then
-        log_info "Skipping database migrations. Use --migrate for backwards-compatible migrations."
+        log_info "Skipping database migrations (--no-migrate)"
         return 0
     fi
 
     log_step "=== Candidate Laravel Migrations ($color) ==="
     write_deploy_status "running" "Candidate Laravel Migrations ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
-    log_warn "Running migrations online. Only expand/contract-safe migrations belong in this path."
 
+    # Skip backup + migrate entirely when nothing is pending — no point dumping
+    # the DB just to verify the schema is already current.
+    local pending
+    pending="$(db_pending_migration_count "$app_container")"
+    if [ "${pending:-0}" -eq 0 ]; then
+        log_ok "No pending migrations — skipping backup and migrate"
+        return 0
+    fi
+
+    log_warn "$pending pending migration(s) detected. Running expand/contract-safe migrations online."
     log_info "Taking pre-migration database snapshot..."
-    local BACKUP_DIR="/opt/nexus-php/backups"
-    mkdir -p "$BACKUP_DIR"
-    local BACKUP_FILE="$BACKUP_DIR/pre-migrate-$(date +%Y%m%d-%H%M%S)-bluegreen.sql.gz"
-    local DB_PASS
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
-    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqldump -u nexus nexus 2>/dev/null | gzip > "$BACKUP_FILE"; then
-        log_ok "Database backed up to $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
-        find "$BACKUP_DIR" -name "pre-migrate-*.sql.gz" -mtime +7 -delete
-    else
-        log_err "Database backup failed — aborting migration to prevent unrecoverable data loss"
-        rm -f "$BACKUP_FILE"
+    if ! db_backup_with_offsite "$app_container"; then
+        log_err "Pre-migration backup failed — aborting migration to prevent unrecoverable data loss"
         return 1
     fi
 
@@ -517,7 +533,57 @@ deploy_candidate() {
     compose_for_release "$release_dir" up -d --build app frontend sales
     wait_for_color "$color"
     optimize_candidate_laravel "$color"
+    verify_candidate_images "$color"
+    write_candidate_build_version "$color"
+    check_candidate_migration_safety "$color" "$release_dir"
     run_candidate_migrations "$color"
+    verify_candidate_build_version "$color"
+}
+
+verify_candidate_images() {
+    local color="$1"
+    phase "Candidate Image Verification ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
+    NEXUS_VERIFY_COLOR="$color" BUILD_COMMIT="${CURRENT_COMMIT:0:12}" \
+        bash "$SELF_DIR/phases/verify-images.sh"
+}
+
+write_candidate_build_version() {
+    local color="$1"
+    phase "Bake Build Version ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
+    NEXUS_BUILD_VERSION_COLOR="$color" MODE=bluegreen \
+        bash "$SELF_DIR/phases/write-build-version.sh"
+}
+
+check_candidate_migration_safety() {
+    local color="$1"
+    local release_dir="$2"
+    phase "Migration Safety Gate ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
+    NEXUS_RELEASE_DIR="$release_dir" \
+    NEXUS_CANDIDATE_CONTAINER="$(container_name "$color" app)" \
+        bash "$SELF_DIR/phases/check-migration-safety.sh"
+}
+
+# Hits the candidate's local API port directly (bypassing Apache + Cloudflare)
+# and asserts /version.php returns the commit we just built. Catches the case
+# where the right image was tagged but a stale layer was reused.
+verify_candidate_build_version() {
+    local color="$1"
+    local api_port _ _2
+    read -r api_port _ _2 < <(ports_for_color "$color")
+    phase "Verify Candidate Build Version ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
+    local response served_commit
+    response="$(curl -sf "http://127.0.0.1:$api_port/version.php" 2>/dev/null || true)"
+    if [ -z "$response" ]; then
+        log_err "Candidate /version.php did not respond on port $api_port"
+        return 1
+    fi
+    served_commit="$(echo "$response" | sed -n 's/.*"commit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+    if [ "$served_commit" != "$CURRENT_COMMIT" ]; then
+        log_err "Candidate served commit '$served_commit' but expected '$CURRENT_COMMIT'"
+        log_err "The image was built or tagged with the wrong commit. Aborting before cutover."
+        return 1
+    fi
+    log_ok "Candidate /version.php confirms commit $served_commit"
 }
 
 start_workers_for_color() {
@@ -534,16 +600,25 @@ start_workers_for_color() {
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
-    phase "Worker Cutover ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
+    phase "Start Workers ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
     compose_for_release "$release_dir" up -d queue scheduler
     wait_for_container_health "$(container_name "$color" queue)"
     wait_for_container_health "$(container_name "$color" scheduler)"
+    log_ok "Queue and scheduler workers are healthy for $color"
+}
 
+# Stops the OLD color's workers AFTER the new color has taken traffic. Keeping
+# them split avoids the window where new web code enqueues jobs that an old
+# worker handles with stale code.
+stop_workers_for_color() {
+    local color="$1"
+    phase "Stop Old Workers ($color)" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+    docker stop "$(container_name "$color" queue)" >/dev/null 2>&1 || true
+    docker stop "$(container_name "$color" scheduler)" >/dev/null 2>&1 || true
+    # Legacy single-color names from before blue/green
     docker stop nexus-php-queue >/dev/null 2>&1 || true
     docker stop nexus-php-scheduler >/dev/null 2>&1 || true
-    docker stop "$(container_name "$(inactive_color "$color")" queue)" >/dev/null 2>&1 || true
-    docker stop "$(container_name "$(inactive_color "$color")" scheduler)" >/dev/null 2>&1 || true
-    log_ok "Queue and scheduler workers are running for $color"
+    log_ok "Old workers stopped"
 }
 
 post_cutover_smoke() {
@@ -551,6 +626,26 @@ post_cutover_smoke() {
 
     curl -sf https://api.project-nexus.ie/up >/dev/null
     log_ok "Public API health passed"
+
+    # CRITICAL: prove the cutover is real. Without this, a misconfigured Apache
+    # include or a Cloudflare cache hit can keep the OLD color live and every
+    # other smoke test still passes. Compare the live commit to CURRENT_COMMIT.
+    local response served_commit
+    # Cache-Control: no-store on /version.php is set by httpdocs/version.php, but
+    # add a no-cache header anyway in case Cloudflare edge ignores it.
+    response="$(curl -sf -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+        "https://api.project-nexus.ie/version.php?_t=$(date +%s)" 2>/dev/null || true)"
+    if [ -z "$response" ]; then
+        log_err "Public /version.php did not respond"
+        return 1
+    fi
+    served_commit="$(echo "$response" | sed -n 's/.*"commit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+    if [ "$served_commit" != "$CURRENT_COMMIT" ]; then
+        log_err "Public API serves commit '$served_commit' but cutover targeted '$CURRENT_COMMIT'"
+        log_err "Apache route file may not have switched, or Cloudflare is caching /version.php."
+        return 1
+    fi
+    log_ok "Public /version.php confirms live commit is $served_commit"
 
     local bootstrap
     bootstrap="$(curl -sf -H "X-Tenant-Slug: hour-timebank" https://api.project-nexus.ie/api/v2/tenant/bootstrap || true)"
@@ -688,6 +783,9 @@ cmd_monitor() {
 }
 
 cmd_deploy() {
+    DEPLOY_START_TS="$(date +%s)"
+    CURRENT_SUBCOMMAND="deploy"
+    CURRENT_PREV_COMMIT="$(cat "$LAST_DEPLOY_FILE" 2>/dev/null || echo "")"
     require_route_switching
     state_init
     state_set DEPLOY_SUCCESS 0
@@ -718,14 +816,37 @@ cmd_deploy() {
 
     deploy_candidate "$target" "$release_dir" "$commit"
     smoke_color "$target"
+
+    # Start the NEW color's workers BEFORE web traffic switches. This eliminates
+    # the window where new web code enqueues jobs that old workers process with
+    # stale code expectations. Both colors' workers run in parallel briefly —
+    # safe because they pull from the same DB-backed queue and the new code is
+    # required to be backwards-compatible (see Migration Safety Gate).
+    if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
+        log_err "Could not start $target workers — aborting before web cutover. Active color $active is unaffected."
+        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
+        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
+        exit 1
+    fi
+
     write_apache_routes "$target"
     if ! post_cutover_smoke; then
         log_err "Public smoke failed after cutover; reverting traffic to $active"
         write_apache_routes "$active"
+        # New workers started, but cutover failed. Stop them; old workers were
+        # never stopped (we hadn't reached stop_workers_for_color "$active" yet)
+        # so the active color is fully restored.
+        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
+        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
         exit 1
     fi
-    # Purge Cloudflare cache after traffic switch — must run after smoke tests pass
-    # so CF doesn't cache the old content right after purge
+
+    # Cutover succeeded. Stop the OLD color's workers — the new color owns the
+    # queue from this point on.
+    stop_workers_for_color "$active"
+
+    # Purge Cloudflare cache after traffic switch — must run after smoke tests
+    # pass so CF doesn't cache the old content right after purge.
     if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
         phase "Cloudflare Cache Purge" "${CURRENT_ACTIVE:-}" "$target" "${CURRENT_COMMIT:-}"
         bash "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" 2>&1 | tee -a "$LOG_FILE" || \
@@ -734,21 +855,6 @@ cmd_deploy() {
         log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
     fi
     write_color_release "$target" "$commit" "$release_dir"
-    if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
-        log_err "Worker cutover failed; reverting web traffic to $active"
-        write_apache_routes "$active"
-        if release_meta="$(read_color_release "$active")"; then
-            commit="${release_meta%%|*}"
-            release_dir="${release_meta#*|}"
-            start_workers_for_color "$active" "$release_dir" "$commit" || true
-        else
-            docker start nexus-php-queue >/dev/null 2>&1 || true
-            docker start nexus-php-scheduler >/dev/null 2>&1 || true
-        fi
-        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
-        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
-        exit 1
-    fi
     run_prerender_for_color "$target" "$release_dir"
     schedule_followup_health_check
     git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
@@ -782,6 +888,9 @@ cmd_deploy() {
 }
 
 cmd_rollback() {
+    DEPLOY_START_TS="$(date +%s)"
+    CURRENT_SUBCOMMAND="rollback"
+    CURRENT_PREV_COMMIT="$(cat "$LAST_DEPLOY_FILE" 2>/dev/null || echo "")"
     require_route_switching
     state_init
     state_set DEPLOY_SUCCESS 0
@@ -810,33 +919,33 @@ cmd_rollback() {
     fi
     log_ok "Rollback target $ROLLBACK_APP is healthy — proceeding with traffic switch"
 
-    write_apache_routes "$target"
+    # Same ordering as cmd_deploy: bring rollback workers up FIRST, switch
+    # web traffic SECOND, stop the (failing) current workers LAST.
     if release_meta="$(read_color_release "$target")"; then
         commit="${release_meta%%|*}"
         release_dir="${release_meta#*|}"
         CURRENT_COMMIT="$commit"
         if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
-            log_err "Rollback worker cutover failed; restoring web traffic to $active"
-            write_apache_routes "$active"
+            log_err "Rollback worker start failed — keeping current active color $active"
             exit 1
         fi
     else
         log_warn "No release metadata found for $target workers; trying legacy containers"
         docker start nexus-php-queue >/dev/null 2>&1 || true
         docker start nexus-php-scheduler >/dev/null 2>&1 || true
-        docker stop "$(container_name "$active" queue)" >/dev/null 2>&1 || true
-        docker stop "$(container_name "$active" scheduler)" >/dev/null 2>&1 || true
     fi
+
+    write_apache_routes "$target"
     if ! post_cutover_smoke; then
         log_err "Rollback public smoke failed; restoring web traffic to $active"
         write_apache_routes "$active"
-        if release_meta="$(read_color_release "$active")"; then
-            commit="${release_meta%%|*}"
-            release_dir="${release_meta#*|}"
-            start_workers_for_color "$active" "$release_dir" "$commit" || true
-        fi
+        # Stop the workers we just brought up — old workers were never stopped
+        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
+        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
         exit 1
     fi
+    # Cutover succeeded — stop the failing color's workers
+    stop_workers_for_color "$active"
     # Purge Cloudflare cache after rollback traffic switch — prevents CF from
     # continuing to serve cached responses from the broken new deployment
     if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
