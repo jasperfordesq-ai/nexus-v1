@@ -155,6 +155,7 @@ class NewsletterService
             if (!$newsletter) {
                 throw new \Exception('Newsletter not found');
             }
+            $tenantId = (int) ($newsletter->tenant_id ?: TenantContext::getId());
 
             if ($newsletter->status === 'sent') {
                 throw new \Exception('Newsletter already sent');
@@ -162,8 +163,8 @@ class NewsletterService
 
             // Guard against re-send within a short window (email bombing fix, 2026-04-02).
             // If this newsletter was sent in the last 5 minutes, refuse to re-send.
-            // This catches edge cases where processRecurring() resets status to 'active'
-            // and a second runner immediately re-claims before last_sent_at propagates.
+            // This catches edge cases where recurring sends are re-claimed before
+            // recurring_last_sent propagates.
             if ($newsletter->sent_at) {
                 $secondsSinceLastSend = time() - strtotime($newsletter->sent_at);
                 if ($secondsSinceLastSend < 300) {
@@ -191,6 +192,7 @@ class NewsletterService
             // Only clear items that haven't been sent — preserve 'sent' records
             // to avoid nuking the audit trail if sendNow() is called twice.
             DB::table('newsletter_queue')
+                ->where('tenant_id', $tenantId)
                 ->where('newsletter_id', $newsletterId)
                 ->whereIn('status', ['pending', 'processing', 'failed'])
                 ->delete();
@@ -226,7 +228,7 @@ class NewsletterService
             return ['sent' => 0, 'failed' => 0];
         }
 
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) ($newsletter->tenant_id ?: TenantContext::getId());
         $tenantName = DB::table('tenants')
             ->where('id', $tenantId)
             ->value('name') ?? 'Community';
@@ -245,8 +247,11 @@ class NewsletterService
         // Step 2: SELECT only 'processing' items (ours) — safe from races.
         do {
             $claimed = DB::update(
-                "UPDATE newsletter_queue SET status = 'processing'
+                "UPDATE newsletter_queue
+                 SET status = 'processing',
+                     last_attempted_at = NOW()
                  WHERE newsletter_id = ?
+                   AND tenant_id = ?
                    AND (
                         status = 'pending'
                         OR (
@@ -255,9 +260,13 @@ class NewsletterService
                             AND (last_attempted_at IS NULL
                                  OR NOW() >= last_attempted_at + INTERVAL (POW(attempts, 2) * 60) SECOND)
                         )
+                        OR (
+                            status = 'processing'
+                            AND last_attempted_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+                        )
                    )
                  ORDER BY id ASC LIMIT ?",
-                [$newsletterId, self::MAX_SEND_ATTEMPTS, $batchSize]
+                [$newsletterId, $tenantId, self::MAX_SEND_ATTEMPTS, $batchSize]
             );
 
             if ($claimed === 0) {
@@ -269,6 +278,7 @@ class NewsletterService
             $pending = DB::table('newsletter_queue as nq')
                 ->leftJoin('users as u', 'nq.user_id', '=', 'u.id')
                 ->where('nq.newsletter_id', $newsletterId)
+                ->where('nq.tenant_id', $tenantId)
                 ->where('nq.status', 'processing')
                 ->limit($batchSize)
                 ->select('nq.*', 'u.preferred_language as subscriber_locale')
@@ -300,11 +310,14 @@ class NewsletterService
                         )
                     );
 
-                    $subject = $newsletter->subject;
+                    $subject = $item->subject_override
+                        ?: (($newsletter->ab_test_enabled && ($item->ab_variant ?? 'a') === 'b' && $newsletter->subject_b)
+                            ? $newsletter->subject_b
+                            : $newsletter->subject);
 
                     $apiUrl = rtrim(config('app.url', ''), '/');
                     $unsubscribeUrl = $unsubscribeToken
-                        ? $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken
+                        ? $apiUrl . '/v2/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken)
                         : null;
 
                     $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl);
@@ -312,6 +325,7 @@ class NewsletterService
                     if ($success) {
                         DB::table('newsletter_queue')
                             ->where('id', $item->id)
+                            ->where('tenant_id', $tenantId)
                             ->update([
                                 'status' => 'sent',
                                 'sent_at' => now(),
@@ -319,18 +333,18 @@ class NewsletterService
                             ]);
                         // Bump attempts counter via raw statement so column stays accurate
                         DB::statement(
-                            'UPDATE newsletter_queue SET attempts = attempts + 1 WHERE id = ?',
-                            [$item->id]
+                            'UPDATE newsletter_queue SET attempts = attempts + 1 WHERE id = ? AND tenant_id = ?',
+                            [$item->id, $tenantId]
                         );
                         $sent++;
                     } else {
-                        self::markAttemptFailed((int) $item->id, 'Email send failed');
+                        self::markAttemptFailed((int) $item->id, $tenantId, 'Email send failed');
                         $failed++;
                     }
 
                     usleep(self::EMAIL_DELAY_MICROSECONDS);
                 } catch (\Exception $e) {
-                    self::markAttemptFailed((int) $item->id, $e->getMessage());
+                    self::markAttemptFailed((int) $item->id, $tenantId, $e->getMessage());
                     $failed++;
                     Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
                 }
@@ -340,11 +354,14 @@ class NewsletterService
         // Update newsletter stats
         $stats = DB::table('newsletter_queue')
             ->where('newsletter_id', $newsletterId)
+            ->where('tenant_id', $tenantId)
             ->selectRaw("
                 SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
                 SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
-            ")
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as processing,
+                SUM(CASE WHEN status = 'failed' AND attempts < ? THEN 1 ELSE 0 END) as retryable_failed
+            ", [self::MAX_SEND_ATTEMPTS])
             ->first();
 
         $newsletter->update([
@@ -353,7 +370,11 @@ class NewsletterService
         ]);
 
         // If queue is complete, mark newsletter as sent (or failed if nothing went out)
-        if (((int) ($stats->pending ?? 0)) === 0) {
+        if (
+            ((int) ($stats->pending ?? 0)) === 0
+            && ((int) ($stats->processing ?? 0)) === 0
+            && ((int) ($stats->retryable_failed ?? 0)) === 0
+        ) {
             $totalSent   = (int) ($stats->sent ?? 0);
             $totalFailed = (int) ($stats->failed ?? 0);
             $finalStatus = ($totalSent === 0 && $totalFailed > 0) ? 'failed' : 'sent';
@@ -374,7 +395,7 @@ class NewsletterService
      * `attempts >= MAX_SEND_ATTEMPTS`, at which point processQueue() stops
      * re-claiming them (permanent failure).
      */
-    private static function markAttemptFailed(int $queueId, string $error): void
+    private static function markAttemptFailed(int $queueId, int $tenantId, string $error): void
     {
         DB::statement(
             "UPDATE newsletter_queue
@@ -382,8 +403,8 @@ class NewsletterService
                  attempts = attempts + 1,
                  last_attempted_at = NOW(),
                  error_message = ?
-             WHERE id = ?",
-            [mb_substr($error, 0, 2000), $queueId]
+             WHERE id = ? AND tenant_id = ?",
+            [mb_substr($error, 0, 2000), $queueId, $tenantId]
         );
     }
 
@@ -399,23 +420,35 @@ class NewsletterService
         // Build set of emails that were already successfully sent in this cycle.
         // This prevents re-queuing recipients if sendNow() is called twice
         // (email bombing fix, 2026-04-02).
+        $newsletter = DB::table('newsletters')->where('id', $newsletterId)->first([
+            'tenant_id',
+            'ab_test_enabled',
+            'ab_split_percentage',
+        ]);
+        $tenantId = (int) (($newsletter->tenant_id ?? null) ?: TenantContext::getId());
         $alreadySent = DB::table('newsletter_queue')
+            ->where('tenant_id', $tenantId)
             ->where('newsletter_id', $newsletterId)
             ->where('status', 'sent')
             ->pluck('email')
+            ->map(fn($email) => strtolower((string) $email))
             ->flip()
             ->all();
-
+        $abTestEnabled = (bool) ($newsletter->ab_test_enabled ?? false);
+        $abSplitPercentage = max(0, min(100, (int) ($newsletter->ab_split_percentage ?? 50)));
         $rows = [];
+        $queuedEmails = [];
         foreach ($recipients as $recipient) {
-            $email = $recipient['email'] ?? '';
-            if (empty($email) || isset($alreadySent[$email])) {
-                continue; // Skip already-sent recipients
+            $email = strtolower(trim($recipient['email'] ?? ''));
+            if (empty($email) || isset($alreadySent[$email]) || isset($queuedEmails[$email])) {
+                continue;
             }
 
+            $queuedEmails[$email] = true;
             $token = $recipient['unsubscribe_token'] ?? bin2hex(random_bytes(32));
 
             $rows[] = [
+                'tenant_id' => $tenantId,
                 'newsletter_id' => $newsletterId,
                 'email' => $email,
                 'user_id' => $recipient['user_id'] ?? null,
@@ -424,6 +457,7 @@ class NewsletterService
                 'last_name' => $recipient['last_name'] ?? '',
                 'unsubscribe_token' => $token,
                 'tracking_token' => bin2hex(random_bytes(32)),
+                'ab_variant' => $abTestEnabled && mt_rand(1, 100) > $abSplitPercentage ? 'b' : 'a',
                 'status' => 'pending',
                 'created_at' => now(),
             ];
@@ -478,7 +512,7 @@ class NewsletterService
 
         // Replace global tokens that are the same for every recipient in this send
         $unsubscribeLink = $unsubscribeToken
-            ? '<a href="' . $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken . '" style="color:#6366f1;">' . __('emails.newsletter.unsubscribe') . '</a>'
+            ? '<a href="' . $frontendUrl . '/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken) . '" style="color:#6366f1;">' . __('emails.newsletter.unsubscribe') . '</a>'
             : '';
         $content = str_replace(
             ['{{tenant_name}}', '{{unsubscribe_link}}'],
@@ -488,7 +522,7 @@ class NewsletterService
 
         // Build unsubscribe URL
         if ($unsubscribeToken) {
-            $unsubscribeUrl = $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken;
+            $unsubscribeUrl = $frontendUrl . '/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken);
             $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.unsubscribe') . '</a>'
                 . ' <span style="color: #d1d5db; margin: 0 8px;">|</span> '
                 . '<a href="' . $frontendUrl . '/settings" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_preferences') . '</a>';
@@ -498,6 +532,10 @@ class NewsletterService
         }
 
         // Tracking pixel (1×1 transparent GIF) — uses unique tracking_token per queue entry
+        if ($trackingToken) {
+            $content = self::wrapTrackedLinks($content, $apiUrl, $trackingToken);
+        }
+
         $pixelHtml = '';
         $pixelToken = $trackingToken ?? $unsubscribeToken;
         if ($pixelToken) {
@@ -602,6 +640,42 @@ class NewsletterService
 </body>
 </html>
 HTML;
+    }
+
+    /**
+     * Wrap content links with the public click-tracking endpoint.
+     */
+    private static function wrapTrackedLinks(string $content, string $apiUrl, string $trackingToken): string
+    {
+        return preg_replace_callback(
+            '/href=(["\'])(.*?)\1/i',
+            function (array $matches) use ($apiUrl, $trackingToken): string {
+                $quote = $matches[1];
+                $href = html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8');
+
+                if (
+                    $href === ''
+                    || str_starts_with($href, '#')
+                    || preg_match('/^(mailto|tel|sms):/i', $href)
+                    || str_contains($href, '/v2/newsletter/')
+                    || str_contains($href, '/newsletter/unsubscribe')
+                    || str_contains($href, '/settings')
+                ) {
+                    return $matches[0];
+                }
+
+                $scheme = parse_url($href, PHP_URL_SCHEME);
+                if ($scheme === null || !in_array(strtolower((string) $scheme), ['http', 'https'], true)) {
+                    return $matches[0];
+                }
+
+                $trackedUrl = rtrim($apiUrl, '/') . '/v2/newsletter/click/' . rawurlencode($trackingToken)
+                    . '?url=' . rawurlencode($href);
+
+                return 'href=' . $quote . htmlspecialchars($trackedUrl, ENT_QUOTES, 'UTF-8') . $quote;
+            },
+            $content
+        ) ?? $content;
     }
 
     /**
@@ -949,6 +1023,7 @@ HTML;
 
         switch ($field) {
             case 'role':
+            case 'user_role':
                 return self::buildStringCondition('role', $operator, $value, $params);
 
             case 'profile_type':
@@ -958,17 +1033,18 @@ HTML;
                 return self::buildStringCondition('location', $operator, $value, $params);
 
             case 'created_at':
+            case 'member_since':
                 return self::buildDateCondition('created_at', $operator, $value, $params);
 
             case 'has_listings':
                 if ($value == '1' || $value === true || $value === 'yes') {
-                    return "id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')";
+                    return "id IN (SELECT DISTINCT user_id FROM listings WHERE listings.tenant_id = users.tenant_id AND status = 'active')";
                 }
-                return "id NOT IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')";
+                return "id NOT IN (SELECT DISTINCT user_id FROM listings WHERE listings.tenant_id = users.tenant_id AND status = 'active')";
 
             case 'listing_count':
                 return self::buildNumericSubqueryCondition(
-                    "(SELECT COUNT(*) FROM listings WHERE listings.user_id = users.id AND listings.status = 'active')",
+                    "(SELECT COUNT(*) FROM listings WHERE listings.user_id = users.id AND listings.tenant_id = users.tenant_id AND listings.status = 'active')",
                     $operator, $value, $params
                 );
 
@@ -1161,7 +1237,7 @@ HTML;
             $params[] = $gid;
         }
 
-        $subquery = "id IN (SELECT user_id FROM group_members WHERE group_id IN ({$placeholders}) AND status = 'active')";
+        $subquery = "id IN (SELECT user_id FROM group_members WHERE tenant_id = users.tenant_id AND group_id IN ({$placeholders}) AND status = 'active')";
 
         if ($operator === 'not_member_of') {
             return "NOT ({$subquery})";
@@ -1263,35 +1339,20 @@ HTML;
             // Query ALL tenants — this runs from cron where tenant context is unreliable.
             $newsletters = DB::table('newsletters')
                 ->where('is_recurring', true)
-                ->where('status', 'active')
+                ->whereIn('status', ['scheduled', 'sent'])
+                ->where(function ($query) {
+                    $query->whereNull('recurring_end_date')
+                        ->orWhere('recurring_end_date', '>=', now()->toDateString());
+                })
+                ->where(function ($query) {
+                    $query->whereNull('recurring_next_send')
+                        ->orWhere('recurring_next_send', '<=', now());
+                })
                 ->get();
 
             foreach ($newsletters as $newsletter) {
                 // Set correct tenant context for this newsletter's tenant
                 TenantContext::setById($newsletter->tenant_id);
-
-                // Check if enough time has passed since last send.
-                // Uses a 90% threshold of the configured interval to prevent edge-case
-                // re-sends when two runners overlap (email bombing fix, 2026-04-02).
-                $lastSent = $newsletter->last_sent_at ?? null;
-                $interval = $newsletter->recurring_interval ?? 'weekly';
-
-                $shouldSend = !$lastSent;
-                if ($lastSent) {
-                    $secondsSince = time() - strtotime($lastSent);
-                    // Minimum seconds that must pass before re-sending (90% of interval)
-                    $minSeconds = match ($interval) {
-                        'daily' => (int) (86400 * 0.9),    // ~21.6 hours
-                        'weekly' => (int) (604800 * 0.9),   // ~6.3 days
-                        'monthly' => (int) (2592000 * 0.9), // ~27 days
-                        default => PHP_INT_MAX,
-                    };
-                    $shouldSend = $secondsSince >= $minSeconds;
-                }
-
-                if (!$shouldSend) {
-                    continue;
-                }
 
                 // Atomically claim by setting status to 'sending' AND updating
                 // last_sent_at in the SAME statement. This prevents a second runner
@@ -1300,10 +1361,15 @@ HTML;
                 // will fail on the next cycle.
                 $claimed = DB::table('newsletters')
                     ->where('id', $newsletter->id)
-                    ->where('status', 'active')
+                    ->whereIn('status', ['scheduled', 'sent'])
+                    ->where(function ($query) {
+                        $query->whereNull('recurring_next_send')
+                            ->orWhere('recurring_next_send', '<=', now());
+                    })
                     ->update([
                         'status' => 'sending',
-                        'last_sent_at' => now(),
+                        'recurring_last_sent' => now(),
+                        'last_recurring_sent' => now(),
                         'updated_at' => now(),
                     ]);
 
@@ -1313,12 +1379,20 @@ HTML;
 
                 try {
                     $service = app(self::class);
-                    $service->sendNow((int) $newsletter->id);
+                    $service->sendNow(
+                        (int) $newsletter->id,
+                        $newsletter->target_audience ?? 'all_members',
+                        $newsletter->segment_id ? (int) $newsletter->segment_id : null
+                    );
                     // Restore to 'active' for the next recurring cycle.
                     // last_sent_at was already set during the atomic claim above.
                     DB::table('newsletters')
                         ->where('id', $newsletter->id)
-                        ->update(['status' => 'active', 'updated_at' => now()]);
+                        ->update([
+                            'status' => 'scheduled',
+                            'recurring_next_send' => self::nextRecurringSend($newsletter),
+                            'updated_at' => now(),
+                        ]);
                     $processed++;
                 } catch (\Exception $e) {
                     // Revert status so it can be retried next cycle.
@@ -1326,7 +1400,7 @@ HTML;
                     DB::table('newsletters')
                         ->where('id', $newsletter->id)
                         ->where('status', 'sending')
-                        ->update(['status' => 'active', 'updated_at' => now()]);
+                        ->update(['status' => 'scheduled', 'updated_at' => now()]);
                     Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
                 }
             }
@@ -1335,6 +1409,43 @@ HTML;
         }
 
         return $processed;
+    }
+
+    private static function nextRecurringSend(object $newsletter): string
+    {
+        $timezone = new \DateTimeZone($newsletter->recurring_timezone ?: config('app.timezone', 'UTC'));
+        $now = new \DateTimeImmutable('now', $timezone);
+        $next = $now;
+
+        $frequency = $newsletter->recurring_frequency ?: 'weekly';
+        $next = match ($frequency) {
+            'daily' => $next->modify('+1 day'),
+            'biweekly' => $next->modify('+2 weeks'),
+            'monthly' => $next->modify('+1 month'),
+            default => $next->modify('+1 week'),
+        };
+
+        if (!empty($newsletter->recurring_time)) {
+            [$hour, $minute] = array_pad(explode(':', (string) $newsletter->recurring_time), 2, 0);
+            $next = $next->setTime((int) $hour, (int) $minute);
+        }
+
+        if ($frequency === 'weekly' && $newsletter->recurring_day_of_week !== null) {
+            $targetDay = max(1, min(7, (int) $newsletter->recurring_day_of_week));
+            while ((int) $next->format('N') !== $targetDay) {
+                $next = $next->modify('+1 day');
+            }
+        }
+
+        if ($frequency === 'monthly' && $newsletter->recurring_day_of_month !== null) {
+            $targetDay = max(1, min(28, (int) $newsletter->recurring_day_of_month));
+            $next = $next->setDate((int) $next->format('Y'), (int) $next->format('m'), $targetDay);
+            if ($next <= $now) {
+                $next = $next->modify('+1 month');
+            }
+        }
+
+        return $next->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
 
     /**
@@ -1397,26 +1508,37 @@ HTML;
             }
 
             $stats = DB::table('newsletter_queue')
+                ->where('tenant_id', $tenantId)
                 ->where('newsletter_id', $newsletterId)
                 ->selectRaw("
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
                     SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
-                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opened,
-                    SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicked
+                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
                 ")
                 ->first();
+
+            $opened = DB::table('newsletter_opens')
+                ->where('tenant_id', $tenantId)
+                ->where('newsletter_id', $newsletterId)
+                ->distinct('email')
+                ->count('email');
+
+            $clicked = DB::table('newsletter_clicks')
+                ->where('tenant_id', $tenantId)
+                ->where('newsletter_id', $newsletterId)
+                ->distinct('email')
+                ->count('email');
 
             return [
                 'total' => (int) ($stats->total ?? 0),
                 'sent' => (int) ($stats->sent ?? 0),
                 'failed' => (int) ($stats->failed ?? 0),
                 'pending' => (int) ($stats->pending ?? 0),
-                'opened' => (int) ($stats->opened ?? 0),
-                'clicked' => (int) ($stats->clicked ?? 0),
-                'open_rate' => ($stats->sent ?? 0) > 0 ? round(($stats->opened ?? 0) / $stats->sent * 100, 1) : 0,
-                'click_rate' => ($stats->sent ?? 0) > 0 ? round(($stats->clicked ?? 0) / $stats->sent * 100, 1) : 0,
+                'opened' => (int) $opened,
+                'clicked' => (int) $clicked,
+                'open_rate' => ($stats->sent ?? 0) > 0 ? round($opened / $stats->sent * 100, 1) : 0,
+                'click_rate' => ($stats->sent ?? 0) > 0 ? round($clicked / $stats->sent * 100, 1) : 0,
             ];
         } catch (\Exception $e) {
             Log::warning('[Newsletter] Failed to fetch newsletter stats: ' . $e->getMessage());
@@ -1446,9 +1568,10 @@ HTML;
             }
 
             if (!empty($filters['group_id'])) {
-                $query->whereIn('id', function ($q) use ($filters) {
+                $query->whereIn('id', function ($q) use ($filters, $tenantId) {
                     $q->select('user_id')
                         ->from('group_members')
+                        ->where('tenant_id', $tenantId)
                         ->where('group_id', $filters['group_id'])
                         ->where('status', 'active');
                 });
@@ -1558,10 +1681,13 @@ HTML;
     public static function resendToNonOpeners(int $newsletterId, ?string $newSubject = null, int $waitDays = 3): int
     {
         try {
-            $newsletter = DB::table('newsletters')->find($newsletterId);
+            $newsletter = DB::table('newsletters')->where('id', $newsletterId)->first();
             if (!$newsletter || $newsletter->status !== 'sent') {
                 return 0;
             }
+
+            $tenantId = (int) $newsletter->tenant_id;
+            TenantContext::setById($tenantId);
 
             // Check if enough time has passed
             if ($newsletter->sent_at) {
@@ -1572,19 +1698,47 @@ HTML;
             }
 
             $nonOpeners = DB::table('newsletter_queue')
+                ->select('newsletter_queue.*')
+                ->where('tenant_id', $tenantId)
                 ->where('newsletter_id', $newsletterId)
                 ->where('status', 'sent')
-                ->whereNull('opened_at')
+                ->whereNotIn('email', function ($query) use ($newsletterId, $tenantId) {
+                    $query->select('email')
+                        ->from('newsletter_opens')
+                        ->where('tenant_id', $tenantId)
+                        ->where('newsletter_id', $newsletterId);
+                })
                 ->get();
 
-            // Queue them for re-send
+            $queued = 0;
+            $queuedEmails = [];
             foreach ($nonOpeners as $item) {
-                DB::table('newsletter_queue')
-                    ->where('id', $item->id)
-                    ->update(['status' => 'pending']);
+                $email = strtolower(trim((string) $item->email));
+                if ($email === '' || isset($queuedEmails[$email])) {
+                    continue;
+                }
+                $queuedEmails[$email] = true;
+
+                DB::table('newsletter_queue')->insert([
+                    'tenant_id' => $tenantId,
+                    'newsletter_id' => $newsletterId,
+                    'email' => $email,
+                    'user_id' => $item->user_id,
+                    'name' => $item->name ?? '',
+                    'first_name' => $item->first_name ?? '',
+                    'last_name' => $item->last_name ?? '',
+                    'status' => 'pending',
+                    'unsubscribe_token' => $item->unsubscribe_token ?: bin2hex(random_bytes(32)),
+                    'tracking_token' => bin2hex(random_bytes(32)),
+                    'subject_override' => $newSubject,
+                    'created_at' => now(),
+                ]);
+                $queued++;
             }
 
-            return count($nonOpeners);
+            self::processQueue($newsletterId);
+
+            return $queued;
         } catch (\Exception $e) {
             Log::error('resendToNonOpeners error: ' . $e->getMessage());
             return 0;
@@ -1600,15 +1754,22 @@ HTML;
     public static function getResendInfo(int $newsletterId): array
     {
         try {
-            $newsletter = DB::table('newsletters')->find($newsletterId);
+            $newsletter = DB::table('newsletters')->where('id', $newsletterId)->first();
             if (!$newsletter) {
                 return ['eligible' => false, 'reason' => 'Newsletter not found'];
             }
+            $tenantId = (int) $newsletter->tenant_id;
 
             $nonOpenerCount = DB::table('newsletter_queue')
+                ->where('tenant_id', $tenantId)
                 ->where('newsletter_id', $newsletterId)
                 ->where('status', 'sent')
-                ->whereNull('opened_at')
+                ->whereNotIn('email', function ($query) use ($newsletterId, $tenantId) {
+                    $query->select('email')
+                        ->from('newsletter_opens')
+                        ->where('tenant_id', $tenantId)
+                        ->where('newsletter_id', $newsletterId);
+                })
                 ->count();
 
             return [

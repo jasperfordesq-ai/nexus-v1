@@ -23,7 +23,7 @@ class NewsletterTemplateFactory extends Factory
             'tenant_id'    => 2,
             'name'         => $this->faker->words(3, true),
             'description'  => $this->faker->sentence(),
-            'category'     => $this->faker->randomElement(['announcement', 'digest', 'welcome', 'event']),
+            'category'     => $this->faker->randomElement(['starter', 'custom', 'saved']),
             'subject'      => $this->faker->sentence(),
             'preview_text' => $this->faker->sentence(),
             'content'      => '<h1>' . $this->faker->sentence() . '</h1><p>' . $this->faker->paragraph() . '</p>',

@@ -267,7 +267,11 @@
     "manage_preferences": "Manage Preferences",
     "manage_email_preferences": "Manage Email Preferences",
     "test_prefix": "[TEST]",
-    "no_subject": "No Subject"
+    "no_subject": "No Subject",
+    "unsubscribed_subject": "You have been unsubscribed - {{community}}",
+    "unsubscribed_title": "Unsubscribed",
+    "unsubscribed_body": "You have been successfully unsubscribed from email newsletters sent by <strong>{{community}}</strong>. You will no longer receive newsletter emails from this community.",
+    "unsubscribed_body_contact": "If you believe this was a mistake, you can resubscribe by visiting the community platform."
   },
   "notification": {
     "sent_by": "This email was sent by {{community}}",

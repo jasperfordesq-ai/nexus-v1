@@ -29,13 +29,16 @@ class NewsletterTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'subject', 'preview_text', 'content', 'status',
+            'tenant_id', 'name', 'subject', 'preview_text', 'content', 'status',
             'scheduled_at', 'sent_at', 'created_by', 'total_recipients',
             'total_sent', 'total_failed', 'total_opens', 'unique_opens',
             'total_clicks', 'unique_clicks', 'target_audience', 'segment_id',
+            'target_counties', 'target_towns', 'target_groups',
             'is_recurring', 'recurring_frequency', 'recurring_day',
+            'recurring_day_of_week',
             'recurring_day_of_month', 'recurring_time', 'recurring_end_date',
-            'last_recurring_sent', 'template_id', 'ab_test_enabled',
+            'recurring_timezone', 'recurring_next_send', 'recurring_last_sent',
+            'last_recurring_sent', 'parent_newsletter_id', 'template_id', 'ab_test_enabled',
             'subject_b', 'ab_split_percentage', 'ab_winner', 'ab_winner_metric',
             'ab_auto_select_winner', 'ab_auto_select_after_hours',
         ];
@@ -47,6 +50,8 @@ class NewsletterTest extends TestCase
         $casts = $this->model->getCasts();
         $this->assertEquals('datetime', $casts['scheduled_at']);
         $this->assertEquals('datetime', $casts['sent_at']);
+        $this->assertEquals('datetime', $casts['recurring_next_send']);
+        $this->assertEquals('datetime', $casts['recurring_last_sent']);
         $this->assertEquals('datetime', $casts['last_recurring_sent']);
         $this->assertEquals('date', $casts['recurring_end_date']);
         $this->assertEquals('boolean', $casts['is_recurring']);

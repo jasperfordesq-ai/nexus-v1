@@ -35,7 +35,7 @@ class NewsletterFactory extends Factory
             'unique_opens'       => $this->faker->numberBetween(0, 200),
             'total_clicks'       => $this->faker->numberBetween(0, 100),
             'unique_clicks'      => $this->faker->numberBetween(0, 80),
-            'target_audience'    => $this->faker->randomElement(['all', 'active', 'new']),
+            'target_audience'    => $this->faker->randomElement(['all_members', 'subscribers_only', 'both']),
             'segment_id'         => null,
             'is_recurring'       => false,
             'recurring_frequency' => null,

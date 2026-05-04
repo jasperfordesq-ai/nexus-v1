@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import Papa from 'papaparse';
 import {
   Button,
   Avatar,
@@ -233,41 +234,47 @@ export function Subscribers() {
     if (!file) return;
     setImportFileName(file.name);
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      if (!text) return;
+    Papa.parse<Record<string, string>>(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: ({ data, errors, meta }) => {
+        if (errors.length > 0) {
+          toast.warning("CSV contains rows that could not be parsed");
+        }
 
-      const lines = text.split(/\r?\n/).filter((l) => l.trim());
-      if (lines.length < 2) {
-        toast.warning("CSV must have a header row and at least one data row");
-        return;
-      }
+        const fields = (meta.fields ?? []).map((field) => field.trim().toLowerCase());
+        if (!fields.includes('email')) {
+          toast.warning("CSV must have an email column");
+          return;
+        }
 
-      // Parse header
-      const header = (lines[0] ?? '').split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
-      const emailIdx = header.indexOf('email');
-      if (emailIdx === -1) {
+        const rows = data
+          .flatMap((row) => {
+            const normalized: Record<string, string> = Object.fromEntries(
+              Object.entries(row).map(([key, value]) => [key.trim().toLowerCase(), value?.trim() ?? '']),
+            );
+            const email = normalized.email ?? '';
+            if (!email) {
+              return [];
+            }
+            return {
+              email,
+              first_name: normalized.first_name || undefined,
+              last_name: normalized.last_name || undefined,
+            };
+          });
+
+        if (rows.length === 0) {
+          toast.warning("CSV must have a header row and at least one data row");
+          return;
+        }
+
+        setImportRows(rows);
+      },
+      error: () => {
         toast.warning("CSV must have an email column");
-        return;
-      }
-      const fnIdx = header.indexOf('first_name');
-      const lnIdx = header.indexOf('last_name');
-
-      const rows: Array<{ email: string; first_name?: string; last_name?: string }> = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = (lines[i] ?? '').split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
-        const email = cols[emailIdx];
-        if (!email) continue;
-        rows.push({
-          email,
-          first_name: fnIdx >= 0 ? cols[fnIdx] : undefined,
-          last_name: lnIdx >= 0 ? cols[lnIdx] : undefined,
-        });
-      }
-      setImportRows(rows);
-    };
-    reader.readAsText(file);
+      },
+    });
   }, [toast])
 
 
@@ -277,7 +284,6 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.importSubscribers(importRows);
       if (res.success) {
-        const data = res.data as { imported?: number; skipped?: number };
         toast.success(`Import Result`);
         setImportModalOpen(false);
         setImportRows([]);
@@ -338,7 +344,6 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.syncMembers();
       if (res.success) {
-        const data = res.data as { synced?: number; already_subscribed?: number };
         toast.success(`Sync Result`);
         loadData(1, statusFilter, searchQuery);
       } else {
@@ -355,6 +360,7 @@ export function Subscribers() {
   // Helpers
   // ───────────────────────────────────────────────────────────────────────────
 
+  const showPublicSubscribeLink = false;
   const subscribeUrl = tenant?.slug
     ? `${window.location.origin}/${tenant.slug}/newsletter/subscribe`
     : '';
@@ -597,7 +603,7 @@ export function Subscribers() {
 
 
       {/* Public subscribe link */}
-      {subscribeUrl && (
+      {showPublicSubscribeLink && subscribeUrl && (
         <Card shadow="sm">
           <CardBody className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
@@ -675,9 +681,11 @@ export function Subscribers() {
           <ModalHeader>{"Import Subscribers From CSV"}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
-              <div
-                className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-default-300 p-8 text-center transition-colors hover:border-primary hover:bg-primary/5"
-                onClick={() => fileInputRef.current?.click()}
+              <Button
+                type="button"
+                variant="bordered"
+                className="h-auto w-full flex-col items-center gap-2 border-2 border-dashed border-default-300 p-8 text-center"
+                onPress={() => fileInputRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -697,7 +705,7 @@ export function Subscribers() {
                 <p className="text-xs text-default-400">
                   {"Accepted Format CSV"}
                 </p>
-              </div>
+              </Button>
               <input
                 ref={fileInputRef}
                 type="file"

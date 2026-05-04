@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Models\NewsletterAnalytics;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -113,13 +114,77 @@ class NewsletterController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.unsubscribe_token_required'), 'token', 400);
         }
 
-        $subscriber = DB::table('newsletter_subscribers')
-            ->where('unsubscribe_token', $token)
-            ->first();
+        $subscriberQuery = DB::table('newsletter_subscribers')
+            ->where('unsubscribe_token', $token);
+
+        $resolvedTenant = TenantContext::get();
+        $hasExplicitTenant = request()->headers->has('X-Tenant-ID')
+            || request()->headers->has('X-Tenant-Slug')
+            || (int) ($resolvedTenant['id'] ?? 1) > 1;
+        $tenantId = $hasExplicitTenant ? (int) ($resolvedTenant['id'] ?? 0) : null;
+        if ($tenantId) {
+            $subscriberQuery->where('tenant_id', $tenantId);
+        }
+
+        $subscriber = $subscriberQuery->first();
+
+        if (! $subscriber) {
+            $queueQuery = DB::table('newsletter_queue as q')
+                ->join('newsletters as n', 'n.id', '=', 'q.newsletter_id')
+                ->where('q.unsubscribe_token', $token);
+
+            if ($tenantId) {
+                $queueQuery->where('n.tenant_id', $tenantId);
+            }
+
+            $queue = $queueQuery
+                ->orderByDesc('q.id')
+                ->first([
+                    'q.email',
+                    'q.user_id',
+                    'q.first_name',
+                    'q.last_name',
+                    'q.unsubscribe_token',
+                    'n.tenant_id',
+                ]);
+
+            if ($queue) {
+                $tenantId = (int) $queue->tenant_id;
+                TenantContext::setById($tenantId);
+
+                $subscriber = DB::table('newsletter_subscribers')
+                    ->where('tenant_id', $tenantId)
+                    ->where('email', $queue->email)
+                    ->first();
+
+                if (! $subscriber) {
+                    $subscriberId = DB::table('newsletter_subscribers')->insertGetId([
+                        'tenant_id' => $tenantId,
+                        'email' => strtolower(trim((string) $queue->email)),
+                        'user_id' => $queue->user_id,
+                        'first_name' => $queue->first_name,
+                        'last_name' => $queue->last_name,
+                        'status' => 'active',
+                        'confirmation_token' => bin2hex(random_bytes(32)),
+                        'confirmed_at' => now(),
+                        'unsubscribe_token' => $token,
+                        'source' => 'manual',
+                        'is_active' => 1,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $subscriber = DB::table('newsletter_subscribers')->where('id', $subscriberId)->first();
+                }
+            }
+        }
 
         if (! $subscriber) {
             return $this->respondWithError('NOT_FOUND', __('api.invalid_unsubscribe_link'), null, 404);
         }
+
+        $tenantId = (int) ($subscriber->tenant_id ?? $tenantId);
+        TenantContext::setById($tenantId);
 
         if ($subscriber->status === 'unsubscribed') {
             return $this->respondWithData([
@@ -129,11 +194,14 @@ class NewsletterController extends BaseApiController
         }
 
         $updated = DB::table('newsletter_subscribers')
-            ->where('unsubscribe_token', $token)
+            ->where('id', (int) $subscriber->id)
+            ->where('tenant_id', $tenantId)
             ->update([
                 'status'             => 'unsubscribed',
+                'is_active'          => 0,
                 'unsubscribed_at'    => now(),
                 'unsubscribe_reason' => 'email_link',
+                'updated_at'         => now(),
             ]);
 
         if ($updated) {
@@ -141,15 +209,15 @@ class NewsletterController extends BaseApiController
             try {
                 $email = $subscriber->email ?? null;
                 if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $community = TenantContext::getName();
+                    $community = DB::table('tenants')->where('id', $tenantId)->value('name') ?? config('app.name');
                     $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.newsletter.unsubscribed_title'))
-                        ->paragraph(__('emails_misc.newsletter.unsubscribed_body', ['community' => $community]))
-                        ->paragraph(__('emails_misc.newsletter.unsubscribed_body_contact'))
+                        ->title(__('emails.newsletter.unsubscribed_title'))
+                        ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
+                        ->paragraph(__('emails.newsletter.unsubscribed_body_contact'))
                         ->render();
                     Mailer::forCurrentTenant()->send(
                         $email,
-                        __('emails_misc.newsletter.unsubscribed_subject', ['community' => $community]),
+                        __('emails.newsletter.unsubscribed_subject', ['community' => $community]),
                         $html
                     );
                 }
@@ -161,6 +229,42 @@ class NewsletterController extends BaseApiController
         }
 
         return $this->respondWithError('SERVER_ERROR', __('api.unable_to_process_request'), null, 500);
+    }
+
+    public function trackClick(string $token): Response|RedirectResponse
+    {
+        $url = trim((string) $this->query('url', ''));
+
+        if (
+            $url === ''
+            || !filter_var($url, FILTER_VALIDATE_URL)
+            || !in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
+        ) {
+            return redirect(config('app.frontend_url', config('app.url')));
+        }
+
+        try {
+            $queue = DB::table('newsletter_queue')
+                ->where('tracking_token', $token)
+                ->orderByDesc('id')
+                ->first(['newsletter_id', 'email']);
+
+            if ($queue instanceof \stdClass) {
+                NewsletterAnalytics::recordClick(
+                    (int) $queue->newsletter_id,
+                    $token,
+                    (string) $queue->email,
+                    $url,
+                    hash('sha256', $url),
+                    request()->header('User-Agent'),
+                    request()->ip()
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Newsletter click tracking failed', ['token' => $token, 'error' => $e->getMessage()]);
+        }
+
+        return redirect()->away($url);
     }
 
     /**

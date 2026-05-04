@@ -28,9 +28,7 @@ import Newspaper from 'lucide-react/icons/newspaper';
 import Trophy from 'lucide-react/icons/trophy';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Sparkles from 'lucide-react/icons/sparkles';
-import Bell from 'lucide-react/icons/bell';
 import Coins from 'lucide-react/icons/coins';
-import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Building2 from 'lucide-react/icons/building-2';
 import Globe from 'lucide-react/icons/globe';
 import Settings from 'lucide-react/icons/settings';
@@ -58,7 +56,6 @@ import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';
 import CreditCard from 'lucide-react/icons/credit-card';
 import Shield from 'lucide-react/icons/shield';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Key from 'lucide-react/icons/key';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Heart from 'lucide-react/icons/heart';
@@ -67,7 +64,6 @@ import Cog from 'lucide-react/icons/cog';
 import Timer from 'lucide-react/icons/timer';
 import Contact from 'lucide-react/icons/contact';
 import StickyNote from 'lucide-react/icons/sticky-note';
-import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Filter from 'lucide-react/icons/filter';
 import Activity from 'lucide-react/icons/activity';
@@ -82,10 +78,6 @@ import MessageCircle from 'lucide-react/icons/message-circle';
 import Star from 'lucide-react/icons/star';
 import Flag from 'lucide-react/icons/flag';
 import UserX from 'lucide-react/icons/user-x';
-import Server from 'lucide-react/icons/server';
-import Scale from 'lucide-react/icons/scale';
-import Layers from 'lucide-react/icons/layers';
-import PlugZap from 'lucide-react/icons/plug-zap';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
 import Lightbulb from 'lucide-react/icons/lightbulb';
@@ -105,11 +97,6 @@ import Languages from 'lucide-react/icons/languages';
 import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
-import FlaskConical from 'lucide-react/icons/flask-conical';
-import Rocket from 'lucide-react/icons/rocket';
-import Sliders from 'lucide-react/icons/sliders';
-import Users2 from 'lucide-react/icons/users-2';
-import TrendingUp from 'lucide-react/icons/trending-up';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -484,16 +471,18 @@ function useAdminNav(): NavSection[] {
       }] as NavSection[] : []),
       {
         key: 'marketing',
-        label: "Marketing",
+        label: t('marketing'),
         icon: Megaphone,
         items: [
-          { label: "Newsletters", href: '/admin/newsletters', icon: Megaphone },
-          { label: "Subscribers", href: '/admin/newsletters/subscribers', icon: Users },
-          { label: "Templates", href: '/admin/newsletters/templates', icon: FileText },
-          { label: "Bounces", href: '/admin/newsletters/bounces', icon: AlertTriangle },
-          { label: "Send Time Optimizer", href: '/admin/newsletters/send-time-optimizer', icon: Clock },
-          { label: "Diagnostics", href: '/admin/newsletters/diagnostics', icon: Stethoscope },
-          { label: "Deliverability", href: '/admin/deliverability', icon: Mail },
+          ...(hasFeature('newsletter') ? [
+            { label: t('newsletters'), href: '/admin/newsletters', icon: Megaphone },
+            { label: t('subscribers'), href: '/admin/newsletters/subscribers', icon: Users },
+            { label: t('templates'), href: '/admin/newsletters/templates', icon: FileText },
+            { label: t('bounces'), href: '/admin/newsletters/bounces', icon: AlertTriangle },
+            { label: t('send_time_optimizer'), href: '/admin/newsletters/send-time-optimizer', icon: Clock },
+            { label: t('diagnostics'), href: '/admin/newsletters/diagnostics', icon: Stethoscope },
+          ] : []),
+          { label: t('deliverability'), href: '/admin/deliverability', icon: Mail },
         ],
       },
       {

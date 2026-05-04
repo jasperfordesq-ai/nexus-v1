@@ -32,7 +32,6 @@ import Smartphone from 'lucide-react/icons/smartphone';
 import Tablet from 'lucide-react/icons/tablet';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import Copy from 'lucide-react/icons/copy';
-import FileText from 'lucide-react/icons/file-text';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -162,7 +161,6 @@ const DEVICE_ICONS: Record<string, typeof Monitor> = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function NewsletterStats() {
-  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -616,7 +614,7 @@ export function NewsletterStats() {
                         borderRadius: '8px',
                         fontSize: '13px',
                       }}
-                      labelFormatter={(h) => `Hour`}
+                      labelFormatter={() => `Hour`}
                     />
                     <Legend />
                     <Line
@@ -797,15 +795,6 @@ export function NewsletterStats() {
         </CardHeader>
         <CardBody className="px-5 pb-5">
           <div className="flex flex-wrap gap-3">
-            <Button
-              variant="flat"
-              startContent={<FileText size={16} />}
-              onPress={() => {
-                window.open(`/api/v2/admin/newsletters/${id}/preview`, '_blank');
-              }}
-            >
-              {"View Email Content"}
-            </Button>
             <Button
               variant="flat"
               startContent={<Copy size={16} />}

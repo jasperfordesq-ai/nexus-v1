@@ -71,12 +71,12 @@ jobs:
       - name: Setup Test Database Schema
         run: |
           echo "Loading schema into nexus_test database..."
-          mysql -h 127.0.0.1 -u root -ptesting nexus_test < schema.sql
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test < database/schema/mysql-schema.sql
           echo "Creating nexus database for DatabaseTestCase fallback..."
           mysql -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE IF NOT EXISTS nexus;"
           mysql -h 127.0.0.1 -u root -ptesting -e "GRANT ALL PRIVILEGES ON nexus.* TO 'nexus'@'%';"
           mysql -h 127.0.0.1 -u root -ptesting -e "FLUSH PRIVILEGES;"
-          mysql -h 127.0.0.1 -u root -ptesting nexus < schema.sql
+          mysql -h 127.0.0.1 -u root -ptesting nexus < database/schema/mysql-schema.sql
           echo "Seeding test tenants and categories..."
           mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT INTO tenants (id, name, slug, is_active) VALUES (1, 'Test Tenant', 'test-tenant', 1), (2, 'Test Tenant 2', 'test-tenant-2', 1);"
           mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"

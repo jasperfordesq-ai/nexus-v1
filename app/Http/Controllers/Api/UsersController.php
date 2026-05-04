@@ -658,6 +658,7 @@ class UsersController extends BaseApiController
             'email_org_admin'               => (bool) ($prefs['email_org_admin'] ?? true),
             'caring_smart_nudges'           => (bool) ($prefs['caring_smart_nudges'] ?? true),
             'push_enabled'                  => (bool) ($prefs['push_enabled'] ?? true),
+            'push_campaigns_opted_in'       => (bool) ($prefs['push_campaigns_opted_in'] ?? false),
         ]);
     }
 
@@ -678,11 +679,11 @@ class UsersController extends BaseApiController
             'email_gamification_digest', 'email_gamification_milestones',
             'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
             'caring_smart_nudges',
-            'push_enabled',
+            'push_enabled', 'push_campaigns_opted_in',
         ];
 
         foreach ($allowedKeys as $key) {
-            if (isset($data[$key])) {
+            if (array_key_exists($key, $data)) {
                 $prefs[$key] = (bool) $data[$key];
             }
         }
@@ -1048,7 +1049,7 @@ class UsersController extends BaseApiController
                         $userId
                     );
                 } elseif ($existing['status'] === 'unsubscribed') {
-                    \App\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'active']);
+                    \App\Models\NewsletterSubscriber::setStatusById((int) $existing['id'], 'active');
                 }
 
                 try {
@@ -1059,7 +1060,7 @@ class UsersController extends BaseApiController
                 }
             } else {
                 if ($existing && $existing['status'] === 'active') {
-                    \App\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'unsubscribed']);
+                    \App\Models\NewsletterSubscriber::setStatusById((int) $existing['id'], 'unsubscribed');
 
                     try {
                         $mailchimp = $this->mailchimpService;

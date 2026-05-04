@@ -29,7 +29,8 @@ class NewsletterSegmentTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'name', 'description', 'rules', 'is_active', 'created_by',
+            'tenant_id', 'name', 'description', 'rules', 'is_active',
+            'match_type', 'subscriber_count', 'created_by',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }
@@ -39,6 +40,7 @@ class NewsletterSegmentTest extends TestCase
         $casts = $this->model->getCasts();
         $this->assertEquals('array', $casts['rules']);
         $this->assertEquals('boolean', $casts['is_active']);
+        $this->assertEquals('integer', $casts['subscriber_count']);
         $this->assertEquals('integer', $casts['created_by']);
     }
 

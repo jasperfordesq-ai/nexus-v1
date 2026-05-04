@@ -25,7 +25,7 @@ class DefaultNewsletterTemplatesSeeder extends Seeder
                 ['tenant_id' => $tenantId, 'name' => $name],
                 [
                     'description'  => __('emails.announcement.template_description'),
-                    'category'     => 'announcement',
+                    'category'     => 'starter',
                     'subject'      => __('emails.announcement.subject', ['community' => $community]),
                     'preview_text' => __('emails.announcement.preview_text'),
                     'content'      => $this->buildContent($community),

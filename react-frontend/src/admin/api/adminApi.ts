@@ -1164,7 +1164,17 @@ export const adminNewsletters = {
     api.get<BounceTrendsData>(`/v2/admin/newsletters/bounce-trends${buildQuery(params || {})}`),
 
   // Per-campaign stats
-  getStats: (id: number) => api.get<{ total_sent: number; total_opened: number; total_clicked: number; open_rate: number; click_rate: number }>(`/v2/admin/newsletters/${id}/stats`),
+  getStats: (id: number) => api.get<{
+    newsletter: Record<string, unknown>;
+    delivery: Record<string, unknown>;
+    engagement: Record<string, unknown>;
+    ab_test: Record<string, unknown> | null;
+    timeline: unknown[];
+    top_links: unknown[];
+    device_stats: Record<string, unknown>;
+    recent_activity: unknown[];
+    peak_engagement: Record<string, unknown>;
+  }>(`/v2/admin/newsletters/${id}/stats`),
 
   selectAbWinner: (id: number, winner: 'a' | 'b') =>
     api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/ab-winner`, { winner }),
@@ -1201,7 +1211,7 @@ export const adminNewsletters = {
     api.get<PaginatedResponse<{ email: string; name: string; opened_at: string }>>(`/v2/admin/newsletters/${id}/openers-no-click${buildQuery(params || {})}`),
 
   getEmailClients: (id: number) =>
-    api.get<Array<{ client: string; count: number; percentage: number }>>(`/v2/admin/newsletters/${id}/email-clients`),
+    api.get<{ email_clients: Array<{ client: string; count: number; percentage?: number }> }>(`/v2/admin/newsletters/${id}/email-clients`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

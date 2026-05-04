@@ -19,12 +19,13 @@ class NewsletterSegment extends Model
 
     protected $fillable = [
         'tenant_id', 'name', 'description', 'rules', 'is_active',
-        'created_by',
+        'match_type', 'subscriber_count', 'created_by',
     ];
 
     protected $casts = [
         'rules' => 'array',
         'is_active' => 'boolean',
+        'subscriber_count' => 'integer',
         'created_by' => 'integer',
     ];
 

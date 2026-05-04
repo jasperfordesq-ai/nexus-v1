@@ -26,13 +26,14 @@ class NewsletterSubscriberFactory extends Factory
             'first_name'         => $this->faker->firstName(),
             'last_name'          => $this->faker->lastName(),
             'user_id'            => User::factory(),
-            'source'             => $this->faker->randomElement(['signup', 'import', 'api']),
-            'status'             => 'confirmed',
+            'source'             => $this->faker->randomElement(['signup', 'import', 'manual', 'member_sync']),
+            'status'             => 'active',
             'confirmation_token' => Str::random(32),
             'unsubscribe_token'  => Str::random(32),
             'confirmed_at'       => $this->faker->dateTimeBetween('-6 months'),
             'unsubscribed_at'    => null,
             'unsubscribe_reason' => null,
+            'is_active'          => true,
         ];
     }
 
@@ -49,6 +50,7 @@ class NewsletterSubscriberFactory extends Factory
             'status'             => 'unsubscribed',
             'unsubscribed_at'    => $this->faker->dateTimeBetween('-1 month'),
             'unsubscribe_reason' => $this->faker->sentence(),
+            'is_active'          => false,
         ]);
     }
 }

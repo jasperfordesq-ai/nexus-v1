@@ -100,6 +100,7 @@ const defaultFeatures: TenantFeatures = {
   ai_agents: false,
   fadp_compliance: false,
   local_advertising: false,
+  newsletter: true,
   merchant_coupons: false,
   regional_analytics: false,
 };

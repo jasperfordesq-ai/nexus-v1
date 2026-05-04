@@ -10,6 +10,8 @@ use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Feature tests for NewsletterController — newsletter unsubscribe.
@@ -37,11 +39,49 @@ class NewsletterControllerTest extends TestCase
     public function test_unsubscribe_works(): void
     {
         $user = $this->authenticatedUser();
+        $token = Str::random(64);
 
-        $response = $this->apiPost('/v2/newsletter/unsubscribe', [
+        DB::table('newsletter_subscribers')->insert([
+            'tenant_id' => $this->testTenantId,
             'email' => $user->email,
+            'user_id' => $user->id,
+            'status' => 'active',
+            'confirmation_token' => Str::random(64),
+            'unsubscribe_token' => $token,
+            'confirmed_at' => now(),
+            'source' => 'signup',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        $this->assertContains($response->getStatusCode(), [200, 204]);
+        $response = $this->apiPost('/v2/newsletter/unsubscribe', [
+            'token' => $token,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('newsletter_subscribers', [
+            'tenant_id' => $this->testTenantId,
+            'email' => $user->email,
+            'status' => 'unsubscribed',
+            'is_active' => 0,
+        ]);
+    }
+
+    public function test_unsubscribe_requires_token(): void
+    {
+        $response = $this->apiPost('/v2/newsletter/unsubscribe', []);
+
+        $response->assertStatus(400);
+    }
+
+    public function test_unsubscribe_rejects_invalid_token(): void
+    {
+        $response = $this->apiPost('/v2/newsletter/unsubscribe', [
+            'token' => Str::random(64),
+        ]);
+
+        $response->assertStatus(404);
     }
 }

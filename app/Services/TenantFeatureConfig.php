@@ -43,6 +43,7 @@ class TenantFeatureConfig
         'ai_agents' => false,
         'partner_api' => false,
         'regional_analytics' => false,
+        'newsletter' => true,
     ];
 
     /**

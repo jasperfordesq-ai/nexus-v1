@@ -416,6 +416,11 @@ export function AdminRoutes() {
       <Route path="moderation/reports" element={<Lazy><ReportsManagement /></Lazy>} />
 
       {/* ─── MARKETING ─── */}
+      <Route element={
+        <FeatureGatedElement feature="newsletter">
+          <Outlet />
+        </FeatureGatedElement>
+      }>
       <Route path="newsletters" element={<Lazy><NewsletterList /></Lazy>} />
       <Route path="newsletters/create" element={<Lazy><NewsletterForm /></Lazy>} />
       <Route path="newsletters/edit/:id" element={<Lazy><NewsletterForm /></Lazy>} />
@@ -432,6 +437,7 @@ export function AdminRoutes() {
       <Route path="newsletters/diagnostics" element={<Lazy><NewsletterDiagnostics /></Lazy>} />
       <Route path="newsletters/:id/stats" element={<Lazy><NewsletterStats /></Lazy>} />
       <Route path="newsletters/:id/activity" element={<Lazy><NewsletterActivity /></Lazy>} />
+      </Route>
 
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />

@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from '@heroui/react';
+import { Button, Card, CardBody } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Loader2 from 'lucide-react/icons/loader-circle';
@@ -45,7 +45,7 @@ export default function NewsletterUnsubscribePage() {
 
     type UnsubBody = { success: boolean; already_done?: boolean };
     api
-      .post<UnsubBody>('/v2/newsletter/unsubscribe', { token }, { skipAuth: true })
+      .post<UnsubBody>('/v2/newsletter/unsubscribe', { token }, { skipAuth: true, skipTenant: true })
       .then((res) => {
         if (!res.success) {
           // ApiResponse.success is false when PHP returned 4xx/5xx
@@ -67,7 +67,8 @@ export default function NewsletterUnsubscribePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-content2 px-4">
       <PageMeta title={t('page_meta.newsletter_unsubscribe.title')} noIndex />
-      <div className="w-full max-w-md bg-content1 rounded-2xl shadow-lg p-8 text-center">
+      <Card className="w-full max-w-md">
+      <CardBody className="p-8 text-center">
         <div className="mb-6">
           <Mail className="mx-auto text-default-400" size={40} />
         </div>
@@ -145,7 +146,8 @@ export default function NewsletterUnsubscribePage() {
             </Button>
           </>
         )}
-      </div>
+      </CardBody>
+      </Card>
     </div>
   );
 }

@@ -86,6 +86,11 @@ describe('NewsletterUnsubscribePage', () => {
     await waitFor(() => {
       expect(screen.getByText(/unsubscribed/i)).toBeInTheDocument();
     });
+    expect(mockApiPost).toHaveBeenCalledWith(
+      '/v2/newsletter/unsubscribe',
+      { token: 'valid-token' },
+      { skipAuth: true, skipTenant: true },
+    );
   });
 
   it('shows already-done state when already unsubscribed', async () => {

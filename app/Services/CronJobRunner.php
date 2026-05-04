@@ -636,8 +636,20 @@ class CronJobRunner
         try {
             echo "Processing newsletter queue...\n";
 
-            // Find newsletters that are currently sending
-            $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue WHERE status = 'pending' LIMIT 10";
+            // Find newsletters with queue work that can be claimed by NewsletterService::processQueue().
+            $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue
+                    WHERE status = 'pending'
+                       OR (
+                           status = 'failed'
+                           AND attempts < 5
+                           AND (last_attempted_at IS NULL
+                                OR NOW() >= last_attempted_at + INTERVAL (POW(attempts, 2) * 60) SECOND)
+                       )
+                       OR (
+                           status = 'processing'
+                           AND last_attempted_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+                       )
+                    LIMIT 10";
             $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 
             foreach ($pending as $row) {
@@ -1276,24 +1288,19 @@ class CronJobRunner
      */
     private function processNewsletterQueueInternal()
     {
-        // Auto-retry: reset failed items that are older than 30 minutes back to pending
-        // for one more attempt (max 1 retry). This acts as a dead-letter recovery.
-        try {
-            $retried = DB::update(
-                "UPDATE newsletter_queue SET status = 'pending', error_message = CONCAT(IFNULL(error_message,''), ' [auto-retry]')
-                 WHERE status = 'failed'
-                 AND updated_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)
-                 AND (error_message IS NULL OR error_message NOT LIKE '%[auto-retry]%')
-                 LIMIT 50"
-            );
-            if ($retried > 0) {
-                echo "   Auto-retried {$retried} previously failed queue items.\n";
-            }
-        } catch (\Throwable $e) {
-            // Non-critical — continue with normal processing
-        }
-
-        $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue WHERE status = 'pending' LIMIT 5";
+        $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue
+                WHERE status = 'pending'
+                   OR (
+                       status = 'failed'
+                       AND attempts < 5
+                       AND (last_attempted_at IS NULL
+                            OR NOW() >= last_attempted_at + INTERVAL (POW(attempts, 2) * 60) SECOND)
+                   )
+                   OR (
+                       status = 'processing'
+                       AND last_attempted_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+                   )
+                LIMIT 5";
         $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 
         if (empty($pending)) {

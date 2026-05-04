@@ -1141,6 +1141,7 @@ export interface TenantFeatures {
   ai_agents: boolean;
   fadp_compliance: boolean;
   local_advertising: boolean;
+  newsletter: boolean;
   merchant_coupons: boolean;
   regional_analytics: boolean;
 }
@@ -1644,6 +1645,7 @@ export interface FederatedMember {
   location?: string;
   service_reach?: string;
   messaging_enabled?: boolean;
+  transactions_enabled?: boolean;
   tenant_id?: number | string;
   tenant_name?: string;
   timebank: {

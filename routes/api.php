@@ -1399,13 +1399,15 @@ Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->
     Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
     Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
 });
-Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
-Route::get('/v2/admin/caring-community/safeguarding/reports', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingList']);
-Route::get('/v2/admin/caring-community/safeguarding/reports/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingShow']);
-Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/assign', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingAssign']);
-Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/escalate', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingEscalate']);
-Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/status', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingStatus']);
-Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/note', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingNote']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
+    Route::get('/v2/admin/caring-community/safeguarding/reports', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingList']);
+    Route::get('/v2/admin/caring-community/safeguarding/reports/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingShow']);
+    Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/assign', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingAssign']);
+    Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/escalate', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingEscalate']);
+    Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/status', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingStatus']);
+    Route::post('/v2/admin/caring-community/safeguarding/reports/{id}/note', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingNote']);
+});
 
 // Caring loyalty bridge — admin
 Route::get('/v2/admin/caring-community/loyalty/redemptions', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'listLoyaltyRedemptions']);
@@ -2321,8 +2323,10 @@ Route::middleware('throttle:60,1')->group(function () {
 });
 
 // Newsletter unsubscribe/tracking — public (recipients may not be logged in)
+Route::get('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
 Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
+Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackClick'])->middleware('throttle:120,1');
 
 // SOC13 — Social login (OAuth). Redirect/callback are public so anonymous
 // visitors can start a sign-in flow. Link/unlink/identities live inside

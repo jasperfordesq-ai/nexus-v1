@@ -31,7 +31,7 @@ class NewsletterSubscriberTest extends TestCase
         $expected = [
             'tenant_id', 'email', 'first_name', 'last_name', 'user_id',
             'source', 'status', 'confirmation_token', 'unsubscribe_token',
-            'confirmed_at', 'unsubscribed_at', 'unsubscribe_reason',
+            'confirmed_at', 'unsubscribed_at', 'unsubscribe_reason', 'is_active',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }
@@ -42,6 +42,7 @@ class NewsletterSubscriberTest extends TestCase
         $this->assertEquals('integer', $casts['user_id']);
         $this->assertEquals('datetime', $casts['confirmed_at']);
         $this->assertEquals('datetime', $casts['unsubscribed_at']);
+        $this->assertEquals('boolean', $casts['is_active']);
     }
 
     public function test_uses_has_tenant_scope(): void
