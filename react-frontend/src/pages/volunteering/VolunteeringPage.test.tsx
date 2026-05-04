@@ -130,9 +130,9 @@ vi.mock("react-i18next", () => ({
         "volunteering.applied_on": "Applied",
       };
       if (typeof fallbackOrOpts === "string") {
-        return translations[key] ?? fallbackOrOpts;
+        return translations[key] ?? translations[`volunteering.${key}`] ?? fallbackOrOpts;
       }
-      return translations[key] ?? key;
+      return translations[key] ?? translations[`volunteering.${key}`] ?? key;
     },
     i18n: { language: "en", changeLanguage: vi.fn() },
   }),

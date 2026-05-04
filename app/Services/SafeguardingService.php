@@ -482,6 +482,61 @@ class SafeguardingService
         }
 
         try {
+            $organizationId = !empty($data['organization_id']) ? (int) $data['organization_id'] : null;
+            $opportunityId = !empty($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
+            $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
+            $involvedUserId = !empty($data['involved_user_id']) ? (int) $data['involved_user_id'] : null;
+            $subjectUserId = !empty($data['subject_user_id']) ? (int) $data['subject_user_id'] : $involvedUserId;
+
+            if ($organizationId !== null && !DB::table('vol_organizations')->where('id', $organizationId)->where('tenant_id', $tenantId)->exists()) {
+                return false;
+            }
+
+            if ($opportunityId !== null) {
+                $opportunity = DB::table('vol_opportunities')
+                    ->where('id', $opportunityId)
+                    ->where('tenant_id', $tenantId)
+                    ->first(['id', 'org_id']);
+
+                if (!$opportunity || ($organizationId !== null && (int) $opportunity->org_id !== $organizationId)) {
+                    return false;
+                }
+
+                $organizationId = $organizationId ?? (int) $opportunity->org_id;
+            }
+
+            if ($shiftId !== null) {
+                $shift = DB::table('vol_shifts as s')
+                    ->join('vol_opportunities as o', function ($join) use ($tenantId) {
+                        $join->on('s.opportunity_id', '=', 'o.id')
+                            ->where('o.tenant_id', '=', $tenantId);
+                    })
+                    ->where('s.id', $shiftId)
+                    ->where('s.tenant_id', $tenantId)
+                    ->first(['s.id', 's.opportunity_id', 'o.org_id']);
+
+                if (!$shift) {
+                    return false;
+                }
+
+                if ($opportunityId !== null && (int) $shift->opportunity_id !== $opportunityId) {
+                    return false;
+                }
+
+                if ($organizationId !== null && (int) $shift->org_id !== $organizationId) {
+                    return false;
+                }
+
+                $opportunityId = (int) $shift->opportunity_id;
+                $organizationId = (int) $shift->org_id;
+            }
+
+            foreach (array_filter([$involvedUserId, $subjectUserId]) as $relatedUserId) {
+                if (!User::where('id', $relatedUserId)->where('tenant_id', $tenantId)->exists()) {
+                    return false;
+                }
+            }
+
             $id = DB::table('vol_safeguarding_incidents')->insertGetId([
                 'tenant_id' => $tenantId,
                 'reported_by' => $reporterId,
@@ -490,9 +545,11 @@ class SafeguardingService
                 'severity' => $severity,
                 'incident_type' => $incidentType,
                 'incident_date' => $data['incident_date'] ?? now()->toDateString(),
-                'involved_user_id' => $data['involved_user_id'] ?? null,
-                'organization_id' => $data['organization_id'] ?? null,
-                'shift_id' => $data['shift_id'] ?? null,
+                'subject_user_id' => $subjectUserId,
+                'involved_user_id' => $involvedUserId,
+                'organization_id' => $organizationId,
+                'opportunity_id' => $opportunityId,
+                'shift_id' => $shiftId,
                 'category' => $data['category'] ?? 'general',
                 'status' => 'open',
                 'created_at' => now(),
@@ -542,15 +599,32 @@ class SafeguardingService
             $total = (int) (clone $query)->count();
 
             $items = (clone $query)
-                ->join('users as u', 'si.reported_by', '=', 'u.id')
-                ->leftJoin('users as iu', 'si.involved_user_id', '=', 'iu.id')
-                ->leftJoin('vol_organizations as org', 'si.organization_id', '=', 'org.id')
-                ->leftJoin('users as au', 'si.assigned_to', '=', 'au.id')
+                ->join('users as u', function ($join) use ($tenantId) {
+                    $join->on('si.reported_by', '=', 'u.id')
+                        ->where('u.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as iu', function ($join) use ($tenantId) {
+                    $join->on('si.involved_user_id', '=', 'iu.id')
+                        ->where('iu.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as su', function ($join) use ($tenantId) {
+                    $join->on('si.subject_user_id', '=', 'su.id')
+                        ->where('su.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('vol_organizations as org', function ($join) use ($tenantId) {
+                    $join->on('si.organization_id', '=', 'org.id')
+                        ->where('org.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as au', function ($join) use ($tenantId) {
+                    $join->on('si.assigned_to', '=', 'au.id')
+                        ->where('au.tenant_id', '=', $tenantId);
+                })
                 ->select(
                     'si.*',
                     'u.name as reported_by_name',
                     'u.avatar_url as reported_by_avatar',
                     'iu.name as involved_user_name',
+                    'su.name as subject_user_name',
                     'org.name as organization_name',
                     'au.name as assigned_to_name'
                 )
@@ -558,7 +632,7 @@ class SafeguardingService
                 ->offset($offset)
                 ->limit($perPage)
                 ->get()
-                ->map(fn ($row) => (array) $row)
+                ->map(fn ($row) => $this->formatIncidentRow((array) $row))
                 ->all();
 
             return ['items' => $items, 'total' => $total, 'page' => $page, 'per_page' => $perPage];
@@ -581,16 +655,19 @@ class SafeguardingService
             $items = DB::table('vol_safeguarding_incidents as si')
                 ->where('si.tenant_id', $tenantId)
                 ->where('si.reported_by', $userId)
-                ->leftJoin('vol_organizations as org', 'si.organization_id', '=', 'org.id')
+                ->leftJoin('vol_organizations as org', function ($join) use ($tenantId) {
+                    $join->on('si.organization_id', '=', 'org.id')
+                        ->where('org.tenant_id', '=', $tenantId);
+                })
                 ->select(
-                    'si.id', 'si.incident_type', 'si.description', 'si.status',
-                    'si.severity', 'si.created_at', 'si.updated_at',
+                    'si.id', 'si.title', 'si.incident_type', 'si.description', 'si.status',
+                    'si.severity', 'si.category', 'si.incident_date', 'si.created_at', 'si.updated_at',
                     'org.name as organization_name'
                 )
                 ->orderByDesc('si.created_at')
                 ->limit(100)
                 ->get()
-                ->map(fn ($row) => (array) $row)
+                ->map(fn ($row) => $this->formatIncidentRow((array) $row))
                 ->all();
 
             return ['items' => $items, 'total' => count($items)];
@@ -607,10 +684,26 @@ class SafeguardingService
     {
         try {
             $record = DB::table('vol_safeguarding_incidents as si')
-                ->join('users as u', 'si.reported_by', '=', 'u.id')
-                ->leftJoin('users as iu', 'si.involved_user_id', '=', 'iu.id')
-                ->leftJoin('vol_organizations as org', 'si.organization_id', '=', 'org.id')
-                ->leftJoin('users as au', 'si.assigned_to', '=', 'au.id')
+                ->join('users as u', function ($join) use ($tenantId) {
+                    $join->on('si.reported_by', '=', 'u.id')
+                        ->where('u.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as iu', function ($join) use ($tenantId) {
+                    $join->on('si.involved_user_id', '=', 'iu.id')
+                        ->where('iu.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as su', function ($join) use ($tenantId) {
+                    $join->on('si.subject_user_id', '=', 'su.id')
+                        ->where('su.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('vol_organizations as org', function ($join) use ($tenantId) {
+                    $join->on('si.organization_id', '=', 'org.id')
+                        ->where('org.tenant_id', '=', $tenantId);
+                })
+                ->leftJoin('users as au', function ($join) use ($tenantId) {
+                    $join->on('si.assigned_to', '=', 'au.id')
+                        ->where('au.tenant_id', '=', $tenantId);
+                })
                 ->where('si.id', $incidentId)
                 ->where('si.tenant_id', $tenantId)
                 ->select(
@@ -619,12 +712,13 @@ class SafeguardingService
                     'u.avatar_url as reported_by_avatar',
                     'iu.name as involved_user_name',
                     'iu.avatar_url as involved_user_avatar',
+                    'su.name as subject_user_name',
                     'org.name as organization_name',
                     'au.name as assigned_to_name'
                 )
                 ->first();
 
-            return $record ? (array) $record : null;
+            return $record ? $this->formatIncidentRow((array) $record) : null;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::getIncident error: ' . $e->getMessage());
             return null;
@@ -639,7 +733,7 @@ class SafeguardingService
         try {
             // Validate status enum if provided
             if (isset($data['status'])) {
-                $validStatuses = ['open', 'investigating', 'resolved', 'closed'];
+                $validStatuses = ['open', 'investigating', 'resolved', 'escalated', 'closed'];
                 if (!in_array($data['status'], $validStatuses, true)) {
                     return false;
                 }
@@ -670,6 +764,22 @@ class SafeguardingService
                 ->where('tenant_id', $tenantId)
                 ->first();
 
+            if (!$currentIncident) {
+                return false;
+            }
+
+            if (isset($updates['assigned_to']) && $updates['assigned_to'] !== null) {
+                $assigneeExists = User::where('id', (int) $updates['assigned_to'])
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'active')
+                    ->whereIn('role', ['admin', 'tenant_admin', 'super_admin', 'broker', 'coordinator'])
+                    ->exists();
+
+                if (!$assigneeExists) {
+                    return false;
+                }
+            }
+
             DB::table('vol_safeguarding_incidents')
                 ->where('id', $incidentId)
                 ->where('tenant_id', $tenantId)
@@ -691,6 +801,110 @@ class SafeguardingService
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::updateIncident error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getIncidentStats(int $tenantId): array
+    {
+        try {
+            $rows = DB::table('vol_safeguarding_incidents')
+                ->selectRaw('status, COUNT(*) as count')
+                ->where('tenant_id', $tenantId)
+                ->groupBy('status')
+                ->get();
+
+            $counts = [];
+            foreach ($rows as $row) {
+                $counts[$row->status] = (int) $row->count;
+            }
+
+            return [
+                'total_incidents' => array_sum($counts),
+                'open' => $counts['open'] ?? 0,
+                'under_investigation' => $counts['investigating'] ?? 0,
+                'resolved' => ($counts['resolved'] ?? 0) + ($counts['closed'] ?? 0),
+                'escalated' => $counts['escalated'] ?? 0,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::getIncidentStats error: ' . $e->getMessage());
+            return [
+                'total_incidents' => 0,
+                'open' => 0,
+                'under_investigation' => 0,
+                'resolved' => 0,
+                'escalated' => 0,
+            ];
+        }
+    }
+
+    public function getDlpAssignments(int $tenantId): array
+    {
+        try {
+            return DB::table('vol_organizations as org')
+                ->leftJoin('users as dlp', function ($join) use ($tenantId) {
+                    $join->on('org.dlp_user_id', '=', 'dlp.id')
+                        ->where('dlp.tenant_id', '=', $tenantId);
+                })
+                ->where('org.tenant_id', $tenantId)
+                ->orderBy('org.name')
+                ->select(
+                    'org.id as organization_id',
+                    'org.name as organization_name',
+                    'org.dlp_user_id',
+                    'dlp.name as dlp_user_name'
+                )
+                ->get()
+                ->map(fn ($row) => [
+                    'organization_id' => (int) $row->organization_id,
+                    'organization_name' => $row->organization_name,
+                    'dlp_user_id' => $row->dlp_user_id !== null ? (int) $row->dlp_user_id : null,
+                    'dlp_user_name' => $row->dlp_user_name,
+                ])
+                ->all();
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::getDlpAssignments error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function assignOrganizationDlp(int $organizationId, int $dlpUserId, int $adminId, int $tenantId): bool
+    {
+        try {
+            $organization = DB::table('vol_organizations')
+                ->where('id', $organizationId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$organization) {
+                return false;
+            }
+
+            $dlpUser = User::where('id', $dlpUserId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->whereIn('role', ['admin', 'tenant_admin', 'super_admin', 'broker', 'coordinator'])
+                ->first();
+
+            if (!$dlpUser) {
+                return false;
+            }
+
+            DB::table('vol_organizations')
+                ->where('id', $organizationId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'dlp_user_id' => $dlpUserId,
+                    'updated_at' => now(),
+                ]);
+
+            $this->logActivity($adminId, 'safeguarding_organization_dlp_assigned', 'vol_organization', $organizationId, [
+                'dlp_user_id' => $dlpUserId,
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::assignOrganizationDlp error: ' . $e->getMessage());
             return false;
         }
     }
@@ -1068,6 +1282,23 @@ class SafeguardingService
     // =========================================================================
     // AUDIT LOGGING
     // =========================================================================
+
+    private function formatIncidentRow(array $row): array
+    {
+        $subjectName = $row['subject_user_name']
+            ?? $row['involved_user_name']
+            ?? $row['subject_name']
+            ?? null;
+
+        $row['type'] = $row['incident_type'] ?? $row['type'] ?? 'other';
+        $row['reporter_name'] = $row['reported_by_name'] ?? $row['reporter_name'] ?? null;
+        $row['subject_name'] = $subjectName;
+        $row['date'] = $row['incident_date'] ?? $row['created_at'] ?? null;
+        $row['dlp_user_id'] = $row['assigned_to'] ?? $row['dlp_user_id'] ?? null;
+        $row['dlp_user_name'] = $row['assigned_to_name'] ?? $row['dlp_user_name'] ?? null;
+
+        return $row;
+    }
 
     private function logActivity(int $userId, string $action, string $entityType, ?int $entityId, array $details = []): void
     {

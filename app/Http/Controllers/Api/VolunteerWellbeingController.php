@@ -310,6 +310,10 @@ class VolunteerWellbeingController extends BaseApiController
         try {
             $tenantId = TenantContext::getId();
             $result = $this->safeguardingService->reportIncident($userId, $data, $tenantId);
+            if ($result === false) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.validation_failed'), null, 422);
+            }
+
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -376,7 +380,17 @@ class VolunteerWellbeingController extends BaseApiController
         $perPage = $this->queryInt('per_page', 20, 1, 50);
 
         $result = $this->safeguardingService->getIncidents($tenantId, $status, $page, $perPage);
-        return $this->respondWithData($result);
+        $incidents = $result['items'] ?? [];
+
+        return $this->respondWithData([
+            'incidents' => $incidents,
+            'items' => $incidents,
+            'stats' => $this->safeguardingService->getIncidentStats($tenantId),
+            'dlp_assignments' => $this->safeguardingService->getDlpAssignments($tenantId),
+            'total' => $result['total'] ?? 0,
+            'page' => $result['page'] ?? $page,
+            'per_page' => $result['per_page'] ?? $perPage,
+        ]);
     }
 
     public function updateIncident($id): JsonResponse
@@ -407,12 +421,16 @@ class VolunteerWellbeingController extends BaseApiController
         }
 
         $tenantId = TenantContext::getId();
-        $result = $this->safeguardingService->assignDlp(
+        $result = $this->safeguardingService->assignOrganizationDlp(
             (int) $id,
             $dlpUserId,
             $adminId,
             $tenantId
         );
+
+        if (!$result) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_dlp_assign_failed'), null, 422);
+        }
 
         return $this->respondWithData(['success' => $result]);
     }

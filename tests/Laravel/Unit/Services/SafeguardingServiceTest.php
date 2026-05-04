@@ -89,7 +89,13 @@ class SafeguardingServiceTest extends TestCase
 
     public function test_updateIncident_sets_resolved_at_for_closed_status(): void
     {
-        DB::shouldReceive('table->where->where->update')->once();
+        DB::shouldReceive('table->where->where->first')->andReturn((object) [
+            'reported_by' => 1,
+            'assigned_to' => null,
+            'severity' => 'low',
+        ]);
+        DB::shouldReceive('table->where->where->update')->once()->andReturn(1);
+        DB::shouldReceive('table->insert')->andReturn(true);
 
         $result = $this->service->updateIncident(1, ['status' => 'resolved'], 1, $this->testTenantId);
         $this->assertTrue($result);

@@ -90,6 +90,7 @@ export function SafeguardingTab() {
 
   const handleSubmitIncident = async () => {
     if (!incidentForm.title.trim() || !incidentForm.description.trim()) { toastRef.current.error(tRef.current('safeguarding.fill_required', 'Please fill in all required fields.')); return; }
+    if (incidentForm.description.trim().length < 20) { toastRef.current.error(tRef.current('safeguarding.description_min', 'Please provide at least 20 characters in the description.')); return; }
     try {
       setIsSubmittingIncident(true);
       const res = await api.post('/v2/volunteering/incidents', { title: incidentForm.title.trim(), description: incidentForm.description.trim(), severity: incidentForm.severity, category: incidentForm.category.trim() || undefined });

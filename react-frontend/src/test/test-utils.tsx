@@ -12,6 +12,7 @@ import { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
+import { HelmetProvider } from 'react-helmet-async';
 import { ToastProvider } from '@/contexts/ToastContext';
 
 /**
@@ -20,11 +21,13 @@ import { ToastProvider } from '@/contexts/ToastContext';
 function AllProviders({ children }: { children: ReactNode }) {
   return (
     <HeroUIProvider>
-      <BrowserRouter>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
-      </BrowserRouter>
+      <HelmetProvider>
+        <BrowserRouter>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </BrowserRouter>
+      </HelmetProvider>
     </HeroUIProvider>
   );
 }

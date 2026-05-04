@@ -61,7 +61,7 @@ import HandHeart from 'lucide-react/icons/hand-heart';
 import Accessibility from 'lucide-react/icons/accessibility';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { PageMeta } from '@/components/seo/PageMeta';
+import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -1177,7 +1177,7 @@ function HoursTab() {
                     {(summary.by_organization ?? []).map((org, i) => (
                       <div key={i} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">{org.name}</span>
-                        <span className="text-sm font-medium text-theme-primary">{org.hours}h</span>
+                        <span className="text-sm font-medium text-theme-primary">{t('hours_abbrev', { hours: org.hours })}</span>
                       </div>
                     ))}
                   </div>
@@ -1197,7 +1197,7 @@ function HoursTab() {
                         <span className="text-sm text-theme-muted">
                           {new Date(month.month + '-01').toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}
                         </span>
-                        <span className="text-sm font-medium text-theme-primary">{month.hours}h</span>
+                        <span className="text-sm font-medium text-theme-primary">{t('hours_abbrev', { hours: month.hours })}</span>
                       </div>
                     ))}
                   </div>

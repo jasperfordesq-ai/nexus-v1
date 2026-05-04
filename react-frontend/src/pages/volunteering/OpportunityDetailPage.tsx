@@ -51,7 +51,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import QrCode from 'lucide-react/icons/qr-code';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
-import { PageMeta } from '@/components/seo/PageMeta';
+import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';

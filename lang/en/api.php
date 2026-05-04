@@ -1320,6 +1320,7 @@ return [
     'vol_incident_not_found'               => 'Incident not found',
     'vol_incident_view_forbidden'          => 'You do not have permission to view this incident',
     'vol_dlp_user_required'                => 'dlp_user_id is required and must be a positive integer',
+    'vol_dlp_assign_failed'                => 'Unable to assign the DLP for this organisation',
     'vol_training_not_found'               => 'Training record not found',
     'vol_training_reject_reason'           => 'A reason is required to reject a training record',
 

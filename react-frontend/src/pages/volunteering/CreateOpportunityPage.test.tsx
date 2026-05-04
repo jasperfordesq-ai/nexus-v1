@@ -55,8 +55,8 @@ vi.mock("react-i18next", () => ({
         "volunteering.form_category": "Category",
         "volunteering.form_org_label": "Organisation",
       };
-      if (typeof fallback === "string") return translations[key] ?? fallback;
-      return translations[key] ?? key;
+      if (typeof fallback === "string") return translations[key] ?? translations[`volunteering.${key}`] ?? fallback;
+      return translations[key] ?? translations[`volunteering.${key}`] ?? key;
     },
     i18n: { language: "en", changeLanguage: vi.fn() },
   }),
