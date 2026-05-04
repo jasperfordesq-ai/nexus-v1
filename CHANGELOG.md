@@ -10,17 +10,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Public `SECURITY.md` vulnerability disclosure policy.
+- Public `CODE_OF_CONDUCT.md` community participation expectations.
+- Dependabot coverage for Composer, npm, Docker, and GitHub Actions.
+- Dependency Review workflow for pull request dependency changes.
+- Tag-driven GitHub Release workflow and release process documentation.
+- Request ID middleware that returns `X-Request-Id` and shares request, tenant, and user context with application logs.
 - Comprehensive documentation suite
   - API Endpoints V2 reference (80+ endpoints documented)
   - React Component Library documentation (40+ components)
   - Developer Guide for extending the platform
   - User guides for Smart Matching and Reviews System
 
+### Changed
+- README now documents the public repository topology, visible quality gates, security process, and release process.
+- README now clarifies that native mobile packaging is separate from the default public Docker workflow.
+
 ---
 
-## [3.0.0] - 2026-03-27
+## [1.5.0-rc.1] - 2026-03-27
 
-This release covers nearly all development from 2026-01-18 to present. It is a **major release** representing the full maturation of the platform: a complete React SPA frontend, a full Laravel 12 migration, a Capacitor mobile app, WebAuthn passkey support, 7-language i18n, federation, social features, and comprehensive security hardening.
+This release candidate covers nearly all development from 2026-01-18 to present. It represents the full maturation of the V1.5 line: a complete React SPA frontend, a full Laravel 12 migration, WebAuthn passkey support, expanded i18n, federation, social features, and comprehensive security hardening.
 
 ### Added
 

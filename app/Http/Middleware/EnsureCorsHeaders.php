@@ -76,7 +76,8 @@ class EnsureCorsHeaders
                 $response->headers->set('Access-Control-Allow-Origin', '*');
             }
             $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, X-Request-Id');
+            $response->headers->set('Access-Control-Expose-Headers', 'X-Request-Id');
             return $response;
         }
 
@@ -84,7 +85,8 @@ class EnsureCorsHeaders
             $response->headers->set('Access-Control-Allow-Origin', $origin);
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, Accept, X-Tenant-Id, X-Trusted-Device, X-Timezone, X-Locale');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, Accept, X-Tenant-Id, X-Trusted-Device, X-Timezone, X-Locale, X-Request-Id');
+            $response->headers->set('Access-Control-Expose-Headers', 'X-Request-Id');
         }
 
         return $response;

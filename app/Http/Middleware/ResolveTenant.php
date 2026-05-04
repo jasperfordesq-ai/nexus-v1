@@ -8,6 +8,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,6 +64,7 @@ class ResolveTenant
 
         // Bind tenant.id into Laravel's container for services that use app('tenant.id')
         app()->instance('tenant.id', $tenantId);
+        Log::shareContext(['tenant_id' => $tenantId]);
 
         return $next($request);
     }

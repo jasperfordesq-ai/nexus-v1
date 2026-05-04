@@ -13,7 +13,14 @@
 /NOTICE @jasperfordesq-ai
 /CONTRIBUTING.md @jasperfordesq-ai
 /CONTRIBUTOR_TERMS.md @jasperfordesq-ai
+/CODE_OF_CONDUCT.md @jasperfordesq-ai
+/SECURITY.md @jasperfordesq-ai
 /.github/CODEOWNERS @jasperfordesq-ai
+/.github/RELEASE_PROCESS.md @jasperfordesq-ai
+/.github/dependabot.yml @jasperfordesq-ai
 /.github/pull_request_template.md @jasperfordesq-ai
 /.github/workflows/contributor-terms.yml @jasperfordesq-ai
+/.github/workflows/dependency-review.yml @jasperfordesq-ai
 /.github/workflows/pr-checks.yml @jasperfordesq-ai
+/.github/workflows/release.yml @jasperfordesq-ai
+/.github/workflows/security-scan.yml @jasperfordesq-ai

@@ -23,7 +23,7 @@ Time banking is a community-based system where members exchange services using t
 - **Smart Matching** — AI-powered matching of members and listings
 - **Exchange Workflow** — Broker-approved service exchange lifecycle
 - **Multi-Tenant** — Run multiple communities from one platform, each with its own branding and configuration
-- **PWA & Native Mobile** — Progressive Web App plus Capacitor native apps (iOS & Android)
+- **PWA & Native Mobile** — Progressive Web App, with native app packaging managed outside the default Docker setup
 - **Real-Time** — Pusher WebSockets for live updates, FCM for mobile push
 - **Internationalisation** — 11 supported languages: English, Irish (Gaeilge), German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, Arabic (with full RTL support)
 - **Light/Dark Theme** — System-aware theme with per-user preference
@@ -44,6 +44,22 @@ Time banking is a community-based system where members exchange services using t
 | **Animations** | Framer Motion |
 | **Charts** | Recharts |
 | **Rich Text** | Lexical |
+
+## Repository Topology
+
+| Path | Purpose |
+|------|---------|
+| `app/`, `routes/`, `config/`, `bootstrap/` | Laravel 12 application, API routing, middleware, providers, and runtime configuration |
+| `react-frontend/` | Primary React 18 + TypeScript UI for members and current admin workflows |
+| `views/` | Laravel Blade/email views plus legacy admin compatibility surfaces only |
+| `httpdocs/` | Apache web root, public health endpoints, and compatibility entrypoints |
+| `database/`, `migrations/`, `schema.sql` | Laravel migrations, legacy SQL history, and schema reference artifacts |
+| `tests/`, `e2e/`, `playwright.config.ts` | PHPUnit, integration, and browser test coverage |
+| `sales-site/` | Public marketing site container |
+| `.github/` | CI, security, contributor, release, and dependency automation |
+| `scripts/` | Build, migration, deployment, maintenance, and audit tooling |
+
+Native mobile project artifacts are not required for the public Docker setup. The React PWA is the canonical user interface; native packaging is release-managed separately from normal local development.
 
 ## Quick Start
 
@@ -66,7 +82,7 @@ docker exec nexus-php-app php artisan migrate
 # PHP API:        http://localhost:8090
 # Sales Site:     http://localhost:3001
 
-# Mobile app (iOS/Android) — see mobile/ directory for Capacitor setup
+# Native app packaging is separate from the default Docker workflow
 ```
 
 ## Database Setup
@@ -77,20 +93,28 @@ Run Laravel migrations after starting Docker to create the schema:
 docker exec nexus-php-app php artisan migrate
 ```
 
-A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. For production migrations, see the [deployment guide](docs/DEPLOYMENT.md).
+A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. For zero-downtime deployment notes, see [docs/ZERO_DOWNTIME_DEPLOYMENT_PLAN.md](docs/ZERO_DOWNTIME_DEPLOYMENT_PLAN.md).
 
 ## Project Status
 
 This is **version 1.5 — release candidate**, in active production use while undergoing final pre-release validation:
 
-- The **React frontend** (`react-frontend/`) is the sole UI for all user-facing and admin pages
+- The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
 - The **Laravel 12 backend** provides the API — all services are native Laravel implementations (zero stubs)
-- The **legacy PHP admin views** (`/admin-legacy/` and `/super-admin/`) have been decommissioned; the React admin panel handles 100% of admin UI
+- The **legacy PHP admin views** are compatibility-only surfaces for `/admin-legacy/` and `/super-admin/`
 - **Zero-downtime blue/green deployments** — production switches between blue and green container stacks with no maintenance window
-- The **mobile app** (`mobile/`) is a Capacitor project targeting iOS and Android
-- **Tests** are in `tests/` — coverage is growing with each release
+- **Native mobile packaging** is managed separately from the default public Docker checkout
+- **Tests** are in `tests/`, `react-frontend/src/**/*.test.*`, and `e2e/`; CI also runs static analysis, build, migration, i18n, SPDX, smoke, accessibility, and security gates
 
 We welcome contributors who are comfortable working with a modern Laravel + React codebase.
+
+## Quality, Security, and Releases
+
+- Security reports use the private process in [SECURITY.md](SECURITY.md).
+- Contributor behaviour expectations are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- Dependency updates are managed by Dependabot for Composer, npm, Docker, and GitHub Actions.
+- Pull requests run dependency review, CI, security scanning, i18n drift checks, SPDX checks, E2E smoke tests, and accessibility checks.
+- GitHub Releases are created from version tags; see [.github/RELEASE_PROCESS.md](.github/RELEASE_PROCESS.md).
 
 ## Credits and Origins
 

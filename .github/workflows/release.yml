@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to publish, for example v1.5.0-rc.1
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG_NAME: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag must look like v1.5.0 or v1.5.0-rc.1"
+            exit 1
+          fi
+          git rev-parse "$TAG_NAME^{commit}" >/dev/null
+
+      - name: Build release notes
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+          NOTES="$RUNNER_TEMP/release-notes.md"
+
+          awk -v version="$VERSION" '
+            $0 ~ "^## \\[" version "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > "$NOTES"
+
+          if [ ! -s "$NOTES" ]; then
+            {
+              echo "Project NEXUS ${TAG_NAME}"
+              echo
+              echo "No matching CHANGELOG.md section was found for ${VERSION}."
+              echo "Review the commit history before publishing this release."
+            } > "$NOTES"
+          fi
+
+          echo "notes_file=$NOTES" >> "$GITHUB_ENV"
+
+      - name: Publish GitHub release
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "::notice::Release $TAG_NAME already exists; leaving it unchanged."
+            exit 0
+          fi
+
+          args=(
+            release create "$TAG_NAME"
+            "--title=Project NEXUS ${TAG_NAME}"
+            "--notes-file=${notes_file}"
+            --verify-tag
+          )
+
+          if [[ "$TAG_NAME" == *-* ]]; then
+            args+=(--prerelease)
+          fi
+
+          gh "${args[@]}"

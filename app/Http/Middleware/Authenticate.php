@@ -9,6 +9,7 @@ namespace App\Http\Middleware;
 use App\Services\TokenService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -86,6 +87,9 @@ class Authenticate
                 }
 
                 auth()->shouldUse($guard);
+                if ($user) {
+                    Log::shareContext(['user_id' => (int) $user->id]);
+                }
                 return $next($request);
             }
         }
@@ -97,6 +101,10 @@ class Authenticate
             if ($validated) {
                 // shouldUse AFTER setUser (setUser happens inside validateLegacyToken)
                 auth()->shouldUse('sanctum');
+                $user = auth()->guard('sanctum')->user();
+                if ($user) {
+                    Log::shareContext(['user_id' => (int) $user->id]);
+                }
                 return $next($request);
             }
         }

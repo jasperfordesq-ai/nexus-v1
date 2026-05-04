@@ -29,6 +29,9 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Composer Audit
+        run: composer audit --locked --no-interaction
+
       # ── Trivy filesystem scan ─────────────────────────────────────
       # The TABLE step is the blocking gate (exit-code 1) because Trivy
       # correctly handles .trivyignore suppressions in table format.
@@ -115,6 +118,13 @@ jobs:
         run: |
           npm ci --ignore-scripts
           cd react-frontend && npm ci --ignore-scripts
+          cd ../e2e && npm ci --ignore-scripts
+
+      - name: NPM Audit
+        run: |
+          npm audit --audit-level=high
+          cd react-frontend && npm audit --audit-level=high
+          cd ../e2e && npm audit --audit-level=high
 
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
