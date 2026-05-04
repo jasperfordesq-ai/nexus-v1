@@ -27,8 +27,8 @@ interface TopEndorsedMember {
   id: number;
   name: string;
   avatar_url?: string;
-  total_endorsements: number;
-  top_skills: string[];
+  total_endorsements?: number;
+  top_skills?: string[] | null;
 }
 
 export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
@@ -80,50 +80,54 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
       </div>
 
       <div className="space-y-3">
-        {members.map((member, index) => (
-          <Link
-            key={member.id}
-            to={tenantPath(`/profile/${member.id}`)}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-theme-hover transition-colors"
-          >
-            {/* Rank */}
-            <div className="w-6 flex-shrink-0 flex items-center justify-center">
-              {index < 3 ? (
-                rankIcons[index]
-              ) : (
-                <span className="text-xs font-bold text-theme-subtle">#{index + 1}</span>
-              )}
-            </div>
+        {members.map((member, index) => {
+          const topSkills = Array.isArray(member.top_skills) ? member.top_skills : [];
 
-            {/* Avatar */}
-            <Avatar
-              src={resolveAvatarUrl(member.avatar_url)}
-              name={member.name}
-              size="sm"
-              className="ring-2 ring-theme-muted/20"
-            />
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-theme-primary truncate">{member.name}</p>
-              {member.top_skills.length > 0 && (
-                <p className="text-xs text-theme-subtle truncate">
-                  {member.top_skills.slice(0, 2).join(', ')}
-                </p>
-              )}
-            </div>
-
-            {/* Count */}
-            <Chip
-              size="sm"
-              variant="flat"
-              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-              startContent={<ThumbsUp className="w-3 h-3" aria-hidden="true" />}
+          return (
+            <Link
+              key={member.id}
+              to={tenantPath(`/profile/${member.id}`)}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-theme-hover transition-colors"
             >
-              {member.total_endorsements}
-            </Chip>
-          </Link>
-        ))}
+              {/* Rank */}
+              <div className="w-6 flex-shrink-0 flex items-center justify-center">
+                {index < 3 ? (
+                  rankIcons[index]
+                ) : (
+                  <span className="text-xs font-bold text-theme-subtle">#{index + 1}</span>
+                )}
+              </div>
+
+              {/* Avatar */}
+              <Avatar
+                src={resolveAvatarUrl(member.avatar_url)}
+                name={member.name}
+                size="sm"
+                className="ring-2 ring-theme-muted/20"
+              />
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-theme-primary truncate">{member.name}</p>
+                {topSkills.length > 0 && (
+                  <p className="text-xs text-theme-subtle truncate">
+                    {topSkills.slice(0, 2).join(', ')}
+                  </p>
+                )}
+              </div>
+
+              {/* Count */}
+              <Chip
+                size="sm"
+                variant="flat"
+                className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                startContent={<ThumbsUp className="w-3 h-3" aria-hidden="true" />}
+              >
+                {member.total_endorsements ?? 0}
+              </Chip>
+            </Link>
+          );
+        })}
       </div>
     </GlassCard>
   );

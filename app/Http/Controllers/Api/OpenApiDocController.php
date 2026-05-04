@@ -19,8 +19,9 @@ class OpenApiDocController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** Path to the OpenAPI spec file */
-    private const SPEC_PATH = 'docs/openapi.yaml';
+    /** Paths to the OpenAPI spec files */
+    private const JSON_SPEC_PATH = 'resources/openapi.json';
+    private const YAML_SPEC_PATH = 'resources/openapi.yaml';
 
     /**
      * GET /api/docs/openapi.json
@@ -30,16 +31,16 @@ class OpenApiDocController extends BaseApiController
      */
     public function json(): JsonResponse
     {
-        $specPath = base_path(self::SPEC_PATH);
+        $specPath = base_path(self::JSON_SPEC_PATH);
 
         if (!file_exists($specPath)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.openapi_spec_not_found'), null, 404);
         }
 
-        $yaml = file_get_contents($specPath);
-        $spec = $this->parseYaml($yaml);
+        $json = file_get_contents($specPath);
+        $spec = $json !== false ? json_decode($json, true) : null;
 
-        if ($spec === null) {
+        if (!is_array($spec)) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.openapi_parse_failed'), null, 500);
         }
 
@@ -58,7 +59,7 @@ class OpenApiDocController extends BaseApiController
      */
     public function yaml(): Response
     {
-        $specPath = base_path(self::SPEC_PATH);
+        $specPath = base_path(self::YAML_SPEC_PATH);
 
         if (!file_exists($specPath)) {
             return response(json_encode([

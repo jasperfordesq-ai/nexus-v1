@@ -24,7 +24,7 @@ import { generateTestData } from '../../helpers/test-utils';
 
 test.describe('Social Feed', () => {
   test.describe('Feed Display', () => {
-    test('should display feed page', async ({ page }) => {
+    test('should display feed page @smoke', async ({ page }) => {
       const feed = new FeedPage(page);
       await feed.navigate();
 

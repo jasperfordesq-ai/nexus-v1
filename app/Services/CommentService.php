@@ -11,6 +11,7 @@ use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\MentionService;
+use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -37,6 +38,11 @@ class CommentService
      */
     public static function getForEntity(string $targetType, int $targetId, int $currentUserId = 0): array
     {
+        $targetType = self::normalizeTargetType($targetType);
+        if (!self::targetIsCommentableAndVisible($targetType, $targetId, $currentUserId ?: null)) {
+            return [];
+        }
+
         $rows = Comment::with(['user:id,first_name,last_name,avatar_url'])
             ->where('tenant_id', TenantContext::getId())
             ->where('target_type', $targetType)
@@ -93,7 +99,7 @@ class CommentService
                 'is_own' => (int) $comment->user_id === $currentUserId,
                 'author' => [
                     'id' => (int) $comment->user_id,
-                    'name' => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                    'name' => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : __('api.unknown_user'),
                     'avatar' => $user->avatar_url ?? null,
                 ],
                 'reactions' => $reactions[$cid] ?? (object) [],
@@ -115,6 +121,19 @@ class CommentService
         return $topLevel;
     }
 
+    public static function normalizeTargetType(string $targetType): string
+    {
+        return $targetType === 'feed_post' ? 'post' : $targetType;
+    }
+
+    public static function targetIsCommentableAndVisible(string $targetType, int $targetId, ?int $viewerId): bool
+    {
+        $targetType = self::normalizeTargetType($targetType);
+
+        return FeedItemTables::isCommentable($targetType)
+            && FeedItemTables::canView($targetType, $targetId, $viewerId);
+    }
+
     /**
      * Count all comments including replies.
      */
@@ -134,20 +153,16 @@ class CommentService
      */
     public static function create(string $targetType, int $targetId, int $userId, int $tenantId, array $data): Comment
     {
+        $targetType = self::normalizeTargetType($targetType);
+
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']));
 
         $parentId = $data['parent_id'] ?? null;
 
         // Check post visibility — prevent commenting on deleted/hidden posts
-        if ($targetType === 'post' || $targetType === 'feed_post') {
-            $post = DB::selectOne(
-                'SELECT id FROM feed_posts WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL',
-                [$targetId, $tenantId]
-            );
-            if (!$post) {
-                throw new \InvalidArgumentException('Target post not found or has been deleted');
-            }
+        if (!self::targetIsCommentableAndVisible($targetType, $targetId, $userId)) {
+            throw new \InvalidArgumentException(__('api.target_not_found'));
         }
 
         // M4: Wrap depth check + insert in a transaction to prevent TOCTOU race
@@ -158,13 +173,21 @@ class CommentService
             $depth = 0;
             $currentId = (int)$parentId;
             while ($currentId && $depth < 15) {
-                $parent = DB::selectOne('SELECT parent_id FROM comments WHERE id = ? AND tenant_id = ?', [$currentId, $tenantId]);
-                if (!$parent) break;
+                $parent = DB::selectOne(
+                    'SELECT parent_id, target_type, target_id FROM comments WHERE id = ? AND tenant_id = ?',
+                    [$currentId, $tenantId]
+                );
+                if (!$parent) {
+                    throw new \InvalidArgumentException(__('api.parent_comment_not_found'));
+                }
+                if ((string) $parent->target_type !== $targetType || (int) $parent->target_id !== $targetId) {
+                    throw new \InvalidArgumentException(__('api.parent_comment_target_mismatch'));
+                }
                 $currentId = (int)$parent->parent_id;
                 $depth++;
             }
             if ($depth >= 10) {
-                throw new \InvalidArgumentException('Comment nesting too deep');
+                throw new \InvalidArgumentException(__('api.comment_nesting_too_deep'));
             }
         }
 
@@ -257,6 +280,10 @@ class CommentService
     public static function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
     {
         $tenantId = TenantContext::getId();
+        $targetType = self::normalizeTargetType($targetType);
+        if (!self::targetIsCommentableAndVisible($targetType, $targetId, $currentUserId ?: null)) {
+            return [];
+        }
 
         $allComments = DB::table('comments as c')
             ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
@@ -265,9 +292,12 @@ class CommentService
             ->where('c.tenant_id', $tenantId)
             ->select([
                 'c.id', 'c.user_id', 'c.content', 'c.parent_id', 'c.created_at', 'c.updated_at',
-                DB::raw("COALESCE(u.name, u.first_name, 'Unknown') as author_name"),
                 DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
             ])
+            ->selectRaw(
+                "COALESCE(NULLIF(u.name, ''), NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), ?) as author_name",
+                [__('api.unknown_user')]
+            )
             ->orderBy('c.created_at')
             ->get()
             ->map(fn ($r) => (array) $r)
@@ -343,10 +373,16 @@ class CommentService
      */
     public static function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
     {
+        $targetType = self::normalizeTargetType($targetType);
+
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($content));
         if (empty($content)) {
             return ['success' => false, 'error' => __('api.comment_cannot_be_empty')];
+        }
+
+        if (!self::targetIsCommentableAndVisible($targetType, $targetId, $userId)) {
+            return ['success' => false, 'error' => __('api.target_not_found')];
         }
 
         // If replying, verify parent exists
@@ -354,6 +390,8 @@ class CommentService
             $parentExists = DB::table('comments')
                 ->where('id', $parentId)
                 ->where('tenant_id', $tenantId)
+                ->where('target_type', $targetType)
+                ->where('target_id', $targetId)
                 ->exists();
 
             if (!$parentExists) {
@@ -385,9 +423,12 @@ class CommentService
             ->where('c.id', $commentId)
             ->select([
                 'c.*',
-                DB::raw("COALESCE(u.name, u.first_name, 'Unknown') as author_name"),
                 DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
             ])
+            ->selectRaw(
+                "COALESCE(NULLIF(u.name, ''), NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), ?) as author_name",
+                [__('api.unknown_user')]
+            )
             ->first();
 
         return [

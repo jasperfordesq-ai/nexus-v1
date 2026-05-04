@@ -69,6 +69,10 @@ export function ReactionSummary({
 }: ReactionSummaryProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
+  const tr = (key: string, fallback: string) => {
+    const value = t(key);
+    return value === key ? fallback : value;
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>('all');
   const [reactors, setReactors] = useState<ReactorUser[]>([]);
@@ -162,7 +166,7 @@ export function ReactionSummary({
   // Build summary text
   const summaryText = (() => {
     if (topReactors.length === 0) {
-      return `${total} ${total === 1 ? t('card.reaction') : t('card.reactions')}`;
+      return `${total} ${total === 1 ? tr('card.reaction', 'reaction') : tr('card.reactions', 'reactions')}`;
     }
     const names = topReactors.map((r) => r.name);
     const remaining = total - names.length;
@@ -170,10 +174,14 @@ export function ReactionSummary({
       return names.join(', ');
     }
     if (names.length === 1) {
-      return `${names[0]} ${t('card.and')} ${remaining} ${remaining === 1 ? t('card.other') : t('card.others')}`;
+      return `${names[0]} ${tr('card.and', 'and')} ${remaining} ${remaining === 1 ? tr('card.other', 'other') : tr('card.others', 'others')}`;
     }
-    return `${names.join(', ')}, ${t('card.and')} ${remaining} ${remaining === 1 ? t('card.other') : t('card.others')}`;
+    return `${names.join(', ')}, ${tr('card.and', 'and')} ${remaining} ${remaining === 1 ? tr('card.other', 'other') : tr('card.others', 'others')}`;
   })();
+  const viewReactionsLabel = tr('card.view_reactions_aria', 'View reactions: {{summary}}').replace(
+    '{{summary}}',
+    summaryText
+  );
 
   /* ───── Render inline summary ───── */
 
@@ -196,7 +204,7 @@ export function ReactionSummary({
         size="sm"
         onPress={handleOpenModal}
         className="flex items-center gap-1.5 text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors h-auto p-0 min-w-0"
-        aria-label={`View reactions: ${summaryText}`}
+        aria-label={viewReactionsLabel}
       >
         {/* Emoji badges */}
         <span className="flex items-center -space-x-0.5">
@@ -236,7 +244,7 @@ export function ReactionSummary({
                   </span>
                 ))}
               </div>
-              {t('card.reactions_title')} ({total})
+              {tr('card.reactions_title', 'Reactions')} ({total})
             </div>
           </ModalHeader>
           <ModalBody className="pb-4 pt-2">
@@ -251,7 +259,7 @@ export function ReactionSummary({
                 tab: 'text-xs px-2',
               }}
             >
-              <Tab key="all" title={`${t('card.all')} ${total}`} />
+              <Tab key="all" title={`${tr('card.all', 'All')} ${total}`} />
               {sortedTypes.map(([type, count]) => (
                 <Tab
                   key={type}
@@ -272,7 +280,7 @@ export function ReactionSummary({
                 </div>
               ) : reactors.length === 0 ? (
                 <p className="text-sm text-[var(--text-subtle)] text-center py-6 italic">
-                  {t('card.no_reactions')}
+                  {tr('card.no_reactions', 'No reactions yet')}
                 </p>
               ) : (
                 <div className="space-y-1">
@@ -311,7 +319,7 @@ export function ReactionSummary({
                         onPress={handleLoadMore}
                         isLoading={isLoadingReactors}
                       >
-                        {t('card.load_more')}
+                        {tr('card.load_more', 'Load More')}
                       </Button>
                     </div>
                   )}

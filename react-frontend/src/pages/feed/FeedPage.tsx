@@ -13,7 +13,7 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import React, { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -144,7 +144,7 @@ export function FeedPage() {
   const pusher = usePusherOptional();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { tenantPath, tenant, hasFeature } = useTenant();
+  const { tenantPath, tenant, hasFeature, hasModule } = useTenant();
   const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -185,7 +185,7 @@ export function FeedPage() {
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
-  const [reportPostId, setReportPostId] = useState<number | null>(null);
+  const [reportTarget, setReportTarget] = useState<FeedItem | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
 
@@ -486,17 +486,27 @@ export function FeedPage() {
           ? {
               ...fi,
               is_liked: !fi.is_liked,
-              likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
+              likes_count: fi.is_liked ? Math.max(0, fi.likes_count - 1) : fi.likes_count + 1,
             }
           : fi
       )
     );
 
     try {
-      await api.post('/v2/feed/like', {
+      const res = await api.post('/v2/feed/like', {
         target_type: item.type,
         target_id: item.id,
       });
+      const serverLikes = (res.data as { likes_count?: number } | undefined)?.likes_count;
+      if (typeof serverLikes === 'number') {
+        setItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, likes_count: serverLikes }
+              : fi
+          )
+        );
+      }
     } catch (err) {
       logError('Failed to toggle like', err);
       // Revert on error
@@ -506,7 +516,7 @@ export function FeedPage() {
             ? {
                 ...fi,
                 is_liked: !fi.is_liked,
-                likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
+                likes_count: fi.is_liked ? Math.max(0, fi.likes_count - 1) : fi.likes_count + 1,
               }
             : fi
         )
@@ -611,24 +621,24 @@ export function FeedPage() {
   }, []);
 
   const openReportModal = useCallback((item: FeedItem) => {
-    setReportPostId(item.id);
+    setReportTarget(item);
     setReportReason('');
     onReportOpen();
   }, [onReportOpen]);
 
   const handleReport = useCallback(async () => {
-    if (!reportPostId || !reportReason.trim()) {
+    if (!reportTarget || !reportReason.trim()) {
       toastRef.current.error(tRef.current('toast.provide_reason'));
       return;
     }
 
     try {
       setIsReporting(true);
-      await api.post(`/v2/feed/posts/${reportPostId}/report`, {
+      await api.post(`/v2/feed/items/${reportTarget.type}/${reportTarget.id}/report`, {
         reason: reportReason.trim(),
       });
       onReportClose();
-      setReportPostId(null);
+      setReportTarget(null);
       setReportReason('');
       toastRef.current.success(tRef.current('toast.reported'));
     } catch (err) {
@@ -637,12 +647,12 @@ export function FeedPage() {
     } finally {
       setIsReporting(false);
     }
-  }, [reportPostId, reportReason, onReportClose]);
+  }, [reportTarget, reportReason, onReportClose]);
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
     if (item.type !== 'post') return;
     try {
-      await api.post(`/v2/feed/posts/${item.id}/delete`);
+      await api.delete(`/v2/feed/posts/${item.id}`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
       toastRef.current.success(tRef.current('toast.deleted'));
     } catch (err) {
@@ -784,23 +794,29 @@ export function FeedPage() {
     syncToUrl({ filter: 'all', subFilter: null });
   }, [syncToUrl]);
 
-  const filterOptions: { key: FeedFilter; label: string }[] = [
+  const filterOptions: { key: FeedFilter; label: string }[] = useMemo(() => [
     { key: 'all', label: t('filter.all') },
     ...(user ? [
       { key: 'following' as FeedFilter, label: t('filter.following') },
       { key: 'saved' as FeedFilter, label: t('filter.saved') },
     ] : []),
     { key: 'posts', label: t('filter.posts') },
-    { key: 'listings', label: t('filter.listings') },
-    { key: 'events', label: t('filter.events') },
+    ...(hasModule('listings') ? [{ key: 'listings' as FeedFilter, label: t('filter.listings') }] : []),
+    ...(hasFeature('events') ? [{ key: 'events' as FeedFilter, label: t('filter.events') }] : []),
     ...(hasFeature('polls') ? [{ key: 'polls' as FeedFilter, label: t('filter.polls') }] : []),
-    { key: 'goals', label: t('filter.goals') },
-    { key: 'jobs', label: t('filter.jobs') },
-    { key: 'challenges', label: t('filter.challenges') },
-    { key: 'volunteering', label: t('filter.volunteering') },
-    { key: 'blogs', label: t('filter.blogs') },
-    { key: 'discussions', label: t('filter.discussions') },
-  ];
+    ...(hasFeature('goals') ? [{ key: 'goals' as FeedFilter, label: t('filter.goals') }] : []),
+    ...(hasFeature('job_vacancies') ? [{ key: 'jobs' as FeedFilter, label: t('filter.jobs') }] : []),
+    ...(hasFeature('ideation_challenges') ? [{ key: 'challenges' as FeedFilter, label: t('filter.challenges') }] : []),
+    ...(hasFeature('volunteering') ? [{ key: 'volunteering' as FeedFilter, label: t('filter.volunteering') }] : []),
+    ...(hasFeature('blog') ? [{ key: 'blogs' as FeedFilter, label: t('filter.blogs') }] : []),
+    ...(hasFeature('groups') ? [{ key: 'discussions' as FeedFilter, label: t('filter.discussions') }] : []),
+  ], [hasFeature, hasModule, t, user]);
+
+  useEffect(() => {
+    if (!filterOptions.some((option) => option.key === filter)) {
+      handleFilterChange('all');
+    }
+  }, [filter, filterOptions, handleFilterChange]);
 
   const mobilePrimaryFilters = new Set<FeedFilter>(['all', 'following', 'saved', 'posts']);
   const mobilePrimaryFilterOptions = filterOptions.filter((opt) => mobilePrimaryFilters.has(opt.key));
@@ -1217,7 +1233,11 @@ export function FeedPage() {
       {/* Report Post Modal */}
       <Modal
         isOpen={isReportOpen}
-        onClose={onReportClose}
+        onClose={() => {
+          onReportClose();
+          setReportTarget(null);
+          setReportReason('');
+        }}
         classNames={{
           base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
           backdrop: 'bg-black/60 backdrop-blur-sm',

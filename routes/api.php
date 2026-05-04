@@ -418,6 +418,7 @@ Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Con
 Route::get('/v2/federation/partners/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partnerDetail']);
 Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
 Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
+Route::get('/v2/federation/groups', [\App\Http\Controllers\Api\FederationV2Controller::class, 'groups'])->middleware('throttle:60,1');
 Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings'])->middleware('throttle:60,1');
 Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members'])->middleware('throttle:60,1');
 Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
@@ -476,6 +477,9 @@ Route::put('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::c
 Route::post('/v2/feed/posts/{id}/not-interested', [\App\Http\Controllers\Api\SocialController::class, 'notInterested']);
 Route::post('/v2/feed/posts/{id}/hide', [\App\Http\Controllers\Api\SocialController::class, 'hidePostV2']);
 Route::post('/v2/feed/posts/{id}/report', [\App\Http\Controllers\Api\SocialController::class, 'reportPostV2']);
+Route::post('/v2/feed/items/{type}/{id}/report', [\App\Http\Controllers\Api\SocialController::class, 'reportItemV2'])
+    ->where('type', '[a-z_]+')
+    ->where('id', '[0-9]+');
 Route::delete('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']);
 Route::post('/v2/feed/posts/{id}/delete', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']); // deprecated: use DELETE /v2/feed/posts/{id}
 Route::post('/v2/feed/users/{id}/mute', [\App\Http\Controllers\Api\SocialController::class, 'muteUserV2']);
@@ -1562,8 +1566,8 @@ Route::get('/v2/admin/caring-community/integration-showcase', [\App\Http\Control
 
 // AG94 — Newsletter and Pilot-Region Lead Nurture
 Route::post('/v2/caring-community/leads/capture', [\App\Http\Controllers\Api\LeadCaptureController::class, 'capture'])
-    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class)
-    ->withoutMiddleware(\App\Http\Middleware\RequireAuth::class);
+    ->withoutMiddleware(['auth:sanctum', 'admin'])
+    ->middleware('throttle:10,1');
 Route::get('/v2/admin/caring-community/leads/summary', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'summary']);
 Route::get('/v2/admin/caring-community/leads/export.csv', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'exportCsv']);
 Route::get('/v2/admin/caring-community/leads', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'index']);
@@ -2195,6 +2199,7 @@ Route::post('/v2/admin/super/federation/whitelist', [\App\Http\Controllers\Api\A
 Route::delete('/v2/admin/super/federation/whitelist/{tenantId}', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationRemoveFromWhitelist']);
 Route::get('/v2/admin/super/federation/partnerships', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationPartnerships']);
 Route::post('/v2/admin/super/federation/partnerships/{id}/suspend', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationSuspendPartnership']);
+Route::post('/v2/admin/super/federation/partnerships/{id}/reactivate', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationReactivatePartnership']);
 Route::post('/v2/admin/super/federation/partnerships/{id}/terminate', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationTerminatePartnership']);
 Route::get('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationGetTenantFeatures']);
 Route::put('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationUpdateTenantFeature']);

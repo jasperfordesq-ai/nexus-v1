@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +39,7 @@ class PostAnalyticsController extends BaseApiController
             ->first();
 
         if (!$post) {
-            return $this->respondWithError('NOT_FOUND', 'Post not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
         }
 
         // Check ownership or admin
@@ -46,7 +47,7 @@ class PostAnalyticsController extends BaseApiController
         $isAdmin = $user && in_array($user->role ?? 'member', ['admin', 'tenant_admin', 'super_admin', 'god']);
 
         if ((int) $post->user_id !== $userId && !$isAdmin) {
-            return $this->respondWithError('FORBIDDEN', 'You can only view analytics for your own posts.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.post_analytics_own_only'), null, 403);
         }
 
         // Gather analytics
@@ -62,12 +63,13 @@ class PostAnalyticsController extends BaseApiController
             ->count();
 
         // Reaction breakdown
-        $reactionsBreakdown = DB::table('post_reactions')
-            ->where('post_id', $id)
+        $reactionsBreakdown = DB::table('reactions')
+            ->where('target_type', 'post')
+            ->where('target_id', $id)
             ->where('tenant_id', $tenantId)
-            ->select('reaction_type', DB::raw('COUNT(*) as count'))
-            ->groupBy('reaction_type')
-            ->pluck('count', 'reaction_type')
+            ->select('emoji', DB::raw('COUNT(*) as count'))
+            ->groupBy('emoji')
+            ->pluck('count', 'emoji')
             ->toArray();
 
         // Unique viewers (reach estimate)
@@ -94,6 +96,9 @@ class PostAnalyticsController extends BaseApiController
     public function recordView(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
+        if (!FeedItemTables::canView('post', $id, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        }
 
         $ipHash = hash('sha256', request()->ip() . ':' . $this->getTenantId());
 

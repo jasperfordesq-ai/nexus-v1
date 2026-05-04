@@ -80,7 +80,7 @@ describe('getAuthor', () => {
     };
     const author = getAuthor(item);
     expect(author.id).toBe(0);
-    expect(author.name).toBe('Unknown');
+    expect(author.name).toBe('');
     expect(author.avatar).toBeNull();
   });
 
@@ -120,8 +120,8 @@ describe('getItemDetailPath', () => {
     expect(getItemDetailPath({ ...base, type: 'event' })).toBe('/events/42');
   });
 
-  it('returns goals list path', () => {
-    expect(getItemDetailPath({ ...base, type: 'goal' })).toBe('/goals');
+  it('returns goals detail path', () => {
+    expect(getItemDetailPath({ ...base, type: 'goal' })).toBe('/goals/42');
   });
 
   it('returns receiver profile for review', () => {

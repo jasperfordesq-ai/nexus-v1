@@ -644,7 +644,9 @@ const FeedCard = React.memo(function FeedCard({
     (entry: IntersectionObserverEntry) => {
       if (!entry.isIntersecting || viewTrackedRef.current) return;
       viewTrackedRef.current = true;
-      api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
+      if (item.type === 'post') {
+        api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
+      }
 
       // Trigger confetti for milestone items on first view
       const isMilestone = item.type === 'badge_earned' || item.type === 'level_up';
@@ -663,13 +665,13 @@ const FeedCard = React.memo(function FeedCard({
 
   const setViewRef = useSharedFeedObserver(handleViewEntry, { threshold: 0.5 });
 
-  const author = getAuthor(item);
+  const author = getAuthor(item, t('author_unknown'));
   const isOwnPost = currentUserId === author.id;
   const config = typeConfig[item.type];
   const typeLabel = config.labelKey ? t(config.labelKey) : null;
   const detailPath = getItemDetailPath(item);
   const detailLabel = getItemDetailLabel(item);
-  const { ref: trackingRef, recordClick } = useFeedTracking(item.id, isAuthenticated);
+  const { ref: trackingRef, recordClick } = useFeedTracking(item.id, item.type, isAuthenticated);
 
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
   // provided inline, and we haven't already loaded or started loading it.
@@ -945,7 +947,7 @@ const FeedCard = React.memo(function FeedCard({
                       isIconOnly
                       size="sm"
                       variant="light"
-                      className="text-theme-subtle hover:text-theme-primary min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-theme-subtle hover:text-theme-primary min-w-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 group-focus-within:opacity-100 transition-opacity"
                       aria-label={t('card.post_options')}
                     >
                       <MoreHorizontal className="w-4 h-4" />

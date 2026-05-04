@@ -44,6 +44,7 @@ class SocialController extends BaseApiController
     private const VALID_LIKE_TARGETS = [
         'post', 'listing', 'event', 'poll', 'goal',
         'resource', 'volunteer', 'volunteering', 'review', 'challenge', 'comment',
+        'job', 'blog', 'discussion',
     ];
 
     public function __construct(
@@ -260,12 +261,10 @@ class SocialController extends BaseApiController
     public function showItem(string $type, int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
-        $tenantId = $this->getTenantId();
-
         // Restrict to canonical reactable types. Excludes notification cards
         // (badge_earned, level_up) and 'comment' (which has its own endpoint).
         $allowed = ['post', 'listing', 'event', 'poll', 'goal', 'review',
-                    'volunteer', 'challenge', 'blog', 'discussion', 'job'];
+                    'volunteer', 'challenge', 'resource', 'blog', 'discussion', 'job'];
         if (!in_array($type, $allowed, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'type', 400);
         }
@@ -274,27 +273,8 @@ class SocialController extends BaseApiController
         // feed query, so non-existent IDs cleanly 404 rather than returning
         // an empty feed result (defence-in-depth — feed_activity also scopes
         // by tenant, but the source table is the source of truth).
-        $sourceTables = [
-            'post'      => 'feed_posts',
-            'listing'   => 'listings',
-            'event'     => 'events',
-            'poll'      => 'polls',
-            'goal'      => 'goals',
-            'review'    => 'reviews',
-            'volunteer' => 'vol_opportunities',
-            'challenge' => 'ideation_challenges',
-            'blog'      => 'blog_posts',
-            'discussion' => 'group_discussions',
-            'job'       => 'job_vacancies',
-        ];
-        if (isset($sourceTables[$type])) {
-            $exists = DB::table($sourceTables[$type])
-                ->where('id', $id)
-                ->where('tenant_id', $tenantId)
-                ->exists();
-            if (!$exists) {
-                return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
-            }
+        if (!FeedItemTables::canView($type, $id, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
         }
 
         $result = $this->feedService->getFeed($userId, [
@@ -363,28 +343,8 @@ class SocialController extends BaseApiController
             $targetType = 'volunteer';
         }
 
-        // Verify the target belongs to this tenant before recording the like.
-        // Table names use the canonical (post-normalisation) target_type as the key.
-        $targetTables = [
-            'post'      => 'feed_posts',
-            'listing'   => 'listings',
-            'event'     => 'events',
-            'poll'      => 'polls',
-            'goal'      => 'goals',
-            'resource'  => 'resources',
-            'volunteer' => 'vol_opportunities',
-            'review'    => 'reviews',
-            'challenge' => 'ideation_challenges',
-            'comment'   => 'comments',
-        ];
-        if (isset($targetTables[$targetType])) {
-            $targetExists = DB::table($targetTables[$targetType])
-                ->where('id', $targetId)
-                ->where('tenant_id', $tenantId)
-                ->exists();
-            if (! $targetExists) {
-                return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
-            }
+        if (!FeedItemTables::canView($targetType, (int) $targetId, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
         }
 
         // Check existing like (tenant-scoped)
@@ -484,7 +444,15 @@ class SocialController extends BaseApiController
             $data['image_url'] = $imageUrl;
         }
 
-        $postObj = $this->feedService->createPost($userId, $data);
+        try {
+            $postObj = $this->feedService->createPost($userId, $data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+
+        if (is_array($postObj) && isset($postObj['error'])) {
+            return $this->respondWithError('VALIDATION_ERROR', (string) $postObj['error'], null, 422);
+        }
 
         if ($postObj === null) {
             $errors = $this->feedService->getErrors();
@@ -679,7 +647,7 @@ class SocialController extends BaseApiController
 
         $targetType = $this->input('type', 'post');
         $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
-                       'challenge', 'volunteer', 'blog', 'discussion'];
+                       'challenge', 'volunteer', 'resource', 'blog', 'discussion'];
         if (!in_array($targetType, $validTypes, true)) {
             $targetType = 'post';
         }
@@ -687,8 +655,8 @@ class SocialController extends BaseApiController
         // Verify the target actually exists in this tenant before writing to
         // feed_hidden. Otherwise a malicious client could poison the table
         // with arbitrary IDs to bias EdgeRank against unrelated content.
-        if (!FeedItemTables::exists($targetType, $id)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.post_not_found'), null, 404);
+        if (!FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
 
         // Record as hidden (reuses feed_hidden table — the EdgeRank negative signal
@@ -714,14 +682,14 @@ class SocialController extends BaseApiController
         // can be hidden correctly. Falls back to 'post' for backward compatibility.
         $targetType = $this->input('type', 'post');
         $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
-                       'challenge', 'volunteer', 'blog', 'discussion'];
+                       'challenge', 'volunteer', 'resource', 'blog', 'discussion'];
         if (!in_array($targetType, $validTypes, true)) {
             $targetType = 'post';
         }
 
         // Tenant-scoped existence check — see notInterested() above.
-        if (!FeedItemTables::exists($targetType, $id)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.post_not_found'), null, 404);
+        if (!FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
 
         DB::table('feed_hidden')->insertOrIgnore([
@@ -779,9 +747,10 @@ class SocialController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $targetType = $this->resolvePolymorphicType($this->input('type', 'post'));
-        if ($userId && $id > 0) {
-            $this->feedRankingService->recordImpression($id, $userId, $targetType);
+        if ($id <= 0 || !FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
+        $this->feedRankingService->recordImpression($id, $userId, $targetType);
         return $this->respondWithData(['recorded' => true]);
     }
 
@@ -805,9 +774,10 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target'), 'target_id', 400);
         }
 
-        if ($userId) {
-            $this->feedRankingService->recordImpression($targetId, $userId, $targetType);
+        if (!FeedItemTables::canView($targetType, $targetId, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
+        $this->feedRankingService->recordImpression($targetId, $userId, $targetType);
         return $this->respondWithData(['recorded' => true]);
     }
 
@@ -898,25 +868,55 @@ class SocialController extends BaseApiController
     /** POST /api/v2/feed/posts/{id}/report */
     public function reportPostV2($id): JsonResponse
     {
+        return $this->reportItemV2((string) $this->input('target_type', $this->input('type', 'post')), (int) $id);
+    }
+
+    public function reportItemV2(string $type, int $id): JsonResponse
+    {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_report:{$tenantId}:{$userId}", 30, 60);
+        $targetType = $type === 'volunteering' ? 'volunteer' : $type;
         $reason = trim($this->input('reason', ''));
+
+        if (!in_array($targetType, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
+        }
+
+        if ($id <= 0 || !FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
+        }
+
+        if ($reason === '') {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reason_required'), 'reason', 400);
+        }
 
         if (mb_strlen($reason) > 1000) {
             $reason = mb_substr($reason, 0, 1000);
         }
 
+        $alreadyReported = DB::table('reports')
+            ->where('reporter_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('target_type', $targetType)
+            ->where('target_id', $id)
+            ->exists();
+
+        if ($alreadyReported) {
+            return $this->respondWithError('DUPLICATE', __('api.already_reported'), null, 409);
+        }
+
         DB::table('reports')->insert([
             'reporter_id' => $userId,
             'tenant_id'   => $tenantId,
-            'target_type' => 'post',
-            'target_id'   => (int) $id,
+            'target_type' => $targetType,
+            'target_id'   => $id,
             'reason'      => $reason,
             'status'      => 'open',
             'created_at'  => now(),
         ]);
 
-        return $this->respondWithData(['reported' => true, 'post_id' => (int) $id]);
+        return $this->respondWithData(['reported' => true, 'target_type' => $targetType, 'target_id' => $id]);
     }
 
     /** POST /api/v2/feed/users/{id}/mute */
@@ -924,15 +924,29 @@ class SocialController extends BaseApiController
     {
         $currentUserId = $this->requireAuth();
         $tenantId = $this->getTenantId();
+        $mutedUserId = (int) $id;
+
+        if ($mutedUserId <= 0 || $mutedUserId === $currentUserId) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_user'), null, 422);
+        }
+
+        $targetExists = DB::table('users')
+            ->where('id', $mutedUserId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$targetExists) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.user_not_found'), null, 404);
+        }
 
         DB::table('feed_muted_users')->insertOrIgnore([
             'user_id'       => $currentUserId,
             'tenant_id'     => $tenantId,
-            'muted_user_id' => (int) $id,
+            'muted_user_id' => $mutedUserId,
             'created_at'    => now(),
         ]);
 
-        return $this->respondWithData(['muted' => true, 'user_id' => (int) $id]);
+        return $this->respondWithData(['muted' => true, 'user_id' => $mutedUserId]);
     }
 
     /**
@@ -943,9 +957,11 @@ class SocialController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $targetType = $this->resolvePolymorphicType($this->input('type', 'post'));
-        if ($userId && (int) $id > 0) {
-            $this->feedRankingService->recordClick((int) $id, $userId, $targetType);
+        $targetId = (int) $id;
+        if ($targetId <= 0 || !FeedItemTables::canView($targetType, $targetId, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
+        $this->feedRankingService->recordClick($targetId, $userId, $targetType);
         return $this->respondWithData(['recorded' => true]);
     }
 
@@ -967,9 +983,10 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target'), 'target_id', 400);
         }
 
-        if ($userId) {
-            $this->feedRankingService->recordClick($targetId, $userId, $targetType);
+        if (!FeedItemTables::canView($targetType, $targetId, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
         }
+        $this->feedRankingService->recordClick($targetId, $userId, $targetType);
         return $this->respondWithData(['recorded' => true]);
     }
 

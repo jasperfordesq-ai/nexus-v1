@@ -35,6 +35,76 @@ class FeedControllerTest extends TestCase
         return $user;
     }
 
+    private function createFeedPost(int $userId, array $overrides = []): int
+    {
+        $post = array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'content' => 'Test feed post ' . uniqid(),
+            'type' => 'post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides);
+
+        $postId = DB::table('feed_posts')->insertGetId($post);
+
+        DB::table('feed_activity')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $post['user_id'],
+            'source_type' => 'post',
+            'source_id' => $postId,
+            'group_id' => $post['group_id'] ?? null,
+            'content' => $post['content'],
+            'is_visible' => true,
+            'created_at' => $post['created_at'],
+        ]);
+
+        return $postId;
+    }
+
+    private function createGroup(int $ownerId, string $visibility = 'private'): int
+    {
+        return DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $ownerId,
+            'name' => 'Test Group ' . uniqid(),
+            'slug' => 'test-group-' . uniqid(),
+            'visibility' => $visibility,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createListing(int $userId): int
+    {
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'title' => 'Reportable listing',
+            'description' => 'A listing that appears in the feed.',
+            'type' => 'offer',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('feed_activity')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'source_type' => 'listing',
+            'source_id' => $listingId,
+            'title' => 'Reportable listing',
+            'content' => 'A listing that appears in the feed.',
+            'is_visible' => true,
+            'created_at' => now(),
+        ]);
+
+        return $listingId;
+    }
+
     // ================================================================
     // FEED (GET /v2/feed) — Happy path
     // ================================================================
@@ -112,6 +182,28 @@ class FeedControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+    }
+
+    public function test_create_post_rejects_non_member_private_group(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $viewer = $this->authenticatedUser();
+        $groupId = $this->createGroup($owner->id, 'private');
+
+        $response = $this->apiPost('/v2/feed/posts', [
+            'body' => 'Trying to post in a private group.',
+            'group_id' => $groupId,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('feed_posts', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $viewer->id,
+            'group_id' => $groupId,
+        ]);
     }
 
     // ================================================================
@@ -319,6 +411,118 @@ class FeedControllerTest extends TestCase
     // ================================================================
     // TENANT ISOLATION — Feed is tenant-scoped
     // ================================================================
+
+    public function test_private_group_posts_are_hidden_from_non_members(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $groupId = $this->createGroup($owner->id, 'private');
+        $this->createFeedPost($owner->id, [
+            'content' => 'Private group post should not leak',
+            'group_id' => $groupId,
+        ]);
+
+        $response = $this->apiGet('/v2/feed?group_id=' . $groupId);
+
+        $response->assertStatus(200);
+        $this->assertSame([], $response->json('data'));
+    }
+
+    public function test_profile_feed_respects_connection_privacy(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'privacy_profile' => 'connections',
+        ]);
+        $this->authenticatedUser();
+        $this->createFeedPost($owner->id, [
+            'content' => 'Connections-only profile post',
+        ]);
+
+        $response = $this->apiGet('/v2/feed?user_id=' . $owner->id);
+
+        $response->assertStatus(200);
+        $this->assertSame([], $response->json('data'));
+    }
+
+    public function test_connections_visibility_posts_are_visible_to_connected_users(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $viewer = $this->authenticatedUser();
+        DB::table('connections')->insert([
+            'tenant_id' => $this->testTenantId,
+            'requester_id' => $viewer->id,
+            'receiver_id' => $author->id,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->createFeedPost($author->id, [
+            'content' => 'Friends-only post',
+            'visibility' => 'connections',
+        ]);
+
+        $response = $this->apiGet('/v2/feed?type=post');
+
+        $response->assertStatus(200);
+        $this->assertContains('Friends-only post', array_column($response->json('data') ?? [], 'content'));
+    }
+
+    public function test_report_item_v2_records_polymorphic_target_and_prevents_duplicates(): void
+    {
+        $user = $this->authenticatedUser();
+        $listingId = $this->createListing($user->id);
+
+        $response = $this->apiPost("/v2/feed/items/listing/{$listingId}/report", [
+            'reason' => 'Spammy listing',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('reports', [
+            'tenant_id' => $this->testTenantId,
+            'reporter_id' => $user->id,
+            'target_type' => 'listing',
+            'target_id' => $listingId,
+        ]);
+
+        $duplicate = $this->apiPost("/v2/feed/items/listing/{$listingId}/report", [
+            'reason' => 'Spammy listing again',
+        ]);
+
+        $duplicate->assertStatus(409);
+    }
+
+    public function test_report_item_v2_rejects_blank_reason_and_invalid_type(): void
+    {
+        $user = $this->authenticatedUser();
+        $listingId = $this->createListing($user->id);
+
+        $blank = $this->apiPost("/v2/feed/items/listing/{$listingId}/report", [
+            'reason' => '',
+        ]);
+        $blank->assertStatus(400);
+
+        $invalid = $this->apiPost("/v2/feed/items/not_a_type/{$listingId}/report", [
+            'reason' => 'Bad type',
+        ]);
+        $invalid->assertStatus(400);
+    }
+
+    public function test_mute_user_v2_rejects_nonexistent_user(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/feed/users/999999999/mute');
+
+        $response->assertStatus(404);
+    }
 
     public function test_feed_only_returns_current_tenant_items(): void
     {

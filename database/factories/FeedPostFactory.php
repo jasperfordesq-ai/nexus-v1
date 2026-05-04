@@ -25,7 +25,7 @@ class FeedPostFactory extends Factory
             'type'        => $this->faker->randomElement(['text', 'image', 'link', 'poll']),
             'parent_id'   => null,
             'parent_type' => null,
-            'visibility'  => $this->faker->randomElement(['public', 'connections', 'private']),
+            'visibility'  => $this->faker->randomElement(['public', 'friends', 'private']),
             'group_id'    => null,
         ];
     }

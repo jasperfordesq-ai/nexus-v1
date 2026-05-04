@@ -40,7 +40,7 @@ export function QuotePostModal({ isOpen, onClose, post, onSuccess }: QuotePostMo
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const author = getAuthor(post);
+  const author = getAuthor(post, t('author_unknown'));
 
   const quotedPostData: QuotedPostData = {
     id: post.id,

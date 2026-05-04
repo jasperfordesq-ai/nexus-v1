@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 
 /**
  * FeedService — Laravel DI-based service for social feed operations.
@@ -110,6 +111,12 @@ class FeedService
 
         // Build query — scope the users JOIN to the current tenant to prevent cross-tenant user leakage
         $tenantId = TenantContext::getId();
+        if ($profileUserId !== null && !FeedItemTables::canViewProfile((int) $profileUserId, $currentUserId)) {
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
+        }
+        if ($groupId !== null && !FeedItemTables::canViewGroup((int) $groupId, $currentUserId, $tenantId)) {
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
+        }
         $query = $this->feedActivity->newQuery()
             ->join('users as u', function ($join) use ($tenantId) {
                 $join->on('feed_activity.user_id', '=', 'u.id')
@@ -131,6 +138,8 @@ class FeedService
                 'u.avatar_url as author_avatar',
                 'u.location as user_location',
             ]);
+
+        $this->applyPostVisibilityScope($query, $currentUserId, $tenantId);
 
         if ($sourceType !== null) {
             $query->where('feed_activity.source_type', $sourceType);
@@ -226,17 +235,21 @@ class FeedService
 
         // Exclude posts hidden by current user (both legacy and V2 tables)
         if ($currentUserId) {
-            $query->whereNotExists(function ($sub) use ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId, $tenantId) {
                 $sub->select(DB::raw(1))
                     ->from('feed_hidden')
                     ->whereColumn('feed_hidden.target_id', 'feed_activity.source_id')
                     ->whereColumn('feed_hidden.target_type', 'feed_activity.source_type')
+                    ->whereColumn('feed_hidden.tenant_id', 'feed_activity.tenant_id')
+                    ->where('feed_hidden.tenant_id', $tenantId)
                     ->where('feed_hidden.user_id', $currentUserId);
             });
-            $query->whereNotExists(function ($sub) use ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId, $tenantId) {
                 $sub->select(DB::raw(1))
                     ->from('user_hidden_posts')
                     ->whereColumn('user_hidden_posts.post_id', 'feed_activity.source_id')
+                    ->whereColumn('user_hidden_posts.tenant_id', 'feed_activity.tenant_id')
+                    ->where('user_hidden_posts.tenant_id', $tenantId)
                     ->where('user_hidden_posts.user_id', $currentUserId);
             });
         }
@@ -251,55 +264,63 @@ class FeedService
 
         // Exclude muted users (both legacy and V2 tables)
         if ($currentUserId) {
-            $query->whereNotExists(function ($sub) use ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId, $tenantId) {
                 $sub->select(DB::raw(1))
                     ->from('feed_muted_users')
                     ->whereColumn('feed_muted_users.muted_user_id', 'feed_activity.user_id')
+                    ->whereColumn('feed_muted_users.tenant_id', 'feed_activity.tenant_id')
+                    ->where('feed_muted_users.tenant_id', $tenantId)
                     ->where('feed_muted_users.user_id', $currentUserId);
             });
-            $query->whereNotExists(function ($sub) use ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId, $tenantId) {
                 $sub->select(DB::raw(1))
                     ->from('user_muted_users')
                     ->whereColumn('user_muted_users.muted_user_id', 'feed_activity.user_id')
+                    ->whereColumn('user_muted_users.tenant_id', 'feed_activity.tenant_id')
+                    ->where('user_muted_users.tenant_id', $tenantId)
                     ->where('user_muted_users.user_id', $currentUserId);
             });
         }
 
-        // Hide private group posts from non-members (unless viewing a specific group feed)
-        if (!isset($filters['group_id'])) {
-            if ($currentUserId) {
-                // Authenticated: show public group posts + groups user is a member of
-                $query->where(function ($q) use ($currentUserId, $tenantId) {
-                    $q->whereNull('feed_activity.group_id')
-                      ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
-                          $sub->select(DB::raw(1))
-                              ->from('group_members')
-                              ->whereColumn('group_members.group_id', 'feed_activity.group_id')
-                              ->where('group_members.user_id', $currentUserId)
-                              ->where('group_members.tenant_id', $tenantId)
-                              ->where('group_members.status', 'active');
-                      })
-                      ->orWhereExists(function ($sub) use ($tenantId) {
-                          $sub->select(DB::raw(1))
-                              ->from('groups')
-                              ->whereColumn('groups.id', 'feed_activity.group_id')
-                              ->where('groups.tenant_id', $tenantId)
-                              ->where('groups.visibility', 'public');
-                      });
-                });
-            } else {
-                // Unauthenticated: only show non-group posts and public group posts
-                $query->where(function ($q) use ($tenantId) {
-                    $q->whereNull('feed_activity.group_id')
-                      ->orWhereExists(function ($sub) use ($tenantId) {
-                          $sub->select(DB::raw(1))
-                              ->from('groups')
-                              ->whereColumn('groups.id', 'feed_activity.group_id')
-                              ->where('groups.tenant_id', $tenantId)
-                              ->where('groups.visibility', 'public');
-                      });
-                });
-            }
+        // Hide private group posts from non-members, including explicit group feeds.
+        if ($currentUserId) {
+            $query->where(function ($q) use ($currentUserId, $tenantId) {
+                $q->whereNull('feed_activity.group_id')
+                  ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('group_members')
+                          ->whereColumn('group_members.group_id', 'feed_activity.group_id')
+                          ->where('group_members.user_id', $currentUserId)
+                          ->where('group_members.tenant_id', $tenantId)
+                          ->where('group_members.status', 'active');
+                  })
+                  ->orWhereExists(function ($sub) use ($tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('groups')
+                          ->whereColumn('groups.id', 'feed_activity.group_id')
+                          ->where('groups.tenant_id', $tenantId)
+                          ->where('groups.visibility', 'public')
+                          ->where(function ($g) {
+                              $g->whereNull('groups.status')
+                                ->orWhere('groups.status', 'active');
+                          });
+                  });
+            });
+        } else {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('feed_activity.group_id')
+                  ->orWhereExists(function ($sub) use ($tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('groups')
+                          ->whereColumn('groups.id', 'feed_activity.group_id')
+                          ->where('groups.tenant_id', $tenantId)
+                          ->where('groups.visibility', 'public')
+                          ->where(function ($g) {
+                              $g->whereNull('groups.status')
+                                ->orWhere('groups.status', 'active');
+                          });
+                  });
+            });
         }
 
         // Cursor pagination by (created_at, id) tuple
@@ -873,6 +894,69 @@ class FeedService
         ];
     }
 
+    private function applyPostVisibilityScope($query, ?int $currentUserId, int $tenantId): void
+    {
+        $hasDeletedAt = Schema::hasColumn('feed_posts', 'deleted_at');
+        $hasPublishStatus = Schema::hasColumn('feed_posts', 'publish_status');
+        $hasHidden = Schema::hasColumn('feed_posts', 'is_hidden');
+
+        $query->where(function ($outer) use ($currentUserId, $tenantId, $hasDeletedAt, $hasPublishStatus, $hasHidden) {
+            $outer->where('feed_activity.source_type', '<>', 'post')
+                ->orWhereExists(function ($sub) use ($currentUserId, $tenantId, $hasDeletedAt, $hasPublishStatus, $hasHidden) {
+                    $sub->select(DB::raw(1))
+                        ->from('feed_posts as fp')
+                        ->whereColumn('fp.id', 'feed_activity.source_id')
+                        ->whereColumn('fp.tenant_id', 'feed_activity.tenant_id')
+                        ->where('fp.tenant_id', $tenantId);
+
+                    if ($hasDeletedAt) {
+                        $sub->whereNull('fp.deleted_at');
+                    }
+
+                    if ($hasPublishStatus) {
+                        $sub->where(function ($q) {
+                            $q->whereNull('fp.publish_status')
+                                ->orWhere('fp.publish_status', 'published');
+                        });
+                    }
+
+                    if ($hasHidden) {
+                        $sub->where(function ($q) {
+                            $q->whereNull('fp.is_hidden')
+                                ->orWhere('fp.is_hidden', 0);
+                        });
+                    }
+
+                    $sub->where(function ($visibility) use ($currentUserId, $tenantId) {
+                        $visibility->where('fp.visibility', 'public')
+                            ->orWhereNull('fp.visibility');
+
+                        if ($currentUserId) {
+                            $visibility->orWhere('fp.user_id', $currentUserId)
+                                ->orWhere(function ($friends) use ($currentUserId, $tenantId) {
+                                    $friends->whereIn('fp.visibility', ['friends', 'connections'])
+                                        ->whereExists(function ($conn) use ($currentUserId, $tenantId) {
+                                            $conn->select(DB::raw(1))
+                                                ->from('connections')
+                                                ->where('connections.tenant_id', $tenantId)
+                                                ->where('connections.status', 'accepted')
+                                                ->where(function ($q) use ($currentUserId) {
+                                                    $q->where(function ($q2) use ($currentUserId) {
+                                                        $q2->where('connections.requester_id', $currentUserId)
+                                                            ->whereColumn('connections.receiver_id', 'fp.user_id');
+                                                    })->orWhere(function ($q2) use ($currentUserId) {
+                                                        $q2->where('connections.receiver_id', $currentUserId)
+                                                            ->whereColumn('connections.requester_id', 'fp.user_id');
+                                                    });
+                                                });
+                                        });
+                                });
+                        }
+                    });
+                });
+        });
+    }
+
     /**
      * Filter out feed items whose source resource has been deleted.
      * Orphans render as "ghost" cards that fail every interaction (share, react,
@@ -1083,6 +1167,12 @@ class FeedService
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content'] ?? ''));
         $image = $data['image_url'] ?? $data['image'] ?? null;
         $visibility = $data['visibility'] ?? 'public';
+        if ($visibility === 'connections') {
+            $visibility = 'friends';
+        }
+        if (!in_array($visibility, ['public', 'private', 'friends'], true)) {
+            $visibility = 'public';
+        }
         $groupId = !empty($data['group_id']) ? (int) $data['group_id'] : null;
 
         if (empty($content) && empty($image)) {
@@ -1091,7 +1181,11 @@ class FeedService
 
         // Fix 6: enforce maximum post body length
         if (mb_strlen($content) > self::MAX_POST_LENGTH) {
-            throw new \InvalidArgumentException('Post content exceeds maximum allowed length of ' . self::MAX_POST_LENGTH . ' characters');
+            throw new \InvalidArgumentException(__('api.feed_post_content_too_long', ['max' => self::MAX_POST_LENGTH]));
+        }
+
+        if ($groupId !== null && !FeedItemTables::canPostInGroup($groupId, $userId)) {
+            return ['error' => __('api.social_group_membership_required')];
         }
 
         // Determine publish status: scheduled, draft, or published
@@ -1099,7 +1193,7 @@ class FeedService
         $scheduledAt = $data['scheduled_at'] ?? null;
 
         if ($publishStatus === 'scheduled' && empty($scheduledAt)) {
-            return ['error' => 'Scheduled posts must have a scheduled_at date'];
+            return ['error' => __('api.feed_scheduled_at_required')];
         }
 
         if ($publishStatus === 'scheduled' && $scheduledAt) {
@@ -1110,7 +1204,7 @@ class FeedService
                 $scheduledAt = null;
             }
             if ($scheduledTime->diffInDays(now()) > 365) {
-                throw new \InvalidArgumentException('Cannot schedule posts more than 1 year in the future');
+                throw new \InvalidArgumentException(__('api.feed_schedule_too_far'));
             }
         }
 
@@ -1356,6 +1450,9 @@ class FeedService
         $visibility = $data['visibility'] ?? 'public';
         $groupId = (int) ($data['group_id'] ?? 0);
 
+        if ($visibility === 'connections') {
+            $visibility = 'friends';
+        }
         $validVisibility = ['public', 'private', 'friends'];
         if (!in_array($visibility, $validVisibility, true)) {
             $visibility = 'public';
@@ -1368,13 +1465,8 @@ class FeedService
 
         // Validate group membership if posting to group
         if ($groupId > 0) {
-            $tenantId = TenantContext::getId();
-            $isMember = DB::selectOne(
-                "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND tenant_id = ? AND status = 'active'",
-                [$groupId, $userId, $tenantId]
-            );
-            if (!$isMember) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api_controllers_2.feed.must_be_group_member')];
+            if (!FeedItemTables::canPostInGroup($groupId, $userId)) {
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.social_group_membership_required')];
                 return null;
             }
         }
@@ -1424,6 +1516,9 @@ class FeedService
     public function getItem(string $type, int $id, ?int $userId): ?array
     {
         $tenantId = TenantContext::getId();
+        if ($type === 'post' && !FeedItemTables::canView('post', $id, $userId)) {
+            return null;
+        }
         $items = [];
         $commentDeleteClause = Schema::hasColumn('comments', 'deleted_at')
             ? " AND deleted_at IS NULL"

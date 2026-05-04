@@ -6,12 +6,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Core\TenantContext;
 use App\Services\ReactionService;
 use App\Services\RealtimeService;
 use App\Services\SocialNotificationService;
+use App\Support\FeedItemTables;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -149,7 +148,7 @@ class ReactionController extends BaseApiController
         if (empty($reactionType) || !in_array($reactionType, ReactionService::VALID_TYPES, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid reaction_type. Valid types: ' . implode(', ', ReactionService::VALID_TYPES),
+                __('api.invalid_reaction_type_allowed', ['types' => implode(', ', ReactionService::VALID_TYPES)]),
                 'reaction_type',
                 400
             );
@@ -158,14 +157,14 @@ class ReactionController extends BaseApiController
         if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid target_type. Valid types: ' . implode(', ', ReactionService::VALID_TARGET_TYPES),
+                __('api.invalid_target_type_allowed', ['types' => implode(', ', ReactionService::VALID_TARGET_TYPES)]),
                 'target_type',
                 400
             );
         }
 
         if ($targetId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'target_id must be positive', 'target_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.target_id_positive'), 'target_id', 400);
         }
 
         // Loud-failure guard: verify (target_type, target_id) resolves to a
@@ -174,10 +173,10 @@ class ReactionController extends BaseApiController
         // a listing's ID) would silently succeed and pollute the reactions
         // table with rows that never read back. This is the structural fix
         // that turns the "reactions don't persist" class of bug into a 404.
-        if (!$this->targetExists($targetType, $targetId)) {
+        if (!$this->targetExists($targetType, $targetId, $userId)) {
             return $this->respondWithError(
                 'NOT_FOUND',
-                "No {$targetType} found with id {$targetId} in this tenant",
+                __('api.target_not_found'),
                 null,
                 404
             );
@@ -199,9 +198,13 @@ class ReactionController extends BaseApiController
     private function doShow(string $targetType, int $id): JsonResponse
     {
         if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target_type', 'target_type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
         }
         $userId = $this->getOptionalUserId();
+
+        if (!$this->targetExists($targetType, $id, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
+        }
 
         try {
             $reactions = $this->reactionService->getReactions($id, $targetType, $userId);
@@ -214,10 +217,15 @@ class ReactionController extends BaseApiController
     private function doReactors(string $targetType, int $id, string $reactionType): JsonResponse
     {
         if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target_type', 'target_type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
         }
         if (!in_array($reactionType, ReactionService::VALID_TYPES, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'type', 400);
+        }
+
+        $userId = $this->getOptionalUserId();
+        if (!$this->targetExists($targetType, $id, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
         }
 
         $page = $this->queryInt('page', 1, 1);
@@ -244,46 +252,12 @@ class ReactionController extends BaseApiController
      * type ever drifts, the request 404s rather than silently writing to the
      * polymorphic reactions table.
      */
-    private const TARGET_TABLES = [
-        'post'      => 'feed_posts',
-        'comment'   => 'comments',
-        'listing'   => 'listings',
-        'event'     => 'events',
-        'goal'      => 'goals',
-        'poll'      => 'polls',
-        'review'    => 'reviews',
-        'volunteer' => 'vol_opportunities',
-        'challenge' => 'ideation_challenges',
-        'resource'  => 'resources',
-    ];
-
-    /**
-     * Verify that the (target_type, target_id) pair resolves to a real row
-     * in the current tenant. The reactions table itself can't enforce this
-     * via FK because it's polymorphic, so we enforce it at the controller.
-     */
-    private function targetExists(string $targetType, int $targetId): bool
+    private function targetExists(string $targetType, int $targetId, ?int $viewerId): bool
     {
-        $table = self::TARGET_TABLES[$targetType] ?? null;
-        if (!$table) {
+        if (!in_array($targetType, ReactionService::VALID_TARGET_TYPES, true)) {
             return false;
         }
-
-        $tenantId = TenantContext::getId();
-        if (!$tenantId) {
-            return false;
-        }
-
-        try {
-            return DB::table($table)
-                ->where('id', $targetId)
-                ->where('tenant_id', $tenantId)
-                ->exists();
-        } catch (\Throwable $e) {
-            // If the table is missing in this environment, fail closed
-            Log::warning("[reactions] target existence check failed for {$targetType}: " . $e->getMessage());
-            return false;
-        }
+        return FeedItemTables::canView($targetType, $targetId, $viewerId);
     }
 
     // ========================================================================

@@ -76,7 +76,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
 
   useEffect(() => {
     loadStoriesRef.current();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run only on mount; isAuthenticated changes handled by ref update
+  }, []);
 
   // Scroll arrow visibility
   const updateArrows = useCallback(() => {
@@ -201,7 +201,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                   <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
                     <Avatar
                       src={resolveAvatarUrl(user?.avatar ?? null)}
-                      name={user?.first_name || 'You'}
+                      name={user?.first_name || t('you')}
                       className="w-full h-full"
                       size="md"
                     />
@@ -227,7 +227,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
 
               return (
                 <Button
-                  key={storyUser.user_id}
+                  key={`${storyUser.user_id}-${actualIndex}`}
                   variant="light"
                   onPress={() => handleStoryClick(actualIndex)}
                   className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 h-auto p-0 min-w-0"

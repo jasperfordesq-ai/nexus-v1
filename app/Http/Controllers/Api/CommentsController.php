@@ -12,6 +12,7 @@ use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\CommentService;
+use App\Support\FeedItemTables;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -46,6 +47,11 @@ class CommentsController extends BaseApiController
         }
 
         $currentUserId = $this->getOptionalUserId() ?? 0;
+        $targetType = CommentService::normalizeTargetType((string) $targetType);
+        if (!FeedItemTables::isCommentable($targetType) || !FeedItemTables::canView($targetType, $targetId, $currentUserId ?: null)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
+        }
+
         $comments = $this->commentService->getForEntity($targetType, $targetId, $currentUserId);
         $count = $this->commentService->countAll($comments);
 
@@ -67,9 +73,12 @@ class CommentsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $data = $this->getAllInput();
-        $targetType = $data['target_type'] ?? null;
+        $targetType = $data['target_type'] ?? $data['commentable_type'] ?? null;
         $targetId = isset($data['target_id']) ? (int) $data['target_id'] : null;
-        $content = trim($data['content'] ?? '');
+        if (!$targetId && isset($data['commentable_id'])) {
+            $targetId = (int) $data['commentable_id'];
+        }
+        $content = trim($data['content'] ?? $data['body'] ?? '');
 
         if (! $targetType || ! $targetId) {
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.target_type_and_id_required'), null, 400);
@@ -83,7 +92,18 @@ class CommentsController extends BaseApiController
             return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.comment_too_long'), 'content', 422);
         }
 
-        $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
+        $targetType = CommentService::normalizeTargetType((string) $targetType);
+        if (!FeedItemTables::isCommentable($targetType) || !FeedItemTables::canView($targetType, $targetId, $userId)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.target_not_found'), null, 404);
+        }
+
+        $data['content'] = $content;
+
+        try {
+            $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
 
         $comment->load('user:id,first_name,last_name,avatar_url');
         $user = $comment->user;
@@ -96,7 +116,7 @@ class CommentsController extends BaseApiController
             'is_own'         => true,
             'author'         => [
                 'id'     => $userId,
-                'name'   => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                'name'   => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : __('api.unknown_user'),
                 'avatar' => $user->avatar_url ?? null,
             ],
             'reactions'      => (object) [],

@@ -179,10 +179,10 @@ export interface FeedComment {
 }
 
 /** Normalize author fields from API (supports both flat and nested) */
-export function getAuthor(item: FeedItem) {
+export function getAuthor(item: FeedItem, fallbackName = '') {
   return {
     id: item.author_id ?? item.author?.id ?? 0,
-    name: item.author_name ?? item.author?.name ?? 'Unknown',
+    name: item.author_name ?? item.author?.name ?? fallbackName,
     avatar: item.author_avatar ?? item.author?.avatar_url ?? null,
   };
 }

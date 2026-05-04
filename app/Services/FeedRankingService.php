@@ -801,6 +801,8 @@ class FeedRankingService
 
         foreach ($items as &$item) {
             $postId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+            $itemType = (string) ($item['type'] ?? $item['source_type'] ?? 'post');
+            $ctrKey = $itemType . ':' . $postId;
             $authorId = (int) ($item['user_id'] ?? 0);
             $score = 1.0;
 
@@ -885,9 +887,9 @@ class FeedRankingService
             }
 
             // 13. CTR
-            if (!empty($config['ctr_enabled']) && isset($ctrScores[$postId])) {
-                $ctr = $ctrScores[$postId];
-                $impressions = $ctrScores['_impressions'][$postId] ?? 0;
+            if (!empty($config['ctr_enabled']) && isset($ctrScores[$ctrKey])) {
+                $ctr = $ctrScores[$ctrKey];
+                $impressions = $ctrScores['_impressions'][$ctrKey] ?? 0;
                 if ($impressions >= ($config['ctr_min_impressions'] ?? 5)) {
                     $maxBoost = (float) ($config['ctr_max_boost'] ?? 1.5);
                     $ctrMultiplier = 1.0 + ($ctr - self::CTR_NEUTRAL_BASELINE) * ($maxBoost - 1.0) / (1.0 - self::CTR_NEUTRAL_BASELINE);
@@ -897,7 +899,6 @@ class FeedRankingService
 
             // 14. User Type Preferences
             if (!empty($config['user_type_prefs_enabled']) && !empty($userTypePrefs)) {
-                $itemType = $item['type'] ?? $item['source_type'] ?? 'post';
                 if (isset($userTypePrefs[$itemType])) {
                     $score *= $userTypePrefs[$itemType];
                 }
@@ -1089,6 +1090,28 @@ class FeedRankingService
     public function recordClick(int $targetId, int $userId, string $targetType = 'post'): void
     {
         if (!self::CLICK_TRACKING_ENABLED || $userId === 0 || $targetId === 0) return;
+        $tenantId = TenantContext::getId();
+
+        try {
+            $analyticsConsent = Cache::remember(
+                "consent:{$tenantId}:{$userId}",
+                now()->addMinutes(30),
+                fn () => DB::table('cookie_consents')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->whereNull('withdrawal_date')
+                    ->where(function ($q) {
+                        $q->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                    })
+                    ->orderByDesc('created_at')
+                    ->value('analytics')
+            );
+            if ($analyticsConsent !== null && (int) $analyticsConsent === 0) return;
+        } catch (\Throwable $e) {
+            return;
+        }
+
         try {
             $hasTypeColumn = \Illuminate\Support\Facades\Schema::hasColumn('feed_clicks', 'target_type');
             if ($hasTypeColumn) {
@@ -1096,7 +1119,7 @@ class FeedRankingService
                     "INSERT INTO feed_clicks (post_id, target_type, user_id, tenant_id, created_at)
                      VALUES (?, ?, ?, ?, NOW())
                      ON DUPLICATE KEY UPDATE click_count = click_count + 1, updated_at = NOW()",
-                    [$targetId, $targetType, $userId, TenantContext::getId()]
+                    [$targetId, $targetType, $userId, $tenantId]
                 );
             } else {
                 if ($targetType !== 'post') return;
@@ -1104,7 +1127,7 @@ class FeedRankingService
                     "INSERT INTO feed_clicks (post_id, user_id, tenant_id, created_at)
                      VALUES (?, ?, ?, NOW())
                      ON DUPLICATE KEY UPDATE click_count = click_count + 1, updated_at = NOW()",
-                    [$targetId, $userId, TenantContext::getId()]
+                    [$targetId, $userId, $tenantId]
                 );
             }
         } catch (\Exception $e) {
@@ -1338,38 +1361,93 @@ class FeedRankingService
     {
         if (empty($feedItems) || !self::CLICK_TRACKING_ENABLED) return [];
 
-        // Only look up CTR for actual posts — other source types share numeric IDs
-        // with posts but have no rows in feed_impressions/feed_clicks.
-        $postOnlyIds = [];
+        return $this->getBatchClickThroughRatesPolymorphic($feedItems);
+    }
+
+    /**
+     * Fetch polymorphic CTR keyed by source type and ID.
+     */
+    private function getBatchClickThroughRatesPolymorphic(array $feedItems): array
+    {
+        $idsByType = [];
         foreach ($feedItems as $item) {
-            $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
-            if ($sourceType === 'post') {
-                $id = (int) ($item['id'] ?? $item['post_id'] ?? 0);
-                if ($id > 0) {
-                    $postOnlyIds[] = $id;
-                }
+            $sourceType = (string) ($item['type'] ?? $item['source_type'] ?? 'post');
+            $id = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+            if ($id > 0) {
+                $idsByType[$sourceType][] = $id;
             }
         }
 
-        if (empty($postOnlyIds)) return ['_impressions' => []];
+        $result = ['_impressions' => []];
+        if (empty($idsByType)) {
+            return $result;
+        }
 
         try {
             $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postOnlyIds), '?'));
-            $rows = DB::select(
-                "SELECT fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
-                 FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id
-                 WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id",
-                array_merge($postOnlyIds, [$tenantId])
-            );
-            $r = ['_impressions' => []];
-            foreach ($rows as $row) {
-                $pid = (int) $row->post_id;
-                $r[$pid] = min(1.0, (float) $row->ctr);
-                $r['_impressions'][$pid] = (int) $row->impressions;
+            $hasTypeColumn = \Illuminate\Support\Facades\Schema::hasColumn('feed_impressions', 'target_type')
+                && \Illuminate\Support\Facades\Schema::hasColumn('feed_clicks', 'target_type');
+
+            if (!$hasTypeColumn) {
+                $postOnlyIds = array_values(array_unique($idsByType['post'] ?? []));
+                if (empty($postOnlyIds)) {
+                    return $result;
+                }
+
+                $ph = implode(',', array_fill(0, count($postOnlyIds), '?'));
+                $rows = DB::select(
+                    "SELECT fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
+                     FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id
+                     WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id",
+                    array_merge($postOnlyIds, [$tenantId])
+                );
+
+                foreach ($rows as $row) {
+                    $key = 'post:' . (int) $row->post_id;
+                    $result[$key] = min(1.0, (float) $row->ctr);
+                    $result['_impressions'][$key] = (int) $row->impressions;
+                }
+
+                return $result;
             }
-            return $r;
-        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
+
+            $clauses = [];
+            $params = [];
+            foreach ($idsByType as $sourceType => $ids) {
+                $ids = array_values(array_unique(array_map('intval', $ids)));
+                if (empty($ids)) {
+                    continue;
+                }
+
+                $ph = implode(',', array_fill(0, count($ids), '?'));
+                $clauses[] = "(fi.target_type = ? AND fi.post_id IN ($ph))";
+                $params[] = $sourceType;
+                array_push($params, ...$ids);
+            }
+
+            if (empty($clauses)) {
+                return $result;
+            }
+
+            $rows = DB::select(
+                "SELECT fi.target_type, fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
+                 FROM feed_impressions fi
+                 LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.target_type=fi.target_type AND fc.tenant_id=fi.tenant_id
+                 WHERE fi.tenant_id=? AND (" . implode(' OR ', $clauses) . ")
+                 GROUP BY fi.target_type, fi.post_id",
+                array_merge([$tenantId], $params)
+            );
+
+            foreach ($rows as $row) {
+                $key = (string) $row->target_type . ':' . (int) $row->post_id;
+                $result[$key] = min(1.0, (float) $row->ctr);
+                $result['_impressions'][$key] = (int) $row->impressions;
+            }
+        } catch (\Exception $e) {
+            Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]);
+        }
+
+        return $result;
     }
 
     /**

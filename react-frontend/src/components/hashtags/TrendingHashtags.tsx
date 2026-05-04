@@ -75,7 +75,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
       <div className="space-y-2">
         {hashtags.map((hashtag, idx) => (
           <Link
-            key={hashtag.tag}
+            key={`${hashtag.tag}-${idx}`}
             to={tenantPath(`/feed/hashtag/${hashtag.tag}`)}
             className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-theme-hover transition-colors group"
           >
@@ -86,7 +86,9 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
                   #{hashtag.tag}
                 </span>
                 <p className="text-xs text-theme-subtle">
-                  {t('trending.post_count', { count: hashtag.post_count })}
+                  {t(hashtag.post_count === 1 ? 'trending.post_count_one' : 'trending.post_count_other', {
+                    count: hashtag.post_count,
+                  })}
                 </p>
               </div>
             </div>

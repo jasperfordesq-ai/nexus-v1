@@ -6,10 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
 
 /**
  * Feature tests for CommentsController — CRUD and reactions on comments.
@@ -30,6 +31,33 @@ class CommentsControllerTest extends TestCase
         return $user;
     }
 
+    private function createPost(int $userId): int
+    {
+        return DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'content' => 'Comment target post ' . uniqid(),
+            'type' => 'post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createComment(int $postId, int $userId): int
+    {
+        return DB::table('comments')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'user_id' => $userId,
+            'content' => 'Parent comment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/comments
     // ------------------------------------------------------------------
@@ -43,9 +71,10 @@ class CommentsControllerTest extends TestCase
 
     public function test_index_returns_data(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
+        $postId = $this->createPost($user->id);
 
-        $response = $this->apiGet('/v2/comments?commentable_type=feed_post&commentable_id=1');
+        $response = $this->apiGet("/v2/comments?commentable_type=feed_post&commentable_id={$postId}");
 
         $response->assertStatus(200);
     }
@@ -63,6 +92,42 @@ class CommentsControllerTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    public function test_store_rejects_missing_target(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'post',
+            'target_id' => 999999999,
+            'content' => 'This should not attach to an arbitrary target.',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_store_rejects_parent_comment_from_different_target(): void
+    {
+        $user = $this->authenticatedUser();
+        $firstPostId = $this->createPost($user->id);
+        $secondPostId = $this->createPost($user->id);
+        $parentCommentId = $this->createComment($firstPostId, $user->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'post',
+            'target_id' => $secondPostId,
+            'parent_id' => $parentCommentId,
+            'content' => 'Reply should not cross targets.',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $secondPostId,
+            'parent_id' => $parentCommentId,
+        ]);
     }
 
     // ------------------------------------------------------------------

@@ -13,15 +13,26 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * BlockUserService — manages user blocking/unblocking.
  *
- * The user_blocks table does NOT have a tenant_id column.
- * Block relationships are global (user IDs are unique across tenants).
+ * Block relationships are tenant-scoped to avoid cross-community effects.
  */
 class BlockUserService
 {
+    private static function scopedBlocks()
+    {
+        $query = DB::table('user_blocks');
+
+        if (Schema::hasColumn('user_blocks', 'tenant_id')) {
+            $query->where('tenant_id', TenantContext::getId());
+        }
+
+        return $query;
+    }
+
     /**
      * Block a user.
      *
@@ -34,12 +45,18 @@ class BlockUserService
         }
 
         // Insert block record (ignore if already exists)
-        DB::table('user_blocks')->insertOrIgnore([
+        $data = [
             'user_id' => $userId,
             'blocked_user_id' => $blockedUserId,
             'reason' => $reason,
             'created_at' => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn('user_blocks', 'tenant_id')) {
+            $data['tenant_id'] = TenantContext::getId();
+        }
+
+        DB::table('user_blocks')->insertOrIgnore($data);
 
         // Auto-disconnect if connected
         try {
@@ -67,7 +84,7 @@ class BlockUserService
      */
     public static function unblock(int $userId, int $blockedUserId): bool
     {
-        return DB::table('user_blocks')
+        return self::scopedBlocks()
             ->where('user_id', $userId)
             ->where('blocked_user_id', $blockedUserId)
             ->delete() > 0;
@@ -78,7 +95,7 @@ class BlockUserService
      */
     public static function isBlocked(int $userId, int $targetUserId): bool
     {
-        return DB::table('user_blocks')
+        return self::scopedBlocks()
             ->where('user_id', $userId)
             ->where('blocked_user_id', $targetUserId)
             ->exists();
@@ -89,7 +106,7 @@ class BlockUserService
      */
     public static function isBlockedEither(int $userA, int $userB): bool
     {
-        return DB::table('user_blocks')
+        return self::scopedBlocks()
             ->where(function ($q) use ($userA, $userB) {
                 $q->where(function ($inner) use ($userA, $userB) {
                     $inner->where('user_id', $userA)->where('blocked_user_id', $userB);
@@ -107,10 +124,16 @@ class BlockUserService
     {
         $tenantId = TenantContext::getId();
 
-        return DB::table('user_blocks')
+        $query = DB::table('user_blocks')
             ->join('users', 'user_blocks.blocked_user_id', '=', 'users.id')
             ->where('user_blocks.user_id', $userId)
-            ->where('users.tenant_id', $tenantId)
+            ->where('users.tenant_id', $tenantId);
+
+        if (Schema::hasColumn('user_blocks', 'tenant_id')) {
+            $query->where('user_blocks.tenant_id', $tenantId);
+        }
+
+        return $query
             ->select([
                 'user_blocks.id as block_id',
                 'user_blocks.blocked_user_id as user_id',
@@ -146,7 +169,7 @@ class BlockUserService
      */
     public static function getBlockedByUsers(int $userId): Collection
     {
-        return DB::table('user_blocks')
+        return self::scopedBlocks()
             ->where('blocked_user_id', $userId)
             ->get();
     }
@@ -157,12 +180,12 @@ class BlockUserService
      */
     public static function getBlockedPairIds(int $userId): array
     {
-        $blockedByMe = DB::table('user_blocks')
+        $blockedByMe = self::scopedBlocks()
             ->where('user_id', $userId)
             ->pluck('blocked_user_id')
             ->all();
 
-        $blockedMe = DB::table('user_blocks')
+        $blockedMe = self::scopedBlocks()
             ->where('blocked_user_id', $userId)
             ->pluck('user_id')
             ->all();

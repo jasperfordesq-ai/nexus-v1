@@ -45,6 +45,9 @@ class ReactionService
         'volunteer',
         'challenge',
         'resource',
+        'job',
+        'blog',
+        'discussion',
     ];
 
     /**

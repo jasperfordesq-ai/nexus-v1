@@ -506,6 +506,51 @@ class ReactionControllerTest extends TestCase
         $response->assertJsonPath('data.user_reaction', null);
     }
 
+    public function test_polymorphic_reaction_rejects_private_group_post_for_non_member(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $viewer = $this->authenticatedUser();
+
+        $groupId = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $owner->id,
+            'name' => 'Private Reaction Group',
+            'visibility' => 'private',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'group_id' => $groupId,
+            'content' => 'Private group reaction target',
+            'type' => 'post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/reactions', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'reaction_type' => 'love',
+        ]);
+
+        $response->assertStatus(404);
+        $this->assertDatabaseMissing('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $viewer->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+        ]);
+    }
+
     // ======================================================================
     //  RESPONSE STRUCTURE
     // ======================================================================

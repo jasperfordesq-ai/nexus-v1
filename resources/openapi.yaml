@@ -1,0 +1,291 @@
+openapi: 3.1.0
+info:
+  title: Project NEXUS API
+  version: 1.0.0
+  description: Project NEXUS tenant-scoped API reference.
+servers:
+  - url: /api
+security:
+  - bearerAuth: []
+paths:
+  /v2/feed:
+    get:
+      summary: List feed items
+      tags: [Feed]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [all, posts, listings, events, polls, goals, jobs, challenges, volunteering, blogs, discussions, following, saved]
+        - name: user_id
+          in: query
+          schema:
+            type: integer
+        - name: group_id
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Feed collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedCollectionResponse'
+  /v2/feed/posts:
+    post:
+      summary: Create a feed post
+      tags: [Feed]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                content:
+                  type: string
+                image_url:
+                  type: string
+                  format: uri
+                visibility:
+                  type: string
+                  enum: [public, friends, private, connections]
+                group_id:
+                  type: integer
+                publish_status:
+                  type: string
+                  enum: [published, scheduled, draft]
+                scheduled_at:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Post created
+        '422':
+          description: Validation error
+  /v2/feed/items/{type}/{id}:
+    get:
+      summary: Show a feed item
+      tags: [Feed]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/FeedTargetType'
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Feed item
+        '404':
+          description: Target not found or not visible
+  /v2/feed/items/{type}/{id}/report:
+    post:
+      summary: Report a feed item
+      tags: [Feed, Moderation]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/FeedTargetType'
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  maxLength: 1000
+      responses:
+        '200':
+          description: Report accepted
+        '400':
+          description: Invalid request
+        '404':
+          description: Target not found or not visible
+        '409':
+          description: Already reported
+  /v2/feed/impression:
+    post:
+      summary: Record a polymorphic feed impression
+      tags: [Feed, Analytics]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        $ref: '#/components/requestBodies/FeedTarget'
+      responses:
+        '200':
+          description: Impression recorded
+        '404':
+          description: Target not found or not visible
+  /v2/feed/click:
+    post:
+      summary: Record a polymorphic feed click
+      tags: [Feed, Analytics]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        $ref: '#/components/requestBodies/FeedTarget'
+      responses:
+        '200':
+          description: Click recorded
+        '404':
+          description: Target not found or not visible
+  /v2/comments:
+    get:
+      summary: List comments for a target
+      tags: [Comments]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: target_type
+          in: query
+          schema:
+            $ref: '#/components/schemas/FeedTargetType'
+        - name: target_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comments returned
+        '404':
+          description: Target not found or not visible
+    post:
+      summary: Create a comment for a target
+      tags: [Comments]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_type, target_id, content]
+              properties:
+                target_type:
+                  $ref: '#/components/schemas/FeedTargetType'
+                target_id:
+                  type: integer
+                content:
+                  type: string
+                  maxLength: 10000
+                parent_id:
+                  type: integer
+      responses:
+        '201':
+          description: Comment created
+        '404':
+          description: Target not found or not visible
+        '422':
+          description: Validation error
+  /v2/reactions:
+    post:
+      summary: Toggle a reaction on a feed target
+      tags: [Reactions]
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_type, target_id, reaction_type]
+              properties:
+                target_type:
+                  $ref: '#/components/schemas/FeedTargetType'
+                target_id:
+                  type: integer
+                reaction_type:
+                  type: string
+                  enum: [love, like, laugh, wow, sad, celebrate, clap, time_credit]
+      responses:
+        '200':
+          description: Reaction toggled
+        '404':
+          description: Target not found or not visible
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+  parameters:
+    TenantId:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    FeedTargetType:
+      name: type
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/FeedTargetType'
+  requestBodies:
+    FeedTarget:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [target_type, target_id]
+            properties:
+              target_type:
+                $ref: '#/components/schemas/FeedTargetType'
+              target_id:
+                type: integer
+  schemas:
+    FeedTargetType:
+      type: string
+      enum: [post, comment, listing, event, goal, poll, review, volunteer, challenge, resource, job, blog, discussion]
+    FeedCollectionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedItem'
+        meta:
+          type: object
+          properties:
+            per_page:
+              type: integer
+            has_more:
+              type: boolean
+    FeedItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          $ref: '#/components/schemas/FeedTargetType'
+        content:
+          type: string
+        author_id:
+          type: integer
+        author_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time

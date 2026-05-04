@@ -2600,14 +2600,15 @@ DROP TABLE IF EXISTS `feed_clicks`;
 CREATE TABLE `feed_clicks` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `post_id` int(10) unsigned NOT NULL,
+  `target_type` varchar(32) NOT NULL DEFAULT 'post',
   `user_id` int(10) unsigned NOT NULL,
   `tenant_id` int(10) unsigned NOT NULL,
   `click_count` int(10) unsigned NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_click` (`post_id`,`user_id`,`tenant_id`),
-  KEY `idx_post_tenant` (`post_id`,`tenant_id`),
+  UNIQUE KEY `uq_click` (`post_id`,`target_type`,`user_id`,`tenant_id`),
+  KEY `idx_post_tenant` (`post_id`,`target_type`,`tenant_id`),
   KEY `idx_user_tenant` (`user_id`,`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2649,14 +2650,15 @@ DROP TABLE IF EXISTS `feed_impressions`;
 CREATE TABLE `feed_impressions` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `post_id` int(10) unsigned NOT NULL,
+  `target_type` varchar(32) NOT NULL DEFAULT 'post',
   `user_id` int(10) unsigned NOT NULL,
   `tenant_id` int(10) unsigned NOT NULL,
   `view_count` int(10) unsigned NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_impression` (`post_id`,`user_id`,`tenant_id`),
-  KEY `idx_post_tenant` (`post_id`,`tenant_id`),
+  UNIQUE KEY `uq_impression` (`post_id`,`target_type`,`user_id`,`tenant_id`),
+  KEY `idx_post_tenant` (`post_id`,`target_type`,`tenant_id`),
   KEY `idx_user_tenant` (`user_id`,`tenant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -5967,7 +5969,7 @@ CREATE TABLE `reports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
   `reporter_id` int(11) NOT NULL,
-  `target_type` enum('listing','user','message') NOT NULL,
+  `target_type` enum('listing','user','message','post','comment','story','event','poll','goal','review','resource','volunteer','challenge','job','blog','discussion') NOT NULL,
   `target_id` int(11) NOT NULL,
   `reason` text NOT NULL,
   `status` enum('open','resolved','dismissed') NOT NULL DEFAULT 'open',
@@ -7022,6 +7024,7 @@ DROP TABLE IF EXISTS `user_blocks`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_blocks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL COMMENT 'User who blocked',
   `blocked_user_id` int(10) unsigned NOT NULL COMMENT 'User who was blocked',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -7029,6 +7032,8 @@ CREATE TABLE `user_blocks` (
   `match` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_block` (`user_id`,`blocked_user_id`),
+  KEY `idx_user_blocks_tenant_user` (`tenant_id`,`user_id`),
+  KEY `idx_user_blocks_tenant_blocked` (`tenant_id`,`blocked_user_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_blocked` (`blocked_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

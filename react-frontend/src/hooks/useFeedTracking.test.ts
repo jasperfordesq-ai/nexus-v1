@@ -67,14 +67,14 @@ describe('useFeedTracking', () => {
 
   it('returns a ref callback and recordClick function', () => {
     const postId = uniquePostId();
-    const { result } = renderHook(() => useFeedTracking(postId, true));
+    const { result } = renderHook(() => useFeedTracking(postId, 'post', true));
     expect(typeof result.current.ref).toBe('function');
     expect(typeof result.current.recordClick).toBe('function');
   });
 
   it('records impression after 1 second of visibility', async () => {
     const postId = uniquePostId();
-    const { result } = renderHook(() => useFeedTracking(postId, true));
+    const { result } = renderHook(() => useFeedTracking(postId, 'listing', true));
 
     const div = document.createElement('div');
     act(() => { result.current.ref(div); });
@@ -84,12 +84,15 @@ describe('useFeedTracking', () => {
       vi.advanceTimersByTime(1000);
     });
     await Promise.resolve();
-    expect(mockApi.post).toHaveBeenCalledWith(`/v2/feed/posts/${postId}/impression`, {});
+    expect(mockApi.post).toHaveBeenCalledWith('/v2/feed/impression', {
+      target_type: 'listing',
+      target_id: postId,
+    });
   });
 
   it('cancels impression timer if element leaves viewport', () => {
     const postId = uniquePostId();
-    const { result } = renderHook(() => useFeedTracking(postId, true));
+    const { result } = renderHook(() => useFeedTracking(postId, 'post', true));
 
     const div = document.createElement('div');
     act(() => { result.current.ref(div); });
@@ -107,16 +110,19 @@ describe('useFeedTracking', () => {
 
   it('recordClick fires POST to click endpoint', () => {
     const postId = uniquePostId();
-    const { result } = renderHook(() => useFeedTracking(postId, true));
+    const { result } = renderHook(() => useFeedTracking(postId, 'event', true));
     act(() => {
       result.current.recordClick();
     });
-    expect(mockApi.post).toHaveBeenCalledWith(`/v2/feed/posts/${postId}/click`, {});
+    expect(mockApi.post).toHaveBeenCalledWith('/v2/feed/click', {
+      target_type: 'event',
+      target_id: postId,
+    });
   });
 
   it('recordClick does nothing when unauthenticated', () => {
     const postId = uniquePostId();
-    const { result } = renderHook(() => useFeedTracking(postId, false));
+    const { result } = renderHook(() => useFeedTracking(postId, 'post', false));
     act(() => {
       result.current.recordClick();
     });
@@ -124,7 +130,7 @@ describe('useFeedTracking', () => {
   });
 
   it('recordClick does nothing when postId is falsy', () => {
-    const { result } = renderHook(() => useFeedTracking(0, true));
+    const { result } = renderHook(() => useFeedTracking(0, 'post', true));
     act(() => {
       result.current.recordClick();
     });
@@ -133,7 +139,7 @@ describe('useFeedTracking', () => {
 
   it('unobserves the element on unmount', () => {
     const postId = uniquePostId();
-    const { result, unmount } = renderHook(() => useFeedTracking(postId, true));
+    const { result, unmount } = renderHook(() => useFeedTracking(postId, 'post', true));
     const div = document.createElement('div');
     act(() => { result.current.ref(div); });
     expect(observerCallbacks.has(div)).toBe(true);

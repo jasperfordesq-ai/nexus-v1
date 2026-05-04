@@ -23,29 +23,33 @@ import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 
 /** Set of post IDs already tracked this session (prevents duplicates) */
-const impressedIds = new Set<number>();
+const impressedIds = new Set<string>();
 
 /** Call this whenever the feed performs a fresh (non-append) load to clear dedup state. */
 export function resetImpressions(): void {
   impressedIds.clear();
 }
 
-export function useFeedTracking(postId: number, isAuthenticated: boolean) {
+export function useFeedTracking(targetId: number, targetType: string, isAuthenticated: boolean) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const targetKey = `${targetType}:${targetId}`;
 
   // Consent + auth gate. Read once per render — readStoredConsent is sync and cheap.
   const consent = readStoredConsent();
-  const enabled = Boolean(consent?.analytics) && isAuthenticated && Boolean(postId);
+  const enabled = Boolean(consent?.analytics) && isAuthenticated && Boolean(targetId);
 
   const handleEntry = useCallback(
     (entry: IntersectionObserverEntry) => {
       if (entry.isIntersecting) {
-        if (impressedIds.has(postId)) return;
+        if (impressedIds.has(targetKey)) return;
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
-          if (!impressedIds.has(postId)) {
-            impressedIds.add(postId);
-            api.post(`/v2/feed/posts/${postId}/impression`, {}).catch(() => {});
+          if (!impressedIds.has(targetKey)) {
+            impressedIds.add(targetKey);
+            api.post('/v2/feed/impression', {
+              target_type: targetType,
+              target_id: targetId,
+            }).catch(() => {});
           }
         }, 1000);
       } else if (timerRef.current) {
@@ -53,7 +57,7 @@ export function useFeedTracking(postId: number, isAuthenticated: boolean) {
         timerRef.current = null;
       }
     },
-    [postId]
+    [targetId, targetKey, targetType]
   );
 
   const setRef = useSharedFeedObserver(handleEntry, {
@@ -71,9 +75,12 @@ export function useFeedTracking(postId: number, isAuthenticated: boolean) {
   const recordClick = useCallback(() => {
     const c = readStoredConsent();
     if (!c?.analytics) return;
-    if (!isAuthenticated || !postId) return;
-    api.post(`/v2/feed/posts/${postId}/click`, {}).catch(() => {});
-  }, [postId, isAuthenticated]);
+    if (!isAuthenticated || !targetId) return;
+    api.post('/v2/feed/click', {
+      target_type: targetType,
+      target_id: targetId,
+    }).catch(() => {});
+  }, [targetId, targetType, isAuthenticated]);
 
   return { ref: setRef, recordClick };
 }

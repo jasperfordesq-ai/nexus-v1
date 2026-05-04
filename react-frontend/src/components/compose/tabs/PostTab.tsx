@@ -145,10 +145,6 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-    // H8: Prevent concurrent double-submissions
-    if (isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-
     if (draft.plainText.trim().length === 0 && mediaFiles.length === 0 && selectedGifUrl === null) {
       toast.error(t('compose.content_required'));
       return;
@@ -157,6 +153,9 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
       toast.error(t('compose.content_too_long', { max: MAX_CONTENT_CHARS }));
       return;
     }
+    // H8: Prevent concurrent double-submissions
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
 
     setIsSubmitting(true);
     try {
@@ -175,10 +174,10 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
 
         if (res.success && res.data) {
           clearDraft();
-          toast.success(t('toast.post_updated', 'Post updated'));
+          toast.success(t('toast.post_updated'));
           onEditSuccess?.(res.data as import('@/components/feed/types').FeedItem);
         } else {
-          toast.error(t('toast.update_failed', 'Failed to update post'));
+          toast.error(t('toast.update_failed'));
         }
         return;
       }
@@ -235,7 +234,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
       }
     } catch (err) {
       logError(isEditing ? 'Failed to update post' : 'Failed to create post', err);
-      toast.error(isEditing ? t('toast.update_failed', 'Failed to update post') : t('compose.post_failed'));
+      toast.error(isEditing ? t('toast.update_failed') : t('compose.post_failed'));
     } finally {
       setIsSubmitting(false);
       isSubmittingRef.current = false; // H8: Release ref guard
@@ -249,18 +248,18 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
       canSubmit,
       isSubmitting,
       onSubmit: () => submitRef.current(),
-      buttonLabel: isEditing ? t('compose.save_changes', 'Save') : t('compose.post_button'),
+      buttonLabel: isEditing ? t('compose.save_changes') : t('compose.post_button'),
       gradientClass: 'from-indigo-500 to-purple-600',
     });
     return unregister;
-  }, [canSubmit, isSubmitting, register, unregister, t]);
+  }, [canSubmit, isEditing, isSubmitting, register, unregister, t]);
 
   return (
     <div className="space-y-4">
       {/* Avatar + Rich text editor */}
       <div className="flex items-start gap-3">
         <Avatar
-          name={user?.first_name || 'You'}
+          name={user?.first_name || t('you')}
           src={resolveAvatarUrl(user?.avatar)}
           size="sm"
           className="mt-1 flex-shrink-0"
@@ -298,7 +297,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
         <div className="relative inline-block">
           <img
             src={selectedGifUrl}
-            alt="Selected GIF"
+            alt={t('compose.selected_gif_alt')}
             className="max-w-[240px] max-h-[200px] rounded-lg border border-[var(--border-default)]"
           />
           <Button
