@@ -668,16 +668,17 @@ class CaringHourTransferService
             return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'destination_member_not_found', 'duplicated' => false];
         }
 
-        return DB::transaction(function () use (
-            $destinationTenantId,
-            $destinationUser,
-            $sourceSlug,
-            $sourceEmail,
-            $hours,
-            $payload,
-            $signature,
-            $idempotencyKey
-        ): array {
+        try {
+            return DB::transaction(function () use (
+                $destinationTenantId,
+                $destinationUser,
+                $sourceSlug,
+                $sourceEmail,
+                $hours,
+                $payload,
+                $signature,
+                $idempotencyKey
+            ): array {
             // Idempotency: if a row with this key already exists, return the
             // prior result without crediting again.
             $existing = DB::table('caring_hour_transfers')
@@ -750,6 +751,23 @@ class CaringHourTransferService
                 'duplicated'              => false,
             ];
         });
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (! $this->isDuplicateKeyException($e)) {
+                throw $e;
+            }
+
+            $existing = DB::table('caring_hour_transfers')
+                ->where('tenant_id', $destinationTenantId)
+                ->where('remote_idempotency_key', $idempotencyKey)
+                ->first();
+
+            return [
+                'accepted'                => $existing !== null,
+                'destination_transfer_id' => $existing !== null ? (int) $existing->id : null,
+                'error'                   => $existing !== null ? null : 'idempotency_conflict',
+                'duplicated'              => true,
+            ];
+        }
     }
 
     /**
@@ -836,6 +854,14 @@ class CaringHourTransferService
             'reason'                   => (string) ($row->reason ?? ''),
             'created_at'               => (string) $row->created_at,
         ];
+    }
+
+    private function isDuplicateKeyException(\Throwable $e): bool
+    {
+        $code = (string) $e->getCode();
+        $message = strtolower($e->getMessage());
+
+        return $code === '23000' || str_contains($message, 'duplicate');
     }
 
     /**

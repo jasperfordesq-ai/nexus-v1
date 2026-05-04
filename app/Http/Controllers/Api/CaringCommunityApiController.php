@@ -1760,16 +1760,20 @@ class CaringCommunityApiController extends BaseApiController
         // Favours offered/received
         if (Schema::hasTable('caring_favours')) {
             $favourQuery = DB::table('caring_favours')->where('tenant_id', $tenantId);
-            $hasOfferer = Schema::hasColumn('caring_favours', 'offerer_id');
-            $hasRecipient = Schema::hasColumn('caring_favours', 'recipient_id');
-            if ($hasOfferer && $hasRecipient) {
-                $favourQuery->where(function ($q) use ($userId) {
-                    $q->where('offerer_id', $userId)->orWhere('recipient_id', $userId);
+            $offererColumn = Schema::hasColumn('caring_favours', 'offered_by_user_id')
+                ? 'offered_by_user_id'
+                : (Schema::hasColumn('caring_favours', 'offerer_id') ? 'offerer_id' : null);
+            $recipientColumn = Schema::hasColumn('caring_favours', 'received_by_user_id')
+                ? 'received_by_user_id'
+                : (Schema::hasColumn('caring_favours', 'recipient_id') ? 'recipient_id' : null);
+            if ($offererColumn !== null && $recipientColumn !== null) {
+                $favourQuery->where(function ($q) use ($userId, $offererColumn, $recipientColumn) {
+                    $q->where($offererColumn, $userId)->orWhere($recipientColumn, $userId);
                 });
-            } elseif ($hasOfferer) {
-                $favourQuery->where('offerer_id', $userId);
-            } elseif ($hasRecipient) {
-                $favourQuery->where('recipient_id', $userId);
+            } elseif ($offererColumn !== null) {
+                $favourQuery->where($offererColumn, $userId);
+            } elseif ($recipientColumn !== null) {
+                $favourQuery->where($recipientColumn, $userId);
             } elseif (Schema::hasColumn('caring_favours', 'user_id')) {
                 $favourQuery->where('user_id', $userId);
             } else {
@@ -1787,22 +1791,30 @@ class CaringCommunityApiController extends BaseApiController
         // Hour gifts (sender or recipient)
         if (Schema::hasTable('caring_hour_gifts')) {
             $giftQuery = DB::table('caring_hour_gifts')->where('tenant_id', $tenantId);
-            $hasSender = Schema::hasColumn('caring_hour_gifts', 'sender_id');
-            $hasRecipient = Schema::hasColumn('caring_hour_gifts', 'recipient_id');
-            if ($hasSender && $hasRecipient) {
-                $giftQuery->where(function ($q) use ($userId) {
-                    $q->where('sender_id', $userId)->orWhere('recipient_id', $userId);
+            $senderColumn = Schema::hasColumn('caring_hour_gifts', 'sender_user_id')
+                ? 'sender_user_id'
+                : (Schema::hasColumn('caring_hour_gifts', 'sender_id') ? 'sender_id' : null);
+            $recipientColumn = Schema::hasColumn('caring_hour_gifts', 'recipient_user_id')
+                ? 'recipient_user_id'
+                : (Schema::hasColumn('caring_hour_gifts', 'recipient_id') ? 'recipient_id' : null);
+            if ($senderColumn !== null && $recipientColumn !== null) {
+                $giftQuery->where(function ($q) use ($userId, $senderColumn, $recipientColumn) {
+                    $q->where($senderColumn, $userId)->orWhere($recipientColumn, $userId);
                 });
-            } elseif ($hasSender) {
-                $giftQuery->where('sender_id', $userId);
-            } elseif ($hasRecipient) {
-                $giftQuery->where('recipient_id', $userId);
+            } elseif ($senderColumn !== null) {
+                $giftQuery->where($senderColumn, $userId);
+            } elseif ($recipientColumn !== null) {
+                $giftQuery->where($recipientColumn, $userId);
+            } else {
+                $giftQuery = null;
             }
-            $data['caring_hour_gifts'] = $giftQuery
-                ->orderByDesc('id')
-                ->get()
-                ->map(fn ($row) => (array) $row)
-                ->all();
+            if ($giftQuery !== null) {
+                $data['caring_hour_gifts'] = $giftQuery
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
+            }
         }
 
         // Hour transfers (cross-cooperative)
@@ -1812,23 +1824,32 @@ class CaringCommunityApiController extends BaseApiController
                 $transferQuery->where('member_user_id', $userId);
             } elseif (Schema::hasColumn('caring_hour_transfers', 'user_id')) {
                 $transferQuery->where('user_id', $userId);
+            } else {
+                $transferQuery = null;
             }
-            $data['caring_hour_transfers'] = $transferQuery
-                ->orderByDesc('id')
-                ->get()
-                ->map(fn ($row) => (array) $row)
-                ->all();
+            if ($transferQuery !== null) {
+                $data['caring_hour_transfers'] = $transferQuery
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
+            }
         }
 
         // Loyalty redemptions
         if (Schema::hasTable('caring_loyalty_redemptions')) {
-            $data['caring_loyalty_redemptions'] = DB::table('caring_loyalty_redemptions')
-                ->where('tenant_id', $tenantId)
-                ->where('user_id', $userId)
-                ->orderByDesc('id')
-                ->get()
-                ->map(fn ($row) => (array) $row)
-                ->all();
+            $memberColumn = Schema::hasColumn('caring_loyalty_redemptions', 'member_user_id')
+                ? 'member_user_id'
+                : (Schema::hasColumn('caring_loyalty_redemptions', 'user_id') ? 'user_id' : null);
+            $data['caring_loyalty_redemptions'] = $memberColumn === null
+                ? []
+                : DB::table('caring_loyalty_redemptions')
+                    ->where('tenant_id', $tenantId)
+                    ->where($memberColumn, $userId)
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
         }
 
         // Regional point transactions

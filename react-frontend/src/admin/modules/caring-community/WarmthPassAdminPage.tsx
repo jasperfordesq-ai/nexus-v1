@@ -73,12 +73,13 @@ export function WarmthPassAdminPage() {
     setResult(null);
     setErrorMsg(null);
     try {
-      const res = await api.get<{ data: WarmthPass }>(
+      const res = await api.get<WarmthPass>(
         `/v2/admin/caring-community/warmth-pass/${id}`,
       );
-      setResult(res.data?.data ?? null);
-      if (!res.data?.data) {
-        setErrorMsg('No data returned for this member ID.');
+      if (res.success && res.data) {
+        setResult(res.data);
+      } else {
+        setErrorMsg(res.error ?? 'No data returned for this member ID.');
       }
     } catch (err: unknown) {
       const msg =

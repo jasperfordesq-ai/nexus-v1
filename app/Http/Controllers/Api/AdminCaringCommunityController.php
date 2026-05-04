@@ -225,9 +225,13 @@ class AdminCaringCommunityController extends BaseApiController
         if ($disabled) return $disabled;
 
         // Coordinators / admins / super-admins always pass. Otherwise check
-        // whether the user holds the safeguarding.view permission via RBAC.
+        // whether the user holds the required safeguarding permission.
         $userId = (int) auth()->id();
-        $user = \DB::table('users')->where('id', $userId)->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
+        $tenantId = TenantContext::getId();
+        $user = \DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
         $role = $user ? (string) ($user->role ?? 'member') : 'member';
 
         if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god', 'coordinator', 'broker'], true)) {
@@ -239,12 +243,33 @@ class AdminCaringCommunityController extends BaseApiController
 
         // Check permission tables — schema may vary, do this defensively
         try {
-            $perm = (string) ($level === 'manage' ? 'safeguarding.manage' : 'safeguarding.view');
-            $hasPerm = \DB::table('user_permissions as up')
+            $allowedPermissions = $level === 'manage'
+                ? ['safeguarding.manage']
+                : ['safeguarding.view', 'safeguarding.manage'];
+
+            $query = \DB::table('user_permissions as up')
                 ->join('permissions as p', 'p.id', '=', 'up.permission_id')
                 ->where('up.user_id', $userId)
-                ->whereIn('p.name', [$perm, 'safeguarding.view'])
-                ->exists();
+                ->whereIn('p.name', $allowedPermissions);
+
+            if (Schema::hasColumn('user_permissions', 'tenant_id')) {
+                $query->where('up.tenant_id', $tenantId);
+            }
+            if (Schema::hasColumn('user_permissions', 'granted')) {
+                $query->where('up.granted', true);
+            }
+            if (Schema::hasColumn('user_permissions', 'expires_at')) {
+                $query->where(function ($q) {
+                    $q->whereNull('up.expires_at')->orWhere('up.expires_at', '>', now());
+                });
+            }
+            if (Schema::hasColumn('permissions', 'tenant_id')) {
+                $query->where(function ($q) use ($tenantId) {
+                    $q->whereNull('p.tenant_id')->orWhere('p.tenant_id', $tenantId);
+                });
+            }
+
+            $hasPerm = $query->exists();
             if ($hasPerm) {
                 return null;
             }
@@ -1342,25 +1367,46 @@ class AdminCaringCommunityController extends BaseApiController
         $totalHoursReceived = 0.0;
 
         if (\Illuminate\Support\Facades\Schema::hasTable('caring_support_relationships')) {
-            $hasRelationshipId = \Illuminate\Support\Facades\Schema::hasColumn('vol_logs', 'caring_support_relationship_id');
+            $supporterColumn = \Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'supporter_id')
+                ? 'supporter_id'
+                : (\Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'supporter_user_id') ? 'supporter_user_id' : null);
+            $recipientColumn = \Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'recipient_id')
+                ? 'recipient_id'
+                : (\Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'recipient_user_id') ? 'recipient_user_id' : null);
+            $typeColumn = \Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'relationship_type')
+                ? 'relationship_type'
+                : (\Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'frequency') ? 'frequency' : null);
+            $activityColumn = \Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'last_logged_at')
+                ? 'last_logged_at'
+                : (\Illuminate\Support\Facades\Schema::hasColumn('caring_support_relationships', 'last_activity_at') ? 'last_activity_at' : 'updated_at');
+            $hasRelationshipId = \Illuminate\Support\Facades\Schema::hasTable('vol_logs')
+                && \Illuminate\Support\Facades\Schema::hasColumn('vol_logs', 'caring_support_relationship_id');
 
-            $rows = \Illuminate\Support\Facades\DB::table('caring_support_relationships as csr')
-                ->join('users as u', 'u.id', '=', 'csr.supporter_user_id')
-                ->where('csr.recipient_user_id', $userId)
-                ->where('csr.tenant_id', $tenantId)
-                ->where('csr.status', 'active')
-                ->select([
+            $rows = collect();
+            if ($supporterColumn !== null && $recipientColumn !== null) {
+                $select = [
                     'csr.id',
-                    'csr.supporter_user_id',
-                    'csr.relationship_type',
-                    'csr.last_activity_at',
+                    'csr.' . $supporterColumn . ' as supporter_user_id',
+                    'csr.' . $activityColumn . ' as last_activity_at',
                     'csr.status',
                     'u.name as supporter_name',
                     'u.first_name as supporter_first_name',
                     'u.last_name as supporter_last_name',
                     'u.trust_tier as supporter_trust_tier',
-                ])
-                ->get();
+                ];
+                $select[] = $typeColumn !== null
+                    ? 'csr.' . $typeColumn . ' as relationship_type'
+                    : \Illuminate\Support\Facades\DB::raw("'' as relationship_type");
+
+                $rows = \Illuminate\Support\Facades\DB::table('caring_support_relationships as csr')
+                    ->join('users as u', 'u.id', '=', 'csr.' . $supporterColumn)
+                    ->where('u.tenant_id', $tenantId)
+                    ->where('csr.' . $recipientColumn, $userId)
+                    ->where('csr.tenant_id', $tenantId)
+                    ->where('csr.status', 'active')
+                    ->select($select)
+                    ->get();
+            }
 
             foreach ($rows as $row) {
                 $relId = (int) $row->id;

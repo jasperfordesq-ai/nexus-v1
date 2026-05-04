@@ -598,6 +598,7 @@ function AppRoutes() {
           </FeatureGate>
         } />
 
+        <Route element={<ProtectedRoute />}>
         {/* Member-facing: Low-friction help request (AG10) */}
         <Route path="caring-community/request-help" element={
           <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
@@ -800,6 +801,7 @@ function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
+        </Route>
 
         {/* GDPR member data export (R3) */}
         <Route path="settings/data-export" element={<ErrorBoundary><DataExportPage /></ErrorBoundary>} />

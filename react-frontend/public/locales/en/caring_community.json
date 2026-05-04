@@ -214,5 +214,62 @@
     "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
     "loading": "Loading your pass...",
     "error": "Could not load your Warmth Pass"
+  },
+  "panel": {
+    "sidebar": {
+      "brand": "Community Caring",
+      "expand": "Expand sidebar",
+      "collapse": "Collapse sidebar",
+      "help_centre": "Help Centre",
+      "full_admin": "Full Admin",
+      "sections": {
+        "overview": "Overview",
+        "operations": "Operations",
+        "engagement": "Engagement",
+        "trust_safety": "Trust & Safety",
+        "pilot_governance": "Pilot Governance",
+        "partnerships": "Partnerships",
+        "reporting": "Reporting"
+      },
+      "items": {
+        "dashboard": "Caring Community",
+        "workflow": "Caring Workflow",
+        "projects": "Caring Projects",
+        "loyalty": "Loyalty Programme",
+        "hour_transfers": "Hour Transfers",
+        "regional_points": "Regional Points",
+        "sub_regions": "Sub-Regions",
+        "federation_peers": "Federation Peers",
+        "sla_dashboard": "SLA Dashboard",
+        "providers": "Providers",
+        "warmth_pass": "Warmth Pass",
+        "recipient_circle": "Care Recipient Circle",
+        "nudges": "Smart Nudges",
+        "emergency_alerts": "Emergency Alerts",
+        "surveys": "Municipal Surveys",
+        "copilot": "Communication Copilot",
+        "civic_digest": "Civic Digest",
+        "lead_nurture": "Lead Nurture",
+        "success_stories": "Success Stories",
+        "feedback": "Feedback Inbox",
+        "verification": "Municipal Verification",
+        "safeguarding": "Safeguarding Reports",
+        "trust_tier": "Trust Tiers",
+        "launch_readiness": "Launch Readiness",
+        "pilot_scoreboard": "Pilot Scoreboard",
+        "data_quality": "Pilot Data Quality",
+        "operating_policy": "Operating Policy",
+        "disclosure_pack": "Disclosure Pack",
+        "commercial_boundary": "Commercial Boundary",
+        "isolated_node": "Isolated Node Gate",
+        "research": "Research Partnerships",
+        "external_integrations": "External Integrations",
+        "integration_showcase": "Integration Showcase",
+        "municipal_impact": "Municipal Impact Reports",
+        "kpi_baselines": "KPI Baselines",
+        "municipal_roi": "Municipal ROI",
+        "category_coefficients": "Category Coefficients"
+      }
+    }
   }
 }

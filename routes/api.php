@@ -1238,14 +1238,16 @@ Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsC
 
 // Public caring community endpoint — no auth required (invite lookup)
 Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'lookupInvite'])
-    ->withoutMiddleware('auth:sanctum')
+    ->withoutMiddleware(['auth:sanctum', 'admin', \App\Http\Middleware\EnsureIsAdmin::class])
     ->middleware('throttle:60,1');
 
 // Member-facing caring community endpoints (auth:sanctum via global middleware)
-Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp']);
-Route::post('/v2/caring-community/request-help/voice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelpVoice'])
-    ->middleware('throttle:20,1');
-Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp']);
+    Route::post('/v2/caring-community/request-help/voice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelpVoice'])
+        ->middleware('throttle:20,1');
+    Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour']);
+});
 
 Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);
 Route::put('/v2/admin/caring-community/workflow/policy', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updatePolicy']);
@@ -1276,15 +1278,16 @@ Route::post('/v2/admin/caring-community/vereine/{organizationId}/members/import/
 Route::post('/v2/admin/caring-community/vereine/{organizationId}/members/import', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'importVereinMembers']);
 Route::post('/v2/admin/caring-community/vereine/{organizationId}/admins', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'assignVereinAdmin']);
 // Member-facing caring community endpoints (auth required, scoped to current user)
-Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
-Route::post('/v2/caring-community/my-relationships/{id}/pause', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'pauseRelationship']);
-Route::post('/v2/caring-community/my-relationships/{id}/end', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'endRelationship']);
-Route::post('/v2/caring-community/my-relationships/{id}/resume', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'resumeRelationship']);
-Route::put('/v2/caring-community/me/onboarding-choice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'setOnboardingChoice']);
-Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
-Route::get('/v2/caring-community/my-ahv-pension-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myAhvPensionExport'])
-    ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
-Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::get('/v2/caring-community/my-relationships', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myRelationships']);
+    Route::post('/v2/caring-community/my-relationships/{id}/pause', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'pauseRelationship']);
+    Route::post('/v2/caring-community/my-relationships/{id}/end', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'endRelationship']);
+    Route::post('/v2/caring-community/my-relationships/{id}/resume', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'resumeRelationship']);
+    Route::put('/v2/caring-community/me/onboarding-choice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'setOnboardingChoice']);
+    Route::get('/v2/caring-community/my-future-care-fund', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myFutureCareFund']);
+    Route::get('/v2/caring-community/my-ahv-pension-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myAhvPensionExport']);
+    Route::get('/v2/caring-community/markt', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'markt']);
+});
 Route::post('/v2/caring-community/vereine/{organizationId}/members/import/preview', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'previewVereinMemberImport'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::post('/v2/caring-community/vereine/{organizationId}/members/import', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'importVereinMembers'])
@@ -1292,11 +1295,13 @@ Route::post('/v2/caring-community/vereine/{organizationId}/members/import', [\Ap
 
 // Caring loyalty bridge (time credits ↔ marketplace) — member-facing
 // Caring Community - regional points (A1), isolated and off by default
-Route::get('/v2/caring-community/regional-points/summary', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsSummary']);
-Route::get('/v2/caring-community/regional-points/history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsHistory']);
-Route::post('/v2/caring-community/regional-points/transfer', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsTransfer']);
-Route::get('/v2/caring-community/regional-points/marketplace/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceQuote']);
-Route::post('/v2/caring-community/regional-points/marketplace/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceRedeem']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::get('/v2/caring-community/regional-points/summary', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsSummary']);
+    Route::get('/v2/caring-community/regional-points/history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsHistory']);
+    Route::post('/v2/caring-community/regional-points/transfer', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsTransfer']);
+    Route::get('/v2/caring-community/regional-points/marketplace/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceQuote']);
+    Route::post('/v2/caring-community/regional-points/marketplace/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'regionalPointsMarketplaceRedeem']);
+});
 Route::get('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsConfig']);
 Route::put('/v2/admin/caring-community/regional-points/config', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointsConfig']);
 Route::get('/v2/admin/caring-community/regional-points/ledger', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'regionalPointsLedger']);
@@ -1305,31 +1310,39 @@ Route::post('/v2/admin/caring-community/regional-points/adjust', [\App\Http\Cont
 Route::get('/v2/admin/caring-community/regional-points/seller-settings/{userId}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'getRegionalPointSellerSettings']);
 Route::put('/v2/admin/caring-community/regional-points/seller-settings', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'updateRegionalPointSellerSettings']);
 
-Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
-Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
-Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::get('/v2/caring-community/loyalty/quote', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyQuote']);
+    Route::post('/v2/caring-community/loyalty/redeem', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyRedeem']);
+    Route::get('/v2/caring-community/loyalty/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'loyaltyMyHistory']);
+});
 
 // Caring Community — Member-side GDPR/FADP data export (E3)
-Route::get('/v2/caring-community/me/data-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myDataExport']);
+Route::get('/v2/caring-community/me/data-export', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'myDataExport'])
+    ->withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class]);
 
 // Caring Community — federation directory (browse discoverable peer communities)
-Route::get('/v2/caring-community/federation-directory', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'federationDirectory']);
+Route::get('/v2/caring-community/federation-directory', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'federationDirectory'])
+    ->withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class]);
 
 // Caring Community — cooperative-to-cooperative banked-hour transfer (K3)
-Route::post('/v2/caring-community/hour-transfer/initiate', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferInitiate']);
-Route::get('/v2/caring-community/hour-transfer/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferMyHistory']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::post('/v2/caring-community/hour-transfer/initiate', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferInitiate']);
+    Route::get('/v2/caring-community/hour-transfer/my-history', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourTransferMyHistory']);
+});
 Route::get('/v2/admin/caring-community/hour-transfer/pending', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferPending']);
 Route::post('/v2/admin/caring-community/hour-transfer/{id}/approve', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferApprove']);
 Route::post('/v2/admin/caring-community/hour-transfer/{id}/reject', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferReject']);
 Route::get('/v2/admin/caring-community/hour-transfer/inbound', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'hourTransferInbound']);
 
 // Caring Community — K5: time-credit gifting (member-to-member, same-tenant)
-Route::post('/v2/caring-community/hour-gifts/send', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSend']);
-Route::post('/v2/caring-community/hour-gifts/{id}/accept', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftAccept']);
-Route::post('/v2/caring-community/hour-gifts/{id}/decline', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftDecline']);
-Route::post('/v2/caring-community/hour-gifts/{id}/revert', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftRevert']);
-Route::get('/v2/caring-community/hour-gifts/inbox', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftInbox']);
-Route::get('/v2/caring-community/hour-gifts/sent', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSent']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::post('/v2/caring-community/hour-gifts/send', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSend']);
+    Route::post('/v2/caring-community/hour-gifts/{id}/accept', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftAccept']);
+    Route::post('/v2/caring-community/hour-gifts/{id}/decline', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftDecline']);
+    Route::post('/v2/caring-community/hour-gifts/{id}/revert', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftRevert']);
+    Route::get('/v2/caring-community/hour-gifts/inbox', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftInbox']);
+    Route::get('/v2/caring-community/hour-gifts/sent', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'hourGiftSent']);
+});
 
 // AG55 — Verein-to-Verein federation (admin + member-facing)
 // Verein admin endpoints (consent, network, event sharing). Use the controller's
@@ -1378,8 +1391,10 @@ Route::get('/v2/caring-community/kiss-treffen/{eventId}', [\App\Http\Controllers
 Route::put('/v2/admin/caring-community/kiss-treffen/{eventId}', [\App\Http\Controllers\Api\KissTreffenController::class, 'adminUpsert']);
 Route::post('/v2/admin/caring-community/kiss-treffen/{eventId}/minutes', [\App\Http\Controllers\Api\KissTreffenController::class, 'adminRecordMinutes']);
 
-Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
-Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
+Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
+    Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
+    Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
+});
 Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
 Route::get('/v2/admin/caring-community/safeguarding/reports', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingList']);
 Route::get('/v2/admin/caring-community/safeguarding/reports/{id}', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingShow']);
@@ -2887,14 +2902,17 @@ Route::post('/v2/admin/push-campaigns/{id}/dispatch', [\App\Http\Controllers\Api
 // AG62 — Municipality Survey & Feedback Tool
 Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'activeSurveys']);
 Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
-Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey']);
-Route::get('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminListSurveys']);
-Route::post('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCreateSurvey']);
-Route::get('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminGetSurvey']);
-Route::put('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminUpdateSurvey']);
-Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminPublishSurvey']);
-Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
-Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
+Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey'])
+    ->middleware('auth:sanctum');
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminListSurveys']);
+    Route::post('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCreateSurvey']);
+    Route::get('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminGetSurvey']);
+    Route::put('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminUpdateSurvey']);
+    Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminPublishSurvey']);
+    Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
+    Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
+});
 
 // ============================================
 // AG61 — KI-Agenten Autonomous Agent Framework

@@ -699,10 +699,24 @@ class CivicDigestService
             return [];
         }
 
+        // Help requests are coordinator-facing by default. Only include them in
+        // member digests if a future schema adds an explicit public/consent flag.
+        $publicColumn = null;
+        foreach (['include_in_civic_digest', 'share_in_civic_digest', 'public_consent', 'is_public'] as $candidate) {
+            if (Schema::hasColumn('caring_help_requests', $candidate)) {
+                $publicColumn = $candidate;
+                break;
+            }
+        }
+        if ($publicColumn === null) {
+            return [];
+        }
+
         $cutoff = $this->cutoff30Days();
         $rows = DB::table('caring_help_requests')
             ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
+            ->where($publicColumn, 1)
             ->where(function ($q) use ($cutoff) {
                 $q->where('created_at', '>=', $cutoff)
                     ->orWhere('updated_at', '>=', $cutoff);
