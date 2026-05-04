@@ -144,6 +144,7 @@ function applyPreferencesToDOM(prefs: ThemePreferences): void {
     FONT_SIZE_MAP[prefs.largeText ? 'large' : prefs.fontSize]
   );
   html.style.setProperty('--spacing-multiplier', SPACING_MULTIPLIER_MAP[prefs.density]);
+  html.setAttribute('data-density', prefs.density);
   html.setAttribute('data-large-text', String(prefs.largeText));
   html.setAttribute('data-high-contrast', String(prefs.highContrast));
   html.setAttribute('data-reduced-motion', String(prefs.reducedMotion));

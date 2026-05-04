@@ -304,9 +304,89 @@ html {
 :root {
   --accent-color-hover: color-mix(in srgb, var(--accent-color) 85%, white);
   --accent-color-subtle: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  --accent-color-end: color-mix(in srgb, var(--accent-color), #000 22%);
   --accent-glow: color-mix(in srgb, var(--accent-color) 50%, transparent);
   --accent-glow-subtle: color-mix(in srgb, var(--accent-color) 25%, transparent);
   --accent-glow-intense: color-mix(in srgb, var(--accent-color) 70%, transparent);
+}
+
+/* ─────────────────────────────────────────────
+   ACCENT COLOR — REMAP HARDCODED INDIGO/PURPLE
+   The brand primary is sprinkled across ~1,250 hardcoded
+   Tailwind utility classes (from-indigo-500 to-purple-600,
+   bg-indigo-500, text-indigo-500, border-indigo-500). Rather
+   than sweep them all, we override the underlying CSS so the
+   accent picker actually changes the UI.
+   ───────────────────────────────────────────── */
+.bg-indigo-500,
+.bg-indigo-600 {
+  background-color: var(--accent-color) !important;
+}
+
+.text-indigo-500,
+.text-indigo-600 {
+  color: var(--accent-color) !important;
+}
+
+.border-indigo-500,
+.border-indigo-600 {
+  border-color: var(--accent-color) !important;
+}
+
+/* Brand gradient: from-indigo-500 → to-purple-600 becomes accent → darker accent */
+.from-indigo-500 {
+  --tw-gradient-from: var(--accent-color) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position)) !important;
+}
+
+.to-purple-600 {
+  --tw-gradient-to: var(--accent-color-end) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position)) !important;
+}
+
+/* Hover variants */
+.hover\:bg-indigo-600:hover,
+.hover\:bg-indigo-700:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+.hover\:text-indigo-500:hover,
+.hover\:text-indigo-600:hover {
+  color: var(--accent-color-hover) !important;
+}
+
+/* Ring/focus utilities */
+.ring-indigo-500,
+.focus\:ring-indigo-500:focus,
+.focus-visible\:ring-indigo-500:focus-visible {
+  --tw-ring-color: var(--accent-color) !important;
+}
+
+/* ─────────────────────────────────────────────
+   LAYOUT DENSITY
+   Tailwind v4 derives every padding / margin / gap / space-x /
+   space-y utility from a single base var (--spacing). Overriding
+   it on <html data-density> scales the entire UI in one stroke.
+   Compact = 75%, Comfortable = 100% (default), Spacious = 125%.
+
+   Note: this also scales width/height utilities like w-4/h-4
+   (icons), which is intentional — true density affects icon
+   sizing too. Components needing fixed sizing should use
+   pixel/rem literals, not spacing utilities.
+   ───────────────────────────────────────────── */
+html[data-density="compact"] {
+  --spacing: 0.1875rem;            /* 0.25rem * 0.75 */
+  --spacing-multiplier: 0.75;
+}
+
+html[data-density="comfortable"] {
+  --spacing: 0.25rem;              /* Tailwind default */
+  --spacing-multiplier: 1;
+}
+
+html[data-density="spacious"] {
+  --spacing: 0.3125rem;            /* 0.25rem * 1.25 */
+  --spacing-multiplier: 1.25;
 }
 
 /* ─────────────────────────────────────────────
