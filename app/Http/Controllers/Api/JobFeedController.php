@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\JobFeedService;
+use App\Services\JobConfigurationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
@@ -25,6 +26,16 @@ class JobFeedController extends BaseApiController
         private readonly JobFeedService $feedService,
     ) {}
 
+    private function feedsEnabled(): bool
+    {
+        $value = JobConfigurationService::get(JobConfigurationService::CONFIG_ENABLE_RSS_FEED, true);
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
+    }
+
     /**
      * GET /api/v2/jobs/feed.xml — RSS 2.0 feed of open job vacancies.
      *
@@ -35,7 +46,7 @@ class JobFeedController extends BaseApiController
     {
         $tenantId = TenantContext::getId();
 
-        if (!TenantContext::hasFeature('job_vacancies')) {
+        if (!TenantContext::hasFeature('job_vacancies') || !$this->feedsEnabled()) {
             return response('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Feature Disabled</title></channel></rss>', 403)
                 ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
         }
@@ -57,8 +68,8 @@ class JobFeedController extends BaseApiController
     {
         $tenantId = TenantContext::getId();
 
-        if (!TenantContext::hasFeature('job_vacancies')) {
-            return $this->respondWithError('FEATURE_DISABLED', __('api.job_vacancies_feature_disabled'), null, 403);
+        if (!TenantContext::hasFeature('job_vacancies') || !$this->feedsEnabled()) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_feed_disabled'), null, 403);
         }
 
         $data = $this->feedService->generateJsonFeed($tenantId);
@@ -78,7 +89,7 @@ class JobFeedController extends BaseApiController
     {
         $tenantId = TenantContext::getId();
 
-        if (!TenantContext::hasFeature('job_vacancies')) {
+        if (!TenantContext::hasFeature('job_vacancies') || !$this->feedsEnabled()) {
             return response('<?xml version="1.0" encoding="UTF-8"?><source></source>', 403)
                 ->header('Content-Type', 'application/xml; charset=UTF-8');
         }

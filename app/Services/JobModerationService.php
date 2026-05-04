@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Log;
  * JobModerationService — Admin approval workflow for job vacancies.
  *
  * Handles pending review queue, approval/rejection/flagging of jobs,
- * and moderation statistics. Checks tenant_settings for
- * `jobs_require_moderation` to determine whether new jobs need approval.
+ * and moderation statistics. Checks typed jobs configuration first, then the
+ * legacy `jobs_require_moderation` tenant setting for older tenants.
  */
 class JobModerationService
 {
@@ -26,6 +26,15 @@ class JobModerationService
      */
     public static function isModerationEnabled(int $tenantId): bool
     {
+        $configured = TenantContext::getSetting(JobConfigurationService::CONFIG_MODERATION_ENABLED, null);
+        if ($configured !== null) {
+            if (is_bool($configured)) {
+                return $configured;
+            }
+
+            return filter_var($configured, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
         $setting = TenantContext::getSetting('jobs_require_moderation', false);
 
         // Support both boolean and string representations

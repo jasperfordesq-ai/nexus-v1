@@ -46,6 +46,104 @@ class JobVacancyService
         return $this->errors;
     }
 
+    private function normalizeJsonList(mixed $value): ?array
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter($value, fn($item) => $item !== null && $item !== ''));
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded, fn($item) => $item !== null && $item !== ''));
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeCoordinate(mixed $value, float $min, float $max): ?float
+    {
+        if ($value === null || $value === '' || !is_numeric($value)) {
+            return null;
+        }
+
+        $coordinate = (float) $value;
+        return $coordinate >= $min && $coordinate <= $max ? $coordinate : null;
+    }
+
+    private function configBool(string $key, bool $default): bool
+    {
+        $value = JobConfigurationService::get($key, $default);
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+    }
+
+    private function inputBool(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+    }
+
+    private function isAdminUser(int $userId): bool
+    {
+        $user = User::where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if (!$user) {
+            return false;
+        }
+
+        $role = (string) ($user->role ?? '');
+        return in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($user->is_admin ?? false)
+            || (bool) ($user->is_super_admin ?? false)
+            || (bool) ($user->is_tenant_super_admin ?? false)
+            || (bool) ($user->is_god ?? false);
+    }
+
+    private function validateOrganizationForPosting(int $organizationId, int $userId, int $tenantId): bool
+    {
+        $exists = DB::table('organizations')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $organizationId)
+            ->exists();
+
+        if (!$exists) {
+            $this->errors[] = ['code' => 'VALIDATION_INVALID_ORGANIZATION', 'message' => __('api.job_organization_invalid')];
+            return false;
+        }
+
+        if ($this->isAdminUser($userId)) {
+            return true;
+        }
+
+        $canPost = DB::table('org_members')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->whereIn('role', ['owner', 'admin'])
+            ->exists();
+
+        if (!$canPost) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_organization_forbidden')];
+        }
+
+        return $canPost;
+    }
+
     /**
      * Get all job vacancies with filtering and cursor-based pagination.
      *
@@ -257,62 +355,128 @@ class JobVacancyService
     public function create(int $userId, array $data): int
     {
         $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $type = $data['type'] ?? 'volunteer';
+        $validTypes = ['paid', 'volunteer', 'timebank'];
+        if (!in_array($type, $validTypes, true)) {
+            $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => __('api.job_type_invalid')];
+            return 0;
+        }
+
+        $typeConfig = [
+            'paid' => JobConfigurationService::CONFIG_ALLOW_PAID,
+            'volunteer' => JobConfigurationService::CONFIG_ALLOW_VOLUNTEER,
+            'timebank' => JobConfigurationService::CONFIG_ALLOW_TIMEBANK,
+        ];
+        if (!$this->configBool($typeConfig[$type], true)) {
+            $this->errors[] = ['code' => 'FEATURE_DISABLED', 'message' => __('api.job_type_disabled')];
+            return 0;
+        }
+
+        $maxPostings = (int) JobConfigurationService::get(JobConfigurationService::CONFIG_MAX_POSTINGS_PER_USER, 20);
+        if ($maxPostings > 0) {
+            $activePostings = $this->vacancy->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->whereIn('status', ['open', 'draft'])
+                ->count();
+            if ($activePostings >= $maxPostings) {
+                $this->errors[] = ['code' => 'QUOTA_EXCEEDED', 'message' => __('api.job_posting_limit_reached', ['limit' => $maxPostings])];
+                return 0;
+            }
+        }
+
+        $requestedStatus = ($data['status'] ?? 'open') === 'draft' ? 'draft' : 'open';
+        $deadline = $data['deadline'] ?? null;
+        if ($deadline === '' || $deadline === null) {
+            $defaultDeadlineDays = (int) JobConfigurationService::get(JobConfigurationService::CONFIG_DEFAULT_DEADLINE_DAYS, 30);
+            $deadline = $defaultDeadlineDays > 0 ? now()->addDays($defaultDeadlineDays)->toDateString() : null;
+        }
+
+        $salaryMin = ($data['salary_min'] ?? '') === '' ? null : $data['salary_min'];
+        $salaryMax = ($data['salary_max'] ?? '') === '' ? null : $data['salary_max'];
 
         // EU Pay Transparency Directive (June 2026) compliance — salary range required unless negotiable
-        $salaryNegotiable = !empty($data['salary_negotiable']) && $data['salary_negotiable'];
-        if (!$salaryNegotiable) {
+        $salaryNegotiable = $this->inputBool($data['salary_negotiable'] ?? false);
+        if (!$salaryNegotiable && $type === 'paid') {
             $hasSalaryMin = isset($data['salary_min']) && $data['salary_min'] !== null && $data['salary_min'] !== '';
             $hasSalaryMax = isset($data['salary_max']) && $data['salary_max'] !== null && $data['salary_max'] !== '';
             if (!$hasSalaryMin || !$hasSalaryMax) {
-                // Only enforce for paid job types
-                $jobType = $data['type'] ?? 'volunteer';
-                if ($jobType === 'paid') {
-                    $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => 'A salary range (min and max) is required unless the role is marked as salary negotiable. EU Pay Transparency Directive compliance.'];
-                    return 0;
-                }
+                $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => __('api.job_salary_required')];
+                return 0;
             }
         }
 
         // Salary min cannot exceed max
-        if (!empty($data['salary_min']) && !empty($data['salary_max']) && (float)$data['salary_min'] > (float)$data['salary_max']) {
-            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => 'Minimum salary cannot exceed maximum salary'];
+        if ($salaryMin !== null && $salaryMax !== null && (float) $salaryMin > (float) $salaryMax) {
+            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => __('api.job_salary_range_invalid')];
             return 0;
         }
 
-        $tenantId = TenantContext::getId();
+        $organizationId = ($data['organization_id'] ?? '') === '' ? null : (int) ($data['organization_id'] ?? 0);
+        if ($organizationId !== null && !$this->validateOrganizationForPosting($organizationId, $userId, $tenantId)) {
+            return 0;
+        }
 
-        // Run spam detection (Agent B)
-        $spamResult = JobSpamDetectionService::analyzeJob($data, $userId, $tenantId);
+        $spamResult = ['score' => 0, 'flags' => [], 'action' => 'allow'];
+        if ($this->configBool(JobConfigurationService::CONFIG_SPAM_DETECTION, true)) {
+            $spamResult = JobSpamDetectionService::analyzeJob($data, $userId, $tenantId);
+        }
         $spamScore = $spamResult['score'];
         $spamFlags = $spamResult['flags'];
         $spamAction = $spamResult['action'];
 
         // Determine initial status and moderation_status
-        $status = 'open';
+        $status = $requestedStatus;
         $moderationStatus = null;
 
         if ($spamAction === 'block') {
             $status = 'closed';
             $moderationStatus = 'rejected';
-        } elseif ($spamAction === 'flag' || JobModerationService::isModerationEnabled($tenantId)) {
+        } elseif ($requestedStatus === 'open' && ($spamAction === 'flag' || JobModerationService::isModerationEnabled($tenantId))) {
             $status = 'draft';
             $moderationStatus = 'pending_review';
         }
 
+        $brandingEnabled = $this->configBool(JobConfigurationService::CONFIG_ENABLE_EMPLOYER_BRANDING, true);
+        $blindHiringEnabled = $this->configBool(JobConfigurationService::CONFIG_ENABLE_BLIND_HIRING, false);
+        $salaryCurrency = trim((string) ($data['salary_currency'] ?? ''));
+        if ($salaryCurrency === '') {
+            $salaryCurrency = (string) JobConfigurationService::get(JobConfigurationService::CONFIG_DEFAULT_CURRENCY, 'EUR');
+        }
+
         $vacancy = $this->vacancy->newQuery()->create(array_filter([
+            'tenant_id'       => $tenantId,
             'title'          => trim($data['title']),
             'description'    => trim($data['description'] ?? ''),
-            'type'           => $data['type'] ?? 'volunteer',
+            'type'           => $type,
             'commitment'     => $data['commitment'] ?? 'flexible',
             'location'       => $data['location'] ?? null,
+            'latitude'       => $this->normalizeCoordinate($data['latitude'] ?? null, -90, 90),
+            'longitude'      => $this->normalizeCoordinate($data['longitude'] ?? null, -180, 180),
+            'is_remote'      => $this->inputBool($data['is_remote'] ?? false),
+            'category'       => $data['category'] ?? null,
+            'skills_required' => $data['skills_required'] ?? null,
+            'hours_per_week' => ($data['hours_per_week'] ?? '') === '' ? null : (float) $data['hours_per_week'],
+            'time_credits'   => ($data['time_credits'] ?? '') === '' ? null : (float) $data['time_credits'],
+            'contact_email'  => $data['contact_email'] ?? null,
+            'contact_phone'  => $data['contact_phone'] ?? null,
+            'deadline'       => $deadline,
+            'salary_min'     => $salaryMin,
+            'salary_max'     => $salaryMax,
+            'salary_type'    => $data['salary_type'] ?? null,
+            'salary_currency' => $salaryCurrency,
+            'salary_negotiable' => $salaryNegotiable,
+            'organization_id' => $organizationId,
             'status'         => $status,
             'user_id'        => $userId,
-            'tagline'        => isset($data['tagline']) ? trim($data['tagline']) : null,
-            'video_url'      => $data['video_url'] ?? null,
-            'culture_photos' => $data['culture_photos'] ?? null,
-            'company_size'   => $data['company_size'] ?? null,
-            'benefits'       => $data['benefits'] ?? null,
-            'blind_hiring'   => !empty($data['blind_hiring']) ? 1 : 0,
+            'tagline'        => $brandingEnabled && isset($data['tagline']) ? trim((string) $data['tagline']) : null,
+            'video_url'      => $brandingEnabled ? ($data['video_url'] ?? null) : null,
+            'culture_photos' => $brandingEnabled ? $this->normalizeJsonList($data['culture_photos'] ?? null) : null,
+            'company_size'   => $brandingEnabled ? ($data['company_size'] ?? null) : null,
+            'benefits'       => $brandingEnabled ? $this->normalizeJsonList($data['benefits'] ?? null) : null,
+            'blind_hiring'   => $blindHiringEnabled && $this->inputBool($data['blind_hiring'] ?? false),
             'moderation_status' => $moderationStatus,
             'spam_score'     => $spamScore,
             'spam_flags'     => !empty($spamFlags) ? $spamFlags : null,
@@ -345,14 +509,16 @@ class JobVacancyService
             Log::warning('JobVacancyService::create webhook dispatch failed: ' . $e->getMessage());
         }
 
-        // Fire event to notify job alert subscribers
-        try {
-            $creator = User::find($userId);
-            if ($creator) {
-                event(new \App\Events\JobVacancyCreated($vacancy, $creator, TenantContext::getId()));
+        if ($vacancy->status === 'open') {
+            // Fire event to notify job alert subscribers
+            try {
+                $creator = User::find($userId);
+                if ($creator) {
+                    event(new \App\Events\JobVacancyCreated($vacancy, $creator, TenantContext::getId()));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('JobVacancyService::create event dispatch failed: ' . $e->getMessage());
             }
-        } catch (\Throwable $e) {
-            Log::warning('JobVacancyService::create event dispatch failed: ' . $e->getMessage());
         }
 
         return $vacancy->id;
@@ -367,17 +533,14 @@ class JobVacancyService
 
         $vacancy = $this->vacancy->newQuery()->find($id);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return false;
         }
 
         // Check ownership or admin
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only edit your own job vacancies'];
-                return false;
-            }
+        if ((int) $vacancy->user_id !== $userId && !$this->isAdminUser($userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_edit_own_only')];
+            return false;
         }
 
         // NOTE: organization_id is intentionally NOT in this list. Allowing it on
@@ -404,6 +567,64 @@ class JobVacancyService
             return true;
         }
 
+        if (array_key_exists('type', $updates)) {
+            $validTypes = ['paid', 'volunteer', 'timebank'];
+            if (!in_array($updates['type'], $validTypes, true)) {
+                $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => __('api.job_type_invalid')];
+                return false;
+            }
+
+            $typeConfig = [
+                'paid' => JobConfigurationService::CONFIG_ALLOW_PAID,
+                'volunteer' => JobConfigurationService::CONFIG_ALLOW_VOLUNTEER,
+                'timebank' => JobConfigurationService::CONFIG_ALLOW_TIMEBANK,
+            ];
+            if (!$this->configBool($typeConfig[$updates['type']], true)) {
+                $this->errors[] = ['code' => 'FEATURE_DISABLED', 'message' => __('api.job_type_disabled')];
+                return false;
+            }
+        }
+
+        if (array_key_exists('latitude', $updates)) {
+            $updates['latitude'] = $this->normalizeCoordinate($updates['latitude'], -90, 90);
+        }
+        if (array_key_exists('longitude', $updates)) {
+            $updates['longitude'] = $this->normalizeCoordinate($updates['longitude'], -180, 180);
+        }
+        if (array_key_exists('is_remote', $updates)) {
+            $updates['is_remote'] = $this->inputBool($updates['is_remote']);
+        }
+        if (array_key_exists('culture_photos', $updates)) {
+            $updates['culture_photos'] = $this->normalizeJsonList($updates['culture_photos']);
+        }
+        if (array_key_exists('benefits', $updates)) {
+            $updates['benefits'] = $this->normalizeJsonList($updates['benefits']);
+        }
+        if (array_key_exists('blind_hiring', $updates)) {
+            $updates['blind_hiring'] = $this->configBool(JobConfigurationService::CONFIG_ENABLE_BLIND_HIRING, false)
+                && $this->inputBool($updates['blind_hiring']);
+        }
+        if (array_key_exists('salary_currency', $updates) && trim((string) $updates['salary_currency']) === '') {
+            $updates['salary_currency'] = JobConfigurationService::get(JobConfigurationService::CONFIG_DEFAULT_CURRENCY, 'EUR');
+        }
+        foreach (['salary_min', 'salary_max', 'hours_per_week', 'time_credits'] as $numericField) {
+            if (array_key_exists($numericField, $updates)) {
+                $updates[$numericField] = ($updates[$numericField] === '' || $updates[$numericField] === null)
+                    ? null
+                    : (float) $updates[$numericField];
+            }
+        }
+        if (array_key_exists('deadline', $updates) && $updates['deadline'] === '') {
+            $updates['deadline'] = null;
+        }
+        if (array_key_exists('salary_negotiable', $updates)) {
+            $updates['salary_negotiable'] = $this->inputBool($updates['salary_negotiable']);
+        }
+        if (array_key_exists('status', $updates) && !in_array($updates['status'], ['open', 'draft', 'closed', 'filled'], true)) {
+            $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => __('api.job_status_invalid')];
+            return false;
+        }
+
         // EU Pay Transparency Directive (June 2026) compliance — salary range required unless negotiable
         // Only validate when salary fields or type are being touched in this update
         $salaryFieldsTouched = array_key_exists('salary_min', $updates) || array_key_exists('salary_max', $updates)
@@ -418,7 +639,7 @@ class JobVacancyService
                 $salaryMin = array_key_exists('salary_min', $updates) ? $updates['salary_min'] : $vacancy->salary_min;
                 $salaryMax = array_key_exists('salary_max', $updates) ? $updates['salary_max'] : $vacancy->salary_max;
                 if (($salaryMin === null || $salaryMin === '') || ($salaryMax === null || $salaryMax === '')) {
-                    $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => 'A salary range (min and max) is required unless the role is marked as salary negotiable. EU Pay Transparency Directive compliance.'];
+                    $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => __('api.job_salary_required')];
                     return false;
                 }
             }
@@ -428,14 +649,14 @@ class JobVacancyService
         $finalMin = array_key_exists('salary_min', $updates) ? $updates['salary_min'] : ($vacancy->salary_min ?? null);
         $finalMax = array_key_exists('salary_max', $updates) ? $updates['salary_max'] : ($vacancy->salary_max ?? null);
         if (!empty($finalMin) && !empty($finalMax) && (float)$finalMin > (float)$finalMax) {
-            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => 'Minimum salary cannot exceed maximum salary'];
+            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => __('api.job_salary_range_invalid')];
             return false;
         }
 
         // Re-analyze spam score on content changes (mirrors create() logic)
         $spamRelevantFields = ['title', 'description', 'tagline', 'location', 'contact_email', 'contact_phone'];
         $hasSpamRelevantChange = !empty(array_intersect(array_keys($updates), $spamRelevantFields));
-        if ($hasSpamRelevantChange) {
+        if ($hasSpamRelevantChange && $this->configBool(JobConfigurationService::CONFIG_SPAM_DETECTION, true)) {
             try {
                 $tenantId = TenantContext::getId();
                 $mergedData = array_merge($vacancy->toArray(), $updates);
@@ -529,8 +750,8 @@ class JobVacancyService
             $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
             return null;
         }
-        if ($vacancy->status === 'closed' || $vacancy->status === 'filled') {
-            $this->errors[] = ['code' => 'VACANCY_CLOSED', 'message' => 'This vacancy is no longer accepting applications'];
+        if ($vacancy->status !== 'open' || ($vacancy->deadline && $vacancy->deadline->copy()->endOfDay()->isPast())) {
+            $this->errors[] = ['code' => 'VACANCY_CLOSED', 'message' => __('api.job_vacancy_not_accepting_applications')];
             return null;
         }
 
@@ -634,17 +855,24 @@ class JobVacancyService
     {
         $this->errors = [];
 
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_FEATURED, true)) {
+            $this->errors[] = ['code' => 'FEATURE_DISABLED', 'message' => __('api.job_featured_disabled')];
+            return false;
+        }
+
+        if ($days <= 0) {
+            $days = (int) JobConfigurationService::get(JobConfigurationService::CONFIG_FEATURED_DURATION_DAYS, 7);
+        }
         $days = max(1, min(90, $days));
 
-        $user = User::where('id', $adminId)->first(['id', 'role']);
-        if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only admins can feature jobs'];
+        if (!$this->isAdminUser($adminId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_admin_feature_only')];
             return false;
         }
 
         $job = $this->vacancy->newQuery()->find($id);
         if (!$job) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return false;
         }
 
@@ -667,9 +895,8 @@ class JobVacancyService
     {
         $this->errors = [];
 
-        $user = User::where('id', $adminId)->first(['id', 'role']);
-        if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only admins can unfeature jobs'];
+        if (!$this->isAdminUser($adminId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_admin_feature_only')];
             return false;
         }
 

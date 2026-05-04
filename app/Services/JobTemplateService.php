@@ -12,6 +12,26 @@ use Illuminate\Support\Facades\Log;
 
 class JobTemplateService
 {
+    private static function normalizeJsonList(mixed $value): ?array
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter($value, fn($item) => $item !== null && $item !== ''));
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded, fn($item) => $item !== null && $item !== ''));
+            }
+        }
+
+        return null;
+    }
+
     public static function list(int $userId): array
     {
         $tenantId = TenantContext::getId();
@@ -33,24 +53,29 @@ class JobTemplateService
     public static function create(int $userId, array $data): array|false
     {
         $tenantId = TenantContext::getId();
+        $type = $data['type'] ?? 'paid';
+        if (!in_array($type, ['paid', 'volunteer', 'timebank'], true)) {
+            $type = 'paid';
+        }
+
         try {
             $template = JobTemplate::create([
                 'tenant_id'       => $tenantId,
                 'user_id'         => $userId,
                 'name'            => trim($data['name'] ?? ''),
                 'description'     => $data['description'] ?? null,
-                'type'            => $data['type'] ?? 'paid',
+                'type'            => $type,
                 'commitment'      => $data['commitment'] ?? 'flexible',
                 'category'        => $data['category'] ?? null,
                 'skills_required' => $data['skills_required'] ?? null,
                 'is_remote'       => (bool) ($data['is_remote'] ?? false),
                 'salary_type'     => $data['salary_type'] ?? null,
-                'salary_currency' => $data['salary_currency'] ?? 'EUR',
+                'salary_currency' => $data['salary_currency'] ?? JobConfigurationService::get(JobConfigurationService::CONFIG_DEFAULT_CURRENCY, 'EUR'),
                 'salary_min'      => isset($data['salary_min']) ? (float) $data['salary_min'] : null,
                 'salary_max'      => isset($data['salary_max']) ? (float) $data['salary_max'] : null,
                 'hours_per_week'  => isset($data['hours_per_week']) ? (float) $data['hours_per_week'] : null,
                 'time_credits'    => isset($data['time_credits']) ? (float) $data['time_credits'] : null,
-                'benefits'        => $data['benefits'] ?? null,
+                'benefits'        => self::normalizeJsonList($data['benefits'] ?? null),
                 'tagline'         => $data['tagline'] ?? null,
                 'is_public'       => (bool) ($data['is_public'] ?? false),
             ]);

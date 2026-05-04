@@ -481,7 +481,7 @@ export function CreateJobPage() {
       if (tagline.trim()) payload.tagline = tagline.trim();
       if (videoUrl.trim()) payload.video_url = videoUrl.trim();
       if (companySize) payload.company_size = companySize;
-      if (benefits.length > 0) payload.benefits = JSON.stringify(benefits);
+      if (benefits.length > 0) payload.benefits = benefits;
 
       let response;
       if (isEditing && id) {
@@ -554,13 +554,15 @@ export function CreateJobPage() {
         salary_currency: form.salary_currency,
         hours_per_week: form.hours_per_week,
         time_credits: form.time_credits,
-        benefits: JSON.stringify(benefits),
+        benefits,
         tagline,
         description: form.description,
       };
       const response = await api.post<JobTemplate>('/v2/jobs/templates', payload);
       if (response.success && response.data) {
-        setTemplates((prev) => [...prev, response.data!]);
+        const templateData = response.data as JobTemplate | { template?: JobTemplate };
+        const savedTemplate = 'template' in templateData && templateData.template ? templateData.template : (templateData as JobTemplate);
+        setTemplates((prev) => [...prev, savedTemplate]);
         toast.success(t('templates.saved', 'Template saved'));
       } else {
         toast.error(t('template.save_error', 'Failed to save template'));
@@ -1386,7 +1388,7 @@ export function CreateJobPage() {
                     if (tagline.trim()) payload.tagline = tagline.trim();
                     if (videoUrl.trim()) payload.video_url = videoUrl.trim();
                     if (companySize) payload.company_size = companySize;
-                    if (benefits.length > 0) payload.benefits = JSON.stringify(benefits);
+                    if (benefits.length > 0) payload.benefits = benefits;
                     const response = await api.post('/v2/jobs', payload);
                     if (response.success) {
                       formDirtyRef.current = false;

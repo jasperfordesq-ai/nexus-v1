@@ -22,7 +22,7 @@ class ListJobVacanciesRequest extends FormRequest
     {
         return [
             'status' => ['nullable', 'in:open,closed,filled,draft,expired,pending_review'],
-            'type' => ['nullable', 'in:paid,volunteer,internship,timebank'],
+            'type' => ['nullable', 'in:paid,volunteer,timebank'],
             'commitment' => ['nullable', 'in:full_time,part_time,one_off,flexible'],
             'category' => ['nullable', 'string', 'max:100'],
             'search' => ['nullable', 'string', 'max:255'],

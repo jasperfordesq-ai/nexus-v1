@@ -27,6 +27,7 @@ use App\Services\JobTemplateService;
 use App\Services\SalaryBenchmarkService;
 use App\Services\CandidateSearchService;
 use App\Services\JobInterviewSchedulingService;
+use App\Services\JobConfigurationService;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
@@ -68,6 +69,25 @@ class JobVacanciesController extends BaseApiController
                 $this->respondWithError('FEATURE_DISABLED', __('api.job_feature_disabled'), null, 403)
             );
         }
+    }
+
+    private function configBool(string $key, bool $default): bool
+    {
+        $value = JobConfigurationService::get($key, $default);
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+    }
+
+    private function rejectIfJobConfigDisabled(string $key, string $messageKey): ?JsonResponse
+    {
+        if ($this->configBool($key, true)) {
+            return null;
+        }
+
+        return $this->respondWithError('FEATURE_DISABLED', __("api.{$messageKey}"), null, 403);
     }
 
     private function findTenantVacancy(int $vacancyId): ?JobVacancy
@@ -137,7 +157,7 @@ class JobVacanciesController extends BaseApiController
         ];
 
         $validStatuses = ['open', 'closed', 'filled', 'draft', 'expired', 'pending_review'];
-        $validTypes = ['paid', 'volunteer', 'internship', 'timebank'];
+        $validTypes = ['paid', 'volunteer', 'timebank'];
         $validCommitments = ['full_time', 'part_time', 'one_off', 'flexible'];
 
         if ($this->query('status') && in_array($this->query('status'), $validStatuses, true)) {
@@ -244,6 +264,10 @@ class JobVacanciesController extends BaseApiController
         if (empty($title)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422);
         }
+        $description = trim($data['description'] ?? '');
+        if (empty($description)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.description_required'), 'description', 422);
+        }
 
         try {
             $jobId = $this->jobService->create($userId, $data);
@@ -262,9 +286,9 @@ class JobVacanciesController extends BaseApiController
         $meta = null;
         if ($job && isset($job['moderation_status'])) {
             if ($job['moderation_status'] === 'pending_review') {
-                $meta = ['notice' => 'Your job posting has been submitted for review and will be published once approved.'];
+                $meta = ['notice' => __('api.job_pending_review_notice')];
             } elseif ($job['moderation_status'] === 'rejected') {
-                $meta = ['notice' => 'Your job posting could not be published. Please contact support for more information.'];
+                $meta = ['notice' => __('api.job_rejected_notice')];
             }
         }
 
@@ -343,12 +367,21 @@ class JobVacanciesController extends BaseApiController
         $this->rateLimit('jobs_apply', 5, 60);
 
         $tenantId = TenantContext::getId();
+        $message = $this->input('message');
+
+        if ($this->configBool(JobConfigurationService::CONFIG_REQUIRE_COVER_MESSAGE, false) && trim((string) $message) === '') {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_cover_message_required'), 'message', 422);
+        }
 
         $cvPath = null;
         $cvFilename = null;
         $cvSize = null;
 
         if (request()->hasFile('cv')) {
+            if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_CV_UPLOAD, true)) {
+                return $this->respondWithError('FEATURE_DISABLED', __('api.job_cv_upload_disabled'), 'cv', 403);
+            }
+
             $file = request()->file('cv');
             $allowed = ['pdf', 'doc', 'docx'];
             $ext = strtolower($file->getClientOriginalExtension());
@@ -382,8 +415,6 @@ class JobVacanciesController extends BaseApiController
             $cvFilename = $safeName;
             $cvSize = $file->getSize();
         }
-
-        $message = $this->input('message');
 
         $applicationId = $this->jobService->apply($id, $userId, [
             'cover_letter' => $message,
@@ -430,7 +461,10 @@ class JobVacanciesController extends BaseApiController
                     $applicantName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_someone');
                     \App\Models\Notification::createNotification(
                         (int) $job->user_id,
-                        "{$applicantName} applied for your job: \"{$job->title}\"",
+                        __('svc_notifications.job_application.owner_applied', [
+                            'name' => $applicantName,
+                            'title' => $job->title,
+                        ]),
                         "/jobs/{$id}/applications",
                         'job_application'
                     );
@@ -771,6 +805,9 @@ class JobVacanciesController extends BaseApiController
     public function matchPercentage($id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SKILLS_MATCHING, 'job_skills_matching_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_match', 30, 60);
 
@@ -783,6 +820,9 @@ class JobVacanciesController extends BaseApiController
     public function qualificationAssessment($id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SKILLS_MATCHING, 'job_skills_matching_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_qualified', 20, 60);
 
@@ -967,7 +1007,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->requireAdmin();
         $this->rateLimit('jobs_feature', 10, 60);
 
-        $days = $this->input('days') ?? 7;
+        $days = $this->input('days') ?? JobConfigurationService::get(JobConfigurationService::CONFIG_FEATURED_DURATION_DAYS, 7);
         $days = max(1, min(30, (int) $days));
 
         $success = $this->jobService->featureJob((int) $id, $userId, $days);
@@ -1020,6 +1060,9 @@ class JobVacanciesController extends BaseApiController
     public function proposeInterview(Request $request, int $applicationId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_interview_propose', 10, 60);
 
@@ -1042,6 +1085,9 @@ class JobVacanciesController extends BaseApiController
     public function acceptInterview(Request $request, int $interviewId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_interview_accept', 10, 60);
 
@@ -1060,6 +1106,9 @@ class JobVacanciesController extends BaseApiController
     public function declineInterview(Request $request, int $interviewId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_interview_decline', 10, 60);
 
@@ -1078,6 +1127,9 @@ class JobVacanciesController extends BaseApiController
     public function cancelInterview(Request $request, int $interviewId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_interview_cancel', 10, 60);
 
@@ -1094,6 +1146,9 @@ class JobVacanciesController extends BaseApiController
     public function getInterviews(Request $request, int $vacancyId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_interviews_list', 30, 60);
 
@@ -1118,6 +1173,9 @@ class JobVacanciesController extends BaseApiController
     public function myInterviews(Request $request): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_my_interviews', 30, 60);
 
@@ -1134,6 +1192,9 @@ class JobVacanciesController extends BaseApiController
     public function createOffer(Request $request, int $applicationId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_create', 10, 60);
 
@@ -1152,6 +1213,9 @@ class JobVacanciesController extends BaseApiController
     public function acceptOffer(Request $request, int $offerId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_accept', 10, 60);
 
@@ -1168,6 +1232,9 @@ class JobVacanciesController extends BaseApiController
     public function rejectOffer(Request $request, int $offerId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_reject', 10, 60);
 
@@ -1184,6 +1251,9 @@ class JobVacanciesController extends BaseApiController
     public function withdrawOffer(Request $request, int $offerId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_withdraw', 10, 60);
 
@@ -1200,6 +1270,9 @@ class JobVacanciesController extends BaseApiController
     public function getApplicationOffer(Request $request, int $applicationId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_get', 30, 60);
 
@@ -1216,6 +1289,9 @@ class JobVacanciesController extends BaseApiController
     public function myOffers(Request $request): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_my_offers', 30, 60);
 
@@ -1232,6 +1308,9 @@ class JobVacanciesController extends BaseApiController
     public function parseResumeCv(Request $request, int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_CV_UPLOAD, 'job_cv_upload_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_parse_cv', 5, 60);
 
@@ -1268,6 +1347,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function getOrCreateReferral(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_REFERRALS, 'job_referrals_disabled')) {
+            return $response;
+        }
+
         $userId   = $this->getOptionalUserId();
         $referral = JobReferralService::getOrCreate($id, $userId);
 
@@ -1283,6 +1367,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function referralStats(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_REFERRALS, 'job_referrals_disabled')) {
+            return $response;
+        }
+
         $userId = $this->getUserId();
 
         // Verify caller owns the vacancy or is admin
@@ -1309,6 +1398,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function upsertScorecard(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SCORECARDS, 'job_scorecards_disabled')) {
+            return $response;
+        }
+
         $userId = $this->getUserId();
 
         // Verify caller owns the vacancy or is admin (only employer/team should score)
@@ -1338,6 +1432,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function getScorecards(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SCORECARDS, 'job_scorecards_disabled')) {
+            return $response;
+        }
+
         $userId = $this->getUserId();
 
         // Verify caller owns the vacancy, is the applicant, or is admin
@@ -1366,6 +1465,7 @@ class JobVacanciesController extends BaseApiController
      */
     public function addTeamMember(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
         $data   = $this->getAllInput();
         $result = JobTeamService::addMember(
@@ -1387,6 +1487,7 @@ class JobVacanciesController extends BaseApiController
      */
     public function removeTeamMember(int $id, int $userId): JsonResponse
     {
+        $this->ensureFeature();
         $currentUserId = $this->getUserId();
 
         $ok = JobTeamService::removeMember($id, $currentUserId, $userId);
@@ -1402,6 +1503,7 @@ class JobVacanciesController extends BaseApiController
      */
     public function getTeam(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
 
         // Verify caller owns the vacancy or is admin
@@ -1428,6 +1530,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function getSavedProfile(): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SAVED_PROFILES, 'job_saved_profiles_disabled')) {
+            return $response;
+        }
+
         $userId  = $this->getUserId();
         $profile = JobSavedProfileService::get($userId);
         return $this->respondWithData(['profile' => $profile]);
@@ -1440,6 +1547,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function saveSavedProfile(): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_SAVED_PROFILES, 'job_saved_profiles_disabled')) {
+            return $response;
+        }
+
         $userId = $this->getUserId();
         $data   = $this->getAllInput();
         $result = JobSavedProfileService::save($userId, $data);
@@ -1457,6 +1569,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function listTemplates(): JsonResponse
     {
+        $this->ensureFeature();
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_TEMPLATES, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_templates_disabled'), null, 403);
+        }
+
         $userId = $this->getUserId();
         return $this->respondWithData(JobTemplateService::list($userId));
     }
@@ -1466,6 +1583,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function createTemplate(): JsonResponse
     {
+        $this->ensureFeature();
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_TEMPLATES, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_templates_disabled'), null, 403);
+        }
+
         $userId = $this->getUserId();
         $data   = $this->getAllInput();
         $result = JobTemplateService::create($userId, $data);
@@ -1479,6 +1601,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function getTemplate(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_TEMPLATES, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_templates_disabled'), null, 403);
+        }
+
         $userId   = $this->getUserId();
         $template = JobTemplateService::get($id, $userId);
         return $template
@@ -1491,6 +1618,11 @@ class JobVacanciesController extends BaseApiController
      */
     public function deleteTemplate(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_TEMPLATES, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_templates_disabled'), null, 403);
+        }
+
         $userId = $this->getUserId();
         $ok     = JobTemplateService::delete($id, $userId);
         return $ok
@@ -1505,6 +1637,7 @@ class JobVacanciesController extends BaseApiController
      */
     public function salaryBenchmark(): JsonResponse
     {
+        $this->ensureFeature();
         $title = $this->query('title', '');
         if (!$title) return $this->respondWithData(['benchmark' => null]);
         $benchmark = SalaryBenchmarkService::findForTitle($title);
@@ -1516,6 +1649,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /v2/jobs/gdpr-export */
     public function gdprExport(): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
         $data = JobGdprService::exportUserData($userId);
         return $this->respondWithData($data);
@@ -1524,6 +1658,7 @@ class JobVacanciesController extends BaseApiController
     /** DELETE /v2/jobs/gdpr-erase-me */
     public function gdprErase(): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
         $ok = JobGdprService::eraseUserData($userId);
         return $ok
@@ -1534,6 +1669,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /v2/jobs/{id}/applications/export-csv */
     public function exportApplicationsCsv(int $id): \Illuminate\Http\Response|JsonResponse
     {
+        $this->ensureFeature();
         $this->rateLimit('jobs_export_csv', 10, 60);
         $userId = $this->getUserId();
 
@@ -1556,6 +1692,9 @@ class JobVacanciesController extends BaseApiController
     public function listPipelineRules(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_PIPELINE_RULES, 'job_pipeline_rules_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
             return $response;
@@ -1568,6 +1707,9 @@ class JobVacanciesController extends BaseApiController
     public function createPipelineRule(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_PIPELINE_RULES, 'job_pipeline_rules_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
             return $response;
@@ -1584,6 +1726,9 @@ class JobVacanciesController extends BaseApiController
     public function deletePipelineRule(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_PIPELINE_RULES, 'job_pipeline_rules_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $ok     = JobPipelineRuleService::delete($id, $userId);
         return $ok
@@ -1595,6 +1740,9 @@ class JobVacanciesController extends BaseApiController
     public function runPipelineRules(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_PIPELINE_RULES, 'job_pipeline_rules_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         if ($response = $this->rejectIfCannotManageVacancy($id, $userId)) {
             return $response;
@@ -1609,6 +1757,7 @@ class JobVacanciesController extends BaseApiController
     /** POST /v2/jobs/{id}/applications/bulk-status */
     public function bulkUpdateApplicationStatus(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->getUserId();
         $data   = $this->getAllInput();
         $ids    = array_map('intval', (array) ($data['application_ids'] ?? []));
@@ -1640,6 +1789,10 @@ class JobVacanciesController extends BaseApiController
         $this->ensureFeature();
         $this->getUserId();
         $this->rateLimit('jobs_ai_generate', 10, 60);
+
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_AI_DESCRIPTIONS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_ai_descriptions_disabled'), null, 403);
+        }
 
         $title = $this->input('title');
         $skills = $this->input('skills', []);
@@ -1724,6 +1877,9 @@ class JobVacanciesController extends BaseApiController
     public function talentSearch(): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_PAGE_TALENT_SEARCH, 'job_talent_search_disabled')) {
+            return $response;
+        }
         $this->getUserId(); // Requires authentication
         $this->rateLimit('talent_search', 30, 60);
 
@@ -1754,6 +1910,9 @@ class JobVacanciesController extends BaseApiController
     public function talentProfile(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_PAGE_TALENT_SEARCH, 'job_talent_search_disabled')) {
+            return $response;
+        }
         $this->getUserId(); // Requires authentication
         $this->rateLimit('talent_profile', 60, 60);
 
@@ -1771,6 +1930,11 @@ class JobVacanciesController extends BaseApiController
     /** PUT /api/v2/users/me/resume-visibility — toggle resume searchability */
     public function updateResumeVisibility(): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_PAGE_TALENT_SEARCH, 'job_talent_search_disabled')) {
+            return $response;
+        }
+
         $userId = $this->getUserId();
         $this->rateLimit('resume_visibility', 10, 60);
 
@@ -1786,8 +1950,8 @@ class JobVacanciesController extends BaseApiController
         return $this->respondWithData([
             'searchable' => $searchable,
             'message' => $searchable
-                ? 'Your profile is now searchable by employers'
-                : 'Your profile is no longer searchable by employers',
+                ? __('api.job_resume_searchable_enabled')
+                : __('api.job_resume_searchable_disabled'),
         ]);
     }
 
@@ -1799,6 +1963,9 @@ class JobVacanciesController extends BaseApiController
     public function listInterviewSlots(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $this->rateLimit('jobs_slots_list', 30, 60);
 
         $tenantId = TenantContext::getId();
@@ -1811,6 +1978,9 @@ class JobVacanciesController extends BaseApiController
     public function createInterviewSlots(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_create', 10, 60);
 
@@ -1847,6 +2017,9 @@ class JobVacanciesController extends BaseApiController
     public function bulkCreateInterviewSlots(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_bulk', 5, 60);
 
@@ -1899,6 +2072,9 @@ class JobVacanciesController extends BaseApiController
     public function bookInterviewSlot(int $slotId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_book', 10, 60);
 
@@ -1932,6 +2108,9 @@ class JobVacanciesController extends BaseApiController
     public function cancelInterviewSlotBooking(int $slotId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $this->getUserId();
         $this->rateLimit('jobs_slots_cancel', 10, 60);
 
@@ -1950,6 +2129,9 @@ class JobVacanciesController extends BaseApiController
     public function deleteInterviewSlot(int $slotId): JsonResponse
     {
         $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
         $this->getUserId();
         $this->rateLimit('jobs_slots_delete', 10, 60);
 
@@ -1967,6 +2149,7 @@ class JobVacanciesController extends BaseApiController
     /** POST /api/v2/jobs/{id}/ai-rank — AI-powered candidate ranking with community trust signals. */
     public function aiRankCandidates(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2124,6 +2307,11 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/offer-templates — List user's offer letter templates. */
     public function offerTemplates(): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2143,6 +2331,11 @@ class JobVacanciesController extends BaseApiController
     /** POST /api/v2/jobs/offer-templates — Create an offer letter template. */
     public function createOfferTemplate(): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
@@ -2166,6 +2359,11 @@ class JobVacanciesController extends BaseApiController
     /** DELETE /api/v2/jobs/offer-templates/{id} — Delete an offer letter template. */
     public function deleteOfferTemplate(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2184,6 +2382,11 @@ class JobVacanciesController extends BaseApiController
     /** POST /api/v2/jobs/offer-templates/{id}/render — Render a template with placeholders. */
     public function renderOfferTemplate(int $id): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_OFFERS, 'job_offers_disabled')) {
+            return $response;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
@@ -2222,6 +2425,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/employer-reviews/{userId} — Get reviews for an employer. */
     public function employerReviews(int $userId): JsonResponse
     {
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
 
         $reviews = Review::where('tenant_id', $tenantId)
@@ -2264,6 +2468,7 @@ class JobVacanciesController extends BaseApiController
     /** POST /api/v2/jobs/employer-reviews — Leave a review for an employer (must have completed a job). */
     public function createEmployerReview(): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
@@ -2327,6 +2532,11 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/interviews/{interviewId}/calendar — Download ICS file for interview. */
     public function interviewCalendar(int $interviewId): \Illuminate\Http\Response
     {
+        $this->ensureFeature();
+        if (!$this->configBool(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, true)) {
+            return response(__('api.job_interview_scheduling_disabled'), 403);
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2396,6 +2606,11 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/interviews/{interviewId}/calendar-links — Get Add-to-Calendar deep links. */
     public function interviewCalendarLinks(int $interviewId): JsonResponse
     {
+        $this->ensureFeature();
+        if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
+            return $response;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2459,6 +2674,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/{id}/audit-trail — Get activity timeline for a job vacancy. */
     public function auditTrail(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2548,6 +2764,7 @@ class JobVacanciesController extends BaseApiController
     /** POST /api/v2/jobs/{id}/ai-chat — AI chat about a specific job vacancy. */
     public function aiJobChat(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
@@ -2627,6 +2844,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /api/v2/jobs/{id}/predictions — AI-powered predictions for a job vacancy. */
     public function predictions(int $id): JsonResponse
     {
+        $this->ensureFeature();
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 

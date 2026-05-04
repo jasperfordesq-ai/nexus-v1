@@ -21,7 +21,7 @@ class JobAlertFactory extends Factory
             'user_id'         => User::factory(),
             'keywords'        => $this->faker->optional()->words(3, true),
             'categories'      => $this->faker->optional()->word(),
-            'type'            => $this->faker->optional()->randomElement(['volunteer', 'paid', 'internship']),
+            'type'            => $this->faker->optional()->randomElement(['volunteer', 'paid', 'timebank']),
             'commitment'      => $this->faker->optional()->randomElement(['full_time', 'part_time', 'flexible']),
             'location'        => $this->faker->optional()->city(),
             'is_remote_only'  => $this->faker->boolean(20),

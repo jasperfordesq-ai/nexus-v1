@@ -16,6 +16,7 @@
     "connection_declined": "Your connection request was declined"
   },
   "job_application": {
+    "owner_applied": ":name applied for your job: \":title\"",
     "shortlisted": "Your application for {{title}} has been shortlisted!",
     "rejected": "Your application for {{title}} was not successful",
     "hired": "Congratulations! You've been hired for {{title}}",

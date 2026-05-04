@@ -31,13 +31,15 @@ class JobVacancyTest extends TestCase
     {
         $expected = [
             'tenant_id', 'user_id', 'organization_id', 'title', 'description',
-            'location', 'is_remote', 'type', 'commitment', 'category',
+            'tagline', 'video_url', 'culture_photos', 'company_size', 'benefits',
+            'location', 'latitude', 'longitude', 'is_remote', 'type', 'commitment', 'category',
             'skills_required', 'hours_per_week', 'time_credits', 'contact_email',
             'contact_phone', 'deadline', 'status', 'salary_min', 'salary_max',
             'salary_type', 'salary_currency', 'salary_negotiable', 'is_featured',
             'featured_until', 'expired_at', 'renewed_at', 'renewal_count',
             'views_count', 'applications_count', 'moderation_status', 'moderation_notes',
             'moderated_by', 'moderated_at', 'spam_score', 'spam_flags',
+            'blind_hiring',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }
@@ -45,11 +47,16 @@ class JobVacancyTest extends TestCase
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();
+        $this->assertEquals('integer', $casts['tenant_id']);
         $this->assertEquals('integer', $casts['user_id']);
         $this->assertEquals('integer', $casts['organization_id']);
+        $this->assertEquals('float', $casts['latitude']);
+        $this->assertEquals('float', $casts['longitude']);
         $this->assertEquals('boolean', $casts['is_remote']);
         $this->assertEquals('float', $casts['hours_per_week']);
         $this->assertEquals('float', $casts['time_credits']);
+        $this->assertEquals('array', $casts['culture_photos']);
+        $this->assertEquals('array', $casts['benefits']);
         $this->assertEquals('float', $casts['salary_min']);
         $this->assertEquals('float', $casts['salary_max']);
         $this->assertEquals('boolean', $casts['salary_negotiable']);
@@ -61,6 +68,7 @@ class JobVacancyTest extends TestCase
         $this->assertEquals('integer', $casts['views_count']);
         $this->assertEquals('integer', $casts['applications_count']);
         $this->assertEquals('datetime', $casts['deadline']);
+        $this->assertEquals('boolean', $casts['blind_hiring']);
     }
 
     public function test_uses_has_tenant_scope(): void

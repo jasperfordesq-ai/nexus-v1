@@ -24,7 +24,14 @@ class JobVacancy extends Model
         'organization_id',
         'title',
         'description',
+        'tagline',
+        'video_url',
+        'culture_photos',
+        'company_size',
+        'benefits',
         'location',
+        'latitude',
+        'longitude',
         'is_remote',
         'type',
         'commitment',
@@ -54,14 +61,20 @@ class JobVacancy extends Model
         'moderated_at',
         'spam_score',
         'spam_flags',
+        'blind_hiring',
     ];
 
     protected $casts = [
+        'tenant_id' => 'integer',
         'user_id' => 'integer',
         'organization_id' => 'integer',
+        'latitude' => 'float',
+        'longitude' => 'float',
         'is_remote' => 'boolean',
         'hours_per_week' => 'float',
         'time_credits' => 'float',
+        'culture_photos' => 'array',
+        'benefits' => 'array',
         'salary_min' => 'float',
         'salary_max' => 'float',
         'salary_negotiable' => 'boolean',
@@ -77,6 +90,7 @@ class JobVacancy extends Model
         'moderated_at' => 'datetime',
         'spam_score' => 'integer',
         'spam_flags' => 'array',
+        'blind_hiring' => 'boolean',
     ];
 
     public function creator(): BelongsTo

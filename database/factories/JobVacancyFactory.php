@@ -24,7 +24,7 @@ class JobVacancyFactory extends Factory
             'description'        => $this->faker->paragraphs(2, true),
             'location'           => $this->faker->city(),
             'is_remote'          => $this->faker->boolean(30),
-            'type'               => $this->faker->randomElement(['volunteer', 'paid', 'internship']),
+            'type'               => $this->faker->randomElement(['volunteer', 'paid', 'timebank']),
             'commitment'         => $this->faker->randomElement(['full_time', 'part_time', 'flexible']),
             'category'           => $this->faker->randomElement(['education', 'health', 'technology', 'community']),
             'skills_required'    => $this->faker->optional()->words(4, true),

@@ -132,7 +132,7 @@ class JobVacanciesControllerTest extends TestCase
 
     public function test_store_creates_job_vacancy(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
 
         $response = $this->apiPost('/v2/jobs', [
             'title' => 'Community Garden Volunteer',
@@ -141,10 +141,53 @@ class JobVacanciesControllerTest extends TestCase
             'commitment' => 'flexible',
             'category' => 'community',
             'location' => 'Dublin',
+            'latitude' => 53.3498,
+            'longitude' => -6.2603,
+            'is_remote' => true,
+            'skills_required' => 'gardening, teamwork',
+            'hours_per_week' => 3.5,
+            'time_credits' => 4,
+            'contact_email' => 'jobs@example.test',
+            'tagline' => 'Grow with your neighbours',
+            'benefits' => ['Training', 'Community lunch'],
         ]);
 
         $response->assertStatus(201);
         $response->assertJsonStructure(['data']);
+        $this->assertDatabaseHas('job_vacancies', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Community Garden Volunteer',
+            'type' => 'volunteer',
+            'category' => 'community',
+            'location' => 'Dublin',
+            'is_remote' => 1,
+            'skills_required' => 'gardening, teamwork',
+            'contact_email' => 'jobs@example.test',
+            'tagline' => 'Grow with your neighbours',
+            'status' => 'open',
+        ]);
+    }
+
+    public function test_store_preserves_draft_status(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/jobs', [
+            'title' => 'Draft Community Role',
+            'description' => 'A draft job that should not publish yet.',
+            'type' => 'volunteer',
+            'commitment' => 'flexible',
+            'status' => 'draft',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('job_vacancies', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Draft Community Role',
+            'status' => 'draft',
+        ]);
     }
 
     public function test_store_returns_422_without_required_fields(): void

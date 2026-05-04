@@ -451,14 +451,14 @@ function useAdminNav(): NavSection[] {
       // Jobs — gated by job_vacancies feature
       ...(hasFeature('job_vacancies') ? [{
         key: 'jobs',
-        label: "Job Vacancies",
+        label: t('jobs'),
         icon: Briefcase,
         items: [
-          { label: "Job Listings", href: '/admin/jobs', icon: Briefcase },
-          { label: "Job Moderation", href: '/admin/jobs/moderation', icon: ShieldCheck },
-          { label: "Pipeline", href: '/admin/jobs/pipeline', icon: Handshake },
-          { label: "Bias Audit", href: '/admin/jobs/bias-audit', icon: BarChart3 },
-          { label: "Templates", href: '/admin/jobs/templates', icon: FileText },
+          { label: t('job_vacancies'), href: '/admin/jobs', icon: Briefcase },
+          { label: t('job_moderation'), href: '/admin/jobs/moderation', icon: ShieldCheck },
+          { label: t('job_pipeline'), href: '/admin/jobs/pipeline', icon: Handshake },
+          { label: t('job_bias_audit'), href: '/admin/jobs/bias-audit', icon: BarChart3 },
+          { label: t('job_templates'), href: '/admin/jobs/templates', icon: FileText },
         ],
       }] as NavSection[] : []),
       // Marketplace — gated by marketplace feature

@@ -42,9 +42,8 @@ interface JobStats { total_jobs: number; open_jobs: number; total_applications: 
 
 const STATUS_TAB_KEYS = ['all', 'open', 'closed', 'expired'] as const;
 const statusColorMap: Record<string, 'success' | 'default' | 'warning'> = { open: 'success', closed: 'default', expired: 'warning' };
-const typeLabel: Record<string, string> = { paid: 'Paid', volunteer: 'Volunteer', timebank: 'Timebank' };
 const appStatusColor: Record<string, 'default' | 'primary' | 'warning' | 'secondary' | 'success' | 'danger'> = { applied: 'default', screening: 'primary', reviewed: 'primary', pending: 'default', interview: 'warning', offer: 'secondary', accepted: 'success', rejected: 'danger', withdrawn: 'default' };
-const APPLICATION_STAGE_KEYS = ['applied', 'screening', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'] as const;
+const APPLICATION_STAGE_KEYS = ['applied', 'pending', 'screening', 'reviewed', 'shortlisted', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'] as const;
 
 interface ApplicationCardProps { application: Application; onStatusUpdate: (appId: number, status: string, notes: string) => Promise<void>; }
 
@@ -64,46 +63,46 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-2 flex-wrap'>
             <span className='font-medium text-sm text-foreground truncate'>{application.applicant.name}</span>
-            <Chip size='sm' variant='flat' color={appStatusColor[application.status] ?? 'default'} className='capitalize shrink-0'>{application.status}</Chip>
+            <Chip size='sm' variant='flat' color={appStatusColor[application.status] ?? 'default'} className='capitalize shrink-0'>{t(`jobs.stage_${application.status}`)}</Chip>
           </div>
           {application.applicant.email && <p className='text-xs text-default-500 truncate mt-0.5'>{application.applicant.email}</p>}
-          <p className='text-xs text-default-400 mt-0.5'>{"Applied:"}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+          <p className='text-xs text-default-400 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
           <div className='flex items-center gap-1.5 mt-1 flex-wrap'>
             {application.cv_url && (
-              <Chip size='sm' variant='flat' color='primary' startContent={<FileText size={10} />} className='h-5 text-[10px]'>CV</Chip>
+              <Chip size='sm' variant='flat' color='primary' startContent={<FileText size={10} />} className='h-5 text-[10px]'>{t('jobs.cv_label')}</Chip>
             )}
             {application.has_interview && (
-              <Chip size='sm' variant='flat' color='warning' startContent={<Calendar size={10} />} className='h-5 text-[10px] capitalize'>{application.interview_status ?? 'Interview'}</Chip>
+              <Chip size='sm' variant='flat' color='warning' startContent={<Calendar size={10} />} className='h-5 text-[10px] capitalize'>{application.interview_status ?? t('jobs.interview_label')}</Chip>
             )}
             {application.has_offer && (
-              <Chip size='sm' variant='flat' color='secondary' startContent={<Gift size={10} />} className='h-5 text-[10px] capitalize'>{application.offer_status ?? 'Offer'}</Chip>
+              <Chip size='sm' variant='flat' color='secondary' startContent={<Gift size={10} />} className='h-5 text-[10px] capitalize'>{application.offer_status ?? t('jobs.offer_label')}</Chip>
             )}
           </div>
         </div>
       </div>
       {application.message && (<div><Button variant="light" size="sm" className='flex items-center gap-1 text-xs text-default-500 hover:text-default-700 h-auto p-0' onPress={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} {"Cover Letter"}</Button>
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} {t('jobs.cover_message')}</Button>
         {expanded && <p className='mt-2 text-sm text-default-700 bg-default-50 rounded-lg p-3 whitespace-pre-wrap leading-relaxed'>{application.message}</p>}
       </div>)}
       <div className='flex items-end gap-2 flex-wrap'>
         <div className='flex-1 min-w-[160px]'>
-          <Select size='sm' label={"Update Status"} selectedKeys={new Set([selectedStatus])} onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setSelectedStatus(val); }} aria-label={"Update application status"} classNames={{ trigger: 'min-h-unit-10 h-10' }}>
+          <Select size='sm' label={t('jobs.status_label')} selectedKeys={new Set([selectedStatus])} onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setSelectedStatus(val); }} aria-label={t('jobs.update_status_aria')} classNames={{ trigger: 'min-h-unit-10 h-10' }}>
             {APPLICATION_STAGE_KEYS.map((stage) => <SelectItem key={stage}>{t(`jobs.stage_${stage}`)}</SelectItem>)}
           </Select>
         </div>
-        <Tooltip content={notesOpen ? "Hide notes" : "Add / Edit Notes"}>
-          <Button isIconOnly size='sm' variant='flat' onPress={() => setNotesOpen((v) => !v)} aria-label={"Toggle notes"}><ClipboardList size={14} /></Button>
+        <Tooltip content={notesOpen ? t('jobs.hide_notes') : t('jobs.add_edit_notes')}>
+          <Button isIconOnly size='sm' variant='flat' onPress={() => setNotesOpen((v) => !v)} aria-label={t('jobs.toggle_notes')}><ClipboardList size={14} /></Button>
         </Tooltip>
-        <Button size='sm' color={isDirty ? 'primary' : 'default'} variant={isDirty ? 'solid' : 'flat'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save size={13} />} onPress={handleSave}>{"Update"}</Button>
+        <Button size='sm' color={isDirty ? 'primary' : 'default'} variant={isDirty ? 'solid' : 'flat'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save size={13} />} onPress={handleSave}>{t('jobs.update_btn')}</Button>
       </div>
-      {notesOpen && <Textarea size='sm' label={"Internal Notes"} placeholder={"Add internal notes about this application..."} value={notes} onValueChange={setNotes} minRows={2} maxRows={6} classNames={{ inputWrapper: 'bg-default-50' }} />}
+      {notesOpen && <Textarea size='sm' label={t('jobs.internal_notes')} placeholder={t('jobs.notes_placeholder')} value={notes} onValueChange={setNotes} minRows={2} maxRows={6} classNames={{ inputWrapper: 'bg-default-50' }} />}
     </CardBody></Card>
   );
 }
 
 export function JobsAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Jobs");
+  usePageTitle(t('jobs.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [panelTab, setPanelTab] = useState<'listings' | 'applications'>('listings');
@@ -146,9 +145,9 @@ export function JobsAdmin() {
         const paginationMeta: JobsMeta | undefined = m ? { page: Number(m.page) || 1, per_page: Number(m.per_page) || 50, total: Number(m.total) || 0, total_pages: Number(m.total_pages) || 1 } : undefined;
         setMeta(paginationMeta ?? { page: 1, per_page: 50, total: 0, total_pages: 1 });
       }
-    } catch { toast.error("Failed to load jobs"); }
+    } catch { toast.error(t('jobs.failed_load_jobs')); }
     finally { setLoading(false); }
-  }, [page, status, search, toast]);
+  }, [page, status, search, toast, t]);
 
 
   useEffect(() => { loadJobs(); }, [loadJobs]);
@@ -158,10 +157,10 @@ export function JobsAdmin() {
     try {
       const res = await api.get<Application[]>(`/v2/admin/jobs/${job.id}/applications`);
       if (res.success) { setApplications(Array.isArray(res.data) ? res.data : []); }
-      else { setAppsError((res as { error?: string }).error ?? "Failed to load applications"); }
-    } catch { setAppsError("Failed to load applications"); }
+      else { setAppsError((res as { error?: string }).error ?? t('jobs.failed_load_applications')); }
+    } catch { setAppsError(t('jobs.failed_load_applications')); }
     finally { setAppsLoading(false); }
-  }, []);
+  }, [t]);
 
   const handleSelectJob = useCallback((job: Job) => { setSelectedJob(job); loadApplications(job); }, [loadApplications]);
 
@@ -169,12 +168,12 @@ export function JobsAdmin() {
     try {
       const res = await api.put(`/v2/admin/jobs/applications/${appId}`, { status: newStatus, notes });
       if (res && res.success) {
-        toast.success("Application updated");
+        toast.success(t('jobs.application_updated'));
         setApplications((prev) => prev.map((appl) => appl.id === appId ? { ...appl, status: newStatus, reviewer_notes: notes } : appl));
         loadJobs();
-      } else { toast.error((res as { error?: string }).error ?? "Failed to update application"); }
-    } catch { toast.error("Unexpected error"); }
-  }, [toast, loadJobs]);
+      } else { toast.error((res as { error?: string }).error ?? t('jobs.failed_update_application')); }
+    } catch { toast.error(t('jobs.unexpected_error')); }
+  }, [toast, loadJobs, t]);
 
 
   const handleFeatureToggle = async (job: Job) => {
@@ -182,10 +181,10 @@ export function JobsAdmin() {
       const endpoint = job.is_featured ? `/v2/admin/jobs/${job.id}/unfeature` : `/v2/admin/jobs/${job.id}/feature`;
       const res = await api.post(endpoint);
       if (res && res.success) {
-        toast.success(job.is_featured ? `${job.title} removed from featured` : `${job.title} is now featured`);
+        toast.success(job.is_featured ? t('jobs.removed_featured', { title: job.title }) : t('jobs.now_featured', { title: job.title }));
         loadJobs();
-      } else { toast.error((res && (res as { error?: string }).error) || "Failed to update featured status"); }
-    } catch { toast.error("Unexpected error"); }
+      } else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_update_featured')); }
+    } catch { toast.error(t('jobs.unexpected_error')); }
   };
 
   const handleDelete = async () => {
@@ -193,44 +192,44 @@ export function JobsAdmin() {
     setActionLoading(true);
     try {
       const res = await api.delete(`/v2/admin/jobs/${confirmDelete.id}`);
-      if (res && res.success) { toast.success("Job deleted"); loadJobs(); }
-      else { toast.error((res && (res as { error?: string }).error) || "Failed to delete job"); }
-    } catch { toast.error("Unexpected error"); }
+      if (res && res.success) { toast.success(t('jobs.job_deleted')); loadJobs(); }
+      else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_delete_job')); }
+    } catch { toast.error(t('jobs.unexpected_error')); }
     finally { setActionLoading(false); setConfirmDelete(null); }
   };
 
   const columns: Column<Job>[] = [
-    { key: 'title', label: "Title", sortable: true, render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
-    { key: 'organization_name', label: "Organization", sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
-    { key: 'type', label: "Type", sortable: true, render: (item) => <span className='text-sm text-default-600'>{typeLabel[item.type ?? ''] ?? item.type ?? '--'}</span> },
-    { key: 'applications_count', label: "Applications", sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
-    { key: 'views_count', label: "Views", sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
+    { key: 'title', label: t('jobs.col_title'), sortable: true, render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
+    { key: 'organization_name', label: t('jobs.col_organization'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
+    { key: 'type', label: t('jobs.col_type'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.type ? t(`jobs.type_${item.type}`) : '--'}</span> },
+    { key: 'applications_count', label: t('jobs.col_applications'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
+    { key: 'views_count', label: t('jobs.col_views'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
     {
-      key: 'is_featured', label: "Featured",
+      key: 'is_featured', label: t('jobs.col_featured'),
       render: (item) => (
-        <Tooltip content={item.is_featured ? "This job is featured - click to remove" : "Click to feature this job"}>
-          <Button isIconOnly size='sm' variant='light' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? "Remove from featured" : "Feature this job"}>
+        <Tooltip content={item.is_featured ? t('jobs.featured_tooltip') : t('jobs.not_featured_tooltip')}>
+          <Button isIconOnly size='sm' variant='light' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? t('jobs.unfeature_job') : t('jobs.feature_job')}>
             {item.is_featured ? <Star size={16} className='text-warning fill-warning' /> : <StarOff size={16} className='text-default-400' />}
           </Button>
         </Tooltip>
       ),
     },
-    { key: 'status', label: "Status", sortable: true, render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{item.status}</Chip> },
-    { key: 'deadline', label: "Deadline", sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
+    { key: 'status', label: t('jobs.col_status'), sortable: true, render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{t(`jobs.status_${item.status}`)}</Chip> },
+    { key: 'deadline', label: t('jobs.col_deadline'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
     {
-      key: 'actions', label: "Actions",
+      key: 'actions', label: t('jobs.col_actions'),
       render: (item) => (
         <div className='flex gap-1'>
-          <Tooltip content={"View job"}>
-            <Button isIconOnly size='sm' variant='flat' color='primary' as='a' href={tenantPath(`/jobs/${item.id}`)} target='_blank' rel='noopener noreferrer' aria-label={"View job"}><Eye size={14} /></Button>
+          <Tooltip content={t('jobs.view_job')}>
+            <Button isIconOnly size='sm' variant='flat' color='primary' as='a' href={tenantPath(`/jobs/${item.id}`)} target='_blank' rel='noopener noreferrer' aria-label={t('jobs.view_job')}><Eye size={14} /></Button>
           </Tooltip>
-          <Tooltip content={item.is_featured ? "Unfeature" : "Feature"}>
-            <Button isIconOnly size='sm' variant='flat' color='warning' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? "Remove from featured" : "Feature this job"}>
+          <Tooltip content={item.is_featured ? t('jobs.unfeature_job') : t('jobs.feature_job')}>
+            <Button isIconOnly size='sm' variant='flat' color='warning' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? t('jobs.unfeature_job') : t('jobs.feature_job')}>
               {item.is_featured ? <StarOff size={14} /> : <Star size={14} />}
             </Button>
           </Tooltip>
-          <Tooltip content={"Delete"}>
-            <Button isIconOnly size='sm' variant='flat' color='danger' onPress={() => setConfirmDelete(item)} aria-label={"Delete"}><Trash2 size={14} /></Button>
+          <Tooltip content={t('jobs.delete_job')}>
+            <Button isIconOnly size='sm' variant='flat' color='danger' onPress={() => setConfirmDelete(item)} aria-label={t('jobs.delete_job')}><Trash2 size={14} /></Button>
           </Tooltip>
         </div>
       ),
@@ -241,11 +240,11 @@ export function JobsAdmin() {
     return (
       <div className='flex gap-4 min-h-[480px]'>
         <div className='w-64 shrink-0 flex flex-col gap-1 border-r border-divider pr-4'>
-          <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2 px-1'>{`${items.length} jobs`}</p>
+          <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2 px-1'>{t('jobs.jobs_count', { count: items.length })}</p>
           {loading ? (
             <div className='flex justify-center pt-8'><Spinner size='sm' /></div>
           ) : items.length === 0 ? (
-            <p className='text-sm text-default-400 px-1'>{"No jobs in this list"}</p>
+            <p className='text-sm text-default-400 px-1'>{t('jobs.no_jobs_in_list')}</p>
           ) : (
             <div className='flex flex-col gap-1 overflow-y-auto max-h-[600px] pr-1'>
               {items.map((job) => {
@@ -261,7 +260,7 @@ export function JobsAdmin() {
                         isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-foreground'].join(' ')}>{job.title}</p>
                       <div className='flex items-center gap-1.5 mt-1'>
                         <Users size={11} className='text-default-400 shrink-0' />
-                        <span className='text-xs text-default-500'>{job.applications_count === 1 ? `${job.applications_count} application` : `${job.applications_count} applications`}</span>
+                        <span className='text-xs text-default-500'>{t(job.applications_count === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: job.applications_count })}</span>
                       </div>
                       {(job.organization_name || job.poster_name) && <p className='text-xs text-default-400 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
                     </div>
@@ -276,8 +275,8 @@ export function JobsAdmin() {
             <div className='flex flex-col items-center justify-center h-64 text-center gap-3'>
               <div className='w-14 h-14 rounded-full bg-default-100 flex items-center justify-center'><ClipboardList size={24} className='text-default-400' /></div>
               <div>
-                <p className='text-sm font-medium text-default-600'>{"Select a job"}</p>
-                <p className='text-xs text-default-400 mt-1'>{"Choose a job from the list to view its applications"}</p>
+                <p className='text-sm font-medium text-default-600'>{t('jobs.select_job')}</p>
+                <p className='text-xs text-default-400 mt-1'>{t('jobs.select_job_hint')}</p>
               </div>
             </div>
           ) : (
@@ -285,26 +284,26 @@ export function JobsAdmin() {
               <div className='flex items-start justify-between gap-3 mb-4'>
                 <div className='min-w-0'>
                   <h3 className='font-semibold text-foreground truncate'>{selectedJob.title}</h3>
-                  <p className='text-sm text-default-500 mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || "-"}{' '}&middot;{' '}<span className='capitalize'>{selectedJob.status}</span></p>
+                  <p className='text-sm text-default-500 mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || t('jobs.no_organization')}{' '}&middot;{' '}<span className='capitalize'>{t(`jobs.status_${selectedJob.status}`)}</span></p>
                 </div>
-                <Button size='sm' variant='flat' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{"Refresh"}</Button>
+                <Button size='sm' variant='flat' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
               </div>
-              {appsLoading && <div className='flex justify-center py-12'><Spinner label={"Loading applications..."} /></div>}
+              {appsLoading && <div className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
               {!appsLoading && appsError && (
                 <div className='flex flex-col items-center gap-3 py-12 text-center'>
                   <p className='text-sm text-danger'>{appsError}</p>
-                  <Button size='sm' variant='flat' color='danger' onPress={() => loadApplications(selectedJob)}>{"Try Again"}</Button>
+                  <Button size='sm' variant='flat' color='danger' onPress={() => loadApplications(selectedJob)}>{t('jobs.try_again')}</Button>
                 </div>
               )}
               {!appsLoading && !appsError && applications.length === 0 && (
                 <div className='flex flex-col items-center justify-center py-12 text-center gap-3'>
                   <div className='w-12 h-12 rounded-full bg-default-100 flex items-center justify-center'><CheckCircle2 size={20} className='text-default-400' /></div>
-                  <div><p className='text-sm font-medium text-default-600'>{"No applications yet"}</p><p className='text-xs text-default-400 mt-1'>{"When candidates apply, they will appear here"}</p></div>
+                  <div><p className='text-sm font-medium text-default-600'>{t('jobs.no_applications_yet')}</p><p className='text-xs text-default-400 mt-1'>{t('jobs.no_applications_hint')}</p></div>
                 </div>
               )}
               {!appsLoading && !appsError && applications.length > 0 && (
                 <div>
-                  <p className='text-xs text-default-500 mb-3'>{applications.length === 1 ? `${applications.length} application` : `${applications.length} applications`}</p>
+                  <p className='text-xs text-default-500 mb-3'>{t(applications.length === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: applications.length })}</p>
                   <div className='overflow-y-auto max-h-[520px] pr-1'>
                     {applications.map((appl) => <ApplicationCard key={appl.id} application={appl} onStatusUpdate={handleStatusUpdate} />)}
                   </div>
@@ -319,43 +318,43 @@ export function JobsAdmin() {
 
   return (
     <div>
-      <PageHeader title={"Jobs"} description={"Manage job listings and applications"}
-        actions={<Button variant='flat' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{"Refresh"}</Button>}
+      <PageHeader title={t('jobs.page_title')} description={t('jobs.page_description')}
+        actions={<Button variant='flat' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{t('jobs.refresh')}</Button>}
       />
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
-        <StatCard label={"Total Jobs"} value={stats?.total_jobs ?? 0} icon={Briefcase} color='primary' loading={statsLoading} />
-        <StatCard label={"Total Applications"} value={stats?.total_applications ?? 0} icon={Users} color='success' loading={statsLoading} />
-        <StatCard label={"Conversion Rate"} value={`${stats?.conversion_rate ?? 0}%`} icon={TrendingUp} color='warning' loading={statsLoading} />
-        <StatCard label={"Active Interviews"} value={stats?.active_interviews ?? 0} icon={Calendar} color='secondary' loading={statsLoading} description={stats?.pending_offers ? `${stats.pending_offers} pending offers` : undefined} />
+        <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='primary' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_applications')} value={stats?.total_applications ?? 0} icon={Users} color='success' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_conversion')} value={`${stats?.conversion_rate ?? 0}%`} icon={TrendingUp} color='warning' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_interviews')} value={stats?.active_interviews ?? 0} icon={Calendar} color='secondary' loading={statsLoading} description={stats?.pending_offers ? t('jobs.stat_pending_offers', { count: stats.pending_offers }) : undefined} />
       </div>
       <div className='mb-6'>
         <Tabs selectedKey={panelTab} onSelectionChange={(key) => setPanelTab(key as 'listings' | 'applications')}
-          variant='underlined' size='md' aria-label={"Job listing panels"}>
-          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase size={15} /><span>{"Listings"}</span></div>} />
-          <Tab key='applications' title={<div className='flex items-center gap-2'><Users size={15} /><span>{"Applications"}</span></div>} />
+          variant='underlined' size='md' aria-label={t('jobs.panels_aria')}>
+          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase size={15} /><span>{t('jobs.tab_listings')}</span></div>} />
+          <Tab key='applications' title={<div className='flex items-center gap-2'><Users size={15} /><span>{t('jobs.tab_applications')}</span></div>} />
         </Tabs>
       </div>
       {panelTab === 'listings' && (
         <>
           <div className='mb-4'>
             <Tabs selectedKey={status} onSelectionChange={(_key) => { setStatus(_key as string); setPage(1); }}
-              variant='underlined' size='sm' aria-label={"Filter by status"}>
+              variant='underlined' size='sm' aria-label={t('jobs.filter_status_aria')}>
               {STATUS_TAB_KEYS.map((key) => <Tab key={key} title={t(`jobs.status_${key}`)} />)}
             </Tabs>
           </div>
           <DataTable columns={columns} data={items} isLoading={loading}
-            searchPlaceholder={"Search jobs..."}
+            searchPlaceholder={t('jobs.search_placeholder')}
             onSearch={(sq) => { setSearch(sq); setPage(1); }}
             onRefresh={loadJobs} totalItems={meta.total} page={page} pageSize={50} onPageChange={setPage}
-            emptyContent={<EmptyState icon={Briefcase} title={"No jobs found"} description={search || status !== 'all' ? "Try adjusting your search or filters" : "No job listings have been posted yet"} />}
+            emptyContent={<EmptyState icon={Briefcase} title={t('jobs.no_jobs_found')} description={search || status !== 'all' ? t('jobs.no_jobs_hint_filter') : t('jobs.no_jobs_hint_empty')} />}
           />
         </>
       )}
       {panelTab === 'applications' && <ApplicationsPanel />}
       {confirmDelete && (
         <ConfirmModal isOpen={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={handleDelete}
-          title={"Delete Job"} message={`Are you sure you want to delete this job? This cannot be undone.`}
-          confirmLabel={"Delete"} confirmColor='danger' isLoading={actionLoading} />
+          title={t('jobs.delete_job_title')} message={t('jobs.delete_job_message')}
+          confirmLabel={t('jobs.delete_job')} confirmColor='danger' isLoading={actionLoading} />
       )}
     </div>
   );
