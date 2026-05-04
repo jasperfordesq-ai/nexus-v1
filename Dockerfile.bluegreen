@@ -166,6 +166,18 @@ COPY src ./src
 COPY views ./views
 COPY artisan ./artisan
 
+# Bake the build commit into the image so /version.php has a valid commit field
+# the moment a container starts — closes the race window where the drift
+# watchdog could see an empty/unknown commit between container start and the
+# orchestrator's docker cp of .build-version. The orchestrator still overwrites
+# this file later with full metadata (deployed_at, commit_message), but the
+# fallback baked here means version.php is NEVER without a commit.
+ARG BUILD_COMMIT=unknown
+RUN printf '{"service":"nexus-php-api","commit":"%s","commit_short":"%s","deployed_at":"image-build","deploy_mode":"bluegreen"}\n' \
+        "$BUILD_COMMIT" "$(echo "$BUILD_COMMIT" | cut -c1-8)" \
+        > /var/www/html/httpdocs/.build-version \
+    && chmod 644 /var/www/html/httpdocs/.build-version
+
 RUN mkdir -p /var/www/html/storage/app/public \
              /var/www/html/storage/framework/cache/data \
              /var/www/html/storage/framework/sessions \

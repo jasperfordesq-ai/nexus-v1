@@ -245,3 +245,7 @@ create_*_summary.sh
 DPO_Confidentiality_Agreement_*.docx
 *.docx
 .codex_tmp/
+
+# Local secrets — never committed (per CLAUDE.md, repo is PUBLIC)
+/.secrets.local
+/.secrets.local/
