@@ -4,32 +4,44 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-// Create nexus_test database
+// Create nexus_test database. Reads credentials from environment, no
+// hardcoded secrets. Run as:
+//   docker exec -e DB_ROOT_PASSWORD=... -e DB_PASS=... <container> php tests/create_test_db.php
+
+$rootPass = getenv('DB_ROOT_PASSWORD') ?: '';
+$userPass = getenv('DB_PASS') ?: '';
+
 try {
+    if ($rootPass === '') {
+        throw new RuntimeException('DB_ROOT_PASSWORD env var not set');
+    }
     $pdo = new PDO(
         'mysql:host=db;port=3306',
         'root',
-        'nexus_root_secret',
+        $rootPass,
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     $pdo->exec('CREATE DATABASE IF NOT EXISTS nexus_test');
     $pdo->exec("GRANT ALL PRIVILEGES ON nexus_test.* TO 'nexus'@'%'");
     $pdo->exec('FLUSH PRIVILEGES');
     echo "nexus_test database created and permissions granted.\n";
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     echo "Error: " . $e->getMessage() . "\n";
 
-    // Try with the nexus user instead
+    // Fall back to the nexus user
     try {
+        if ($userPass === '') {
+            throw new RuntimeException('DB_PASS env var not set');
+        }
         $pdo = new PDO(
             'mysql:host=db;port=3306',
             'nexus',
-            'HpW4H99dd2BNXjtl5FhHlIEitzAkjmm',
+            $userPass,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
         $pdo->exec('CREATE DATABASE IF NOT EXISTS nexus_test');
         echo "nexus_test database created with nexus user.\n";
-    } catch (PDOException $e2) {
+    } catch (Throwable $e2) {
         echo "Error with nexus user: " . $e2->getMessage() . "\n";
     }
 }

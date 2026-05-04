@@ -1,5 +1,5 @@
 -- Performance audit 2026-03-28: Add missing composite indexes for hot-path queries
--- Run via: sudo docker exec -i nexus-php-db mysql -u nexus -pHpW4H99dd2BNXjtl5FhHlIEitzAkjmm nexus < migrations/2026_03_28_add_performance_indexes.sql
+-- Run via: sudo docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u nexus nexus < migrations/2026_03_28_add_performance_indexes.sql
 
 -- messages: composite for conversation grouping & unread queries
 ALTER TABLE `messages` ADD INDEX IF NOT EXISTS `idx_msg_tenant_sender_receiver` (`tenant_id`, `sender_id`, `receiver_id`);
