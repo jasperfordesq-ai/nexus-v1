@@ -815,6 +815,10 @@ cmd_deploy() {
     state_set MAINTENANCE_ENABLED_BY_US 0
     check_lock
     create_lock
+    # Translate signals into non-zero exits BEFORE the EXIT trap captures $?.
+    # Without this, `kill <pid>` on a deploy that's mid-sleep causes $? to be
+    # the sleep's 0, so the EXIT trap mis-records the run as "success".
+    trap 'log_warn "Deploy received signal — aborting"; exit 143' TERM INT HUP
     trap deploy_exit_trap EXIT
 
     # Validate environment before doing anything irreversible
@@ -920,6 +924,10 @@ cmd_rollback() {
     state_set MAINTENANCE_ENABLED_BY_US 0
     check_lock
     create_lock
+    # Translate signals into non-zero exits BEFORE the EXIT trap captures $?.
+    # Without this, `kill <pid>` on a deploy that's mid-sleep causes $? to be
+    # the sleep's 0, so the EXIT trap mis-records the run as "success".
+    trap 'log_warn "Deploy received signal — aborting"; exit 143' TERM INT HUP
     trap deploy_exit_trap EXIT
 
     local active target release_meta commit release_dir
