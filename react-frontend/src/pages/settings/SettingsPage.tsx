@@ -833,7 +833,10 @@ export function SettingsPage() {
       </motion.div>
 
       {/* Tabs */}
-      <motion.div variants={itemVariants}>
+      <motion.div
+        variants={itemVariants}
+        className="relative after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-[var(--background)] after:to-transparent sm:after:hidden"
+      >
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => {
