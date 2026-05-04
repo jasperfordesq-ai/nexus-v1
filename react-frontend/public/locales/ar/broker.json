@@ -877,6 +877,8 @@
     "load_failed": "Failed to load broker configuration.",
     "save_failed": "Failed to save broker configuration.",
     "save_success": "Broker configuration saved.",
+    "limited_access_title": "عناصر التحكم في السياسات مخصصة للمشرفين فقط",
+    "limited_access_body": "يمكن للوسطاء حفظ حدود التشغيل وإعدادات المراجعة هنا. تظهر مفاتيح سياسات المستأجر بالكامل للسياق، لكن يجب أن يغيّرها مشرف.",
     "section_messaging": "Messaging",
     "section_message_copy_rules": "Message Copy Rules",
     "section_broker_visibility": "Broker Visibility",

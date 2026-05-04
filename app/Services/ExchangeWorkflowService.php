@@ -1125,7 +1125,7 @@ class ExchangeWorkflowService
                 $isHighRisk = DB::table('listing_risk_tags')
                     ->where('listing_id', $listingId)
                     ->where('tenant_id', $tenantId)
-                    ->where('risk_level', 'high')
+                    ->whereIn('risk_level', ['high', 'critical'])
                     ->exists();
 
                 if ($isHighRisk) {

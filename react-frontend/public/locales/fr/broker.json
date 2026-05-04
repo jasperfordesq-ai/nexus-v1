@@ -877,6 +877,8 @@
     "load_failed": "Failed to load broker configuration.",
     "save_failed": "Failed to save broker configuration.",
     "save_success": "Broker configuration saved.",
+    "limited_access_title": "Les contrôles de politique sont réservés aux admins",
+    "limited_access_body": "Les courtiers peuvent enregistrer ici les seuils opérationnels et les paramètres de revue. Les réglages de politique du tenant restent visibles pour contexte, mais doivent être modifiés par un admin.",
     "section_messaging": "Messaging",
     "section_message_copy_rules": "Message Copy Rules",
     "section_broker_visibility": "Broker Visibility",

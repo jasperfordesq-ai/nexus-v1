@@ -19,12 +19,30 @@ import { usePageTitle } from '@/hooks';
 import { adminBroker } from '@/admin/api/adminApi';
 import type { BrokerConfig } from '@/admin/api/types';
 import { PageHeader } from '@/admin/components/PageHeader';
-import { useTenant, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
+
+const ADMIN_ONLY_CONFIG_KEYS = [
+  'broker_messaging_enabled',
+  'broker_copy_all_messages',
+  'require_exchange_for_listings',
+  'risk_tagging_enabled',
+  'auto_flag_high_risk',
+  'require_approval_high_risk',
+  'notify_on_high_risk_match',
+  'broker_approval_required',
+  'auto_approve_low_risk',
+  'max_hours_without_approval',
+  'vetting_enabled',
+  'insurance_enabled',
+  'enforce_vetting_on_exchanges',
+  'enforce_insurance_on_exchanges',
+] as const satisfies readonly (keyof BrokerConfig)[];
 
 export default function BrokerConfiguration() {
   const { t } = useTranslation('broker');
   usePageTitle(t('configuration.page_title'));
   const { tenantPath } = useTenant();
+  const { user } = useAuth();
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,6 +80,21 @@ export default function BrokerConfiguration() {
     insurance_expiry_warning_days: 30,
   });
 
+  const role = (user?.role as string) || '';
+  const userRecord = user as Record<string, unknown> | null;
+  const isAdminTier =
+    role === 'admin' ||
+    role === 'tenant_admin' ||
+    role === 'super_admin' ||
+    role === 'god' ||
+    userRecord?.is_admin === true ||
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true ||
+    userRecord?.is_god === true;
+
+  const canEditKey = (key: keyof BrokerConfig) =>
+    isAdminTier || !ADMIN_ONLY_CONFIG_KEYS.includes(key as (typeof ADMIN_ONLY_CONFIG_KEYS)[number]);
+
   const loadConfig = useCallback(async () => {
     setLoading(true);
     try {
@@ -84,8 +117,17 @@ export default function BrokerConfiguration() {
   async function handleSave() {
     setSaving(true);
     try {
-      const res = await adminBroker.saveConfiguration(config);
+      const payload = isAdminTier
+        ? config
+        : (Object.fromEntries(
+            Object.entries(config).filter(([key]) => canEditKey(key as keyof BrokerConfig))
+          ) as Partial<BrokerConfig>);
+
+      const res = await adminBroker.saveConfiguration(payload);
       if (res.success) {
+        if (res.data) {
+          setConfig(prev => ({ ...prev, ...res.data }));
+        }
         toast.success(t('configuration.save_success'));
       } else {
         toast.error(t('configuration.save_failed'));
@@ -138,6 +180,19 @@ export default function BrokerConfiguration() {
         }
       />
 
+      {!isAdminTier && (
+        <Card shadow="sm" className="border border-warning-200 bg-warning-50/60">
+          <CardBody className="py-3">
+            <p className="text-sm font-medium text-warning-700">
+              {t('configuration.limited_access_title')}
+            </p>
+            <p className="text-sm text-default-600">
+              {t('configuration.limited_access_body')}
+            </p>
+          </CardBody>
+        </Card>
+      )}
+
       {/* Messaging Settings */}
       <Card shadow="sm">
         <CardHeader>
@@ -153,6 +208,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.broker_messaging_enabled}
               onValueChange={v => updateConfig('broker_messaging_enabled', v)}
+              isDisabled={!canEditKey('broker_messaging_enabled')}
             />
           </div>
           <Divider />
@@ -164,6 +220,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.broker_copy_all_messages}
               onValueChange={v => updateConfig('broker_copy_all_messages', v)}
+              isDisabled={!canEditKey('broker_copy_all_messages')}
             />
           </div>
           <Divider />
@@ -209,6 +266,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.require_exchange_for_listings}
               onValueChange={v => updateConfig('require_exchange_for_listings', v)}
+              isDisabled={!canEditKey('require_exchange_for_listings')}
             />
           </div>
         </CardBody>
@@ -229,6 +287,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.risk_tagging_enabled}
               onValueChange={v => updateConfig('risk_tagging_enabled', v)}
+              isDisabled={!canEditKey('risk_tagging_enabled')}
             />
           </div>
           <Divider />
@@ -240,6 +299,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.auto_flag_high_risk}
               onValueChange={v => updateConfig('auto_flag_high_risk', v)}
+              isDisabled={!canEditKey('auto_flag_high_risk')}
             />
           </div>
           <Divider />
@@ -251,6 +311,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.require_approval_high_risk}
               onValueChange={v => updateConfig('require_approval_high_risk', v)}
+              isDisabled={!canEditKey('require_approval_high_risk')}
             />
           </div>
           <Divider />
@@ -262,6 +323,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.notify_on_high_risk_match}
               onValueChange={v => updateConfig('notify_on_high_risk_match', v)}
+              isDisabled={!canEditKey('notify_on_high_risk_match')}
             />
           </div>
         </CardBody>
@@ -282,6 +344,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.broker_approval_required}
               onValueChange={v => updateConfig('broker_approval_required', v)}
+              isDisabled={!canEditKey('broker_approval_required')}
             />
           </div>
           <Divider />
@@ -293,6 +356,7 @@ export default function BrokerConfiguration() {
             <Switch
               isSelected={config.auto_approve_low_risk}
               onValueChange={v => updateConfig('auto_approve_low_risk', v)}
+              isDisabled={!canEditKey('auto_approve_low_risk')}
             />
           </div>
           <Divider />
@@ -328,6 +392,7 @@ export default function BrokerConfiguration() {
               max={24}
               step={0.5}
               size="sm"
+              isDisabled={!canEditKey('max_hours_without_approval')}
             />
           </div>
           <Divider />
@@ -538,6 +603,7 @@ export default function BrokerConfiguration() {
               isSelected={config.vetting_enabled}
               onValueChange={v => updateConfig('vetting_enabled', v)}
               size="sm"
+              isDisabled={!canEditKey('vetting_enabled')}
             />
           </div>
           <div className="flex justify-between items-center">
@@ -549,6 +615,7 @@ export default function BrokerConfiguration() {
               isSelected={config.insurance_enabled}
               onValueChange={v => updateConfig('insurance_enabled', v)}
               size="sm"
+              isDisabled={!canEditKey('insurance_enabled')}
             />
           </div>
           <Divider />
@@ -561,7 +628,7 @@ export default function BrokerConfiguration() {
               isSelected={config.enforce_vetting_on_exchanges}
               onValueChange={v => updateConfig('enforce_vetting_on_exchanges', v)}
               size="sm"
-              isDisabled={!config.vetting_enabled}
+              isDisabled={!config.vetting_enabled || !canEditKey('enforce_vetting_on_exchanges')}
             />
           </div>
           <div className="flex justify-between items-center">
@@ -573,7 +640,7 @@ export default function BrokerConfiguration() {
               isSelected={config.enforce_insurance_on_exchanges}
               onValueChange={v => updateConfig('enforce_insurance_on_exchanges', v)}
               size="sm"
-              isDisabled={!config.insurance_enabled}
+              isDisabled={!config.insurance_enabled || !canEditKey('enforce_insurance_on_exchanges')}
             />
           </div>
           <Divider />

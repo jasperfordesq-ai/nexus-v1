@@ -877,6 +877,8 @@
     "load_failed": "Failed to load broker configuration.",
     "save_failed": "Failed to save broker configuration.",
     "save_success": "Broker configuration saved.",
+    "limited_access_title": "I controlli delle policy sono riservati agli admin",
+    "limited_access_body": "I broker possono salvare qui soglie operative e impostazioni di revisione. Le opzioni di policy a livello di tenant sono visibili come contesto, ma devono essere modificate da un admin.",
     "section_messaging": "Messaging",
     "section_message_copy_rules": "Message Copy Rules",
     "section_broker_visibility": "Broker Visibility",

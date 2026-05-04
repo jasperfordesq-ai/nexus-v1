@@ -190,7 +190,7 @@ class AdminBrokerController extends BaseApiController
         $unreviewedMessages = 0;
         try {
             $row = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM broker_message_copies WHERE {$tenantWhere} AND reviewed_by IS NULL",
+                "SELECT COUNT(*) as cnt FROM broker_message_copies WHERE {$tenantWhere} AND reviewed_at IS NULL",
                 $tenantParams
             );
             $unreviewedMessages = (int) ($row->cnt ?? 0);
@@ -834,11 +834,11 @@ class AdminBrokerController extends BaseApiController
             }
 
             if ($filter === 'unreviewed') {
-                $conditions[] = 'bmc.reviewed_by IS NULL';
+                $conditions[] = 'bmc.reviewed_at IS NULL';
             } elseif ($filter === 'flagged') {
                 $conditions[] = 'bmc.flagged = 1';
             } elseif ($filter === 'reviewed') {
-                $conditions[] = 'bmc.reviewed_by IS NOT NULL';
+                $conditions[] = 'bmc.reviewed_at IS NOT NULL';
             }
 
             $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
@@ -946,6 +946,7 @@ class AdminBrokerController extends BaseApiController
     {
         $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
+        $notes = trim((string) $this->input('notes', ''));
 
         // Cross-tenant write: removed (always caller's tenant). Super-admins
         // who need to act in another tenant should switch context first.
@@ -960,11 +961,15 @@ class AdminBrokerController extends BaseApiController
             }
 
             DB::update(
-                "UPDATE broker_message_copies SET reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$adminId, $id, $tenantId]
+                "UPDATE broker_message_copies SET reviewed_by = ?, reviewed_at = NOW(), review_notes = ? WHERE id = ? AND tenant_id = ?",
+                [$adminId, $notes !== '' ? $notes : null, $id, $tenantId]
             );
 
-            $this->auditLogService->log('broker_message_reviewed', null, $adminId, ['message_id' => $id, 'actor_role' => $this->resolveActorRole()]);
+            $this->auditLogService->log('broker_message_reviewed', null, $adminId, [
+                'message_id' => $id,
+                'has_notes' => $notes !== '',
+                'actor_role' => $this->resolveActorRole(),
+            ]);
 
             return $this->respondWithData(['id' => $id, 'reviewed' => true]);
         } catch (\Exception $e) {
@@ -1439,18 +1444,23 @@ class AdminBrokerController extends BaseApiController
         try {
             if ($effectiveTenantId === null) {
                 $rows = DB::select(
-                    "SELECT ts.tenant_id, ts.setting_value, t.name as tenant_name
-                     FROM tenant_settings ts LEFT JOIN tenants t ON ts.tenant_id = t.id
-                     WHERE ts.setting_key = 'broker_config' ORDER BY t.name ASC"
+                    "SELECT t.id as tenant_id, t.name as tenant_name, ts.setting_value
+                     FROM tenants t
+                     LEFT JOIN tenant_settings ts
+                       ON ts.tenant_id = t.id AND ts.setting_key = 'broker_config'
+                     ORDER BY t.name ASC"
                 );
 
                 $allConfigs = [];
                 foreach ($rows as $r) {
                     $saved = json_decode($r->setting_value, true) ?? [];
+                    $runtimeConfig = BrokerControlConfigService::nestedToFlat(
+                        BrokerControlConfigService::getConfigForTenant((int) $r->tenant_id)
+                    );
                     $allConfigs[] = [
                         'tenant_id' => (int) $r->tenant_id,
                         'tenant_name' => $r->tenant_name ?? 'Unknown',
-                        'config' => array_merge($defaults, $saved),
+                        'config' => array_merge($defaults, $runtimeConfig, $saved),
                     ];
                 }
                 return $this->respondWithData($allConfigs);
@@ -1461,10 +1471,15 @@ class AdminBrokerController extends BaseApiController
                 [$scopeTenantId]
             );
 
-            $config = $defaults;
+            $config = array_merge(
+                $defaults,
+                BrokerControlConfigService::nestedToFlat(
+                    BrokerControlConfigService::getConfigForTenant($scopeTenantId)
+                )
+            );
             if ($row && !empty($row->setting_value)) {
                 $saved = json_decode($row->setting_value, true) ?? [];
-                $config = array_merge($defaults, $saved);
+                $config = array_merge($config, $saved);
             }
 
             return $this->respondWithData($config);
@@ -1495,7 +1510,10 @@ class AdminBrokerController extends BaseApiController
             'broker_messaging_enabled', 'broker_copy_all_messages', 'broker_copy_threshold_hours',
             'new_member_monitoring_days', 'require_exchange_for_listings',
             'risk_tagging_enabled', 'auto_flag_high_risk', 'require_approval_high_risk',
-            'notify_on_high_risk_match', 'broker_approval_required', 'auto_approve_low_risk',
+            'notify_on_high_risk_match', 'broker_approval_required', 'require_broker_approval',
+            'exchange_workflow_enabled', 'require_broker_approval_new_members',
+            'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
+            'auto_approve_low_risk',
             'exchange_timeout_days', 'max_hours_without_approval', 'confirmation_deadline_hours',
             'allow_hour_adjustment', 'max_hour_variance_percent', 'expiry_hours',
             'broker_visible_to_members', 'show_broker_name', 'broker_contact_email',
@@ -1514,7 +1532,11 @@ class AdminBrokerController extends BaseApiController
         // could disable platform-wide vetting enforcement for their tenant.
         $adminOnlyKeys = [
             'broker_messaging_enabled', 'broker_copy_all_messages',
-            'risk_tagging_enabled', 'broker_approval_required',
+            'risk_tagging_enabled', 'auto_flag_high_risk', 'require_approval_high_risk',
+            'notify_on_high_risk_match', 'broker_approval_required', 'require_broker_approval',
+            'exchange_workflow_enabled', 'require_broker_approval_new_members',
+            'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
+            'auto_approve_low_risk', 'max_hours_without_approval',
             'vetting_enabled', 'insurance_enabled',
             'enforce_vetting_on_exchanges', 'enforce_insurance_on_exchanges',
             'require_exchange_for_listings',
@@ -1551,11 +1573,20 @@ class AdminBrokerController extends BaseApiController
 
         try {
             $existing = DB::selectOne(
-                "SELECT id FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
+                "SELECT id, setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'broker_config'",
                 [$targetTenantId]
             );
 
-            $json = json_encode($config);
+            $savedConfig = [];
+            if ($existing && !empty($existing->setting_value)) {
+                $savedConfig = json_decode($existing->setting_value, true) ?? [];
+            }
+
+            // Partial updates must preserve previously saved policy keys.
+            // Otherwise a broker saving an allowed threshold can wipe
+            // admin-owned controls from tenant_settings.broker_config.
+            $mergedConfig = array_merge($savedConfig, $config);
+            $json = json_encode($mergedConfig);
             if ($existing) {
                 DB::update(
                     "UPDATE tenant_settings SET setting_value = ?, updated_at = NOW() WHERE tenant_id = ? AND setting_key = 'broker_config'",
@@ -1604,6 +1635,9 @@ class AdminBrokerController extends BaseApiController
             if (!empty($workflowConfig)) {
                 $this->brokerControlConfigService->updateConfig($workflowConfig);
             }
+            if (!empty($config)) {
+                $this->brokerControlConfigService->updateConfig($config);
+            }
 
             // Audit log — broker config governs platform-wide messaging
             // visibility, vetting/insurance enforcement, and approval rules.
@@ -1616,7 +1650,7 @@ class AdminBrokerController extends BaseApiController
                 ['updated_keys' => array_keys($config), 'actor_role' => $this->resolveActorRole()]
             );
 
-            return $this->respondWithData($config);
+            return $this->respondWithData($mergedConfig);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.failed_to_save_config'), null, 500);
         }

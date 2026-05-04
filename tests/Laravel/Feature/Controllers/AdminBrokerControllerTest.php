@@ -133,6 +133,27 @@ class AdminBrokerControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_review_message_persists_broker_notes(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $sender = User::factory()->forTenant($this->testTenantId)->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $copyId = $this->insertMessageCopy($sender->id, $receiver->id);
+
+        $response = $this->apiPost("/v2/admin/broker/messages/{$copyId}/review", [
+            'notes' => 'Reviewed and no action needed.',
+        ]);
+
+        $response->assertStatus(200);
+
+        $copy = DB::table('broker_message_copies')->where('id', $copyId)->first();
+        $this->assertSame($admin->id, (int) $copy->reviewed_by);
+        $this->assertNotNull($copy->reviewed_at);
+        $this->assertSame('Reviewed and no action needed.', $copy->review_notes);
+    }
+
     // ================================================================
     // MONITORING — GET /v2/admin/broker/monitoring
     // ================================================================
@@ -171,6 +192,38 @@ class AdminBrokerControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/broker/configuration');
 
         $response->assertStatus(403);
+    }
+
+    public function test_super_admin_reads_target_tenant_runtime_configuration(): void
+    {
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->create([
+            'role' => 'super_admin',
+            'is_super_admin' => true,
+        ]);
+        Sanctum::actingAs($superAdmin);
+
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode([
+                'broker_controls' => [
+                    'broker_visibility' => ['retention_days' => 30],
+                    'exchange_workflow' => ['max_hours_without_approval' => 2],
+                ],
+            ]),
+        ]);
+        DB::table('tenants')->where('id', 999)->update([
+            'configuration' => json_encode([
+                'broker_controls' => [
+                    'broker_visibility' => ['retention_days' => 240],
+                    'exchange_workflow' => ['max_hours_without_approval' => 8],
+                ],
+            ]),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/broker/configuration?tenant_id=999');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.retention_days', 240);
+        $this->assertSame(8.0, (float) $response->json('data.max_hours_without_approval'));
     }
 
     // ================================================================
@@ -1127,12 +1180,77 @@ class AdminBrokerControllerTest extends TestCase
         $broker = User::factory()->forTenant($this->testTenantId)->create(['role' => 'broker']);
         Sanctum::actingAs($broker);
 
-        // broker_messaging_enabled is an admin-only key
+        // Platform-wide message and high-risk approval policy keys are admin-only.
         $response = $this->apiPost('/v2/admin/broker/configuration', [
             'broker_messaging_enabled' => false,
+            'require_approval_high_risk' => false,
         ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_broker_can_save_operational_configuration_without_clobbering_admin_policy(): void
+    {
+        $broker = User::factory()->forTenant($this->testTenantId)->create(['role' => 'broker']);
+        Sanctum::actingAs($broker);
+
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'broker_config'],
+            [
+                'setting_value' => json_encode([
+                    'broker_messaging_enabled' => true,
+                    'broker_approval_required' => true,
+                    'retention_days' => 90,
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $response = $this->apiPost('/v2/admin/broker/configuration', [
+            'retention_days' => 120,
+            'copy_first_contact' => false,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.retention_days', 120);
+        $response->assertJsonPath('data.broker_messaging_enabled', true);
+        $response->assertJsonPath('data.broker_approval_required', true);
+
+        $saved = DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'broker_config')
+            ->value('setting_value');
+        $config = json_decode((string) $saved, true);
+
+        $this->assertSame(120, $config['retention_days']);
+        $this->assertFalse($config['copy_first_contact']);
+        $this->assertTrue($config['broker_messaging_enabled']);
+        $this->assertTrue($config['broker_approval_required']);
+    }
+
+    public function test_save_configuration_syncs_flat_panel_keys_to_runtime_broker_controls(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/broker/configuration', [
+            'broker_approval_required' => true,
+            'auto_approve_low_risk' => true,
+            'max_hours_without_approval' => 6,
+            'copy_high_risk_listing_messages' => false,
+        ]);
+
+        $response->assertStatus(200);
+
+        $tenantConfig = DB::table('tenants')->where('id', $this->testTenantId)->value('configuration');
+        $brokerControls = (json_decode((string) $tenantConfig, true) ?: [])['broker_controls'] ?? [];
+
+        $this->assertTrue($brokerControls['exchange_workflow']['enabled']);
+        $this->assertTrue($brokerControls['exchange_workflow']['require_broker_approval']);
+        $this->assertTrue($brokerControls['exchange_workflow']['auto_approve_low_risk']);
+        $this->assertSame(6.0, (float) $brokerControls['exchange_workflow']['max_hours_without_approval']);
+        $this->assertFalse($brokerControls['broker_visibility']['copy_high_risk_listing_messages']);
     }
 
     public function test_save_configuration_returns_403_for_regular_member(): void

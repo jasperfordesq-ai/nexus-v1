@@ -877,6 +877,8 @@
     "load_failed": "Failed to load broker configuration.",
     "save_failed": "Failed to save broker configuration.",
     "save_success": "Broker configuration saved.",
+    "limited_access_title": "Beleidsinstellingen zijn alleen voor beheerders",
+    "limited_access_body": "Brokers kunnen hier operationele drempels en beoordelingsinstellingen opslaan. Tenantbrede beleidsknoppen zijn zichtbaar als context, maar moeten door een beheerder worden gewijzigd.",
     "section_messaging": "Messaging",
     "section_message_copy_rules": "Message Copy Rules",
     "section_broker_visibility": "Broker Visibility",

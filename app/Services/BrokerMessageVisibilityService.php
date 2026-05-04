@@ -80,7 +80,7 @@ class BrokerMessageVisibilityService
             $isHighRisk = DB::table('listing_risk_tags')
                 ->where('listing_id', $listingId)
                 ->where('tenant_id', TenantContext::getId())
-                ->where('risk_level', 'high')
+                ->whereIn('risk_level', ['high', 'critical'])
                 ->exists();
             if ($isHighRisk) {
                 return self::REASON_HIGH_RISK_LISTING;

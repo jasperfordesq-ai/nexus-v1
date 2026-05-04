@@ -877,6 +877,8 @@
     "load_failed": "Failed to load broker configuration.",
     "save_failed": "Failed to save broker configuration.",
     "save_success": "Broker configuration saved.",
+    "limited_access_title": "Los controles de política son solo para administradores",
+    "limited_access_body": "Los brokers pueden guardar aquí umbrales operativos y ajustes de revisión. Los controles de política de todo el tenant se muestran como contexto, pero debe cambiarlos un administrador.",
     "section_messaging": "Messaging",
     "section_message_copy_rules": "Message Copy Rules",
     "section_broker_visibility": "Broker Visibility",
