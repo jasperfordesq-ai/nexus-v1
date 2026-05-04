@@ -6,24 +6,39 @@ set -eo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/../lib/common.sh"
 
-cd "$DEPLOY_DIR"
+SOURCE_DIR="${NEXUS_BUILD_VERSION_RELEASE_DIR:-$DEPLOY_DIR}"
+NEW_COMMIT="${NEXUS_BUILD_VERSION_COMMIT:-}"
+UPDATE_LAST_DEPLOY="${NEXUS_BUILD_VERSION_UPDATE_LAST_DEPLOY:-1}"
 
-# Update last successful deployment
-NEW_COMMIT=$(git rev-parse HEAD)
-echo "$NEW_COMMIT" > "$LAST_DEPLOY_FILE"
+if [ -z "$NEW_COMMIT" ]; then
+    NEW_COMMIT=$(git -C "$SOURCE_DIR" rev-parse HEAD)
+fi
 
 DEPLOY_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-COMMIT_MSG=$(git log -1 --format='%s')
+COMMIT_MSG=$(git -C "$SOURCE_DIR" log -1 --format='%s' "$NEW_COMMIT" 2>/dev/null || true)
 DEPLOY_MODE="${MODE:-${NEXUS_DEPLOY_MODE:-unknown}}"
+
+json_escape() {
+    local value="$1"
+    value=${value//\\/\\\\}
+    value=${value//\"/\\\"}
+    value=${value//$'\n'/\\n}
+    value=${value//$'\r'/\\r}
+    value=${value//$'\t'/\\t}
+    printf '%s' "$value"
+}
+
+COMMIT_MSG_ESCAPED="$(json_escape "$COMMIT_MSG")"
+DEPLOY_MODE_ESCAPED="$(json_escape "$DEPLOY_MODE")"
 
 VERSION_JSON=$(cat <<VEOF
 {
     "service": "nexus-php-api",
     "commit": "$NEW_COMMIT",
     "commit_short": "${NEW_COMMIT:0:8}",
-    "commit_message": "$COMMIT_MSG",
+    "commit_message": "$COMMIT_MSG_ESCAPED",
     "deployed_at": "$DEPLOY_TS",
-    "deploy_mode": "$DEPLOY_MODE"
+    "deploy_mode": "$DEPLOY_MODE_ESCAPED"
 }
 VEOF
 )
@@ -67,4 +82,8 @@ else
     # Legacy bind-mount path: host file is served directly by the container
     printf '%s\n' "$VERSION_JSON" > "$DEPLOY_DIR/httpdocs/.build-version"
     log_ok "Build version file written (httpdocs/.build-version)"
+fi
+
+if [ "$UPDATE_LAST_DEPLOY" = "1" ]; then
+    printf '%s\n' "$NEW_COMMIT" > "$LAST_DEPLOY_FILE"
 fi

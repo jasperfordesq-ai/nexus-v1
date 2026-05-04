@@ -417,7 +417,16 @@ run_candidate_migrations() {
         return 1
     fi
 
-    docker exec "$app_container" php /var/www/html/artisan migrate --force
+    docker exec "$app_container" php /var/www/html/artisan migrate --force --isolated
+
+    local pending_after
+    pending_after="$(db_pending_migration_count "$app_container")"
+    if [ "${pending_after:-0}" -ne 0 ]; then
+        log_err "$pending_after migration(s) still pending after migrate --isolated"
+        log_err "Another migration runner may have held Laravel's migration lock. Aborting before cutover."
+        return 1
+    fi
+
     log_ok "Laravel migrations completed"
 }
 
@@ -541,11 +550,12 @@ deploy_candidate() {
     export BUILD_COMMIT="${commit:0:12}"
 
     free_target_color_ports "$color" "$release_dir"
-    compose_for_release "$release_dir" up -d --build app frontend sales
+    compose_for_release "$release_dir" build --no-cache app frontend sales
+    compose_for_release "$release_dir" up -d --no-build app frontend sales
     wait_for_color "$color"
     optimize_candidate_laravel "$color"
     verify_candidate_images "$color"
-    write_candidate_build_version "$color"
+    write_candidate_build_version "$color" "$release_dir" "$commit"
     check_candidate_migration_safety "$color" "$release_dir"
     run_candidate_migrations "$color"
     verify_candidate_build_version "$color"
@@ -560,8 +570,14 @@ verify_candidate_images() {
 
 write_candidate_build_version() {
     local color="$1"
+    local release_dir="$2"
+    local commit="$3"
     phase "Bake Build Version ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
-    NEXUS_BUILD_VERSION_COLOR="$color" MODE=bluegreen \
+    NEXUS_BUILD_VERSION_COLOR="$color" \
+    NEXUS_BUILD_VERSION_RELEASE_DIR="$release_dir" \
+    NEXUS_BUILD_VERSION_COMMIT="$commit" \
+    NEXUS_BUILD_VERSION_UPDATE_LAST_DEPLOY=0 \
+    MODE=bluegreen \
         bash "$SELF_DIR/phases/write-build-version.sh"
 }
 
@@ -597,10 +613,33 @@ verify_candidate_build_version() {
     log_ok "Candidate /version.php confirms commit $served_commit"
 }
 
-start_workers_for_color() {
+wait_for_container_stopped() {
+    local container="$1"
+    local timeout_s="${2:-180}"
+    local deadline=$((SECONDS + timeout_s))
+    local status
+
+    while [ "$SECONDS" -lt "$deadline" ]; do
+        status="$(docker inspect -f '{{.State.Status}}' "$container" 2>/dev/null || echo missing)"
+        case "$status" in
+            exited|dead|created|missing)
+                log_ok "$container is stopped"
+                return 0
+                ;;
+        esac
+        sleep 3
+    done
+
+    log_warn "$container did not stop within ${timeout_s}s"
+    return 1
+}
+
+start_worker_services_for_color() {
     local color="$1"
     local release_dir="$2"
     local commit="$3"
+    shift 3
+    local services=("$@")
     local api_port frontend_port sales_port
     read -r api_port frontend_port sales_port < <(ports_for_color "$color")
 
@@ -611,36 +650,118 @@ start_workers_for_color() {
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
-    phase "Start Workers ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
+    phase "Start Workers ($color: ${services[*]})" "${CURRENT_ACTIVE:-}" "$color" "$commit"
 
     # Remove any stale worker containers (e.g. left in Exited state by a prior
     # aborted deploy or built against an image tag that no longer exists).
     # `compose up -d` won't recreate a container that's just stopped — it tries
     # to `docker start` it, which fails if the image is gone, leaving a stuck
     # "Exited" container that blocks the new one. `docker rm -f` is idempotent.
-    docker rm -f "$(container_name "$color" queue)" >/dev/null 2>&1 || true
-    docker rm -f "$(container_name "$color" scheduler)" >/dev/null 2>&1 || true
+    local service
+    for service in "${services[@]}"; do
+        docker rm -f "$(container_name "$color" "$service")" >/dev/null 2>&1 || true
+    done
 
     # --force-recreate guarantees a clean container even if compose decides the
     # config is unchanged. Without it, an existing healthy-but-stale container
     # could be reused.
-    compose_for_release "$release_dir" up -d --force-recreate queue scheduler
-    wait_for_container_health "$(container_name "$color" queue)"
-    wait_for_container_health "$(container_name "$color" scheduler)"
-    log_ok "Queue and scheduler workers are healthy for $color"
+    compose_for_release "$release_dir" up -d --force-recreate "${services[@]}"
+    for service in "${services[@]}"; do
+        wait_for_container_health "$(container_name "$color" "$service")"
+    done
+    log_ok "Worker services are healthy for $color: ${services[*]}"
 }
 
-# Stops the OLD color's workers AFTER the new color has taken traffic. Keeping
-# them split avoids the window where new web code enqueues jobs that an old
-# worker handles with stale code.
+start_queue_for_color() {
+    start_worker_services_for_color "$1" "$2" "$3" queue
+}
+
+start_scheduler_for_color() {
+    start_worker_services_for_color "$1" "$2" "$3" scheduler
+}
+
+start_workers_for_color() {
+    start_worker_services_for_color "$1" "$2" "$3" queue scheduler
+}
+
+restart_existing_workers_for_color() {
+    local color="$1"
+    local queue scheduler
+    local saw_color_container=0
+    queue="$(container_name "$color" queue)"
+    scheduler="$(container_name "$color" scheduler)"
+
+    phase "Restart Workers ($color)" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+
+    if docker ps -a --format '{{.Names}}' | grep -qx "$queue"; then
+        saw_color_container=1
+        docker update --restart=unless-stopped "$queue" >/dev/null 2>&1 || true
+        docker start "$queue" >/dev/null 2>&1 || true
+    fi
+    if docker ps -a --format '{{.Names}}' | grep -qx "$scheduler"; then
+        saw_color_container=1
+        docker update --restart=unless-stopped "$scheduler" >/dev/null 2>&1 || true
+        docker start "$scheduler" >/dev/null 2>&1 || true
+    fi
+
+    if [ "$saw_color_container" = "0" ]; then
+        # Legacy single-color names from before blue/green.
+        docker update --restart=unless-stopped nexus-php-queue nexus-php-scheduler >/dev/null 2>&1 || true
+        docker start nexus-php-queue nexus-php-scheduler >/dev/null 2>&1 || true
+    fi
+
+    log_ok "Existing workers restarted for $color where available"
+}
+
+stop_queue_for_color() {
+    local color="$1"
+    local queue
+    queue="$(container_name "$color" queue)"
+
+    if ! docker ps -a --format '{{.Names}}' | grep -qx "$queue"; then
+        return 0
+    fi
+
+    docker update --restart=no "$queue" >/dev/null 2>&1 || true
+    if docker ps --format '{{.Names}}' | grep -qx "$queue"; then
+        log_info "Gracefully terminating Horizon in $queue"
+        docker exec "$queue" php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || \
+            log_warn "horizon:terminate failed in $queue; falling back to docker stop"
+        wait_for_container_stopped "$queue" 180 || docker stop -t 120 "$queue" >/dev/null 2>&1 || true
+    fi
+}
+
+stop_scheduler_for_color() {
+    local color="$1"
+    local scheduler
+    scheduler="$(container_name "$color" scheduler)"
+
+    if ! docker ps -a --format '{{.Names}}' | grep -qx "$scheduler"; then
+        return 0
+    fi
+
+    docker update --restart=no "$scheduler" >/dev/null 2>&1 || true
+    if docker ps --format '{{.Names}}' | grep -qx "$scheduler"; then
+        docker exec "$scheduler" php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
+        docker stop -t 90 "$scheduler" >/dev/null 2>&1 || true
+    fi
+}
+
 stop_workers_for_color() {
     local color="$1"
     phase "Stop Old Workers ($color)" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
-    docker stop "$(container_name "$color" queue)" >/dev/null 2>&1 || true
-    docker stop "$(container_name "$color" scheduler)" >/dev/null 2>&1 || true
+    stop_queue_for_color "$color"
+    stop_scheduler_for_color "$color"
     # Legacy single-color names from before blue/green
-    docker stop nexus-php-queue >/dev/null 2>&1 || true
-    docker stop nexus-php-scheduler >/dev/null 2>&1 || true
+    docker update --restart=no nexus-php-queue nexus-php-scheduler >/dev/null 2>&1 || true
+    if docker ps --format '{{.Names}}' | grep -qx "nexus-php-queue"; then
+        docker exec nexus-php-queue php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || true
+        wait_for_container_stopped nexus-php-queue 180 || docker stop -t 120 nexus-php-queue >/dev/null 2>&1 || true
+    fi
+    if docker ps --format '{{.Names}}' | grep -qx "nexus-php-scheduler"; then
+        docker exec nexus-php-scheduler php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
+        docker stop -t 90 nexus-php-scheduler >/dev/null 2>&1 || true
+    fi
     log_ok "Old workers stopped"
 }
 
@@ -844,15 +965,15 @@ cmd_deploy() {
     deploy_candidate "$target" "$release_dir" "$commit"
     smoke_color "$target"
 
-    # Start the NEW color's workers BEFORE web traffic switches. This eliminates
-    # the window where new web code enqueues jobs that old workers process with
-    # stale code expectations. Both colors' workers run in parallel briefly —
-    # safe because they pull from the same DB-backed queue and the new code is
-    # required to be backwards-compatible (see Migration Safety Gate).
-    if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
-        log_err "Could not start $target workers — aborting before web cutover. Active color $active is unaffected."
-        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
-        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
+    # Drain active workers before starting target workers. Queue jobs may wait
+    # briefly in Redis, but Horizon shuts down gracefully and the scheduler never
+    # runs in both colors at once. The target scheduler starts only after public
+    # smoke passes so inactive code does not run scheduled tasks.
+    stop_workers_for_color "$active"
+    if ! start_queue_for_color "$target" "$release_dir" "$commit"; then
+        log_err "Could not start $target queue — aborting before web cutover. Active color $active is unaffected."
+        stop_workers_for_color "$target"
+        restart_existing_workers_for_color "$active"
         exit 1
     fi
 
@@ -860,17 +981,18 @@ cmd_deploy() {
     if ! post_cutover_smoke; then
         log_err "Public smoke failed after cutover; reverting traffic to $active"
         write_apache_routes "$active"
-        # New workers started, but cutover failed. Stop them; old workers were
-        # never stopped (we hadn't reached stop_workers_for_color "$active" yet)
-        # so the active color is fully restored.
-        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
-        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
+        stop_workers_for_color "$target"
+        restart_existing_workers_for_color "$active"
         exit 1
     fi
 
-    # Cutover succeeded. Stop the OLD color's workers — the new color owns the
-    # queue from this point on.
-    stop_workers_for_color "$active"
+    if ! start_scheduler_for_color "$target" "$release_dir" "$commit"; then
+        log_err "Could not start $target scheduler after cutover; reverting traffic to $active"
+        write_apache_routes "$active"
+        stop_workers_for_color "$target"
+        restart_existing_workers_for_color "$active"
+        exit 1
+    fi
 
     # Purge Cloudflare cache after traffic switch — must run after smoke tests
     # pass so CF doesn't cache the old content right after purge.
@@ -904,7 +1026,12 @@ cmd_deploy() {
 
     # Write build version file — records commit/timestamp into httpdocs/.build-version
     phase "Write Build Version" "${CURRENT_TARGET:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
-    MODE=bluegreen bash "$SELF_DIR/phases/write-build-version.sh"
+    NEXUS_BUILD_VERSION_COLOR="$target" \
+    NEXUS_BUILD_VERSION_RELEASE_DIR="$release_dir" \
+    NEXUS_BUILD_VERSION_COMMIT="$commit" \
+    NEXUS_BUILD_VERSION_UPDATE_LAST_DEPLOY=1 \
+    MODE=bluegreen \
+        bash "$SELF_DIR/phases/write-build-version.sh"
 
     # Prune dangling Docker images to reclaim disk space
     phase "Docker Image Cleanup" "${CURRENT_TARGET:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
@@ -930,11 +1057,12 @@ cmd_rollback() {
     trap 'log_warn "Deploy received signal — aborting"; exit 143' TERM INT HUP
     trap deploy_exit_trap EXIT
 
-    local active target release_meta commit release_dir
+    local active target release_meta commit release_dir target_has_release
     active="$(read_active_color)"
     target="$(inactive_color "$active")"
     CURRENT_ACTIVE="$active"
     CURRENT_TARGET="$target"
+    target_has_release=0
 
     log_warn "Rolling back from $active to $target"
     write_deploy_status "running" "starting rollback" "$active" "$target" ""
@@ -950,33 +1078,48 @@ cmd_rollback() {
     fi
     log_ok "Rollback target $ROLLBACK_APP is healthy — proceeding with traffic switch"
 
-    # Same ordering as cmd_deploy: bring rollback workers up FIRST, switch
-    # web traffic SECOND, stop the (failing) current workers LAST.
+    # Match deploy worker ordering: drain the active workers before starting
+    # the rollback workers so Horizon is graceful and the scheduler is singular.
+    stop_workers_for_color "$active"
     if release_meta="$(read_color_release "$target")"; then
+        target_has_release=1
         commit="${release_meta%%|*}"
         release_dir="${release_meta#*|}"
         CURRENT_COMMIT="$commit"
-        if ! start_workers_for_color "$target" "$release_dir" "$commit"; then
-            log_err "Rollback worker start failed — keeping current active color $active"
+        if ! start_queue_for_color "$target" "$release_dir" "$commit"; then
+            log_err "Rollback queue start failed — keeping current active color $active"
+            stop_workers_for_color "$target"
+            restart_existing_workers_for_color "$active"
             exit 1
         fi
     else
-        log_warn "No release metadata found for $target workers; trying legacy containers"
+        log_warn "No release metadata found for $target workers; trying legacy queue container"
+        docker update --restart=unless-stopped nexus-php-queue >/dev/null 2>&1 || true
         docker start nexus-php-queue >/dev/null 2>&1 || true
-        docker start nexus-php-scheduler >/dev/null 2>&1 || true
     fi
 
     write_apache_routes "$target"
     if ! post_cutover_smoke; then
         log_err "Rollback public smoke failed; restoring web traffic to $active"
         write_apache_routes "$active"
-        # Stop the workers we just brought up — old workers were never stopped
-        docker stop "$(container_name "$target" queue)" >/dev/null 2>&1 || true
-        docker stop "$(container_name "$target" scheduler)" >/dev/null 2>&1 || true
+        stop_workers_for_color "$target"
+        restart_existing_workers_for_color "$active"
         exit 1
     fi
-    # Cutover succeeded — stop the failing color's workers
-    stop_workers_for_color "$active"
+
+    if [ "$target_has_release" = "1" ]; then
+        if ! start_scheduler_for_color "$target" "$release_dir" "$commit"; then
+            log_err "Rollback scheduler start failed; restoring web traffic to $active"
+            write_apache_routes "$active"
+            stop_workers_for_color "$target"
+            restart_existing_workers_for_color "$active"
+            exit 1
+        fi
+    else
+        docker update --restart=unless-stopped nexus-php-scheduler >/dev/null 2>&1 || true
+        docker start nexus-php-scheduler >/dev/null 2>&1 || true
+    fi
+
     # Purge Cloudflare cache after rollback traffic switch — prevents CF from
     # continuing to serve cached responses from the broken new deployment
     if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then

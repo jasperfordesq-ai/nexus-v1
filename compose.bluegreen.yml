@@ -115,7 +115,7 @@ services:
   queue:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-queue
-    command: sh -c "php artisan package:discover --ansi 2>/dev/null; php artisan optimize && php artisan horizon"
+    command: sh -c "php artisan package:discover --ansi 2>/dev/null; php artisan optimize && exec php artisan horizon"
     restart: unless-stopped
     stop_grace_period: 120s
     deploy:
@@ -151,7 +151,7 @@ services:
   scheduler:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-scheduler
-    command: sh -c "php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    command: sh -c "trap 'php artisan schedule:interrupt >/dev/null 2>&1 || true; exit 0' TERM INT; php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60 & wait $!; done"
     restart: unless-stopped
     stop_grace_period: 90s
     deploy:
