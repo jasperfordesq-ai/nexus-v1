@@ -12,15 +12,26 @@
 # Usage (from project root in Git Bash):
 #   bash scripts/setup-rclone-local.sh
 #
-# Requires: Git Bash, SSH key at C:\ssh-keys\project-nexus.pem
+# Requires: Git Bash and an SSH key (path comes from .secrets.local/deploy.env
+# or PROD_SSH_KEY env var — the public script has no hardcoded defaults).
 # Run PART B on the server afterwards:
-#   ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253
+#   ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_HOST"
 #   sudo bash /opt/nexus-php/scripts/setup-rclone-gdrive.sh
 
 set -euo pipefail
 
-SSH_KEY="C:/ssh-keys/project-nexus.pem"
-SSH_HOST="azureuser@20.224.171.253"
+# Load local secrets if present. .secrets.local/deploy.env is gitignored.
+# shellcheck disable=SC1091
+[ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
+
+if [ -z "${PROD_SSH_HOST:-}" ] || [ -z "${PROD_SSH_KEY:-}" ]; then
+    echo "ERROR: PROD_SSH_HOST and PROD_SSH_KEY must be set." >&2
+    echo "       Either create .secrets.local/deploy.env or export them." >&2
+    exit 1
+fi
+
+SSH_KEY="$PROD_SSH_KEY"
+SSH_HOST="$PROD_SSH_HOST"
 REMOTE_NAME="gdrive"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
@@ -150,8 +161,8 @@ echo -e "${BOLD}║  Part A complete — now run Part B on the server          �
 echo -e "${BOLD}╠══════════════════════════════════════════════════════════╣${NC}"
 echo -e "${BOLD}║  SSH in and run:                                         ║${NC}"
 echo -e "${BOLD}║                                                          ║${NC}"
-echo -e "${BOLD}║    ssh -i \"C:\\ssh-keys\\project-nexus.pem\" \\             ║${NC}"
-echo -e "${BOLD}║      -o RequestTTY=force azureuser@20.224.171.253        ║${NC}"
+echo -e "${BOLD}║    ssh -i \"\$PROD_SSH_KEY\" \\                              ║${NC}"
+echo -e "${BOLD}║      -o RequestTTY=force \"\$PROD_SSH_HOST\"                ║${NC}"
 echo -e "${BOLD}║                                                          ║${NC}"
 echo -e "${BOLD}║    sudo bash /opt/nexus-php/scripts/setup-rclone-gdrive.sh ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"

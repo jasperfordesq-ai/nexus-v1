@@ -33,8 +33,18 @@ if [[ "${1:-}" == "--ci" ]]; then
     CI_MODE=true
 fi
 
-SSH_KEY="${PROD_SSH_KEY:-C:\\ssh-keys\\project-nexus.pem}"
-SSH_HOST="${PROD_SSH_HOST:-azureuser@20.224.171.253}"
+# Load local secrets if present (gitignored .secrets.local/deploy.env)
+# shellcheck disable=SC1091
+[ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
+
+if [ -z "${PROD_SSH_HOST:-}" ] || [ -z "${PROD_SSH_KEY:-}" ]; then
+    echo "ERROR: PROD_SSH_HOST and PROD_SSH_KEY must be set." >&2
+    echo "       Either create .secrets.local/deploy.env or export them." >&2
+    exit 1
+fi
+
+SSH_KEY="$PROD_SSH_KEY"
+SSH_HOST="$PROD_SSH_HOST"
 SSH_OPTS="-i ${SSH_KEY} -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new"
 DB_NAME="${PROD_DB_NAME:-nexus}"
 DB_CONTAINER="nexus-php-db"

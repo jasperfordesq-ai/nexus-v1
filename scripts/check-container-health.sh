@@ -29,8 +29,18 @@
 set -u
 
 # --- Config ---
-SSH_KEY="${SSH_KEY:-C:\\ssh-keys\\project-nexus.pem}"
-SSH_HOST="${SSH_HOST:-azureuser@20.224.171.253}"
+# Load local secrets if present (gitignored .secrets.local/deploy.env)
+# shellcheck disable=SC1091
+[ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
+
+SSH_KEY="${SSH_KEY:-${PROD_SSH_KEY:-}}"
+SSH_HOST="${SSH_HOST:-${PROD_SSH_HOST:-}}"
+
+if [ -z "$SSH_KEY" ] || [ -z "$SSH_HOST" ]; then
+    echo "ERROR: SSH_HOST and SSH_KEY (or PROD_SSH_HOST/PROD_SSH_KEY) must be set." >&2
+    echo "       Either create .secrets.local/deploy.env or export them." >&2
+    exit 1
+fi
 SSH_OPTS="-i \"$SSH_KEY\" -o RequestTTY=force -o StrictHostKeyChecking=accept-new"
 MEM_THRESHOLD_PCT="${MEM_THRESHOLD_PCT:-90}"   # percent of limit → WARN/FAIL
 OOM_LOOKBACK="${OOM_LOOKBACK:-1h}"             # docker events window

@@ -7,9 +7,10 @@
 # Production Migration Runner
 # Usage: bash scripts/migrate-production.sh <migration-file.sql> [--dry-run]
 #
-# Required env vars (set in .env or export before running):
-#   PROD_SSH_KEY   - Path to SSH private key (default: C:\ssh-keys\project-nexus.pem)
-#   PROD_SSH_HOST  - SSH user@host (default: azureuser@20.224.171.253)
+# Required env vars (loaded from .secrets.local/deploy.env if present, or
+# exported by the caller — there are NO hardcoded defaults in this script):
+#   PROD_SSH_KEY   - Path to SSH private key
+#   PROD_SSH_HOST  - SSH user@host
 #   PROD_DB_USER   - Production DB username (default: read from server .env)
 #   PROD_DB_PASS   - Production DB password (default: read from server .env)
 #   PROD_DB_NAME   - Production DB name (default: nexus)
@@ -47,8 +48,18 @@ if [[ ! -f "$MIGRATION_PATH" ]]; then
 fi
 
 # ─── SSH Config ───────────────────────────────────────────────
-SSH_KEY="${PROD_SSH_KEY:-C:\\ssh-keys\\project-nexus.pem}"
-SSH_HOST="${PROD_SSH_HOST:-azureuser@20.224.171.253}"
+# Load local secrets if present (gitignored .secrets.local/deploy.env)
+# shellcheck disable=SC1091
+[ -f "$(dirname "$0")/../.secrets.local/deploy.env" ] && . "$(dirname "$0")/../.secrets.local/deploy.env"
+
+if [ -z "${PROD_SSH_HOST:-}" ] || [ -z "${PROD_SSH_KEY:-}" ]; then
+    error "PROD_SSH_HOST and PROD_SSH_KEY must be set."
+    error "Either create .secrets.local/deploy.env or export them."
+    exit 1
+fi
+
+SSH_KEY="$PROD_SSH_KEY"
+SSH_HOST="$PROD_SSH_HOST"
 SSH_OPTS="-i ${SSH_KEY} -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new"
 DB_NAME="${PROD_DB_NAME:-nexus}"
 DB_CONTAINER="nexus-php-db"
