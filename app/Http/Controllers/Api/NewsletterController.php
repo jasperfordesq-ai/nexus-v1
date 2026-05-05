@@ -26,9 +26,10 @@ class NewsletterController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly NewsletterService $newsletterService,
-    ) {}
+    private function newsletterService(): NewsletterService
+    {
+        return app(NewsletterService::class);
+    }
 
     /** GET /api/v2/newsletters */
     public function index(): JsonResponse
@@ -38,7 +39,7 @@ class NewsletterController extends BaseApiController
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $status = $this->query('status');
 
-        $result = $this->newsletterService->getAll($tenantId, $page, $perPage, $status);
+        $result = $this->newsletterService()->getAll($tenantId, $page, $perPage, $status);
 
         return $this->respondWithPaginatedCollection(
             $result['items'],
@@ -53,7 +54,7 @@ class NewsletterController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
 
-        $newsletter = $this->newsletterService->getById($id, $tenantId);
+        $newsletter = $this->newsletterService()->getById($id, $tenantId);
 
         if ($newsletter === null) {
             return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
@@ -71,7 +72,7 @@ class NewsletterController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $newsletter = $this->newsletterService->create($tenantId, $data);
+        $newsletter = $this->newsletterService()->create($tenantId, $data);
 
         return $this->respondWithData($newsletter, null, 201);
     }
@@ -87,7 +88,7 @@ class NewsletterController extends BaseApiController
         $tenantId = $this->getTenantId();
         $this->rateLimit('newsletter_send', 2, 300);
 
-        $result = $this->newsletterService->send($id, $tenantId);
+        $result = $this->newsletterService()->send($id, $tenantId);
 
         if ($result === null) {
             return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
