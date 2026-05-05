@@ -3,7 +3,7 @@
    ============================================= */
 
 /* Tailwind v4 */
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 
 /* Hero UI Tailwind plugin */
 @plugin "./hero.ts";
@@ -11,6 +11,10 @@
 /* Content sources for Tailwind */
 @source "../index.html";
 @source "./**/*.{js,ts,jsx,tsx}";
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+@source not "./**/*.spec.ts";
+@source not "./**/*.spec.tsx";
 @source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 
 /* Hero UI dark mode variant */

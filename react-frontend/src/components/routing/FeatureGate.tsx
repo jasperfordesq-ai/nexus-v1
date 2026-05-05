@@ -16,7 +16,7 @@
 
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import type { TenantFeatures, TenantModules } from '@/types';
 
 interface FeatureGateProps {

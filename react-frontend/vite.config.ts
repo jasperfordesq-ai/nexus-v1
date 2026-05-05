@@ -17,13 +17,13 @@ import { createRequire } from 'module'
 // .dockerignore excludes .git/). Falls back to git for local dev.
 const commitHash = process.env.BUILD_COMMIT || (() => {
   try {
-    return execSync('git rev-parse --short HEAD').toString().trim()
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
   } catch {
     return 'dev'
   }
 })()
 
-const isDocker = !!process.env.DOCKER_ENV
+const usePolling = process.env.VITE_USE_POLLING === '1' || process.env.CHOKIDAR_USEPOLLING === 'true'
 const require = createRequire(import.meta.url)
 const canOptimizeImages = (() => {
   try {
@@ -136,23 +136,24 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5173,
     host: '0.0.0.0', // Required for Docker
-    // Pre-transform the eagerly-loaded modules before the browser requests them.
-    // Hides Windows NTFS I/O latency on first page load without blocking startup.
-    warmup: {
-      clientFiles: [
-        './src/main.tsx',
-        './src/App.tsx',
-        './src/contexts/index.ts',
-        './src/lib/api.ts',
-        './src/components/layout/Layout.tsx',
-        './src/components/layout/Navbar.tsx',
-      ],
-    },
+    // Do not enable Vite warmup here. This app's root graph is large, and
+    // warming it made Vite report "ready" while still spending 10s+ transforming
+    // modules, which caused audit/browser navigations to time out.
     watch: {
-      // Polling is only needed inside Docker on Windows (bind mounts don't trigger inotify).
-      // Native Windows dev uses efficient fs events instead.
-      usePolling: isDocker,
+      // Polling over Docker Desktop's Windows bind mount pegged the Vite
+      // container at high idle CPU and made even static file requests take
+      // seconds. Keep it opt-in for machines that truly need it for HMR.
+      usePolling,
       interval: 1000,
+      ignored: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/coverage/**',
+        '**/playwright-report/**',
+        '**/test-results/**',
+        '**/.codex_tmp/**',
+        '**/*.log',
+      ],
     },
     proxy: {
       // Proxy API requests to PHP backend

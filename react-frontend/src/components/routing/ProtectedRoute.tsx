@@ -11,8 +11,9 @@
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant } from '@/contexts';
-import { LoadingScreen } from '@/components/feedback';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { useLegalGate } from '@/hooks/useLegalGate';
 import { LegalAcceptanceGate } from '@/components/legal/LegalAcceptanceGate';
 

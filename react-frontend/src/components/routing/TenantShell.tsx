@@ -28,12 +28,15 @@
 
 import { useTranslation } from 'react-i18next';
 import { Outlet, Routes, useLocation } from 'react-router-dom';
-import { TenantProvider, useTenant, useAuth } from '@/contexts';
-import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
+import { TenantProvider, useTenant } from '@/contexts/TenantContext';
+import { useAuth, AuthProvider } from '@/contexts/AuthContext';
+import { NotificationsProvider } from '@/contexts/NotificationsContext';
+import { PusherProvider } from '@/contexts/PusherContext';
+import { MenuProvider } from '@/contexts/MenuContext';
 import { PresenceProvider } from '@/contexts/PresenceContext';
 import { detectTenantFromUrl, RESERVED_PATHS } from '@/lib/tenant-routing';
 import { tokenManager } from '@/lib/api';
-import { CookieConsentBanner } from '@/components/feedback';
+import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { Spinner } from '@heroui/react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
@@ -292,9 +295,9 @@ import { Helmet } from 'react-helmet-async';
 import Home from 'lucide-react/icons/house';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
-import { GlassCard } from '@/components/ui';
-import { PageMeta } from '@/components/seo';
-import { usePageTitle } from '@/hooks';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 function CommunityNotFound({ slug }: { slug: string }) {
   const { t } = useTranslation('errors');

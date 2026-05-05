@@ -77,17 +77,26 @@ function lazyWithRetry(
 import { HelmetProvider } from 'react-helmet-async';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
-import { ToastProvider, ThemeProvider, CookieConsentProvider, useTenant } from '@/contexts';
+import { ToastProvider } from '@/contexts/ToastContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 
 
 // Layout Components
-import { Layout, AuthLayout } from '@/components/layout';
-import { ProtectedRoute, FeatureGate, ScrollToTop, TenantShell } from '@/components/routing';
-import { LoadingScreen, ErrorBoundary, FeatureErrorBoundary } from '@/components/feedback';
+import { Layout, AuthLayout } from '@/components/layout/Layout';
+import { ProtectedRoute } from '@/components/routing/ProtectedRoute';
+import { FeatureGate } from '@/components/routing/FeatureGate';
+import { ScrollToTop } from '@/components/routing/ScrollToTop';
+import { TenantShell } from '@/components/routing/TenantShell';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
+import { FeatureErrorBoundary } from '@/components/feedback/FeatureErrorBoundary';
 
 // Auth Pages (critical path - eager loaded)
-import { LoginPage, RegisterPage } from '@/pages/auth';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { RegisterPage } from '@/pages/auth/RegisterPage';
 
 // Auth Pages (rarely used - lazy loaded)
 const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswordPage'));
