@@ -139,6 +139,7 @@ return [
     'campaign_name_required'       => 'Campaign name is required',
     'feature_name_required'        => 'Feature name is required',
     'module_name_required'         => 'Module name is required',
+    'module_disabled_for_community' => 'This module is not enabled for this community.',
     'enabled_required'             => 'Enabled value is required',
     'field_required'               => 'This field is required.',
     'role_name_required'           => 'Role name is required',
@@ -368,6 +369,8 @@ return [
     'no_valid_fields_to_update'            => 'No valid fields to update',
     'webhook_private_ip'                   => 'Webhook URL resolves to a private or internal IP address',
     'delivery_already_succeeded'           => 'This delivery already succeeded',
+    'marketplace_delivery_order_not_found' => 'Marketplace order not found.',
+    'marketplace_delivery_participant_required' => 'Only the buyer or seller can manage this delivery offer.',
     'parent_webhook_not_found'             => 'Parent webhook not found',
     'api_key_already_revoked'              => 'API key is already revoked',
 
@@ -1116,8 +1119,13 @@ return [
     'listing_status_forbidden'             => 'You cannot set this status.',
     'listing_title_max'                    => 'Title must not exceed 255 characters',
     'listing_type_invalid'                 => 'Type must be offer or request',
+    'listing_approve_failed'               => 'Failed to approve listing',
     'listing_reject_failed'                => 'Failed to reject listing',
     'listing_reject_reason_required'       => 'A reason is required to reject a listing',
+    'listing_max_per_user_reached'         => 'You have reached the maximum of :max listings for this community.',
+    'listing_favourites_disabled'          => 'Saved listings are not enabled for this community.',
+    'listing_reporting_disabled'           => 'Listing reports are not enabled for this community.',
+    'listing_ai_descriptions_disabled'     => 'AI listing descriptions are not enabled for this community.',
 
     // ============================================
     // USER-FACING — GAMIFICATION (additional)
@@ -2228,6 +2236,10 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'scope_violation' => 'Scope violation',
+    'user_not_found_in_tenant' => 'User not found in this tenant',
+    'municipal_announcer_role_missing' => 'municipality_announcer role not found',
+    'municipal_announcer_role_missing_run_migrations' => 'municipality_announcer role not found - run migrations',
 
     // ============================================
     // CARING COMMUNITY — relationship state errors

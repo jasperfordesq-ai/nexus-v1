@@ -57,6 +57,8 @@ describe('tenant-routing', () => {
       expect(RESERVED_PATHS.has('admin')).toBe(true);
       expect(RESERVED_PATHS.has('admin-legacy')).toBe(true);
       expect(RESERVED_PATHS.has('api')).toBe(true);
+      expect(RESERVED_PATHS.has('caring')).toBe(true);
+      expect(RESERVED_PATHS.has('caring-community')).toBe(true);
     });
 
     it('does not contain tenant slugs', () => {
@@ -75,6 +77,13 @@ describe('tenant-routing', () => {
 
     it('returns null for reserved path on localhost', () => {
       mockLocation('localhost', '/dashboard');
+      const result = detectTenantFromUrl();
+      expect(result.slug).toBeNull();
+      expect(result.source).toBeNull();
+    });
+
+    it('returns null for caring module paths on localhost', () => {
+      mockLocation('localhost', '/caring/workflow');
       const result = detectTenantFromUrl();
       expect(result.slug).toBeNull();
       expect(result.source).toBeNull();

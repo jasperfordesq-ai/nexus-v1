@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Core\TenantContext;
 use App\Services\MarketplaceCommunityDeliveryService;
+use Illuminate\Auth\Access\AuthorizationException;
 
 /**
  * MarketplaceCommunityDeliveryController — Community delivery endpoints.
@@ -93,8 +94,10 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
         }
 
         try {
-            MarketplaceCommunityDeliveryService::acceptDeliveryOffer($orderId, $delivererId);
+            MarketplaceCommunityDeliveryService::acceptDeliveryOffer($orderId, $delivererId, (int) $userId);
             return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.offer_accepted')]);
+        } catch (AuthorizationException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('DELIVERY_ACCEPT_ERROR', $e->getMessage(), null, 400);
         }
@@ -115,8 +118,10 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
         }
 
         try {
-            MarketplaceCommunityDeliveryService::confirmDelivery($orderId, $delivererId);
+            MarketplaceCommunityDeliveryService::confirmDelivery($orderId, $delivererId, (int) $userId);
             return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.delivery_confirmed')]);
+        } catch (AuthorizationException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('DELIVERY_CONFIRM_ERROR', $e->getMessage(), null, 400);
         }

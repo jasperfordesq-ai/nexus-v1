@@ -48,7 +48,10 @@ class CaregiverService
     public function getLinksForCaregiver(int $caregiverId, int $tenantId): array
     {
         return DB::table('caring_caregiver_links as cl')
-            ->join('users as u', 'u.id', '=', 'cl.cared_for_id')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'cl.cared_for_id')
+                    ->on('u.tenant_id', '=', 'cl.tenant_id');
+            })
             ->where('cl.caregiver_id', $caregiverId)
             ->where('cl.tenant_id', $tenantId)
             ->where('cl.status', 'active')
@@ -78,7 +81,10 @@ class CaregiverService
     public function getLinksForCaredFor(int $caredForId, int $tenantId): array
     {
         return DB::table('caring_caregiver_links as cl')
-            ->join('users as u', 'u.id', '=', 'cl.caregiver_id')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'cl.caregiver_id')
+                    ->on('u.tenant_id', '=', 'cl.tenant_id');
+            })
             ->where('cl.cared_for_id', $caredForId)
             ->where('cl.tenant_id', $tenantId)
             ->where('cl.status', 'active')
@@ -117,6 +123,13 @@ class CaregiverService
     ): array {
         if ($caregiverId === $caredForId) {
             throw new \RuntimeException(__('api.caring_caregiver_self_link'));
+        }
+
+        if (
+            !$this->userBelongsToTenant($caregiverId, $tenantId)
+            || !$this->userBelongsToTenant($caredForId, $tenantId)
+        ) {
+            throw new \RuntimeException(__('api.user_not_found_in_tenant'));
         }
 
         $existing = DB::table('caring_caregiver_links')
@@ -185,7 +198,10 @@ class CaregiverService
         $supportRelationships = [];
         if (Schema::hasTable('caring_support_relationships')) {
             $supportRelationships = DB::table('caring_support_relationships as sr')
-                ->join('users as u', 'u.id', '=', 'sr.supporter_id')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'sr.supporter_id')
+                        ->on('u.tenant_id', '=', 'sr.tenant_id');
+                })
                 ->where('sr.recipient_id', $caredForId)
                 ->where('sr.tenant_id', $tenantId)
                 ->where('sr.status', 'active')
@@ -210,7 +226,10 @@ class CaregiverService
         $recentLogs = [];
         if (Schema::hasTable('vol_logs')) {
             $recentLogs = DB::table('vol_logs as vl')
-                ->join('users as u', 'u.id', '=', 'vl.user_id')
+                ->join('users as u', function ($join): void {
+                    $join->on('u.id', '=', 'vl.user_id')
+                        ->on('u.tenant_id', '=', 'vl.tenant_id');
+                })
                 ->where('vl.support_recipient_id', $caredForId)
                 ->where('vl.tenant_id', $tenantId)
                 ->where('vl.logged_at', '>=', now()->subDays(30))
@@ -357,8 +376,14 @@ class CaregiverService
         $this->ensureCoverRequestsAvailable();
 
         return DB::table('caring_cover_requests as cr')
-            ->join('users as u', 'u.id', '=', 'cr.cared_for_id')
-            ->leftJoin('users as s', 's.id', '=', 'cr.matched_supporter_id')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'cr.cared_for_id')
+                    ->on('u.tenant_id', '=', 'cr.tenant_id');
+            })
+            ->leftJoin('users as s', function ($join): void {
+                $join->on('s.id', '=', 'cr.matched_supporter_id')
+                    ->on('s.tenant_id', '=', 'cr.tenant_id');
+            })
             ->where('cr.tenant_id', $tenantId)
             ->where('cr.caregiver_id', $caregiverId)
             ->select([
@@ -550,8 +575,14 @@ class CaregiverService
     private function getCoverRequest(int $id, int $caregiverId, int $tenantId): ?array
     {
         $row = DB::table('caring_cover_requests as cr')
-            ->join('users as u', 'u.id', '=', 'cr.cared_for_id')
-            ->leftJoin('users as s', 's.id', '=', 'cr.matched_supporter_id')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'cr.cared_for_id')
+                    ->on('u.tenant_id', '=', 'cr.tenant_id');
+            })
+            ->leftJoin('users as s', function ($join): void {
+                $join->on('s.id', '=', 'cr.matched_supporter_id')
+                    ->on('s.tenant_id', '=', 'cr.tenant_id');
+            })
             ->where('cr.id', $id)
             ->where('cr.tenant_id', $tenantId)
             ->where('cr.caregiver_id', $caregiverId)
@@ -609,5 +640,13 @@ class CaregiverService
 
         $value = trim((string) $value);
         return $value === '' ? null : $value;
+    }
+
+    private function userBelongsToTenant(int $userId, int $tenantId): bool
+    {
+        return DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
     }
 }

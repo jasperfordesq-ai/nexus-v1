@@ -7,7 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
-use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -123,11 +123,13 @@ class MarketplaceCommunityDeliveryService
      * @param int $delivererId The deliverer whose offer to accept
      * @return void
      *
+     * @throws AuthorizationException If the actor is not the buyer or seller
      * @throws \RuntimeException If offer not found or invalid state
      */
-    public static function acceptDeliveryOffer(int $orderId, int $delivererId): void
+    public static function acceptDeliveryOffer(int $orderId, int $delivererId, int $actorId): void
     {
         $tenantId = TenantContext::getId();
+        self::requireOrderParticipant($orderId, $tenantId, $actorId);
 
         $offer = DB::table('marketplace_delivery_offers')
             ->where('order_id', $orderId)
@@ -144,6 +146,7 @@ class MarketplaceCommunityDeliveryService
             // Accept this offer
             DB::table('marketplace_delivery_offers')
                 ->where('id', $offer->id)
+                ->where('tenant_id', $tenantId)
                 ->update([
                     'status' => 'accepted',
                     'accepted_at' => now(),
@@ -165,6 +168,7 @@ class MarketplaceCommunityDeliveryService
         Log::info('Community delivery offer accepted', [
             'order_id' => $orderId,
             'deliverer_id' => $delivererId,
+            'actor_id' => $actorId,
             'time_credits' => $offer->time_credits,
         ]);
     }
@@ -179,11 +183,13 @@ class MarketplaceCommunityDeliveryService
      * @param int $delivererId
      * @return void
      *
+     * @throws AuthorizationException If the actor is not the buyer or seller
      * @throws \RuntimeException If offer not found, wrong state, or insufficient balance
      */
-    public static function confirmDelivery(int $orderId, int $delivererId): void
+    public static function confirmDelivery(int $orderId, int $delivererId, int $actorId): void
     {
         $tenantId = TenantContext::getId();
+        $order = self::requireOrderParticipant($orderId, $tenantId, $actorId);
 
         $offer = DB::table('marketplace_delivery_offers')
             ->where('order_id', $orderId)
@@ -196,19 +202,11 @@ class MarketplaceCommunityDeliveryService
             throw new \RuntimeException('No accepted delivery offer found');
         }
 
-        $order = DB::table('marketplace_orders')
-            ->where('id', $orderId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (!$order) {
-            throw new \RuntimeException('Order not found');
-        }
-
         DB::transaction(function () use ($offer, $order, $tenantId) {
             // Mark offer as completed
             DB::table('marketplace_delivery_offers')
                 ->where('id', $offer->id)
+                ->where('tenant_id', $tenantId)
                 ->update([
                     'status' => 'completed',
                     'completed_at' => now(),
@@ -261,6 +259,7 @@ class MarketplaceCommunityDeliveryService
         Log::info('Community delivery confirmed and time credits awarded', [
             'order_id' => $orderId,
             'deliverer_id' => $delivererId,
+            'actor_id' => $actorId,
             'time_credits' => $offer->time_credits,
         ]);
     }
@@ -276,7 +275,10 @@ class MarketplaceCommunityDeliveryService
         $tenantId = TenantContext::getId();
 
         $offers = DB::table('marketplace_delivery_offers as mdo')
-            ->leftJoin('users as u', 'u.id', '=', 'mdo.deliverer_id')
+            ->leftJoin('users as u', function ($join): void {
+                $join->on('u.id', '=', 'mdo.deliverer_id')
+                    ->on('u.tenant_id', '=', 'mdo.tenant_id');
+            })
             ->where('mdo.order_id', $orderId)
             ->where('mdo.tenant_id', $tenantId)
             ->select(
@@ -332,5 +334,28 @@ class MarketplaceCommunityDeliveryService
                 'is_verified' => (bool) ($offer->is_verified ?? false),
             ],
         ];
+    }
+
+    /**
+     * Buyer or seller authorization gate for delivery lifecycle actions.
+     *
+     * @throws AuthorizationException
+     */
+    private static function requireOrderParticipant(int $orderId, int $tenantId, int $actorId): object
+    {
+        $order = DB::table('marketplace_orders')
+            ->where('id', $orderId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$order) {
+            throw new \RuntimeException(__('api.marketplace_delivery_order_not_found'));
+        }
+
+        if ((int) $order->buyer_id !== $actorId && (int) $order->seller_id !== $actorId) {
+            throw new AuthorizationException(__('api.marketplace_delivery_participant_required'));
+        }
+
+        return $order;
     }
 }

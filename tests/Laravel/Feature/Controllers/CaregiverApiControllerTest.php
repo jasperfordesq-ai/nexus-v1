@@ -99,6 +99,31 @@ class CaregiverApiControllerTest extends TestCase
         ]);
     }
 
+    public function test_caregiver_cannot_link_receiver_from_another_tenant(): void
+    {
+        $this->requireCaregiverTables();
+        $this->setCaringCommunityFeature(true);
+
+        $caregiver = User::factory()->forTenant($this->testTenantId)->create();
+        $otherTenantReceiver = User::factory()->forTenant(999)->create();
+        Sanctum::actingAs($caregiver);
+
+        $response = $this->apiPost('/v2/caring-community/caregiver/links', [
+            'cared_for_id' => $otherTenantReceiver->id,
+            'relationship_type' => 'family',
+            'start_date' => now()->toDateString(),
+        ]);
+
+        $response->assertStatus(409);
+        $response->assertJsonPath('errors.0.code', 'CONFLICT');
+
+        $this->assertDatabaseMissing('caring_caregiver_links', [
+            'tenant_id' => $this->testTenantId,
+            'caregiver_id' => $caregiver->id,
+            'cared_for_id' => $otherTenantReceiver->id,
+        ]);
+    }
+
     public function test_caregiver_routes_respect_caring_community_feature_gate(): void
     {
         $this->requireCaregiverTables();

@@ -178,6 +178,8 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
       <li key={item.key}>
         <Link
           to={tenantPath(item.path)}
+          aria-label={label}
+          aria-current={active ? 'page' : undefined}
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             active
               ? 'bg-primary/10 text-primary'
@@ -249,6 +251,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
           <Tooltip content={t('panel.sidebar.help_centre')} placement="right">
             <Link
               to={tenantPath('/admin/help')}
+              aria-label={t('panel.sidebar.help_centre')}
               className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors hover:bg-default-100 ${
                 location.pathname.includes('/admin/help') ? 'text-primary' : 'text-default-400 hover:text-foreground'
               }`}
@@ -273,6 +276,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
               <Tooltip content={t('panel.sidebar.full_admin')} placement="right">
                 <Link
                   to={tenantPath('/admin')}
+                  aria-label={t('panel.sidebar.full_admin')}
                   className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
                 >
                   <Settings size={18} />
