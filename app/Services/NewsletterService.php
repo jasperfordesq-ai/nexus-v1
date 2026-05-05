@@ -12,6 +12,7 @@ use App\Models\Newsletter;
 use App\Models\NewsletterSegment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 // Define rate limit constant globally for cron/test access
 if (!defined('NEWSLETTER_EMAIL_DELAY_MICROSECONDS')) {
@@ -237,6 +238,7 @@ class NewsletterService
 
         $sent = 0;
         $failed = 0;
+        $suppressedEmails = self::getSuppressedEmails($tenantId);
 
         // Process all pending items in batches with ATOMIC CLAIMING.
         // Step 1: UPDATE status to 'processing' (claim) — prevents other runners
@@ -286,6 +288,13 @@ class NewsletterService
 
             foreach ($pending as $item) {
                 try {
+                    $email = strtolower(trim((string) $item->email));
+                    if (isset($suppressedEmails[$email])) {
+                        self::markSuppressedRecipientSkipped((int) $item->id, $tenantId);
+                        $failed++;
+                        continue;
+                    }
+
                     $recipientData = [
                         'email' => $item->email,
                         'first_name' => $item->first_name ?? '',
@@ -408,6 +417,19 @@ class NewsletterService
         );
     }
 
+    private static function markSuppressedRecipientSkipped(int $queueId, int $tenantId): void
+    {
+        DB::table('newsletter_queue')
+            ->where('id', $queueId)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'status' => 'failed',
+                'attempts' => self::MAX_SEND_ATTEMPTS,
+                'last_attempted_at' => now(),
+                'error_message' => 'Recipient is suppressed',
+            ]);
+    }
+
     /**
      * Queue recipients with unsubscribe tokens.
      *
@@ -424,23 +446,28 @@ class NewsletterService
             'tenant_id',
             'ab_test_enabled',
             'ab_split_percentage',
+            'is_recurring',
         ]);
         $tenantId = (int) (($newsletter->tenant_id ?? null) ?: TenantContext::getId());
-        $alreadySent = DB::table('newsletter_queue')
-            ->where('tenant_id', $tenantId)
-            ->where('newsletter_id', $newsletterId)
-            ->where('status', 'sent')
-            ->pluck('email')
-            ->map(fn($email) => strtolower((string) $email))
-            ->flip()
-            ->all();
+        $alreadySent = [];
+        if (empty($newsletter->is_recurring)) {
+            $alreadySent = DB::table('newsletter_queue')
+                ->where('tenant_id', $tenantId)
+                ->where('newsletter_id', $newsletterId)
+                ->where('status', 'sent')
+                ->pluck('email')
+                ->map(fn($email) => strtolower((string) $email))
+                ->flip()
+                ->all();
+        }
+        $suppressedEmails = self::getSuppressedEmails($tenantId);
         $abTestEnabled = (bool) ($newsletter->ab_test_enabled ?? false);
         $abSplitPercentage = max(0, min(100, (int) ($newsletter->ab_split_percentage ?? 50)));
         $rows = [];
         $queuedEmails = [];
         foreach ($recipients as $recipient) {
             $email = strtolower(trim($recipient['email'] ?? ''));
-            if (empty($email) || isset($alreadySent[$email]) || isset($queuedEmails[$email])) {
+            if (empty($email) || isset($alreadySent[$email]) || isset($queuedEmails[$email]) || isset($suppressedEmails[$email])) {
                 continue;
             }
 
@@ -669,8 +696,10 @@ HTML;
                     return $matches[0];
                 }
 
+                $signature = hash_hmac('sha256', $trackingToken . '|' . $href, (string) config('app.key'));
                 $trackedUrl = rtrim($apiUrl, '/') . '/v2/newsletter/click/' . rawurlencode($trackingToken)
-                    . '?url=' . rawurlencode($href);
+                    . '?url=' . rawurlencode($href)
+                    . '&sig=' . rawurlencode($signature);
 
                 return 'href=' . $quote . htmlspecialchars($trackedUrl, ENT_QUOTES, 'UTF-8') . $quote;
             },
@@ -712,9 +741,7 @@ HTML;
             return 0;
         }
 
-        $rules = self::normalizeSegmentRules($segment->rules, $segment->match_type ?? 'all');
-
-        return self::countUsersByRules($rules);
+        return self::countRecipientsByRules($segment->match_type ?? 'all', $segment->rules);
     }
 
     /**
@@ -737,6 +764,7 @@ HTML;
     {
         $tenantId = TenantContext::getId();
         $recipients = [];
+        $suppressedEmails = self::getSuppressedEmails($tenantId);
 
         switch ($targetAudience) {
             case 'subscribers_only':
@@ -746,6 +774,9 @@ HTML;
                     ->get();
 
                 foreach ($subscribers as $sub) {
+                    if (isset($suppressedEmails[strtolower((string) $sub->email)])) {
+                        continue;
+                    }
                     $recipients[] = [
                         'email' => $sub->email,
                         'user_id' => $sub->user_id,
@@ -777,6 +808,9 @@ HTML;
 
                 foreach ($subscribers as $sub) {
                     $email = strtolower($sub->email);
+                    if (isset($suppressedEmails[$email])) {
+                        continue;
+                    }
                     $seen[$email] = true;
                     $recipients[] = [
                         'email' => $sub->email,
@@ -789,16 +823,21 @@ HTML;
                 }
 
                 // Add members not already in subscribers and not unsubscribed
-                $users = DB::table('users')
-                    ->where('tenant_id', $tenantId)
-                    ->where('is_approved', 1)
-                    ->whereNotNull('email')
-                    ->where('email', '!=', '')
-                    ->get(['id', 'email', 'name', 'first_name', 'last_name']);
+                $users = collect();
+                if (Schema::hasColumn('users', 'newsletter_opt_in')) {
+                    $users = DB::table('users')
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_approved', 1)
+                        ->where('status', 'active')
+                        ->where('newsletter_opt_in', 1)
+                        ->whereNotNull('email')
+                        ->where('email', '!=', '')
+                        ->get(['id', 'email', 'name', 'first_name', 'last_name']);
+                }
 
                 foreach ($users as $user) {
                     $email = strtolower($user->email);
-                    if (isset($seen[$email]) || isset($unsubscribedEmails[$email])) {
+                    if (isset($seen[$email]) || isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
                         continue;
                     }
 
@@ -824,16 +863,22 @@ HTML;
                     ->flip()
                     ->all();
 
-                $users = DB::table('users')
-                    ->where('tenant_id', $tenantId)
-                    ->where('is_approved', 1)
-                    ->whereNotNull('email')
-                    ->where('email', '!=', '')
-                    ->get(['id', 'email', 'name', 'first_name', 'last_name']);
+                $users = collect();
+                if (Schema::hasColumn('users', 'newsletter_opt_in')) {
+                    $users = DB::table('users')
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_approved', 1)
+                        ->where('status', 'active')
+                        ->where('newsletter_opt_in', 1)
+                        ->whereNotNull('email')
+                        ->where('email', '!=', '')
+                        ->get(['id', 'email', 'name', 'first_name', 'last_name']);
+                }
 
                 foreach ($users as $user) {
                     // Skip users who have unsubscribed from newsletters
-                    if (isset($unsubscribedEmails[strtolower($user->email)])) {
+                    $email = strtolower((string) $user->email);
+                    if (isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
                         continue;
                     }
 
@@ -876,6 +921,7 @@ HTML;
 
         $tenantId = TenantContext::getId();
         $recipients = [];
+        $suppressedEmails = self::getSuppressedEmails($tenantId);
 
         // Collect unsubscribed emails to exclude from segment sends
         $unsubscribedEmails = DB::table('newsletter_subscribers')
@@ -892,7 +938,8 @@ HTML;
             }
 
             // Skip users who have unsubscribed from newsletters
-            if (isset($unsubscribedEmails[strtolower($user->email)])) {
+            $email = strtolower((string) $user->email);
+            if (isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
                 continue;
             }
 
@@ -912,6 +959,46 @@ HTML;
         }
 
         return $recipients;
+    }
+
+    public static function countRecipientsByRules(string $matchType, array $rules): int
+    {
+        $tenantId = TenantContext::getId();
+        $users = self::queryUsersByRules(self::normalizeSegmentRules($rules, $matchType));
+
+        $unsubscribedEmails = DB::table('newsletter_subscribers')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'unsubscribed')
+            ->pluck('email')
+            ->map(fn ($email) => strtolower((string) $email))
+            ->flip()
+            ->all();
+        $suppressedEmails = self::getSuppressedEmails($tenantId);
+
+        return $users
+            ->filter(function ($user) use ($unsubscribedEmails, $suppressedEmails) {
+                $email = strtolower((string) ($user->email ?? ''));
+                return $email !== '' && !isset($unsubscribedEmails[$email]) && !isset($suppressedEmails[$email]);
+            })
+            ->count();
+    }
+
+    private static function getSuppressedEmails(int $tenantId): array
+    {
+        if (!Schema::hasTable('newsletter_suppression_list')) {
+            return [];
+        }
+
+        return DB::table('newsletter_suppression_list')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->pluck('email')
+            ->map(fn ($email) => strtolower((string) $email))
+            ->flip()
+            ->all();
     }
 
     // =========================================================================
@@ -965,7 +1052,10 @@ HTML;
             }
         }
 
-        $baseWhere = "tenant_id = ? AND is_approved = 1";
+        $baseWhere = "tenant_id = ? AND is_approved = 1 AND status = 'active'";
+        $baseWhere .= Schema::hasColumn('users', 'newsletter_opt_in')
+            ? " AND newsletter_opt_in = 1"
+            : " AND 1 = 0";
 
         if (!empty($conditions)) {
             $operator = ($matchType === 'all') ? ' AND ' : ' OR ';
@@ -994,7 +1084,10 @@ HTML;
             }
         }
 
-        $baseWhere = "tenant_id = ? AND is_approved = 1";
+        $baseWhere = "tenant_id = ? AND is_approved = 1 AND status = 'active'";
+        $baseWhere .= Schema::hasColumn('users', 'newsletter_opt_in')
+            ? " AND newsletter_opt_in = 1"
+            : " AND 1 = 0";
 
         if (!empty($conditions)) {
             $operator = ($matchType === 'all') ? ' AND ' : ' OR ';

@@ -52,6 +52,62 @@ class AdminNewsletterController extends BaseApiController
         return Schema::hasTable($table);
     }
 
+    private function normalizeJsonListInput(mixed $value, bool $integerValues = false): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $value = $decoded;
+            } else {
+                $value = array_map('trim', explode(',', $value));
+            }
+        }
+
+        if (!is_array($value)) {
+            return null;
+        }
+
+        $items = [];
+        foreach ($value as $item) {
+            if ($integerValues) {
+                $intValue = (int) $item;
+                if ($intValue > 0) {
+                    $items[] = $intValue;
+                }
+                continue;
+            }
+
+            $stringValue = trim((string) $item);
+            if ($stringValue !== '') {
+                $items[] = $stringValue;
+            }
+        }
+
+        return $items === [] ? null : json_encode(array_values(array_unique($items)));
+    }
+
+    private function activeSuppressedEmailSet(int $tenantId): array
+    {
+        if (!$this->tableExists('newsletter_suppression_list')) {
+            return [];
+        }
+
+        return DB::table('newsletter_suppression_list')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->pluck('email')
+            ->map(fn ($email) => strtolower((string) $email))
+            ->flip()
+            ->all();
+    }
+
     public function index(): JsonResponse
     {
         $this->requireAdmin();
@@ -133,18 +189,27 @@ class AdminNewsletterController extends BaseApiController
         $abWinnerMetric = $this->input('ab_winner_metric', 'opens');
         $abAutoSelectWinner = $this->input('ab_auto_select_winner') ? 1 : 0;
         $abAutoSelectAfterHours = $this->inputInt('ab_auto_select_after_hours') ?: null;
-        $targetCounties = $this->input('target_counties') ?: null;
-        $targetTowns = $this->input('target_towns') ?: null;
-        $targetGroups = $this->input('target_groups') ?: null;
+        $targetCounties = $this->normalizeJsonListInput($this->input('target_counties'));
+        $targetTowns = $this->normalizeJsonListInput($this->input('target_towns'));
+        $targetGroups = $this->normalizeJsonListInput($this->input('target_groups'), true);
         $isRecurring = $this->input('is_recurring') ? 1 : 0;
         $recurringFrequency = $this->input('recurring_frequency') ?: null;
-        $recurringDay = $this->inputInt('recurring_day') ?: null;
+        $recurringDayOfWeek = $this->inputInt('recurring_day_of_week') ?: ($this->inputInt('recurring_day') ?: null);
+        $recurringDay = $recurringDayOfWeek !== null ? (string) $recurringDayOfWeek : null;
         $recurringDayOfMonth = $this->inputInt('recurring_day_of_month') ?: null;
         $recurringTime = $this->input('recurring_time') ?: null;
         $recurringEndDate = $this->input('recurring_end_date') ?: null;
 
         if (!$name && !$subject) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.subject_required'), 'subject');
+        }
+
+        if (!in_array($status, ['draft', 'scheduled'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
+        }
+
+        if (!in_array($targetAudience, ['all_members', 'subscribers_only', 'both', 'segment'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_target'), 'target_audience');
         }
 
         if (!$this->tableExists('newsletters')) {
@@ -157,15 +222,15 @@ class AdminNewsletterController extends BaseApiController
                     target_audience, segment_id, scheduled_at, ab_test_enabled, subject_b, template_id,
                     ab_split_percentage, ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
                     target_counties, target_towns, target_groups,
-                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_week, recurring_day_of_month,
                     recurring_time, recurring_end_date,
                     created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [$tenantId, $name, $subject, $previewText, $content, $status,
                  $targetAudience, $segmentId, $scheduledAt, $abTestEnabled, $subjectB, $templateId,
                  $abSplitPercentage, $abWinnerMetric, $abAutoSelectWinner, $abAutoSelectAfterHours,
                  $targetCounties, $targetTowns, $targetGroups,
-                 $isRecurring, $recurringFrequency, $recurringDay, $recurringDayOfMonth,
+                 $isRecurring, $recurringFrequency, $recurringDay, $recurringDayOfWeek, $recurringDayOfMonth,
                  $recurringTime, $recurringEndDate,
                  $userId]
             );
@@ -189,10 +254,27 @@ class AdminNewsletterController extends BaseApiController
             $fields = [];
             $params = [];
 
+            $status = $this->input('status');
+            if ($status !== null) {
+                if (!in_array($status, ['draft', 'scheduled'], true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
+                }
+                $fields[] = "status = ?";
+                $params[] = $status;
+            }
+
+            $targetAudience = $this->input('target_audience');
+            if ($targetAudience !== null) {
+                if (!in_array($targetAudience, ['all_members', 'subscribers_only', 'both', 'segment'], true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_target'), 'target_audience');
+                }
+                $fields[] = "target_audience = ?";
+                $params[] = $targetAudience;
+            }
+
             $allowedFields = [
                 'name', 'subject', 'preview_text', 'content',
-                'target_audience', 'scheduled_at', 'subject_b',
-                'target_counties', 'target_towns', 'target_groups',
+                'scheduled_at', 'subject_b',
                 'ab_winner_metric',
                 'recurring_frequency', 'recurring_time', 'recurring_end_date',
             ];
@@ -205,8 +287,25 @@ class AdminNewsletterController extends BaseApiController
                 }
             }
 
+            foreach (['target_counties' => false, 'target_towns' => false, 'target_groups' => true] as $field => $integerValues) {
+                $val = $this->input($field);
+                if ($val !== null) {
+                    $fields[] = "{$field} = ?";
+                    $params[] = $this->normalizeJsonListInput($val, $integerValues);
+                }
+            }
+
+            $recurringDayInput = $this->input('recurring_day_of_week') ?? $this->input('recurring_day');
+            if ($recurringDayInput !== null) {
+                $day = $recurringDayInput ? (int) $recurringDayInput : null;
+                $fields[] = "recurring_day = ?";
+                $params[] = $day !== null ? (string) $day : null;
+                $fields[] = "recurring_day_of_week = ?";
+                $params[] = $day;
+            }
+
             // Handle nullable int fields
-            foreach (['segment_id', 'template_id', 'ab_split_percentage', 'recurring_day', 'recurring_day_of_month', 'ab_auto_select_after_hours'] as $intField) {
+            foreach (['segment_id', 'template_id', 'ab_split_percentage', 'recurring_day_of_month', 'ab_auto_select_after_hours'] as $intField) {
                 $val = $this->input($intField);
                 if ($val !== null) {
                     $fields[] = "{$intField} = ?";
@@ -895,124 +994,68 @@ class AdminNewsletterController extends BaseApiController
         $suggestions = [];
 
         try {
-            // Suggestion 1: Active users (logged in within 30 days)
-            $activeCount = 0;
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
-                    [$tenantId]
-                );
-                $activeCount = (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                // Column may not exist
-            }
-
-            if ($activeCount > 0) {
-                $suggestions[] = [
+            $suggestionDefinitions = [
+                [
                     'name' => __('api.newsletter_segment_active_name'),
-                    'description' => __('api.newsletter_segment_active_description', ['count' => $activeCount]),
+                    'description_key' => 'api.newsletter_segment_active_description',
                     'match_type' => 'all',
                     'rules' => [
                         ['field' => 'login_recency', 'operator' => 'newer_than_days', 'value' => '30'],
                     ],
-                    'estimated_count' => $activeCount,
-                ];
-            }
-
-            // Suggestion 2: Inactive users (not logged in for 60+ days)
-            $inactiveCount = 0;
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND (last_login_at IS NULL OR last_login_at < DATE_SUB(NOW(), INTERVAL 60 DAY))",
-                    [$tenantId]
-                );
-                $inactiveCount = (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                // Column may not exist
-            }
-
-            if ($inactiveCount > 0) {
-                $suggestions[] = [
+                ],
+                [
                     'name' => __('api.newsletter_segment_inactive_name'),
-                    'description' => __('api.newsletter_segment_inactive_description', ['count' => $inactiveCount]),
-                    'match_type' => 'all',
+                    'description_key' => 'api.newsletter_segment_inactive_description',
+                    'match_type' => 'any',
                     'rules' => [
                         ['field' => 'login_recency', 'operator' => 'older_than_days', 'value' => '60'],
+                        ['field' => 'login_recency', 'operator' => 'equals', 'value' => 'never'],
                     ],
-                    'estimated_count' => $inactiveCount,
-                ];
-            }
-
-            // Suggestion 3: Members with listings
-            $withListingsCount = 0;
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(DISTINCT u.id) as cnt FROM users u INNER JOIN listings l ON u.id = l.user_id AND l.tenant_id = ? WHERE u.tenant_id = ? AND u.status = 'active'",
-                    [$tenantId, $tenantId]
-                );
-                $withListingsCount = (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                // Table may not exist
-            }
-
-            if ($withListingsCount > 0) {
-                $suggestions[] = [
+                ],
+                [
                     'name' => __('api.newsletter_segment_listings_name'),
-                    'description' => __('api.newsletter_segment_listings_description', ['count' => $withListingsCount]),
+                    'description_key' => 'api.newsletter_segment_listings_description',
                     'match_type' => 'all',
                     'rules' => [
                         ['field' => 'has_listings', 'operator' => 'equals', 'value' => '1'],
                     ],
-                    'estimated_count' => $withListingsCount,
-                ];
-            }
-
-            // Suggestion 4: New members (joined in last 30 days)
-            $newCount = 0;
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
-                    [$tenantId]
-                );
-                $newCount = (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                // Ignore
-            }
-
-            if ($newCount > 0) {
-                $suggestions[] = [
+                ],
+                [
                     'name' => __('api.newsletter_segment_new_name'),
-                    'description' => __('api.newsletter_segment_new_description', ['count' => $newCount]),
+                    'description_key' => 'api.newsletter_segment_new_description',
                     'match_type' => 'all',
                     'rules' => [
                         ['field' => 'member_since', 'operator' => 'after', 'value' => date('Y-m-d', strtotime('-30 days'))],
                     ],
-                    'estimated_count' => $newCount,
-                ];
-            }
-
-            // Suggestion 5: Admin users
-            $adminCount = 0;
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND role IN ('admin', 'broker')",
-                    [$tenantId]
-                );
-                $adminCount = (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                // Ignore
-            }
-
-            if ($adminCount > 0) {
-                $suggestions[] = [
+                ],
+                [
                     'name' => __('api.newsletter_segment_admins_name'),
-                    'description' => __('api.newsletter_segment_admins_description', ['count' => $adminCount]),
+                    'description_key' => 'api.newsletter_segment_admins_description',
                     'match_type' => 'any',
                     'rules' => [
                         ['field' => 'user_role', 'operator' => 'equals', 'value' => 'admin'],
                         ['field' => 'user_role', 'operator' => 'equals', 'value' => 'broker'],
                     ],
-                    'estimated_count' => $adminCount,
+                ],
+            ];
+
+            foreach ($suggestionDefinitions as $definition) {
+                try {
+                    $count = $this->countMatchingSubscribers($tenantId, $definition['match_type'], $definition['rules']);
+                } catch (\Throwable $e) {
+                    $count = 0;
+                }
+
+                if ($count <= 0) {
+                    continue;
+                }
+
+                $suggestions[] = [
+                    'name' => $definition['name'],
+                    'description' => __($definition['description_key'], ['count' => $count]),
+                    'match_type' => $definition['match_type'],
+                    'rules' => $definition['rules'],
+                    'estimated_count' => $count,
                 ];
             }
         } catch (\Exception $e) {
@@ -1027,178 +1070,8 @@ class AdminNewsletterController extends BaseApiController
      */
     private function countMatchingSubscribers(int $tenantId, string $matchType, array $rules): int
     {
-        if (empty($rules)) {
-            // No rules = match all active users
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
-                    [$tenantId]
-                );
-                return (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                return 0;
-            }
-        }
-
-        // Build dynamic WHERE clauses from rules
-        $conditions = [];
-        $params = [$tenantId];
-        $needsListingJoin = false;
-
-        foreach ($rules as $rule) {
-            if (!is_array($rule) || empty($rule['field']) || empty($rule['operator'])) {
-                continue;
-            }
-
-            $field = $rule['field'];
-            $operator = $rule['operator'];
-            $value = $rule['value'] ?? '';
-
-            switch ($field) {
-                case 'login_recency':
-                    $days = (int) $value;
-                    if ($operator === 'less_than') {
-                        $conditions[] = "u.last_login >= DATE_SUB(NOW(), INTERVAL ? DAY)";
-                    } else {
-                        $conditions[] = "(u.last_login IS NULL OR u.last_login < DATE_SUB(NOW(), INTERVAL ? DAY))";
-                    }
-                    $params[] = $days;
-                    break;
-
-                case 'member_since':
-                    if ($operator === 'after') {
-                        $conditions[] = "u.created_at >= ?";
-                    } else {
-                        $conditions[] = "u.created_at <= ?";
-                    }
-                    $params[] = $value;
-                    break;
-
-                case 'user_role':
-                    if ($operator === 'equals') {
-                        $conditions[] = "u.role = ?";
-                    } else {
-                        $conditions[] = "u.role != ?";
-                    }
-                    $params[] = $value;
-                    break;
-
-                case 'profile_type':
-                    if ($operator === 'equals') {
-                        $conditions[] = "u.profile_type = ?";
-                    } else {
-                        $conditions[] = "u.profile_type != ?";
-                    }
-                    $params[] = $value;
-                    break;
-
-                case 'county':
-                    if ($operator === 'equals') {
-                        $conditions[] = "u.county = ?";
-                        $params[] = $value;
-                    } elseif ($operator === 'contains') {
-                        $conditions[] = "u.county LIKE ?";
-                        $params[] = '%' . $value . '%';
-                    }
-                    break;
-
-                case 'town':
-                    if ($operator === 'equals') {
-                        $conditions[] = "u.town = ?";
-                        $params[] = $value;
-                    } elseif ($operator === 'contains') {
-                        $conditions[] = "u.town LIKE ?";
-                        $params[] = '%' . $value . '%';
-                    }
-                    break;
-
-                case 'has_listings':
-                    $needsListingJoin = true;
-                    if ($value === '1' || $value === 'true') {
-                        $conditions[] = "listing_count.cnt > 0";
-                    } else {
-                        $conditions[] = "(listing_count.cnt IS NULL OR listing_count.cnt = 0)";
-                    }
-                    break;
-
-                case 'listing_count':
-                    $needsListingJoin = true;
-                    $intVal = (int) $value;
-                    if ($operator === 'greater_than') {
-                        $conditions[] = "COALESCE(listing_count.cnt, 0) > ?";
-                    } elseif ($operator === 'less_than') {
-                        $conditions[] = "COALESCE(listing_count.cnt, 0) < ?";
-                    } else {
-                        $conditions[] = "COALESCE(listing_count.cnt, 0) = ?";
-                    }
-                    $params[] = $intVal;
-                    break;
-
-                case 'activity_score':
-                case 'community_rank':
-                    $col = $field === 'activity_score'
-                        ? '(SELECT COALESCE(cr.activity_score, 0) FROM community_ranks cr WHERE cr.user_id = u.id AND cr.tenant_id = ? LIMIT 1)'
-                        : '(SELECT COALESCE(cr.rank_score, 0) FROM community_ranks cr WHERE cr.user_id = u.id AND cr.tenant_id = ? LIMIT 1)';
-                    $numVal = (float) $value;
-                    if ($operator === 'greater_than') {
-                        $conditions[] = "{$col} > ?";
-                    } elseif ($operator === 'less_than') {
-                        $conditions[] = "{$col} < ?";
-                    } else {
-                        $conditions[] = "{$col} = ?";
-                    }
-                    $params[] = $tenantId;
-                    $params[] = $numVal;
-                    break;
-
-                case 'transaction_count':
-                    $numVal = (int) $value;
-                    if ($operator === 'greater_than') {
-                        $conditions[] = "COALESCE(u.transaction_count, 0) > ?";
-                    } elseif ($operator === 'less_than') {
-                        $conditions[] = "COALESCE(u.transaction_count, 0) < ?";
-                    } else {
-                        $conditions[] = "COALESCE(u.transaction_count, 0) = ?";
-                    }
-                    $params[] = $numVal;
-                    break;
-
-                // email_open_rate and email_click_rate would need newsletter tracking join
-                // For now, skip complex joins — these are best-effort
-                default:
-                    break;
-            }
-        }
-
-        if (empty($conditions)) {
-            try {
-                $stmt = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
-                    [$tenantId]
-                );
-                return (int) ($stmt->cnt ?? 0);
-            } catch (\Exception $e) {
-                return 0;
-            }
-        }
-
-        $joinClause = '';
-        if ($needsListingJoin) {
-            $joinClause = "LEFT JOIN (SELECT user_id, COUNT(*) as cnt FROM listings WHERE tenant_id = ? GROUP BY user_id) listing_count ON u.id = listing_count.user_id";
-            // Insert tenant_id for the listing subquery after the main tenant_id
-            array_splice($params, 1, 0, [$tenantId]);
-        }
-
-        $connector = $matchType === 'any' ? ' OR ' : ' AND ';
-        $whereClause = '(' . implode($connector, $conditions) . ')';
-
-        try {
-            $sql = "SELECT COUNT(DISTINCT u.id) as cnt FROM users u {$joinClause} WHERE u.tenant_id = ? AND u.status = 'active' AND {$whereClause}";
-            $stmt = DB::selectOne($sql, $params);
-            return (int) ($stmt->cnt ?? 0);
-        } catch (\Exception $e) {
-            return 0;
-        }
+        unset($tenantId);
+        return NewsletterService::countRecipientsByRules($matchType, $rules);
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -1975,6 +1848,11 @@ class AdminNewsletterController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
+        $email = strtolower(trim(rawurldecode($email)));
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email'), 'email');
+        }
 
         if (!$this->tableExists('newsletter_suppression_list')) {
             return $this->respondWithError('TABLE_MISSING', __('api.suppression_list_not_available'), null, 503);
@@ -1995,6 +1873,11 @@ class AdminNewsletterController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
+        $email = strtolower(trim(rawurldecode($email)));
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email'), 'email');
+        }
 
         if (!$this->tableExists('newsletter_suppression_list')) {
             return $this->respondWithError('TABLE_MISSING', __('api.suppression_list_not_available'), null, 503);
@@ -2159,10 +2042,11 @@ class AdminNewsletterController extends BaseApiController
             $queuedCount = 0;
 
             $queuedEmails = [];
+            $suppressedEmails = $this->activeSuppressedEmailSet($tenantId);
             foreach ($recipients as $recipient) {
                 $recipient = is_array($recipient) ? $recipient : ['email' => (string) $recipient];
                 $email = strtolower(trim((string) ($recipient['email'] ?? '')));
-                if ($email === '' || isset($queuedEmails[$email])) {
+                if ($email === '' || isset($queuedEmails[$email]) || isset($suppressedEmails[$email])) {
                     continue;
                 }
                 $queuedEmails[$email] = true;
@@ -2474,7 +2358,7 @@ class AdminNewsletterController extends BaseApiController
                         ab_test_enabled, subject_b, ab_split_percentage, ab_winner_metric,
                         ab_auto_select_winner, ab_auto_select_after_hours,
                         target_counties, target_towns, target_groups, template_id,
-                        is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                        is_recurring, recurring_frequency, recurring_day, recurring_day_of_week, recurring_day_of_month,
                         recurring_time, recurring_end_date
                  FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
@@ -2492,9 +2376,9 @@ class AdminNewsletterController extends BaseApiController
                     target_audience, segment_id, ab_test_enabled, subject_b, ab_split_percentage,
                     ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
                     target_counties, target_towns, target_groups, template_id,
-                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_week, recurring_day_of_month,
                     recurring_time, recurring_end_date, created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId, $newName, $newSubject, $newsletter->preview_text, $newsletter->content,
                     $newsletter->target_audience, $newsletter->segment_id,
@@ -2504,7 +2388,7 @@ class AdminNewsletterController extends BaseApiController
                     $newsletter->target_counties, $newsletter->target_towns,
                     $newsletter->target_groups, $newsletter->template_id,
                     $newsletter->is_recurring, $newsletter->recurring_frequency,
-                    $newsletter->recurring_day, $newsletter->recurring_day_of_month,
+                    $newsletter->recurring_day, $newsletter->recurring_day_of_week, $newsletter->recurring_day_of_month,
                     $newsletter->recurring_time, $newsletter->recurring_end_date,
                     $userId,
                 ]

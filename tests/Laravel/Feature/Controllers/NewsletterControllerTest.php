@@ -84,4 +84,32 @@ class NewsletterControllerTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_click_tracking_does_not_redirect_unknown_signed_tokens(): void
+    {
+        config(['app.frontend_url' => 'https://app.example.test']);
+
+        $token = 'unknown-token';
+        $url = 'https://evil.example.test/phishing';
+        $signature = hash_hmac('sha256', $token . '|' . $url, (string) config('app.key'));
+
+        $response = $this->get(
+            '/api/v2/newsletter/click/' . $token . '?url=' . rawurlencode($url) . '&sig=' . rawurlencode($signature),
+            $this->withTenantHeader()
+        );
+
+        $response->assertRedirect('https://app.example.test');
+    }
+
+    public function test_click_tracking_requires_signature(): void
+    {
+        config(['app.frontend_url' => 'https://app.example.test']);
+
+        $response = $this->get(
+            '/api/v2/newsletter/click/missing-signature?url=' . rawurlencode('https://evil.example.test/phishing'),
+            $this->withTenantHeader()
+        );
+
+        $response->assertRedirect('https://app.example.test');
+    }
 }

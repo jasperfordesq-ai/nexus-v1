@@ -11955,6 +11955,7 @@ CREATE TABLE `users` (
   `last_daily_reward` date DEFAULT NULL,
   `email_preferences` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`email_preferences`)),
   `notification_preferences` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`notification_preferences`)),
+  `newsletter_opt_in` tinyint(1) NOT NULL DEFAULT 0,
   `skills` text DEFAULT NULL COMMENT 'Comma-separated skills',
   `longest_streak` int(11) DEFAULT 0,
   `gamification_enabled` tinyint(1) DEFAULT 1,
@@ -12035,6 +12036,7 @@ CREATE TABLE `users` (
   KEY `idx_users_status` (`status`),
   KEY `idx_users_last_login` (`last_login_at`),
   KEY `idx_users_last_active` (`last_active_at`),
+  KEY `idx_users_newsletter_opt_in` (`tenant_id`,`newsletter_opt_in`),
   KEY `idx_users_last_login_tenant` (`tenant_id`,`is_approved`,`last_login_at`),
   KEY `idx_users_created_tenant` (`tenant_id`,`is_approved`,`created_at`),
   KEY `idx_users_xp` (`xp`),
@@ -13468,7 +13470,8 @@ INSERT INTO `laravel_migrations` VALUES
 (220,'2026_05_04_141000_enforce_federation_message_idempotency',97),
 (221,'2026_05_04_142000_enforce_verein_event_share_idempotency',97),
 (222,'2026_05_04_143000_add_remote_and_updated_at_to_vol_opportunities',97),
-(223,'2026_05_05_100000_reconcile_listing_integrity_indexes',98);
+(223,'2026_05_05_100000_reconcile_listing_integrity_indexes',98),
+(224,'2026_05_05_110000_add_newsletter_opt_in_to_users_table',99);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

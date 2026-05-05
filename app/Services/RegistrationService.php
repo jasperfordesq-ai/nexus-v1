@@ -15,6 +15,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 /**
  * RegistrationService — Laravel DI-based service for user registration.
@@ -68,6 +70,9 @@ class RegistrationService
             $user->status = 'pending';
             // Defensive: never trust the column default for an auth-gating flag
             $user->onboarding_completed = false;
+            if (Schema::hasColumn('users', 'newsletter_opt_in')) {
+                $user->newsletter_opt_in = filter_var($data['newsletter_opt_in'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            }
 
             // Welcome credits are granted during admin approval (AdminUsersController::grantWelcomeCredits)
             // NOT at registration time — to avoid double-crediting on tenants with admin_approval enabled

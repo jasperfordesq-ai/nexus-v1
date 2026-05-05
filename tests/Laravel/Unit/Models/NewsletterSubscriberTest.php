@@ -8,11 +8,16 @@ namespace Tests\Laravel\Unit\Models;
 
 use App\Models\Concerns\HasTenantScope;
 use App\Models\NewsletterSubscriber;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 class NewsletterSubscriberTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private NewsletterSubscriber $model;
 
     protected function setUp(): void
@@ -54,5 +59,42 @@ class NewsletterSubscriberTest extends TestCase
     public function test_user_relationship(): void
     {
         $this->assertInstanceOf(BelongsTo::class, $this->model->user());
+    }
+
+    public function test_member_sync_requires_newsletter_opt_in(): void
+    {
+        if (!Schema::hasColumn('users', 'newsletter_opt_in')) {
+            $this->markTestSkipped('newsletter_opt_in column is not available in this test schema.');
+        }
+
+        $this->withTenant(999);
+
+        $optedIn = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'newsletter-opt-in@example.test',
+            'newsletter_opt_in' => 1,
+            'status' => 'active',
+            'is_approved' => 1,
+        ]);
+
+        $optedOut = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'newsletter-opt-out@example.test',
+            'newsletter_opt_in' => 0,
+            'status' => 'active',
+            'is_approved' => 1,
+        ]);
+
+        $result = NewsletterSubscriber::syncMembersWithStats();
+
+        $this->assertSame(1, $result['synced']);
+        $this->assertDatabaseHas('newsletter_subscribers', [
+            'tenant_id' => $this->testTenantId,
+            'email' => $optedIn->email,
+            'status' => 'active',
+            'source' => 'member_sync',
+        ]);
+        $this->assertDatabaseMissing('newsletter_subscribers', [
+            'tenant_id' => $this->testTenantId,
+            'email' => $optedOut->email,
+        ]);
     }
 }

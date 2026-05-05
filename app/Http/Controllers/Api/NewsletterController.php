@@ -234,13 +234,21 @@ class NewsletterController extends BaseApiController
     public function trackClick(string $token): Response|RedirectResponse
     {
         $url = trim((string) $this->query('url', ''));
+        $signature = trim((string) $this->query('sig', ''));
+        $frontendUrl = config('app.frontend_url', config('app.url'));
 
         if (
             $url === ''
+            || $signature === ''
             || !filter_var($url, FILTER_VALIDATE_URL)
             || !in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
         ) {
-            return redirect(config('app.frontend_url', config('app.url')));
+            return redirect($frontendUrl);
+        }
+
+        $expectedSignature = hash_hmac('sha256', $token . '|' . $url, (string) config('app.key'));
+        if (!hash_equals($expectedSignature, $signature)) {
+            return redirect($frontendUrl);
         }
 
         try {
@@ -248,18 +256,25 @@ class NewsletterController extends BaseApiController
                 ->where('tracking_token', $token)
                 ->orderByDesc('id')
                 ->first(['newsletter_id', 'email']);
+        } catch (\Throwable $e) {
+            Log::warning('Newsletter click token lookup failed', ['token' => $token, 'error' => $e->getMessage()]);
+            return redirect($frontendUrl);
+        }
 
-            if ($queue instanceof \stdClass) {
-                NewsletterAnalytics::recordClick(
-                    (int) $queue->newsletter_id,
-                    $token,
-                    (string) $queue->email,
-                    $url,
-                    hash('sha256', $url),
-                    request()->header('User-Agent'),
-                    request()->ip()
-                );
-            }
+        if (!$queue instanceof \stdClass) {
+            return redirect($frontendUrl);
+        }
+
+        try {
+            NewsletterAnalytics::recordClick(
+                (int) $queue->newsletter_id,
+                $token,
+                (string) $queue->email,
+                $url,
+                hash('sha256', $url),
+                request()->header('User-Agent'),
+                request()->ip()
+            );
         } catch (\Throwable $e) {
             Log::warning('Newsletter click tracking failed', ['token' => $token, 'error' => $e->getMessage()]);
         }

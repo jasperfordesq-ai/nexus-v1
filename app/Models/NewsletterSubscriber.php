@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class NewsletterSubscriber extends Model
 {
@@ -183,9 +184,37 @@ class NewsletterSubscriber extends Model
     public static function syncMembersWithStats(): array
     {
         $tenantId = \App\Core\TenantContext::getId();
+
+        if (!Schema::hasColumn('users', 'newsletter_opt_in')) {
+            return [
+                'synced' => 0,
+                'total_users' => 0,
+                'already_subscribed' => 0,
+                'eligible' => 0,
+                'pending_approval' => 0,
+                'suppressed' => 0,
+                'consent_column_missing' => true,
+            ];
+        }
+
+        $suppressedEmails = [];
+        if (Schema::hasTable('newsletter_suppression_list')) {
+            $suppressedEmails = DB::table('newsletter_suppression_list')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                })
+                ->pluck('email')
+                ->map(fn ($email) => self::normalizeEmail((string) $email))
+                ->flip()
+                ->all();
+        }
+
         $users = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('is_approved', 1)
+            ->where('newsletter_opt_in', 1)
             ->whereNotNull('email')
             ->where('email', '!=', '')
             ->get(['id', 'email', 'first_name', 'last_name', 'status']);
@@ -193,6 +222,7 @@ class NewsletterSubscriber extends Model
         $synced = 0;
         $alreadySubscribed = 0;
         $pendingApproval = 0;
+        $suppressed = 0;
 
         foreach ($users as $user) {
             if (($user->status ?? 'active') !== 'active') {
@@ -200,13 +230,19 @@ class NewsletterSubscriber extends Model
                 continue;
             }
 
-            if (self::findByEmail((string) $user->email)) {
+            $email = self::normalizeEmail((string) $user->email);
+            if (isset($suppressedEmails[$email])) {
+                $suppressed++;
+                continue;
+            }
+
+            if (self::findByEmail($email)) {
                 $alreadySubscribed++;
                 continue;
             }
 
             self::createConfirmed(
-                (string) $user->email,
+                $email,
                 $user->first_name ?? null,
                 $user->last_name ?? null,
                 'member_sync',
@@ -221,6 +257,7 @@ class NewsletterSubscriber extends Model
             'already_subscribed' => $alreadySubscribed,
             'eligible' => $synced + $alreadySubscribed,
             'pending_approval' => $pendingApproval,
+            'suppressed' => $suppressed,
         ];
     }
 

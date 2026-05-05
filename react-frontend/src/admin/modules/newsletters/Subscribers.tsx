@@ -44,6 +44,7 @@ import Mail from 'lucide-react/icons/mail';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Clock from 'lucide-react/icons/clock';
 import UserX from 'lucide-react/icons/user-x';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
@@ -79,7 +80,8 @@ type StatusFilter = '' | 'active' | 'pending' | 'unsubscribed';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function Subscribers() {
-  usePageTitle("Newsletters");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const { tenant } = useTenant();
   const toast = useToast();
 
@@ -188,18 +190,18 @@ export function Subscribers() {
         last_name: addForm.last_name || undefined,
       });
       if (res.success) {
-        toast.success(`Subscriber Added`);
+        toast.success(t('newsletters.subscriber_added'));
         setAddModalOpen(false);
         setAddForm({ email: '', first_name: '', last_name: '' });
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || "Failed to add subscriber");
+        toast.error(res.message || t('newsletters.failed_to_add_subscriber'));
       }
     } catch {
-      toast.error("Failed to add subscriber");
+      toast.error(t('newsletters.failed_to_add_subscriber'));
     }
     setAddLoading(false);
-  }, [addForm, loadData, statusFilter, searchQuery, toast])
+  }, [addForm, loadData, statusFilter, searchQuery, t, toast])
 
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -212,17 +214,17 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.removeSubscriber(removeTarget.id);
       if (res.success) {
-        toast.success(`Subscriber Removed`);
+        toast.success(t('newsletters.subscriber_removed'));
         setRemoveTarget(null);
         loadData();
       } else {
-        toast.error("Failed to remove subscriber");
+        toast.error(t('newsletters.failed_to_remove_subscriber'));
       }
     } catch {
-      toast.error("Failed to remove subscriber");
+      toast.error(t('newsletters.failed_to_remove_subscriber'));
     }
     setRemoveLoading(false);
-  }, [removeTarget, loadData, toast])
+  }, [removeTarget, loadData, t, toast])
 
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -239,12 +241,12 @@ export function Subscribers() {
       skipEmptyLines: true,
       complete: ({ data, errors, meta }) => {
         if (errors.length > 0) {
-          toast.warning("CSV contains rows that could not be parsed");
+          toast.warning(t('newsletters.csv_parse_warning'));
         }
 
         const fields = (meta.fields ?? []).map((field) => field.trim().toLowerCase());
         if (!fields.includes('email')) {
-          toast.warning("CSV must have an email column");
+          toast.warning(t('newsletters.c_s_v_must_have_an_email_column'));
           return;
         }
 
@@ -265,17 +267,17 @@ export function Subscribers() {
           });
 
         if (rows.length === 0) {
-          toast.warning("CSV must have a header row and at least one data row");
+          toast.warning(t('newsletters.c_s_v_must_have_a_header_row_and_at_least_'));
           return;
         }
 
         setImportRows(rows);
       },
       error: () => {
-        toast.warning("CSV must have an email column");
+        toast.warning(t('newsletters.c_s_v_must_have_an_email_column'));
       },
     });
-  }, [toast])
+  }, [t, toast])
 
 
   const handleImport = useCallback(async () => {
@@ -284,19 +286,19 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.importSubscribers(importRows);
       if (res.success) {
-        toast.success(`Import Result`);
+        toast.success(t('newsletters.import_result'));
         setImportModalOpen(false);
         setImportRows([]);
         setImportFileName('');
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || "Failed to import subscribers");
+        toast.error(res.message || t('newsletters.failed_to_import_subscribers'));
       }
     } catch {
-      toast.error("Failed to import subscribers");
+      toast.error(t('newsletters.failed_to_import_subscribers'));
     }
     setImportLoading(false);
-  }, [importRows, loadData, statusFilter, searchQuery, toast])
+  }, [importRows, loadData, statusFilter, searchQuery, t, toast])
 
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -310,7 +312,7 @@ export function Subscribers() {
       if (res.success && Array.isArray(res.data)) {
         const rows = res.data as Array<Record<string, string>>;
         if (rows.length === 0) {
-          toast.warning("No subscribers to export");
+          toast.warning(t('newsletters.no_subscribers_to_export'));
           setExportLoading(false);
           return;
         }
@@ -326,13 +328,13 @@ export function Subscribers() {
         a.download = `subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success(`Subscribers Exported`);
+        toast.success(t('newsletters.subscribers_exported'));
       }
     } catch {
-      toast.error("Failed to export subscribers");
+      toast.error(t('newsletters.failed_to_export_subscribers'));
     }
     setExportLoading(false);
-  }, [toast])
+  }, [t, toast])
 
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -344,16 +346,16 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.syncMembers();
       if (res.success) {
-        toast.success(`Sync Result`);
+        toast.success(t('newsletters.sync_result'));
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || "Failed to sync members");
+        toast.error(res.message || t('newsletters.failed_to_sync_members'));
       }
     } catch {
-      toast.error("Failed to sync members");
+      toast.error(t('newsletters.failed_to_sync_members'));
     }
     setSyncLoading(false);
-  }, [loadData, statusFilter, searchQuery, toast])
+  }, [loadData, statusFilter, searchQuery, t, toast])
 
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -368,8 +370,8 @@ export function Subscribers() {
   const copySubscribeLink = useCallback(() => {
     if (!subscribeUrl) return;
     navigator.clipboard.writeText(subscribeUrl);
-    toast.success("Subscribe Link Copied to Clipboard");
-  }, [subscribeUrl, toast])
+    toast.success(t('newsletters.subscribe_link_copied_to_clipboard'));
+  }, [subscribeUrl, t, toast])
 
 
   const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
@@ -383,11 +385,11 @@ export function Subscribers() {
 
   const sourceLabel = (source: string | null) => {
     switch (source) {
-      case 'signup': return 'Sign-up';
-      case 'import': return 'CSV Import';
-      case 'manual': return 'Manual';
-      case 'member_sync': return 'Member Sync';
-      case 'member': return 'Platform';
+      case 'signup': return t('newsletters.source_signup');
+      case 'import': return t('newsletters.source_import');
+      case 'manual': return t('newsletters.source_manual');
+      case 'member_sync': return t('newsletters.source_member_sync');
+      case 'member': return t('newsletters.source_member');
       default: return source || '--';
     }
   };
@@ -400,8 +402,8 @@ export function Subscribers() {
     <div className="space-y-6">
       {/* Header */}
       <PageHeader
-        title={"Subscribers"}
-        description={"Manage subscriber lists, imports, and suppressions"}
+        title={t('newsletters.subscribers_title')}
+        description={t('newsletters.subscribers_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -411,7 +413,7 @@ export function Subscribers() {
               onPress={() => loadData()}
               isLoading={loading}
             >
-              {"Refresh"}
+              {t('newsletters.refresh')}
             </Button>
             <Button
               variant="flat"
@@ -420,7 +422,7 @@ export function Subscribers() {
               onPress={handleExport}
               isLoading={exportLoading}
             >
-              {"Export CSV"}
+              {t('newsletters.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -428,7 +430,7 @@ export function Subscribers() {
               startContent={<Upload size={14} />}
               onPress={() => setImportModalOpen(true)}
             >
-              {"Import CSV"}
+              {t('newsletters.import_csv')}
             </Button>
             <Button
               color="primary"
@@ -436,7 +438,7 @@ export function Subscribers() {
               startContent={<UserPlus size={14} />}
               onPress={() => setAddModalOpen(true)}
             >
-              {"Add Subscriber"}
+              {t('newsletters.add_subscriber')}
             </Button>
           </div>
         }
@@ -449,9 +451,9 @@ export function Subscribers() {
             <Users size={20} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-foreground">{"Sync Platform Members"}</p>
+            <p className="font-medium text-foreground">{t('newsletters.sync_platform_members')}</p>
             <p className="text-sm text-default-500">
-              {"Sync Platform Members."}
+              {t('newsletters.sync_platform_members_desc')}
             </p>
           </div>
           <Button
@@ -462,7 +464,7 @@ export function Subscribers() {
             onPress={handleSync}
             isLoading={syncLoading}
           >
-            {"Sync Now"}
+            {t('newsletters.sync_now')}
           </Button>
         </CardBody>
       </Card>
@@ -470,16 +472,16 @@ export function Subscribers() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('')}>
-          <StatCard label={"Total Subscribers"} value={stats.total} icon={Mail} color="primary" loading={loading} />
+          <StatCard label={t('newsletters.label_total_subscribers')} value={stats.total} icon={Mail} color="primary" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('active')}>
-          <StatCard label={"Active"} value={stats.active} icon={CheckCircle} color="success" loading={loading} />
+          <StatCard label={t('newsletters.label_active')} value={stats.active} icon={CheckCircle} color="success" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('pending')}>
-          <StatCard label={"Pending"} value={stats.pending} icon={Clock} color="warning" loading={loading} />
+          <StatCard label={t('newsletters.label_pending')} value={stats.pending} icon={Clock} color="warning" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('unsubscribed')}>
-          <StatCard label={"Unsubscribed"} value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
+          <StatCard label={t('newsletters.label_unsubscribed')} value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
         </Button>
       </div>
 
@@ -494,15 +496,15 @@ export function Subscribers() {
               className="cursor-pointer"
               onClick={() => handleStatusFilter(s)}
             >
-              {s === '' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+              {s === '' ? t('newsletters.tab_all') : t(`newsletters.label_${s}`)}
             </Chip>
           ))}
         </div>
         <div className="ml-auto w-full max-w-xs">
           <Input
             size="sm"
-            placeholder={"Search by Name or Email..."}
-            aria-label={"Search subscribers..."}
+            placeholder={t('newsletters.placeholder_search_by_name_or_email')}
+            aria-label={t('newsletters.label_search_subscribers')}
             startContent={<Search size={14} className="text-default-400" />}
             value={searchInput}
             onValueChange={handleSearchChange}
@@ -514,14 +516,14 @@ export function Subscribers() {
 
       {/* Data table */}
       <Table
-        aria-label={"Subscribers"}
+        aria-label={t('newsletters.label_subscribers')}
         shadow="sm"
         isStriped
         bottomContent={
           totalPages > 1 ? (
             <div className="flex items-center justify-between px-2 py-2">
               <p className="text-sm text-default-500">
-                {total} subscriber{total !== 1 ? 's' : ''} total
+                {t('newsletters.subscriber_total', { count: total })}
               </p>
               <Pagination
                 total={totalPages}
@@ -535,18 +537,18 @@ export function Subscribers() {
         }
       >
         <TableHeader>
-          <TableColumn>{"Subscriber"}</TableColumn>
-          <TableColumn>{"Status"}</TableColumn>
-          <TableColumn>{"Source"}</TableColumn>
-          <TableColumn>{"Date"}</TableColumn>
-          <TableColumn className="text-right">{"Actions"}</TableColumn>
+          <TableColumn>{t('newsletters.col_subscriber')}</TableColumn>
+          <TableColumn>{t('newsletters.col_status')}</TableColumn>
+          <TableColumn>{t('newsletters.col_source')}</TableColumn>
+          <TableColumn>{t('newsletters.col_date')}</TableColumn>
+          <TableColumn className="text-right">{t('newsletters.col_actions')}</TableColumn>
         </TableHeader>
         <TableBody
           emptyContent={
             <div className="flex flex-col items-center gap-2 py-8 text-default-400">
               <Users size={40} />
-              <p className="text-lg font-medium">{"No subscribers found found"}</p>
-              <p className="text-sm">{"No Subscribers."}</p>
+              <p className="text-lg font-medium">{t('newsletters.no_subscribers_found')}</p>
+              <p className="text-sm">{t('newsletters.no_subscribers_hint')}</p>
             </div>
           }
           isLoading={loading && items.length === 0}
@@ -583,13 +585,13 @@ export function Subscribers() {
                 {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
               </TableCell>
               <TableCell className="text-right">
-                <Tooltip content={"Remove Subscriber"}>
+                <Tooltip content={t('newsletters.remove_subscriber')}>
                   <Button
                     isIconOnly
                     variant="light"
                     color="danger"
                     size="sm"
-                    aria-label={"Remove"}
+                    aria-label={t('newsletters.remove')}
                     onPress={() => setRemoveTarget(sub)}
                   >
                     <Trash2 size={14} />
@@ -607,12 +609,12 @@ export function Subscribers() {
         <Card shadow="sm">
           <CardBody className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground">{"Public Subscribe Link"}</p>
+              <p className="text-sm font-medium text-foreground">{t('newsletters.public_subscribe_link')}</p>
               <p className="truncate text-xs text-default-400">{subscribeUrl}</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="flat" size="sm" startContent={<Copy size={14} />} onPress={copySubscribeLink}>
-                {"Copy"}
+                {t('newsletters.copy')}
               </Button>
               <Button
                 variant="flat"
@@ -623,7 +625,7 @@ export function Subscribers() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {"Preview"}
+                {t('newsletters.preview')}
               </Button>
             </div>
           </CardBody>
@@ -633,11 +635,11 @@ export function Subscribers() {
       {/* ─── Add Subscriber Modal ────────────────────────────────────────────── */}
       <Modal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)} size="md">
         <ModalContent>
-          <ModalHeader>{"Add Subscriber"}</ModalHeader>
+          <ModalHeader>{t('newsletters.add_subscriber')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label={"Email"}
+                label={t('newsletters.label_email')}
                 type="email"
                 placeholder="subscriber@example.com"
                 isRequired
@@ -646,14 +648,14 @@ export function Subscribers() {
                 autoFocus
               />
               <Input
-                label={"First Name"}
-                placeholder={"Jane..."}
+                label={t('newsletters.label_first_name')}
+                placeholder={t('newsletters.placeholder_jane')}
                 value={addForm.first_name}
                 onValueChange={(v) => setAddForm((f) => ({ ...f, first_name: v }))}
               />
               <Input
-                label={"Last Name"}
-                placeholder={"Doe..."}
+                label={t('newsletters.label_last_name')}
+                placeholder={t('newsletters.placeholder_doe')}
                 value={addForm.last_name}
                 onValueChange={(v) => setAddForm((f) => ({ ...f, last_name: v }))}
               />
@@ -661,7 +663,7 @@ export function Subscribers() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setAddModalOpen(false)} isDisabled={addLoading}>
-              {"Cancel"}
+              {t('newsletter_form.cancel')}
             </Button>
             <Button
               color="primary"
@@ -669,7 +671,7 @@ export function Subscribers() {
               isLoading={addLoading}
               isDisabled={!addForm.email}
             >
-              {"Add Subscriber"}
+              {t('newsletters.add_subscriber')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -678,7 +680,7 @@ export function Subscribers() {
       {/* ─── Import CSV Modal ────────────────────────────────────────────────── */}
       <Modal isOpen={importModalOpen} onClose={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} size="lg">
         <ModalContent>
-          <ModalHeader>{"Import Subscribers From CSV"}</ModalHeader>
+          <ModalHeader>{t('newsletters.import_subscribers_from_csv')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Button
@@ -700,10 +702,10 @@ export function Subscribers() {
               >
                 <Upload size={32} className="text-default-400" />
                 <p className="font-medium text-foreground">
-                  {importFileName || "Click or Drag CSV"}
+                  {importFileName || t('newsletters.click_or_drag_csv')}
                 </p>
                 <p className="text-xs text-default-400">
-                  {"Accepted Format CSV"}
+                  {t('newsletters.accepted_format_csv')}
                 </p>
               </Button>
               <input
@@ -717,19 +719,19 @@ export function Subscribers() {
               {importRows.length > 0 && (
                 <div className="rounded-lg bg-success/10 p-3">
                   <p className="text-sm font-medium text-success">
-                    {importRows.length} subscriber{importRows.length !== 1 ? 's' : ''} found in CSV
+                    {t('newsletters.import_rows_found', { count: importRows.length })}
                   </p>
                 </div>
               )}
 
               <Card shadow="none" className="bg-default-50">
                 <CardBody className="p-3">
-                  <p className="text-xs font-medium text-default-600">{"Required CSV Format"}</p>
+                  <p className="text-xs font-medium text-default-600">{t('newsletters.required_csv_format')}</p>
                   <code className="mt-1 block text-xs text-default-500">
                     email,first_name,last_name
                   </code>
                   <p className="mt-1 text-xs text-default-400">
-                    {"CSV Email Required."}
+                    {t('newsletters.csv_email_required_hint')}
                   </p>
                 </CardBody>
               </Card>
@@ -737,7 +739,7 @@ export function Subscribers() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} isDisabled={importLoading}>
-              {"Cancel"}
+              {t('newsletter_form.cancel')}
             </Button>
             <Button
               color="primary"
@@ -745,7 +747,7 @@ export function Subscribers() {
               isLoading={importLoading}
               isDisabled={importRows.length === 0}
             >
-              {"Import"} {importRows.length > 0 ? `(${importRows.length})` : ''}
+              {t('newsletters.import')} {importRows.length > 0 ? `(${importRows.length})` : ''}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -756,9 +758,9 @@ export function Subscribers() {
         isOpen={!!removeTarget}
         onClose={() => setRemoveTarget(null)}
         onConfirm={handleRemoveSubscriber}
-        title={"Remove Subscriber"}
-        message={`Are you sure you want to remove subscriber?`}
-        confirmLabel={"Remove"}
+        title={t('newsletters.remove_subscriber')}
+        message={t('newsletters.confirm_remove_subscriber')}
+        confirmLabel={t('newsletters.remove')}
         confirmColor="danger"
         isLoading={removeLoading}
       />
