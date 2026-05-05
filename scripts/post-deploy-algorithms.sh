@@ -33,9 +33,10 @@ else
     echo "  Generated and saved MEILISEARCH_KEY to .env"
 fi
 
-# ─── 4. Full Docker rebuild (picks up new Meilisearch container) ─────────────
+# ─── 4. Blue-green Docker rebuild (picks up new Meilisearch container) ───────
 echo "$LOG_PREFIX [4/8] Rebuilding Docker containers..."
-sudo bash scripts/safe-deploy.sh full
+sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
+sudo bash scripts/deploy/bluegreen-deploy.sh monitor
 
 # ─── 5. Wait for Meilisearch to be healthy ───────────────────────────────────
 echo "$LOG_PREFIX [5/8] Waiting for Meilisearch to start..."

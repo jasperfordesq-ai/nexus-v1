@@ -92,18 +92,35 @@ async function main() {
     viewport: { width: 1280, height: 720 },
   });
 
-  const results = { success: 0, failed: 0 };
+  const results = {
+    success: 0,
+    failed: 0,
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    entries: [],
+  };
+  const successfulCachePaths = [];
+  const failedCachePaths = [];
   let nextIndex = 0;
 
   async function renderEntry(entry) {
     const page = await context.newPage();
+    const label = entry.canonicalUrl || entry.url;
     try {
       const html = await renderPage(page, entry.url);
       const size = Buffer.byteLength(html, 'utf-8');
 
       if (size < 3000) {
-        console.log(`  skipped ${entry.url} - too small (${size}B)`);
+        console.log(`  skipped ${label} - too small (${size}B)`);
         results.failed++;
+        results.entries.push({
+          url: label,
+          output: entry.output,
+          cachePath: entry.cachePath || null,
+          status: 'failed',
+          reason: `too small (${size}B)`,
+        });
+        if (entry.cachePath) failedCachePaths.push(entry.cachePath);
         return;
       }
 
@@ -111,11 +128,27 @@ async function main() {
       mkdirSync(outputDir, { recursive: true });
       writeFileSync(entry.output, html, 'utf-8');
 
-      console.log(`  rendered ${entry.url} (${(size / 1024).toFixed(1)}KB)`);
+      console.log(`  rendered ${label} (${(size / 1024).toFixed(1)}KB)`);
       results.success++;
+      results.entries.push({
+        url: label,
+        output: entry.output,
+        cachePath: entry.cachePath || null,
+        status: 'rendered',
+        bytes: size,
+      });
+      if (entry.cachePath) successfulCachePaths.push(entry.cachePath);
     } catch (err) {
-      console.log(`  failed ${entry.url} - ${err.message}`);
+      console.log(`  failed ${label} - ${err.message}`);
       results.failed++;
+      results.entries.push({
+        url: label,
+        output: entry.output,
+        cachePath: entry.cachePath || null,
+        status: 'failed',
+        reason: err.message,
+      });
+      if (entry.cachePath) failedCachePaths.push(entry.cachePath);
     } finally {
       await page.close();
     }
@@ -134,6 +167,11 @@ async function main() {
   );
 
   await browser.close();
+
+  results.finishedAt = new Date().toISOString();
+  writeFileSync('/output/.prerender-results.json', JSON.stringify(results, null, 2), 'utf-8');
+  writeFileSync('/output/.prerender-successes.txt', `${successfulCachePaths.join('\n')}\n`, 'utf-8');
+  writeFileSync('/output/.prerender-failures.txt', `${failedCachePaths.join('\n')}\n`, 'utf-8');
 
   console.log(`\nDone: ${results.success} succeeded, ${results.failed} failed`);
   process.exit(results.failed > 0 ? 1 : 0);

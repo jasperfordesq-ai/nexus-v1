@@ -65,7 +65,8 @@ deploy_quick() {
     log_info "Build commit: $BUILD_COMMIT"
 
     # Build flags: quick mode uses layer caching by default (faster).
-    # Use --no-cache flag to force a clean rebuild: safe-deploy.sh quick --no-cache
+    # This is the legacy maintenance-mode fallback; production blue-green deploys
+    # use scripts/deploy/bluegreen-deploy.sh instead.
     local BUILD_FLAGS=""
     [ "${FORCE_NO_CACHE:-0}" = "1" ] && BUILD_FLAGS="--no-cache"
 

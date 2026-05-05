@@ -142,11 +142,13 @@ if [ "$violations" -gt 0 ]; then
     log_err ""
     log_err "Options:"
     log_err "  1. Refactor as expand/contract (multi-deploy)."
-    log_err "  2. Run with maintenance mode:"
+    log_err "  2. Run blue-green with manually controlled maintenance mode:"
     log_err "       sudo bash scripts/maintenance.sh on"
-    log_err "       sudo bash scripts/safe-deploy.sh full --detach"
+    log_err "       DEPLOY_ALLOW_DESTRUCTIVE_MIGRATION=1 sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
+    log_err "       sudo bash scripts/deploy/bluegreen-deploy.sh monitor"
+    log_err "       sudo bash scripts/maintenance.sh off"
     log_err "  3. Override only with an accepted outage risk:"
-    log_err "       DEPLOY_ALLOW_DESTRUCTIVE_MIGRATION=1 sudo bash scripts/safe-deploy.sh auto --detach"
+    log_err "       DEPLOY_ALLOW_DESTRUCTIVE_MIGRATION=1 sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
     exit 1
 fi
 

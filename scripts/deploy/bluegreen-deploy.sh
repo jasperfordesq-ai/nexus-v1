@@ -79,8 +79,9 @@ Usage:
   sudo bash scripts/deploy/bluegreen-deploy.sh logs -f
   sudo bash scripts/deploy/bluegreen-deploy.sh monitor
 
-Required server env for deploy/rollback:
-  NEXUS_APACHE_ROUTES_FILE=/etc/apache2/conf-enabled/nexus-active-upstreams.conf
+Apache route switch file:
+  Auto-detected at /etc/apache2/conf-enabled/nexus-active-upstreams.conf
+  Override with NEXUS_APACHE_ROUTES_FILE only for non-standard server layouts.
 
 Optional:
   NEXUS_APACHE_CONFIGTEST="apachectl configtest"
@@ -842,6 +843,29 @@ run_prerender_for_color() {
     bash "$release_dir/scripts/deploy/phases/prerender-tenants.sh" || true
 }
 
+run_script_with_log() {
+    local script="$1"
+    shift || true
+
+    if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ] || [ -n "${__NEXUS_BLUEGREEN_DETACHED__:-}" ]; then
+        bash "$script" "$@"
+    else
+        bash "$script" "$@" 2>&1 | tee -a "$LOG_FILE"
+    fi
+}
+
+purge_cloudflare_cache() {
+    local label="$1"
+
+    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
+        phase "$label" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+        run_script_with_log "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" || \
+            log_warn "Cloudflare purge had errors — run manually: sudo bash scripts/purge-cloudflare-cache.sh"
+    else
+        log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
+    fi
+}
+
 schedule_followup_health_check() {
     if [ -f "$DEPLOY_DIR/scripts/deploy/phases/schedule-health-check.sh" ]; then
         bash "$DEPLOY_DIR/scripts/deploy/phases/schedule-health-check.sh" || true
@@ -994,17 +1018,14 @@ cmd_deploy() {
         exit 1
     fi
 
-    # Purge Cloudflare cache after traffic switch — must run after smoke tests
-    # pass so CF doesn't cache the old content right after purge.
-    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
-        phase "Cloudflare Cache Purge" "${CURRENT_ACTIVE:-}" "$target" "${CURRENT_COMMIT:-}"
-        bash "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" 2>&1 | tee -a "$LOG_FILE" || \
-            log_warn "Cloudflare purge had errors — run manually: sudo bash scripts/purge-cloudflare-cache.sh"
-    else
-        log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
-    fi
+    # Purge once after traffic switch so the prerender worker and users do not
+    # keep seeing old edge responses while the new color is active.
+    purge_cloudflare_cache "Cloudflare Cache Purge"
     write_color_release "$target" "$commit" "$release_dir"
     run_prerender_for_color "$target" "$release_dir"
+    # Purge again after prerender injection. Otherwise edge caches can keep
+    # serving the previous prerendered HTML for the full s-maxage window.
+    purge_cloudflare_cache "Cloudflare Cache Purge (Post-Prerender)"
     schedule_followup_health_check
     git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
     # Prune old release worktrees — keep the 3 most recent commits (current + 2 rollback candidates)
@@ -1122,13 +1143,7 @@ cmd_rollback() {
 
     # Purge Cloudflare cache after rollback traffic switch — prevents CF from
     # continuing to serve cached responses from the broken new deployment
-    if [ -f "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" ]; then
-        phase "Cloudflare Cache Purge" "${CURRENT_ACTIVE:-}" "$target" "${CURRENT_COMMIT:-}"
-        bash "$DEPLOY_DIR/scripts/deploy/phases/purge-cloudflare.sh" 2>&1 | tee -a "$LOG_FILE" || \
-            log_warn "Cloudflare purge had errors — run manually: sudo bash scripts/purge-cloudflare-cache.sh"
-    else
-        log_warn "purge-cloudflare.sh phase not found — Cloudflare cache NOT purged"
-    fi
+    purge_cloudflare_cache "Cloudflare Cache Purge"
     state_set DEPLOY_SUCCESS 1
 }
 

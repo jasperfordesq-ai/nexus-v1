@@ -1,18 +1,26 @@
 #!/bin/bash
 # =============================================================================
-# Project NEXUS - Safe Production Deploy Script (Orchestrator)
+# Project NEXUS - Legacy Deploy Compatibility Wrapper
 # =============================================================================
+# Production deploys should use:
+#   sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach
+#
+# This wrapper remains for old docs, muscle memory, and non-blue-green
+# environments. On a production blue-green server it auto-detects the Apache
+# route switch file and execs into scripts/deploy/bluegreen-deploy.sh before
+# any maintenance-mode deploy path can run.
+#
 # Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--no-migrate] [--detach] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]
 #
 # Modes:
-#   auto      - AUTO-DETECT: inspects git diff vs origin/main, picks quick or full (RECOMMENDED)
-#   quick     - Git pull + rebuild frontend + restart PHP (use for PHP/React code changes)
-#   full      - Git pull + rebuild ALL containers --no-cache (use for composer/package/Dockerfile changes)
-#   rollback  - Rollback to last successful deploy (full rebuild)
+#   auto      - Legacy fallback only: inspect git diff and pick quick/full
+#   quick     - Legacy fallback only: rebuild frontend + restart PHP
+#   full      - Legacy fallback only: rebuild ALL containers --no-cache
+#   rollback  - Legacy fallback rollback
 #   status    - Show current deployment status (no changes)
 #   logs      - Tail the latest deploy log (follow mode: logs -f)
 #
-# Auto-detection triggers full rebuild when any of these change:
+# Legacy auto-detection triggers full rebuild when any of these change:
 #   composer.json, composer.lock, package.json, package-lock.json,
 #   Dockerfile, Dockerfile.prod, react-frontend/Dockerfile.prod
 #   All other changes → quick (PHP code is volume-mounted, not baked into image)
@@ -132,7 +140,7 @@ if [ -n "${NEXUS_APACHE_ROUTES_FILE:-}" ] && \
     [ "$FORCE_PRERENDER" = "1" ] && BG_ARGS+=(--force-prerender)
     [ -n "$PRERENDER_TENANT" ]   && BG_ARGS+=(--prerender-tenant "$PRERENDER_TENANT")
     [ -n "$PRERENDER_ROUTES" ]   && BG_ARGS+=(--prerender-routes "$PRERENDER_ROUTES")
-    echo "[INFO] Blue-green configured — delegating to bluegreen-deploy.sh (zero-downtime)"
+    echo "[INFO] safe-deploy.sh is a compatibility wrapper; delegating to bluegreen-deploy.sh (zero-downtime)"
     exec bash "$SELF_DIR/deploy/bluegreen-deploy.sh" "${BG_ARGS[@]}"
 fi
 
@@ -232,7 +240,8 @@ case "$MODE" in
         ;;
     *)
         log_err "Invalid mode: $MODE"
-        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--no-migrate] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]"
+        log_info "Production usage: sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
+        log_info "Legacy wrapper usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--no-migrate] [--skip-prerender|--force-prerender] [--prerender-tenant slug] [--prerender-routes /about,/privacy]"
         exit 1
         ;;
 esac
@@ -265,8 +274,13 @@ if run_phase "$DEPLOY_SCRIPTS/phases/smoke-tests.sh"; then
     CF_PURGE_OK=true
     bash "$DEPLOY_SCRIPTS/phases/purge-cloudflare.sh" || CF_PURGE_OK=false
 
-    # Pre-render all tenant public pages with real data
+    # Plan and refresh only missing/stale/scoped tenant public pages with real data
     run_phase "$DEPLOY_SCRIPTS/phases/prerender-tenants.sh"
+
+    # Purge again after pre-rendering. The first purge clears old edge content
+    # for the worker; this one clears any old HTML cached while the prerender
+    # volume was being refreshed.
+    bash "$DEPLOY_SCRIPTS/phases/purge-cloudflare.sh" || CF_PURGE_OK=false
 
     # Remove dangling Docker images (prevents disk bloat over time)
     run_phase "$DEPLOY_SCRIPTS/phases/prune-images.sh"
@@ -306,8 +320,8 @@ else
     state_set MAINTENANCE_ENABLED_BY_US 0
     log_warn "The platform remains in maintenance mode for safety."
     log_warn "Fix the issue, then either:"
-    log_warn "  1. Re-deploy:  sudo bash scripts/safe-deploy.sh full --detach"
-    log_warn "  2. Rollback:   sudo bash scripts/safe-deploy.sh rollback --detach"
+    log_warn "  1. Re-deploy legacy path:  sudo bash scripts/safe-deploy.sh full --detach"
+    log_warn "  2. Rollback legacy path:   sudo bash scripts/safe-deploy.sh rollback --detach"
     log_warn "  3. Force live:  sudo bash scripts/maintenance.sh off"
     log_info "Log saved to: $LOG_FILE"
 

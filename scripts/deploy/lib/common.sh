@@ -51,7 +51,7 @@ NC='\033[0m'
 # _log_out: in detached mode, just echo (stdout IS the log file).
 # In interactive mode, tee to both terminal and log file.
 _log_out() {
-    if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
+    if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ] || [ -n "${__NEXUS_BLUEGREEN_DETACHED__:-}" ]; then
         echo -e "$1"
     else
         echo -e "$1" | tee -a "$LOG_FILE"
