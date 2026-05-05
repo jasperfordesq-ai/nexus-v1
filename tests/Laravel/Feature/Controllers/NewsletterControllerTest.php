@@ -112,4 +112,24 @@ class NewsletterControllerTest extends TestCase
 
         $response->assertRedirect('https://app.example.test');
     }
+
+    public function test_legacy_unprefixed_tracking_pixel_route_works_for_sent_email_links(): void
+    {
+        $response = $this->get('/v2/newsletter/pixel/legacy-token', $this->withTenantHeader());
+
+        $response->assertOk();
+        $this->assertSame('image/gif', $response->headers->get('Content-Type'));
+    }
+
+    public function test_legacy_unprefixed_click_route_redirects_for_sent_email_links(): void
+    {
+        config(['app.frontend_url' => 'https://app.example.test']);
+
+        $response = $this->get(
+            '/v2/newsletter/click/legacy-token?url=' . rawurlencode('https://hour-timebank.ie/'),
+            $this->withTenantHeader()
+        );
+
+        $response->assertRedirect('https://app.example.test');
+    }
 }

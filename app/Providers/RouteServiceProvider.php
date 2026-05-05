@@ -75,6 +75,18 @@ class RouteServiceProvider extends ServiceProvider
             // (root crontab on the host, every minute).
 
             // Sitemap endpoints — no /api prefix (crawlers access these directly)
+            // Compatibility for newsletter links generated without the /api
+            // prefix. Already-sent emails must keep resolving.
+            Route::middleware('api')->group(function () {
+                Route::get('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])
+                    ->middleware('throttle:30,1');
+                Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])
+                    ->middleware('throttle:30,1');
+                Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
+                Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackClick'])
+                    ->middleware('throttle:120,1');
+            });
+
             Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);
             Route::get('/sitemap-{slug}.xml', [\App\Http\Controllers\SitemapController::class, 'tenant'])
                 ->where('slug', '[a-zA-Z0-9_-]+');
