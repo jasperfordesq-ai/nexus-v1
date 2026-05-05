@@ -16,9 +16,9 @@
     "install": "playwright install"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.9.0",
+    "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.41.0",
-    "@types/node": "^20.11.0",
-    "dotenv": "^16.4.0"
+    "@types/node": "^25.6.0",
+    "dotenv": "^17.4.2"
   }
 }
