@@ -16,6 +16,7 @@ import Bug from 'lucide-react/icons/bug';
 import { TenantLogo } from '@/components/branding';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
+import { SourceRepositoryLink } from './SourceRepositoryLink';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -48,25 +49,21 @@ export function Footer({ children, copyright }: FooterProps) {
   return (
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
       <div className="md:hidden px-4 py-4 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
-        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
-          <a
-            href="https://github.com/jasperfordesq-ai/nexus-v1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-theme-primary transition-colors"
-          >
-            {t('footer.project_nexus')}
-          </a>
-          <span aria-hidden="true">&middot;</span>
-          <span>{t('footer.agpl_notice', { year })}</span>
-          <span aria-hidden="true">&middot;</span>
-          <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
-            {t('footer.terms')}
-          </Link>
-          <span aria-hidden="true">&middot;</span>
-          <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
-            {t('footer.privacy')}
-          </Link>
+        <div className="flex flex-col items-center gap-2">
+          <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/75">
+            <span className="font-medium text-theme-subtle">{t('footer.project_nexus')}</span>
+            <span aria-hidden="true">&middot;</span>
+            <span>{t('footer.agpl_notice', { year })}</span>
+            <span aria-hidden="true">&middot;</span>
+            <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
+              {t('footer.terms')}
+            </Link>
+            <span aria-hidden="true">&middot;</span>
+            <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
+              {t('footer.privacy')}
+            </Link>
+          </div>
         </div>
       </div>
       <div className="hidden md:block">
@@ -206,28 +203,24 @@ export function Footer({ children, copyright }: FooterProps) {
             </div>
 
             {/* Platform Attribution */}
-            <div className="pt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[11px] text-theme-subtle/60">
-              <a
-                href="https://github.com/jasperfordesq-ai/nexus-v1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-theme-primary transition-colors"
-              >
-                {t('footer.project_nexus')}
-              </a>
-              <span>&middot;</span>
-              <span>{t('footer.agpl_notice', { year })}</span>
-              <span>&middot;</span>
-              <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
-                {t('footer.terms')}
-              </Link>
-              <span>&middot;</span>
-              <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
-                {t('footer.privacy')}
-              </Link>
-              <span className="max-w-[8rem] truncate font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
-                {__BUILD_COMMIT__}
-              </span>
+            <div className="pt-4 flex flex-col items-center justify-center gap-3 text-center">
+              <SourceRepositoryLink />
+              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
+                <span className="font-medium text-theme-subtle">{t('footer.project_nexus')}</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>{t('footer.agpl_notice', { year })}</span>
+                <span aria-hidden="true">&middot;</span>
+                <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
+                  {t('footer.terms')}
+                </Link>
+                <span aria-hidden="true">&middot;</span>
+                <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
+                  {t('footer.privacy')}
+                </Link>
+                <span className="max-w-[8rem] truncate font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
+                  {__BUILD_COMMIT__}
+                </span>
+              </div>
             </div>
           </div>
         )}

@@ -92,12 +92,28 @@ const i18nMap: Record<string, string> = {
   'legal.terms_of_service': 'Terms of Service', 'legal.privacy_policy': 'Privacy Policy',
   'legal.cookie_policy': 'Cookie Policy', 'legal.accessibility': 'Accessibility',
   'legal.legal_hub': 'Legal Hub',
+  'footer.project_nexus': 'Project NEXUS',
+  'footer.source_repo': 'GitHub repo',
+  'footer.source_repo_aria': 'Open the Project NEXUS GitHub repository',
+  'footer.source_repo_tooltip': 'Open the Project NEXUS source repository on GitHub',
+  'footer.agpl_notice': 'AGPL-3.0 \u2014 Copyright \u00A9 2024\u2013{{year}} Jasper Ford',
+  'footer.terms': 'Terms',
+  'footer.privacy': 'Privacy',
   'cookie_consent.manage': 'Manage Cookies',
   'stats.credits': 'Credits', 'stats.messages': 'Messages', 'stats.alerts': 'Alerts',
   'search.placeholder': 'Search...',
 };
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => i18nMap[key] ?? key, i18n: { language: 'en', changeLanguage: vi.fn() } }),
+  useTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) => {
+      let value = i18nMap[key] ?? key;
+      Object.entries(options ?? {}).forEach(([optionKey, optionValue]) => {
+        value = value.replace(`{{${optionKey}}}`, String(optionValue));
+      });
+      return value;
+    },
+    i18n: { language: 'en', changeLanguage: vi.fn() },
+  }),
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
@@ -121,6 +137,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 import { MobileDrawer } from './MobileDrawer';
+import { PROJECT_NEXUS_REPO_URL } from './SourceRepositoryLink';
 
 function setupDefaultMocks(overrides: {
   auth?: Record<string, unknown>;
@@ -460,12 +477,15 @@ describe('MobileDrawer', () => {
   describe('AGPL attribution', () => {
     it('renders Built on Project NEXUS attribution link', () => {
       render(<MobileDrawer {...defaultProps} />);
-      const link = screen.getByText('Built on Project NEXUS by Jasper Ford');
+      const link = screen.getByRole('link', { name: 'Open the Project NEXUS GitHub repository' });
       expect(link).toBeInTheDocument();
-      expect(link.closest('a')).toHaveAttribute(
+      expect(link).toHaveAttribute(
         'href',
-        'https://github.com/jasperfordesq-ai/nexus-v1',
+        PROJECT_NEXUS_REPO_URL,
       );
+      expect(screen.getByText('GitHub repo')).toBeInTheDocument();
+      const year = new Date().getFullYear();
+      expect(screen.getByText(`AGPL-3.0 \u2014 Copyright \u00A9 2024\u2013${year} Jasper Ford`)).toBeInTheDocument();
     });
   });
 

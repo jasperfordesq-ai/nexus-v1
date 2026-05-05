@@ -233,6 +233,9 @@
   },
   "footer": {
     "project_nexus": "Project NEXUS",
+    "source_repo": "GitHub repo",
+    "source_repo_aria": "Open the Project NEXUS GitHub repository",
+    "source_repo_tooltip": "Open the Project NEXUS source repository on GitHub",
     "platform": "Platform",
     "support": "Support",
     "help_center": "Help Center",

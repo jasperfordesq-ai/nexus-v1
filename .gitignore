@@ -41,6 +41,7 @@ CLAUDE.md
 !/scripts/check-regression-patterns.sh
 !/scripts/check-dockerfile-drift.sh
 !/scripts/verify-feature.sh
+!/scripts/start-native-dev.ps1
 !/scripts/add-spdx-headers.mjs
 !/scripts/check-spdx.mjs
 !/scripts/safe_migrate.php
@@ -134,6 +135,7 @@ _deprecated/
 /cache
 /.phpunit.cache
 .snapshots
+*.tsbuildinfo
 
 /coverage/
 **/coverage/

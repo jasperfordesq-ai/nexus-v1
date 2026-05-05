@@ -12,6 +12,15 @@ import { render, screen } from '@/test/test-utils';
 import React from 'react';
 
 // Mock child components to isolate Layout logic
+const mockUseAuth = vi.fn();
+const mockUseTenant = vi.fn();
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
 vi.mock('./Navbar', () => ({
   Navbar: ({ onMobileMenuOpen: _onMobileMenuOpen }: Record<string, unknown>) => (
     <nav data-testid="navbar">Navbar Mock</nav>
@@ -37,11 +46,23 @@ vi.mock('@/components/feedback/OfflineIndicator', () => ({
 vi.mock('@/components/feedback', () => ({
   SessionExpiredModal: () => <div data-testid="session-modal">SessionExpired Mock</div>,
 }));
+vi.mock('@/components/feedback/SessionExpiredModal', () => ({
+  SessionExpiredModal: () => <div data-testid="session-modal">SessionExpired Mock</div>,
+}));
 vi.mock('@/components/feedback/AppUpdateModal', () => ({
   AppUpdateModal: () => null,
 }));
 vi.mock('@/components/feedback/UpdateAvailableBanner', () => ({
   UpdateAvailableBanner: () => null,
+}));
+vi.mock('@/components/seo/SeoHead', () => ({
+  SeoHead: () => null,
+}));
+vi.mock('@/components/caring-community/EmergencyAlertBanner', () => ({
+  default: () => null,
+}));
+vi.mock('@/components/legal/FadpConsentBanner', () => ({
+  FadpConsentBanner: () => null,
 }));
 vi.mock('./DevelopmentStatusBanner', () => ({
   DevelopmentStatusBanner: () => null,
@@ -70,10 +91,17 @@ vi.mock('react-router-dom', async () => {
 });
 
 import { Layout, AuthLayout } from './Layout';
+import { PROJECT_NEXUS_REPO_URL } from './SourceRepositoryLink';
 
 describe('Layout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({
+      user: null,
+    });
+    mockUseTenant.mockReturnValue({
+      tenantPath: (path: string) => path,
+    });
   });
 
   it('renders children via Outlet', () => {
@@ -130,7 +158,7 @@ describe('Layout', () => {
   it('adds padding class when showNavbar and withNavbarPadding are true', () => {
     const { container } = render(<Layout showNavbar={true} withNavbarPadding={true} />);
     const main = container.querySelector('main');
-    expect(main?.className).toContain('pt-20');
+    expect(main?.className).toContain('pt-[calc(var(--safe-area-top)+5rem)]');
   });
 
   it('does not add padding class when withNavbarPadding is false', () => {
@@ -168,17 +196,19 @@ describe('AuthLayout', () => {
 
   it('renders AGPL attribution link', () => {
     render(<AuthLayout />);
-    const link = screen.getByText('Built on Project NEXUS by Jasper Ford');
+    const link = screen.getByRole('link', { name: 'Open the Project NEXUS GitHub repository' });
     expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute(
+    expect(link).toHaveAttribute(
       'href',
-      'https://github.com/jasperfordesq-ai/nexus-v1',
+      PROJECT_NEXUS_REPO_URL,
     );
+    const year = new Date().getFullYear();
+    expect(screen.getByText(`AGPL-3.0 \u2014 Copyright \u00A9 2024\u2013${year} Jasper Ford`)).toBeInTheDocument();
   });
 
   it('attribution link opens in new tab', () => {
     render(<AuthLayout />);
-    const link = screen.getByText('Built on Project NEXUS by Jasper Ford').closest('a');
+    const link = screen.getByRole('link', { name: 'Open the Project NEXUS GitHub repository' });
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });

@@ -19,6 +19,8 @@ services:
   # PHP Application (Apache + mod_rewrite for .htaccess support)
   # ---------------------------------------------------------------------------
   app:
+    profiles:
+      - docker-php
     build:
       context: .
       dockerfile: Dockerfile
@@ -115,9 +117,9 @@ services:
       # - ./migrations:/docker-entrypoint-initdb.d:ro
     networks:
       - nexus-internal
-    # NOT exposed to host by default (security). Uncomment if needed:
-    # ports:
-    #   - "3307:3306"
+    ports:
+      # Exposed for the native Windows PHP/Apache dev stack.
+      - "127.0.0.1:3307:3306"
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -137,9 +139,9 @@ services:
       - nexus-redis-data:/data
     networks:
       - nexus-internal
-    # NOT exposed to host by default. Uncomment if needed:
-    # ports:
-    #   - "6380:6379"
+    ports:
+      # Exposed for the native Windows PHP/Apache dev stack.
+      - "127.0.0.1:6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -212,6 +214,8 @@ services:
   # Federation push listeners, notifications, etc. run here, not in HTTP requests.
   # ---------------------------------------------------------------------------
   queue:
+    profiles:
+      - docker-queue
     build:
       context: .
       dockerfile: Dockerfile
@@ -249,6 +253,8 @@ services:
   # Sales Site (project-nexus.ie) - Marketing/Landing Page
   # ---------------------------------------------------------------------------
   sales:
+    profiles:
+      - docker-sales
     build:
       context: ./sales-site
       dockerfile: Dockerfile

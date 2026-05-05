@@ -222,6 +222,10 @@
     "save": "حفظ التفضيلات"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
+    "source_repo": "مستودع GitHub",
+    "source_repo_aria": "افتح مستودع Project NEXUS على GitHub",
+    "source_repo_tooltip": "افتح مستودع مصدر Project NEXUS على GitHub",
     "platform": "المنصة",
     "support": "الدعم",
     "help_center": "مركز المساعدة",

@@ -222,6 +222,10 @@
     "save": "Guardar preferencias"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
+    "source_repo": "Repo de GitHub",
+    "source_repo_aria": "Abrir el repositorio de Project NEXUS en GitHub",
+    "source_repo_tooltip": "Abrir el repositorio de código fuente de Project NEXUS en GitHub",
     "platform": "Plataforma",
     "support": "Soporte",
     "help_center": "Centro de Ayuda",

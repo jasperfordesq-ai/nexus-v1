@@ -222,6 +222,10 @@
     "save": "設定を保存"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
+    "source_repo": "GitHubリポジトリ",
+    "source_repo_aria": "Project NEXUS の GitHub リポジトリを開く",
+    "source_repo_tooltip": "Project NEXUS のソースリポジトリを GitHub で開く",
     "platform": "プラットフォーム",
     "support": "サポート",
     "help_center": "ヘルプセンター",

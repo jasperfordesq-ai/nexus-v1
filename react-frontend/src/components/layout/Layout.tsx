@@ -15,6 +15,7 @@ import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MobileTabBar } from './MobileTabBar';
 import { Footer } from './Footer';
+import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
@@ -232,6 +233,8 @@ export function Layout({
  */
 export function AuthLayout() {
   const { t } = useTranslation('common');
+  const year = new Date().getFullYear();
+
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
       {/* Skip navigation — visible on focus only */}
@@ -263,15 +266,15 @@ export function AuthLayout() {
       </main>
 
       {/* Attribution (AGPL Section 7(b) — required on all pages) */}
-      <footer className="relative z-10 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center">
-        <a
-          href="https://github.com/jasperfordesq-ai/nexus-v1"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-white/40 hover:text-white/70 transition-colors"
-        >
-          Built on Project NEXUS by Jasper Ford
-        </a>
+      <footer className="relative z-10 px-4 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <SourceRepositoryLink inverse compact className="max-w-[18rem] justify-center" />
+          <p className="text-xs text-white/55">
+            <span className="font-medium text-white/75">{t('footer.project_nexus')}</span>
+            <span aria-hidden="true"> &middot; </span>
+            <span>{t('footer.agpl_notice', { year })}</span>
+          </p>
+        </div>
       </footer>
     </div>
   );

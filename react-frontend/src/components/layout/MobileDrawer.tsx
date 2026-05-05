@@ -69,6 +69,7 @@ import Bookmark from 'lucide-react/icons/bookmark';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
+import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -148,6 +149,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { resetConsent } = useCookieConsent();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
+  const year = new Date().getFullYear();
 
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
@@ -645,22 +647,22 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
             <div className="pt-4 pb-4 px-4">
               <Divider className="bg-theme-elevated mb-3" />
-              <a
-                href="https://github.com/jasperfordesq-ai/nexus-v1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-center text-sm text-theme-muted hover:text-theme-primary transition-colors py-2 min-h-[44px] flex items-center justify-center"
-              >
-                Built on Project NEXUS by Jasper Ford
-              </a>
-              <div className="flex justify-center items-center gap-1 mt-1">
+              <div className="flex flex-col items-center gap-2">
+                <SourceRepositoryLink compact className="w-full justify-center" />
+                <p className="text-center text-sm text-theme-muted">
+                  <span className="font-medium text-theme-secondary">{t('footer.project_nexus')}</span>
+                  <span aria-hidden="true"> &middot; </span>
+                  <span>{t('footer.agpl_notice', { year })}</span>
+                </p>
+              </div>
+              <div className="flex justify-center items-center gap-1 mt-2">
                 <Button
                   variant="light"
                   size="sm"
                   onPress={() => navigateAndClose('/platform/terms')}
                   className="text-sm text-theme-muted hover:text-theme-primary transition-colors h-11 min-h-[44px] px-3"
                 >
-                  Platform Terms
+                  {t('footer.terms')}
                 </Button>
                 <span className="text-theme-muted/40" aria-hidden="true">&middot;</span>
                 <Button
@@ -669,7 +671,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   onPress={() => navigateAndClose('/platform/privacy')}
                   className="text-sm text-theme-muted hover:text-theme-primary transition-colors h-11 min-h-[44px] px-3"
                 >
-                  Privacy
+                  {t('footer.privacy')}
                 </Button>
               </div>
             </div>

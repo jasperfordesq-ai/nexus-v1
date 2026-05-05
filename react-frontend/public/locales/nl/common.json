@@ -222,6 +222,10 @@
     "save": "Voorkeuren opslaan"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
+    "source_repo": "GitHub-repo",
+    "source_repo_aria": "Open de GitHub-repository van Project NEXUS",
+    "source_repo_tooltip": "Open de Project NEXUS-bronrepository op GitHub",
     "platform": "Platform",
     "support": "Ondersteuning",
     "help_center": "Helpcentrum",

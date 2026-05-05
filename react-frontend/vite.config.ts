@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -34,7 +34,11 @@ const canOptimizeImages = (() => {
   }
 })()
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, mode }) => {
+  const env = loadEnv(mode, process.cwd(), 'VITE_')
+  const apiUrl = env.VITE_API_URL || process.env.VITE_API_URL || 'http://localhost:8090'
+
+  return {
   plugins: [
     react(),
     tailwindcss(),
@@ -159,7 +163,7 @@ export default defineConfig(({ command }) => ({
       // Proxy API requests to PHP backend
       // Uses Docker service name 'app' when running in Docker, localhost:8090 otherwise
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        target: apiUrl,
         changeOrigin: true,
         secure: false,
         timeout: 120000,
@@ -174,17 +178,17 @@ export default defineConfig(({ command }) => ({
       },
       // Proxy legacy admin panel to PHP backend
       '/admin-legacy': {
-        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        target: apiUrl,
         changeOrigin: true,
       },
       // Proxy uploaded assets (images, media) to PHP backend
       '/uploads': {
-        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        target: apiUrl,
         changeOrigin: true,
       },
       // Proxy health check
       '/health.php': {
-        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        target: apiUrl,
         changeOrigin: true,
       },
     },
@@ -206,4 +210,5 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-}))
+  }
+})

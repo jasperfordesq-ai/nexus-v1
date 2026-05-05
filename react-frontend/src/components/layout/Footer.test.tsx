@@ -32,6 +32,11 @@ vi.mock('@/contexts', () => ({
 }));
 
 import { Footer, FooterLink } from './Footer';
+import { PROJECT_NEXUS_REPO_URL } from './SourceRepositoryLink';
+
+const getSourceRepoLinks = () => screen.getAllByRole('link', {
+  name: 'Open the Project NEXUS GitHub repository',
+});
 
 function setupDefaultMocks(overrides: {
   tenant?: Record<string, unknown>;
@@ -102,21 +107,32 @@ describe('Footer', () => {
   describe('AGPL attribution', () => {
     it('renders Project NEXUS attribution link', () => {
       render(<Footer />);
-      const link = screen.getByText('Project NEXUS');
-      expect(link).toBeInTheDocument();
+      expect(screen.getAllByText('Project NEXUS').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('GitHub repo').length).toBeGreaterThan(0);
     });
 
     it('attribution links to the GitHub repository', () => {
       render(<Footer />);
-      const link = screen.getByText('Project NEXUS');
-      expect(link).toHaveAttribute('href', 'https://github.com/jasperfordesq-ai/nexus-v1');
+      const links = getSourceRepoLinks();
+      expect(links.length).toBeGreaterThan(0);
+      links.forEach((link) => {
+        expect(link).toHaveAttribute('href', PROJECT_NEXUS_REPO_URL);
+      });
     });
 
     it('attribution opens in new tab with security attributes', () => {
       render(<Footer />);
-      const link = screen.getByText('Project NEXUS');
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      getSourceRepoLinks().forEach((link) => {
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      });
+    });
+
+    it('renders the full AGPL attribution notice', () => {
+      render(<Footer />);
+      const year = new Date().getFullYear();
+      const notice = `AGPL-3.0 \u2014 Copyright \u00A9 2024\u2013${year} Jasper Ford`;
+      expect(screen.getAllByText(notice).length).toBeGreaterThan(0);
     });
   });
 

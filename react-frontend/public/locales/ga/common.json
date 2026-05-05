@@ -222,6 +222,10 @@
     "save": "Sábháil sainroghanna"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
+    "source_repo": "Stór GitHub",
+    "source_repo_aria": "Oscail stór GitHub Project NEXUS",
+    "source_repo_tooltip": "Oscail stór foinse Project NEXUS ar GitHub",
     "platform": "Ardán",
     "support": "Tacaíocht",
     "help_center": "Ionad Cabhraigh",
