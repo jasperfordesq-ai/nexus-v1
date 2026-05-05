@@ -22,7 +22,7 @@ import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { logError } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -81,6 +81,7 @@ const DISMISS_CLASSES: Record<EmergencyAlert['severity'], string> = {
 export default function EmergencyAlertBanner() {
   const { t } = useTranslation('caring_community');
   const { hasFeature } = useTenant();
+  const { isAuthenticated } = useAuth();
 
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [dismissed, setDismissed] = useState<Set<number>>(new Set());
@@ -102,7 +103,10 @@ export default function EmergencyAlertBanner() {
   };
 
   useEffect(() => {
-    if (!hasFeature('caring_community')) return;
+    if (!hasFeature('caring_community') || !isAuthenticated) {
+      setAlerts([]);
+      return;
+    }
 
     void fetchAlerts();
 
@@ -111,9 +115,9 @@ export default function EmergencyAlertBanner() {
     }, POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [hasFeature]);
+  }, [hasFeature, isAuthenticated]);
 
-  if (!hasFeature('caring_community')) return null;
+  if (!hasFeature('caring_community') || !isAuthenticated) return null;
 
   const visible = alerts.filter((a) => !dismissed.has(a.id));
   if (visible.length === 0) return null;

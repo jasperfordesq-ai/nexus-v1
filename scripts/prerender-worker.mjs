@@ -22,11 +22,26 @@ const TIMEOUT = 30000;
 const SETTLE_TIME = 2000; // Wait for React hydration + API calls
 const CONCURRENCY = Math.max(1, Number.parseInt(process.env.PRERENDER_CONCURRENCY || '4', 10) || 4);
 
+async function waitForUsefulRender(page) {
+  await page.waitForFunction(() => {
+    const root = document.querySelector('#root');
+    const bodyText = document.body?.innerText?.trim() || '';
+    return Boolean(root?.children.length) && bodyText.length > 200;
+  }, { timeout: 15000 }).catch(() => {});
+}
+
 async function renderPage(page, url) {
-  await page.goto(url, { waitUntil: 'networkidle', timeout: TIMEOUT });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+
+  await waitForUsefulRender(page);
 
   // Wait for React Helmet to inject meta tags
   await page.waitForSelector('[data-rh]', { timeout: 10000 }).catch(() => {});
+
+  // Network idle is useful when it happens, but public pages can contain
+  // authenticated pollers or third-party noise. The render contract is DOM
+  // content plus SEO tags, so do not let a stray request block the whole tenant.
+  await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
 
   // Extra settle time for tenant bootstrap + content rendering
   await page.waitForTimeout(SETTLE_TIME);
