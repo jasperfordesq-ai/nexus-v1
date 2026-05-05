@@ -2242,6 +2242,30 @@ return [
     'municipal_announcer_role_missing_run_migrations' => 'municipality_announcer role not found - run migrations',
 
     // ============================================
+    // ACTIVITY LOG
+    // ============================================
+    'activity_log' => [
+        'safeguarding_preferences_updated' => 'updated safeguarding preferences (:count option)|updated safeguarding preferences (:count options)',
+        'safeguarding_consent_revoked' => 'revoked safeguarding consent (:option)',
+        'safeguarding_triggers_none' => 'updated safeguarding protections: no active restrictions',
+        'safeguarding_triggers_active' => 'updated safeguarding protections: :triggers',
+        'safeguarding_preferences_list_viewed' => 'viewed safeguarding preferences for :count member|viewed safeguarding preferences for :count members',
+        'safeguarding_member_activity_viewed' => 'viewed safeguarding activity (:count event)|viewed safeguarding activity (:count events)',
+        'safeguarding_member_activity_exported' => 'exported safeguarding activity (:count event)|exported safeguarding activity (:count events)',
+        'structured_details' => 'recorded structured activity details',
+        'option_id' => 'option #:id',
+        'unknown_option' => 'unknown option',
+        'trigger_needs_monitoring' => 'monitoring required',
+        'trigger_needs_broker_approval' => 'broker approval required',
+        'trigger_requires_vetted_interaction' => 'vetted interaction required',
+        'trigger_requires_broker_approval' => 'broker approval required',
+        'trigger_restricts_messaging' => 'messaging restricted',
+        'trigger_restricts_matching' => 'matching restricted',
+        'trigger_notify_admin_on_selection' => 'admin notification enabled',
+        'trigger_vetting_types_required' => ':types required',
+    ],
+
+    // ============================================
     // CARING COMMUNITY — relationship state errors
     // ============================================
     'caring_community' => [

@@ -226,13 +226,121 @@ class AdminDashboardController extends BaseApiController
                 'user_email' => $row->email ?? '',
                 'user_avatar' => $row->avatar_url ?? null,
                 'action' => $row->action ?? '',
-                'description' => $row->details ?? '',
+                'description' => $this->formatActivityDescription($row),
                 'ip_address' => $row->ip_address ?? null,
                 'created_at' => $row->created_at ?? '',
             ];
         }, $items);
 
         return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
+    }
+
+    private function formatActivityDescription(object $row): string
+    {
+        $details = (string) ($row->details ?? '');
+        $decoded = $this->decodeActivityDetails($details);
+
+        if ($decoded === null) {
+            return $details;
+        }
+
+        return match ((string) ($row->action ?? '')) {
+            'safeguarding_preferences_updated' => trans_choice(
+                'api.activity_log.safeguarding_preferences_updated',
+                (int) ($decoded['options_count'] ?? 0),
+                ['count' => (int) ($decoded['options_count'] ?? 0)]
+            ),
+            'safeguarding_consent_revoked' => __(
+                'api.activity_log.safeguarding_consent_revoked',
+                ['option' => $this->formatOptionReference($decoded['option_id'] ?? null)]
+            ),
+            'safeguarding_triggers_activated' => $this->formatSafeguardingTriggers($decoded),
+            'safeguarding_preferences_list_viewed' => trans_choice(
+                'api.activity_log.safeguarding_preferences_list_viewed',
+                (int) ($decoded['members_count'] ?? 0),
+                ['count' => (int) ($decoded['members_count'] ?? 0)]
+            ),
+            'safeguarding_member_activity_viewed' => trans_choice(
+                'api.activity_log.safeguarding_member_activity_viewed',
+                (int) ($decoded['events_count'] ?? 0),
+                ['count' => (int) ($decoded['events_count'] ?? 0)]
+            ),
+            'safeguarding_member_activity_exported' => trans_choice(
+                'api.activity_log.safeguarding_member_activity_exported',
+                (int) ($decoded['events_count'] ?? 0),
+                ['count' => (int) ($decoded['events_count'] ?? 0)]
+            ),
+            default => __('api.activity_log.structured_details'),
+        };
+    }
+
+    private function decodeActivityDetails(string $details): ?array
+    {
+        $trimmed = trim($details);
+
+        if ($trimmed === '' || !str_starts_with($trimmed, '{')) {
+            return null;
+        }
+
+        $decoded = json_decode($trimmed, true);
+
+        return json_last_error() === JSON_ERROR_NONE && is_array($decoded)
+            ? $decoded
+            : null;
+    }
+
+    private function formatOptionReference(mixed $optionId): string
+    {
+        $id = (int) $optionId;
+
+        if ($id <= 0) {
+            return __('api.activity_log.unknown_option');
+        }
+
+        return __('api.activity_log.option_id', ['id' => $id]);
+    }
+
+    private function formatSafeguardingTriggers(array $details): string
+    {
+        $triggers = is_array($details['triggers'] ?? null) ? $details['triggers'] : [];
+        $labels = [];
+
+        foreach ([
+            'needs_monitoring',
+            'needs_broker_approval',
+            'requires_vetted_interaction',
+            'requires_broker_approval',
+            'restricts_messaging',
+            'restricts_matching',
+            'notify_admin_on_selection',
+        ] as $key) {
+            $source = array_key_exists($key, $details) ? $details : $triggers;
+            if (($source[$key] ?? false) === true) {
+                $label = __('api.activity_log.trigger_' . $key);
+                $labels[$label] = $label;
+            }
+        }
+
+        $vettingTypes = $triggers['vetting_types_required'] ?? [];
+        if (is_array($vettingTypes) && $vettingTypes !== []) {
+            $types = implode(', ', array_map(
+                fn ($type) => str_replace('_', ' ', (string) $type),
+                $vettingTypes
+            ));
+            $label = __(
+                'api.activity_log.trigger_vetting_types_required',
+                ['types' => $types]
+            );
+            $labels[$label] = $label;
+        }
+
+        if ($labels === []) {
+            return __('api.activity_log.safeguarding_triggers_none');
+        }
+
+        return __('api.activity_log.safeguarding_triggers_active', [
+            'triggers' => implode(', ', array_values($labels)),
+        ]);
     }
 
     /**
