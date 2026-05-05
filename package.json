@@ -45,7 +45,7 @@
     ]
   },
   "dependencies": {
-    "@capacitor/cli": "^8.0.0",
+    "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^8.0.0",
     "@prisma/client": "^5.22.0"
   },
