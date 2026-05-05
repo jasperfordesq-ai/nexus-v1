@@ -25,6 +25,7 @@ import {
   Chip,
 } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
+import BookOpen from 'lucide-react/icons/book-open';
 import Send from 'lucide-react/icons/send';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Sparkles from 'lucide-react/icons/sparkles';
@@ -45,6 +46,15 @@ interface ChatMessage {
   content: string;
   timestamp: Date;
   isError?: boolean;
+  sources?: ChatSource[];
+}
+
+interface ChatSource {
+  type: string;
+  id: number | string;
+  title: string;
+  url?: string;
+  audience?: string;
 }
 
 // The /ai/chat endpoint returns a non-standard envelope where `message` and
@@ -61,6 +71,8 @@ interface AiChatResponse {
   tokens_used?: number;
   model?: string;
   provider?: string;
+  sources?: ChatSource[];
+  source_count?: number;
   limits?: {
     daily_remaining: number;
     monthly_remaining: number;
@@ -132,6 +144,7 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
   const { t } = useTranslation('chat');
   const isUser = message.role === 'user';
   const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const sources = !isUser && message.sources?.length ? message.sources.slice(0, 4) : [];
 
   return (
     <motion.div
@@ -180,6 +193,35 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
           {message.content}
         </div>
         <span className="text-xs text-[var(--color-text-muted)] px-1">{time}</span>
+        {sources.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 px-1" aria-label={t('sources_label')}>
+            {sources.map((source) => {
+              const chip = (
+                <Chip
+                  key={`${source.type}-${source.id}`}
+                  size="sm"
+                  variant="flat"
+                  color="default"
+                  startContent={<BookOpen className="h-3 w-3 shrink-0" aria-hidden="true" />}
+                  className="max-w-[13rem] text-xs"
+                >
+                  <span className="truncate">{source.title}</span>
+                </Chip>
+              );
+
+              return source.url ? (
+                <a
+                  key={`${source.type}-${source.id}`}
+                  href={source.url}
+                  className="inline-flex max-w-full"
+                  title={source.title}
+                >
+                  {chip}
+                </a>
+              ) : chip;
+            })}
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -336,6 +378,7 @@ export default function AiChatPage() {
           role: 'assistant',
           content: data.message.content,
           timestamp: new Date(),
+          sources: data.sources ?? [],
         };
         setMessages(prev => [...prev, assistantMsg]);
 

@@ -17,6 +17,7 @@ use App\Models\Event;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\AI\AIServiceFactory;
+use App\Services\AiSupportContextService;
 
 /**
  * AiChatController -- AI chat endpoints (chat, stream, history, conversations,
@@ -32,6 +33,7 @@ class AiChatController extends BaseApiController
 
     public function __construct(
         private readonly AIServiceFactory $aiServiceFactory,
+        private readonly AiSupportContextService $supportContextService,
     ) {}
 
     // =====================================================================
@@ -73,13 +75,13 @@ class AiChatController extends BaseApiController
             [$conversationId, 'user', $message]
         );
 
-        // Build conversation history for context
-        $history = DB::select(
-            'SELECT role, content FROM ai_messages WHERE conversation_id = ? ORDER BY created_at ASC',
-            [$conversationId]
-        );
+        $supportContext = $this->supportContextService->build($userId, $message);
+
+        // Build a bounded conversation history for context.
+        $history = $this->supportContextService->recentConversationHistory((int) $conversationId);
         $chatMessages = [
             ['role' => 'system', 'content' => AIServiceFactory::getSystemPrompt() ?: 'You are a helpful community assistant for a timebanking platform.'],
+            ['role' => 'system', 'content' => $supportContext['content']],
         ];
         foreach ($history as $row) {
             $chatMessages[] = ['role' => $row->role, 'content' => $row->content];
@@ -92,7 +94,10 @@ class AiChatController extends BaseApiController
         $provider = null;
 
         try {
-            $response = AIServiceFactory::chatWithFallback($chatMessages);
+            $response = AIServiceFactory::chatWithFallback($chatMessages, [
+                'temperature' => 0.2,
+                'max_tokens' => 1200,
+            ]);
             $content = $response['content'] ?? '';
             $tokensUsed = $response['tokens_used'] ?? null;
             $model = $response['model'] ?? null;
@@ -126,6 +131,8 @@ class AiChatController extends BaseApiController
             'tokens_used' => $tokensUsed,
             'model' => $model,
             'provider' => $provider,
+            'sources' => $supportContext['sources'],
+            'source_count' => $supportContext['source_count'],
         ]);
     }
 
