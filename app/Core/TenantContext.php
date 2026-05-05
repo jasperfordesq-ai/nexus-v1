@@ -213,6 +213,7 @@ class TenantContext
             'super-admin',
             'logout',
             'api',
+            'v2',
             'assets',
             'downloads',
             'uploads',
