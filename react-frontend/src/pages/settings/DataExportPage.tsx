@@ -220,22 +220,24 @@ export function DataExportPage(): JSX.Element {
         ) : history.length === 0 ? (
           <p className="text-theme-muted text-sm">{t('data_export.history.empty')}</p>
         ) : (
-          <Table aria-label={t('data_export.history.title')} removeWrapper>
-            <TableHeader>
-              <TableColumn>{t('data_export.history.date')}</TableColumn>
-              <TableColumn>{t('data_export.history.format')}</TableColumn>
-              <TableColumn>{t('data_export.history.size')}</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {history.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{formatDate(row.requested_at)}</TableCell>
-                  <TableCell className="uppercase">{row.format}</TableCell>
-                  <TableCell>{formatBytes(row.file_size_bytes)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="responsive-table-wrap">
+            <Table aria-label={t('data_export.history.title')} removeWrapper classNames={{ table: 'min-w-max' }}>
+              <TableHeader>
+                <TableColumn>{t('data_export.history.date')}</TableColumn>
+                <TableColumn>{t('data_export.history.format')}</TableColumn>
+                <TableColumn>{t('data_export.history.size')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {history.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell className="whitespace-nowrap">{formatDate(row.requested_at)}</TableCell>
+                    <TableCell className="uppercase whitespace-nowrap">{row.format}</TableCell>
+                    <TableCell className="whitespace-nowrap">{formatBytes(row.file_size_bytes)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </GlassCard>
     </motion.div>

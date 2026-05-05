@@ -39,6 +39,7 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
@@ -204,7 +205,7 @@ export function FederationPartnerDetailPage() {
             <div className="relative flex-shrink-0">
               <Avatar
                 name={partner.name}
-                src={partner.logo || undefined}
+                src={resolveAvatarUrl(partner.logo)}
                 className="w-24 h-24 ring-4 ring-indigo-500/20 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-3xl"
               />
               <div

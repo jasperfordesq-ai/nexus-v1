@@ -62,6 +62,14 @@ class SafeguardingService
 
     private const MAX_DESCRIPTION_LENGTH = 2000;
 
+    private const STATUS_TRANSITIONS = [
+        'submitted'     => ['submitted', 'triaged', 'investigating', 'resolved', 'dismissed'],
+        'triaged'       => ['triaged', 'investigating', 'resolved', 'dismissed'],
+        'investigating' => ['investigating', 'resolved', 'dismissed'],
+        'resolved'      => ['resolved'],
+        'dismissed'     => ['dismissed'],
+    ];
+
     /**
      * Member submits a report.
      *
@@ -81,19 +89,28 @@ class SafeguardingService
         $evidenceUrl = trim((string) ($data['evidence_url'] ?? ''));
 
         if (!in_array($category, self::CATEGORIES, true)) {
-            throw new InvalidArgumentException('Invalid category.');
+            throw new InvalidArgumentException(__('api.safeguarding_invalid_category'));
         }
         if (!in_array($severity, self::SEVERITIES, true)) {
-            throw new InvalidArgumentException('Invalid severity.');
+            throw new InvalidArgumentException(__('api.safeguarding_invalid_severity'));
         }
         if ($description === '') {
-            throw new InvalidArgumentException('Description is required.');
+            throw new InvalidArgumentException(__('api.safeguarding_description_required'));
         }
         if (mb_strlen($description) > self::MAX_DESCRIPTION_LENGTH) {
-            throw new InvalidArgumentException('Description is too long.');
+            throw new InvalidArgumentException(__('api.safeguarding_description_too_long'));
         }
         if ($evidenceUrl !== '' && mb_strlen($evidenceUrl) > 500) {
-            throw new InvalidArgumentException('Evidence URL is too long.');
+            throw new InvalidArgumentException(__('api.safeguarding_evidence_url_too_long'));
+        }
+        if (!$this->userBelongsToTenant($reporterId, $tenantId)) {
+            throw new RuntimeException(__('api.safeguarding_reporter_not_found'));
+        }
+        if ($subjectUserId !== null && !$this->userBelongsToTenant($subjectUserId, $tenantId)) {
+            throw new RuntimeException(__('api.safeguarding_subject_user_not_found'));
+        }
+        if ($subjectOrganisationId !== null && !$this->organisationBelongsToTenant($subjectOrganisationId, $tenantId)) {
+            throw new RuntimeException(__('api.safeguarding_subject_organisation_not_found'));
         }
 
         $reviewDueAt = now()->addHours(self::REVIEW_SLA_HOURS[$severity]);
@@ -139,7 +156,7 @@ class SafeguardingService
             ->where('id', $reportId)
             ->first();
         if (!$report) {
-            throw new RuntimeException('Report not found.');
+            throw new RuntimeException(__('api.safeguarding_report_not_found'));
         }
 
         $assignee = DB::table('users')
@@ -147,7 +164,7 @@ class SafeguardingService
             ->where('id', $assigneeUserId)
             ->first(['id']);
         if (!$assignee) {
-            throw new RuntimeException('Assignee not found.');
+            throw new RuntimeException(__('api.safeguarding_assignee_not_found'));
         }
 
         DB::table('safeguarding_reports')
@@ -173,7 +190,7 @@ class SafeguardingService
             ->where('id', $reportId)
             ->first();
         if (!$report) {
-            throw new RuntimeException('Report not found.');
+            throw new RuntimeException(__('api.safeguarding_report_not_found'));
         }
 
         DB::table('safeguarding_reports')
@@ -194,7 +211,7 @@ class SafeguardingService
     public function changeStatus(int $reportId, string $newStatus, int $actorId, ?string $notes = null): void
     {
         if (!in_array($newStatus, self::STATUSES, true)) {
-            throw new InvalidArgumentException('Invalid status.');
+            throw new InvalidArgumentException(__('api.safeguarding_invalid_status'));
         }
 
         $tenantId = (int) TenantContext::getId();
@@ -204,7 +221,13 @@ class SafeguardingService
             ->where('id', $reportId)
             ->first();
         if (!$report) {
-            throw new RuntimeException('Report not found.');
+            throw new RuntimeException(__('api.safeguarding_report_not_found'));
+        }
+        if (!in_array($newStatus, self::STATUS_TRANSITIONS[(string) $report->status] ?? [], true)) {
+            throw new InvalidArgumentException(__('api.safeguarding_invalid_status_transition', [
+                'from' => (string) $report->status,
+                'to' => $newStatus,
+            ]));
         }
 
         $update = [
@@ -241,7 +264,7 @@ class SafeguardingService
     {
         $note = trim($note);
         if ($note === '') {
-            throw new InvalidArgumentException('Note is required.');
+            throw new InvalidArgumentException(__('api.safeguarding_note_required'));
         }
 
         $tenantId = (int) TenantContext::getId();
@@ -251,7 +274,7 @@ class SafeguardingService
             ->where('id', $reportId)
             ->first();
         if (!$report) {
-            throw new RuntimeException('Report not found.');
+            throw new RuntimeException(__('api.safeguarding_report_not_found'));
         }
 
         $this->logAction($reportId, $actorId, 'note_added', $note);
@@ -657,5 +680,30 @@ class SafeguardingService
     private function fullName(string $first, string $last): string
     {
         return trim($first . ' ' . $last);
+    }
+
+    private function userBelongsToTenant(int $userId, int $tenantId): bool
+    {
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $userId)
+            ->exists();
+    }
+
+    private function organisationBelongsToTenant(int $organisationId, int $tenantId): bool
+    {
+        foreach (['vol_organizations', 'organizations'] as $table) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+            if (DB::table($table)
+                ->where('tenant_id', $tenantId)
+                ->where('id', $organisationId)
+                ->exists()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

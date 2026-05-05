@@ -1379,35 +1379,35 @@ export function ConversationPage() {
   const other_user = meta.other_user;
 
   return (
-    <div className="-my-6 sm:-my-8 h-[calc(100dvh-4rem-4rem)] md:h-[calc(100dvh-4rem)] flex flex-col max-w-3xl mx-auto">
+    <div className="-my-6 sm:-my-8 flex h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-8rem)] min-h-0 max-w-3xl flex-col mx-auto md:h-[calc(100dvh-var(--safe-area-top)-4rem)]">
       <PageMeta title={t('page_meta.conversation.title')} noIndex />
       {/* Header */}
       <GlassCard className="p-4 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <Button
               isIconOnly
               size="sm"
               variant="light"
-              className="text-theme-muted"
+              className="shrink-0 text-theme-muted"
               onPress={() => navigate(tenantPath('/messages'))}
               aria-label={t('aria_back')}
             >
               <ArrowLeft className="w-5 h-5" aria-hidden="true" />
             </Button>
 
-            <Link to={tenantPath(`/profile/${other_user.id}`)} className="flex items-center gap-3">
+            <Link to={tenantPath(`/profile/${other_user.id}`)} className="flex min-w-0 items-center gap-3">
               <h1 className="sr-only">{t('conversation_with', { name: other_user.name })}</h1>
               <Avatar
                 src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
                 name={other_user.name}
                 size="md"
-                className="ring-2 ring-white/20"
+                className="shrink-0 ring-2 ring-white/20"
               />
-              <div>
-                <div className="flex items-center gap-1.5">
+              <div className="min-w-0">
+                <div className="flex min-w-0 items-center gap-1.5">
                   {other_user.name ? (
-                    <h2 className="font-semibold text-theme-primary">{other_user.name}</h2>
+                    <h2 className="truncate font-semibold text-theme-primary">{other_user.name}</h2>
                   ) : (
                     <Skeleton className="rounded-md">
                       <div className="h-4 w-32 rounded-md bg-default-300" />
@@ -1416,13 +1416,13 @@ export function ConversationPage() {
                   <VerificationBadgeRow userId={other_user.id} size="sm" />
                 </div>
                 {other_user.tagline && (
-                  <p className="text-xs text-theme-subtle">{other_user.tagline}</p>
+                  <p className="truncate text-xs text-theme-subtle">{other_user.tagline}</p>
                 )}
               </div>
             </Link>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Button
               isIconOnly
               variant="flat"
@@ -1505,8 +1505,8 @@ export function ConversationPage() {
       {/* Search Bar */}
       {showSearch && (
         <GlassCard className="p-3 mb-2">
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative min-w-0 flex-1">
               <Input
                 placeholder={t('conversation_search_placeholder')}
                 value={searchQuery}
@@ -1659,10 +1659,10 @@ export function ConversationPage() {
       )}
 
       {/* Messages */}
-      <GlassCard className="flex-1 overflow-hidden flex flex-col">
+      <GlassCard className="flex min-h-0 flex-1 overflow-hidden flex-col">
         <div
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4"
+          className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4 space-y-4"
           onScroll={handleScroll}
         >
           {/* Loading indicator for older messages */}

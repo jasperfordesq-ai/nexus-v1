@@ -150,9 +150,15 @@ class SafeguardingTriggerService
 
         // Sync user-level safeguarding flags (transactional to keep flags consistent)
         DB::transaction(function () use ($userId, $tenantId, $triggers) {
-            $user = User::find($userId);
+            $user = User::where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->first();
             if ($user) {
-                $updates = [];
+                $updates = [
+                    'works_with_children' => false,
+                    'works_with_vulnerable_adults' => false,
+                    'no_home_visits' => false,
+                ];
                 if ($triggers['restricts_matching']) {
                     // Check if any of the selected options specifically flag children or vulnerable adults
                     $prefs = UserSafeguardingPreference::where('tenant_id', $tenantId)
@@ -174,9 +180,9 @@ class SafeguardingTriggerService
                         }
                     }
                 }
-                if (!empty($updates)) {
-                    User::where('id', $userId)->update($updates);
-                }
+                User::where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->update($updates);
             }
         });
 

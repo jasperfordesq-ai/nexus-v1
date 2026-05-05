@@ -674,7 +674,7 @@ export function OnboardingPage() {
           {/* ─── Step 1: Welcome ─── */}
           {currentStepSlug === 'welcome' && (
             <div className="space-y-6">
-              <GlassCard className="p-8 text-center">
+              <GlassCard className="p-5 text-center sm:p-8">
                 <div className="flex items-center justify-center gap-4 mb-6">
                   <motion.div
                     animate={{ y: [0, -6, 0] }}
@@ -1240,7 +1240,7 @@ export function OnboardingPage() {
               </GlassCard>
 
               {/* Action buttons */}
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button
                   variant="light"
                   className="text-theme-muted"
@@ -1250,7 +1250,7 @@ export function OnboardingPage() {
                   {t('back')}
                 </Button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Button
                     variant="light"
                     className="text-theme-subtle"
@@ -1329,7 +1329,7 @@ interface StepIndicatorProps {
 function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, onStepClick, stepLabelKeys }: StepIndicatorProps) {
   const { t } = useTranslation('onboarding');
   return (
-    <div className="flex items-center justify-between">
+    <div className="-mx-1 flex items-center justify-between overflow-x-auto px-1 pb-1">
       {Array.from({ length: totalSteps }, (_, i) => {
         const step = i + 1;
         const isCurrent = step === currentStep;
@@ -1338,7 +1338,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
         const isClickable = isVisited || step <= currentStep;
 
         return (
-          <div key={step} className="flex items-center flex-1 last:flex-initial">
+          <div key={step} className="flex min-w-[3rem] items-center flex-1 last:flex-initial">
             {/* Step dot + label */}
             <Button
               variant="light"
@@ -1353,7 +1353,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
             >
               <div
                 className={`
-                  w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
+                  w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 shrink-0
                   ${isCurrent
                     ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30 scale-110'
                     : isCompleted
@@ -1380,7 +1380,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
 
             {/* Connector line */}
             {step < totalSteps && (
-              <div className="flex-1 mx-1.5 sm:mx-2">
+              <div className="flex-1 min-w-4 mx-1.5 sm:mx-2">
                 <div
                   className={`
                     h-0.5 rounded-full transition-all duration-500

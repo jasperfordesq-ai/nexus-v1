@@ -12,8 +12,10 @@ use App\I18n\LocaleContext;
 use App\Services\EmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -39,7 +41,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function dashboard(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $activeAssignments = 0;
@@ -146,7 +148,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function flaggedMessages(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -237,7 +239,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function assignments(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         try {
@@ -305,7 +307,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function reviewMessage(Request $request, int $id): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('manage');
         $tenantId = $this->getTenantId();
 
         $notes = $request->input('notes', '');
@@ -373,7 +375,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function createAssignment(Request $request): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('manage');
         $tenantId = $this->getTenantId();
 
         $wardId = null;
@@ -563,7 +565,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function deleteAssignment(int $id): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('manage');
         $tenantId = $this->getTenantId();
 
         try {
@@ -702,7 +704,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberPreferences(): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('view');
         $tenantId = TenantContext::getId();
 
         try {
@@ -716,8 +718,8 @@ class AdminSafeguardingController extends BaseApiController
                     tso.label as option_label,
                     tso.triggers
                  FROM user_safeguarding_preferences usp
-                 JOIN users u ON u.id = usp.user_id
-                 JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
+                 JOIN users u ON u.id = usp.user_id AND u.tenant_id = usp.tenant_id
+                 JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id AND tso.tenant_id = usp.tenant_id
                  WHERE usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1
                  ORDER BY usp.consent_given_at DESC, u.id, tso.sort_order",
                 [$tenantId]
@@ -794,7 +796,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberActivity(Request $request, int $userId): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $member = DB::table('users')
@@ -842,7 +844,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberActivityCsv(Request $request, int $userId)
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $member = DB::table('users')
@@ -1091,7 +1093,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function getStatement(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')
@@ -1144,7 +1146,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function uploadStatement(Request $request): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $adminId = $this->requireSafeguardingStaff('manage');
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')->where('id', $tenantId)->first();
@@ -1275,7 +1277,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function downloadStatement()
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireSafeguardingStaff('view');
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')
@@ -1306,6 +1308,85 @@ class AdminSafeguardingController extends BaseApiController
     // ============================================
     // HELPERS
     // ============================================
+
+    private function requireSafeguardingStaff(string $level = 'view'): int
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($user) {
+            $role = (string) ($user->role ?? 'member');
+            if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god', 'broker'], true)) {
+                return $userId;
+            }
+
+            if (($user->is_admin ?? false)
+                || ($user->is_super_admin ?? false)
+                || ($user->is_tenant_super_admin ?? false)
+                || ($user->is_god ?? false)) {
+                return $userId;
+            }
+        }
+
+        if ($this->hasSafeguardingPermission($userId, $tenantId, $level)) {
+            return $userId;
+        }
+
+        throw new HttpResponseException(
+            $this->respondWithError(
+                'AUTH_INSUFFICIENT_PERMISSIONS',
+                __('api.safeguarding_staff_access_required'),
+                null,
+                403
+            )
+        );
+    }
+
+    private function hasSafeguardingPermission(int $userId, int $tenantId, string $level): bool
+    {
+        if (!Schema::hasTable('user_permissions') || !Schema::hasTable('permissions')) {
+            return false;
+        }
+
+        try {
+            $allowedPermissions = $level === 'manage'
+                ? ['safeguarding.manage']
+                : ['safeguarding.view', 'safeguarding.manage'];
+
+            $query = DB::table('user_permissions as up')
+                ->join('permissions as p', 'p.id', '=', 'up.permission_id')
+                ->where('up.user_id', $userId)
+                ->whereIn('p.name', $allowedPermissions);
+
+            if (Schema::hasColumn('user_permissions', 'tenant_id')) {
+                $query->where('up.tenant_id', $tenantId);
+            }
+            if (Schema::hasColumn('user_permissions', 'granted')) {
+                $query->where('up.granted', true);
+            }
+            if (Schema::hasColumn('user_permissions', 'expires_at')) {
+                $query->where(function ($q) {
+                    $q->whereNull('up.expires_at')
+                        ->orWhere('up.expires_at', '>', now());
+                });
+            }
+            if (Schema::hasColumn('permissions', 'tenant_id')) {
+                $query->where(function ($q) use ($tenantId) {
+                    $q->whereNull('p.tenant_id')
+                        ->orWhere('p.tenant_id', $tenantId);
+                });
+            }
+
+            return $query->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
 
     /**
      * Check if a QueryException indicates a missing table (SQLSTATE 42S02).

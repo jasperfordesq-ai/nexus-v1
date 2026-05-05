@@ -100,6 +100,13 @@ export function FederationListingsPage() {
   toastRef.current = toast;
   const loadListingsRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
+  const memberProfilePath = useCallback((listing: FederatedListing) => {
+    if (!listing.author?.id) return '/federation/members';
+    const tenantId = listing.timebank?.id;
+    const tenantParam = tenantId ? `?tenant_id=${encodeURIComponent(String(tenantId))}` : '';
+    return `/federation/members/${listing.author.id}${tenantParam}`;
+  }, []);
+
   // ── Debounce search ──────────────────────────────────────────────────────
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -512,7 +519,7 @@ export function FederationListingsPage() {
                           onPress={() => {
                             setIsDetailOpen(false);
                             setSelectedListing(null);
-                            navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
+                            navigate(tenantPath(memberProfilePath(selectedListing)));
                           }}
                         >
                           <Avatar src={authorAvatar} name={authorName} size="sm" />
@@ -552,7 +559,7 @@ export function FederationListingsPage() {
                           onPress={() => {
                             setIsDetailOpen(false);
                             setSelectedListing(null);
-                            navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
+                            navigate(tenantPath(memberProfilePath(selectedListing)));
                           }}
                         >
                           {t('listings.view_profile')}
@@ -686,7 +693,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
         {listing.estimated_hours && (
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" aria-hidden="true" />
-            {listing.estimated_hours}h
+            {t('listings.hours_estimated', { hours: listing.estimated_hours })}
           </span>
         )}
         {listing.location && (

@@ -53,7 +53,7 @@ export function ResetPasswordPage() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <GlassCard className="p-8 text-center">
+          <GlassCard className="p-5 text-center sm:p-8">
             <h1 className="text-2xl font-bold text-theme-primary mb-4">{t('reset_password.invalid_title')}</h1>
             <p className="text-theme-muted mb-6">
               {t('reset_password.invalid_message')}
@@ -112,7 +112,7 @@ export function ResetPasswordPage() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <GlassCard className="p-8 text-center">
+          <GlassCard className="p-5 text-center sm:p-8">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
             </div>
@@ -148,7 +148,7 @@ export function ResetPasswordPage() {
           {t('reset_password.back_to_login')}
         </Link>
 
-        <GlassCard className="p-8">
+        <GlassCard className="p-5 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('reset_password.page_title')}</h1>

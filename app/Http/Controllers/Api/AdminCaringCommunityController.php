@@ -221,12 +221,12 @@ class AdminCaringCommunityController extends BaseApiController
      */
     private function guardSafeguarding(string $level): ?JsonResponse
     {
-        $disabled = $this->guardCaringCommunity();
+        $disabled = $this->guardCaringCommunityFeature();
         if ($disabled) return $disabled;
 
         // Coordinators / admins / super-admins always pass. Otherwise check
         // whether the user holds the required safeguarding permission.
-        $userId = (int) auth()->id();
+        $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
         $user = \DB::table('users')
             ->where('id', $userId)
@@ -277,7 +277,7 @@ class AdminCaringCommunityController extends BaseApiController
             // If permission tables aren't shaped as expected, fall through to deny.
         }
 
-        return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.admin_access_required'), null, 403);
+        return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.safeguarding_staff_access_required'), null, 403);
     }
 
     /**

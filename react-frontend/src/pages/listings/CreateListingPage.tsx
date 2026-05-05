@@ -70,7 +70,7 @@ export function CreateListingPage() {
   usePageTitle(t('create'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tenantPath, listingConfig = {} } = useTenant();
+  const { tenantPath, listingConfig } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
 

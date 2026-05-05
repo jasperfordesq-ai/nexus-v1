@@ -50,6 +50,19 @@ class AdminSafeguardingControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_dashboard_rejects_coordinator_without_safeguarding_permission(): void
+    {
+        $coordinator = User::factory()->forTenant($this->testTenantId)->create([
+            'role' => 'coordinator',
+            'status' => 'active',
+        ]);
+        Sanctum::actingAs($coordinator);
+
+        $response = $this->apiGet('/v2/admin/safeguarding/dashboard');
+
+        $response->assertStatus(403);
+    }
+
     public function test_dashboard_returns_401_for_unauthenticated(): void
     {
         $response = $this->apiGet('/v2/admin/safeguarding/dashboard');

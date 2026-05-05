@@ -350,7 +350,7 @@ export function WalletPage() {
       {!error && (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <GlassCard className="p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               {t('history')}
@@ -374,9 +374,10 @@ export function WalletPage() {
             selectedKey={filter}
             onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); setHasMoreTransactions(true); }}
             classNames={{
-              tabList: 'bg-theme-elevated p-1 rounded-lg',
+              base: 'w-full max-w-full overflow-x-auto',
+              tabList: 'bg-theme-elevated p-1 rounded-lg min-w-max flex-nowrap',
               cursor: 'bg-theme-hover',
-              tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
+              tab: 'shrink-0 text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
             <Tab key="all" title={t('filter.all')} />
@@ -497,9 +498,9 @@ function TransactionCard({ transaction }: TransactionCardProps) {
       className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
       aria-label={t('aria.transaction_detail', { direction: isCredit ? t('csv.received') : t('csv.sent'), amount: transaction.amount, name: otherPartyName || '' })}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className={`
-          p-2.5 rounded-full
+          p-2.5 rounded-full self-start shrink-0
           ${isCredit ? 'bg-emerald-500/20' : 'bg-rose-500/20'}
         `}>
           {isCredit ? (
@@ -510,7 +511,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <h4 className="font-medium text-theme-primary truncate">{transaction.description}</h4>
             {transaction.status === 'pending' && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
@@ -518,15 +519,15 @@ function TransactionCard({ transaction }: TransactionCardProps) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm text-theme-subtle mt-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-theme-subtle mt-1">
             {transaction.other_user && (
-              <span className="flex items-center gap-1">
-                <User className="w-3 h-3" aria-hidden="true" />
-                {transaction.other_user.name}
+              <span className="flex min-w-0 items-center gap-1">
+                <User className="w-3 h-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">{transaction.other_user.name}</span>
               </span>
             )}
             <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" aria-hidden="true" />
+              <Calendar className="w-3 h-3 shrink-0" aria-hidden="true" />
               <time dateTime={transaction.created_at}>
                 {new Date(transaction.created_at).toLocaleDateString()}
               </time>
@@ -534,7 +535,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           </div>
         </div>
 
-        <div className={`text-lg font-semibold ${isCredit ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <div className={`shrink-0 text-lg font-semibold sm:text-right ${isCredit ? 'text-emerald-400' : 'text-rose-400'}`}>
           {isCredit ? '+' : '-'}{transaction.amount}h
         </div>
       </div>

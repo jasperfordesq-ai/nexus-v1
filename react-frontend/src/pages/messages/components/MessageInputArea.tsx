@@ -99,10 +99,10 @@ export function MessageInputArea({
   const { tenantPath } = useTenant();
 
   return (
-    <div className="p-4 border-t border-theme-default" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}>
+    <div className="border-t border-theme-default p-3 sm:p-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
       {/* Messaging disabled notice (feature flag) */}
       {!isDirectMessagingEnabled && (
-        <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
+        <div className="flex flex-col items-stretch gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center sm:flex-row sm:items-center">
           <span className="text-amber-600 dark:text-amber-400 text-sm flex-1">
             {t('disabled_inline')}
           </span>
@@ -133,9 +133,9 @@ export function MessageInputArea({
 
       {/* Voice recording preview */}
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && audioBlob && !isRecording && (
-        <div className="flex items-center gap-3 mb-3 p-3 bg-theme-elevated rounded-lg">
+        <div className="flex min-w-0 flex-col gap-3 mb-3 p-3 bg-theme-elevated rounded-lg sm:flex-row sm:items-center">
           <VoiceMessagePlayer audioBlob={audioBlob} />
-          <div className="flex gap-2 ml-auto">
+          <div className="flex gap-2 sm:ml-auto">
             <Button
               size="sm"
               variant="flat"
@@ -158,11 +158,11 @@ export function MessageInputArea({
 
       {/* Recording indicator */}
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isRecording && (
-        <div className="flex items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+        <div className="flex flex-wrap items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shrink-0" />
           <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
-          <span className="text-theme-subtle text-sm">{t('recording')}</span>
-          <div className="ml-auto flex gap-2">
+          <span className="min-w-0 text-theme-subtle text-sm">{t('recording')}</span>
+          <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
             <Button
               size="sm"
               variant="flat"
@@ -218,7 +218,7 @@ export function MessageInputArea({
 
       {/* Text input form */}
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && !isRecording && !audioBlob && (
-        <form onSubmit={onSendMessage} className="flex gap-3">
+        <form onSubmit={onSendMessage} className="flex min-w-0 gap-2 sm:gap-3">
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -233,7 +233,7 @@ export function MessageInputArea({
             type="button"
             isIconOnly
             variant="flat"
-            className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
+            className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
             onPress={() => fileInputRef.current?.click()}
             aria-label={t('aria_add_attachment')}
             isDisabled={attachments.length >= 5}
@@ -244,7 +244,7 @@ export function MessageInputArea({
           {onGifSelect && (
             <GifPicker onSelect={onGifSelect} />
           )}
-          <div className="flex-1 flex flex-col">
+          <div className="min-w-0 flex-1 flex flex-col">
             <Textarea
               placeholder={t('type_placeholder')}
               value={newMessage}
@@ -284,7 +284,7 @@ export function MessageInputArea({
               type="button"
               isIconOnly
               variant="flat"
-              className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
+              className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onPress={onStartRecording}
               aria-label={t('aria_record_voice')}
             >
@@ -297,7 +297,7 @@ export function MessageInputArea({
               type="submit"
               isIconOnly
               aria-label={t('aria_send_message')}
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
+              className="shrink-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
               isLoading={isSending}
             >
               <Send className="w-4 h-4" />

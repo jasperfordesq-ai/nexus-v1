@@ -197,8 +197,9 @@ class FederationExternalPartnerService
                   protocol_type, signing_secret, oauth_client_id, oauth_client_secret, oauth_token_url,
                   allow_member_search, allow_listing_search, allow_messaging,
                   allow_transactions, allow_events, allow_groups,
+                  allow_connections, allow_volunteering, allow_member_sync,
                   status, created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
                 [
                     $tenantId,
                     $data['name'],
@@ -218,6 +219,9 @@ class FederationExternalPartnerService
                     (int) ($data['allow_transactions'] ?? 1),
                     (int) ($data['allow_events'] ?? 0),
                     (int) ($data['allow_groups'] ?? 0),
+                    (int) ($data['allow_connections'] ?? 0),
+                    (int) ($data['allow_volunteering'] ?? 0),
+                    (int) ($data['allow_member_sync'] ?? 0),
                     $userId,
                 ]
             );
@@ -305,6 +309,7 @@ class FederationExternalPartnerService
                 'protocol_type', 'oauth_client_id', 'oauth_token_url', 'status',
                 'allow_member_search', 'allow_listing_search', 'allow_messaging',
                 'allow_transactions', 'allow_events', 'allow_groups',
+                'allow_connections', 'allow_volunteering', 'allow_member_sync',
             ];
 
             foreach ($plainFields as $field) {
@@ -666,6 +671,9 @@ class FederationExternalPartnerService
             'allow_transactions' => (bool) $row->allow_transactions,
             'allow_events' => (bool) $row->allow_events,
             'allow_groups' => (bool) $row->allow_groups,
+            'allow_connections' => (bool) ($row->allow_connections ?? false),
+            'allow_volunteering' => (bool) ($row->allow_volunteering ?? false),
+            'allow_member_sync' => (bool) ($row->allow_member_sync ?? false),
             'created_by' => $row->created_by ? (int) $row->created_by : null,
             'created_at' => $row->created_at,
             'updated_at' => $row->updated_at,

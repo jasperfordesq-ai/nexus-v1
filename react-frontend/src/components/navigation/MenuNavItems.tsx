@@ -243,7 +243,7 @@ export function MobileMenuItems({ menus }: MobileMenuItemsProps) {
 
       return (
         <div key={item.id}>
-          <p className="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-theme-subtle">
+          <p className="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-theme-subtle break-words">
             {item.label}
           </p>
           {visibleChildren.map((child) => renderLink(child))}
@@ -264,10 +264,10 @@ export function MobileMenuItems({ menus }: MobileMenuItemsProps) {
           href={item.url || '#'}
           target={item.target || '_blank'}
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all min-w-0"
         >
-          <DynamicIcon name={item.icon} className="w-5 h-5" />
-          <span>{item.label}</span>
+          <DynamicIcon name={item.icon} className="w-5 h-5 shrink-0" />
+          <span className="min-w-0 truncate">{item.label}</span>
         </a>
       );
     }
@@ -277,15 +277,15 @@ export function MobileMenuItems({ menus }: MobileMenuItemsProps) {
         key={item.id}
         to={href}
         className={({ isActive }) =>
-          `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+          `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all min-w-0 ${
             isActive
               ? 'bg-theme-active text-theme-primary'
               : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
           }`
         }
       >
-        <DynamicIcon name={item.icon} className="w-5 h-5" />
-        <span>{item.label}</span>
+        <DynamicIcon name={item.icon} className="w-5 h-5 shrink-0" />
+        <span className="min-w-0 truncate">{item.label}</span>
       </NavLink>
     );
   };

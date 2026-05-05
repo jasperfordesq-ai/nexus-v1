@@ -21,16 +21,16 @@ import type { FontSize, Density } from '@/contexts/ThemeContext';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ACCENT_COLORS = [
-  { name: 'indigo', hex: '#6366f1' },
-  { name: 'purple', hex: '#a855f7' },
-  { name: 'blue', hex: '#3b82f6' },
-  { name: 'teal', hex: '#14b8a6' },
-  { name: 'green', hex: '#22c55e' },
-  { name: 'amber', hex: '#f59e0b' },
-  { name: 'orange', hex: '#f97316' },
-  { name: 'rose', hex: '#f43f5e' },
-  { name: 'pink', hex: '#ec4899' },
-  { name: 'cyan', hex: '#06b6d4' },
+  { name: 'indigo', hex: '#6366f1', swatchClass: 'bg-[#6366f1] ring-[#6366f1]' },
+  { name: 'purple', hex: '#a855f7', swatchClass: 'bg-[#a855f7] ring-[#a855f7]' },
+  { name: 'blue', hex: '#3b82f6', swatchClass: 'bg-[#3b82f6] ring-[#3b82f6]' },
+  { name: 'teal', hex: '#14b8a6', swatchClass: 'bg-[#14b8a6] ring-[#14b8a6]' },
+  { name: 'green', hex: '#22c55e', swatchClass: 'bg-[#22c55e] ring-[#22c55e]' },
+  { name: 'amber', hex: '#f59e0b', swatchClass: 'bg-[#f59e0b] ring-[#f59e0b]' },
+  { name: 'orange', hex: '#f97316', swatchClass: 'bg-[#f97316] ring-[#f97316]' },
+  { name: 'rose', hex: '#f43f5e', swatchClass: 'bg-[#f43f5e] ring-[#f43f5e]' },
+  { name: 'pink', hex: '#ec4899', swatchClass: 'bg-[#ec4899] ring-[#ec4899]' },
+  { name: 'cyan', hex: '#06b6d4', swatchClass: 'bg-[#06b6d4] ring-[#06b6d4]' },
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,13 +75,11 @@ export function AppearanceSettings() {
                 isIconOnly
                 size="sm"
                 aria-label={t('appearance_prefs.select_color', { color: color.name })}
-                className="w-9 h-9 min-w-0 rounded-full border-2 transition-transform"
-                style={{
-                  backgroundColor: color.hex,
-                  borderColor: isSelected ? color.hex : 'transparent',
-                  transform: isSelected ? 'scale(1.15)' : 'scale(1)',
-                  boxShadow: isSelected ? `0 0 0 2px var(--background), 0 0 0 4px ${color.hex}` : 'none',
-                }}
+                className={[
+                  'w-9 h-9 min-w-0 rounded-full border-2 border-transparent transition-transform',
+                  color.swatchClass,
+                  isSelected ? 'scale-110 ring-2 ring-offset-2 ring-offset-[var(--background)]' : 'scale-100',
+                ].join(' ')}
                 onPress={() => setAccentColor(color.hex)}
               >
                 {isSelected && (

@@ -59,66 +59,66 @@ function getDeviceIcon(cred: Credential) {
 function getDeviceLabel(cred: Credential, t: (key: string, options?: Record<string, unknown>) => string): string {
   if (cred.device_name) return cred.device_name;
   // Fallback for credentials registered before device_name was added
-  if (cred.authenticator_type === 'platform') return t('biometric.label_builtin', { defaultValue: 'Built-in authenticator' });
-  if (cred.authenticator_type === 'cross-platform') return t('biometric.label_external', { defaultValue: 'External authenticator' });
-  return t('biometric.label_passkey', { defaultValue: 'Passkey' });
+  if (cred.authenticator_type === 'platform') return t('biometric.label_builtin');
+  if (cred.authenticator_type === 'cross-platform') return t('biometric.label_external');
+  return t('biometric.label_passkey');
 }
 
 function getPlatformInstructions(platform: DevicePlatform, t: (key: string, options?: Record<string, unknown>) => string): { title: string; steps: string[] } {
   const instructions: Record<DevicePlatform, { title: string; steps: string[] }> = {
     windows: {
-      title: t('biometric.platform_windows_title', { defaultValue: 'Setting up on Windows' }),
+      title: t('biometric.platform_windows_title'),
       steps: [
-        t('biometric.platform_windows_step1', { defaultValue: 'Click "This PC" to create a passkey stored on this computer. You\'ll confirm with your Windows Hello PIN, fingerprint, or face.' }),
-        t('biometric.platform_windows_step2', { defaultValue: 'Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.' }),
-        t('biometric.platform_windows_step3', { defaultValue: 'Or click "Phone, tablet, or security key" to scan a QR code with your phone instead.' }),
-        t('biometric.platform_windows_step4', { defaultValue: 'To set up passkeys on your phone too, open this page on your phone and tap "This device".' }),
+        t('biometric.platform_windows_step1'),
+        t('biometric.platform_windows_step2'),
+        t('biometric.platform_windows_step3'),
+        t('biometric.platform_windows_step4'),
       ],
     },
     mac: {
-      title: t('biometric.platform_mac_title', { defaultValue: 'Setting up on Mac' }),
+      title: t('biometric.platform_mac_title'),
       steps: [
-        t('biometric.platform_mac_step1', { defaultValue: 'Click "This Mac" — your browser will prompt Touch ID or your Mac password.' }),
-        t('biometric.platform_mac_step2', { defaultValue: 'The passkey syncs via iCloud Keychain to your iPhone, iPad, and other Macs automatically.' }),
-        t('biometric.platform_mac_step3', { defaultValue: 'Or click "Phone, tablet, or security key" to register a different device.' }),
+        t('biometric.platform_mac_step1'),
+        t('biometric.platform_mac_step2'),
+        t('biometric.platform_mac_step3'),
       ],
     },
     iphone: {
-      title: t('biometric.platform_iphone_title', { defaultValue: 'Setting up on iPhone' }),
+      title: t('biometric.platform_iphone_title'),
       steps: [
-        t('biometric.platform_iphone_step1', { defaultValue: 'Tap "This device" to create a passkey using Face ID or Touch ID.' }),
-        t('biometric.platform_iphone_step2', { defaultValue: 'The passkey is saved to iCloud Keychain and works on all your Apple devices.' }),
-        t('biometric.platform_iphone_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+        t('biometric.platform_iphone_step1'),
+        t('biometric.platform_iphone_step2'),
+        t('biometric.platform_iphone_step3'),
       ],
     },
     ipad: {
-      title: t('biometric.platform_ipad_title', { defaultValue: 'Setting up on iPad' }),
+      title: t('biometric.platform_ipad_title'),
       steps: [
-        t('biometric.platform_ipad_step1', { defaultValue: 'Tap "This device" to create a passkey using Face ID or Touch ID.' }),
-        t('biometric.platform_ipad_step2', { defaultValue: 'The passkey is saved to iCloud Keychain and works on all your Apple devices.' }),
-        t('biometric.platform_ipad_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+        t('biometric.platform_ipad_step1'),
+        t('biometric.platform_ipad_step2'),
+        t('biometric.platform_ipad_step3'),
       ],
     },
     android: {
-      title: t('biometric.platform_android_title', { defaultValue: 'Setting up on Android' }),
+      title: t('biometric.platform_android_title'),
       steps: [
-        t('biometric.platform_android_step1', { defaultValue: 'Tap "This device" to create a passkey using your fingerprint, face, or screen lock.' }),
-        t('biometric.platform_android_step2', { defaultValue: 'The passkey is saved to Google Password Manager and works on all your Android devices and Chrome browsers.' }),
-        t('biometric.platform_android_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+        t('biometric.platform_android_step1'),
+        t('biometric.platform_android_step2'),
+        t('biometric.platform_android_step3'),
       ],
     },
     linux: {
-      title: t('biometric.platform_linux_title', { defaultValue: 'Setting up on Linux' }),
+      title: t('biometric.platform_linux_title'),
       steps: [
-        t('biometric.platform_linux_step1', { defaultValue: 'Click "This device" — your browser will use its built-in passkey manager.' }),
-        t('biometric.platform_linux_step2', { defaultValue: 'Or click "Phone, tablet, or security key" to use a USB security key or scan a QR code with your phone.' }),
+        t('biometric.platform_linux_step1'),
+        t('biometric.platform_linux_step2'),
       ],
     },
     unknown: {
-      title: t('biometric.platform_unknown_title', { defaultValue: 'Setting up a passkey' }),
+      title: t('biometric.platform_unknown_title'),
       steps: [
-        t('biometric.platform_unknown_step1', { defaultValue: 'Click "This device" to create a passkey on the device you\'re using now.' }),
-        t('biometric.platform_unknown_step2', { defaultValue: 'Or click "Phone, tablet, or security key" to register a different device.' }),
+        t('biometric.platform_unknown_step1'),
+        t('biometric.platform_unknown_step2'),
       ],
     },
   };
@@ -165,10 +165,10 @@ export function BiometricSettings() {
     setRegistering(false);
 
     if (result.success) {
-      toast.success(t('biometric_registered', { defaultValue: 'Passkey registered successfully!' }));
+      toast.success(t('biometric_registered'));
       loadCredentials();
     } else {
-      toast.error(result.error || t('passkey_registration_failed', { defaultValue: 'Registration failed' }));
+      toast.error(result.error || t('passkey_registration_failed'));
     }
   };
 
@@ -178,10 +178,10 @@ export function BiometricSettings() {
     setRemovingId(null);
 
     if (success) {
-      toast.success(t('biometric_removed', { defaultValue: 'Passkey removed.' }));
+      toast.success(t('biometric_removed'));
       setCredentials(prev => prev.filter(c => c.credential_id !== credentialId));
     } else {
-      toast.error(t('passkey_remove_failed', { defaultValue: 'Failed to remove credential' }));
+      toast.error(t('passkey_remove_failed'));
     }
   };
 
@@ -193,13 +193,12 @@ export function BiometricSettings() {
     if (result.success) {
       toast.success(
         t('biometric_all_removed', {
-          defaultValue: `Removed ${result.removedCount} passkey(s).`,
           count: result.removedCount,
         }),
       );
       setCredentials([]);
     } else {
-      toast.error(t('passkey_remove_all_failed', { defaultValue: 'Failed to remove credentials' }));
+      toast.error(t('passkey_remove_all_failed'));
     }
   };
 
@@ -214,9 +213,9 @@ export function BiometricSettings() {
       setCredentials(prev =>
         prev.map(c => c.credential_id === credentialId ? { ...c, device_name: trimmed } : c),
       );
-      toast.success(t('passkey_renamed', { defaultValue: 'Passkey renamed.' }));
+      toast.success(t('passkey_renamed'));
     } else {
-      toast.error(t('passkey_rename_failed', { defaultValue: 'Failed to rename passkey' }));
+      toast.error(t('passkey_rename_failed'));
     }
     setEditingId(null);
   };
@@ -231,12 +230,10 @@ export function BiometricSettings() {
           </div>
           <div>
             <p className="font-medium text-theme-primary">
-              {t('biometric_title', { defaultValue: 'Passkey Login' })}
+              {t('biometric_title')}
             </p>
             <p className="text-sm text-theme-subtle">
-              {t('biometric_not_supported', {
-                defaultValue: 'Your device or browser does not support passkeys. Try using a modern browser like Chrome, Edge, Safari, or Firefox.',
-              })}
+              {t('biometric_not_supported')}
             </p>
           </div>
         </div>
@@ -255,7 +252,7 @@ export function BiometricSettings() {
           <div className="flex items-center gap-2">
             <Spinner size="sm" />
             <span className="text-sm text-theme-muted">
-              {t('biometric_checking', { defaultValue: 'Checking passkey support...' })}
+              {t('biometric_checking')}
             </span>
           </div>
         </div>
@@ -275,34 +272,31 @@ export function BiometricSettings() {
           </div>
           <div>
             <p className="font-medium text-theme-primary">
-              {t('biometric_title', { defaultValue: 'Passkey Login' })}
+              {t('biometric_title')}
             </p>
             <p className="text-sm text-theme-subtle">
               {hasCredentials ? (
                 <span className="flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-emerald-500" aria-hidden="true" />
                   {t('biometric_enabled', {
-                    defaultValue: `${credentials.length} passkey(s) registered`,
                     count: credentials.length,
                   })}
                 </span>
               ) : (
-                t('biometric_not_enabled', {
-                  defaultValue: 'Sign in faster with fingerprint, face, or PIN',
-                })
+                t('biometric_not_enabled')
               )}
             </p>
           </div>
         </div>
 
-        <Tooltip content={t('passkey_setup_tooltip', { defaultValue: 'How to set up passkeys' })}>
+        <Tooltip content={t('passkey_setup_tooltip')}>
           <Button
             isIconOnly
             size="sm"
             variant="light"
             className="text-theme-subtle"
             onPress={() => setShowInstructions(!showInstructions)}
-            aria-label={t('passkey_show_instructions', { defaultValue: 'Show setup instructions' })}
+            aria-label={t('passkey_show_instructions')}
           >
             <Info className="w-4 h-4" />
           </Button>
@@ -313,7 +307,7 @@ export function BiometricSettings() {
       {showInstructions && (
         <div className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20 space-y-2">
           <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-            {t('passkey_setup_title', { defaultValue: instructions.title })} — {t('passkey_setup_subtitle', { defaultValue: 'Setup for this device' })}
+            {instructions.title} - {t('passkey_setup_subtitle')}
           </p>
           <ol className="text-sm text-theme-subtle space-y-1 list-decimal list-inside">
             {instructions.steps.map((step, i) => (
@@ -322,7 +316,7 @@ export function BiometricSettings() {
           </ol>
           <div className="pt-2 border-t border-indigo-500/10">
             <p className="text-xs text-theme-muted">
-              {t('passkey_multi_device_note', { defaultValue: 'You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).' })}
+              {t('passkey_multi_device_note')}
             </p>
           </div>
         </div>
@@ -336,7 +330,7 @@ export function BiometricSettings() {
         isLoading={registering}
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
       >
-        {hasCredentials ? t('passkey_add_another', { defaultValue: 'Add another passkey' }) : t('passkey_create', { defaultValue: 'Create a passkey' })}
+        {hasCredentials ? t('passkey_add_another') : t('passkey_create')}
       </Button>
 
       {/* Registered credentials list */}
@@ -360,7 +354,7 @@ export function BiometricSettings() {
                         onValueChange={setEditName}
                         autoFocus
                         className="max-w-[200px]"
-                        aria-label={t('passkey_rename_input', { defaultValue: 'New passkey name' })}
+                        aria-label={t('passkey_rename_input')}
                         onBlur={() => handleRename(cred.credential_id)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleRename(cred.credential_id);
@@ -377,14 +371,14 @@ export function BiometricSettings() {
                     )}
                     <div className="flex items-center gap-2 text-xs text-theme-subtle">
                       <span>
-                        {t('biometric_registered_on', { defaultValue: 'Registered' })}{' '}
+                        {t('biometric_registered_on')}{' '}
                         {new Date(cred.created_at).toLocaleDateString()}
                       </span>
                       {cred.last_used_at && (
                         <>
                           <span>&middot;</span>
                           <span>
-                            {t('biometric_last_used', { defaultValue: 'Last used' })}{' '}
+                            {t('biometric_last_used')}{' '}
                             {new Date(cred.last_used_at).toLocaleDateString()}
                           </span>
                         </>
@@ -402,7 +396,7 @@ export function BiometricSettings() {
                       setEditingId(cred.credential_id);
                       setEditName(getDeviceLabel(cred, (key, options) => t(key, options)));
                     }}
-                    aria-label={t('passkey_rename', { defaultValue: 'Rename passkey' })}
+                    aria-label={t('passkey_rename')}
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
@@ -413,7 +407,7 @@ export function BiometricSettings() {
                     className="text-[var(--color-error)] hover:bg-red-500/10"
                     onPress={() => handleRemove(cred.credential_id)}
                     isLoading={removingId === cred.credential_id}
-                    aria-label={t('biometric_remove', { defaultValue: 'Remove passkey' })}
+                    aria-label={t('biometric_remove')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -433,7 +427,7 @@ export function BiometricSettings() {
                 isLoading={removingAll}
                 startContent={!removingAll ? <Trash2 className="w-3 h-3" /> : undefined}
               >
-                {t('biometric_remove_all', { defaultValue: 'Remove All Passkeys' })}
+                {t('biometric_remove_all')}
               </Button>
             </div>
           )}
@@ -443,14 +437,14 @@ export function BiometricSettings() {
       {/* Multi-device tip */}
       {!showInstructions && (
         <p className="text-xs text-theme-muted">
-          {t('passkey_device_tip', { defaultValue: 'Register a passkey on each device you use. To add your phone, open this page on your phone.' })}{' '}
+          {t('passkey_device_tip')}{' '}
           <Button
             variant="light"
             size="sm"
             className="text-indigo-500 hover:underline h-auto p-0 min-w-0"
             onPress={() => setShowInstructions(true)}
           >
-            {t('passkey_setup_guide', { defaultValue: 'Setup guide' })}
+            {t('passkey_setup_guide')}
           </Button>
         </p>
       )}
@@ -461,19 +455,16 @@ export function BiometricSettings() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {t('passkey_remove_all_title', { defaultValue: 'Remove All Passkeys' })}
+                {t('passkey_remove_all_title')}
               </ModalHeader>
               <ModalBody>
                 <p className="text-theme-subtle">
-                  {t('passkey_remove_all_warning', {
-                    defaultValue:
-                      "Are you sure you want to remove all passkeys? You'll need to set them up again on each device.",
-                  })}
+                  {t('passkey_remove_all_warning')}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  {t('cancel', { defaultValue: 'Cancel' })}
+                  {t('cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -482,7 +473,7 @@ export function BiometricSettings() {
                     onClose();
                   }}
                 >
-                  {t('passkey_remove_all_confirm', { defaultValue: 'Remove All' })}
+                  {t('passkey_remove_all_confirm')}
                 </Button>
               </ModalFooter>
             </>

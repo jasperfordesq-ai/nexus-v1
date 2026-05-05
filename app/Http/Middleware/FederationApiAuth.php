@@ -87,9 +87,20 @@ class FederationApiAuth
         }
 
         if (str_contains($path, '/v2/federation/cc/')) {
-            return $method === 'GET'
-                ? ['transactions:read', 'members:read']
-                : ['transactions:write'];
+            if ($method !== 'GET') {
+                return ['transactions:write'];
+            }
+
+            if (
+                str_contains($path, '/v2/federation/cc/account/history')
+                || str_contains($path, '/v2/federation/cc/transactions')
+                || str_contains($path, '/v2/federation/cc/transaction/')
+                || str_contains($path, '/v2/federation/cc/entries')
+            ) {
+                return ['transactions:read'];
+            }
+
+            return ['members:read'];
         }
 
         if (str_contains($path, '/v2/federation/komunitin/')) {

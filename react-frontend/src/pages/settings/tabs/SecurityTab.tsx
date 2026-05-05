@@ -292,14 +292,14 @@ export function SecurityTab({
                       <Monitor className="w-4 h-4 text-theme-muted" aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-theme-primary flex items-center gap-2">
+                      <div className="text-sm font-medium text-theme-primary flex items-center gap-2">
                         {session.browser} {t('session_on')} {session.device}
                         {session.is_current && (
                           <Chip size="sm" color="success" variant="flat">{t('session_current')}</Chip>
                         )}
-                      </p>
+                      </div>
                       <p className="text-xs text-theme-subtle">
-                        {session.ip_address} &mdash; {t('session_last_active')} {new Date(session.last_active).toLocaleDateString()}
+                        {session.ip_address} - {t('session_last_active')} {new Date(session.last_active).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -511,13 +511,13 @@ export function SecurityTab({
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
-                      Google Authenticator
+                      {t('twofa_app_google')}
                     </a>
                     <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
-                      Microsoft Authenticator
+                      {t('twofa_app_microsoft')}
                     </a>
                     <a href="https://authy.com/download/" target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1 rounded-full bg-theme-elevated text-indigo-500 hover:bg-theme-hover transition-colors">
-                      Authy
+                      {t('twofa_app_authy')}
                     </a>
                   </div>
                 </div>

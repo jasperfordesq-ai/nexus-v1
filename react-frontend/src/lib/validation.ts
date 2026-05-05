@@ -154,7 +154,7 @@ export function validateEmail(email: string): string | null {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Phone Validation (E.164 international format)
+// Phone Validation (international format)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -166,7 +166,11 @@ export function validateEmail(email: string): string | null {
  */
 export function isPhoneValid(phone: string): boolean {
   if (!phone || !phone.trim()) return true; // optional field
-  return /^\+[1-9]\d{6,14}$/.test(phone.trim());
+  const trimmed = phone.trim();
+  if (!/^\+[0-9\s().-]+$/.test(trimmed)) return false;
+
+  const digits = trimmed.replace(/\D/g, '');
+  return digits.length >= 7 && digits.length <= 15 && digits[0] !== '0';
 }
 
 /**

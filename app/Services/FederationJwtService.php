@@ -46,10 +46,12 @@ class FederationJwtService
         $lifetime = min(max($lifetime, 60), self::MAX_TOKEN_LIFETIME);
 
         $now = time();
+        $issuer = config('federation.jwt_issuer', config('app.url', 'project-nexus'));
+        $audience = config('app.url', 'project-nexus');
         $payload = [
-            'iss' => config('app.url', 'project-nexus'),
+            'iss' => $issuer,
             'sub' => $userId,
-            'aud' => config('app.url', 'project-nexus'),
+            'aud' => $audience,
             'client_id' => $platformId,
             'iat' => $now,
             'exp' => $now + $lifetime,

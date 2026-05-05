@@ -134,8 +134,8 @@ export function DataTable<T extends Record<string, any>>({
   // Top content (search + actions)
   const tableTopContent = useMemo(
     () => (
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 min-w-0">
+        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto min-w-0">
           {searchable && (
             <Input
               className="w-full sm:max-w-xs"
@@ -160,7 +160,7 @@ export function DataTable<T extends Record<string, any>>({
             </Button>
           )}
         </div>
-        {topContent}
+        {topContent && <div className="flex flex-wrap items-center gap-2">{topContent}</div>}
       </div>
     ),
     [searchable, searchPlaceholder, searchValue, handleSearchChange, onRefresh, topContent],
@@ -170,7 +170,7 @@ export function DataTable<T extends Record<string, any>>({
   const tableBottomContent = useMemo(() => {
     if (!onPageChange || totalPages <= 1) return null;
     return (
-      <div className="flex items-center justify-between px-2 py-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-2 py-2">
         <span className="text-sm text-default-400">
           {totalItems ? `${totalItems.toLocaleString()} total` : ''}
         </span>
@@ -198,7 +198,11 @@ export function DataTable<T extends Record<string, any>>({
       bottomContent={tableBottomContent}
       bottomContentPlacement="outside"
       classNames={{
-        wrapper: 'shadow-sm',
+        base: 'min-w-0',
+        wrapper: 'shadow-sm max-w-full overflow-x-auto',
+        table: 'min-w-max',
+        th: 'whitespace-nowrap',
+        td: 'align-top',
       }}
     >
       <TableHeader>

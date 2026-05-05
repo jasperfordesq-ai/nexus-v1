@@ -27,49 +27,49 @@ class FederationNativeIngestControllerTest extends TestCase
 
     public function test_reviews_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/reviews', []);
+        $response = $this->apiPost('/v2/federation/ingest/reviews', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_listings_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/listings', []);
+        $response = $this->apiPost('/v2/federation/ingest/listings', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_events_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/events', []);
+        $response = $this->apiPost('/v2/federation/ingest/events', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_groups_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/groups', []);
+        $response = $this->apiPost('/v2/federation/ingest/groups', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_connections_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/connections', []);
+        $response = $this->apiPost('/v2/federation/ingest/connections', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_volunteering_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/volunteering', []);
+        $response = $this->apiPost('/v2/federation/ingest/volunteering', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_members_sync_rejects_unauthenticated(): void
     {
-        $response = $this->apiPost('/v2/federation/members/sync', []);
+        $response = $this->apiPost('/v2/federation/ingest/members/sync', []);
         $this->assertContains($response->status(), [401, 403, 400, 422]);
     }
 
     public function test_reviews_rejects_garbage_body(): void
     {
-        $response = $this->apiPost('/v2/federation/reviews', ['garbage' => str_repeat('x', 200)]);
+        $response = $this->apiPost('/v2/federation/ingest/reviews', ['garbage' => str_repeat('x', 200)]);
         $this->assertLessThan(500, $response->status());
     }
 
@@ -85,13 +85,13 @@ class FederationNativeIngestControllerTest extends TestCase
     public function test_all_ingest_endpoints_reject_unauthenticated(): void
     {
         $endpoints = [
-            '/v2/federation/reviews',
-            '/v2/federation/listings',
-            '/v2/federation/events',
-            '/v2/federation/groups',
-            '/v2/federation/connections',
-            '/v2/federation/volunteering',
-            '/v2/federation/members/sync',
+            '/v2/federation/ingest/reviews',
+            '/v2/federation/ingest/listings',
+            '/v2/federation/ingest/events',
+            '/v2/federation/ingest/groups',
+            '/v2/federation/ingest/connections',
+            '/v2/federation/ingest/volunteering',
+            '/v2/federation/ingest/members/sync',
         ];
         foreach ($endpoints as $path) {
             $response = $this->apiPost($path, ['external_id' => 'x', 'rating' => 5]);
@@ -111,7 +111,7 @@ class FederationNativeIngestControllerTest extends TestCase
     public function test_bogus_bearer_token_rejected(): void
     {
         $response = $this->apiPost(
-            '/v2/federation/reviews',
+            '/v2/federation/ingest/reviews',
             ['external_id' => 'r1', 'rating' => 5],
             ['Authorization' => 'Bearer totally-fake-' . uniqid()]
         );
@@ -125,7 +125,7 @@ class FederationNativeIngestControllerTest extends TestCase
     {
         $response = $this->call(
             'POST',
-            '/api/v2/federation/reviews',
+            '/api/v2/federation/ingest/reviews',
             [],
             [],
             [],
@@ -145,10 +145,10 @@ class FederationNativeIngestControllerTest extends TestCase
     public function test_malformed_json_never_500_across_endpoints(): void
     {
         $endpoints = [
-            '/v2/federation/reviews',
-            '/v2/federation/listings',
-            '/v2/federation/events',
-            '/v2/federation/members/sync',
+            '/v2/federation/ingest/reviews',
+            '/v2/federation/ingest/listings',
+            '/v2/federation/ingest/events',
+            '/v2/federation/ingest/members/sync',
         ];
         foreach ($endpoints as $path) {
             $response = $this->call(
@@ -179,7 +179,7 @@ class FederationNativeIngestControllerTest extends TestCase
     public function test_tenant_header_cannot_bypass_partner_auth(): void
     {
         $response = $this->postJson(
-            '/api/v2/federation/reviews',
+            '/api/v2/federation/ingest/reviews',
             ['external_id' => 'r1', 'rating' => 5, 'tenant_id' => 999],
             ['X-Tenant-ID' => '999', 'Accept' => 'application/json']
         );
@@ -196,7 +196,7 @@ class FederationNativeIngestControllerTest extends TestCase
             $this->markTestSkipped('federation_external_partner_logs table not in test schema');
         }
         $before = \Illuminate\Support\Facades\DB::table('federation_external_partner_logs')->count();
-        $this->apiPost('/v2/federation/reviews', ['external_id' => 'x', 'rating' => 5]);
+        $this->apiPost('/v2/federation/ingest/reviews', ['external_id' => 'x', 'rating' => 5]);
         $after = \Illuminate\Support\Facades\DB::table('federation_external_partner_logs')->count();
         $this->assertSame($before, $after,
             'Unauthenticated request wrote to partner_logs — auth is enforced AFTER logging (SEC BUG)');

@@ -43,7 +43,10 @@ export function TranslationTab() {
   const { t, i18n } = useTranslation('common');
   const toast = useToast();
 
-  const userLocale = (i18n.resolvedLanguage || i18n.language || 'en').slice(0, 2) as SupportedLocale;
+  const detectedLocale = (i18n.resolvedLanguage || i18n.language || 'en').slice(0, 2);
+  const userLocale = SUPPORTED_LOCALES.includes(detectedLocale as SupportedLocale)
+    ? detectedLocale as SupportedLocale
+    : 'en';
   const [prefersChronological, setPrefersChronological] = useState(false);
   const [autoTranslate, setAutoTranslate] = useState(false);
   const [targetLocale, setTargetLocale] = useState<SupportedLocale>(userLocale);
@@ -83,12 +86,12 @@ export function TranslationTab() {
       };
       const resp = await api.put('/v2/users/me/preferences', payload);
       if (resp.success) {
-        toast.success(t('settings_translation.saved', 'Translation preferences saved.'));
+        toast.success(t('settings_translation.saved'));
       } else {
-        toast.error(t('settings_translation.save_failed', 'Could not save translation preferences.'));
+        toast.error(t('settings_translation.save_failed'));
       }
     } catch {
-      toast.error(t('settings_translation.save_failed', 'Could not save translation preferences.'));
+      toast.error(t('settings_translation.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -100,23 +103,23 @@ export function TranslationTab() {
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-indigo-500" />
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('feed.personalisation.label', 'Feed mode')}
+            {t('feed.personalisation.label')}
           </h2>
         </div>
         <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
           <div>
             <p className="font-medium text-theme-primary">
-              {t('feed.personalisation.latest', 'Latest')}
+              {t('feed.personalisation.latest')}
             </p>
             <p className="text-sm text-theme-subtle">
-              {t('feed.personalisation.latest_hint', 'Newest posts first.')}
+              {t('feed.personalisation.latest_hint')}
             </p>
           </div>
           <Switch
             isDisabled={isLoading}
             isSelected={prefersChronological}
             onValueChange={setPrefersChronological}
-            aria-label={t('feed.personalisation.latest', 'Latest')}
+            aria-label={t('feed.personalisation.latest')}
           />
         </div>
       </GlassCard>
@@ -125,30 +128,30 @@ export function TranslationTab() {
         <div className="flex items-center gap-2 mb-4">
           <Languages className="w-5 h-5 text-indigo-500" />
           <h2 className="text-lg font-semibold text-theme-primary">
-            {t('settings_translation.section_title', 'Translation')}
+            {t('settings_translation.section_title')}
           </h2>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
             <div className="pr-4">
               <p className="font-medium text-theme-primary">
-                {t('settings_translation.auto_translate_label', 'Auto-translate posts and listings to my language')}
+                {t('settings_translation.auto_translate_label')}
               </p>
               <p className="text-sm text-theme-subtle">
-                {t('settings_translation.auto_translate_help', 'When enabled, content already translated to your language is shown automatically.')}
+                {t('settings_translation.auto_translate_help')}
               </p>
             </div>
             <Switch
               isDisabled={isLoading}
               isSelected={autoTranslate}
               onValueChange={setAutoTranslate}
-              aria-label={t('settings_translation.auto_translate_label', 'Auto-translate')}
+              aria-label={t('settings_translation.auto_translate_label')}
             />
           </div>
 
           <Select
             isDisabled={isLoading || !autoTranslate}
-            label={t('settings_translation.target_locale_label', 'Translate into')}
+            label={t('settings_translation.target_locale_label')}
             selectedKeys={[targetLocale]}
             onSelectionChange={(keys) => {
               const v = keys instanceof Set ? ([...keys][0] as SupportedLocale) : userLocale;
@@ -175,7 +178,7 @@ export function TranslationTab() {
           onPress={handleSave}
           startContent={<Save className="w-4 h-4" />}
         >
-          {t('common.save', 'Save')}
+          {t('save')}
         </Button>
       </div>
     </div>

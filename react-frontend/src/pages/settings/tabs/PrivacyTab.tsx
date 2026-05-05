@@ -30,6 +30,17 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 
+const INSURANCE_TYPE_KEYS = [
+  'public_liability',
+  'professional_indemnity',
+  'employers_liability',
+  'product_liability',
+  'personal_accident',
+  'other',
+] as const;
+
+const INSURANCE_STATUS_KEYS = ['verified', 'pending', 'submitted', 'rejected'] as const;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -78,8 +89,8 @@ interface SettingToggleProps {
 
 function SettingToggle({ label, description, checked, onChange }: SettingToggleProps) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
-      <div>
+    <div className="flex items-center justify-between gap-4 p-4 rounded-lg bg-theme-elevated">
+      <div className="min-w-0">
         <p className="font-medium text-theme-primary">{label}</p>
         <p className="text-sm text-theme-subtle">{description}</p>
       </div>
@@ -87,6 +98,7 @@ function SettingToggle({ label, description, checked, onChange }: SettingToggleP
         aria-label={label}
         isSelected={checked}
         onValueChange={onChange}
+        className="shrink-0"
         classNames={{
           wrapper: 'group-data-[selected=true]:bg-indigo-500',
         }}
@@ -117,6 +129,18 @@ export function PrivacyTab({
   const { t } = useTranslation('settings');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+
+  const getInsuranceTypeLabel = (type: string) => (
+    INSURANCE_TYPE_KEYS.includes(type as (typeof INSURANCE_TYPE_KEYS)[number])
+      ? t(`insurance.${type}`)
+      : t('insurance.other')
+  );
+
+  const getInsuranceStatusLabel = (status: string) => (
+    INSURANCE_STATUS_KEYS.includes(status as (typeof INSURANCE_STATUS_KEYS)[number])
+      ? t(`insurance.status_${status}`)
+      : t('insurance.status_unknown')
+  );
 
   const selectClassNames = {
     trigger: 'bg-theme-elevated border-theme-default',
@@ -232,8 +256,8 @@ export function PrivacyTab({
                 <Ban className="w-4 h-4 text-red-600 dark:text-red-400" aria-hidden="true" />
               </div>
               <div className="text-left">
-                <p className="font-medium">{t('blocked_users.title', 'Blocked Users')}</p>
-                <p className="text-sm text-theme-subtle font-normal">{t('blocked_users.description', 'Manage users you have blocked')}</p>
+                <p className="font-medium">{t('blocked_users.title')}</p>
+                <p className="text-sm text-theme-subtle font-normal">{t('blocked_users.description')}</p>
               </div>
             </div>
           }
@@ -402,7 +426,7 @@ export function PrivacyTab({
                     >
                       <div>
                         <p className="text-sm font-medium text-theme-primary">
-                          {t(`insurance.${cert.insurance_type}`, { defaultValue: cert.insurance_type })}
+                          {getInsuranceTypeLabel(cert.insurance_type)}
                         </p>
                         <p className="text-xs text-theme-muted">
                           {cert.provider_name || t('insurance.unknown_provider')}
@@ -415,7 +439,7 @@ export function PrivacyTab({
                           : cert.status === 'rejected' ? 'bg-red-500/20 text-red-600 dark:text-red-400'
                           : 'bg-default-200 text-default-600'
                       }`}>
-                        {t(`insurance.status_${cert.status}`, { defaultValue: cert.status })}
+                        {getInsuranceStatusLabel(cert.status)}
                       </span>
                     </div>
                   ))}

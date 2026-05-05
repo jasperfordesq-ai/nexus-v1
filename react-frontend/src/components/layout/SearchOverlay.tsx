@@ -271,12 +271,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
       {/* Modal panel */}
       <div
-        className="absolute top-16 sm:top-24 left-1/2 -translate-x-1/2 w-[92vw] max-w-xl"
+        className="absolute top-[calc(var(--safe-area-top)+1rem)] sm:top-[calc(var(--safe-area-top)+4.5rem)] left-1/2 -translate-x-1/2 w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right)-1rem)] max-w-xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden">
+        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
           {/* Search input row */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
+          <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
             <Search className="w-5 h-5 text-zinc-400 flex-shrink-0" />
             <input
               type="text"
@@ -286,7 +286,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               placeholder={t('search.placeholder', 'Search...')}
               aria-label={t('search.placeholder', 'Search...')}
               autoFocus
-              className="flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="min-w-0 flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             />
             {query && (
               <Button
@@ -304,7 +304,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               variant="flat"
               size="sm"
               onPress={handleClose}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600 h-auto"
+              className="hidden min-[360px]:flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600 h-auto"
               aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
@@ -313,7 +313,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           </div>
 
           {/* Results area */}
-          <div className="px-4 py-3 max-h-80 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-4 py-3 overscroll-contain">
             {/* Action mode */}
             {isActionMode ? (
               <div>
@@ -329,14 +329,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           onPress={() => { action.action(); handleClose(); }}
                           onMouseEnter={() => setSelectedIndex(i)}
                           onFocus={() => setSelectedIndex(i)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start ${
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start min-w-0 ${
                             i === selectedIndex
                               ? 'bg-indigo-50 dark:bg-indigo-500/10'
                               : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
                           }`}
                         >
-                          <Icon className="w-4 h-4 text-zinc-500" />
-                          <span className="text-sm text-zinc-800 dark:text-zinc-200">{action.label}</span>
+                          <Icon className="w-4 h-4 shrink-0 text-zinc-500" />
+                          <span className="min-w-0 truncate text-sm text-zinc-800 dark:text-zinc-200">{action.label}</span>
                         </Button>
                       );
                     })}
@@ -358,13 +358,13 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         variant="light"
                         onPress={() => goToSuggestion(s)}
                         onMouseEnter={() => setSelectedIndex(i)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-start h-auto ${
+                        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-start h-auto min-w-0 ${
                           i === selectedIndex
                             ? 'bg-indigo-50 dark:bg-indigo-500/10'
                             : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
                         }`}
                       >
-                        <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{s.title || s.name}</span>
+                        <span className="min-w-0 truncate text-sm text-zinc-800 dark:text-zinc-200">{s.title || s.name}</span>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ms-2 flex-shrink-0`}>{type.label}</span>
                       </Button>
                     );
@@ -425,10 +425,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
                             handleClose();
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800 h-auto justify-start"
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800 h-auto justify-start min-w-0"
                         >
-                          <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                          <span className="text-sm text-zinc-600 dark:text-zinc-400">{q}</span>
+                          <Clock className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
+                          <span className="min-w-0 truncate text-sm text-zinc-600 dark:text-zinc-400">{q}</span>
                         </Button>
                       ))}
                     </div>

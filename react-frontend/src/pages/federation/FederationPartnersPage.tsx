@@ -47,6 +47,7 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
@@ -271,7 +272,7 @@ export function FederationPartnersPage() {
               <ModalHeader className="flex items-center gap-3">
                 <Avatar
                   name={selectedPartner.name[0]}
-                  src={selectedPartner.logo || undefined}
+                  src={resolveAvatarUrl(selectedPartner.logo)}
                   size="md"
                   className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0"
                 />
@@ -426,7 +427,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
         {/* Logo / Avatar */}
         <Avatar
           name={partner.name}
-          src={partner.logo || undefined}
+          src={resolveAvatarUrl(partner.logo)}
           size="lg"
           className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0"
         />

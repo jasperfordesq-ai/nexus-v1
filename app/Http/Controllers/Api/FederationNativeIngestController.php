@@ -22,10 +22,9 @@ use Illuminate\Support\Facades\Log;
  * connections, volunteering, member updates) to us.
  *
  * This controller is intentionally thin: it authenticates via the standard
- * FederationApiMiddleware (API key / HMAC / JWT), synthesizes a webhook-style
- * payload that mirrors FederationExternalWebhookController's event schema, and
- * logs the inbound event to federation_external_partner_logs for the
- * existing webhook/listener pipeline to pick up asynchronously.
+ * FederationApiMiddleware (API key / HMAC / JWT), validates tenant access,
+ * logs the inbound event, and delegates to the same normalized handlers used
+ * by FederationExternalWebhookController.
  *
  * Ownership split:
  *   - THIS controller  — HTTP ingress + auth + logging
@@ -35,13 +34,13 @@ use Illuminate\Support\Facades\Log;
  * All endpoints are tenant-scoped by the authenticated partner's tenant_id.
  *
  * Routes (under `federation.api` middleware):
- *   POST /v2/federation/reviews
- *   POST /v2/federation/listings
- *   POST /v2/federation/events
- *   POST /v2/federation/groups
- *   POST /v2/federation/connections
- *   POST /v2/federation/volunteering
- *   POST /v2/federation/members/sync
+ *   POST /v2/federation/ingest/reviews
+ *   POST /v2/federation/ingest/listings
+ *   POST /v2/federation/ingest/events
+ *   POST /v2/federation/ingest/groups
+ *   POST /v2/federation/ingest/connections
+ *   POST /v2/federation/ingest/volunteering
+ *   POST /v2/federation/ingest/members/sync
  */
 class FederationNativeIngestController extends BaseApiController
 {
@@ -49,22 +48,22 @@ class FederationNativeIngestController extends BaseApiController
 
     public function reviews(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'review.received');
+        return $this->ingest($request, 'review.created');
     }
 
     public function listings(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'listing.received');
+        return $this->ingest($request, 'listing.created');
     }
 
     public function events(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'event.received');
+        return $this->ingest($request, 'event.created');
     }
 
     public function groups(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'group.received', false);
+        return $this->ingest($request, 'group.created');
     }
 
     public function connections(Request $request): JsonResponse
@@ -74,23 +73,18 @@ class FederationNativeIngestController extends BaseApiController
 
     public function volunteering(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'volunteering.received');
+        return $this->ingest($request, 'volunteering.created');
     }
 
     public function membersSync(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'member.sync');
+        return $this->ingest($request, 'member.profile_updated');
     }
 
     /**
-     * Shared ingest path: validates payload, logs the event, returns 202 Accepted.
-     *
-     * @param bool $queuedForProcessing  Set to false when no async pipeline is wired
-     *                                   up for this event type (avoids misleading clients).
-     *
-     * Any downstream persistence is handled by dedicated listeners (other agents).
+     * Shared ingest path: validates payload, logs the event, and processes it.
      */
-    private function ingest(Request $request, string $eventType, bool $queuedForProcessing = true): JsonResponse
+    private function ingest(Request $request, string $eventType): JsonResponse
     {
         $partner = FederationApiMiddleware::getPartner();
         if (!$partner) {
@@ -143,22 +137,38 @@ class FederationNativeIngestController extends BaseApiController
             // Table missing in minimal test schemas — ignore
         }
 
+        $handlerPartner = (object) [
+            'id' => (int) ($externalPartnerId ?: ($partner['id'] ?? 0)),
+            'tenant_id' => (int) $tenantId,
+            'name' => (string) ($partner['name'] ?? $partner['platform_id'] ?? __('api.external_partner_fallback')),
+            'status' => 'active',
+            'allow_messaging' => true,
+            'allow_transactions' => true,
+            'allow_listing_search' => true,
+        ];
+
         try {
-            DB::table('federation_external_partner_logs')->insert([
-                'partner_id'    => $externalPartnerId ?: ($partner['id'] ?? 0),
-                'endpoint'      => "/api/v2/federation/native/ingest [{$eventType}]",
-                'method'        => 'POST',
-                'response_code' => 202,
-                'success'       => true,
-                'request_body'  => substr(json_encode($payload) ?: '{}', 0, 10000),
-                'created_at'    => now(),
-                'updated_at'    => now(),
-            ]);
+            $result = app(FederationExternalWebhookController::class)
+                ->processTrustedEvent($eventType, $payload, $handlerPartner);
+        } catch (InboundValidationException $e) {
+            $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 400, false, $e->getMessage());
+
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), [
+                'field' => $e->field,
+            ], 400);
         } catch (\Throwable $e) {
-            Log::warning('[FederationNativeIngest] Log write failed', [
-                'event' => $eventType, 'error' => $e->getMessage(),
+            Log::error('[FederationNativeIngest] Processing failed', [
+                'event' => $eventType,
+                'partner_id' => $partner['id'] ?? null,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
             ]);
+            $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 500, false, $e->getMessage());
+
+            return $this->respondWithError('PROCESSING_FAILED', __('api.federation.ingest_processing_failed'), null, 500);
         }
+
+        $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 200, true, null, $result);
 
         Log::info('[FederationNativeIngest] Accepted', [
             'event' => $eventType,
@@ -169,7 +179,38 @@ class FederationNativeIngestController extends BaseApiController
         return $this->respondWithData([
             'received' => true,
             'event' => $eventType,
-            'queued_for_processing' => $queuedForProcessing,
-        ], null, 202);
+            'processed' => true,
+            'result' => $result,
+        ]);
+    }
+
+    private function logNativeIngest(
+        int $partnerId,
+        string $eventType,
+        array $payload,
+        int $responseCode,
+        bool $success,
+        ?string $errorMessage = null,
+        ?array $responseBody = null,
+    ): void {
+        try {
+            DB::table('federation_external_partner_logs')->insert([
+                'partner_id'        => $partnerId,
+                'endpoint'          => "/api/v2/federation/ingest [{$eventType}]",
+                'method'            => 'POST',
+                'response_code'     => $responseCode,
+                'success'           => $success,
+                'request_body'      => substr(json_encode($payload) ?: '{}', 0, 10000),
+                'response_body'     => $responseBody ? substr(json_encode($responseBody) ?: '{}', 0, 10000) : null,
+                'error_message'     => $errorMessage,
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('[FederationNativeIngest] Log write failed', [
+                'event' => $eventType,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

@@ -525,9 +525,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
         {/* Main Navigation Bar */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center justify-between gap-2 h-14 sm:h-16">
             {/* Left Section: Mobile Menu + Brand */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 lg:flex-none">
               {/* Mobile Menu Toggle — guests only (authenticated users use MobileTabBar) */}
               {!isAuthenticated && (
                 <Button
@@ -708,7 +708,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
             </nav>
 
             {/* User Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               {/* Search — visible on mobile/tablet where utility bar is hidden */}
               <Button
                 isIconOnly
@@ -762,7 +762,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </Dropdown>
 
                   {/* Language Switcher — mobile only (desktop uses utility bar) */}
-                  <div className="sm:hidden">
+                  <div className="hidden min-[390px]:block sm:hidden">
                     <LanguageSwitcher />
                   </div>
 
@@ -770,7 +770,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <NotificationFlyout />
 
                   {/* Status Selector (small dot button) */}
-                  <StatusSelector />
+                  <div className="hidden min-[390px]:block">
+                    <StatusSelector />
+                  </div>
 
                   {/* User Dropdown */}
                   <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
@@ -807,10 +809,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           textValue="Profile"
                           isReadOnly
                         >
-                          <p className="font-semibold text-theme-primary">
+                          <p className="font-semibold text-theme-primary truncate">
                             {user?.first_name} {user?.last_name}
                           </p>
-                          <p className="text-sm text-theme-subtle">{user?.email}</p>
+                          <p className="text-sm text-theme-subtle truncate">{user?.email}</p>
                         </DropdownItem>
                       </DropdownSection>
 
@@ -873,7 +875,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               ) : (
                 <>
                   {/* Theme Toggle + Language Switcher — mobile only (desktop uses utility bar) */}
-                  <div className="flex items-center gap-1 sm:hidden">
+                  <div className="hidden min-[390px]:flex items-center gap-1 sm:hidden">
                     <Button
                       isIconOnly
                       variant="light"
@@ -891,13 +893,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <LanguageSwitcher />
                   </div>
 
-                  <Link to={tenantPath('/login')}>
-                    <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
+                  <Link to={tenantPath('/login')} className="hidden min-[360px]:inline-flex">
+                    <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary min-w-0 px-2 sm:px-3">
                       {t('auth.log_in')}
                     </Button>
                   </Link>
                   <Link to={tenantPath('/register')}>
-                    <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
+                    <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium min-w-0 px-2 sm:px-3">
                       {t('auth.sign_up')}
                     </Button>
                   </Link>

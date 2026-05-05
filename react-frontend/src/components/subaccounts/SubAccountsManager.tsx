@@ -4,15 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * SubAccountsManager - Manage linked sub-accounts
- *
- * Allows parents to manage child accounts with permission toggles.
- * Used in the Settings page.
- *
- * API: GET/POST /api/v2/users/me/sub-accounts
+ * SubAccountsManager - manage delegated account relationships.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { ReactNode } from 'react';
 import {
   Button,
   Input,
@@ -38,84 +34,122 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Clock from 'lucide-react/icons/clock';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
+type RelationshipStatus = 'active' | 'pending' | 'revoked' | 'rejected';
+type PermissionKey = 'can_view_activity' | 'can_manage_listings' | 'can_transact' | 'can_view_messages';
 
-interface SubAccount {
-  id: number;
-  child_user_id: number;
-  child_name: string;
-  child_email: string;
-  child_avatar?: string;
-  status: 'pending' | 'approved' | 'rejected';
-  permissions: {
-    can_post: boolean;
-    can_message: boolean;
-    can_exchange: boolean;
-    can_join_events: boolean;
-    can_join_groups: boolean;
-  };
+interface AccountRelationshipRow {
+  relationship_id: number;
+  relationship_type: string;
+  permissions: Partial<Record<PermissionKey, boolean>> | string | null;
+  status: RelationshipStatus;
+  approved_at?: string | null;
   created_at: string;
+  user_id: number;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  email: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Component
-// ─────────────────────────────────────────────────────────────────────────────
+interface NormalizedRelationship extends Omit<AccountRelationshipRow, 'permissions'> {
+  permissions: Record<PermissionKey, boolean>;
+}
+
+const PERMISSION_KEYS: PermissionKey[] = [
+  'can_view_activity',
+  'can_manage_listings',
+  'can_transact',
+  'can_view_messages',
+];
+
+const DEFAULT_PERMISSIONS: Record<PermissionKey, boolean> = {
+  can_view_activity: true,
+  can_manage_listings: false,
+  can_transact: false,
+  can_view_messages: false,
+};
+
+function parsePermissions(
+  permissions: AccountRelationshipRow['permissions'],
+): Record<PermissionKey, boolean> {
+  let parsed = permissions;
+
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed) as Partial<Record<PermissionKey, boolean>>;
+    } catch {
+      parsed = null;
+    }
+  }
+
+  return PERMISSION_KEYS.reduce<Record<PermissionKey, boolean>>((acc, key) => {
+    acc[key] = Boolean((parsed as Partial<Record<PermissionKey, boolean>> | null)?.[key] ?? DEFAULT_PERMISSIONS[key]);
+    return acc;
+  }, { ...DEFAULT_PERMISSIONS });
+}
+
+function normalizeRelationship(row: AccountRelationshipRow): NormalizedRelationship {
+  return {
+    ...row,
+    permissions: parsePermissions(row.permissions),
+  };
+}
+
+function getDisplayName(account: NormalizedRelationship, unknownLabel: string): string {
+  const name = [account.first_name, account.last_name]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(' ');
+
+  return name || account.email || unknownLabel;
+}
 
 export function SubAccountsManager() {
   const toast = useToast();
   const { t } = useTranslation('settings');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [subAccounts, setSubAccounts] = useState<SubAccount[]>([]);
+  const [managedAccounts, setManagedAccounts] = useState<NormalizedRelationship[]>([]);
+  const [managerAccounts, setManagerAccounts] = useState<NormalizedRelationship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Add form state
   const [addEmail, setAddEmail] = useState('');
-  const [addName, setAddName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+  const [busyRelationshipId, setBusyRelationshipId] = useState<number | null>(null);
 
-  // AbortController ref to cancel stale requests
-  const abortRef = useRef<AbortController | null>(null);
-
-  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
   const loadSubAccounts = useCallback(async () => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<SubAccount[]>('/v2/users/me/sub-accounts');
-      if (controller.signal.aborted) return;
-      if (response.success && response.data) {
-        setSubAccounts(response.data);
-      } else {
+
+      const [childrenResponse, parentsResponse] = await Promise.all([
+        api.get<AccountRelationshipRow[]>('/v2/users/me/sub-accounts'),
+        api.get<AccountRelationshipRow[]>('/v2/users/me/parent-accounts'),
+      ]);
+
+      if (!childrenResponse.success || !parentsResponse.success) {
         setError(tRef.current('sub_accounts.load_failed'));
+        return;
       }
+
+      setManagedAccounts((childrenResponse.data ?? []).map(normalizeRelationship));
+      setManagerAccounts((parentsResponse.data ?? []).map(normalizeRelationship));
     } catch (err) {
-      if (controller.signal.aborted) return;
       logError('Failed to load sub-accounts', err);
       setError(tRef.current('sub_accounts.load_failed'));
     } finally {
-      if (!controller.signal.aborted) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, []);
 
@@ -123,26 +157,22 @@ export function SubAccountsManager() {
     loadSubAccounts();
   }, [loadSubAccounts]);
 
-  // Add sub-account
   const handleAdd = async () => {
-    if (!addEmail.trim()) {
+    const email = addEmail.trim();
+    if (!email) {
       toastRef.current.error(tRef.current('toasts.subaccount_enter_email'));
       return;
     }
 
     try {
       setIsAdding(true);
-      const response = await api.post('/v2/users/me/sub-accounts', {
-        email: addEmail.trim(),
-        name: addName.trim() || undefined,
-      });
+      const response = await api.post('/v2/users/me/sub-accounts', { email });
 
       if (response.success) {
         toastRef.current.success(tRef.current('toasts.subaccount_request_sent'));
         setAddEmail('');
-        setAddName('');
         onClose();
-        loadSubAccounts();
+        await loadSubAccounts();
       } else {
         toastRef.current.error(response.error || tRef.current('sub_accounts.add_failed'));
       }
@@ -154,79 +184,229 @@ export function SubAccountsManager() {
     }
   };
 
-  // Update permissions
-  const handlePermissionChange = async (accountId: number, permission: string, value: boolean) => {
+  const handlePermissionChange = async (
+    relationshipId: number,
+    permission: PermissionKey,
+    value: boolean,
+  ) => {
+    const previousAccounts = managedAccounts;
+
+    setManagedAccounts((prev) =>
+      prev.map((account) =>
+        account.relationship_id === relationshipId
+          ? { ...account, permissions: { ...account.permissions, [permission]: value } }
+          : account,
+      ),
+    );
+
     try {
-      const response = await api.put(`/v2/users/me/sub-accounts/${accountId}/permissions`, {
-        [permission]: value,
+      const response = await api.put(`/v2/users/me/sub-accounts/${relationshipId}/permissions`, {
+        permissions: { [permission]: value },
       });
 
-      if (response.success) {
-        setSubAccounts((prev) =>
-          prev.map((sa) =>
-            sa.id === accountId
-              ? { ...sa, permissions: { ...sa.permissions, [permission]: value } }
-              : sa
-          )
-        );
-      } else {
+      if (!response.success) {
+        setManagedAccounts(previousAccounts);
         toastRef.current.error(response.error || tRef.current('toasts.subaccount_permission_failed'));
       }
     } catch (err) {
+      setManagedAccounts(previousAccounts);
       logError('Failed to update permission', err);
       toastRef.current.error(tRef.current('toasts.subaccount_permission_failed'));
     }
   };
 
-  // Remove sub-account
-  const handleRemove = async (accountId: number) => {
+  const handleRemove = async (relationshipId: number) => {
     try {
-      const response = await api.delete(`/v2/users/me/sub-accounts/${accountId}`);
+      setBusyRelationshipId(relationshipId);
+      const response = await api.delete(`/v2/users/me/sub-accounts/${relationshipId}`);
+
       if (response.success) {
         toastRef.current.success(tRef.current('toasts.subaccount_removed'));
-        setSubAccounts((prev) => prev.filter((sa) => sa.id !== accountId));
+        setManagedAccounts((prev) => prev.filter((account) => account.relationship_id !== relationshipId));
+        setManagerAccounts((prev) => prev.filter((account) => account.relationship_id !== relationshipId));
       } else {
         toastRef.current.error(response.error || tRef.current('sub_accounts.remove_failed'));
       }
     } catch (err) {
-      logError('Failed to remove sub-account', err);
+      logError('Failed to remove sub-account relationship', err);
       toastRef.current.error(tRef.current('toasts.subaccount_remove_failed'));
+    } finally {
+      setBusyRelationshipId(null);
     }
   };
 
-  // Approve pending request
-  const handleApprove = async (accountId: number) => {
+  const handleApprove = async (relationshipId: number) => {
     try {
-      const response = await api.put(`/v2/users/me/sub-accounts/${accountId}/approve`);
+      setBusyRelationshipId(relationshipId);
+      const response = await api.put(`/v2/users/me/sub-accounts/${relationshipId}/approve`);
+
       if (response.success) {
         toastRef.current.success(tRef.current('toasts.subaccount_approved'));
-        loadSubAccounts();
+        await loadSubAccounts();
       } else {
         toastRef.current.error(response.error || tRef.current('sub_accounts.approve_failed'));
       }
     } catch (err) {
-      logError('Failed to approve sub-account', err);
+      logError('Failed to approve sub-account relationship', err);
       toastRef.current.error(tRef.current('toasts.subaccount_approve_failed'));
+    } finally {
+      setBusyRelationshipId(null);
     }
   };
 
-  const statusConfig: Record<string, { label: string; color: 'success' | 'warning' | 'danger'; icon: React.ReactNode }> = {
-    approved: { label: t('sub_accounts.status_active'), color: 'success', icon: <CheckCircle className="w-3 h-3" /> },
+  const statusConfig: Record<RelationshipStatus, { label: string; color: 'success' | 'warning' | 'danger' | 'default'; icon: ReactNode }> = {
+    active: { label: t('sub_accounts.status_active'), color: 'success', icon: <CheckCircle className="w-3 h-3" /> },
     pending: { label: t('sub_accounts.status_pending'), color: 'warning', icon: <Clock className="w-3 h-3" /> },
+    revoked: { label: t('sub_accounts.status_revoked'), color: 'default', icon: <AlertTriangle className="w-3 h-3" /> },
     rejected: { label: t('sub_accounts.status_rejected'), color: 'danger', icon: <AlertTriangle className="w-3 h-3" /> },
   };
 
+  const renderRelationshipCard = (
+    account: NormalizedRelationship,
+    options: { canManagePermissions: boolean; canApprove: boolean; pendingMessageKey: string },
+  ) => {
+    const name = getDisplayName(account, t('sub_accounts.unknown_member'));
+    const status = statusConfig[account.status] ?? {
+      label: t('sub_accounts.status_unknown'),
+      color: 'default' as const,
+      icon: <AlertTriangle className="w-3 h-3" />,
+    };
+    const isBusy = busyRelationshipId === account.relationship_id;
+
+    return (
+      <div
+        key={account.relationship_id}
+        className="rounded-lg border border-theme-default bg-theme-elevated/60 p-4"
+      >
+        <div className="flex items-start gap-4">
+          <Avatar
+            src={resolveAvatarUrl(account.avatar_url)}
+            name={name}
+            size="md"
+            className="ring-2 ring-theme-muted/20 flex-shrink-0"
+          />
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="font-medium text-theme-primary">{name}</h4>
+              <Chip size="sm" variant="flat" color={status.color} startContent={status.icon}>
+                {status.label}
+              </Chip>
+            </div>
+            <p className="text-xs text-theme-subtle break-all">{account.email}</p>
+
+            {options.canManagePermissions && account.status === 'active' && (
+              <div className="mt-4 space-y-3">
+                <p className="text-xs font-medium text-theme-muted flex items-center gap-1">
+                  <Shield className="w-3 h-3" aria-hidden="true" />
+                  {t('sub_accounts.permissions_label')}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {PERMISSION_KEYS.map((permission) => {
+                    const label = t(`sub_accounts.permissions.${permission}`);
+                    return (
+                      <div key={permission} className="flex min-w-0 items-center justify-between gap-3">
+                        <span className="text-xs text-theme-muted">{label}</span>
+                        <Switch
+                          size="sm"
+                          className="shrink-0"
+                          isSelected={account.permissions[permission]}
+                          onValueChange={(value) =>
+                            handlePermissionChange(account.relationship_id, permission, value)
+                          }
+                          aria-label={t('sub_accounts.permission_aria', { permission: label, name })}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {account.status === 'pending' && (
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {options.canApprove ? (
+                  <>
+                    <Button
+                      size="sm"
+                      color="success"
+                      variant="flat"
+                      isLoading={isBusy}
+                      onPress={() => handleApprove(account.relationship_id)}
+                    >
+                      {t('sub_accounts.approve')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      variant="flat"
+                      isDisabled={isBusy}
+                      onPress={() => handleRemove(account.relationship_id)}
+                    >
+                      {t('sub_accounts.decline')}
+                    </Button>
+                  </>
+                ) : (
+                  <p className="text-xs text-theme-muted">
+                    {t(options.pendingMessageKey)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            color="danger"
+            isLoading={isBusy && account.status !== 'pending'}
+            onPress={() => handleRemove(account.relationship_id)}
+            aria-label={t('sub_accounts.remove_aria', { name })}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSection = (
+    titleKey: string,
+    descriptionKey: string,
+    emptyKey: string,
+    accounts: NormalizedRelationship[],
+    options: { canManagePermissions: boolean; canApprove: boolean; pendingMessageKey: string },
+  ) => (
+    <section className="space-y-3">
+      <div>
+        <h4 className="text-sm font-semibold text-theme-primary">{t(titleKey)}</h4>
+        <p className="text-xs text-theme-muted">{t(descriptionKey)}</p>
+      </div>
+
+      {accounts.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-theme-default p-4 text-sm text-theme-muted">
+          {t(emptyKey)}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {accounts.map((account) => renderRelationshipCard(account, options))}
+        </div>
+      )}
+    </section>
+  );
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <Users className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-theme-primary">{t('sub_accounts.title')}</h3>
         </div>
         <Button
           size="sm"
           variant="flat"
-          className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+          className="shrink-0 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
@@ -234,20 +414,16 @@ export function SubAccountsManager() {
         </Button>
       </div>
 
-      <p className="text-sm text-theme-subtle">
-        {t('sub_accounts.description')}
-      </p>
+      <p className="text-sm text-theme-subtle">{t('sub_accounts.description')}</p>
 
-      {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-8">
           <Spinner size="lg" />
         </div>
       )}
 
-      {/* Error */}
       {error && !isLoading && (
-        <GlassCard className="p-6 text-center">
+        <div className="rounded-lg border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
           <p className="text-sm text-theme-muted mb-3">{error}</p>
           <Button
@@ -258,125 +434,55 @@ export function SubAccountsManager() {
           >
             {t('sub_accounts.retry')}
           </Button>
-        </GlassCard>
+        </div>
       )}
 
-      {/* Sub Accounts List */}
-      {!isLoading && !error && (
-        <>
-          {subAccounts.length === 0 ? (
-            <EmptyState
-              icon={<UserPlus className="w-10 h-10" aria-hidden="true" />}
-              title={t('sub_accounts.empty_title')}
-              description={t('sub_accounts.empty_description')}
-              action={
-                <Button
-                  variant="flat"
-                  className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                  onPress={onOpen}
-                >
-                  {t('sub_accounts.add_button')}
-                </Button>
-              }
-            />
-          ) : (
-            <div className="space-y-3">
-              {subAccounts.map((account) => {
-                const status = statusConfig[account.status] ?? statusConfig['pending'] ?? { label: account.status, color: 'warning' as const, icon: null };
-                return (
-                  <GlassCard key={account.id} className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar
-                        src={resolveAvatarUrl(account.child_avatar)}
-                        name={account.child_name}
-                        size="md"
-                        className="ring-2 ring-theme-muted/20 flex-shrink-0"
-                      />
+      {!isLoading && !error && managedAccounts.length === 0 && managerAccounts.length === 0 ? (
+        <EmptyState
+          icon={<UserPlus className="w-10 h-10" aria-hidden="true" />}
+          title={t('sub_accounts.empty_title')}
+          description={t('sub_accounts.empty_description')}
+          action={
+            <Button
+              variant="flat"
+              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              onPress={onOpen}
+            >
+              {t('sub_accounts.add_button')}
+            </Button>
+          }
+        />
+      ) : null}
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium text-theme-primary">{account.child_name}</h4>
-                          <Chip
-                            size="sm"
-                            variant="flat"
-                            color={status.color}
-                            startContent={status.icon}
-                          >
-                            {status.label}
-                          </Chip>
-                        </div>
-                        <p className="text-xs text-theme-subtle">{account.child_email}</p>
-
-                        {/* Permissions */}
-                        {account.status === 'approved' && (
-                          <div className="mt-3 space-y-2">
-                            <p className="text-xs font-medium text-theme-muted flex items-center gap-1">
-                              <Shield className="w-3 h-3" aria-hidden="true" />
-                              {t('sub_accounts.permissions_label')}
-                            </p>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              {Object.entries(account.permissions).map(([key, value]) => (
-                                <div key={key} className="flex items-center gap-2">
-                                  <Switch
-                                    size="sm"
-                                    isSelected={value}
-                                    onValueChange={(v) => handlePermissionChange(account.id, key, v)}
-                                    aria-label={key.replace(/_/g, ' ')}
-                                  />
-                                  <span className="text-xs text-theme-muted capitalize">
-                                    {key.replace(/can_/g, '').replace(/_/g, ' ')}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Pending actions */}
-                        {account.status === 'pending' && (
-                          <div className="mt-3 flex gap-2">
-                            <Button
-                              size="sm"
-                              color="success"
-                              variant="flat"
-                              onPress={() => handleApprove(account.id)}
-                            >
-                              {t('sub_accounts.approve')}
-                            </Button>
-                            <Button
-                              size="sm"
-                              color="danger"
-                              variant="flat"
-                              onPress={() => handleRemove(account.id)}
-                            >
-                              {t('sub_accounts.decline')}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Remove button */}
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        color="danger"
-                        onPress={() => handleRemove(account.id)}
-                        aria-label={t('sub_accounts.remove_aria', { name: account.child_name })}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </GlassCard>
-                );
-              })}
-            </div>
+      {!isLoading && !error && (managedAccounts.length > 0 || managerAccounts.length > 0) && (
+        <div className="space-y-6">
+          {renderSection(
+            'sub_accounts.managed_title',
+            'sub_accounts.managed_description',
+            'sub_accounts.managed_empty',
+            managedAccounts,
+            {
+              canManagePermissions: true,
+              canApprove: false,
+              pendingMessageKey: 'sub_accounts.pending_member_approval',
+            },
           )}
-        </>
+
+          {renderSection(
+            'sub_accounts.managers_title',
+            'sub_accounts.managers_description',
+            'sub_accounts.managers_empty',
+            managerAccounts,
+            {
+              canManagePermissions: false,
+              canApprove: true,
+              pendingMessageKey: 'sub_accounts.pending_your_approval',
+            },
+          )}
+        </div>
       )}
 
-      {/* Add Sub-Account Modal */}
       <Modal
         isOpen={isOpen}
         onClose={onClose}
@@ -402,7 +508,7 @@ export function SubAccountsManager() {
               label={t('sub_accounts.email_label')}
               placeholder={t('sub_accounts.email_placeholder')}
               value={addEmail}
-              onChange={(e) => setAddEmail(e.target.value)}
+              onChange={(event) => setAddEmail(event.target.value)}
               type="email"
               startContent={<Mail className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
@@ -410,16 +516,6 @@ export function SubAccountsManager() {
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
               autoFocus
-            />
-            <Input
-              label={t('sub_accounts.name_label')}
-              placeholder={t('sub_accounts.name_placeholder')}
-              value={addName}
-              onChange={(e) => setAddName(e.target.value)}
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default',
-              }}
             />
           </ModalBody>
           <ModalFooter>

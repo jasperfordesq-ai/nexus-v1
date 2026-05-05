@@ -205,7 +205,7 @@ export default function SafeguardingPage() {
       const payload = res.data as unknown;
       if (Array.isArray(payload)) {
         setFlaggedMessages(payload as FlaggedMessage[]);
-        setFlaggedTotal(payload.length);
+        setFlaggedTotal(res.meta?.total ?? payload.length);
       } else if (payload && typeof payload === 'object') {
         const paged = payload as { data: FlaggedMessage[]; meta?: { total: number } };
         setFlaggedMessages(paged.data || []);
@@ -615,7 +615,7 @@ export default function SafeguardingPage() {
               <div className="space-y-3">
                 <div className="rounded-lg bg-default-100 p-3 text-sm text-default-700">
                   <p className="mb-1 font-medium">
-                    {reviewTarget.sender_name} &rarr; {reviewTarget.receiver_name}
+                    {reviewTarget.sender?.name || reviewTarget.sender_name || '—'} &rarr; {reviewTarget.recipient?.name || reviewTarget.receiver_name || '—'}
                   </p>
                   <p className="text-default-500">{reviewTarget.message_content || reviewTarget.message_body || ''}</p>
                 </div>

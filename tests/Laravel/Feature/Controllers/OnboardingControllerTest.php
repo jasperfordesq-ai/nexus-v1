@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use App\Models\TenantSafeguardingOption;
 use App\Models\User;
 
 /**
@@ -189,5 +190,42 @@ class OnboardingControllerTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonPath('errors.0.code', 'VALIDATION_REQUIRED_FIELD');
+    }
+
+    public function test_save_safeguarding_enforces_required_options_server_side(): void
+    {
+        $this->authenticatedUser();
+
+        TenantSafeguardingOption::create([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'required_support_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'Required support option',
+            'sort_order' => 10,
+            'is_active' => true,
+            'is_required' => true,
+            'triggers' => [],
+        ]);
+
+        $optional = TenantSafeguardingOption::create([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'optional_support_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'Optional support option',
+            'sort_order' => 20,
+            'is_active' => true,
+            'is_required' => false,
+            'triggers' => [],
+        ]);
+
+        $response = $this->apiPost('/v2/onboarding/safeguarding', [
+            'preferences' => [
+                ['option_id' => $optional->id, 'value' => '1'],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+        $response->assertJsonPath('errors.0.field', 'preferences');
     }
 }

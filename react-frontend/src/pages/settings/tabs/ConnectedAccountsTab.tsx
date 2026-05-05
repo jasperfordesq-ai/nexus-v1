@@ -39,10 +39,10 @@ interface IdentitiesResponse {
   supported_providers: Provider[];
 }
 
-const PROVIDER_META: Record<Provider, { Icon: typeof GoogleIcon; labelKey: string }> = {
-  google: { Icon: GoogleIcon, labelKey: 'oauth.continue_with_google' },
-  apple: { Icon: AppleIcon, labelKey: 'oauth.continue_with_apple' },
-  facebook: { Icon: FacebookIcon, labelKey: 'oauth.continue_with_facebook' },
+const PROVIDER_META: Record<Provider, { Icon: typeof GoogleIcon; providerLabelKey: string }> = {
+  google: { Icon: GoogleIcon, providerLabelKey: 'oauth.provider_google' },
+  apple: { Icon: AppleIcon, providerLabelKey: 'oauth.provider_apple' },
+  facebook: { Icon: FacebookIcon, providerLabelKey: 'oauth.provider_facebook' },
 };
 
 export function ConnectedAccountsTab() {
@@ -88,18 +88,11 @@ export function ConnectedAccountsTab() {
   }
 
   async function handleDisconnect(provider: Provider) {
-    if (!data) return;
-    const linkedCount = data.identities.length;
-    if (linkedCount <= 1) {
-      // Frontend hint — backend is the source of truth.
-      const proceed = confirm(t('oauth.connect_modal.confirm'));
-      if (!proceed) return;
-    }
     setBusyProvider(provider);
     try {
       const res = await api.delete(`/v2/auth/oauth/${provider}/unlink`);
       if (res.success) {
-        toast.success(t('oauth.disconnect') + ' ✓');
+        toast.success(t('oauth.disconnected'));
         await load();
       } else {
         toast.error(res.error || t('oauth.cannot_disconnect_last'));
@@ -113,6 +106,7 @@ export function ConnectedAccountsTab() {
   }
 
   const supported: Provider[] = data?.supported_providers ?? ['google', 'apple', 'facebook'];
+  const enabled = new Set(data?.enabled_providers ?? []);
   const linkedMap = new Map((data?.identities ?? []).map((i) => [i.provider, i] as const));
 
   return (
@@ -121,9 +115,7 @@ export function ConnectedAccountsTab() {
         {t('oauth.connected_accounts.title')}
       </h2>
       <p className="text-sm text-theme-muted mb-6">
-        {t('oauth.connected_accounts.subtitle', {
-          defaultValue: 'Sign in faster by connecting your existing Google, Apple, or Facebook account.',
-        })}
+        {t('oauth.connected_accounts.subtitle')}
       </p>
 
       <ul className="space-y-3">
@@ -132,6 +124,7 @@ export function ConnectedAccountsTab() {
           const linked = linkedMap.get(provider);
           const isBusy = busyProvider === provider;
           const isOnlyAuthMethod = !!linked && (data?.identities.length ?? 0) <= 1;
+          const isProviderEnabled = enabled.has(provider);
           return (
             <li
               key={provider}
@@ -139,19 +132,21 @@ export function ConnectedAccountsTab() {
             >
               <meta.Icon className="w-7 h-7 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-theme-primary capitalize">{provider}</p>
+                <p className="font-medium text-theme-primary">{t(meta.providerLabelKey)}</p>
                 {linked ? (
                   <p className="text-xs text-theme-muted truncate">
                     {linked.provider_email ?? ''}
                     {linked.linked_at && (
                       <span className="ml-2">
-                        {t('oauth.connected_at', { defaultValue: 'connected' })}{' '}
+                        {t('oauth.connected_at')}{' '}
                         {new Date(linked.linked_at).toLocaleDateString()}
                       </span>
                     )}
                   </p>
                 ) : (
-                  <p className="text-xs text-theme-subtle">{t('oauth.not_connected', { defaultValue: 'Not connected' })}</p>
+                  <p className="text-xs text-theme-subtle">
+                    {isProviderEnabled ? t('oauth.not_connected') : t('oauth.provider_unavailable')}
+                  </p>
                 )}
               </div>
               {linked ? (
@@ -168,7 +163,7 @@ export function ConnectedAccountsTab() {
                 <Button
                   size="sm"
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  isDisabled={isBusy || loading}
+                  isDisabled={isBusy || loading || !isProviderEnabled}
                   isLoading={isBusy}
                   onPress={() => handleConnect(provider)}
                 >

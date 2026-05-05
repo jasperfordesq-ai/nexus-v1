@@ -6,6 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Services\SubAccountService;
 
@@ -29,13 +31,7 @@ class SubAccountController extends BaseApiController
 
         $children = $this->subAccountService->getChildAccounts($userId);
 
-        foreach ($children as &$child) {
-            if (is_string($child['permissions'] ?? null)) {
-                $child['permissions'] = json_decode($child['permissions'], true);
-            }
-        }
-
-        return $this->respondWithData($children);
+        return $this->respondWithData($this->normalizeRelationships($children));
     }
 
     /** GET /api/v2/users/me/parent-accounts */
@@ -45,13 +41,7 @@ class SubAccountController extends BaseApiController
 
         $parents = $this->subAccountService->getParentAccounts($userId);
 
-        foreach ($parents as &$parent) {
-            if (is_string($parent['permissions'] ?? null)) {
-                $parent['permissions'] = json_decode($parent['permissions'], true);
-            }
-        }
-
-        return $this->respondWithData($parents);
+        return $this->respondWithData($this->normalizeRelationships($parents));
     }
 
     /** POST /api/v2/users/me/sub-accounts */
@@ -62,11 +52,30 @@ class SubAccountController extends BaseApiController
 
         $data = $this->getAllInput();
         $childUserId = (int) ($data['child_user_id'] ?? 0);
-        $relationshipType = $data['relationship_type'] ?? 'family';
-        $permissions = $data['permissions'] ?? [];
+        $email = is_string($data['email'] ?? null)
+            ? trim((string) $data['email'])
+            : (is_string($data['child_email'] ?? null) ? trim((string) $data['child_email']) : '');
+        $relationshipType = is_string($data['relationship_type'] ?? null) ? $data['relationship_type'] : 'family';
+        $permissions = is_array($data['permissions'] ?? null) ? $data['permissions'] : [];
+        $permissions = array_intersect_key($permissions, array_flip(array_keys(SubAccountService::DEFAULT_PERMISSIONS)));
 
         if ($childUserId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'child_user_id']), 'child_user_id', 400);
+            if ($email === '') {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'email']), 'email', 400);
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email'), 'email', 400);
+            }
+
+            $childUserId = (int) (User::query()
+                ->where('tenant_id', TenantContext::getId())
+                ->where('email', $email)
+                ->value('id') ?? 0);
+
+            if ($childUserId <= 0) {
+                return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), 'email', 404);
+            }
         }
 
         $relationshipId = $this->subAccountService->requestRelationship($userId, $childUserId, $relationshipType, $permissions);
@@ -77,7 +86,7 @@ class SubAccountController extends BaseApiController
 
         $children = $this->subAccountService->getChildAccounts($userId);
 
-        return $this->respondWithData($children, null, 201);
+        return $this->respondWithData($this->normalizeRelationships($children), null, 201);
     }
 
     /** PUT /api/v2/users/me/sub-accounts/{id}/approve */
@@ -93,7 +102,7 @@ class SubAccountController extends BaseApiController
 
         $parents = $this->subAccountService->getParentAccounts($userId);
 
-        return $this->respondWithData($parents);
+        return $this->respondWithData($this->normalizeRelationships($parents));
     }
 
     /** PUT /api/v2/users/me/sub-accounts/{id}/permissions */
@@ -103,6 +112,16 @@ class SubAccountController extends BaseApiController
 
         $data = $this->getAllInput();
         $permissions = $data['permissions'] ?? [];
+        if (!is_array($permissions)) {
+            $permissions = [];
+        }
+
+        if (empty($permissions)) {
+            $allowedKeys = array_keys(SubAccountService::DEFAULT_PERMISSIONS);
+            $permissions = array_intersect_key($data, array_flip($allowedKeys));
+        }
+
+        $permissions = array_intersect_key($permissions, array_flip(array_keys(SubAccountService::DEFAULT_PERMISSIONS)));
 
         if (empty($permissions)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'permissions']), 'permissions', 400);
@@ -116,7 +135,7 @@ class SubAccountController extends BaseApiController
 
         $children = $this->subAccountService->getChildAccounts($userId);
 
-        return $this->respondWithData($children);
+        return $this->respondWithData($this->normalizeRelationships($children));
     }
 
     /** DELETE /api/v2/users/me/sub-accounts/{id} */
@@ -147,5 +166,20 @@ class SubAccountController extends BaseApiController
         }
 
         return $this->respondWithData($activity);
+    }
+
+    private function normalizeRelationships(array $relationships): array
+    {
+        foreach ($relationships as &$relationship) {
+            if (is_string($relationship['permissions'] ?? null)) {
+                $decoded = json_decode($relationship['permissions'], true);
+                $relationship['permissions'] = is_array($decoded) ? $decoded : [];
+            } elseif (!is_array($relationship['permissions'] ?? null)) {
+                $relationship['permissions'] = [];
+            }
+        }
+        unset($relationship);
+
+        return $relationships;
     }
 }

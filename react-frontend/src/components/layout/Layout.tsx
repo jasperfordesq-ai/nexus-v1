@@ -197,8 +197,8 @@ export function Layout({
         className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible
-              ? 'pt-20 sm:pt-[7.5rem]'
-              : 'pt-16 sm:pt-[5.5rem]'
+              ? 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+7.5rem)]'
+              : 'pt-[calc(var(--safe-area-top)+4rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem)]'
             : ''
         }`}
       >
@@ -253,7 +253,7 @@ export function AuthLayout() {
       <UpdateAvailableBanner />
 
       {/* Language switcher — top-right on auth pages */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-[calc(var(--safe-area-top)+1rem)] right-[calc(var(--safe-area-right)+1rem)] z-20">
         <LanguageSwitcher />
       </div>
 
@@ -263,7 +263,7 @@ export function AuthLayout() {
       </main>
 
       {/* Attribution (AGPL Section 7(b) — required on all pages) */}
-      <footer className="relative z-10 py-4 text-center">
+      <footer className="relative z-10 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center">
         <a
           href="https://github.com/jasperfordesq-ai/nexus-v1"
           target="_blank"

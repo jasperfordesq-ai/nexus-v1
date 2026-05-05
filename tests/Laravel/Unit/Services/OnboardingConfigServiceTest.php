@@ -32,7 +32,7 @@ class OnboardingConfigServiceTest extends TestCase
         $this->assertTrue($config['bio_required']);
         $this->assertEquals(10, $config['bio_min_length']);
         $this->assertEquals('disabled', $config['listing_creation_mode']);
-        $this->assertFalse($config['step_safeguarding_enabled']);
+        $this->assertTrue($config['step_safeguarding_enabled']);
         $this->assertFalse($config['require_completion_for_visibility']);
     }
 
@@ -53,7 +53,7 @@ class OnboardingConfigServiceTest extends TestCase
         $this->assertEquals(50, $config['bio_min_length']);
     }
 
-    public function test_getActiveSteps_returns_default_five_steps(): void
+    public function test_getActiveSteps_returns_default_safeguarding_step(): void
     {
         $steps = OnboardingConfigService::getActiveSteps($this->testTenantId);
 
@@ -63,7 +63,7 @@ class OnboardingConfigServiceTest extends TestCase
         $this->assertContains('interests', $slugs);
         $this->assertContains('skills', $slugs);
         $this->assertContains('confirm', $slugs);
-        $this->assertNotContains('safeguarding', $slugs); // Off by default
+        $this->assertContains('safeguarding', $slugs);
     }
 
     public function test_getActiveSteps_includes_safeguarding_when_enabled(): void

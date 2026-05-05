@@ -226,7 +226,16 @@ class OnboardingController extends BaseApiController
 
         $ipAddress = request()?->ip();
 
-        SafeguardingPreferenceService::saveUserPreferences($userId, $preferences, $ipAddress);
+        try {
+            SafeguardingPreferenceService::saveUserPreferences($userId, $preferences, $ipAddress);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                $e->getMessage(),
+                'preferences',
+                422
+            );
+        }
 
         return $this->respondWithData([
             'message' => __('api_controllers_2.onboarding.safeguarding_saved'),

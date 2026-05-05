@@ -322,10 +322,13 @@ class User extends Authenticatable
     {
         $defaults = [
             'email_messages' => 1,
+            'email_listings' => 1,
+            'email_digest' => 0,
             'email_connections' => 1,
             'email_transactions' => 1,
             'email_reviews' => 1,
             'push_enabled' => 1,
+            'push_campaigns_opted_in' => 0,
             'email_org_payments' => 1,
             'email_org_transfers' => 1,
             'email_org_membership' => 1,
@@ -361,8 +364,9 @@ class User extends Authenticatable
         // are silently dropped. This prevents callers from stuffing arbitrary
         // JSON (and potentially sensitive fields) into the column via the API.
         $allowed = [
-            'email_messages', 'email_connections', 'email_transactions',
-            'email_reviews', 'push_enabled',
+            'email_messages', 'email_listings', 'email_digest',
+            'email_connections', 'email_transactions',
+            'email_reviews', 'push_enabled', 'push_campaigns_opted_in',
             'email_org_payments', 'email_org_transfers', 'email_org_membership',
             'email_org_admin', 'email_gamification_digest',
             'email_gamification_milestones',

@@ -298,9 +298,10 @@ export function SearchPage() {
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as SearchTab)}
             classNames={{
-              tabList: 'bg-theme-elevated p-1 rounded-lg',
+              base: 'w-full max-w-full overflow-x-auto',
+              tabList: 'bg-theme-elevated p-1 rounded-lg min-w-max flex-nowrap',
               cursor: 'bg-theme-hover',
-              tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
+              tab: 'shrink-0 text-theme-muted data-[selected=true]:text-theme-primary',
             }}
           >
             <Tab key="all" title={t('tab_all', { count: totalResults })} />
@@ -386,7 +387,7 @@ export function SearchPage() {
                                 {listing.type === 'offer' ? t('listing_offering') : t('listing_requesting')}
                               </span>
                               {listing.is_featured && <FeaturedBadge />}
-                              <h3 className="font-semibold text-theme-primary mt-2">{listing.title}</h3>
+                              <h3 className="font-semibold text-theme-primary mt-2 break-words [overflow-wrap:anywhere]">{listing.title}</h3>
                               <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
                               <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                                 <Clock className="w-3 h-3" aria-hidden="true" />
@@ -439,9 +440,9 @@ export function SearchPage() {
                                   <p className="text-sm text-theme-subtle line-clamp-2">{user.tagline}</p>
                                 )}
                                 {user.location && (
-                                  <p className="text-xs text-theme-subtle flex items-center gap-1 mt-1">
-                                    <MapPin className="w-3 h-3" aria-hidden="true" />
-                                    {user.location}
+                                  <p className="text-xs text-theme-subtle flex min-w-0 items-center gap-1 mt-1">
+                                    <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+                                    <span className="truncate">{user.location}</span>
                                   </p>
                                 )}
                               </div>
@@ -479,17 +480,17 @@ export function SearchPage() {
                       <motion.div key={event.id} variants={itemVariants}>
                         <Link to={tenantPath(`/events/${event.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
-                            <h3 className="font-semibold text-theme-primary">{event.title}</h3>
+                            <h3 className="font-semibold text-theme-primary break-words [overflow-wrap:anywhere]">{event.title}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{event.description}</p>
-                            <div className="flex items-center gap-4 mt-3 text-xs text-theme-subtle">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-theme-subtle">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" aria-hidden="true" />
                                 {event.start_date ? new Date(event.start_date).toLocaleDateString() : '—'}
                               </span>
                               {event.location && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" aria-hidden="true" />
-                                  {event.location}
+                                <span className="flex min-w-0 items-center gap-1">
+                                  <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+                                  <span className="truncate">{event.location}</span>
                                 </span>
                               )}
                             </div>
@@ -526,7 +527,7 @@ export function SearchPage() {
                       <motion.div key={group.id} variants={itemVariants}>
                         <Link to={tenantPath(`/groups/${group.id}`)}>
                           <GlassCard className="p-5 hover:scale-[1.02] transition-transform">
-                            <h3 className="font-semibold text-theme-primary">{group.name}</h3>
+                            <h3 className="font-semibold text-theme-primary break-words [overflow-wrap:anywhere]">{group.name}</h3>
                             <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{group.description}</p>
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Users className="w-3 h-3" aria-hidden="true" />

@@ -107,6 +107,7 @@
     "required_fields": "Required fields",
     "select_option": "Choose an option",
     "or_separator": "or",
+    "learn_more": "Learn more",
     "confirmation": {
       "title": "Your safeguarding preferences have been saved",
       "intro": "Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.",

@@ -42,10 +42,10 @@ export function BottomSheet({
 }: BottomSheetProps) {
   // Determine max height class from first snap point
   const maxHeightClass = snapPoints?.[0] === 'full'
-    ? 'max-h-[95vh]'
+    ? 'max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom))]'
     : snapPoints?.[0] === 'half'
-      ? 'max-h-[50vh]'
-      : '';
+      ? 'max-h-[50dvh]'
+      : 'max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-1rem)]';
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { y: number }; velocity: { y: number } }) => {
@@ -64,7 +64,7 @@ export function BottomSheet({
       backdrop="blur"
       hideCloseButton
       classNames={{
-        base: `bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-t-2xl sm:rounded-2xl ${maxHeightClass} ${className}`,
+        base: `bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-t-2xl sm:rounded-2xl ${maxHeightClass} overflow-hidden ${className}`,
         backdrop: 'bg-black/60 backdrop-blur-sm',
         wrapper: 'sm:items-center items-end',
       }}
@@ -83,6 +83,7 @@ export function BottomSheet({
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={handleDragEnd}
+            className="flex max-h-[inherit] flex-col"
             style={{ touchAction: 'none' }}
           >
             {/* Drag handle bar (mobile only) */}
@@ -96,7 +97,7 @@ export function BottomSheet({
               </ModalHeader>
             )}
 
-            <ModalBody className="px-5 pb-5 pt-0">
+            <ModalBody className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-[calc(var(--safe-area-bottom)+1.25rem)] pt-0">
               {children}
             </ModalBody>
           </motion.div>

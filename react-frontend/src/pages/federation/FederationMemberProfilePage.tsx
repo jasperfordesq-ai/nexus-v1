@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -64,6 +64,7 @@ export function FederationMemberProfilePage() {
   usePageTitle(t('member_profile.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
@@ -88,6 +89,7 @@ export function FederationMemberProfilePage() {
   const [connectionStatus, setConnectionStatus] = useState<string>('none');
   const [connectLoading, setConnectLoading] = useState(false);
   const [userOptedIn, setUserOptedIn] = useState<boolean | null>(null);
+  const memberTenantIdParam = searchParams.get('tenant_id');
 
   // Transaction modal
   const txModal = useDisclosure();
@@ -119,7 +121,8 @@ export function FederationMemberProfilePage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<FederatedMember>(`/v2/federation/members/${id}`, { signal: controller.signal });
+      const tenantQuery = memberTenantIdParam ? `?tenant_id=${encodeURIComponent(memberTenantIdParam)}` : '';
+      const response = await api.get<FederatedMember>(`/v2/federation/members/${id}${tenantQuery}`, { signal: controller.signal });
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setMember(response.data);
@@ -133,7 +136,7 @@ export function FederationMemberProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, isExternalMember]);
+  }, [id, isExternalMember, memberTenantIdParam]);
 
   useEffect(() => {
     loadMember();
@@ -150,11 +153,12 @@ export function FederationMemberProfilePage() {
       return;
     }
     let cancelled = false;
-    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+    api.get<{ enabled?: boolean; federation_optin?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
       if (cancelled) return;
       if (res.success && res.data) {
         const isOptedIn =
           res.data.enabled === true ||
+          res.data.federation_optin === true ||
           res.data.status?.user_optin === true;
         setUserOptedIn(isOptedIn);
       } else {
@@ -164,11 +168,10 @@ export function FederationMemberProfilePage() {
       setUserOptedIn(false);
     });
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const handleConnect = async () => {
-    if (!member) return;
+    if (!member || userOptedIn !== true) return;
     try {
       setConnectLoading(true);
       const response = await api.post('/v2/federation/connections', {
@@ -190,8 +193,8 @@ export function FederationMemberProfilePage() {
   };
 
   const displayName = member
-    ? (member.name?.trim() || `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Member')
-    : 'Member';
+    ? (member.name?.trim() || `${member.first_name || ''} ${member.last_name || ''}`.trim() || t('member_profile.member_fallback'))
+    : t('member_profile.member_fallback');
 
   const reachKey = member?.service_reach ?? 'local_only';
   const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { icon: Home };
@@ -223,13 +226,19 @@ export function FederationMemberProfilePage() {
             {t('member_profile.external_member_description')}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-              onPress={() => navigate(tenantPath(`/federation/messages?compose=true&to_user=${id}&to_tenant=${extTenantId}`))}
+            <Tooltip
+              content={userOptedIn === false ? t('member_profile.optin_required_tooltip') : undefined}
+              isDisabled={userOptedIn !== false}
             >
-              {t('member_profile.send_message')}
-            </Button>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                isDisabled={userOptedIn !== true}
+                onPress={() => navigate(tenantPath(`/federation/messages?compose=true&to_user=${id}&to_tenant=${extTenantId}`))}
+              >
+                {t('member_profile.send_message')}
+              </Button>
+            </Tooltip>
             <Button
               variant="flat"
               className="bg-theme-elevated text-theme-primary"
@@ -295,6 +304,13 @@ export function FederationMemberProfilePage() {
   }
 
   const skills = member.skills ?? [];
+  const canUseFederationActions = isAuthenticated && userOptedIn === true;
+  const canMessageMember = canUseFederationActions && member.messaging_enabled === true;
+  const canTransactWithMember = canUseFederationActions && member.transactions_enabled === true;
+  const actionDisabledTooltip = userOptedIn === false ? t('member_profile.optin_required_tooltip') : undefined;
+  const transactionTooltip = member.transactions_enabled === false
+    ? t('member_profile.transactions_disabled_tooltip')
+    : actionDisabledTooltip;
 
   return (
     <div className="space-y-6">
@@ -371,14 +387,14 @@ export function FederationMemberProfilePage() {
               <div className="flex flex-wrap gap-3 mt-4">
                 {isAuthenticated && connectionStatus === 'none' && (
                   <Tooltip
-                    content={userOptedIn === false ? t('member_profile.optin_required_tooltip', 'Enable federation to connect with members from other communities') : undefined}
+                    content={actionDisabledTooltip}
                     isDisabled={userOptedIn !== false}
                   >
                     <Button
                       className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                       startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                       isLoading={connectLoading}
-                      isDisabled={userOptedIn === false}
+                      isDisabled={!canUseFederationActions}
                       onPress={handleConnect}
                     >
                       {t('member_profile.connect')}
@@ -404,30 +420,40 @@ export function FederationMemberProfilePage() {
                   </Chip>
                 )}
                 {isAuthenticated && member.messaging_enabled && (
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => {
-                      const nameParam = member.name ? `&name=${encodeURIComponent(member.name)}` : '';
-                      navigate(
-                        tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}${nameParam}`)
-                      );
-                    }}
+                  <Tooltip
+                    content={actionDisabledTooltip}
+                    isDisabled={userOptedIn !== false}
                   >
-                    {t('member_profile.send_message')}
-                  </Button>
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                      isDisabled={!canMessageMember}
+                      onPress={() => {
+                        if (!canMessageMember) return;
+                        const nameParam = member.name ? `&name=${encodeURIComponent(member.name)}` : '';
+                        navigate(
+                          tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}${nameParam}`)
+                        );
+                      }}
+                    >
+                      {t('member_profile.send_message')}
+                    </Button>
+                  </Tooltip>
                 )}
                 {isAuthenticated && (
                   <Tooltip
-                    content={userOptedIn === false ? t('member_profile.optin_required_tooltip', 'Enable federation to connect with members from other communities') : undefined}
-                    isDisabled={userOptedIn !== false}
+                    content={transactionTooltip}
+                    isDisabled={!transactionTooltip}
                   >
                     <Button
                       variant="flat"
                       className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                       startContent={<Coins className="w-4 h-4" aria-hidden="true" />}
-                      isDisabled={userOptedIn === false}
-                      onPress={() => txModal.onOpen()}
+                      isDisabled={!canTransactWithMember}
+                      onPress={() => {
+                        if (!canTransactWithMember) return;
+                        txModal.onOpen();
+                      }}
                     >
                       {t('member_profile.send_credits')}
                     </Button>
@@ -488,7 +514,7 @@ export function FederationMemberProfilePage() {
             <Star className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('reviews.title')}
           </h2>
-          <FederationReviewsPanel memberId={member.id} />
+          <FederationReviewsPanel memberId={member.id} tenantId={member.timebank?.id ?? member.tenant_id} />
         </GlassCard>
       </motion.div>
 
@@ -500,7 +526,7 @@ export function FederationMemberProfilePage() {
               <>
                 <ModalHeader className="flex items-center gap-2">
                   <Coins className="w-5 h-5 text-emerald-500" />
-                  {t('member_profile.send_credits_to', { name: member.name }) || `Send Credits to ${member.name}`}
+                  {t('member_profile.send_credits_to', { name: member.name })}
                 </ModalHeader>
                 <ModalBody className="gap-4">
                   <Input
@@ -527,7 +553,7 @@ export function FederationMemberProfilePage() {
                         amount: txAmount || '0',
                         name: member.name,
                         community: member.timebank?.name || '',
-                      }) || `Transfer ${txAmount || '0'} hour(s) to ${member.name} at ${member.timebank?.name}`}
+                      })}
                     </p>
                   </div>
                 </ModalBody>
@@ -539,8 +565,9 @@ export function FederationMemberProfilePage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
                     startContent={<Coins className="w-4 h-4" />}
                     isLoading={txSending}
-                    isDisabled={!txAmount || parseInt(txAmount) < 1 || parseInt(txAmount) > 100 || !txDescription.trim()}
+                    isDisabled={!canTransactWithMember || !txAmount || parseInt(txAmount) < 1 || parseInt(txAmount) > 100 || !txDescription.trim()}
                     onPress={async () => {
+                      if (!canTransactWithMember) return;
                       setTxSending(true);
                       try {
                         const res = await api.post('/v2/federation/transactions', {
@@ -555,7 +582,7 @@ export function FederationMemberProfilePage() {
                             t('member_profile.tx_success_detail', {
                               amount: txAmount,
                               name: member.name,
-                            }) || `${txAmount} hour(s) sent to ${member.name}`
+                            })
                           );
                           setTxAmount('');
                           setTxDescription('');

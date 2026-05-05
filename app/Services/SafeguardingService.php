@@ -22,6 +22,14 @@ use Illuminate\Support\Facades\Log;
  */
 class SafeguardingService
 {
+    private const INCIDENT_STATUS_TRANSITIONS = [
+        'open'          => ['open', 'investigating', 'escalated', 'resolved', 'closed'],
+        'investigating' => ['investigating', 'escalated', 'resolved', 'closed'],
+        'escalated'     => ['escalated', 'investigating', 'resolved', 'closed'],
+        'resolved'      => ['resolved'],
+        'closed'        => ['closed'],
+    ];
+
     /** @var array Collected errors from the last operation */
     private array $errors = [];
 
@@ -239,6 +247,10 @@ class SafeguardingService
         }
 
         try {
+            if (!$this->activeUserBelongsToTenant($userId, $tenantId)) {
+                return false;
+            }
+
             $id = DB::table('vol_safeguarding_training')->insertGetId([
                 'user_id' => $userId,
                 'tenant_id' => $tenantId,
@@ -487,6 +499,10 @@ class SafeguardingService
             $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
             $involvedUserId = !empty($data['involved_user_id']) ? (int) $data['involved_user_id'] : null;
             $subjectUserId = !empty($data['subject_user_id']) ? (int) $data['subject_user_id'] : $involvedUserId;
+
+            if (!$this->activeUserBelongsToTenant($reporterId, $tenantId)) {
+                return false;
+            }
 
             if ($organizationId !== null && !DB::table('vol_organizations')->where('id', $organizationId)->where('tenant_id', $tenantId)->exists()) {
                 return false;
@@ -766,6 +782,14 @@ class SafeguardingService
 
             if (!$currentIncident) {
                 return false;
+            }
+
+            if (isset($updates['status'])) {
+                $currentStatus = (string) ($currentIncident->status ?? '');
+                $nextStatus = (string) $updates['status'];
+                if (!in_array($nextStatus, self::INCIDENT_STATUS_TRANSITIONS[$currentStatus] ?? [], true)) {
+                    return false;
+                }
             }
 
             if (isset($updates['assigned_to']) && $updates['assigned_to'] !== null) {
@@ -1123,10 +1147,11 @@ class SafeguardingService
     {
         try {
             $statusLabels = [
-                'open' => 'opened',
-                'investigating' => 'under investigation',
-                'resolved' => 'resolved',
-                'closed' => 'closed',
+                'open' => __('emails_misc.safeguarding.status_open'),
+                'investigating' => __('emails_misc.safeguarding.status_investigating'),
+                'escalated' => __('emails_misc.safeguarding.status_escalated'),
+                'resolved' => __('emails_misc.safeguarding.status_resolved'),
+                'closed' => __('emails_misc.safeguarding.status_closed'),
             ];
             $label = $statusLabels[$newStatus] ?? $newStatus;
 
@@ -1317,5 +1342,13 @@ class SafeguardingService
         } catch (\Throwable $e) {
             Log::error('SafeguardingService: failed to log activity', ['action' => $action, 'error' => $e->getMessage()]);
         }
+    }
+
+    private function activeUserBelongsToTenant(int $userId, int $tenantId): bool
+    {
+        return User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->exists();
     }
 }

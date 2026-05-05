@@ -345,6 +345,15 @@ class FederationExternalWebhookController extends BaseApiController
         };
     }
 
+    public function processTrustedEvent(string $event, array $data, object $partner): array
+    {
+        if (!TenantContext::setById((int) $partner->tenant_id)) {
+            throw new \RuntimeException(__('api.federation.tenant_context_failed'));
+        }
+
+        return $this->handleEvent($event, $data, $partner);
+    }
+
     // ----------------------------------------------------------------
     // Inbound PUSH handlers (partner-initiated create/update)
     // ----------------------------------------------------------------
@@ -784,21 +793,21 @@ class FederationExternalWebhookController extends BaseApiController
         $users = DB::table('users as u')
             ->join('federation_user_settings as fus', function ($join) {
                 $join->on('fus.user_id', '=', 'u.id')
-                     ->where('fus.federation_optin', '=', 1);
+                     ->where('fus.federation_optin', '=', 1)
+                     ->where('fus.profile_visible_federated', '=', 1)
+                     ->where('fus.appear_in_federated_search', '=', 1);
             })
             ->where('u.tenant_id', TenantContext::getId())
             ->where('u.status', 'active')
             ->limit(100)
-            ->get(['u.id', 'u.first_name', 'u.last_name', 'fus.profile_visible_federated', 'u.balance']);
+            ->get(['u.id', 'u.first_name', 'u.last_name', 'u.balance']);
 
         $members = [];
         foreach ($users as $user) {
             $members[] = [
                 'id' => $user->id,
                 'username' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                // Only include balance when the user has consented to profile visibility in federation.
-                // TODO: Replace with a dedicated `share_balance_federated` column for finer control.
-                'balance' => $user->profile_visible_federated ? ($user->balance ?? 0) * 3600 : null,
+                'balance' => ($user->balance ?? 0) * 3600,
                 'tags' => '',
             ];
         }
@@ -808,33 +817,45 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleListingsList(array $data, object $partner): array
     {
+        if (empty($partner->allow_listing_search)) {
+            return ['listings' => [], 'count' => 0];
+        }
+
         $tenantId = TenantContext::getId();
         $typeFilter = $data['type'] ?? null;
         $searchFilter = $data['search'] ?? null;
 
-        $query = DB::table('listings')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->whereNull('deleted_at');
+        $query = DB::table('listings as l')
+            ->join('federation_user_settings as fus', function ($join) {
+                $join->on('fus.user_id', '=', 'l.user_id')
+                    ->where('fus.federation_optin', '=', 1)
+                    ->where('fus.profile_visible_federated', '=', 1);
+            })
+            ->where('l.tenant_id', $tenantId)
+            ->where('l.status', 'active')
+            ->whereNull('l.deleted_at');
 
         if ($typeFilter) {
-            $query->where('type', $typeFilter);
+            $query->where('l.type', $typeFilter);
         }
 
         if ($searchFilter) {
             $query->where(function ($q) use ($searchFilter) {
-                $q->where('title', 'LIKE', "%{$searchFilter}%")
-                  ->orWhere('description', 'LIKE', "%{$searchFilter}%");
+                $q->where('l.title', 'LIKE', "%{$searchFilter}%")
+                  ->orWhere('l.description', 'LIKE', "%{$searchFilter}%");
             });
         }
 
         $rows = $query->limit(100)
-            ->get(['id', 'title', 'description', 'type', 'category', 'user_id']);
+            ->get(['l.id', 'l.title', 'l.description', 'l.type', 'l.category', 'l.user_id']);
 
         $listings = [];
         foreach ($rows as $row) {
             // Optionally check if the listing owner has opted-in to federation
-            $user = DB::table('users')->where('id', $row->user_id)->first(['first_name', 'last_name']);
+            $user = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $row->user_id)
+                ->first(['first_name', 'last_name']);
             $username = $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : null;
 
             $listings[] = [

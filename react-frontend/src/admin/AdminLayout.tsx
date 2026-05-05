@@ -9,13 +9,19 @@
  * All admin pages render inside this layout.
  */
 
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { AdminSidebar } from './components/AdminSidebar';
 import { AdminHeader } from './components/AdminHeader';
 import { AdminBreadcrumbs } from './components/AdminBreadcrumbs';
 export function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setMobileDrawerOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -28,20 +34,20 @@ export function AdminLayout() {
       </div>
 
       {/* Header */}
-      <AdminHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={() => setSidebarCollapsed((prev) => !prev)} />
+      <AdminHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={() => setMobileDrawerOpen((prev) => !prev)} />
 
       {/* Mobile sidebar overlay */}
-      {!sidebarCollapsed && (
+      {mobileDrawerOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => setSidebarCollapsed(true)}
+          onClick={() => setMobileDrawerOpen(false)}
         />
       )}
       {/* Mobile sidebar drawer */}
-      <div className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden ${sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'}`}>
+      <div className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-content1 transition-transform duration-300 md:hidden ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <AdminSidebar
           collapsed={false}
-          onToggle={() => setSidebarCollapsed(true)}
+          onToggle={() => setMobileDrawerOpen(false)}
         />
       </div>
 

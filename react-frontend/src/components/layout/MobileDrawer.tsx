@@ -124,10 +124,10 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
     <Button
       variant="flat"
       onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
-      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 h-auto"
+      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 h-auto min-w-0"
     >
-      <Fingerprint className="w-5 h-5" />
-      {t('nav.verify_identity', 'Verify Your Identity')}
+      <Fingerprint className="w-5 h-5 shrink-0" />
+      <span className="min-w-0 truncate">{t('nav.verify_identity', 'Verify Your Identity')}</span>
     </Button>
   );
 }
@@ -281,14 +281,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         variant="light"
         onPress={() => navigateAndClose(item.href)}
         style={{ minHeight: 'var(--nav-row-min-h, 48px)', paddingTop: 'var(--nav-row-py, 0.875rem)', paddingBottom: 'var(--nav-row-py, 0.875rem)' }}
-        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start h-auto justify-start ${
+        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start h-auto justify-start min-w-0 ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
         }`}
       >
-        <Icon className="w-5 h-5" aria-hidden="true" />
-        <span>{item.label}</span>
+        <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+        <span className="min-w-0 truncate">{item.label}</span>
       </Button>
     );
   };
@@ -315,12 +315,12 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       size="md"
       hideCloseButton
       classNames={{
-        base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl',
+        base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl w-[min(28rem,100dvw)] max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))]',
         header: 'border-b border-[var(--border-default)] p-4',
         body: 'p-0',
       }}
     >
-      <DrawerContent style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <DrawerContent style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
           <TenantLogo size="lg" showName />
@@ -338,16 +338,16 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         <DrawerBody>
           {/* Search Button */}
           {onSearchOpen && (
-            <div className="px-4 pt-3 pb-1">
+            <div className="px-4 pt-3 pb-1 min-w-0">
               <Button
                 variant="flat"
                 fullWidth
-                className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-base text-theme-muted h-auto"
+                className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-base text-theme-muted h-auto min-w-0"
                 onPress={() => { onClose(); onSearchOpen(); }}
                 aria-label={t('aria.open_search')}
               >
-                <Search className="w-5 h-5" aria-hidden="true" />
-                <span>{t('search.placeholder')}</span>
+                <Search className="w-5 h-5 shrink-0" aria-hidden="true" />
+                <span className="min-w-0 truncate">{t('search.placeholder')}</span>
               </Button>
             </div>
           )}
@@ -365,6 +365,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   src={resolveAvatarUrl(user.avatar_url || user.avatar)}
                   size="lg"
                   showFallback
+                  className="shrink-0"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-theme-primary truncate">
@@ -379,26 +380,26 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <IdentityVerificationCTA userId={user.id} tenantPath={tenantPath} onClose={onClose} />
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-2 mt-3">
+              <div className="grid grid-cols-3 gap-2 mt-3 min-w-0">
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/wallet')}
-                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
-                  <p className="text-sm text-theme-muted">{t('stats.credits')}</p>
+                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.credits')}</p>
                 </Button>
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/messages')}
-                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
                   </p>
-                  <p className="text-sm text-theme-muted">{t('stats.messages')}</p>
+                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.messages')}</p>
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
@@ -406,12 +407,12 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/notifications')}
-                  className="text-center p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
                   </p>
-                  <p className="text-sm text-theme-muted">{t('stats.alerts')}</p>
+                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.alerts')}</p>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}

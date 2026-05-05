@@ -181,7 +181,7 @@ export const MessageBubble = memo(function MessageBubble({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : ''} group transition-all duration-300 ${isHighlighted ? 'ring-2 ring-yellow-400/30 rounded-lg' : ''}`}
+      className={`flex min-w-0 gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''} group transition-all duration-300 ${isHighlighted ? 'ring-2 ring-yellow-400/30 rounded-lg' : ''}`}
     >
       {showAvatar && !isOwn ? (
         <Avatar
@@ -191,13 +191,13 @@ export const MessageBubble = memo(function MessageBubble({
           className="flex-shrink-0"
         />
       ) : (
-        <div className="w-8" />
+        <div className="w-8 flex-shrink-0" />
       )}
 
-      <div className={`max-w-[70%] ${isOwn ? 'text-right' : ''} relative`}>
+      <div className={`min-w-0 max-w-[85%] sm:max-w-[70%] ${isOwn ? 'text-right' : ''} relative`}>
         <div
           className={`
-            inline-block px-4 py-2 rounded-2xl relative
+            inline-block max-w-full break-words px-3 py-2 sm:px-4 rounded-2xl relative [overflow-wrap:anywhere]
             ${isOwn
               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
               : 'bg-theme-elevated text-theme-primary rounded-bl-md'
@@ -206,7 +206,7 @@ export const MessageBubble = memo(function MessageBubble({
         >
           {isEditing ? (
             /* Editing mode */
-            <div className="min-w-[200px]">
+            <div className="min-w-0 sm:min-w-[200px]">
               <Input
                 value={editingText}
                 onChange={(e) => onEditingTextChange?.(e.target.value)}
@@ -271,7 +271,7 @@ export const MessageBubble = memo(function MessageBubble({
                     )}
                   </div>
                   {translatedText && !showOriginal && (
-                    <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed italic">
+                    <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed italic break-words [overflow-wrap:anywhere]">
                       {translatedText}
                     </p>
                   )}
@@ -287,9 +287,9 @@ export const MessageBubble = memo(function MessageBubble({
                 <>
                   {/* Show translated text or original */}
                   {translatedText && !showOriginal ? (
-                    <p className="text-sm whitespace-pre-wrap">{translatedText}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{translatedText}</p>
                   ) : (
-                    <p className="text-sm whitespace-pre-wrap">{highlightText(message.body || message.content || '')}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{highlightText(message.body || message.content || '')}</p>
                   )}
                 </>
               )}
@@ -335,20 +335,20 @@ export const MessageBubble = memo(function MessageBubble({
                       href={attachment.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block"
+                      className="block min-w-0 max-w-full"
                     >
                       {attachment.type === 'image' ? (
                         <img
                           src={attachment.url}
                           alt={attachment.name}
-                          className="max-w-[200px] max-h-[200px] rounded-lg object-cover hover:opacity-90 transition-opacity"
+                          className="max-w-[min(200px,70vw)] max-h-[200px] rounded-lg object-cover hover:opacity-90 transition-opacity"
                           loading="lazy"
                         />
                       ) : (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-black/10 dark:bg-white/10 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
-                          <FileText className="w-4 h-4 opacity-60" />
-                          <div className="flex flex-col">
-                            <span className="text-xs opacity-80 truncate max-w-[150px]">{attachment.name}</span>
+                        <div className="flex min-w-0 max-w-full items-center gap-2 px-3 py-2 bg-black/10 dark:bg-white/10 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
+                          <FileText className="w-4 h-4 opacity-60 shrink-0" />
+                          <div className="flex min-w-0 flex-col">
+                            <span className="max-w-[min(150px,55vw)] truncate text-xs opacity-80">{attachment.name}</span>
                             <span className="text-[10px] opacity-40">
                               {(attachment.size / 1024).toFixed(1)} KB
                             </span>
@@ -366,7 +366,7 @@ export const MessageBubble = memo(function MessageBubble({
 
           {/* Action buttons - shows on hover (only when not editing) */}
           {!isEditing && !isDeleted && (
-            <div className={`absolute -bottom-2 ${isOwn ? '-left-12' : '-right-12'} flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
+            <div className={`absolute -bottom-2 ${isOwn ? '-left-8 sm:-left-12' : '-right-8 sm:-right-12'} flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity`}>
               {/* Reaction button */}
               <Button
                 isIconOnly
@@ -400,7 +400,7 @@ export const MessageBubble = memo(function MessageBubble({
             <div
               ref={reactionPickerRef}
               className={`
-                absolute ${isOwn ? 'left-0' : 'right-0'} -top-10
+                absolute ${isOwn ? 'left-0' : 'right-0'} -top-10 max-w-[calc(100dvw-2rem)] overflow-x-auto
                 flex gap-1 p-1.5 bg-theme-card rounded-full border border-theme-default
                 shadow-lg z-10
               `}
@@ -433,7 +433,7 @@ export const MessageBubble = memo(function MessageBubble({
               className={`
                 absolute ${isOwn ? 'left-0' : 'right-0'} -top-16
                 flex flex-col p-1 bg-theme-card rounded-lg border border-theme-default
-                shadow-lg z-10 min-w-[100px]
+                shadow-lg z-10 min-w-[100px] max-w-[calc(100dvw-2rem)]
               `}
               role="menu"
               aria-label={t('aria_message_options')}
@@ -472,7 +472,7 @@ export const MessageBubble = memo(function MessageBubble({
 
         {/* Display existing reactions */}
         {hasReactions && (
-          <div className={`flex gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'} px-2`}>
+          <div className={`flex max-w-full flex-wrap gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'} px-2`}>
             {Object.entries(reactions).map(([emoji, count]) => (
               <Button
                 key={emoji}

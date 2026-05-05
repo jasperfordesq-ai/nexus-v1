@@ -17,7 +17,7 @@ import { LoadingScreen } from '@/components/feedback';
 export function BrokerRoute() {
   const { t } = useTranslation('broker');
   const { user, isAuthenticated, isLoading, status } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const location = useLocation();
 
   if (isLoading || status === 'loading') {
@@ -47,7 +47,7 @@ export function BrokerRoute() {
     userRecord?.is_tenant_super_admin === true ||
     userRecord?.is_god === true;
 
-  if (!hasBrokerAccess) {
+  if (!hasBrokerAccess || !hasFeature('exchange_workflow')) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 

@@ -267,7 +267,9 @@ export function FederationMembersPage() {
       );
       return;
     }
-    navigate(tenantPath(`/federation/members/${member.id}`));
+    const tenantId = member.tenant_id ?? member.timebank?.id;
+    const tenantParam = tenantId ? `?tenant_id=${encodeURIComponent(String(tenantId))}` : '';
+    navigate(tenantPath(`/federation/members/${member.id}${tenantParam}`));
   }, [navigate, tenantPath, toast, t]);
 
   const handleSendMessage = useCallback((member: FederatedMember) => {
@@ -511,7 +513,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
   const displayName =
     member.name?.trim() ||
     `${member.first_name || ''} ${member.last_name || ''}`.trim() ||
-    'Member';
+    t('members.member_fallback');
 
   const skills = member.skills ?? [];
   const visibleSkills = skills.slice(0, 5);

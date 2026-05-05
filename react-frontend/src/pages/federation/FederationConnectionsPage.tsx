@@ -210,7 +210,7 @@ export function FederationConnectionsPage() {
               <motion.div key={conn.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -100 }} transition={{ delay: index * 0.05 }}>
                 <ConnectionCard connection={conn} tab={activeTab} actionLoading={actionLoading} onAction={handleAction}
                   onMessage={(userId, tenantId) => navigate(tenantPath(`/federation/messages?compose=true&to_user=${userId}&to_tenant=${tenantId}`))}
-                  onViewProfile={(userId) => navigate(tenantPath(`/federation/members/${userId}`))}
+                  onViewProfile={(userId, tenantId) => navigate(tenantPath(`/federation/members/${userId}?tenant_id=${encodeURIComponent(String(tenantId))}`))}
                 />
               </motion.div>
             ))}
@@ -226,7 +226,7 @@ interface ConnectionCardProps {
   actionLoading: number | null;
   onAction: (id: number, action: 'accept' | 'reject' | 'remove') => void;
   onMessage: (userId: number, tenantId: number) => void;
-  onViewProfile: (userId: number) => void;
+  onViewProfile: (userId: number, tenantId: number) => void;
 }
 
 function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, onViewProfile }: ConnectionCardProps) {
@@ -237,7 +237,7 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
   return (
     <GlassCard className="p-4 sm:p-5">
       <div className="flex flex-col sm:flex-row items-start gap-4">
-        <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => onViewProfile(connection.user_id)} role="button" tabIndex={0} aria-label={displayName} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewProfile(connection.user_id); } }}>
+        <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => onViewProfile(connection.user_id, connection.tenant_id)} role="button" tabIndex={0} aria-label={displayName} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewProfile(connection.user_id, connection.tenant_id); } }}>
           <div className="relative flex-shrink-0">
             <Avatar src={resolveAvatarUrl(connection.avatar_url)} name={displayName} className="w-12 h-12 ring-2 ring-indigo-500/20" />
             <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center ring-1 ring-white dark:ring-gray-900" title={connection.tenant_name}>

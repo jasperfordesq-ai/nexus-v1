@@ -17,6 +17,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import type { Key } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -66,6 +67,25 @@ import { ConnectedAccountsTab } from './tabs/ConnectedAccountsTab';
 import { SafeguardingTab } from './tabs/SafeguardingTab';
 import { TranslationTab } from './tabs/TranslationTab';
 
+const SETTINGS_TABS = [
+  'profile',
+  'notifications',
+  'privacy',
+  'security',
+  'skills',
+  'availability',
+  'linked-accounts',
+  'connected-accounts',
+  'safeguarding',
+  'translation',
+] as const;
+
+type SettingsTabKey = (typeof SETTINGS_TABS)[number];
+
+function isSettingsTabKey(value: string | null): value is SettingsTabKey {
+  return !!value && SETTINGS_TABS.includes(value as SettingsTabKey);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,13 +94,14 @@ export function SettingsPage() {
   const { t } = useTranslation('settings');
   usePageTitle(t('page_meta.title'));
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
   const toast = useToast();
-  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'connected-accounts', 'safeguarding', 'translation'];
-  const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const tabParam = searchParams.get('tab');
+  const initialTab: SettingsTabKey = isSettingsTabKey(tabParam) ? tabParam : 'profile';
+  const [activeTab, setActiveTab] = useState<SettingsTabKey>(initialTab);
+  const [pendingTab, setPendingTab] = useState<SettingsTabKey | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -105,6 +126,7 @@ export function SettingsPage() {
   const backupCodesModal = useDisclosure();
   const gdprModal = useDisclosure();
   const marketingConsentModal = useDisclosure();
+  const unsavedChangesModal = useDisclosure();
 
   // Password form
   const [passwordData, setPasswordData] = useState({
@@ -169,7 +191,7 @@ export function SettingsPage() {
     email_org_membership: true,
     email_org_admin: true,
     push_enabled: true,
-    push_campaigns_opted_in: true,
+    push_campaigns_opted_in: false,
   });
 
   // Match digest frequency & preferences
@@ -215,6 +237,39 @@ export function SettingsPage() {
   const [insuranceUploading, setInsuranceUploading] = useState(false);
   const [insuranceType, setInsuranceType] = useState('public_liability');
 
+  const applyTabSelection = useCallback((tab: SettingsTabKey) => {
+    setActiveTab(tab);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (tab === 'profile') {
+        next.delete('tab');
+      } else {
+        next.set('tab', tab);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  const handleTabSelection = useCallback((key: Key) => {
+    const nextTab = String(key);
+    if (!isSettingsTabKey(nextTab) || nextTab === activeTab) return;
+    if (isDirty) {
+      setPendingTab(nextTab);
+      unsavedChangesModal.onOpen();
+      return;
+    }
+    applyTabSelection(nextTab);
+  }, [activeTab, applyTabSelection, isDirty, unsavedChangesModal]);
+
+  const discardChangesAndSwitchTab = useCallback(() => {
+    if (pendingTab) {
+      setIsDirty(false);
+      applyTabSelection(pendingTab);
+    }
+    setPendingTab(null);
+    unsavedChangesModal.onClose();
+  }, [applyTabSelection, pendingTab, unsavedChangesModal]);
+
   // ─────────────────────────────────────────────────────────────────────────
   // Data Loading
   // ─────────────────────────────────────────────────────────────────────────
@@ -226,13 +281,13 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setNotifications((prev) => ({ ...prev, ...response.data }));
       } else {
-        setNotificationError('Failed to load notification settings');
+        setNotificationError(t('notification_load_failed'));
       }
     } catch (error) {
       logError('Failed to load notification settings', error);
-      setNotificationError('Failed to load notification settings');
+      setNotificationError(t('notification_load_failed'));
     }
-  }, []);
+  }, [t]);
 
   const loadMatchPreferences = useCallback(async () => {
     try {
@@ -391,9 +446,9 @@ export function SettingsPage() {
         profile_type: profileData.profile_type,
         organization_name: profileData.profile_type === 'organisation' ? profileData.organization_name : '',
       };
-      // Include DOB if set (backend will silently ignore if verified)
-      if (profileData.date_of_birth) {
-        payload.date_of_birth = profileData.date_of_birth;
+      // Let unverified members clear DOB; verified profiles are locked server-side.
+      if (!isIdVerified) {
+        payload.date_of_birth = profileData.date_of_birth || null;
       }
       const response = await api.put('/v2/users/me', payload);
       if (response.success) {
@@ -409,7 +464,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [profileData, refreshUser, toast, t]);
+  }, [isIdVerified, profileData, refreshUser, toast, t]);
 
   const saveNotifications = useCallback(async () => {
     try {
@@ -839,11 +894,7 @@ export function SettingsPage() {
       >
         <Tabs
           selectedKey={activeTab}
-          onSelectionChange={(key) => {
-            setActiveTab(key as string);
-            // Tab switching resets dirty state — user has moved away from the form
-            setIsDirty(false);
-          }}
+          onSelectionChange={handleTabSelection}
           classNames={{
             tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
             cursor: 'bg-theme-hover',
@@ -918,7 +969,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Lock className="w-4 h-4" aria-hidden="true" />
-                {t("tabs.connected_accounts", { defaultValue: "Connected accounts" })}
+                {t("tabs.connected_accounts")}
               </span>
             }
           />
@@ -936,7 +987,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Languages className="w-4 h-4" aria-hidden="true" />
-                {t("tabs.translation", "Translation")}
+                {t("tabs.translation")}
               </span>
             }
           />
@@ -1089,6 +1140,47 @@ export function SettingsPage() {
         {activeTab === 'translation' && <TranslationTab />}
       </motion.div>
 
+      {/* Unsaved Changes Confirmation Modal */}
+      <Modal
+        isOpen={unsavedChangesModal.isOpen}
+        onClose={() => {
+          setPendingTab(null);
+          unsavedChangesModal.onClose();
+        }}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('unsaved_changes.title')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">
+              {t('unsaved_changes.message')}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => {
+                setPendingTab(null);
+                unsavedChangesModal.onClose();
+              }}
+            >
+              {t('unsaved_changes.stay')}
+            </Button>
+            <Button color="danger" onPress={discardChangesAndSwitchTab}>
+              {t('unsaved_changes.leave')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       {/* Marketing Consent Confirmation Modal */}
       <Modal
         isOpen={marketingConsentModal.isOpen}
@@ -1102,11 +1194,11 @@ export function SettingsPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('marketing_consent_confirm_title', 'Subscribe to Marketing Emails')}
+            {t('marketing_consent_confirm_title')}
           </ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              {t('marketing_consent_confirm_body', 'Are you sure you want to receive occasional marketing emails, product updates, and community highlights? You can unsubscribe at any time.')}
+              {t('marketing_consent_confirm_body')}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -1118,7 +1210,7 @@ export function SettingsPage() {
               onPress={() => { marketingConsentModal.onClose(); applyMarketingConsent(true); }}
               isLoading={marketingConsentLoading}
             >
-              {t('marketing_consent_confirm_button', 'Yes, subscribe me')}
+              {t('marketing_consent_confirm_button')}
             </Button>
           </ModalFooter>
         </ModalContent>

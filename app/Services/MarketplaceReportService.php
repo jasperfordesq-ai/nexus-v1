@@ -43,23 +43,31 @@ class MarketplaceReportService
      */
     public static function createReport(int $reporterId, int $listingId, array $data): MarketplaceReport
     {
-        $listing = MarketplaceListing::find($listingId);
+        $tenantId = TenantContext::getId();
+        $listing = MarketplaceListing::where('tenant_id', $tenantId)
+            ->where('id', $listingId)
+            ->first();
         if (!$listing) {
-            throw new \InvalidArgumentException('Marketplace listing not found.');
+            throw new \InvalidArgumentException(__('api.marketplace_listing_not_found'));
+        }
+
+        if ((int) $listing->user_id === $reporterId) {
+            throw new \InvalidArgumentException(__('api.marketplace_report_own_listing'));
         }
 
         // Prevent duplicate active reports from the same user
         $existingReport = MarketplaceReport::where('reporter_id', $reporterId)
+            ->where('tenant_id', $tenantId)
             ->where('marketplace_listing_id', $listingId)
             ->whereNotIn('status', ['no_action', 'appeal_resolved'])
             ->first();
 
         if ($existingReport) {
-            throw new \InvalidArgumentException('You already have an active report for this listing.');
+            throw new \InvalidArgumentException(__('api.marketplace_report_duplicate_active'));
         }
 
         $report = new MarketplaceReport();
-        $report->tenant_id = TenantContext::getId();
+        $report->tenant_id = $tenantId;
         $report->marketplace_listing_id = $listingId;
         $report->reporter_id = $reporterId;
         $report->reason = $data['reason'];

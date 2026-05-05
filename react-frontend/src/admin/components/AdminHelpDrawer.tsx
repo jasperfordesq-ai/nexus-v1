@@ -33,12 +33,12 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         role="dialog"
         aria-modal="true"
         aria-label={`Help: ${article.title}`}
-        className={`fixed inset-y-0 right-0 z-50 flex w-96 max-w-full flex-col bg-content1 shadow-xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[min(24rem,calc(100dvw-var(--safe-area-left)-var(--safe-area-right)))] flex-col bg-content1 shadow-xl transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex shrink-0 items-start justify-between gap-3 px-5 py-4 border-b border-divider">
+        <div className="flex shrink-0 items-start justify-between gap-3 px-5 py-4 border-b border-divider pt-[calc(var(--safe-area-top)+1rem)]">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-0.5">
               Help
@@ -58,7 +58,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] space-y-5">
 
           {/* Summary */}
           <p className="text-sm text-default-600 leading-relaxed">

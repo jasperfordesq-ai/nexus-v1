@@ -151,7 +151,8 @@
     "send_message": "Send Message",
     "external_profile_title": "External Member",
     "external_profile_message": "This member is on an external partner platform. Direct profile viewing is not available.",
-    "external_member": "External Member"
+    "external_member": "External Member",
+    "member_fallback": "Member"
   },
 
   "messages": {
@@ -487,6 +488,7 @@
     "external_member_description": "This member belongs to an external federation partner. You can message them or send credits, but the full profile is hosted on their platform.",
     "send_message": "Send Message",
     "send_credits": "Send Credits",
+    "member_fallback": "Member",
     "send_credits_to": "Send credits to {{name}}",
     "amount_hours": "Amount (hours)",
     "description": "Description",
@@ -501,6 +503,7 @@
     "reach_remote_ok": "Remote OK",
     "reach_travel_ok": "Will travel",
     "optin_required_tooltip": "Enable federation in your settings to connect with members on partner timebanks.",
+    "transactions_disabled_tooltip": "This member does not accept federated credit transfers.",
     "connect": "Connect",
     "connected": "Connected",
     "request_pending": "Request pending",

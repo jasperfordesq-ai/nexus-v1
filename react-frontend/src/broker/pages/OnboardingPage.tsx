@@ -267,8 +267,8 @@ export default function OnboardingPage() {
                     )}
 
                     {/* Stage card */}
-                    <div className="flex items-center gap-4">
-                      <div className="w-40 shrink-0">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                      <div className="min-w-0 sm:w-40 sm:shrink-0">
                         <p className="text-sm font-medium text-foreground truncate">
                           {label}
                         </p>
@@ -276,7 +276,7 @@ export default function OnboardingPage() {
                           {stage.count.toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex-1">
+                      <div className="min-w-0 flex-1">
                         <Progress
                           value={pct}
                           size="lg"
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
                           }}
                         />
                       </div>
-                      <div className="w-16 text-right shrink-0">
+                      <div className="text-left sm:w-16 sm:text-right sm:shrink-0">
                         <span className="text-sm font-bold text-foreground">
                           {Math.round(pct)}%
                         </span>

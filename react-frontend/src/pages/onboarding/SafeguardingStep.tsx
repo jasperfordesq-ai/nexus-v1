@@ -418,7 +418,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                   {t('safeguarding.confirmation.revoke_body')}
                 </p>
                 <a
-                  href={tenantPath('/settings/safeguarding')}
+                  href={tenantPath('/settings?tab=safeguarding')}
                   className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   {t('safeguarding.confirmation.revoke_cta')}
@@ -549,7 +549,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                       className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      Learn more <ExternalLink className="w-3 h-3" />
+                      {t('safeguarding.learn_more')} <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
                 </div>

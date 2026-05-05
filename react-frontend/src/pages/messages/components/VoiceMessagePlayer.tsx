@@ -83,8 +83,8 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="min-w-[150px]">
-      <div className="flex items-center gap-3">
+    <div className="min-w-0 w-full sm:min-w-[150px]">
+      <div className="flex min-w-0 items-center gap-3">
         <Button
           isIconOnly
           size="sm"
@@ -99,7 +99,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
             <Play className="w-4 h-4 ml-0.5" aria-hidden="true" />
           )}
         </Button>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="h-1 bg-theme-elevated rounded-full overflow-hidden">
             <div
               className="h-full bg-black/60 dark:bg-white/60 rounded-full transition-all"
@@ -126,7 +126,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
             {showTranscript ? t('voice.hide_transcript') : t('voice.show_transcript')}
           </Button>
           {showTranscript && (
-            <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed break-words [overflow-wrap:anywhere]">
               {transcript}
             </p>
           )}

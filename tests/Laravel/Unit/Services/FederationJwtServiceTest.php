@@ -16,13 +16,12 @@ class FederationJwtServiceTest extends TestCase
         config(['federation.jwt_secret' => null, 'app.key' => null]);
 
         $result = FederationJwtService::generateToken('platform1', 'user1', 2);
-        // May or may not be null depending on app.key in test config
-        $this->assertTrue($result === null || is_array($result));
+        $this->assertNull($result);
     }
 
     public function test_generateToken_returns_expected_structure(): void
     {
-        config(['app.key' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
+        config(['federation.jwt_secret' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
 
         $result = FederationJwtService::generateToken('platform1', 'user1', 2, ['read', 'write']);
 
@@ -40,7 +39,7 @@ class FederationJwtServiceTest extends TestCase
 
     public function test_generateToken_clamps_lifetime(): void
     {
-        config(['app.key' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
+        config(['federation.jwt_secret' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
 
         $shortResult = FederationJwtService::generateToken('p', 'u', 2, [], 1); // Too short
         $longResult = FederationJwtService::generateToken('p', 'u', 2, [], 999999); // Too long
@@ -74,18 +73,33 @@ class FederationJwtServiceTest extends TestCase
 
     public function test_validateToken_roundtrip(): void
     {
-        config(['app.key' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
+        config(['federation.jwt_secret' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
 
         $tokenData = FederationJwtService::generateToken('platform1', 'user1', 2, ['read']);
-        if (!$tokenData) {
-            $this->markTestSkipped('No signing secret');
-        }
 
         $payload = FederationJwtService::validateToken($tokenData['access_token']);
         $this->assertNotNull($payload);
         $this->assertEquals('user1', $payload['sub']);
         $this->assertEquals(2, $payload['tenant_id']);
         $this->assertEquals(['read'], $payload['scopes']);
+    }
+
+    public function test_generateToken_uses_configured_issuer(): void
+    {
+        config([
+            'app.url' => 'https://app.project-nexus.test',
+            'federation.jwt_secret' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678'),
+            'federation.jwt_issuer' => 'https://issuer.project-nexus.test',
+        ]);
+
+        $tokenData = FederationJwtService::generateToken('platform1', 'user1', 2, ['read']);
+
+        $this->assertNotNull($tokenData);
+        $payload = FederationJwtService::validateToken($tokenData['access_token']);
+
+        $this->assertNotNull($payload);
+        $this->assertEquals('https://issuer.project-nexus.test', $payload['iss']);
+        $this->assertEquals('https://app.project-nexus.test', $payload['aud']);
     }
 
     public function test_validateTokenStatic_delegates_to_validateToken(): void

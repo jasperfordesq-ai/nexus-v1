@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\FederationExternalPartnerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -226,10 +227,15 @@ class AdminFederationDataController extends BaseApiController
                     $summary['external_partners']['skipped']++;
                     continue;
                 }
+                $baseUrl = (string) $row['base_url'];
+                if (FederationExternalPartnerService::validateBaseUrl($baseUrl) !== null) {
+                    $summary['external_partners']['invalid']++;
+                    continue;
+                }
                 try {
                     $exists = DB::selectOne(
                         'SELECT id FROM federation_external_partners WHERE tenant_id = ? AND base_url = ?',
-                        [$tenantId, (string) $row['base_url']]
+                        [$tenantId, $baseUrl]
                     );
                 } catch (\Throwable) {
                     $summary['external_partners']['invalid']++;
@@ -250,7 +256,7 @@ class AdminFederationDataController extends BaseApiController
                                 $tenantId,
                                 (string) $row['name'],
                                 isset($row['description']) ? (string) $row['description'] : null,
-                                (string) $row['base_url'],
+                                $baseUrl,
                                 isset($row['api_path']) ? (string) $row['api_path'] : '/api/v1/federation',
                                 'pending',
                                 $userId,

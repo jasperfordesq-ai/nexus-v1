@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Models\TenantSafeguardingOption;
 use App\Services\SafeguardingPreferenceService;
 use Illuminate\Http\JsonResponse;
 
@@ -119,14 +120,14 @@ class AdminSafeguardingOptionsController extends BaseApiController
             }
         }
 
-        $existingCount = \App\Models\TenantSafeguardingOption::where('tenant_id', $tenantId)->count();
+        $existingCount = TenantSafeguardingOption::where('tenant_id', $tenantId)->count();
         if ($existingCount >= 50) {
             return $this->respondWithError('LIMIT_EXCEEDED', __('api.safeguarding_max_50_options'), null, 422);
         }
 
         try {
             $option = SafeguardingPreferenceService::createOption($tenantId, $data);
-            return $this->respondWithData($option->toArray(), 201);
+            return $this->respondWithData($option->toArray(), null, 201);
         } catch (\Illuminate\Database\QueryException $e) {
             if (str_contains($e->getMessage(), 'Duplicate entry')) {
                 return $this->respondWithError('DUPLICATE', __('api.safeguarding_duplicate_option_key', ['key' => $optionKey]), 'option_key', 409);
@@ -139,12 +140,69 @@ class AdminSafeguardingOptionsController extends BaseApiController
     public function update(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $option = TenantSafeguardingOption::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->first();
+
+        if (!$option) {
+            return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
+        }
 
         $data = $this->getAllInput();
         unset($data['id'], $data['tenant_id'], $data['option_key']); // Immutable fields
 
         if (empty($data)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_updateable_fields'), null, 422);
+        }
+
+        if (array_key_exists('label', $data) && trim((string) $data['label']) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.label_is_required'), 'label', 422);
+        }
+
+        if (array_key_exists('option_type', $data) && !in_array($data['option_type'], ['checkbox', 'info', 'select'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_invalid_option_type'), 'option_type', 422);
+        }
+
+        if (array_key_exists('triggers', $data)) {
+            if (!is_array($data['triggers'])) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_triggers_json_required'), 'triggers', 422);
+            }
+
+            $validatedTriggers = $this->validateTriggers($data['triggers']);
+            if ($validatedTriggers instanceof JsonResponse) {
+                return $validatedTriggers;
+            }
+            $data['triggers'] = $validatedTriggers;
+        }
+
+        if (array_key_exists('select_options', $data) && $data['select_options'] !== null) {
+            $selectOptionsError = $this->validateSelectOptions($data['select_options']);
+            if ($selectOptionsError instanceof JsonResponse) {
+                return $selectOptionsError;
+            }
+        }
+
+        $finalOptionType = $data['option_type'] ?? $option->option_type;
+        $finalSelectOptions = array_key_exists('select_options', $data)
+            ? $data['select_options']
+            : $option->select_options;
+
+        if ($finalOptionType === 'select') {
+            $selectOptionsError = $this->validateSelectOptions($finalSelectOptions);
+            if ($selectOptionsError instanceof JsonResponse) {
+                return $selectOptionsError;
+            }
+        }
+
+        foreach (['is_active', 'is_required'] as $booleanField) {
+            if (array_key_exists($booleanField, $data)) {
+                $data[$booleanField] = filter_var($data[$booleanField], FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+        if (array_key_exists('sort_order', $data)) {
+            $data['sort_order'] = (int) $data['sort_order'];
         }
 
         $success = SafeguardingPreferenceService::updateOption($id, $data);
@@ -194,5 +252,48 @@ class AdminSafeguardingOptionsController extends BaseApiController
         SafeguardingPreferenceService::reorderOptions($tenantId, $order);
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_safeguarding_options.options_reordered')]);
+    }
+
+    private function validateTriggers(array $triggers): array|JsonResponse
+    {
+        $allowedTriggerKeys = [
+            'requires_vetted_interaction' => 'boolean',
+            'requires_broker_approval'    => 'boolean',
+            'restricts_messaging'         => 'boolean',
+            'restricts_matching'          => 'boolean',
+            'notify_admin_on_selection'   => 'boolean',
+            'vetting_type_required'       => 'string_or_null',
+        ];
+
+        foreach ($triggers as $key => $value) {
+            if (!array_key_exists($key, $allowedTriggerKeys)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_key_invalid', ['key' => $key]), 'triggers', 422);
+            }
+
+            $expectedType = $allowedTriggerKeys[$key];
+            if ($expectedType === 'boolean' && !is_bool($value)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_type_invalid', ['key' => $key]), 'triggers', 422);
+            }
+            if ($expectedType === 'string_or_null' && $value !== null && !is_string($value)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_type_invalid', ['key' => $key]), 'triggers', 422);
+            }
+        }
+
+        return array_intersect_key($triggers, $allowedTriggerKeys);
+    }
+
+    private function validateSelectOptions(mixed $selectOptions): ?JsonResponse
+    {
+        if (!is_array($selectOptions) || empty($selectOptions)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_select_options_required'), 'select_options', 422);
+        }
+
+        foreach ($selectOptions as $idx => $opt) {
+            if (!is_array($opt) || !isset($opt['value']) || !isset($opt['label'])) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_select_option_invalid', ['idx' => $idx]), 'select_options', 422);
+            }
+        }
+
+        return null;
     }
 }

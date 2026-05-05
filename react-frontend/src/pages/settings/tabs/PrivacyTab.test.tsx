@@ -146,7 +146,7 @@ describe('PrivacyTab', () => {
     const publicLiabilityElements = screen.getAllByText('Public Liability');
     expect(publicLiabilityElements.length).toBeGreaterThan(0);
     expect(screen.getByText(/Aviva/)).toBeDefined();
-    expect(screen.getByText('verified')).toBeDefined();
+    expect(screen.getByText('Verified')).toBeDefined();
   });
 
   it('renders search indexing toggle', () => {

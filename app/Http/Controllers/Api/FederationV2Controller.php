@@ -1151,6 +1151,7 @@ class FederationV2Controller extends BaseApiController
             $sql = "SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
                     u.location, u.tenant_id, t.name as tenant_name,
                     fus.service_reach, fus.messaging_enabled_federated,
+                    fus.transactions_enabled_federated,
                     fus.show_skills_federated, fus.show_location_federated " . $fromWhere;
             if ($cursorId) {
                 $sql .= " AND u.id < :cursor_id";
@@ -1183,6 +1184,7 @@ class FederationV2Controller extends BaseApiController
                     'location' => $m['show_location_federated'] ? ($m['location'] ?? null) : null,
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool) ($m['messaging_enabled_federated'] ?? false),
+                    'transactions_enabled' => (bool) ($m['transactions_enabled_federated'] ?? false),
                     'tenant_id' => (int) $m['tenant_id'],
                     'tenant_name' => $m['tenant_name'] ?? '',
                     'timebank' => [
@@ -1249,6 +1251,7 @@ class FederationV2Controller extends BaseApiController
                     'location' => $m['location'] ?? null,
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool) ($m['accepts_messages'] ?? $m['messaging_enabled'] ?? false),
+                    'transactions_enabled' => (bool) ($m['accepts_transactions'] ?? $m['transactions_enabled'] ?? false),
                     'tenant_id' => 'ext-' . $externalPartnerId,
                     'tenant_name' => $m['timebank']['name'] ?? $partnerName,
                     'timebank' => [
@@ -1292,6 +1295,7 @@ class FederationV2Controller extends BaseApiController
                     'location' => $m['location'] ?? null,
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool) ($m['accepts_messages'] ?? $m['messaging_enabled'] ?? false),
+                    'transactions_enabled' => (bool) ($m['accepts_transactions'] ?? $m['transactions_enabled'] ?? false),
                     'tenant_id' => (int) ($m['timebank']['id'] ?? $m['tenant_id'] ?? 0),
                     'tenant_name' => $m['timebank']['name'] ?? $m['partner_name'] ?? __('api.external_partner_fallback'),
                     'timebank' => [
@@ -1325,7 +1329,8 @@ class FederationV2Controller extends BaseApiController
                     u.location, u.tenant_id, t.name as tenant_name,
                     fus.service_reach, fus.messaging_enabled_federated,
                     fus.transactions_enabled_federated, fus.show_skills_federated,
-                    fus.show_location_federated, fus.show_reviews_federated
+                    fus.show_location_federated, fus.show_reviews_federated,
+                    fp.listings_enabled
                 FROM users u
                 JOIN federation_user_settings fus ON fus.user_id = u.id
                 JOIN tenants t ON t.id = u.tenant_id
@@ -1406,15 +1411,19 @@ class FederationV2Controller extends BaseApiController
             );
 
             // Add member's active listings (if partnership allows listings)
-            $memberListings = DB::select(
-                "SELECT l.id, l.title, l.type, l.description, c.name as category_name, l.created_at
-                 FROM listings l
-                 LEFT JOIN categories c ON c.id = l.category_id
-                 WHERE l.user_id = ? AND l.tenant_id = ? AND l.status = 'active'
-                 ORDER BY l.created_at DESC LIMIT 10",
-                [(int) $m['id'], (int) $m['tenant_id']]
-            );
-            $member['listings'] = array_map(fn ($l) => (array) $l, $memberListings);
+            if (!empty($m['listings_enabled'])) {
+                $memberListings = DB::select(
+                    "SELECT l.id, l.title, l.type, l.description, c.name as category_name, l.created_at
+                     FROM listings l
+                     LEFT JOIN categories c ON c.id = l.category_id
+                     WHERE l.user_id = ? AND l.tenant_id = ? AND l.status = 'active'
+                     ORDER BY l.created_at DESC LIMIT 10",
+                    [(int) $m['id'], (int) $m['tenant_id']]
+                );
+                $member['listings'] = array_map(fn ($l) => (array) $l, $memberListings);
+            } else {
+                $member['listings'] = [];
+            }
 
             return $this->respondWithData($member);
         } catch (\Exception $e) {
@@ -1515,11 +1524,28 @@ class FederationV2Controller extends BaseApiController
         if ($userId <= 0) {
             return $this->respondWithData([]);
         }
+        $memberTenantId = $this->queryInt('tenant_id') ?: $tenantId;
 
         try {
-            /** @var \App\Services\ReviewService $reviewService */
-            $reviewService = app(\App\Services\ReviewService::class);
-            $result = $reviewService->getForUser($userId, ['limit' => 100]);
+            $visibleMember = DB::selectOne("
+                SELECT fus.show_reviews_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id)
+                    OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'
+                  AND fus.federation_optin = 1
+                  AND fus.profile_visible_federated = 1
+                  AND fp.status = 'active'
+                  AND fp.profiles_enabled = 1
+                LIMIT 1
+            ", [$tenantId, $tenantId, $userId, $memberTenantId]);
+
+            if (!$visibleMember || empty($visibleMember->show_reviews_federated)) {
+                return $this->respondWithData([]);
+            }
 
             // Resolve partner metadata lazily — most reviews are local, and
             // the reviewer_tenant_id column identifies cross-tenant origin.
@@ -1544,9 +1570,16 @@ class FederationV2Controller extends BaseApiController
             // Re-query raw review rows to pick up reviewer_tenant_id + review_type
             // (getForUser returns a formatted projection without those fields).
             $rawRows = \App\Models\Review::query()
-                ->withFederated()
+                ->withoutGlobalScope(\App\Scopes\TenantScope::class)
                 ->with(['reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type'])
                 ->where('receiver_id', $userId)
+                ->where(function ($q) use ($memberTenantId) {
+                    $q->where('receiver_tenant_id', $memberTenantId)
+                      ->orWhere(function ($q2) use ($memberTenantId) {
+                          $q2->where('tenant_id', $memberTenantId)
+                             ->whereNull('receiver_tenant_id');
+                      });
+                })
                 ->where(function ($q) {
                     $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
                 })

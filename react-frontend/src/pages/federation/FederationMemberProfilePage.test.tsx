@@ -31,6 +31,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => vi.fn(),
     useParams: () => ({ id: '20' }),
+    useSearchParams: () => [new URLSearchParams('tenant_id=5'), vi.fn()],
   };
 });
 
@@ -105,6 +106,12 @@ const mockConnectionStatus = { status: 'none', connection_id: null };
 
 function setupMocks() {
   vi.mocked(api.get).mockImplementation((url: string) => {
+    if (url.includes('/v2/federation/status')) {
+      return Promise.resolve({ success: true, data: { enabled: true, federation_optin: true } });
+    }
+    if (url.includes('/v2/federation/members/20/reviews')) {
+      return Promise.resolve({ success: true, data: [] });
+    }
     if (url.includes('/v2/federation/connections/status/')) {
       return Promise.resolve({ success: true, data: mockConnectionStatus });
     }
@@ -171,7 +178,7 @@ describe('FederationMemberProfilePage', () => {
     setupMocks();
     render(<FederationMemberProfilePage />);
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith('/v2/federation/members/20');
+      expect(api.get).toHaveBeenCalledWith('/v2/federation/members/20?tenant_id=5', expect.any(Object));
     });
   });
 });

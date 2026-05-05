@@ -341,6 +341,7 @@ class SafeguardingPreferenceService
     ): void {
         $tenantId = TenantContext::getId();
         $now = now();
+        $preferences = self::validatePreferencePayload($tenantId, $preferences);
 
         // Server-side mutual exclusivity: if none_apply is submitted alongside
         // real option selections, real options win (they activate protections;
@@ -388,13 +389,9 @@ class SafeguardingPreferenceService
 
                 // For select-type options, validate submitted value against allowlist
                 if ($option->option_type === 'select') {
-                    $allowedValues = [];
-                    $decoded = json_decode($option->select_options ?? '[]', true);
-                    if (is_array($decoded)) {
-                        $allowedValues = array_column($decoded, 'value');
-                    }
+                    $allowedValues = self::allowedSelectValues($option);
                     if (!empty($allowedValues) && !in_array($value, $allowedValues, true)) {
-                        continue; // Silently reject out-of-allowlist values
+                        throw new \InvalidArgumentException(__('api.safeguarding_select_value_invalid'));
                     }
                 }
 
@@ -439,6 +436,92 @@ class SafeguardingPreferenceService
                 'error'     => $e->getMessage(),
             ]);
         }
+    }
+
+    private static function validatePreferencePayload(int $tenantId, array $preferences): array
+    {
+        $activeOptions = TenantSafeguardingOption::where('tenant_id', $tenantId)
+            ->where('is_active', true)
+            ->get()
+            ->keyBy('id');
+
+        $validated = [];
+        $submittedValues = [];
+
+        foreach ($preferences as $pref) {
+            $optionId = (int) ($pref['option_id'] ?? 0);
+            if ($optionId <= 0 || !$activeOptions->has($optionId)) {
+                throw new \InvalidArgumentException(__('api.safeguarding_preference_option_invalid'));
+            }
+
+            /** @var TenantSafeguardingOption $option */
+            $option = $activeOptions->get($optionId);
+            $value = array_key_exists('value', $pref) ? (string) $pref['value'] : '1';
+
+            if ($option->option_type === 'select') {
+                $allowedValues = self::allowedSelectValues($option);
+                if (!empty($allowedValues) && !in_array($value, $allowedValues, true)) {
+                    throw new \InvalidArgumentException(__('api.safeguarding_select_value_invalid'));
+                }
+            }
+
+            $validated[] = [
+                'option_id' => $optionId,
+                'value' => $value,
+                'notes' => $pref['notes'] ?? null,
+            ];
+            $submittedValues[$optionId] = $value;
+        }
+
+        foreach ($activeOptions as $option) {
+            if (!$option->is_required || $option->option_type === 'info') {
+                continue;
+            }
+
+            $value = $submittedValues[(int) $option->id] ?? null;
+            $isMissing = $option->option_type === 'select'
+                ? $value === null || trim((string) $value) === ''
+                : $value === null || !self::isTruthyPreferenceValue($value);
+
+            if ($isMissing) {
+                throw new \InvalidArgumentException(__('api.safeguarding_required_option_missing', [
+                    'label' => $option->label,
+                ]));
+            }
+        }
+
+        return $validated;
+    }
+
+    private static function allowedSelectValues(TenantSafeguardingOption $option): array
+    {
+        $selectOptions = $option->select_options ?? [];
+        if (is_string($selectOptions)) {
+            $decoded = json_decode($selectOptions, true);
+            $selectOptions = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($selectOptions)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            array_map(
+                fn ($selectOption) => is_array($selectOption) && array_key_exists('value', $selectOption)
+                    ? (string) $selectOption['value']
+                    : null,
+                $selectOptions
+            ),
+            fn ($value) => $value !== null && $value !== ''
+        ));
+    }
+
+    private static function isTruthyPreferenceValue(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'yes', 'on'], true);
     }
 
     /**

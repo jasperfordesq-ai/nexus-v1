@@ -18,9 +18,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('vol_safeguarding_incidents') && Schema::hasColumn('vol_safeguarding_incidents', 'tusla_notified')) {
+        if (!Schema::hasTable('vol_safeguarding_incidents')) {
+            return;
+        }
+
+        if (Schema::hasColumn('vol_safeguarding_incidents', 'tusla_notified')
+            && !Schema::hasColumn('vol_safeguarding_incidents', 'authority_notified')) {
             Schema::table('vol_safeguarding_incidents', function (Blueprint $table) {
                 $table->renameColumn('tusla_notified', 'authority_notified');
+            });
+        }
+
+        if (Schema::hasColumn('vol_safeguarding_incidents', 'tusla_reference')
+            && !Schema::hasColumn('vol_safeguarding_incidents', 'authority_reference')) {
+            Schema::table('vol_safeguarding_incidents', function (Blueprint $table) {
                 $table->renameColumn('tusla_reference', 'authority_reference');
             });
         }
@@ -31,9 +42,20 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('vol_safeguarding_incidents') && Schema::hasColumn('vol_safeguarding_incidents', 'authority_notified')) {
+        if (!Schema::hasTable('vol_safeguarding_incidents')) {
+            return;
+        }
+
+        if (Schema::hasColumn('vol_safeguarding_incidents', 'authority_notified')
+            && !Schema::hasColumn('vol_safeguarding_incidents', 'tusla_notified')) {
             Schema::table('vol_safeguarding_incidents', function (Blueprint $table) {
                 $table->renameColumn('authority_notified', 'tusla_notified');
+            });
+        }
+
+        if (Schema::hasColumn('vol_safeguarding_incidents', 'authority_reference')
+            && !Schema::hasColumn('vol_safeguarding_incidents', 'tusla_reference')) {
+            Schema::table('vol_safeguarding_incidents', function (Blueprint $table) {
                 $table->renameColumn('authority_reference', 'tusla_reference');
             });
         }

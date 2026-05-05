@@ -74,8 +74,8 @@ interface SettingToggleProps {
 
 function SettingToggle({ label, description, checked, onChange, disabled }: SettingToggleProps) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
-      <div>
+    <div className="flex items-center justify-between gap-4 p-4 rounded-lg bg-theme-elevated">
+      <div className="min-w-0">
         <p className="font-medium text-theme-primary">{label}</p>
         <p className="text-sm text-theme-subtle">{description}</p>
       </div>
@@ -84,6 +84,7 @@ function SettingToggle({ label, description, checked, onChange, disabled }: Sett
         isSelected={checked}
         onValueChange={onChange}
         isDisabled={disabled}
+        className="shrink-0"
         classNames={{
           wrapper: 'group-data-[selected=true]:bg-indigo-500',
         }}

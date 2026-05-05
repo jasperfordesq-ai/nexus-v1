@@ -115,7 +115,7 @@ export function ProfileTab({
               onChange={onAvatarUpload}
               className="hidden"
               disabled={isUploading}
-              aria-label={t('profile.upload_photo_aria', { defaultValue: 'Upload profile photo' })}
+              aria-label={t('profile.upload_photo_aria')}
             />
             <Button
               isIconOnly
@@ -124,7 +124,7 @@ export function ProfileTab({
               onPress={() => fileInputRef.current?.click()}
               isDisabled={isUploading}
               isLoading={isUploading}
-              aria-label={t('profile.change_photo_aria', { defaultValue: 'Change profile photo' })}
+              aria-label={t('profile.change_photo_aria')}
             >
               <Camera className="w-4 h-4" aria-hidden="true" />
             </Button>
@@ -170,7 +170,7 @@ export function ProfileTab({
           {/* Date of Birth */}
           <Input
             type="date"
-            label={t('profile.date_of_birth', 'Date of Birth')}
+            label={t('profile.date_of_birth')}
             value={profileData.date_of_birth || ''}
             onChange={(e) => onProfileDataChange((prev) => ({ ...prev, date_of_birth: e.target.value }))}
             classNames={inputClassNames}
@@ -180,9 +180,9 @@ export function ProfileTab({
             endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
             description={
               isIdVerified
-                ? t('identity_verified_lock_dob', 'Your date of birth is locked because your identity has been verified.')
+                ? t('identity_verified_lock_dob')
                 : !profileData.date_of_birth
-                  ? t('profile.dob_description', 'Required for identity verification')
+                  ? t('profile.dob_description')
                   : undefined
             }
           />
@@ -299,7 +299,7 @@ export function ProfileTab({
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
           <Monitor className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-          {t('language')} &amp; {t('appearance')}
+          {t('language_appearance')}
         </h2>
 
         <div className="space-y-6">

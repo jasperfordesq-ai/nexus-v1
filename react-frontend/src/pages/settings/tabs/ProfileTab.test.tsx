@@ -64,6 +64,7 @@ const defaultProps = {
   profileData: defaultProfileData,
   isSaving: false,
   isUploading: false,
+  isDirty: true,
   onProfileDataChange: vi.fn(),
   onSave: vi.fn(),
   onAvatarUpload: vi.fn(),

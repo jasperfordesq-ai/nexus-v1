@@ -31,6 +31,7 @@ vi.mock('@heroui/react', async () => {
         'aria-label': rest['aria-label'] as string | undefined,
         'data-testid': rest['data-testid'] as string | undefined,
       }, (isLoading ? 'Loading...' : children) as ReactNode),
+    ButtonGroup: ({ children }: { children: ReactNode }) => R.createElement('div', null, children),
     Input: ({ label, value, onChange, placeholder, type, name }: Record<string, unknown>) =>
       R.createElement('input', {
         'aria-label': label as string,

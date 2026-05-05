@@ -112,13 +112,13 @@ class FederationProtocolEndpointsTest extends TestCase
             'CC POST propose'                    => ['POST',   '/v2/federation/cc/transactions/propose'],
             'CC POST validate'                   => ['POST',   '/v2/federation/cc/transactions/00000000-0000-0000-0000-000000000000/validate'],
             'CC POST commit'                     => ['POST',   '/v2/federation/cc/transactions/00000000-0000-0000-0000-000000000000/commit'],
-            'Native POST reviews'                => ['POST',   '/v2/federation/reviews'],
-            'Native POST listings'               => ['POST',   '/v2/federation/listings'],
-            'Native POST events'                 => ['POST',   '/v2/federation/events'],
-            'Native POST groups'                 => ['POST',   '/v2/federation/groups'],
-            'Native POST connections'            => ['POST',   '/v2/federation/connections'],
-            'Native POST volunteering'           => ['POST',   '/v2/federation/volunteering'],
-            'Native POST members/sync'           => ['POST',   '/v2/federation/members/sync'],
+            'Native POST reviews'                => ['POST',   '/v2/federation/ingest/reviews'],
+            'Native POST listings'               => ['POST',   '/v2/federation/ingest/listings'],
+            'Native POST events'                 => ['POST',   '/v2/federation/ingest/events'],
+            'Native POST groups'                 => ['POST',   '/v2/federation/ingest/groups'],
+            'Native POST connections'            => ['POST',   '/v2/federation/ingest/connections'],
+            'Native POST volunteering'           => ['POST',   '/v2/federation/ingest/volunteering'],
+            'Native POST members/sync'           => ['POST',   '/v2/federation/ingest/members/sync'],
         ];
     }
 
@@ -342,31 +342,57 @@ class FederationProtocolEndpointsTest extends TestCase
     public function nativeIngestPathProvider(): array
     {
         return [
-            'reviews'       => ['/v2/federation/reviews'],
-            'listings'      => ['/v2/federation/listings'],
-            'events'        => ['/v2/federation/events'],
-            'groups'        => ['/v2/federation/groups'],
-            'connections'   => ['/v2/federation/connections'],
-            'volunteering'  => ['/v2/federation/volunteering'],
-            'members_sync'  => ['/v2/federation/members/sync'],
+            'reviews'       => ['/v2/federation/ingest/reviews'],
+            'listings'      => ['/v2/federation/ingest/listings'],
+            'events'        => ['/v2/federation/ingest/events'],
+            'groups'        => ['/v2/federation/ingest/groups'],
+            'connections'   => ['/v2/federation/ingest/connections'],
+            'volunteering'  => ['/v2/federation/ingest/volunteering'],
+            'members_sync'  => ['/v2/federation/ingest/members/sync'],
         ];
     }
 
     /** @dataProvider nativeIngestPathProvider */
     public function test_native_ingest_accepts_payload_and_logs(string $path): void
     {
-        $payload = ['external_id' => 'ext-' . bin2hex(random_bytes(4)), 'title' => 'smoke-test'];
+        $userId = DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('status', 'active')
+            ->value('id');
+        if (!$userId && str_contains($path, '/reviews')) {
+            $this->markTestSkipped('No active user available for review ingest');
+        }
+        if (!$userId && str_contains($path, '/connections')) {
+            $this->markTestSkipped('No active user available for connection ingest');
+        }
+
+        $externalId = 'ext-' . bin2hex(random_bytes(4));
+        $payload = match (true) {
+            str_contains($path, '/reviews') => [
+                'external_id' => $externalId,
+                'receiver_id' => (int) $userId,
+                'reviewer_id' => 9001,
+                'rating' => 5,
+            ],
+            str_contains($path, '/groups') => ['external_id' => $externalId, 'name' => 'smoke-test'],
+            str_contains($path, '/connections') => [
+                'external_user_id' => $externalId,
+                'local_user_id' => (int) $userId,
+            ],
+            str_contains($path, '/members/sync') => ['external_id' => $externalId, 'display_name' => 'Smoke Test'],
+            default => ['external_id' => $externalId, 'title' => 'smoke-test'],
+        };
 
         $response = $this->json('POST', '/api' . $path, $payload, $this->authHeaders());
 
-        $this->assertContains($response->getStatusCode(), [200, 202]);
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertTrue((bool) $response->json('data.received'));
-        $this->assertTrue((bool) $response->json('data.queued_for_processing'));
+        $this->assertTrue((bool) $response->json('data.processed'));
     }
 
     public function test_native_ingest_rejects_empty_body(): void
     {
-        $response = $this->json('POST', '/api/v2/federation/reviews', [], $this->authHeaders());
+        $response = $this->json('POST', '/api/v2/federation/ingest/reviews', [], $this->authHeaders());
         $response->assertStatus(400);
     }
 }

@@ -685,9 +685,9 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       </div>
 
       {/* Editor + optional preview */}
-      <div className={`flex gap-4 items-start ${showPreview ? 'flex-row' : 'flex-col'}`}>
+      <div className={`flex gap-4 items-start ${showPreview ? 'flex-col lg:flex-row' : 'flex-col'}`}>
         {/* Lexical editor */}
-        <div className={showPreview ? 'w-1/2' : 'w-full'}>
+        <div className={showPreview ? 'w-full lg:w-1/2' : 'w-full'}>
           <div
             className={`
               rounded-lg border-2 transition-colors
@@ -703,7 +703,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                 <RichTextPlugin
                   contentEditable={
                     <ContentEditable
-                      className="min-h-[400px] px-4 py-3 outline-none text-foreground rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+                      className="min-h-[320px] sm:min-h-[400px] px-4 py-3 outline-none text-foreground rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
                       aria-label={"Content HTML"}
                     />
                   }
@@ -732,7 +732,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
         {/* Live preview — pointer-events-none prevents accidental navigation via
             the Contact Us / version-history links that CustomLegalDocument renders */}
         {showPreview && (
-          <div className="w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
+          <div className="w-full lg:w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
             <p className="text-[0.7rem] font-semibold text-default-400 uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
               {"Preview"}
             </p>

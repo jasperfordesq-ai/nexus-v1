@@ -120,7 +120,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                         <Plus className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
                       </motion.div>
                     </Button>
-                    <span className="text-[10px] mt-0.5 font-medium text-theme-subtle leading-none">
+                    <span className="max-w-full truncate px-1 text-[10px] mt-0.5 font-medium text-theme-subtle leading-none">
                       {tab.label}
                     </span>
                   </div>
@@ -159,13 +159,13 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                     }`}
                   />
 
-                  <div className="relative z-10 flex flex-col items-center gap-0.5">
+                  <div className="relative z-10 flex min-w-0 max-w-full flex-col items-center gap-0.5">
                     <Icon
                       className={`w-5 h-5 transition-transform duration-150 ${active ? 'scale-110' : ''}`}
                       strokeWidth={active ? 2.5 : 2}
                       aria-hidden="true"
                     />
-                    <span className="text-[10px] font-medium leading-none">{tab.label}</span>
+                    <span className="max-w-full truncate px-1 text-[10px] font-medium leading-none">{tab.label}</span>
                   </div>
 
                   {/* Active indicator dot — always rendered, opacity-driven */}

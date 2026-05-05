@@ -1,4 +1,6 @@
 {
+  "back": "Back",
+  "error_title": "Something went wrong",
   "nav": {
     "dashboard": "Dashboard",
     "feed": "Feed",
@@ -229,6 +231,7 @@
     "save": "Save preferences"
   },
   "footer": {
+    "project_nexus": "Project NEXUS",
     "platform": "Platform",
     "support": "Support",
     "help_center": "Help Center",
@@ -1751,10 +1754,15 @@
     "or_continue_with_email": "Or continue with email",
     "callback_signing_in": "Signing you in…",
     "callback_failed": "Sign-in failed. Please try again.",
+    "provider_google": "Google",
+    "provider_apple": "Apple",
+    "provider_facebook": "Facebook",
     "connect": "Connect",
     "disconnect": "Disconnect",
+    "disconnected": "Account disconnected.",
     "connected_at": "connected",
     "not_connected": "Not connected",
+    "provider_unavailable": "Not available for this community",
     "cannot_disconnect_last": "Cannot disconnect your only sign-in method",
     "connected_accounts": {
       "title": "Connected accounts",

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Tests for SubAccountsManager component
+ * Tests for SubAccountsManager component.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -71,40 +71,71 @@ vi.mock('@/lib/helpers', () => ({
 
 import { SubAccountsManager } from '../SubAccountsManager';
 
-const mockSubAccounts = [
+const mockManagedAccounts = [
   {
-    id: 1,
-    child_user_id: 10,
-    child_name: 'Child One',
-    child_email: 'child1@example.com',
-    child_avatar: undefined,
-    status: 'approved' as const,
+    relationship_id: 1,
+    relationship_type: 'family',
+    user_id: 10,
+    first_name: 'Child',
+    last_name: 'One',
+    email: 'child1@example.com',
+    avatar_url: null,
+    status: 'active' as const,
     permissions: {
-      can_post: true,
-      can_message: true,
-      can_exchange: false,
-      can_join_events: true,
-      can_join_groups: false,
+      can_view_activity: true,
+      can_manage_listings: false,
+      can_transact: false,
+      can_view_messages: false,
     },
+    approved_at: '2026-01-01T00:00:00Z',
     created_at: '2026-01-01T00:00:00Z',
   },
   {
-    id: 2,
-    child_user_id: 11,
-    child_name: 'Child Two',
-    child_email: 'child2@example.com',
-    child_avatar: undefined,
+    relationship_id: 2,
+    relationship_type: 'family',
+    user_id: 11,
+    first_name: 'Child',
+    last_name: 'Two',
+    email: 'child2@example.com',
+    avatar_url: null,
     status: 'pending' as const,
     permissions: {
-      can_post: false,
-      can_message: false,
-      can_exchange: false,
-      can_join_events: false,
-      can_join_groups: false,
+      can_view_activity: true,
+      can_manage_listings: false,
+      can_transact: false,
+      can_view_messages: false,
     },
+    approved_at: null,
     created_at: '2026-01-02T00:00:00Z',
   },
 ];
+
+const mockManagerAccounts = [
+  {
+    relationship_id: 3,
+    relationship_type: 'guardian',
+    user_id: 12,
+    first_name: 'Parent',
+    last_name: 'One',
+    email: 'parent@example.com',
+    avatar_url: null,
+    status: 'pending' as const,
+    permissions: {
+      can_view_activity: true,
+      can_manage_listings: false,
+      can_transact: false,
+      can_view_messages: false,
+    },
+    approved_at: null,
+    created_at: '2026-01-03T00:00:00Z',
+  },
+];
+
+function mockLoad(children = mockManagedAccounts, parents = mockManagerAccounts) {
+  vi.mocked(api.get)
+    .mockResolvedValueOnce({ success: true, data: children })
+    .mockResolvedValueOnce({ success: true, data: parents });
+}
 
 describe('SubAccountsManager', () => {
   beforeEach(() => {
@@ -119,18 +150,18 @@ describe('SubAccountsManager', () => {
   });
 
   it('renders header with title and add button', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
+    mockLoad([], []);
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('Linked Accounts')).toBeInTheDocument();
-      expect(screen.getByText('Add Account')).toBeInTheDocument();
+      expect(screen.getAllByText('Add Account').length).toBeGreaterThan(0);
     });
   });
 
-  it('renders empty state when no sub-accounts', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
+  it('renders empty state when there are no linked accounts', async () => {
+    mockLoad([], []);
 
     render(<SubAccountsManager />);
 
@@ -139,57 +170,97 @@ describe('SubAccountsManager', () => {
     });
   });
 
-  it('renders sub-accounts list after loading', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockSubAccounts });
+  it('renders managed accounts and manager requests after loading', async () => {
+    mockLoad();
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('Child One')).toBeInTheDocument();
       expect(screen.getByText('Child Two')).toBeInTheDocument();
+      expect(screen.getByText('Parent One')).toBeInTheDocument();
     });
   });
 
   it('shows status chips for each account', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockSubAccounts });
+    mockLoad();
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('Active')).toBeInTheDocument();
-      expect(screen.getByText('Pending')).toBeInTheDocument();
+      expect(screen.getAllByText('Pending')).toHaveLength(2);
     });
   });
 
   it('shows email for each account', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockSubAccounts });
+    mockLoad();
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('child1@example.com')).toBeInTheDocument();
       expect(screen.getByText('child2@example.com')).toBeInTheDocument();
+      expect(screen.getByText('parent@example.com')).toBeInTheDocument();
     });
   });
 
-  it('shows permissions section for approved accounts', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockSubAccounts });
+  it('shows permission toggles for active managed accounts', async () => {
+    mockLoad();
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('Permissions')).toBeInTheDocument();
+      expect(screen.getByText('View messages')).toBeInTheDocument();
     });
   });
 
-  it('shows approve/decline buttons for pending accounts', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockSubAccounts });
+  it('sends nested permission updates to the backend', async () => {
+    mockLoad();
+    vi.mocked(api.put).mockResolvedValueOnce({ success: true, data: [] });
+
+    render(<SubAccountsManager />);
+
+    const switchControl = await screen.findByLabelText('Toggle View messages permission for Child One');
+    fireEvent.click(switchControl);
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith('/v2/users/me/sub-accounts/1/permissions', {
+        permissions: { can_view_messages: true },
+      });
+    });
+  });
+
+  it('shows approve and decline buttons for manager requests awaiting this user', async () => {
+    mockLoad();
 
     render(<SubAccountsManager />);
 
     await waitFor(() => {
       expect(screen.getByText('Approve')).toBeInTheDocument();
       expect(screen.getByText('Decline')).toBeInTheDocument();
+    });
+  });
+
+  it('posts email only when adding a linked account request', async () => {
+    mockLoad([], []);
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: [] });
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ success: true, data: [] })
+      .mockResolvedValueOnce({ success: true, data: [] });
+
+    render(<SubAccountsManager />);
+
+    await screen.findByText('No linked accounts');
+    fireEvent.click(screen.getAllByText('Add Account')[0]);
+    fireEvent.change(screen.getByLabelText('Email Address'), { target: { value: 'child@example.com' } });
+    fireEvent.click(screen.getByText('Send Request'));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/v2/users/me/sub-accounts', {
+        email: 'child@example.com',
+      });
     });
   });
 
@@ -201,16 +272,6 @@ describe('SubAccountsManager', () => {
     await waitFor(() => {
       expect(screen.getByText('Failed to load linked accounts')).toBeInTheDocument();
       expect(screen.getByText('Retry')).toBeInTheDocument();
-    });
-  });
-
-  it('shows description text', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
-
-    render(<SubAccountsManager />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Link accounts for family members/)).toBeInTheDocument();
     });
   });
 });

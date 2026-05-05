@@ -31,9 +31,9 @@ function shouldUseDarkText(hex: string): boolean {
 const avatarSizeMap = { sm: 'sm', md: 'sm', lg: 'md' } as const;
 
 const imgClassMap = {
-  sm: 'h-7 w-auto object-contain max-w-[140px]',
-  md: 'h-8 sm:h-9 w-auto object-contain max-w-[160px]',
-  lg: 'h-9 w-auto object-contain max-w-[160px]',
+  sm: 'h-7 w-auto object-contain max-w-[96px] sm:max-w-[140px]',
+  md: 'h-8 sm:h-9 w-auto object-contain max-w-[112px] sm:max-w-[160px]',
+  lg: 'h-9 w-auto object-contain max-w-[128px] sm:max-w-[160px]',
 } as const;
 
 const nameClassMap = {
@@ -126,13 +126,13 @@ export function TenantLogo({
   return (
     <Link
       to={tenantPath('/')}
-      className={`flex items-center gap-2 ${className}`.trim()}
+      className={`flex min-w-0 items-center gap-2 ${className}`.trim()}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="flex items-center"
+        className="flex min-w-0 items-center shrink-0"
       >
         {iconElement}
       </motion.div>

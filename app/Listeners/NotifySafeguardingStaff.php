@@ -111,7 +111,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'tenant_id'        => $tenantId,
                 'flagged_user_id'  => $flaggedUserId,
                 'staff_notified'   => count($staffUsers),
-                'options_selected' => $optionLabels,
+                'options_selected_count' => count($optionLabels),
             ]);
         } catch (\Throwable $e) {
             Log::error('NotifySafeguardingStaff: failed to notify staff', [

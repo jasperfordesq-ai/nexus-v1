@@ -305,21 +305,21 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
   if (breadcrumbs.length <= 1) return null;
 
   return (
-    <nav aria-label={"Breadcrumbs"} className="mb-4">
-      <ol className="flex items-center gap-1.5 text-sm text-default-500">
+    <nav aria-label={"Breadcrumbs"} className="mb-4 max-w-full overflow-x-auto pb-1">
+      <ol className="flex w-max max-w-full items-center gap-1.5 text-sm text-default-500">
         {breadcrumbs.map((crumb, index) => (
-          <li key={crumb.label} className="flex items-center gap-1.5">
-            {index > 0 && <ChevronRight size={14} className="text-default-300" />}
-            {index === 0 && <LayoutDashboard size={14} className="mr-1" />}
+          <li key={crumb.label} className="flex min-w-0 items-center gap-1.5">
+            {index > 0 && <ChevronRight size={14} className="shrink-0 text-default-300" />}
+            {index === 0 && <LayoutDashboard size={14} className="mr-1 shrink-0" />}
             {crumb.href ? (
               <Link
                 to={crumb.href}
-                className="hover:text-foreground transition-colors"
+                className="max-w-[9rem] truncate hover:text-foreground transition-colors sm:max-w-[14rem]"
               >
                 {crumb.label}
               </Link>
             ) : (
-              <span className="font-medium text-foreground">{crumb.label}</span>
+              <span className="max-w-[12rem] truncate font-medium text-foreground sm:max-w-[18rem]">{crumb.label}</span>
             )}
           </li>
         ))}

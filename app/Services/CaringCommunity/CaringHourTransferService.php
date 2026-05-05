@@ -109,6 +109,9 @@ class CaringHourTransferService
         if ($destinationTenant && (int) $destinationTenant->id === $sourceTenantId) {
             throw new InvalidArgumentException('Destination cooperative must be different from source.');
         }
+        $counterpartTenantSlug = $destinationTenant
+            ? (string) $destinationTenant->slug
+            : (string) ($remotePeer['peer_slug'] ?? $destinationTenantSlug);
 
         if ($destinationTenant) {
             // Match by email — same-platform federation requires the destination
@@ -127,7 +130,7 @@ class CaringHourTransferService
 
         $row = [
             'tenant_id'                => $sourceTenantId,
-            'counterpart_tenant_slug'  => (string) $destinationTenant->slug,
+            'counterpart_tenant_slug'  => $counterpartTenantSlug,
             'role'                     => 'source',
             'member_user_id'           => $sourceMemberId,
             'counterpart_member_email' => (string) $sourceUser->email,

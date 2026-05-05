@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Models\TenantSafeguardingOption;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -76,6 +77,48 @@ class AdminSafeguardingOptionsControllerTest extends TestCase
             'option_key' => 'police_check',
             'label' => 'Police check',
             'option_type' => 'not_a_valid_type',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_store_returns_created_for_valid_option(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/safeguarding/options', [
+            'option_key' => 'needs_broker_check_' . uniqid(),
+            'label' => 'Needs broker check',
+            'option_type' => 'checkbox',
+            'triggers' => [
+                'requires_broker_approval' => true,
+            ],
+        ]);
+
+        $response->assertStatus(201);
+    }
+
+    public function test_update_rejects_invalid_trigger_keys(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $option = TenantSafeguardingOption::create([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'needs_support_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'Needs support',
+            'sort_order' => 10,
+            'is_active' => true,
+            'is_required' => false,
+            'triggers' => [],
+        ]);
+
+        $response = $this->apiPut("/v2/admin/safeguarding/options/{$option->id}", [
+            'triggers' => [
+                'unsafe_custom_trigger' => true,
+            ],
         ]);
 
         $response->assertStatus(422);

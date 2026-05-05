@@ -286,6 +286,9 @@ section[id] {
   top: 64px;
   left: 1rem;
   right: 1rem;
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(10, 10, 15, 0.98);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);

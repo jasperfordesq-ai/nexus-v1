@@ -177,6 +177,7 @@ export function FederationMessagesPage() {
   const { hasFeature, tenantSlug, tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isFederationEnabled = hasFeature('federation');
 
   // ── Opt-in status ──
   const [userOptedIn, setUserOptedIn] = useState<boolean | null>(null);
@@ -259,6 +260,8 @@ export function FederationMessagesPage() {
     () => threads.find((t) => `${t.partner.id}-${t.partner.tenant_id}` === activeThreadKey) ?? null,
     [threads, activeThreadKey]
   );
+
+  const canUseFederationMessaging = isFederationEnabled && userOptedIn === true;
 
   // ── Load messages ──
   const loadMessages = useCallback(async () => {
@@ -380,7 +383,21 @@ export function FederationMessagesPage() {
     const toUser = searchParams.get('to_user');
     const toTenant = searchParams.get('to_tenant');
 
-    if (compose === 'true') {
+    if (compose !== 'true') return;
+
+    if (!canUseFederationMessaging) {
+      if (userOptedIn === false) {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('compose');
+        newParams.delete('to_user');
+        newParams.delete('to_tenant');
+        newParams.delete('name');
+        setSearchParams(newParams, { replace: true });
+      }
+      return;
+    }
+
+    if (canUseFederationMessaging) {
       setIsComposeOpen(true);
 
       if (toUser && toTenant) {
@@ -424,7 +441,7 @@ export function FederationMessagesPage() {
       newParams.delete('name');
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]); // Only run on mount
+  }, [canUseFederationMessaging, searchParams, setSearchParams, userOptedIn]);
 
   // ── Mark thread as read ──
   const markThreadRead = useCallback(
@@ -445,7 +462,10 @@ export function FederationMessagesPage() {
 
       // Batch mark-read in a single request
       try {
-        await api.post('/v2/federation/messages/mark-read-batch', { ids: unreadIds });
+        const response = await api.post('/v2/federation/messages/mark-read-batch', { ids: unreadIds });
+        if (!response.success) {
+          throw new Error(response.error || 'Mark-read failed');
+        }
       } catch (err) {
         logError('Failed to batch mark federated messages as read', err);
       }
@@ -603,7 +623,7 @@ export function FederationMessagesPage() {
 
   // ── Send reply ──
   const sendReply = useCallback(async () => {
-    if (!replyText.trim() || !activeThread || isSending) return;
+    if (!replyText.trim() || !activeThread || isSending || !canUseFederationMessaging) return;
 
     try {
       setIsSending(true);
@@ -633,7 +653,7 @@ export function FederationMessagesPage() {
     } finally {
       setIsSending(false);
     }
-  }, [replyText, activeThread, isSending]);
+  }, [replyText, activeThread, isSending, canUseFederationMessaging]);
 
   // ── Recipient search (debounced) ──
   useEffect(() => {
@@ -671,7 +691,7 @@ export function FederationMessagesPage() {
 
   // ── Send compose message ──
   const sendComposeMessage = useCallback(async () => {
-    if (!selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim() || isComposeSending) return;
+    if (!selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim() || isComposeSending || !canUseFederationMessaging) return;
 
     try {
       setIsComposeSending(true);
@@ -707,7 +727,7 @@ export function FederationMessagesPage() {
     } finally {
       setIsComposeSending(false);
     }
-  }, [selectedRecipient, composeSubject, composeBody, isComposeSending]);
+  }, [selectedRecipient, composeSubject, composeBody, isComposeSending, canUseFederationMessaging]);
 
   // ── Close compose and reset ──
   const closeCompose = useCallback(() => {
@@ -728,11 +748,12 @@ export function FederationMessagesPage() {
   // Check opt-in status on mount (proactive gate — avoids 403 on Send)
   useEffect(() => {
     let cancelled = false;
-    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+    api.get<{ enabled?: boolean; federation_optin?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
       if (cancelled) return;
       if (res.success && res.data) {
         const isOptedIn =
           res.data.enabled === true ||
+          res.data.federation_optin === true ||
           res.data.status?.user_optin === true;
         setUserOptedIn(isOptedIn);
       } else {
@@ -742,11 +763,7 @@ export function FederationMessagesPage() {
       setUserOptedIn(false);
     });
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ── Check federation feature ──
-  const isFederationEnabled = hasFeature('federation');
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
@@ -804,7 +821,7 @@ export function FederationMessagesPage() {
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => setIsComposeOpen(true)}
-          isDisabled={!isFederationEnabled || userOptedIn === false}
+          isDisabled={!canUseFederationMessaging}
         >
           {t('messages.compose')}
         </Button>
@@ -842,7 +859,7 @@ export function FederationMessagesPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white mt-2"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setIsComposeOpen(true)}
-              isDisabled={!isFederationEnabled}
+              isDisabled={!canUseFederationMessaging}
             >
               {t('messages.compose_message')}
             </Button>
@@ -1258,7 +1275,7 @@ export function FederationMessagesPage() {
                       className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white self-end"
                       onPress={sendReply}
                       isLoading={isSending}
-                      isDisabled={!replyText.trim()}
+                      isDisabled={!canUseFederationMessaging || !replyText.trim()}
                       aria-label={t('messages.aria_send_reply')}
                     >
                       <Send className="w-4 h-4" aria-hidden="true" />
@@ -1459,7 +1476,7 @@ export function FederationMessagesPage() {
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               onPress={sendComposeMessage}
               isLoading={isComposeSending}
-              isDisabled={!selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim()}
+              isDisabled={!canUseFederationMessaging || !selectedRecipient || !selectedRecipient.tenant_id || !composeSubject.trim() || !composeBody.trim()}
             >
               {t('messages.send_message')}
             </Button>

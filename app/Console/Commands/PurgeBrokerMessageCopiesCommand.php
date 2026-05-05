@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\Log;
  */
 class PurgeBrokerMessageCopiesCommand extends Command
 {
+    private const MIN_REVIEWED_RETENTION_DAYS = 7;
+    private const MIN_FLAGGED_RETENTION_DAYS = 365;
+
     protected $signature = 'safeguarding:purge-message-copies
                             {--days=90 : Default retention days when a tenant has no broker_config.retention_days set}
                             {--flagged-days=365 : Retention days for flagged copies (uniform across tenants)}';
@@ -32,8 +35,8 @@ class PurgeBrokerMessageCopiesCommand extends Command
 
     public function handle(): int
     {
-        $defaultDays = (int) $this->option('days');
-        $flaggedDays = (int) $this->option('flagged-days');
+        $defaultDays = max(self::MIN_REVIEWED_RETENTION_DAYS, (int) $this->option('days'));
+        $flaggedDays = max(self::MIN_FLAGGED_RETENTION_DAYS, (int) $this->option('flagged-days'));
         $now = now();
 
         // Build a per-tenant retention map from broker_config so each tenant
@@ -113,7 +116,7 @@ class PurgeBrokerMessageCopiesCommand extends Command
             // Hard floor of 7 days — a tenant accidentally setting
             // retention_days to 0 would otherwise wipe their entire
             // broker review queue on the next purge run.
-            $map[$tenantId] = max(7, $days);
+            $map[$tenantId] = max(self::MIN_REVIEWED_RETENTION_DAYS, $days);
         }
 
         return $map;

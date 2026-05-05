@@ -27,7 +27,7 @@ export interface FooterProps {
 /**
  * Footer - Glass-styled footer component
  * Shows tenant branding, contact info, and footer_text from bootstrap API.
- * Hidden on mobile (md:block) — mobile uses MobileDrawer for nav links.
+ * Desktop footer carries full navigation; mobile keeps a compact attribution strip.
  */
 export function Footer({ children, copyright }: FooterProps) {
   const { t } = useTranslation('common');
@@ -46,7 +46,30 @@ export function Footer({ children, copyright }: FooterProps) {
   const contact = tenant?.contact;
 
   return (
-    <footer className="hidden md:block relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
+    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
+      <div className="md:hidden px-4 py-4 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-theme-subtle/70">
+          <a
+            href="https://github.com/jasperfordesq-ai/nexus-v1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-theme-primary transition-colors"
+          >
+            {t('footer.project_nexus')}
+          </a>
+          <span aria-hidden="true">&middot;</span>
+          <span>{t('footer.agpl_notice', { year })}</span>
+          <span aria-hidden="true">&middot;</span>
+          <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
+            {t('footer.terms')}
+          </Link>
+          <span aria-hidden="true">&middot;</span>
+          <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
+            {t('footer.privacy')}
+          </Link>
+        </div>
+      </div>
+      <div className="hidden md:block">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children ? (
           children
@@ -152,7 +175,7 @@ export function Footer({ children, copyright }: FooterProps) {
             ) : null}
 
             {/* RC dev notice */}
-            <div className="border-t border-theme-default pt-4 flex items-center justify-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+            <div className="border-t border-theme-default pt-4 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-center text-xs text-amber-700 dark:text-amber-400">
               <FlaskConical className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               <span>
                 <span className="font-semibold">{RELEASE_STATUS.stageLabel}</span>
@@ -183,17 +206,17 @@ export function Footer({ children, copyright }: FooterProps) {
             </div>
 
             {/* Platform Attribution */}
-            <div className="pt-4 flex items-center justify-center gap-2 text-[11px] text-theme-subtle/60">
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[11px] text-theme-subtle/60">
               <a
                 href="https://github.com/jasperfordesq-ai/nexus-v1"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-theme-primary transition-colors"
               >
-                Project NEXUS
+                {t('footer.project_nexus')}
               </a>
               <span>&middot;</span>
-              <span>AGPL-3.0 &copy; 2024&ndash;{year} Jasper Ford</span>
+              <span>{t('footer.agpl_notice', { year })}</span>
               <span>&middot;</span>
               <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
                 {t('footer.terms')}
@@ -202,12 +225,13 @@ export function Footer({ children, copyright }: FooterProps) {
               <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
                 {t('footer.privacy')}
               </Link>
-              <span className="font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
+              <span className="max-w-[8rem] truncate font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
                 {__BUILD_COMMIT__}
               </span>
             </div>
           </div>
         )}
+      </div>
       </div>
     </footer>
   );

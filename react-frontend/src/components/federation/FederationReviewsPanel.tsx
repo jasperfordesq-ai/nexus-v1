@@ -45,6 +45,7 @@ export interface FederationReviewItem {
 
 interface FederationReviewsPanelProps {
   memberId: string | number;
+  tenantId?: string | number | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +124,7 @@ function partnerChipClass(partnerId: number | string | undefined): string {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function FederationReviewsPanel({ memberId }: FederationReviewsPanelProps) {
+export function FederationReviewsPanel({ memberId, tenantId }: FederationReviewsPanelProps) {
   const { t, i18n } = useTranslation('federation');
   const [reviews, setReviews] = useState<FederationReviewItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -140,8 +141,9 @@ export function FederationReviewsPanel({ memberId }: FederationReviewsPanelProps
     setError(null);
     setUnavailable(false);
     try {
+      const tenantQuery = tenantId ? `?tenant_id=${encodeURIComponent(String(tenantId))}` : '';
       const response = await api.get<FederationReviewItem[]>(
-        `/v2/federation/members/${memberId}/reviews`,
+        `/v2/federation/members/${memberId}/reviews${tenantQuery}`,
         { signal: controller.signal }
       );
       if (controller.signal.aborted) return;
@@ -171,7 +173,7 @@ export function FederationReviewsPanel({ memberId }: FederationReviewsPanelProps
     } finally {
       if (!controller.signal.aborted) setIsLoading(false);
     }
-  }, [memberId, t]);
+  }, [memberId, tenantId, t]);
 
   useEffect(() => {
     load();

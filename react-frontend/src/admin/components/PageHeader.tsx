@@ -38,11 +38,11 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-6 flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-3">
             {icon && <span className="shrink-0 text-primary">{icon}</span>}
-            <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+            <h1 className="min-w-0 break-words text-xl font-bold text-foreground [overflow-wrap:anywhere] sm:text-2xl">{title}</h1>
             {article && (
               <button
                 type="button"
@@ -56,10 +56,10 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
             )}
           </div>
           {body && (
-            <p className="mt-1 text-sm text-default-500">{body}</p>
+            <p className="mt-1 break-words text-sm text-default-500 [overflow-wrap:anywhere]">{body}</p>
           )}
         </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        {actions && <div className="flex flex-wrap items-center gap-2 sm:justify-end">{actions}</div>}
       </div>
       {article && (
         <AdminHelpDrawer

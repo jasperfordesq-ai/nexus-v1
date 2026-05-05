@@ -130,7 +130,7 @@ const TRIGGER_KEYS = [
 
 export function SafeguardingOptionsAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle("Safeguarding Options");
+  usePageTitle(t('safeguarding.options_page_title'));
   const toast = useToast();
 
   const [options, setOptions] = useState<SafeguardingOption[]>([]);
@@ -154,11 +154,11 @@ export function SafeguardingOptionsAdmin() {
       }
     } catch (error) {
       logError('Failed to load safeguarding options', error);
-      toast.error("Failed to load options");
+      toast.error(t('safeguarding.failed_to_load_options'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => { fetchOptions(); }, [fetchOptions]);
@@ -167,11 +167,11 @@ export function SafeguardingOptionsAdmin() {
 
   const handleSave = useCallback(async () => {
     if (!form.label.trim()) {
-      toast.error("Is Required");
+      toast.error(t('safeguarding.label_is_required'));
       return;
     }
     if (!editingOption && !form.option_key.trim()) {
-      toast.error("Option Key is Required");
+      toast.error(t('safeguarding.option_key_is_required'));
       return;
     }
 
@@ -192,30 +192,30 @@ export function SafeguardingOptionsAdmin() {
         // Update
         const res = await api.put(`/v2/admin/safeguarding/options/${editingOption.id}`, payload);
         if (res.success) {
-          toast.success(`Option Updated`);
+          toast.success(t('safeguarding.option_updated'));
           createModal.onClose();
           fetchOptions();
         } else {
-          toast.error(res.error || "Update Failed");
+          toast.error(res.error || t('safeguarding.update_failed'));
         }
       } else {
         // Create
         const res = await api.post('/v2/admin/safeguarding/options', payload);
         if (res.success) {
-          toast.success(`Option Created`);
+          toast.success(t('safeguarding.option_created'));
           createModal.onClose();
           fetchOptions();
         } else {
-          toast.error(res.error || "Create Failed");
+          toast.error(res.error || t('safeguarding.create_failed'));
         }
       }
     } catch (error) {
       logError('Failed to save safeguarding option', error);
-      toast.error("Save Failed");
+      toast.error(t('safeguarding.save_failed'));
     } finally {
       setSaving(false);
     }
-  }, [form, editingOption, toast, fetchOptions, createModal])
+  }, [form, editingOption, toast, fetchOptions, createModal, t])
 
 
   // ── Delete handler ───────────────────────────────────────────────────────
@@ -225,17 +225,17 @@ export function SafeguardingOptionsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/safeguarding/options/${deleteTarget.id}`);
       if (res.success) {
-        toast.success(`Option Deactivated`);
+        toast.success(t('safeguarding.option_deactivated'));
         deleteModal.onClose();
         fetchOptions();
       } else {
-        toast.error(res.error || "Deactivation Failed");
+        toast.error(res.error || t('safeguarding.deactivation_failed'));
       }
     } catch (error) {
       logError('Failed to deactivate safeguarding option', error);
-      toast.error("Deactivation Failed");
+      toast.error(t('safeguarding.deactivation_failed'));
     }
-  }, [deleteTarget, toast, fetchOptions, deleteModal])
+  }, [deleteTarget, toast, fetchOptions, deleteModal, t])
 
 
   // ── Open edit modal ──────────────────────────────────────────────────────
@@ -297,8 +297,8 @@ export function SafeguardingOptionsAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Safeguarding Options"}
-        description={"Create and manage safeguarding options available to members"}
+        title={t('safeguarding.safeguarding_options')}
+        description={t('safeguarding.safeguarding_options_desc')}
       />
 
       <div className="space-y-6">
@@ -306,15 +306,15 @@ export function SafeguardingOptionsAdmin() {
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">{"Active Options"}</h3>
-              <p className="text-sm text-theme-muted">{"Safeguarding options that are currently active and available to members"}</p>
+              <h3 className="text-lg font-semibold">{t('safeguarding.active_options')}</h3>
+              <p className="text-sm text-theme-muted">{t('safeguarding.active_options_desc')}</p>
             </div>
             <Button
               color="primary"
               startContent={<Plus className="w-4 h-4" />}
               onPress={openCreate}
             >
-              {"Add Option"}
+              {t('safeguarding.add_option')}
             </Button>
           </CardHeader>
           <CardBody>
@@ -332,8 +332,8 @@ export function SafeguardingOptionsAdmin() {
             ) : (
               <div className="text-center py-8 text-theme-muted">
                 <Shield className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                <p>{"No options configured"}</p>
-                <p className="text-sm mt-1">{"No safeguarding options have been created yet"}</p>
+                <p>{t('safeguarding.no_options_configured')}</p>
+                <p className="text-sm mt-1">{t('safeguarding.no_options_configured_desc')}</p>
               </div>
             )}
           </CardBody>
@@ -344,8 +344,8 @@ export function SafeguardingOptionsAdmin() {
           <Card shadow="sm">
             <CardHeader>
               <div>
-                <h3 className="text-lg font-semibold text-theme-muted">{"Inactive Options"}</h3>
-                <p className="text-sm text-theme-muted">{"Safeguarding options that have been deactivated"}</p>
+                <h3 className="text-lg font-semibold text-theme-muted">{t('safeguarding.inactive_options')}</h3>
+                <p className="text-sm text-theme-muted">{t('safeguarding.inactive_options_desc')}</p>
               </div>
             </CardHeader>
             <CardBody>
@@ -356,7 +356,7 @@ export function SafeguardingOptionsAdmin() {
                       <p className="text-sm line-through">{opt.label}</p>
                       <p className="text-xs text-theme-muted">{opt.option_key}</p>
                     </div>
-                    <Chip size="sm" variant="flat" color="default">{"Inactive"}</Chip>
+                    <Chip size="sm" variant="flat" color="default">{t('safeguarding.inactive')}</Chip>
                   </div>
                 ))}
               </div>
@@ -368,44 +368,44 @@ export function SafeguardingOptionsAdmin() {
       {/* ─── Create/Edit Modal ─── */}
       <Modal isOpen={createModal.isOpen} onClose={createModal.onClose} size="2xl" scrollBehavior="inside">
         <ModalContent>
-          <ModalHeader>{editingOption ? "Edit Option" : "Add Safeguarding Option"}</ModalHeader>
+          <ModalHeader>{editingOption ? t('safeguarding.edit_option') : t('safeguarding.add_safeguarding_option')}</ModalHeader>
           <ModalBody className="gap-4">
             {!editingOption && (
               <Input
-                label={"Option Key"}
+                label={t('safeguarding.label_option_key')}
                 value={form.option_key}
                 onValueChange={(v) => setForm(prev => ({ ...prev, option_key: v }))}
                 variant="bordered"
-                description={"A unique identifier for this safeguarding option"}
-                placeholder="e.g. works_with_children"
+                description={t('safeguarding.desc_option_key')}
+                placeholder={t('safeguarding.placeholder_option_key')}
               />
             )}
             <Input
-              label={"Display Label"}
+              label={t('safeguarding.label_display_label')}
               value={form.label}
               onValueChange={(v) => setForm(prev => ({ ...prev, label: v }))}
               variant="bordered"
-              placeholder="e.g. I may work with children or young people (under 18)"
+              placeholder={t('safeguarding.placeholder_display_label')}
               isRequired
             />
             <Textarea
-              label={"Description Help"}
+              label={t('safeguarding.label_description_help')}
               value={form.description}
               onValueChange={(v) => setForm(prev => ({ ...prev, description: v }))}
               variant="bordered"
-              placeholder={"Description Help..."}
+              placeholder={t('safeguarding.placeholder_description_help')}
               minRows={2}
             />
             <Input
-              label={"Help URL"}
+              label={t('safeguarding.label_help_url')}
               value={form.help_url}
               onValueChange={(v) => setForm(prev => ({ ...prev, help_url: v }))}
               variant="bordered"
-              placeholder="https://..."
-              description={"A link to help documentation for this safeguarding option"}
+              placeholder={t('safeguarding.placeholder_help_url')}
+              description={t('safeguarding.desc_help_url')}
             />
             <Select
-              label={"Option Type"}
+              label={t('safeguarding.label_option_type')}
               selectedKeys={[form.option_type]}
               onSelectionChange={(keys) => {
                 const key = Array.from(keys)[0] as 'checkbox' | 'info' | 'select';
@@ -413,24 +413,24 @@ export function SafeguardingOptionsAdmin() {
               }}
               variant="bordered"
             >
-              <SelectItem key="checkbox">{"Checkbox"}</SelectItem>
-              <SelectItem key="info">{"Info"}</SelectItem>
-              <SelectItem key="select">{"Select"}</SelectItem>
+              <SelectItem key="checkbox">{t('safeguarding.type_checkbox')}</SelectItem>
+              <SelectItem key="info">{t('safeguarding.type_info')}</SelectItem>
+              <SelectItem key="select">{t('safeguarding.type_select')}</SelectItem>
             </Select>
             <Switch
               isSelected={form.is_required}
               onValueChange={(v) => setForm(prev => ({ ...prev, is_required: v }))}
             >
               <div>
-                <p className="font-medium text-sm">{"Required"}</p>
-                <p className="text-xs text-theme-muted">{"This safeguarding option is mandatory and cannot be opt-out"}</p>
+                <p className="font-medium text-sm">{t('safeguarding.required')}</p>
+                <p className="text-xs text-theme-muted">{t('safeguarding.required_desc')}</p>
               </div>
             </Switch>
 
             <div className="border-t pt-4 mt-2">
-              <h4 className="font-semibold text-sm mb-3">{"Behavioral Triggers"}</h4>
+              <h4 className="font-semibold text-sm mb-3">{t('safeguarding.behavioral_triggers')}</h4>
               <p className="text-xs text-theme-muted mb-3">
-                {"Configure automatic flags triggered by specific member behaviours"}
+                {t('safeguarding.behavioral_triggers_desc')}
               </p>
               <div className="space-y-3">
                 {TRIGGER_KEYS.map((key) => {
@@ -457,7 +457,7 @@ export function SafeguardingOptionsAdmin() {
 
               {(form.triggers.requires_vetted_interaction || form.triggers.restricts_matching) && (
                 <Select
-                  label={"Required Vetting Type"}
+                  label={t('safeguarding.label_required_vetting_type')}
                   selectedKeys={form.triggers.vetting_type_required ? [form.triggers.vetting_type_required] : []}
                   onSelectionChange={(keys) => {
                     const key = Array.from(keys)[0] as string || '';
@@ -465,24 +465,24 @@ export function SafeguardingOptionsAdmin() {
                   }}
                   variant="bordered"
                   className="mt-3"
-                  description={"The vetting type required before this safeguarding option can be assigned"}
+                  description={t('safeguarding.desc_required_vetting_type')}
                 >
-                  <SelectItem key="garda_vetting">{"Vetting Garda"}</SelectItem>
-                  <SelectItem key="dbs_basic">{"Vetting Dbs Basic"}</SelectItem>
-                  <SelectItem key="dbs_standard">{"Vetting Dbs Standard"}</SelectItem>
-                  <SelectItem key="dbs_enhanced">{"Vetting Dbs Enhanced"}</SelectItem>
-                  <SelectItem key="pvg_scotland">{"Vetting Pvg Scotland"}</SelectItem>
-                  <SelectItem key="access_ni">{"Vetting Access Ni"}</SelectItem>
-                  <SelectItem key="international">{"Vetting International"}</SelectItem>
-                  <SelectItem key="other">{"Vetting Other"}</SelectItem>
+                  <SelectItem key="garda_vetting">{t('safeguarding.vetting_garda')}</SelectItem>
+                  <SelectItem key="dbs_basic">{t('safeguarding.vetting_dbs_basic')}</SelectItem>
+                  <SelectItem key="dbs_standard">{t('safeguarding.vetting_dbs_standard')}</SelectItem>
+                  <SelectItem key="dbs_enhanced">{t('safeguarding.vetting_dbs_enhanced')}</SelectItem>
+                  <SelectItem key="pvg_scotland">{t('safeguarding.vetting_pvg_scotland')}</SelectItem>
+                  <SelectItem key="access_ni">{t('safeguarding.vetting_access_ni')}</SelectItem>
+                  <SelectItem key="international">{t('safeguarding.vetting_international')}</SelectItem>
+                  <SelectItem key="other">{t('safeguarding.vetting_other')}</SelectItem>
                 </Select>
               )}
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={createModal.onClose}>{"Cancel"}</Button>
+            <Button variant="light" onPress={createModal.onClose}>{t('safeguarding.cancel')}</Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingOption ? "Save Changes" : "Create Option"}
+              {editingOption ? t('safeguarding.save_changes') : t('safeguarding.create_option')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -491,18 +491,18 @@ export function SafeguardingOptionsAdmin() {
       {/* ─── Delete Confirmation Modal ─── */}
       <Modal isOpen={deleteModal.isOpen} onClose={deleteModal.onClose}>
         <ModalContent>
-          <ModalHeader>{"Deactivate Option"}</ModalHeader>
+          <ModalHeader>{t('safeguarding.deactivate_option')}</ModalHeader>
           <ModalBody>
             <p>
-              {"Deactivate Confirm Question"} <strong>&quot;{deleteTarget?.label}&quot;</strong>?
+              {t('safeguarding.deactivate_confirm_question')} <strong>&quot;{deleteTarget?.label}&quot;</strong>?
             </p>
             <p className="text-sm text-theme-muted mt-2">
-              {"Are you sure you want to deactivate this safeguarding option?"}
+              {t('safeguarding.deactivate_option_desc')}
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={deleteModal.onClose}>{"Cancel"}</Button>
-            <Button color="danger" onPress={handleDelete}>{"Deactivate"}</Button>
+            <Button variant="light" onPress={deleteModal.onClose}>{t('safeguarding.cancel')}</Button>
+            <Button color="danger" onPress={handleDelete}>{t('safeguarding.deactivate')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -534,7 +534,7 @@ function OptionCard({
           <CheckCircle className="w-4 h-4 text-success-500 flex-shrink-0" />
           <p className="font-medium text-sm">{option.label}</p>
           {option.is_required && (
-            <Chip size="sm" variant="flat" color="danger" className="text-xs">{"Required"}</Chip>
+            <Chip size="sm" variant="flat" color="danger" className="text-xs">{t('safeguarding.required')}</Chip>
           )}
           {option.preset_source && (
             <Chip size="sm" variant="flat" color="secondary" className="text-xs">{option.preset_source}</Chip>
@@ -554,10 +554,10 @@ function OptionCard({
         )}
       </div>
       <div className="flex items-center gap-1 ml-3 flex-shrink-0">
-        <Button isIconOnly size="sm" variant="light" onPress={onEdit} aria-label={"Edit Option"}>
+        <Button isIconOnly size="sm" variant="light" onPress={onEdit} aria-label={t('safeguarding.aria_edit_option')}>
           <Edit3 className="w-4 h-4" />
         </Button>
-        <Button isIconOnly size="sm" variant="light" color="danger" onPress={onDelete} aria-label={"Deactivate Option"}>
+        <Button isIconOnly size="sm" variant="light" color="danger" onPress={onDelete} aria-label={t('safeguarding.aria_deactivate_option')}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
