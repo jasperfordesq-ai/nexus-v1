@@ -97,7 +97,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
     "eslint-plugin-i18next": "^6.1.4",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "i18next-cli": "^1.54.2",
     "jsdom": "^25.0.0",
     "sharp": "^0.33.0",
