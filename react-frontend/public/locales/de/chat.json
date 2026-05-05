@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} heute übrig",
   "new_conversation_aria": "Neues Gespräch starten",
   "typing_aria": "KI tippt",
+  "sources_label": "Quellen",
   "error_label": "Fehler",
   "input_aria": "Nachricht",
   "input_placeholder": "Fragen Sie mich etwas... (Enter zum Senden, Shift+Enter für neue Zeile)",

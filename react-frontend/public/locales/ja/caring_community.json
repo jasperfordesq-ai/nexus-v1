@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
     "progress_to_next": "Progress to {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
-    "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care",
     "link_error": "Care receiver could not be linked",
     "search_label": "Find member",
     "search_placeholder": "Search by name",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Optional context for coordinators or trusted substitutes",
     "cancel": "Cancel",
+    "upcoming_care": "Upcoming care",
+    "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
     "no_recent_care": "No recent care logs yet"
-  },
-  "providers": {
-    "title": "Care Provider Directory",
-    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
-    "search_placeholder": "Search providers...",
-    "filter_all": "All",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Day Centres",
-    "filter_private": "Private",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Volunteers",
-    "verified_badge": "Verified",
-    "contact": "Contact",
-    "website": "Website",
-    "opening_hours": "Opening Hours",
-    "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Dismiss",
-    "severity_info": "Information",
-    "severity_warning": "Warning",
-    "severity_danger": "Emergency",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Cover Care",
@@ -134,26 +106,33 @@
       "assign": "Substitute could not be matched"
     }
   },
-  "warmth_pass": {
-    "title": "My Warmth Pass",
-    "credential_label": "Community Warmth Pass",
-    "not_eligible": "Not yet eligible",
-    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
-    "member_name": "Member",
-    "hours_logged": "Hours logged",
-    "reviews_received": "Reviews received",
-    "identity_verified": "Identity verified",
-    "yes": "Yes",
-    "no": "No",
-    "categories": "Areas I help with",
-    "no_categories": "No categories yet",
-    "member_since": "Member since",
-    "active_since": "Pass active since",
-    "issued_by": "Issued by {{tenant}} via Project NEXUS",
-    "what_is_this": "What is a Warmth Pass?",
-    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
-    "loading": "Loading your pass...",
-    "error": "Could not load your Warmth Pass"
+  "providers": {
+    "title": "Care Provider Directory",
+    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
+    "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
+    "filter_all": "All",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Day Centres",
+    "filter_private": "Private",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Volunteers",
+    "verified_badge": "Verified",
+    "contact": "Contact",
+    "website": "Website",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Opening Hours",
+    "no_providers": "No care providers found",
+    "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "サイドバーの切り替え",
+      "back_to_site": "サイトに戻る",
+      "notifications": "通知",
+      "user_fallback": "ユーザー",
+      "user_menu": "ユーザーメニュー",
+      "my_profile": "私のプロフィール",
+      "sign_out": "サインアウト"
+    },
+    "breadcrumbs": {
+      "aria": "ブレッドクラム",
+      "segments": {
+        "caring": "ダッシュボード",
+        "workflow": "ワークフロー",
+        "projects": "プロジェクト",
+        "loyalty": "ロイヤルティ プログラム",
+        "hour-transfers": "時間移動",
+        "regional-points": "地域ポイント",
+        "sub-regions": "サブリージョン",
+        "federation-peers": "フェデレーションピア",
+        "sla-dashboard": "SLA ダッシュボード",
+        "providers": "プロバイダー",
+        "warmth-pass": "温もりパス",
+        "recipient-circle": "要介護者サークル",
+        "nudges": "スマートナッジ",
+        "emergency-alerts": "緊急警報",
+        "surveys": "自治体の調査",
+        "copilot": "コミュニケーション副操縦士",
+        "civic-digest": "シビックダイジェスト",
+        "lead-nurture": "リードの育成",
+        "success-stories": "成功事例",
+        "feedback": "フィードバック受信箱",
+        "verification": "自治体の検証",
+        "safeguarding": "レポートの保護",
+        "trust-tier": "信頼層",
+        "launch-readiness": "発売準備完了",
+        "pilot-scoreboard": "パイロットスコアボード",
+        "data-quality": "パイロットデータの品質",
+        "operating-policy": "運営方針",
+        "disclosure-pack": "開示パック",
+        "commercial-boundary": "商業境界線",
+        "isolated-node": "分離されたノードゲート",
+        "research": "研究パートナーシップ",
+        "external-integrations": "外部統合",
+        "integration-showcase": "統合ショーケース",
+        "municipal-impact": "自治体の影響レポート",
+        "kpi-baselines": "KPI ベースライン",
+        "municipal-roi": "自治体の ROI",
+        "category-coefficients": "カテゴリ係数"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "介護提供者ディレクトリ - 管理者",
+      "title": "介護提供者ディレクトリ",
+      "subtitle": "在宅ケア サービス、デイ センター、協会、ボランティア グループを管理する",
+      "verified": "確認済み",
+      "yes": "はい",
+      "no": "いいえ",
+      "empty": "ケア提供者はまだいません。開始するには、ケア提供者を追加してください。",
+      "confirm_delete": "「{{name}}」を削除しますか?これにより、ディレクトリから非表示になります。",
+      "confirm_deactivate": "「{{name}}」を非アクティブとしてマークしますか?後で再アクティブ化できます。",
+      "actions": {
+        "add_provider": "プロバイダーの追加",
+        "cancel": "キャンセル",
+        "close": "近い",
+        "create_provider": "プロバイダーの作成",
+        "deactivate_named": "「{{name}}」を無効化します",
+        "delete_provider": "プロバイダーの削除",
+        "edit_provider": "プロバイダーの編集",
+        "find_duplicates": "重複の検索",
+        "save_changes": "変更を保存",
+        "verify_provider": "プロバイダーの確認"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "ケア提供者は、個人のボランティアとともに地域ケア ネットワークに参加する外部組織です。彼らはヘルプ リクエストを割り当てたり、タイム クレジットの支払いを受け取ったり、メンバー ディレクトリに表示したりすることができます。",
+        "verification_label": "検証",
+        "verification_body": "検証されたプロバイダーにはディレクトリにバッジが表示されます。プロバイダーを認証済みとしてマークする前に、登録、保険、保護ポリシーを確認してください。",
+        "types_label": "プロバイダーの種類",
+        "types_body": "タイプと説明のフィールドを使用して提供されるケアを表示し、メンバーとコーディネーターが各リクエストに適切なプロバイダーを見つけられるようにします。"
+      },
+      "duplicates": {
+        "title": "潜在的な重複",
+        "summary": "スキャンされた {{scanned}} アクティブプロバイダー - 類似性 65% を超える {{total}} ペア",
+        "scanning": "走査...",
+        "empty": "重複する可能性のあるものは見つかりませんでした。ディレクトリはきれいに見えます。",
+        "vs": "対",
+        "match_percent": "{{percent}}% の一致"
+      },
+      "errors": {
+        "delete": "プロバイダーの削除に失敗しました。",
+        "deactivate": "プロバイダーの無効化に失敗しました。",
+        "duplicates": "重複のスキャンに失敗しました。",
+        "load": "ケアプロバイダーをロードできませんでした。",
+        "name_required": "名前は必須です。",
+        "save": "プロバイダーの保存に失敗しました。",
+        "type_required": "プロバイダーの種類は必須です。",
+        "verify": "プロバイダーを確認できませんでした。"
+      },
+      "fields": {
+        "address": "住所",
+        "description": "説明",
+        "email": "電子メール",
+        "name": "名前",
+        "phone": "電話",
+        "status": "状態",
+        "type": "タイプ",
+        "website": "Webサイト"
+      },
+      "messages": {
+        "created": "プロバイダーが正常に作成されました。",
+        "deactivated": "「{{name}}」が無効化されました。",
+        "removed": "プロバイダーが削除されました。",
+        "updated": "プロバイダーが正常に更新されました。",
+        "verified": "「{{name}}」は検証済みとしてマークされています。"
+      },
+      "modal": {
+        "create_title": "介護提供者の追加",
+        "edit_title": "編集: {{name}}"
+      },
+      "pagination": {
+        "next": "次",
+        "previous": "前の",
+        "summary": "{{total}} プロバイダーの {{from}}-{{to}} を表示しています"
+      },
+      "placeholders": {
+        "address": "通り、都市、郵便番号",
+        "description": "提供されるサービスの簡単な説明...",
+        "name": "例えば地域ケアサービス"
+      },
+      "signals": {
+        "address_overlap": "住所の重複",
+        "email_match": "メールマッチ",
+        "name_match": "名前一致",
+        "name_similar": "名前が似ている",
+        "phone_match": "電話照合",
+        "website_match": "ウェブサイトの一致"
+      },
+      "status": {
+        "active": "アクティブ",
+        "inactive": "非アクティブ"
+      },
+      "table": {
+        "actions": "アクション",
+        "aria": "介護提供者テーブル",
+        "name": "名前",
+        "status": "状態",
+        "type": "タイプ",
+        "verified": "確認済み"
+      },
+      "types": {
+        "private": "プライベートサービス",
+        "spitex": "スパイテックス",
+        "tagesstätte": "デイセンター",
+        "verein": "協会",
+        "volunteer": "ボランティアグループ"
+      }
+    },
+    "warmth_pass": {
+      "title": "暖かさパスの検索",
+      "subtitle": "メンバーのコミュニティ信頼資格情報を表示する",
+      "eligible": "適格",
+      "not_eligible": "対象外",
+      "verified": "確認済み",
+      "not_verified": "未検証",
+      "loading": "メンバーパスを読み込み中...",
+      "empty_date": "未設定",
+      "no_categories": "記録にカテゴリはありません。",
+      "tier_chip": "{{label}} (ティア {{tier}})",
+      "about": {
+        "title": "このページについて",
+        "body": "Warmth Pass は、メンバーが Trusted レベルに到達し、ピアレビューを受け、非公式の近隣ケアを提供する資格があることを示す、ポータブルな信頼資格です。受信者は、支援を受け入れる前に、ヘルパーの Warmth Pass の閲覧をリクエストできます。この検索を使用して、リクエストに応じてメンバーの資格情報を確認したり、資格が不明なメンバーを支援したりできます。"
+      },
+      "lookup": {
+        "title": "メンバー検索",
+        "member_id": "会員ID",
+        "placeholder": "数値の会員IDを入力してください",
+        "button": "見上げる"
+      },
+      "errors": {
+        "no_data": "このメンバー ID についてはデータが返されませんでした。",
+        "lookup_failed": "メンバーが見つからないか、エラーが発生しました。"
+      },
+      "not_eligible_notice": {
+        "title": "メンバーはまだ Trusted レベルに達しておらず、Warmth Pass を保持していません。",
+        "body": "資格を得るには、より多くのケア時間を記録し、少なくとも 1 回のピアレビューを受ける必要があります。 Trust プロフィール ページで自分の進捗状況を確認できます。"
+      },
+      "fields": {
+        "help_categories": "ヘルプカテゴリ",
+        "hours_logged": "記録された時間数",
+        "identity_verified": "本人確認済み",
+        "member_since": "メンバー歴",
+        "pass_active_since": "パスがアクティブになってから",
+        "reviews_received": "受け取ったレビュー",
+        "trust_tier": "トラスト層"
       }
     }
   }

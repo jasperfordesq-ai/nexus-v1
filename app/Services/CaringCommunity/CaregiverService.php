@@ -460,12 +460,18 @@ class CaregiverService
             $skills = [];
         }
 
+        $supportRelationshipId = $this->normaliseSupportRelationshipId(
+            $data['support_relationship_id'] ?? null,
+            $tenantId,
+            $caredForId,
+        );
+
         $id = DB::table('caring_cover_requests')->insertGetId([
             'tenant_id' => $tenantId,
             'caregiver_link_id' => (int) $link->id,
             'caregiver_id' => $caregiverId,
             'cared_for_id' => $caredForId,
-            'support_relationship_id' => isset($data['support_relationship_id']) ? (int) $data['support_relationship_id'] : null,
+            'support_relationship_id' => $supportRelationshipId,
             'title' => mb_substr($title, 0, 255),
             'briefing' => $this->nullableString($data['briefing'] ?? null),
             'required_skills' => json_encode(array_values($skills)),
@@ -480,6 +486,30 @@ class CaregiverService
         ]);
 
         return $this->getCoverRequest((int) $id, $caregiverId, $tenantId) ?? [];
+    }
+
+    private function normaliseSupportRelationshipId(mixed $value, int $tenantId, int $caredForId): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $relationshipId = (int) $value;
+        if ($relationshipId <= 0 || ! Schema::hasTable('caring_support_relationships')) {
+            throw new InvalidArgumentException(__('api.caring_cover_not_found'));
+        }
+
+        $exists = DB::table('caring_support_relationships')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $relationshipId)
+            ->where('recipient_id', $caredForId)
+            ->exists();
+
+        if (! $exists) {
+            throw new InvalidArgumentException(__('api.caring_cover_not_found'));
+        }
+
+        return $relationshipId;
     }
 
     /**

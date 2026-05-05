@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "Meine Vertrauensstufe",
     "subtitle": "Ihr Stellenwert in der Gemeinschaft",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Neueinsteiger/in",
     "tier_member": "Mitglied",
     "tier_trusted": "Vertrauensperson",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Erhaltene Bewertungen",
     "criteria_identity": "Identität verifiziert",
     "progress_to_next": "Fortschritt zu {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Nachbar/in",
     "relationship_professional": "Professionelle Fachkraft",
     "link_success": "Begleitete Person erfolgreich verknüpft",
-    "upcoming_care": "Bevorstehende Begleitung",
-    "recent_care": "Letzte Begleitung",
     "link_error": "Begleitete Person konnte nicht verknüpft werden",
     "search_label": "Mitglied finden",
     "search_placeholder": "Nach Name suchen",
@@ -61,36 +59,10 @@
     "notes_label": "Notizen",
     "notes_placeholder": "Optionaler Kontext für Koordinator/innen oder Stellvertretungen",
     "cancel": "Abbrechen",
+    "upcoming_care": "Bevorstehende Begleitung",
+    "recent_care": "Letzte Begleitung",
     "no_upcoming_care": "Noch keine geplante Begleitung",
     "no_recent_care": "Noch keine Begleiteinträge"
-  },
-  "emergency_alert": {
-    "dismiss": "Schliessen",
-    "severity_info": "Information",
-    "severity_warning": "Warnung",
-    "severity_danger": "Notfall",
-    "region_label": "Emergency alerts"
-  },
-  "providers": {
-    "title": "Anbieter-Verzeichnis",
-    "subtitle": "Finden Sie Pflegedienste, Tagesstätten, Vereine und Freiwillige in Ihrer Region",
-    "search_placeholder": "Anbieter suchen...",
-    "filter_all": "Alle",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Tagesstätten",
-    "filter_private": "Privat",
-    "filter_verein": "Vereine",
-    "filter_volunteer": "Freiwillige",
-    "verified_badge": "Verifiziert",
-    "contact": "Kontakt",
-    "website": "Webseite",
-    "opening_hours": "Öffnungszeiten",
-    "no_providers": "Keine Pflegeanbieter gefunden",
-    "no_providers_hint": "Passen Sie Ihre Filter oder Suche an",
-    "filter_aria": "Anbieter nach Typ filtern",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
   },
   "cover": {
     "title": "Stellvertretende Begleitung",
@@ -134,26 +106,33 @@
       "assign": "Stellvertretung konnte nicht zugeordnet werden"
     }
   },
-  "warmth_pass": {
-    "title": "Mein Vertrauensausweis",
-    "credential_label": "Vertrauensausweis der Gemeinschaft",
-    "not_eligible": "Noch nicht berechtigt",
-    "not_eligible_hint": "Erreichen Sie die Stufe «Vertrauensperson», um Ihren Vertrauensausweis freizuschalten",
-    "member_name": "Mitglied",
-    "hours_logged": "Erfasste Stunden",
-    "reviews_received": "Erhaltene Bewertungen",
-    "identity_verified": "Identität verifiziert",
-    "yes": "Ja",
-    "no": "Nein",
-    "categories": "Bereiche, in denen ich helfe",
-    "no_categories": "Noch keine Bereiche",
-    "member_since": "Mitglied seit",
-    "active_since": "Ausweis aktiv seit",
-    "issued_by": "Ausgestellt von {{tenant}} über Project NEXUS",
-    "what_is_this": "Was ist ein Vertrauensausweis?",
-    "what_is_this_body": "Ihr Vertrauensausweis zeigt, dass Sie eine verifizierte, vertrauenswürdige Helferin oder ein verifizierter, vertrauenswürdiger Helfer in der Gemeinschaft sind. Sie können ihn begleiteten Personen, Koordinator/innen und Organisationen als Beleg für Ihre Stellung in der Caring Community vorzeigen.",
-    "loading": "Ihr Ausweis wird geladen...",
-    "error": "Vertrauensausweis konnte nicht geladen werden"
+  "providers": {
+    "title": "Anbieter-Verzeichnis",
+    "subtitle": "Finden Sie Pflegedienste, Tagesstätten, Vereine und Freiwillige in Ihrer Region",
+    "search_placeholder": "Anbieter suchen...",
+    "filter_aria": "Anbieter nach Typ filtern",
+    "filter_all": "Alle",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Tagesstätten",
+    "filter_private": "Privat",
+    "filter_verein": "Vereine",
+    "filter_volunteer": "Freiwillige",
+    "verified_badge": "Verifiziert",
+    "contact": "Kontakt",
+    "website": "Webseite",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Öffnungszeiten",
+    "no_providers": "Keine Pflegeanbieter gefunden",
+    "no_providers_hint": "Passen Sie Ihre Filter oder Suche an"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Schliessen",
+    "severity_info": "Information",
+    "severity_warning": "Warnung",
+    "severity_danger": "Notfall"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "Mein Vertrauensausweis",
+    "credential_label": "Vertrauensausweis der Gemeinschaft",
+    "not_eligible": "Noch nicht berechtigt",
+    "not_eligible_hint": "Erreichen Sie die Stufe «Vertrauensperson», um Ihren Vertrauensausweis freizuschalten",
+    "member_name": "Mitglied",
+    "hours_logged": "Erfasste Stunden",
+    "reviews_received": "Erhaltene Bewertungen",
+    "identity_verified": "Identität verifiziert",
+    "yes": "Ja",
+    "no": "Nein",
+    "categories": "Bereiche, in denen ich helfe",
+    "no_categories": "Noch keine Bereiche",
+    "member_since": "Mitglied seit",
+    "active_since": "Ausweis aktiv seit",
+    "issued_by": "Ausgestellt von {{tenant}} über Project NEXUS",
+    "what_is_this": "Was ist ein Vertrauensausweis?",
+    "what_is_this_body": "Ihr Vertrauensausweis zeigt, dass Sie eine verifizierte, vertrauenswürdige Helferin oder ein verifizierter, vertrauenswürdiger Helfer in der Gemeinschaft sind. Sie können ihn begleiteten Personen, Koordinator/innen und Organisationen als Beleg für Ihre Stellung in der Caring Community vorzeigen.",
+    "loading": "Ihr Ausweis wird geladen...",
+    "error": "Vertrauensausweis konnte nicht geladen werden"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Seitenleiste umschalten",
+      "back_to_site": "Zurück zur Website",
+      "notifications": "Benachrichtigungen",
+      "user_fallback": "Benutzer",
+      "user_menu": "Benutzermenü",
+      "my_profile": "Mein Profil",
+      "sign_out": "Abmelden"
+    },
+    "breadcrumbs": {
+      "aria": "Paniermehl",
+      "segments": {
+        "caring": "Armaturenbrett",
+        "workflow": "Arbeitsablauf",
+        "projects": "Projekte",
+        "loyalty": "Treueprogramm",
+        "hour-transfers": "Stundentransfers",
+        "regional-points": "Regionale Punkte",
+        "sub-regions": "Unterregionen",
+        "federation-peers": "Föderationskollegen",
+        "sla-dashboard": "SLA-Dashboard",
+        "providers": "Anbieter",
+        "warmth-pass": "Wärmepass",
+        "recipient-circle": "Kreis der Pflegebedürftigen",
+        "nudges": "Intelligente Anstupser",
+        "emergency-alerts": "Notfallwarnungen",
+        "surveys": "Kommunale Umfragen",
+        "copilot": "Kommunikations-Copilot",
+        "civic-digest": "Bürger-Digest",
+        "lead-nurture": "Lead-Pflege",
+        "success-stories": "Erfolgsgeschichten",
+        "feedback": "Feedback-Posteingang",
+        "verification": "Kommunale Überprüfung",
+        "safeguarding": "Schutzberichte",
+        "trust-tier": "Vertrauensstufen",
+        "launch-readiness": "Startbereitschaft",
+        "pilot-scoreboard": "Pilotenanzeigetafel",
+        "data-quality": "Pilotdatenqualität",
+        "operating-policy": "Betriebspolitik",
+        "disclosure-pack": "Offenlegungspaket",
+        "commercial-boundary": "Handelsgrenze",
+        "isolated-node": "Isoliertes Knotentor",
+        "research": "Forschungspartnerschaften",
+        "external-integrations": "Externe Integrationen",
+        "integration-showcase": "Integrationsschaufenster",
+        "municipal-impact": "Kommunale Wirkungsberichte",
+        "kpi-baselines": "KPI-Baselines",
+        "municipal-roi": "Kommunaler ROI",
+        "category-coefficients": "Kategoriekoeffizienten"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Pflegedienstleisterverzeichnis – Admin",
+      "title": "Pflegedienstleisterverzeichnis",
+      "subtitle": "Verwalten Sie häusliche Pflegedienste, Tageszentren, Vereine und Freiwilligengruppen",
+      "verified": "Verifiziert",
+      "yes": "Ja",
+      "no": "NEIN",
+      "empty": "Noch kein Pflegedienstleister – fügen Sie einen hinzu, um loszulegen.",
+      "confirm_delete": "„{{name}}“ löschen? Dadurch wird es aus dem Verzeichnis ausgeblendet.",
+      "confirm_deactivate": "„{{name}}“ als inaktiv markieren? Sie können es später wieder aktivieren.",
+      "actions": {
+        "add_provider": "Anbieter hinzufügen",
+        "cancel": "Stornieren",
+        "close": "Schließen",
+        "create_provider": "Anbieter erstellen",
+        "deactivate_named": "„{{name}}“ deaktivieren",
+        "delete_provider": "Anbieter löschen",
+        "edit_provider": "Anbieter bearbeiten",
+        "find_duplicates": "Finden Sie Duplikate",
+        "save_changes": "Änderungen speichern",
+        "verify_provider": "Anbieter überprüfen"
+      },
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Pflegedienstleister sind externe Organisationen, die neben einzelnen Freiwilligen am Community-Care-Netzwerk teilnehmen. Ihnen können Hilfsanfragen zugewiesen werden, sie erhalten Zeitguthaben und werden im Mitgliederverzeichnis angezeigt.",
+        "verification_label": "Überprüfung",
+        "verification_body": "Verifizierte Anbieter zeigen im Verzeichnis ein Abzeichen an. Überprüfen Sie die Registrierungs-, Versicherungs- und Schutzrichtlinien, bevor Sie einen Anbieter als verifiziert markieren.",
+        "types_label": "Anbietertypen",
+        "types_body": "Verwenden Sie die Felder „Typ“ und „Beschreibung“, um die angebotene Pflege anzuzeigen, damit Mitglieder und Koordinatoren für jede Anfrage den richtigen Anbieter finden können."
+      },
+      "duplicates": {
+        "title": "Mögliche Duplikate",
+        "summary": "Gescannte aktive {{scanned}}-Anbieter – {{total}}-Paare mit mehr als 65 % Ähnlichkeit",
+        "scanning": "Scannen...",
+        "empty": "Keine wahrscheinlichen Duplikate gefunden. Das Verzeichnis sieht sauber aus.",
+        "vs": "vs",
+        "match_percent": "{{percent}}% Übereinstimmung"
+      },
+      "errors": {
+        "delete": "Anbieter konnte nicht gelöscht werden.",
+        "deactivate": "Der Anbieter konnte nicht deaktiviert werden.",
+        "duplicates": "Die Suche nach Duplikaten ist fehlgeschlagen.",
+        "load": "Pflegedienstleister konnten nicht geladen werden.",
+        "name_required": "Name ist erforderlich.",
+        "save": "Anbieter konnte nicht gespeichert werden.",
+        "type_required": "Anbietertyp ist erforderlich.",
+        "verify": "Anbieter konnte nicht überprüft werden."
+      },
+      "fields": {
+        "address": "Adresse",
+        "description": "Beschreibung",
+        "email": "E-Mail",
+        "name": "Name",
+        "phone": "Telefon",
+        "status": "Status",
+        "type": "Typ",
+        "website": "Webseite"
+      },
+      "messages": {
+        "created": "Anbieter erfolgreich erstellt.",
+        "deactivated": "„{{name}}“ deaktiviert.",
+        "removed": "Anbieter entfernt.",
+        "updated": "Anbieter wurde erfolgreich aktualisiert.",
+        "verified": "„{{name}}“ als verifiziert markiert."
+      },
+      "modal": {
+        "create_title": "Pflegedienstleister hinzufügen",
+        "edit_title": "Bearbeiten: {{name}}"
+      },
+      "pagination": {
+        "next": "Nächste",
+        "previous": "Vorherige",
+        "summary": "Zeigt {{from}}-{{to}} von {{total}}-Anbietern"
+      },
+      "placeholders": {
+        "address": "Straße, Ort, Postleitzahl",
+        "description": "Kurze Beschreibung der angebotenen Dienstleistungen...",
+        "name": "z.B. Gemeindepflegedienst"
+      },
+      "signals": {
+        "address_overlap": "Adressüberschneidung",
+        "email_match": "E-Mail-Übereinstimmung",
+        "name_match": "Namensübereinstimmung",
+        "name_similar": "Name ähnlich",
+        "phone_match": "Telefonübereinstimmung",
+        "website_match": "Website-Übereinstimmung"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv"
+      },
+      "table": {
+        "actions": "Aktionen",
+        "aria": "Tabelle der Pflegedienstleister",
+        "name": "Name",
+        "status": "Status",
+        "type": "Typ",
+        "verified": "Verifiziert"
+      },
+      "types": {
+        "private": "Privater Dienst",
+        "spitex": "Spitex",
+        "tagesstätte": "Tageszentrum",
+        "verein": "Verein",
+        "volunteer": "Freiwilligengruppe"
+      }
+    },
+    "warmth_pass": {
+      "title": "Wärmepass-Suche",
+      "subtitle": "Sehen Sie sich die Community-Trust-Anmeldeinformationen eines beliebigen Mitglieds an",
+      "eligible": "Berechtigt",
+      "not_eligible": "Nicht förderfähig",
+      "verified": "Verifiziert",
+      "not_verified": "Nicht verifiziert",
+      "loading": "Mitgliedsausweis wird geladen...",
+      "empty_date": "Nicht festgelegt",
+      "no_categories": "Keine Kategorien erfasst.",
+      "tier_chip": "{{label}} (Stufe {{tier}})",
+      "about": {
+        "title": "Über diese Seite",
+        "body": "Ein Warmth Pass ist ein tragbarer Vertrauensnachweis, der zeigt, dass ein Mitglied die Vertrauensstufe erreicht hat, Peer-Reviews erhalten hat und zur informellen Nachbarschaftspflege berechtigt ist. Empfänger können die Vorlage des Wärmepasses eines Helfers anfordern, bevor sie Hilfe annehmen. Verwenden Sie diese Suche, um die Anmeldeinformationen eines Mitglieds auf Anfrage zu überprüfen oder um einem Mitglied zu helfen, das sich seiner Berechtigung nicht sicher ist."
+      },
+      "lookup": {
+        "title": "Mitgliedersuche",
+        "member_id": "Mitglieds-ID",
+        "placeholder": "Geben Sie eine numerische Mitglieds-ID ein",
+        "button": "Nachschlagen"
+      },
+      "errors": {
+        "no_data": "Für diese Mitglieds-ID wurden keine Daten zurückgegeben.",
+        "lookup_failed": "Mitglied nicht gefunden oder es ist ein Fehler aufgetreten."
+      },
+      "not_eligible_notice": {
+        "title": "Das Mitglied hat noch nicht die Trusted-Stufe erreicht und besitzt keinen Warmth Pass.",
+        "body": "Um berechtigt zu sein, müssen sie mehr Pflegestunden protokollieren und mindestens eine Peer-Review erhalten. Sie können ihren eigenen Fortschritt auf der Trust-Profilseite überprüfen."
+      },
+      "fields": {
+        "help_categories": "Hilfekategorien",
+        "hours_logged": "Protokollierte Stunden",
+        "identity_verified": "Identität überprüft",
+        "member_since": "Mitglied seit",
+        "pass_active_since": "Pass aktiv seit",
+        "reviews_received": "Bewertungen erhalten",
+        "trust_tier": "Vertrauensstufe"
       }
     }
   }

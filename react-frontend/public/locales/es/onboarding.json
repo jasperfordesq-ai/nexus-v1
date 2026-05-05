@@ -7,6 +7,10 @@
   "step_skills": "Habilidades",
   "step_confirm": "Confirmar",
   "step_safeguarding": "Protección",
+  "safeguarding_title": "Support & Safeguarding",
+  "safeguarding_subtitle": "Let us know if you'd like additional support",
+  "safeguarding_intro": "Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.",
+  "safeguarding_gdpr_notice": "This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses.",
   "welcome_title": "¡Bienvenido a {{name}}!",
   "welcome_description": "Vamos a configurar tu perfil para que puedas empezar a conectar con tu comunidad e intercambiar créditos de tiempo.",
   "benefit_earn_title": "Gana Créditos de Tiempo",
@@ -102,6 +106,8 @@
     "save_continue": "Guardar y continuar",
     "required_fields": "Campos obligatorios",
     "select_option": "Choose an option",
+    "or_separator": "or",
+    "learn_more": "Más información",
     "confirmation": {
       "title": "Your safeguarding preferences have been saved",
       "intro": "Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.",
@@ -121,14 +127,9 @@
       "continue_cta": "Continue",
       "declination_title": "Noted — your response is recorded",
       "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
-    },
-    "or_separator": "or"
+    }
   },
   "page_meta": {
     "title": "Onboarding"
-  },
-  "safeguarding_title": "Support & Safeguarding",
-  "safeguarding_subtitle": "Let us know if you'd like additional support",
-  "safeguarding_intro": "Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.",
-  "safeguarding_gdpr_notice": "This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses."
+  }
 }

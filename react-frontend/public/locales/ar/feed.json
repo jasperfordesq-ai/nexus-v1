@@ -2,13 +2,13 @@
   "page_title": "Feed",
   "title": "تغذية المجتمع",
   "subtitle": "شاهد ما يحدث في مجتمعك",
-  "author_unknown": "Unknown",
   "new_post": "منشور جديد",
   "whats_on_your_mind": "ما الذي يدور في ذهنك؟",
   "add_image_aria": "أضف صورة",
   "quoted_post_image": "صورة المنشور المقتبس",
   "create_poll_aria": "إنشاء استطلاع",
   "create_post": "إنشاء منشور",
+  "author_unknown": "Unknown",
   "load_more": "تحميل المزيد",
   "unable_to_load": "غير قادر على تحميل التغذية",
   "try_again": "حاول مرة أخرى",
@@ -82,6 +82,7 @@
     "post_created": "تم إنشاء المنشور!",
     "post_failed": "فشل في إنشاء المنشور.",
     "post_button": "Post",
+    "save_changes": "Save",
     "poll_question_placeholder": "اطرح سؤالاً...",
     "poll_question_required": "يرجى إدخال سؤال الاستطلاع.",
     "poll_min_options": "أضف خيارين على الأقل.",
@@ -99,6 +100,7 @@
     "category_label": "Category",
     "category_placeholder": "اختر فئة",
     "estimated_hours_label": "الساعات المقدرة",
+    "placeholder_hours": "1",
     "listing_created": "تم إنشاء القائمة!",
     "listing_failed": "فشل في إنشاء القائمة.",
     "create_listing": "إنشاء قائمة",
@@ -207,11 +209,12 @@
     "media_upload_error": "فشل في معالجة الصور",
     "sdg_selected_one": "{{count}} هدف محدد",
     "sdg_selected_other": "{{count}} أهداف محددة",
-    "save_changes": "Save",
-    "placeholder_hours": "1",
     "content_required": "Post content cannot be empty.",
     "content_too_long": "Post is too long (max {{max}} characters).",
     "groups_load_error": "Failed to load groups."
+  },
+  "moderation": {
+    "unauthorized": "You do not have permission to perform this action."
   },
   "card": {
     "edited": "edited",
@@ -238,6 +241,7 @@
     "comment_action": "Comment",
     "write_comment": "اكتب تعليقًا...",
     "no_comments": "لا توجد تعليقات حتى الآن. كن الأول في مشاركة أفكارك!",
+    "scheduled": "Scheduled",
     "edit_post": "تعديل المنشور",
     "not_interested": "غير مهتم",
     "admin_delete": "حذف (مدير)",
@@ -281,7 +285,6 @@
     "detail_challenge": "عرض التحدي",
     "detail_volunteer": "عرض الفرصة",
     "detail_blog": "اقرأ المقال",
-    "scheduled": "Scheduled",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -320,6 +323,24 @@
       "level_reached": "Level reached"
     }
   },
+  "poll": {
+    "load_failed": "Failed to load poll data.",
+    "expired": "This poll has ended.",
+    "expiry_past": "Poll expiry date must be in the future.",
+    "min_options_hint": "At least 2 options are required.",
+    "closed": "Closed",
+    "closes_minutes": "Closes in {{minutes}}m",
+    "closes_hours": "Closes in {{hours}}h",
+    "closes_days": "Closes in {{days}}d",
+    "live": "Live",
+    "view_full": "View full poll",
+    "vote_to_see_results": "Vote to see results",
+    "results_hidden_until_close": "Results revealed when poll closes",
+    "your_vote": "Your vote"
+  },
+  "feed": {
+    "end_of_feed": "You're all caught up!"
+  },
   "hashtag": {
     "title": "Hashtag",
     "load_failed": "فشل في تحميل المنشورات لهذا الوسم.",
@@ -351,7 +372,11 @@
     "button_label": "Share",
     "button_label_count": "شارك ({{count}})",
     "shared_by": "<0>{{name}}</0> شارك هذا",
+    "shared_by_text": "shared this",
+    "cannot_share_own_post": "You cannot share your own post",
     "menu_label": "خيارات المشاركة",
+    "default_title": "بريد",
+    "repost": "Repost",
     "repost_desc": "شارك في خلاصتك",
     "repost_remove": "إزالة إعادة النشر",
     "repost_remove_desc": "إزالة إعادة النشر من خلاصتك",
@@ -362,6 +387,7 @@
     "quote_content_required": "يرجى إضافة تعليقك",
     "quote_posted": "تم إنشاء منشور الاقتباس",
     "quote_failed": "فشل في إنشاء منشور الاقتباس",
+    "quote_submit": "Post",
     "copy_link": "نسخ الرابط",
     "link_copied": "تم نسخ الرابط إلى الحافظة",
     "copy_failed": "فشل في نسخ الرابط",
@@ -375,13 +401,22 @@
     "dm_hint": "اكتب على الأقل حرفين للبحث",
     "dm_sent": "تم مشاركة المنشور مع {{name}}",
     "dm_failed": "فشل في إرسال الرسالة",
-    "repost": "Repost",
-    "quote_submit": "Post",
     "dm_sent_label": "Sent",
     "dm_send": "Send",
-    "dm_done": "Done",
-    "shared_by_text": "shared this",
-    "cannot_share_own_post": "You cannot share your own post"
+    "dm_done": "Done"
+  },
+  "video": {
+    "select": "إضافة فيديو",
+    "too_large": "يجب أن يكون حجم الفيديو أقل من {{size}}MB",
+    "invalid_type": "تنسيق الفيديو غير صالح. المدعوم: MP4، WebM، MOV",
+    "remove": "إزالة الفيديو",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "trending": {
     "title": "Trending",
@@ -503,19 +538,6 @@
     "click_to_remove": "{{label}} (انقر لإزالة)",
     "react_to_post": "تفاعل مع هذا المنشور"
   },
-  "video": {
-    "select": "إضافة فيديو",
-    "too_large": "يجب أن يكون حجم الفيديو أقل من {{size}}MB",
-    "invalid_type": "تنسيق الفيديو غير صالح. المدعوم: MP4، WebM، MOV",
-    "remove": "إزالة الفيديو",
-    "mute": "Mute",
-    "unmute": "Unmute",
-    "pause": "Pause",
-    "play": "Play",
-    "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
-  },
   "why_shown": {
     "label": "لماذا أرى هذا؟",
     "title": "لماذا ترى هذا",
@@ -532,18 +554,6 @@
     "active_discussion": "نقاش نشط",
     "frequently_saved": "تم حفظه بشكل متكرر من قبل الآخرين"
   },
-  "analytics": {
-    "title": "تحليلات المنشور",
-    "reactions_breakdown": "تفصيل ردود الفعل",
-    "views": "Views",
-    "likes": "Likes",
-    "comments": "Comments",
-    "shares": "Shares",
-    "reach": "Reach",
-    "loading": "Loading analytics...",
-    "load_failed": "Failed to load analytics."
-  },
-  "failed_to_load_analytics": "Failed to load analytics",
   "suggestions": {
     "title": "People You May Know",
     "see_all": "See All",
@@ -555,27 +565,18 @@
     "dismiss": "Dismiss",
     "load_failed": "Failed to load suggestions"
   },
-  "moderation": {
-    "unauthorized": "You do not have permission to perform this action."
+  "analytics": {
+    "title": "تحليلات المنشور",
+    "loading": "Loading analytics...",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach",
+    "reactions_breakdown": "تفصيل ردود الفعل",
+    "load_failed": "Failed to load analytics."
   },
-  "poll": {
-    "load_failed": "Failed to load poll data.",
-    "expired": "This poll has ended.",
-    "expiry_past": "Poll expiry date must be in the future.",
-    "min_options_hint": "At least 2 options are required.",
-    "closed": "Closed",
-    "closes_hours": "Closes in {{hours}}h",
-    "closes_days": "Closes in {{days}}d",
-    "closes_minutes": "Closes in {{minutes}}m",
-    "live": "Live",
-    "view_full": "View full poll",
-    "vote_to_see_results": "Vote to see results",
-    "results_hidden_until_close": "Results revealed when poll closes",
-    "your_vote": "Your vote"
-  },
-  "feed": {
-    "end_of_feed": "You're all caught up!"
-  },
+  "failed_to_load_analytics": "Failed to load analytics",
   "you": "You",
   "items_loaded": "{{count}} posts",
   "post_detail": {

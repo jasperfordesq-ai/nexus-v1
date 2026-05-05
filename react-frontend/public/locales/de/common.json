@@ -1,10 +1,14 @@
 {
+  "back": "Zurück",
+  "hours_short": "{{count}}h",
+  "error_title": "Etwas ist schief gelaufen",
   "nav": {
     "dashboard": "Dashboard",
     "feed": "Feed",
     "listings": "Inserate",
     "messages": "Nachrichten",
     "community": "Gemeinschaft",
+    "caring_community": "Caring Community",
     "members": "Mitglieder",
     "events": "Veranstaltungen",
     "groups": "Gruppen",
@@ -19,6 +23,7 @@
     "goals": "Ziele",
     "more": "Mehr",
     "activity": "Aktivität",
+    "saved": "Gespeichert",
     "federation": "Föderation",
     "federation_hub": "Föderations-Hub",
     "partner_communities": "Partnergemeinschaften",
@@ -49,11 +54,16 @@
     "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
     "timebanking": "Zeitbank",
     "explore": "Entdecken",
-    "saved": "Gespeichert",
     "marketplace": "Marktplatz",
-    "verify_identity": "Identität verifizieren",
-    "caring_community": "Caring Community",
-    "premium": "Premium"
+    "premium": "Premium",
+    "verify_identity": "Identität verifizieren"
+  },
+  "landing_links": {
+    "title": "Explore this community",
+    "aria_label": "Explore community sections"
+  },
+  "location": {
+    "powered_by_google": "Powered by Google"
   },
   "nav_desc": {
     "feed": "Community-Feed",
@@ -62,6 +72,7 @@
     "connections": "Ihre Verbindungen & Anfragen",
     "events": "Bevorstehende Community-Veranstaltungen",
     "groups": "Interessengruppen beitreten",
+    "caring_community": "Zeitvorsorge, Unterstützung, Organisationen und Wirkung",
     "blog": "Community-Artikel & Neuigkeiten",
     "volunteering": "Freiwilligenangebote",
     "organisations": "Lokale Organisationen",
@@ -100,7 +111,6 @@
     "timebanking_listings": "Angebote & Gesuche",
     "messages": "Ihre Nachrichten",
     "marketplace": "Kaufen & Verkaufen in Ihrer Gemeinschaft",
-    "caring_community": "Zeitvorsorge, Unterstützung, Organisationen und Wirkung",
     "premium": "Premium membership tiers"
   },
   "user_menu": {
@@ -249,11 +259,20 @@
   "members": {
     "title": "Mitglieder",
     "subtitle": "Vernetzen Sie sich mit Mitgliedern der Gemeinschaft",
+    "quick_filters": "Mitgliederfilter",
     "all": "Alle Mitglieder",
     "new": "Neue Mitglieder",
     "active": "Aktivste",
     "showing": "{{shown}} von {{total}} Mitgliedern angezeigt",
     "search_placeholder": "Mitglieder suchen...",
+    "near_me": "In meiner Nähe",
+    "near_me_no_location": "Legen Sie Ihren Standort in Ihrem Profil fest, um die Funktion „In meiner Nähe“ zu nutzen",
+    "applied_filters": "Aktive Filter",
+    "search_filter": "Suche: {{query}}",
+    "nearby_filter": "Innerhalb von {{radius}} km",
+    "clear_search": "Suche zurücksetzen",
+    "radius_label": "Radius",
+    "sort_communityrank": "Community-Rang",
     "sort_name": "Name",
     "sort_newest": "Neueste",
     "sort_rated": "Bestbewertet",
@@ -266,33 +285,24 @@
     "no_members_community": "Noch keine Mitglieder in dieser Gemeinschaft",
     "load_more": "Mehr laden",
     "results_matching": "{{shown}} von {{total}} Mitgliedern, die \"{{query}}\" entsprechen",
+    "results_count": "{{count}} Mitglieder angezeigt",
     "no_location": "Keine Mitglieder mit Standortdaten",
     "fallback_name": "Mitglied",
-    "load_failed": "Mitglieder konnten nicht geladen werden",
-    "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden",
-    "near_me": "In meiner Nähe",
-    "near_me_no_location": "Legen Sie Ihren Standort in Ihrem Profil fest, um die Funktion „In meiner Nähe“ zu nutzen",
-    "radius_label": "Radius",
-    "sort_communityrank": "Community-Rang",
     "avatar_alt": "Profilbild von {{name}}",
+    "profile_aria": "Profil von {{name}} anzeigen",
+    "distance_km": "{{distance}} km",
+    "location_distance": "{{location}} · {{distance}}",
     "joined_date": "Beigetreten am {{date}}",
     "showcased_badges": "Hervorgehobene Abzeichen",
     "verified_member": "Verifiziertes Mitglied",
     "community_rank_score_tooltip": "Community-Rang-Punktzahl",
     "rating_aria": "Bewertung: {{rating}} von 5",
     "hours_exchanged_aria": "{{count}} Stunden ausgetauscht",
+    "hours_short": "{{count}} Std.",
+    "load_failed": "Mitglieder konnten nicht geladen werden",
+    "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden",
     "my_profile": "Mein Profil",
-    "load_more_count": "Mehr laden ({{remaining}} verbleibend)",
-    "quick_filters": "Mitgliederfilter",
-    "applied_filters": "Aktive Filter",
-    "search_filter": "Suche: {{query}}",
-    "nearby_filter": "Innerhalb von {{radius}} km",
-    "clear_search": "Suche zurücksetzen",
-    "results_count": "{{count}} Mitglieder angezeigt",
-    "profile_aria": "Profil von {{name}} anzeigen",
-    "distance_km": "{{distance}} km",
-    "location_distance": "{{location}} · {{distance}}",
-    "hours_short": "{{count}} Std."
+    "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
   },
   "update_banner": {
     "message": "Eine neue Version ist verfügbar.",
@@ -320,6 +330,371 @@
     "offer_time": "Zeit anbieten",
     "offer_time_desc": "Caring Community Hub öffnen"
   },
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Zeitvorsorge, Freiwilligenarbeit, Organisationen, vertrauensvolle Unterstützung und lokale Wirkung koordinieren."
+    },
+    "badge": "Integriertes Modul",
+    "title": "Caring Community",
+    "subtitle": "Zeitvorsorge, verifizierte Freiwilligenarbeit, vertrauenswürdige Organisationen, Gruppen, Veranstaltungen, Ressourcen und Wirkungsdaten – alles in einem koordinierten Sorge-Workflow.",
+    "welcome_banner": "Willkommen! Hier kannst du um Hilfe bitten, deine Zeit anbieten oder einfach eine nachbarschaftliche Gefälligkeit festhalten. Jeder Beitrag – ob gross oder klein – stärkt deine Gemeinschaft.",
+    "actions": {
+      "request_help": "Hilfe anfragen",
+      "request_help_sub": "Bitte deine Gemeinschaft um praktische Unterstützung",
+      "offer_favour": "Gefälligkeit erfassen",
+      "offer_favour_sub": "Eine informelle Hilfe festhalten – ohne Zeitgutschrift",
+      "offer_time": "Zeit anbieten",
+      "offer_time_sub": "Einen Dienst oder eine Fähigkeit anbieten, die du teilen möchtest",
+      "log_hours": "Stunden erfassen",
+      "log_hours_sub": "Geleistete Freiwilligenstunden zur Genehmigung erfassen",
+      "coordinate_org": "Organisation koordinieren",
+      "coordinate_org_sub": "Deine Freiwilligen-Organisationen verwalten",
+      "my_relationships": "Meine Unterstützungsbeziehungen",
+      "my_relationships_sub": "Laufende Unterstützungsbeziehungen ansehen",
+      "markt": "Marktplatz",
+      "markt_sub": "Lokale Dienste, Waren und Zeitgutschrift-Angebote entdecken.",
+      "loyalty_history": "Meine Einlösungen",
+      "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt.",
+      "future_care_fund": "Zeitvorsorge-Fonds",
+      "future_care_fund_sub": "Deine gesparten Stunden als Zukunftsvorsorge sehen.",
+      "cover_care": "Stellvertretende Begleitung",
+      "cover_care_sub": "Vertrauensvolle Stellvertretung organisieren, wenn eine Begleitperson Entlastung braucht.",
+      "hour_gift": "Stunden schenken",
+      "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
+      "hour_transfer": "Stunden übertragen",
+      "hour_transfer_sub": "Gesparte Stunden zu einer anderen KISS-Genossenschaft übertragen.",
+      "safeguarding_report": "Anliegen melden",
+      "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden.",
+      "projects": "Gemeinschaftsprojekte",
+      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen."
+    },
+    "operating_model": {
+      "title": "Funktionsweise",
+      "subtitle": "Konzipiert für gegenseitige Unterstützung nach KISS-Prinzip",
+      "trusted_requests": {
+        "title": "Vertrauensvolle Anfragen",
+        "description": "Mitglieder können praktische Unterstützung über Zeitvorsorge-Inserate und koordinierte Freiwilligenarbeit anfragen."
+      },
+      "verified_hours": {
+        "title": "Verifizierte Stunden",
+        "description": "Unterstützungsleistungen durchlaufen Genehmigungen, Erfassungen, Bewertungen und werden im Zeitkonto verbucht."
+      },
+      "municipal_value": {
+        "title": "Mehrwert für Gemeinde und Kanton",
+        "description": "Das Modul bereitet die Grundlage für Wirkungsberichte an Kanton, Gemeinde und Genossenschaften."
+      }
+    },
+    "modules": {
+      "title": "Verbundene Funktionen",
+      "subtitle": "Der Hub ist nur sichtbar, wenn die Caring Community aktiviert ist.",
+      "open": "Öffnen",
+      "timebank": {
+        "title": "Zeitvorsorge",
+        "description": "Angebote, Gesuche, Gegenseitigkeit und den Austausch von Zeitgutschriften koordinieren."
+      },
+      "volunteering": {
+        "title": "Freiwilligenarbeit",
+        "description": "Einsätze, Anmeldungen, Schichten, Verifizierung und Unterstützungsstunden verwalten."
+      },
+      "organisations": {
+        "title": "Organisationen",
+        "description": "Genossenschaften, lokale Partner und Dienstleister ins Sorge-Netzwerk einbinden."
+      },
+      "events": {
+        "title": "Veranstaltungen",
+        "description": "Tagungen, Quartiercafés, Schulungen und Gemeinschaftstreffen durchführen."
+      },
+      "groups": {
+        "title": "Gruppen",
+        "description": "Quartierzirkel, kantonale Pilotprojekte und Arbeitsgruppen unterstützen."
+      },
+      "resources": {
+        "title": "Ressourcen",
+        "description": "Leitfäden, Datenschutzdokumente, Handbücher und Einführungsmaterial teilen."
+      },
+      "goals": {
+        "title": "Ziele",
+        "description": "Persönliche, gemeinschaftliche und kommunale Unterstützungsziele verfolgen."
+      },
+      "federation": {
+        "title": "Föderation",
+        "description": "Regionale Knoten, Genossenschaften und Partnergemeinschaften verbinden."
+      },
+      "messages": {
+        "title": "Nachrichten",
+        "description": "Kommunikation zwischen Mitgliedern, Koordinator:innen und Organisationen nah am Geschehen."
+      },
+      "trust": {
+        "title": "Vertrauen und Verifizierung",
+        "description": "Identitätsprüfung, Bewertungen und Compliance-Signale für sensible Sorge-Prozesse nutzen."
+      },
+      "clubs": {
+        "title": "Vereine",
+        "description": "Vereine, Clubs und Mitgliedergruppen mit dem Sorge-Netzwerk verbinden."
+      },
+      "markt": "Marktplatz",
+      "projects": {
+        "title": "Community projects",
+        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
+      }
+    },
+    "onboarding": {
+      "title": "What brings you here today?",
+      "intro": "Choose the path that best fits you. You can change this later.",
+      "choice_recipient": "I need support",
+      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
+      "choice_helper": "I want to help",
+      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
+      "choice_browse": "I want to browse",
+      "choice_browse_desc": "Show the full caring community hub.",
+      "show_all": "Show all actions",
+      "show_recommended": "Show recommended",
+      "change_answer": "Change answer"
+    }
+  },
+  "request_help": {
+    "meta": {
+      "title": "Hilfe anfragen",
+      "description": "Bitte deine Gemeinschaft um Unterstützung"
+    },
+    "subtitle": "Deine Nachbarinnen und Nachbarn sind für dich da. Sag uns, was du brauchst – wir geben unser Bestes.",
+    "form": {
+      "what_label": "Welche Art von Hilfe brauchst du?",
+      "what_placeholder": "z. B. Hilfe beim Einkaufen, eine Fahrt zum Arzt, Begleitung bei einem Spaziergang...",
+      "when_label": "Wann brauchst du die Hilfe?",
+      "when_placeholder": "z. B. dienstags nachmittags, so bald wie möglich...",
+      "contact_label": "Wie sollen wir dich kontaktieren?",
+      "contact_phone": "Telefonisch",
+      "contact_message": "Per Nachricht",
+      "contact_either": "Beides ist in Ordnung",
+      "submit": "Hilfe anfragen",
+      "submitting": "Anfrage wird gesendet...",
+      "what_too_long": "Bitte halte deine Anfrage unter 500 Zeichen."
+    },
+    "success": {
+      "title": "Anfrage erhalten",
+      "body": "Deine Anfrage ist eingegangen. Eine Koordinatorin oder ein Koordinator wird sich bald bei dir melden.",
+      "back": "Zurück zur Caring Community"
+    },
+    "errors": {
+      "submit_failed": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.",
+      "voice_unsupported": "Sprachaufzeichnung wird in diesem Browser nicht unterstützt.",
+      "voice_permission_denied": "Mikrofon-Berechtigung wurde verweigert.",
+      "voice_failed": "Wir konnten deine Aufnahme nicht verstehen. Bitte versuche es erneut oder fülle das Formular aus."
+    },
+    "voice": {
+      "start": "Tippen, um deine Anfrage zu sprechen",
+      "stop": "Aufnahme beenden",
+      "recording": "Nimmt auf... {{seconds}}s",
+      "processing": "Höre zu...",
+      "filled_hint": "Wir haben das Formular aus deiner Aufnahme befüllt. Bitte prüfe es vor dem Absenden.",
+      "transcript_label": "Was wir gehört haben"
+    },
+    "back": "Zurück zur Caring Community"
+  },
+  "hour_gift": {
+    "meta": {
+      "title": "Stunden schenken",
+      "description": "Schenke deine angesparten Stunden einem anderen Genossenschaftsmitglied"
+    },
+    "title": "Schenke deine Stunden",
+    "subtitle": "Angesparte Stunden lassen sich an Familie, Freunde oder jeden weitergeben, der sie braucht.",
+    "tabs": {
+      "send": "Senden",
+      "inbox": "Posteingang",
+      "sent": "Gesendet"
+    },
+    "send": {
+      "recipient_label": "Wem möchtest du Stunden schenken?",
+      "recipient_placeholder": "Nach Name suchen...",
+      "hours_label": "Wie viele Stunden?",
+      "hours_balance_helper": "Du hast {{balance}} Stunden zur Verfügung",
+      "message_label": "Persönliche Nachricht hinzufügen (optional)",
+      "message_placeholder": "Warum du diese Stunden schenkst...",
+      "submit": "Stunden schenken",
+      "confirm_title": "{{hours}} Stunden an {{name}} schenken?",
+      "confirm_body": "Deine Stunden werden jetzt abgebucht und gutgeschrieben, sobald die Person das Geschenk annimmt.",
+      "confirm_button": "Ja, Stunden schenken",
+      "cancel": "Abbrechen"
+    },
+    "inbox": {
+      "empty": "Aktuell keine Geschenke zur Annahme.",
+      "from": "Von {{name}}",
+      "received_at": "Erhalten am {{date}}",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "decline_reason_label": "Grund für die Ablehnung (optional)",
+      "decline_button": "Geschenk ablehnen"
+    },
+    "sent": {
+      "empty": "Du hast noch keine Geschenke gesendet.",
+      "to": "An {{name}}",
+      "status": {
+        "pending": "Wartet auf Annahme",
+        "accepted": "Angenommen",
+        "declined": "Abgelehnt",
+        "reverted": "Zurückgezogen"
+      },
+      "revert": "Geschenk zurückziehen"
+    },
+    "success": {
+      "sent": "Geschenk gesendet. {{name}} wird benachrichtigt.",
+      "accepted": "Geschenk angenommen. Die Stunden sind jetzt in deinem Konto.",
+      "declined": "Geschenk abgelehnt. Stunden wurden zurückerstattet."
+    },
+    "errors": {
+      "insufficient_balance": "Du hast nicht genug Stunden in deinem Konto.",
+      "send_failed": "Das Geschenk konnte nicht gesendet werden. Bitte versuche es nochmals."
+    },
+    "back": "Zurück zum Community-Hub"
+  },
+  "inter_gen": {
+    "badge": "Generationenübergreifend",
+    "tooltip": "Diese Tandem-Beziehung verbindet Generationen — ein Markenzeichen des KISS-Modells."
+  },
+  "hour_transfer": {
+    "meta": {
+      "title": "Gutgeschriebene Stunden übertragen",
+      "description": "Übertrag deiner gutgeschriebenen Stunden an eine andere KISS-Genossenschaft"
+    },
+    "title": "Deine gutgeschriebenen Stunden übertragen",
+    "subtitle": "Du ziehst in eine andere Gemeinde? Deine gutgeschriebenen Stunden gehen mit.",
+    "success_message": "Transfer request submitted. A coordinator will review it before hours move.",
+    "form": {
+      "destination_label": "Ziel-Genossenschaft",
+      "destination_placeholder": "z. B. zug-kiss",
+      "destination_help": "Der Slug der KISS-Genossenschaft oder Mandantin am neuen Wohnort",
+      "hours_label": "Zu übertragende Stunden",
+      "hours_placeholder": "z. B. 25.5",
+      "reason_label": "Grund (optional)",
+      "reason_placeholder": "z. B. Umzug von Cham nach Zug",
+      "submit": "Übertrag beantragen",
+      "submitting": "Wird beantragt..."
+    },
+    "history": {
+      "title": "Deine bisherigen Überträge",
+      "date": "Datum",
+      "destination": "Ziel",
+      "hours": "Stunden",
+      "status": "Status",
+      "reason": "Grund",
+      "empty": "Noch keine Überträge."
+    },
+    "status": {
+      "pending": "Wartet auf Freigabe",
+      "approved_by_source": "Freigegeben",
+      "sent": "Versendet",
+      "received": "Empfangen",
+      "completed": "Abgeschlossen",
+      "rejected": "Abgelehnt"
+    },
+    "disclaimer": "Sobald die Koordination den Übertrag freigibt, werden die Stunden hier von deinem Konto abgezogen. In der Ziel-Genossenschaft erscheinen sie unmittelbar danach.",
+    "back": "Zurück zur Gemeinschaftsseite",
+    "errors": {
+      "submit_failed": "Der Übertrag konnte nicht beantragt werden. Bitte versuche es erneut.",
+      "destination_not_found": "Diese Ziel-Genossenschaft konnten wir nicht finden.",
+      "no_matching_email": "Deine E-Mail-Adresse ist bei der Ziel-Genossenschaft nicht registriert — bitte melde dich dort zuerst an.",
+      "insufficient_hours": "Du hast nicht genug gutgeschriebene Stunden."
+    }
+  },
+  "my_support_relationships": {
+    "meta": {
+      "title": "Meine Unterstützungsbeziehungen",
+      "description": "Deine laufenden Unterstützungsbeziehungen ansehen"
+    },
+    "subtitle": "Deine Unterstützungsbeziehungen – Menschen, denen du hilfst, und solche, die dir helfen.",
+    "loading": "Deine Informationen werden geladen...",
+    "empty": {
+      "title": "Keine Unterstützungsbeziehungen",
+      "body": "Du hast keine aktiven Unterstützungsbeziehungen."
+    },
+    "role": {
+      "supporter": "Unterstützer:in",
+      "recipient": "Empfänger:in"
+    },
+    "frequency": {
+      "weekly": "Wöchentlich",
+      "fortnightly": "Vierzehntäglich",
+      "monthly": "Monatlich",
+      "ad_hoc": "Nach Bedarf"
+    },
+    "status": {
+      "active": "Aktiv",
+      "paused": "Pausiert",
+      "completed": "Abgeschlossen",
+      "cancelled": "Abgebrochen"
+    },
+    "log_status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
+    },
+    "next_check_in": "Nächster Check-in",
+    "overdue": "Überfällig",
+    "expected_hours": "{{hours}} Std. erwartet",
+    "hours_short": "{{hours}}h",
+    "recent_logs": "Kürzlich erfasste Stunden",
+    "no_recent_logs": "Noch keine Stunden erfasst",
+    "back": "Zurück zur Caring Community",
+    "errors": {
+      "load_failed": "Deine Unterstützungsbeziehungen konnten nicht geladen werden."
+    }
+  },
+  "future_care_fund": {
+    "meta": {
+      "title": "Dein Zeitvorsorge-Fonds",
+      "description": "Stunden, die du für deine zukünftige Betreuung gespart hast"
+    },
+    "title": "Dein Zeitvorsorge-Fonds",
+    "subhead": "Im Wert von etwa CHF {{value}} — Betreuung, auf die du zählen kannst, wenn du sie brauchst",
+    "intro": "Das sind nicht nur Stunden. Das ist die Fürsorge, die du in deiner Gemeinschaft gespart hast — abrufbar für Einkäufe, Arztbesuche oder einfach Gesellschaft, wann immer du sie brauchst.",
+    "hours_short": "Stunden",
+    "stats": {
+      "lifetime_given": "Insgesamt geleistet",
+      "lifetime_received": "Insgesamt erhalten",
+      "active_months": "Aktive Monate",
+      "this_month_given": "Diesen Monat geleistet",
+      "this_month_received": "Diesen Monat erhalten",
+      "partner_orgs": "Partner­organisationen unterstützt"
+    },
+    "reciprocity": {
+      "title": "Deine Bilanz",
+      "given_label": "Geleistet",
+      "received_label": "Erhalten",
+      "strong_giver": "Du hast weit mehr gegeben als erhalten — dein Zeitvorsorge-Fonds steht stark da.",
+      "balanced": "Deine Bilanz ist im Gleichgewicht.",
+      "strong_receiver": "Du hast grosszügig Hilfe erhalten — wenn du bereit bist, gib deiner Gemeinschaft zurück."
+    },
+    "by_year": {
+      "title": "Jahr für Jahr",
+      "given": "Geleistet",
+      "received": "Erhalten"
+    },
+    "how_it_works": {
+      "title": "So funktioniert dein Zeitvorsorge-Fonds",
+      "step1": "Hilf deinen Nachbarinnen und Nachbarn und sammle Stunden",
+      "step2": "Deine Stunden werden sicher in deinem Gemeinschafts-Fonds gespart",
+      "step3": "Wenn du Hilfe brauchst, löst du Stunden aus deinem Fonds ein",
+      "cta_offer": "Jetzt Hilfe anbieten",
+      "cta_browse": "Anfragen entdecken",
+      "cta_relationships": "Meine Betreuungs­beziehungen ansehen"
+    },
+    "first_contribution": "Erster Beitrag: {{date}}",
+    "back": "Zurück zur Gemeinschafts-Übersicht",
+    "loading": "Dein Fonds wird berechnet …",
+    "errors": {
+      "load_failed": "Dein Zeitvorsorge-Fonds konnte nicht geladen werden."
+    }
+  },
+  "reciprocity": {
+    "title": "Deine gegenseitige Bilanz",
+    "given": "Du hast {{hours}} Stunden geleistet",
+    "received": "Du hast {{hours}} Stunden erhalten",
+    "net_positive": "Netto: +{{hours}} Stunden gespart",
+    "net_negative": "Netto: {{hours}} Stunden eingelöst",
+    "view_fund": "Zeitvorsorge-Fonds ansehen"
+  },
   "gif": {
     "search_placeholder": "GIFs suchen...",
     "trending": "Beliebt",
@@ -330,6 +705,7 @@
     "preview_alt": "GIF-Vorschau"
   },
   "loading": "Wird geladen...",
+  "go_back": "Zurück",
   "feature_error": {
     "load_failed": "{{feature}} konnte nicht geladen werden. Dieser Bereich ist möglicherweise vorübergehend nicht verfügbar."
   },
@@ -423,10 +799,10 @@
   "hours_display_one": "{{count}} Stunde",
   "hours_display_other": "{{count}} Stunden",
   "compose": {
-    "aria_insert_link": "Link einfügen",
-    "aria_remove_link": "Link entfernen",
     "placeholder_url": "https://example.com",
-    "placeholder_hours": "1"
+    "placeholder_hours": "1",
+    "aria_insert_link": "Link einfügen",
+    "aria_remove_link": "Link entfernen"
   },
   "toast": {
     "aria_notifications": "Benachrichtigungen",
@@ -438,232 +814,61 @@
   "verification": {
     "not_id_verified": "Nicht ID-verifiziert"
   },
-  "page_meta": {
-    "skills_browse": {
-      "title": "Fähigkeiten durchsuchen"
-    },
-    "members": {
-      "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus.",
-      "title": "Mitglieder"
-    }
-  },
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
-  "go_back": "Zurück",
+  "page_meta": {
+    "skills_browse": {
+      "title": "Fähigkeiten durchsuchen"
+    },
+    "members": {
+      "title": "Mitglieder",
+      "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus."
+    }
+  },
   "checking_authentication": "Authentifizierung wird geprüft...",
   "verification_status": "Verifizierungsstatus",
   "verify_identity": "Identität verifizieren",
   "level_short": "St. {{level}}",
   "cancel": "Abbrechen",
   "save": "Speichern",
-  "caring_community": {
+  "offer_favour": {
     "meta": {
-      "title": "Caring Community",
-      "description": "Zeitvorsorge, Freiwilligenarbeit, Organisationen, vertrauensvolle Unterstützung und lokale Wirkung koordinieren."
+      "title": "Gefälligkeit erfassen",
+      "description": "Eine informelle nachbarschaftliche Hilfe festhalten"
     },
-    "badge": "Integriertes Modul",
-    "title": "Caring Community",
-    "subtitle": "Zeitvorsorge, verifizierte Freiwilligenarbeit, vertrauenswürdige Organisationen, Gruppen, Veranstaltungen, Ressourcen und Wirkungsdaten – alles in einem koordinierten Sorge-Workflow.",
-    "actions": {
-      "request_help": "Hilfe anfragen",
-      "offer_time": "Zeit anbieten",
-      "log_hours": "Stunden erfassen",
-      "coordinate_org": "Organisation koordinieren",
-      "my_relationships": "Meine Unterstützungsbeziehungen",
-      "request_help_sub": "Bitte deine Gemeinschaft um praktische Unterstützung",
-      "offer_favour": "Gefälligkeit erfassen",
-      "offer_favour_sub": "Eine informelle Hilfe festhalten – ohne Zeitgutschrift",
-      "offer_time_sub": "Einen Dienst oder eine Fähigkeit anbieten, die du teilen möchtest",
-      "log_hours_sub": "Geleistete Freiwilligenstunden zur Genehmigung erfassen",
-      "coordinate_org_sub": "Deine Freiwilligen-Organisationen verwalten",
-      "my_relationships_sub": "Laufende Unterstützungsbeziehungen ansehen",
-      "markt": "Marktplatz",
-      "markt_sub": "Lokale Dienste, Waren und Zeitgutschrift-Angebote entdecken.",
-      "loyalty_history": "Meine Einlösungen",
-      "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt.",
-      "future_care_fund": "Zeitvorsorge-Fonds",
-      "future_care_fund_sub": "Deine gesparten Stunden als Zukunftsvorsorge sehen.",
-      "hour_gift": "Stunden schenken",
-      "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
-      "hour_transfer": "Stunden übertragen",
-      "hour_transfer_sub": "Gesparte Stunden zu einer anderen KISS-Genossenschaft übertragen.",
-      "safeguarding_report": "Anliegen melden",
-      "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden.",
-      "cover_care": "Stellvertretende Begleitung",
-      "cover_care_sub": "Vertrauensvolle Stellvertretung organisieren, wenn eine Begleitperson Entlastung braucht.",
-      "projects": "Gemeinschaftsprojekte",
-      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen."
-    },
-    "operating_model": {
-      "title": "Funktionsweise",
-      "subtitle": "Konzipiert für gegenseitige Unterstützung nach KISS-Prinzip",
-      "trusted_requests": {
-        "title": "Vertrauensvolle Anfragen",
-        "description": "Mitglieder können praktische Unterstützung über Zeitvorsorge-Inserate und koordinierte Freiwilligenarbeit anfragen."
-      },
-      "verified_hours": {
-        "title": "Verifizierte Stunden",
-        "description": "Unterstützungsleistungen durchlaufen Genehmigungen, Erfassungen, Bewertungen und werden im Zeitkonto verbucht."
-      },
-      "municipal_value": {
-        "title": "Mehrwert für Gemeinde und Kanton",
-        "description": "Das Modul bereitet die Grundlage für Wirkungsberichte an Kanton, Gemeinde und Genossenschaften."
-      }
-    },
-    "modules": {
-      "title": "Verbundene Funktionen",
-      "subtitle": "Der Hub ist nur sichtbar, wenn die Caring Community aktiviert ist.",
-      "open": "Öffnen",
-      "timebank": {
-        "title": "Zeitvorsorge",
-        "description": "Angebote, Gesuche, Gegenseitigkeit und den Austausch von Zeitgutschriften koordinieren."
-      },
-      "volunteering": {
-        "title": "Freiwilligenarbeit",
-        "description": "Einsätze, Anmeldungen, Schichten, Verifizierung und Unterstützungsstunden verwalten."
-      },
-      "organisations": {
-        "title": "Organisationen",
-        "description": "Genossenschaften, lokale Partner und Dienstleister ins Sorge-Netzwerk einbinden."
-      },
-      "events": {
-        "title": "Veranstaltungen",
-        "description": "Tagungen, Quartiercafés, Schulungen und Gemeinschaftstreffen durchführen."
-      },
-      "groups": {
-        "title": "Gruppen",
-        "description": "Quartierzirkel, kantonale Pilotprojekte und Arbeitsgruppen unterstützen."
-      },
-      "resources": {
-        "title": "Ressourcen",
-        "description": "Leitfäden, Datenschutzdokumente, Handbücher und Einführungsmaterial teilen."
-      },
-      "goals": {
-        "title": "Ziele",
-        "description": "Persönliche, gemeinschaftliche und kommunale Unterstützungsziele verfolgen."
-      },
-      "federation": {
-        "title": "Föderation",
-        "description": "Regionale Knoten, Genossenschaften und Partnergemeinschaften verbinden."
-      },
-      "messages": {
-        "title": "Nachrichten",
-        "description": "Kommunikation zwischen Mitgliedern, Koordinator:innen und Organisationen nah am Geschehen."
-      },
-      "trust": {
-        "title": "Vertrauen und Verifizierung",
-        "description": "Identitätsprüfung, Bewertungen und Compliance-Signale für sensible Sorge-Prozesse nutzen."
-      },
-      "clubs": {
-        "title": "Vereine",
-        "description": "Vereine, Clubs und Mitgliedergruppen mit dem Sorge-Netzwerk verbinden."
-      },
-      "markt": "Marktplatz",
-      "projects": {
-        "title": "Community projects",
-        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
-      }
-    },
-    "welcome_banner": "Willkommen! Hier kannst du um Hilfe bitten, deine Zeit anbieten oder einfach eine nachbarschaftliche Gefälligkeit festhalten. Jeder Beitrag – ob gross oder klein – stärkt deine Gemeinschaft.",
-    "onboarding": {
-      "title": "What brings you here today?",
-      "intro": "Choose the path that best fits you. You can change this later.",
-      "choice_recipient": "I need support",
-      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
-      "choice_helper": "I want to help",
-      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
-      "choice_browse": "I want to browse",
-      "choice_browse_desc": "Show the full caring community hub.",
-      "show_all": "Show all actions",
-      "show_recommended": "Show recommended",
-      "change_answer": "Change answer"
-    }
-  },
-  "my_support_relationships": {
-    "meta": {
-      "title": "Meine Unterstützungsbeziehungen",
-      "description": "Deine laufenden Unterstützungsbeziehungen ansehen"
-    },
-    "empty": {
-      "title": "Keine Unterstützungsbeziehungen",
-      "body": "Du hast keine aktiven Unterstützungsbeziehungen."
-    },
-    "role": {
-      "supporter": "Unterstützer:in",
-      "recipient": "Empfänger:in"
-    },
-    "frequency": {
-      "weekly": "Wöchentlich",
-      "fortnightly": "Vierzehntäglich",
-      "monthly": "Monatlich",
-      "ad_hoc": "Nach Bedarf"
-    },
-    "status": {
-      "active": "Aktiv",
-      "paused": "Pausiert",
-      "completed": "Abgeschlossen",
-      "cancelled": "Abgebrochen"
-    },
-    "next_check_in": "Nächster Check-in",
-    "overdue": "Überfällig",
-    "expected_hours": "{{hours}} Std. erwartet",
-    "recent_logs": "Kürzlich erfasste Stunden",
-    "no_recent_logs": "Noch keine Stunden erfasst",
-    "back": "Zurück zur Caring Community",
-    "errors": {
-      "load_failed": "Deine Unterstützungsbeziehungen konnten nicht geladen werden."
-    },
-    "subtitle": "Deine Unterstützungsbeziehungen – Menschen, denen du hilfst, und solche, die dir helfen.",
-    "loading": "Deine Informationen werden geladen...",
-    "log_status": {
-      "approved": "Approved",
-      "pending": "Pending",
-      "declined": "Declined"
-    },
-    "hours_short": "{{hours}}h"
-  },
-  "request_help": {
-    "meta": {
-      "title": "Hilfe anfragen",
-      "description": "Bitte deine Gemeinschaft um Unterstützung"
-    },
+    "subtitle": "Keine Zeitgutschrift nötig – halte einfach eine Gefälligkeit für deine Gemeinschaft fest.",
     "form": {
-      "what_label": "Welche Art von Hilfe brauchst du?",
-      "what_placeholder": "z. B. Hilfe beim Einkaufen, eine Fahrt zum Arzt, Begleitung bei einem Spaziergang...",
-      "when_label": "Wann brauchst du die Hilfe?",
-      "when_placeholder": "z. B. dienstags nachmittags, so bald wie möglich...",
-      "contact_label": "Wie sollen wir dich kontaktieren?",
-      "contact_phone": "Telefonisch",
-      "contact_message": "Per Nachricht",
-      "contact_either": "Beides ist in Ordnung",
-      "submit": "Hilfe anfragen",
-      "submitting": "Anfrage wird gesendet...",
-      "what_too_long": "Bitte halte deine Anfrage unter 500 Zeichen."
+      "what_label": "Wobei hast du geholfen?",
+      "what_placeholder": "z. B. Einkäufe getragen, jemanden mitgenommen, eine Mahlzeit geteilt...",
+      "category_label": "Kategorie",
+      "categories": {
+        "companionship": "Gesellschaft",
+        "shopping": "Einkaufen & Besorgungen",
+        "transport": "Transport",
+        "home_help": "Haushaltshilfe",
+        "gardening": "Gartenarbeit",
+        "meals": "Mahlzeiten",
+        "other": "Sonstiges"
+      },
+      "recipient_label": "Wem hast du geholfen? (optional)",
+      "recipient_placeholder": "Name, oder leer lassen für anonym",
+      "date_label": "Wann?",
+      "what_too_long": "Please keep your favour under 500 characters.",
+      "submit": "Gefälligkeit erfassen",
+      "submitting": "Wird erfasst..."
     },
     "success": {
-      "title": "Anfrage erhalten",
-      "body": "Deine Anfrage ist eingegangen. Eine Koordinatorin oder ein Koordinator wird sich bald bei dir melden.",
+      "title": "Vielen Dank!",
+      "body": "Jede Gefälligkeit stärkt deine Gemeinschaft. Deine Hilfe wurde erfasst.",
       "back": "Zurück zur Caring Community"
     },
     "errors": {
-      "submit_failed": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.",
-      "voice_unsupported": "Sprachaufzeichnung wird in diesem Browser nicht unterstützt.",
-      "voice_permission_denied": "Mikrofon-Berechtigung wurde verweigert.",
-      "voice_failed": "Wir konnten deine Aufnahme nicht verstehen. Bitte versuche es erneut oder fülle das Formular aus."
+      "submit_failed": "Deine Gefälligkeit konnte nicht erfasst werden. Bitte versuche es erneut."
     },
-    "back": "Zurück zur Caring Community",
-    "subtitle": "Deine Nachbarinnen und Nachbarn sind für dich da. Sag uns, was du brauchst – wir geben unser Bestes.",
-    "voice": {
-      "start": "Tippen, um deine Anfrage zu sprechen",
-      "stop": "Aufnahme beenden",
-      "recording": "Nimmt auf... {{seconds}}s",
-      "processing": "Höre zu...",
-      "filled_hint": "Wir haben das Formular aus deiner Aufnahme befüllt. Bitte prüfe es vor dem Absenden.",
-      "transcript_label": "Was wir gehört haben"
-    }
+    "back": "Zurück zur Caring Community"
   },
   "invite": {
     "valid": {
@@ -710,10 +915,10 @@
     },
     "marketplace_unavailable": "Der lokale Marktplatz ist für diese Gemeinschaft nicht aktiviert.",
     "load_more": "Mehr laden",
+    "retry": "Try again",
     "errors": {
       "load_failed": "Der Marktplatz konnte nicht geladen werden. Bitte versuche es erneut."
-    },
-    "retry": "Try again"
+    }
   },
   "proximity": {
     "label": "In meiner Nähe",
@@ -736,42 +941,6 @@
     "type_canton": "Kanton",
     "type_other": "Gebiet"
   },
-  "offer_favour": {
-    "meta": {
-      "title": "Gefälligkeit erfassen",
-      "description": "Eine informelle nachbarschaftliche Hilfe festhalten"
-    },
-    "subtitle": "Keine Zeitgutschrift nötig – halte einfach eine Gefälligkeit für deine Gemeinschaft fest.",
-    "form": {
-      "what_label": "Wobei hast du geholfen?",
-      "what_placeholder": "z. B. Einkäufe getragen, jemanden mitgenommen, eine Mahlzeit geteilt...",
-      "category_label": "Kategorie",
-      "categories": {
-        "companionship": "Gesellschaft",
-        "shopping": "Einkaufen & Besorgungen",
-        "transport": "Transport",
-        "home_help": "Haushaltshilfe",
-        "gardening": "Gartenarbeit",
-        "meals": "Mahlzeiten",
-        "other": "Sonstiges"
-      },
-      "recipient_label": "Wem hast du geholfen? (optional)",
-      "recipient_placeholder": "Name, oder leer lassen für anonym",
-      "date_label": "Wann?",
-      "submit": "Gefälligkeit erfassen",
-      "submitting": "Wird erfasst...",
-      "what_too_long": "Please keep your favour under 500 characters."
-    },
-    "success": {
-      "title": "Vielen Dank!",
-      "body": "Jede Gefälligkeit stärkt deine Gemeinschaft. Deine Hilfe wurde erfasst.",
-      "back": "Zurück zur Caring Community"
-    },
-    "errors": {
-      "submit_failed": "Deine Gefälligkeit konnte nicht erfasst werden. Bitte versuche es erneut."
-    },
-    "back": "Zurück zur Caring Community"
-  },
   "clubs": {
     "meta": {
       "title": "Vereine",
@@ -791,14 +960,14 @@
     }
   },
   "feed": {
-    "official_badge": "Offiziell",
     "personalisation": {
       "label": "Feed mode",
       "personalised": "Personalised",
       "latest": "Latest",
       "personalised_hint": "Ranked for you based on your activity.",
       "latest_hint": "Newest posts first."
-    }
+    },
+    "official_badge": "Offiziell"
   },
   "loyalty": {
     "section_title": "Zeitgutschriften einsetzen",
@@ -842,108 +1011,9 @@
       }
     }
   },
-  "future_care_fund": {
-    "meta": {
-      "title": "Dein Zeitvorsorge-Fonds",
-      "description": "Stunden, die du für deine zukünftige Betreuung gespart hast"
-    },
-    "title": "Dein Zeitvorsorge-Fonds",
-    "subhead": "Im Wert von etwa CHF {{value}} — Betreuung, auf die du zählen kannst, wenn du sie brauchst",
-    "intro": "Das sind nicht nur Stunden. Das ist die Fürsorge, die du in deiner Gemeinschaft gespart hast — abrufbar für Einkäufe, Arztbesuche oder einfach Gesellschaft, wann immer du sie brauchst.",
-    "hours_short": "Stunden",
-    "stats": {
-      "lifetime_given": "Insgesamt geleistet",
-      "lifetime_received": "Insgesamt erhalten",
-      "active_months": "Aktive Monate",
-      "this_month_given": "Diesen Monat geleistet",
-      "this_month_received": "Diesen Monat erhalten",
-      "partner_orgs": "Partner­organisationen unterstützt"
-    },
-    "reciprocity": {
-      "title": "Deine Bilanz",
-      "given_label": "Geleistet",
-      "received_label": "Erhalten",
-      "strong_giver": "Du hast weit mehr gegeben als erhalten — dein Zeitvorsorge-Fonds steht stark da.",
-      "balanced": "Deine Bilanz ist im Gleichgewicht.",
-      "strong_receiver": "Du hast grosszügig Hilfe erhalten — wenn du bereit bist, gib deiner Gemeinschaft zurück."
-    },
-    "by_year": {
-      "title": "Jahr für Jahr",
-      "given": "Geleistet",
-      "received": "Erhalten"
-    },
-    "how_it_works": {
-      "title": "So funktioniert dein Zeitvorsorge-Fonds",
-      "step1": "Hilf deinen Nachbarinnen und Nachbarn und sammle Stunden",
-      "step2": "Deine Stunden werden sicher in deinem Gemeinschafts-Fonds gespart",
-      "step3": "Wenn du Hilfe brauchst, löst du Stunden aus deinem Fonds ein",
-      "cta_offer": "Jetzt Hilfe anbieten",
-      "cta_browse": "Anfragen entdecken",
-      "cta_relationships": "Meine Betreuungs­beziehungen ansehen"
-    },
-    "first_contribution": "Erster Beitrag: {{date}}",
-    "back": "Zurück zur Gemeinschafts-Übersicht",
-    "loading": "Dein Fonds wird berechnet …",
-    "errors": {
-      "load_failed": "Dein Zeitvorsorge-Fonds konnte nicht geladen werden."
-    }
-  },
-  "reciprocity": {
-    "title": "Deine gegenseitige Bilanz",
-    "given": "Du hast {{hours}} Stunden geleistet",
-    "received": "Du hast {{hours}} Stunden erhalten",
-    "net_positive": "Netto: +{{hours}} Stunden gespart",
-    "net_negative": "Netto: {{hours}} Stunden eingelöst",
-    "view_fund": "Zeitvorsorge-Fonds ansehen"
-  },
   "federation_aggregates": {
     "consent_enabled": "Föderations-Aggregation aktiviert",
     "consent_disabled": "Föderations-Aggregation deaktiviert"
-  },
-  "hour_transfer": {
-    "meta": {
-      "title": "Gutgeschriebene Stunden übertragen",
-      "description": "Übertrag deiner gutgeschriebenen Stunden an eine andere KISS-Genossenschaft"
-    },
-    "title": "Deine gutgeschriebenen Stunden übertragen",
-    "subtitle": "Du ziehst in eine andere Gemeinde? Deine gutgeschriebenen Stunden gehen mit.",
-    "form": {
-      "destination_label": "Ziel-Genossenschaft",
-      "destination_placeholder": "z. B. zug-kiss",
-      "destination_help": "Der Slug der KISS-Genossenschaft oder Mandantin am neuen Wohnort",
-      "hours_label": "Zu übertragende Stunden",
-      "hours_placeholder": "z. B. 25.5",
-      "reason_label": "Grund (optional)",
-      "reason_placeholder": "z. B. Umzug von Cham nach Zug",
-      "submit": "Übertrag beantragen",
-      "submitting": "Wird beantragt..."
-    },
-    "history": {
-      "title": "Deine bisherigen Überträge",
-      "date": "Datum",
-      "destination": "Ziel",
-      "hours": "Stunden",
-      "status": "Status",
-      "reason": "Grund",
-      "empty": "Noch keine Überträge."
-    },
-    "status": {
-      "pending": "Wartet auf Freigabe",
-      "approved_by_source": "Freigegeben",
-      "sent": "Versendet",
-      "received": "Empfangen",
-      "completed": "Abgeschlossen",
-      "rejected": "Abgelehnt"
-    },
-    "disclaimer": "Sobald die Koordination den Übertrag freigibt, werden die Stunden hier von deinem Konto abgezogen. In der Ziel-Genossenschaft erscheinen sie unmittelbar danach.",
-    "back": "Zurück zur Gemeinschaftsseite",
-    "errors": {
-      "submit_failed": "Der Übertrag konnte nicht beantragt werden. Bitte versuche es erneut.",
-      "destination_not_found": "Diese Ziel-Genossenschaft konnten wir nicht finden.",
-      "no_matching_email": "Deine E-Mail-Adresse ist bei der Ziel-Genossenschaft nicht registriert — bitte melde dich dort zuerst an.",
-      "insufficient_hours": "Du hast nicht genug gutgeschriebene Stunden."
-    },
-    "success_message": "Transfer request submitted. A coordinator will review it before hours move."
   },
   "data_export": {
     "meta": {
@@ -974,66 +1044,6 @@
       "rate_limit": "Du kannst pro Tag 5 Exporte anfordern. Bitte versuche es morgen wieder.",
       "build_failed": "Dein Archiv konnte nicht erstellt werden. Bitte versuche es nochmals oder kontaktiere den Support."
     }
-  },
-  "hour_gift": {
-    "meta": {
-      "title": "Stunden schenken",
-      "description": "Schenke deine angesparten Stunden einem anderen Genossenschaftsmitglied"
-    },
-    "title": "Schenke deine Stunden",
-    "subtitle": "Angesparte Stunden lassen sich an Familie, Freunde oder jeden weitergeben, der sie braucht.",
-    "tabs": {
-      "send": "Senden",
-      "inbox": "Posteingang",
-      "sent": "Gesendet"
-    },
-    "send": {
-      "recipient_label": "Wem möchtest du Stunden schenken?",
-      "recipient_placeholder": "Nach Name suchen...",
-      "hours_label": "Wie viele Stunden?",
-      "hours_balance_helper": "Du hast {{balance}} Stunden zur Verfügung",
-      "message_label": "Persönliche Nachricht hinzufügen (optional)",
-      "message_placeholder": "Warum du diese Stunden schenkst...",
-      "submit": "Stunden schenken",
-      "confirm_title": "{{hours}} Stunden an {{name}} schenken?",
-      "confirm_body": "Deine Stunden werden jetzt abgebucht und gutgeschrieben, sobald die Person das Geschenk annimmt.",
-      "confirm_button": "Ja, Stunden schenken",
-      "cancel": "Abbrechen"
-    },
-    "inbox": {
-      "empty": "Aktuell keine Geschenke zur Annahme.",
-      "from": "Von {{name}}",
-      "received_at": "Erhalten am {{date}}",
-      "accept": "Annehmen",
-      "decline": "Ablehnen",
-      "decline_reason_label": "Grund für die Ablehnung (optional)",
-      "decline_button": "Geschenk ablehnen"
-    },
-    "sent": {
-      "empty": "Du hast noch keine Geschenke gesendet.",
-      "to": "An {{name}}",
-      "status": {
-        "pending": "Wartet auf Annahme",
-        "accepted": "Angenommen",
-        "declined": "Abgelehnt",
-        "reverted": "Zurückgezogen"
-      },
-      "revert": "Geschenk zurückziehen"
-    },
-    "success": {
-      "sent": "Geschenk gesendet. {{name}} wird benachrichtigt.",
-      "accepted": "Geschenk angenommen. Die Stunden sind jetzt in deinem Konto.",
-      "declined": "Geschenk abgelehnt. Stunden wurden zurückerstattet."
-    },
-    "errors": {
-      "insufficient_balance": "Du hast nicht genug Stunden in deinem Konto.",
-      "send_failed": "Das Geschenk konnte nicht gesendet werden. Bitte versuche es nochmals."
-    },
-    "back": "Zurück zum Community-Hub"
-  },
-  "inter_gen": {
-    "badge": "Generationenübergreifend",
-    "tooltip": "Diese Tandem-Beziehung verbindet Generationen — ein Markenzeichen des KISS-Modells."
   },
   "safeguarding_reports": {
     "submit": {
@@ -1516,6 +1526,55 @@
     "webhook_create_title": "Create a subscription",
     "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
   },
+  "regional_analytics": {
+    "page_title": "Regionale Analysen",
+    "contact_subject": "Regional Analytics – Partneranfrage",
+    "privacy_badge": "Datenschutz steht beim Design an erster Stelle",
+    "hero_title": "Verstehen Sie Ihre Region. Ohne die Privatsphäre zu beeinträchtigen.",
+    "hero_subtitle": "Ein kostenpflichtiges Analyseprodukt für Kommunen und KMU-Partner. Gebündelte Aggregate, unterdrückte Segmente unter N=10, niemals einzelne Daten.",
+    "cta_request_access": "Zugriff anfordern",
+    "cta_learn_more": "Erfahren Sie mehr",
+    "features_heading": "Was ist enthalten",
+    "feature_trends_title": "Trends",
+    "feature_trends_body": "Verfolgen Sie Engagement, Mitgliederaktivität und ehrenamtliche Stunden im Laufe der Zeit – keine Einzelpersonen, nur regionale Aggregate.",
+    "feature_demand_supply_title": "Nachfrage und Angebot",
+    "feature_demand_supply_body": "Sehen Sie, wo sich Angebote und Anfragen nach dreistelliger Postleitzahl und Kategorie gruppieren, mit einer datenschutzkonformen Übereinstimmungsrate.",
+    "feature_demographics_title": "Demografie",
+    "feature_demographics_body": "Alters- und Geschlechtsverteilung, unter N=10 unterdrückt – perfekt für Förderanträge und Wirkungsberichte.",
+    "feature_footfall_title": "Schritt",
+    "feature_footfall_body": "Anonymisierte Seitenaufruftrends in öffentlichen Bereichen der Plattform – messen Sie die Aufmerksamkeit, nicht die Identität.",
+    "pricing_heading": "Einfache, transparente Preisgestaltung",
+    "tier_cta": "Fordern Sie ein Angebot an",
+    "privacy_footer": "Alle Kennzahlen werden in Gruppen zusammengefasst und anonymisiert. Segmente mit N<10 werden unterdrückt. Wir geben niemals einzelne Benutzer, Namen oder Adressen an Partner weiter.",
+    "tiers": {
+      "basic": {
+        "label": "Basic",
+        "price": "299 EUR / Monat",
+        "description": "Für kleine Kommunen und Gemeindepartner.",
+        "feature_1": "Module „Trends + Demografie“.",
+        "feature_2": "Monatlicher PDF-Bericht",
+        "feature_3": "E-Mail-Support"
+      },
+      "pro": {
+        "label": "Profi",
+        "price": "799 EUR / Monat",
+        "description": "Für mittelgroße Kommunen und KMU-Partner mit mehreren Interessengruppen.",
+        "feature_1": "Alle vier Module",
+        "feature_2": "Wöchentliche PDF- und On-Demand-Berichte",
+        "feature_3": "Live-Partner-Dashboard",
+        "feature_4": "Vorrangiger Support"
+      },
+      "enterprise": {
+        "label": "Unternehmen",
+        "price": "Individuelle Preise",
+        "description": "Für Stadtverwaltungen und föderierte Netzwerke. Benutzerdefinierte Module, benutzerdefiniertes Branding, engagierter Erfolgsmanager.",
+        "feature_1": "Benutzerdefinierte Datenfeeds und -exporte",
+        "feature_2": "White-Label-PDFs",
+        "feature_3": "Vierteljährliche Review-Workshops",
+        "feature_4": "Engagierter Erfolgsmanager"
+      }
+    }
+  },
   "provisioning": {
     "meta": {
       "title": "Apply for a Pilot Community",
@@ -1748,10 +1807,15 @@
     "or_continue_with_email": "Or continue with email",
     "callback_signing_in": "Signing you in…",
     "callback_failed": "Sign-in failed. Please try again.",
+    "provider_google": "Google",
+    "provider_apple": "Apfel",
+    "provider_facebook": "Facebook",
     "connect": "Connect",
     "disconnect": "Disconnect",
+    "disconnected": "Konto getrennt.",
     "connected_at": "connected",
     "not_connected": "Not connected",
+    "provider_unavailable": "Für diese Community nicht verfügbar",
     "cannot_disconnect_last": "Cannot disconnect your only sign-in method",
     "connected_accounts": {
       "title": "Connected accounts",
@@ -1885,12 +1949,5 @@
     "reaction_clap": "Clap",
     "reaction_star": "Star",
     "say_thanks": "Say thanks"
-  },
-  "landing_links": {
-    "title": "Explore this community",
-    "aria_label": "Explore community sections"
-  },
-  "location": {
-    "powered_by_google": "Powered by Google"
   }
 }

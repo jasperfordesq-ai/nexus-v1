@@ -82,11 +82,15 @@ run_smoke_tests() {
         nexus-sales-site
         nexus-meilisearch
         nexus-blue-php-app
-        nexus-blue-frontend
+        nexus-blue-react
         nexus-blue-sales
+        nexus-blue-php-queue
+        nexus-blue-php-scheduler
         nexus-green-php-app
-        nexus-green-frontend
+        nexus-green-react
         nexus-green-sales
+        nexus-green-php-queue
+        nexus-green-php-scheduler
     )
     local UNHEALTHY=""
     local CONTAINER STATUS

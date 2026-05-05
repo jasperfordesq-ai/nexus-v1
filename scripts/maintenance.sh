@@ -59,6 +59,25 @@ detect_php_container() {
         return
     fi
 
+    local state_file color candidate
+    state_file="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
+    if [ -f "$state_file" ]; then
+        color="$(tr -d '[:space:]' < "$state_file" 2>/dev/null || echo "")"
+        case "$color" in
+            blue|green)
+                candidate="nexus-$color-php-app"
+                if docker ps --format "{{.Names}}" | grep -qx "$candidate"; then
+                    PHP_CONTAINER="$candidate"
+                    return
+                fi
+                log_warn "Active color is '$color' but $candidate is not running; falling back to container discovery"
+                ;;
+            *)
+                log_warn "Invalid blue-green active color '$color' in $state_file; falling back to container discovery"
+                ;;
+        esac
+    fi
+
     PHP_CONTAINER=$(docker ps --format "{{.Names}}" | grep -E '^nexus-(blue|green)-php-app$' | head -n 1 || true)
     if [ -z "$PHP_CONTAINER" ]; then
         PHP_CONTAINER="nexus-php-app"

@@ -2,13 +2,13 @@
   "page_title": "Fil",
   "title": "Fil communautaire",
   "subtitle": "Découvrez ce qui se passe dans votre communauté",
-  "author_unknown": "Unknown",
   "new_post": "Nouvelle publication",
   "whats_on_your_mind": "Qu'avez-vous en tête ?",
   "add_image_aria": "Ajouter une image",
   "quoted_post_image": "Image du post cité",
   "create_poll_aria": "Créer un sondage",
   "create_post": "Créer une publication",
+  "author_unknown": "Unknown",
   "load_more": "Charger plus",
   "unable_to_load": "Impossible de charger le fil",
   "try_again": "Réessayer",
@@ -82,6 +82,7 @@
     "post_created": "Publication créée !",
     "post_failed": "Impossible de créer la publication.",
     "post_button": "Publier",
+    "save_changes": "Save",
     "poll_question_placeholder": "Posez une question...",
     "poll_question_required": "Veuillez saisir une question pour le sondage.",
     "poll_min_options": "Ajoutez au moins 2 options.",
@@ -99,6 +100,7 @@
     "category_label": "Catégorie",
     "category_placeholder": "Sélectionner une catégorie",
     "estimated_hours_label": "Heures estimées",
+    "placeholder_hours": "1",
     "listing_created": "Annonce créée !",
     "listing_failed": "Impossible de créer l'annonce.",
     "create_listing": "Créer l'annonce",
@@ -207,11 +209,12 @@
     "media_upload_error": "Échec du traitement des images",
     "sdg_selected_one": "{{count}} objectif sélectionné",
     "sdg_selected_other": "{{count}} objectifs sélectionnés",
-    "save_changes": "Save",
-    "placeholder_hours": "1",
     "content_required": "Post content cannot be empty.",
     "content_too_long": "Post is too long (max {{max}} characters).",
     "groups_load_error": "Failed to load groups."
+  },
+  "moderation": {
+    "unauthorized": "You do not have permission to perform this action."
   },
   "card": {
     "edited": "modifié",
@@ -238,6 +241,7 @@
     "comment_action": "Commenter",
     "write_comment": "Écrire un commentaire...",
     "no_comments": "Aucun commentaire pour l'instant. Soyez la première personne à partager vos réflexions !",
+    "scheduled": "Scheduled",
     "edit_post": "Modifier le post",
     "not_interested": "Pas intéressé",
     "admin_delete": "Supprimer (Admin)",
@@ -281,7 +285,6 @@
     "detail_challenge": "Voir le défi",
     "detail_volunteer": "Voir l'opportunité",
     "detail_blog": "Lire l'article",
-    "scheduled": "Scheduled",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -320,6 +323,24 @@
       "level_reached": "Level reached"
     }
   },
+  "poll": {
+    "load_failed": "Failed to load poll data.",
+    "expired": "This poll has ended.",
+    "expiry_past": "Poll expiry date must be in the future.",
+    "min_options_hint": "At least 2 options are required.",
+    "closed": "Closed",
+    "closes_minutes": "Closes in {{minutes}}m",
+    "closes_hours": "Closes in {{hours}}h",
+    "closes_days": "Closes in {{days}}d",
+    "live": "Live",
+    "view_full": "View full poll",
+    "vote_to_see_results": "Vote to see results",
+    "results_hidden_until_close": "Results revealed when poll closes",
+    "your_vote": "Your vote"
+  },
+  "feed": {
+    "end_of_feed": "You're all caught up!"
+  },
   "hashtag": {
     "title": "Hashtag",
     "load_failed": "Impossible de charger les publications pour ce hashtag.",
@@ -351,7 +372,11 @@
     "button_label": "Partager",
     "button_label_count": "Partager ({{count}})",
     "shared_by": "<0>{{name}}</0> a partagé ceci",
+    "shared_by_text": "shared this",
+    "cannot_share_own_post": "You cannot share your own post",
     "menu_label": "Options de partage",
+    "default_title": "Poste",
+    "repost": "Repost",
     "repost_desc": "Partager sur votre fil",
     "repost_remove": "Supprimer le repost",
     "repost_remove_desc": "Supprimer le repost de votre fil",
@@ -362,6 +387,7 @@
     "quote_content_required": "Veuillez ajouter votre commentaire",
     "quote_posted": "Post cité créé",
     "quote_failed": "Échec de la création du post cité",
+    "quote_submit": "Post",
     "copy_link": "Copier le lien",
     "link_copied": "Lien copié dans le presse-papiers",
     "copy_failed": "Échec de la copie du lien",
@@ -375,13 +401,22 @@
     "dm_hint": "Tapez au moins 2 caractères pour rechercher",
     "dm_sent": "Publication partagée avec {{name}}",
     "dm_failed": "Échec de l'envoi du message",
-    "repost": "Repost",
-    "quote_submit": "Post",
     "dm_sent_label": "Sent",
     "dm_send": "Send",
-    "dm_done": "Done",
-    "shared_by_text": "shared this",
-    "cannot_share_own_post": "You cannot share your own post"
+    "dm_done": "Done"
+  },
+  "video": {
+    "select": "Ajouter une vidéo",
+    "too_large": "La vidéo doit être inférieure à {{size}} Mo",
+    "invalid_type": "Format vidéo invalide. Formats pris en charge : MP4, WebM, MOV",
+    "remove": "Supprimer la vidéo",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "trending": {
     "title": "Tendances",
@@ -503,19 +538,6 @@
     "click_to_remove": "{{label}} (cliquer pour retirer)",
     "react_to_post": "Réagir à cette publication"
   },
-  "video": {
-    "select": "Ajouter une vidéo",
-    "too_large": "La vidéo doit être inférieure à {{size}} Mo",
-    "invalid_type": "Format vidéo invalide. Formats pris en charge : MP4, WebM, MOV",
-    "remove": "Supprimer la vidéo",
-    "mute": "Mute",
-    "unmute": "Unmute",
-    "pause": "Pause",
-    "play": "Play",
-    "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
-  },
   "why_shown": {
     "label": "Pourquoi est-ce que je vois ça ?",
     "title": "Pourquoi vous voyez cela",
@@ -532,18 +554,6 @@
     "active_discussion": "Discussion active",
     "frequently_saved": "Souvent enregistré par d'autres"
   },
-  "analytics": {
-    "title": "Analyse des publications",
-    "reactions_breakdown": "Répartition des réactions",
-    "views": "Views",
-    "likes": "Likes",
-    "comments": "Comments",
-    "shares": "Shares",
-    "reach": "Reach",
-    "loading": "Loading analytics...",
-    "load_failed": "Failed to load analytics."
-  },
-  "failed_to_load_analytics": "Failed to load analytics",
   "suggestions": {
     "title": "People You May Know",
     "see_all": "See All",
@@ -555,27 +565,18 @@
     "dismiss": "Dismiss",
     "load_failed": "Failed to load suggestions"
   },
-  "moderation": {
-    "unauthorized": "You do not have permission to perform this action."
+  "analytics": {
+    "title": "Analyse des publications",
+    "loading": "Loading analytics...",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach",
+    "reactions_breakdown": "Répartition des réactions",
+    "load_failed": "Failed to load analytics."
   },
-  "poll": {
-    "load_failed": "Failed to load poll data.",
-    "expired": "This poll has ended.",
-    "expiry_past": "Poll expiry date must be in the future.",
-    "min_options_hint": "At least 2 options are required.",
-    "closed": "Closed",
-    "closes_hours": "Closes in {{hours}}h",
-    "closes_days": "Closes in {{days}}d",
-    "closes_minutes": "Closes in {{minutes}}m",
-    "live": "Live",
-    "view_full": "View full poll",
-    "vote_to_see_results": "Vote to see results",
-    "results_hidden_until_close": "Results revealed when poll closes",
-    "your_vote": "Your vote"
-  },
-  "feed": {
-    "end_of_feed": "You're all caught up!"
-  },
+  "failed_to_load_analytics": "Failed to load analytics",
   "you": "You",
   "items_loaded": "{{count}} posts",
   "post_detail": {

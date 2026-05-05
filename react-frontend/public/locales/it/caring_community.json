@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "Il mio livello di fiducia",
     "subtitle": "La tua posizione nella comunità",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Nuovo arrivato",
     "tier_member": "Membro",
     "tier_trusted": "Persona di fiducia",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Valutazioni ricevute",
     "criteria_identity": "Identità verificata",
     "progress_to_next": "Progresso verso {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Vicino/a di casa",
     "relationship_professional": "Professionista della cura",
     "link_success": "Persona accompagnata collegata con successo",
-    "upcoming_care": "Prossimo accompagnamento",
-    "recent_care": "Accompagnamento recente",
     "link_error": "Impossibile collegare la persona accompagnata",
     "search_label": "Trova un membro",
     "search_placeholder": "Cerca per nome",
@@ -61,36 +59,10 @@
     "notes_label": "Note",
     "notes_placeholder": "Contesto facoltativo per i coordinatori o i sostituti di fiducia",
     "cancel": "Annulla",
+    "upcoming_care": "Prossimo accompagnamento",
+    "recent_care": "Accompagnamento recente",
     "no_upcoming_care": "Nessun accompagnamento programmato",
     "no_recent_care": "Nessun registro di accompagnamento recente"
-  },
-  "providers": {
-    "title": "Elenco dei fornitori di cura",
-    "subtitle": "Trova servizi di cura, centri diurni, associazioni e volontari nella tua regione",
-    "search_placeholder": "Cerca fornitori...",
-    "filter_all": "Tutti",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Centri diurni",
-    "filter_private": "Privati",
-    "filter_verein": "Associazioni",
-    "filter_volunteer": "Volontari",
-    "verified_badge": "Verificato",
-    "contact": "Contatto",
-    "website": "Sito web",
-    "opening_hours": "Orari di apertura",
-    "no_providers": "Nessun fornitore di cura trovato",
-    "no_providers_hint": "Modifica i filtri o la ricerca",
-    "filter_aria": "Filtra i fornitori per tipo",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Chiudi",
-    "severity_info": "Informazione",
-    "severity_warning": "Avviso",
-    "severity_danger": "Emergenza",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Accompagnamento sostitutivo",
@@ -134,26 +106,33 @@
       "assign": "Impossibile assegnare il sostituto"
     }
   },
-  "warmth_pass": {
-    "title": "Il mio pass di fiducia",
-    "credential_label": "Pass di fiducia della comunità",
-    "not_eligible": "Non ancora idoneo",
-    "not_eligible_hint": "Raggiungi il livello «Persona di fiducia» per sbloccare il tuo pass di fiducia",
-    "member_name": "Membro",
-    "hours_logged": "Ore registrate",
-    "reviews_received": "Valutazioni ricevute",
-    "identity_verified": "Identità verificata",
-    "yes": "Sì",
-    "no": "No",
-    "categories": "Ambiti in cui aiuto",
-    "no_categories": "Nessun ambito per ora",
-    "member_since": "Membro da",
-    "active_since": "Pass attivo da",
-    "issued_by": "Rilasciato da {{tenant}} tramite Project NEXUS",
-    "what_is_this": "Che cos'è un pass di fiducia?",
-    "what_is_this_body": "Il tuo pass di fiducia attesta che sei una persona verificata e di fiducia all'interno della comunità. Puoi mostrarlo alle persone accompagnate, ai coordinatori e alle organizzazioni come prova del tuo impegno nella Caring Community.",
-    "loading": "Caricamento del tuo pass...",
-    "error": "Impossibile caricare il tuo pass di fiducia"
+  "providers": {
+    "title": "Elenco dei fornitori di cura",
+    "subtitle": "Trova servizi di cura, centri diurni, associazioni e volontari nella tua regione",
+    "search_placeholder": "Cerca fornitori...",
+    "filter_aria": "Filtra i fornitori per tipo",
+    "filter_all": "Tutti",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Centri diurni",
+    "filter_private": "Privati",
+    "filter_verein": "Associazioni",
+    "filter_volunteer": "Volontari",
+    "verified_badge": "Verificato",
+    "contact": "Contatto",
+    "website": "Sito web",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Orari di apertura",
+    "no_providers": "Nessun fornitore di cura trovato",
+    "no_providers_hint": "Modifica i filtri o la ricerca"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Chiudi",
+    "severity_info": "Informazione",
+    "severity_warning": "Avviso",
+    "severity_danger": "Emergenza"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "Il mio pass di fiducia",
+    "credential_label": "Pass di fiducia della comunità",
+    "not_eligible": "Non ancora idoneo",
+    "not_eligible_hint": "Raggiungi il livello «Persona di fiducia» per sbloccare il tuo pass di fiducia",
+    "member_name": "Membro",
+    "hours_logged": "Ore registrate",
+    "reviews_received": "Valutazioni ricevute",
+    "identity_verified": "Identità verificata",
+    "yes": "Sì",
+    "no": "No",
+    "categories": "Ambiti in cui aiuto",
+    "no_categories": "Nessun ambito per ora",
+    "member_since": "Membro da",
+    "active_since": "Pass attivo da",
+    "issued_by": "Rilasciato da {{tenant}} tramite Project NEXUS",
+    "what_is_this": "Che cos'è un pass di fiducia?",
+    "what_is_this_body": "Il tuo pass di fiducia attesta che sei una persona verificata e di fiducia all'interno della comunità. Puoi mostrarlo alle persone accompagnate, ai coordinatori e alle organizzazioni come prova del tuo impegno nella Caring Community.",
+    "loading": "Caricamento del tuo pass...",
+    "error": "Impossibile caricare il tuo pass di fiducia"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Attiva/disattiva la barra laterale",
+      "back_to_site": "Torna al sito",
+      "notifications": "Notifiche",
+      "user_fallback": "Utente",
+      "user_menu": "Menù utente",
+      "my_profile": "Il mio profilo",
+      "sign_out": "disconnessione"
+    },
+    "breadcrumbs": {
+      "aria": "Pangrattato",
+      "segments": {
+        "caring": "Pannello di controllo",
+        "workflow": "Flusso di lavoro",
+        "projects": "Progetti",
+        "loyalty": "Programma fedeltà",
+        "hour-transfers": "Trasferimenti orari",
+        "regional-points": "Punti regionali",
+        "sub-regions": "Sottoregioni",
+        "federation-peers": "Pari della Federazione",
+        "sla-dashboard": "Cruscotto SLA",
+        "providers": "Fornitori",
+        "warmth-pass": "Passaggio di calore",
+        "recipient-circle": "Circolo dei destinatari delle cure",
+        "nudges": "Nudge intelligenti",
+        "emergency-alerts": "Avvisi di emergenza",
+        "surveys": "Indagini comunali",
+        "copilot": "Copilota di comunicazione",
+        "civic-digest": "Compendio civico",
+        "lead-nurture": "Coltivare il piombo",
+        "success-stories": "Storie di successo",
+        "feedback": "Posta in arrivo di feedback",
+        "verification": "Verifica comunale",
+        "safeguarding": "Rapporti di salvaguardia",
+        "trust-tier": "Livelli di fiducia",
+        "launch-readiness": "Preparazione al lancio",
+        "pilot-scoreboard": "Tabellone segnapunti pilota",
+        "data-quality": "Qualità dei dati pilota",
+        "operating-policy": "Politica operativa",
+        "disclosure-pack": "Pacchetto di divulgazione",
+        "commercial-boundary": "Confine commerciale",
+        "isolated-node": "Cancello del nodo isolato",
+        "research": "Partenariati di ricerca",
+        "external-integrations": "Integrazioni esterne",
+        "integration-showcase": "Vetrina dell'integrazione",
+        "municipal-impact": "Rapporti sull'impatto municipale",
+        "kpi-baselines": "Linee di base KPI",
+        "municipal-roi": "ROI comunale",
+        "category-coefficients": "Coefficienti di categoria"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Directory dei fornitori di servizi sanitari - Admin",
+      "title": "Elenco dei fornitori di servizi sanitari",
+      "subtitle": "Gestire servizi di assistenza domiciliare, centri diurni, associazioni e gruppi di volontariato",
+      "verified": "Verificato",
+      "yes": "SÌ",
+      "no": "NO",
+      "empty": "Ancora nessun fornitore di servizi sanitari: aggiungine uno per iniziare.",
+      "confirm_delete": "Eliminare \"NEXUSPLACEholder0TOKEN\"? Questo lo nasconderà dalla directory.",
+      "confirm_deactivate": "Contrassegnare \"NEXUSPLACEholder0TOKEN\" come inattivo? Puoi riattivarlo in seguito.",
+      "actions": {
+        "add_provider": "Aggiungi fornitore",
+        "cancel": "Cancellare",
+        "close": "Vicino",
+        "create_provider": "Crea fornitore",
+        "deactivate_named": "Disattiva \"NEXUSPLACEholder0TOKEN\"",
+        "delete_provider": "Elimina fornitore",
+        "edit_provider": "Modifica fornitore",
+        "find_duplicates": "Trova duplicati",
+        "save_changes": "Salva modifiche",
+        "verify_provider": "Verifica fornitore"
+      },
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Gli operatori sanitari sono organizzazioni esterne che partecipano alla rete di assistenza comunitaria insieme ai singoli volontari. Possono essere assegnate richieste di aiuto, ricevere pagamenti con crediti di tempo e apparire nella directory dei membri.",
+        "verification_label": "Verifica",
+        "verification_body": "I fornitori verificati visualizzano un badge nella directory. Controlla la registrazione, l'assicurazione e le politiche di salvaguardia prima di contrassegnare un fornitore come verificato.",
+        "types_label": "Tipi di fornitori",
+        "types_body": "Utilizza i campi tipo e descrizione per mostrare l'assistenza offerta in modo che membri e coordinatori possano trovare il fornitore giusto per ogni richiesta."
+      },
+      "duplicates": {
+        "title": "Potenziali duplicati",
+        "summary": "Fornitori attivi {{scanned}} scansionati: coppie NEXUSPLACEholder1TOKEN con una somiglianza superiore al 65%",
+        "scanning": "Scansione...",
+        "empty": "Nessun probabile duplicato trovato. La directory sembra pulita.",
+        "vs": "contro",
+        "match_percent": "NEXUSPLACEholder0TOKEN% corrispondenza"
+      },
+      "errors": {
+        "delete": "Impossibile eliminare il fornitore.",
+        "deactivate": "Impossibile disattivare il fornitore.",
+        "duplicates": "Impossibile eseguire la scansione dei duplicati.",
+        "load": "Impossibile caricare gli operatori sanitari.",
+        "name_required": "Il nome è obbligatorio.",
+        "save": "Impossibile salvare il fornitore.",
+        "type_required": "Il tipo di fornitore è obbligatorio.",
+        "verify": "Impossibile verificare il fornitore."
+      },
+      "fields": {
+        "address": "Indirizzo",
+        "description": "Descrizione",
+        "email": "E-mail",
+        "name": "Nome",
+        "phone": "Telefono",
+        "status": "Stato",
+        "type": "Tipo",
+        "website": "Sito web"
+      },
+      "messages": {
+        "created": "Fornitore creato con successo.",
+        "deactivated": "\"NEXUSPLACEholder0TOKEN\" disattivato.",
+        "removed": "Fornitore rimosso.",
+        "updated": "Fornitore aggiornato correttamente.",
+        "verified": "\"NEXUSPLACEholder0TOKEN\" contrassegnato come verificato."
+      },
+      "modal": {
+        "create_title": "Aggiungi fornitore di servizi sanitari",
+        "edit_title": "Modifica: NEXUSPLACEholder0TOKEN"
+      },
+      "pagination": {
+        "next": "Prossimo",
+        "previous": "Precedente",
+        "summary": "Visualizzazione {{from}}-NEXUSPLACEholder1TOKEN dei fornitori NEXUSPLACEholder2TOKEN"
+      },
+      "placeholders": {
+        "address": "Via, città, codice postale",
+        "description": "Breve descrizione dei servizi offerti...",
+        "name": "per esempio. Servizio di assistenza comunitaria"
+      },
+      "signals": {
+        "address_overlap": "Sovrapposizione degli indirizzi",
+        "email_match": "Corrispondenza e-mail",
+        "name_match": "Corrispondenza del nome",
+        "name_similar": "Nome simile",
+        "phone_match": "Corrispondenza telefonica",
+        "website_match": "Corrispondenza del sito web"
+      },
+      "status": {
+        "active": "Attivo",
+        "inactive": "Inattivo"
+      },
+      "table": {
+        "actions": "Azioni",
+        "aria": "Tabella degli operatori sanitari",
+        "name": "Nome",
+        "status": "Stato",
+        "type": "Tipo",
+        "verified": "Verificato"
+      },
+      "types": {
+        "private": "Servizio privato",
+        "spitex": "Spitex",
+        "tagesstätte": "Centro Diurno",
+        "verein": "Associazione",
+        "volunteer": "Gruppo di volontariato"
+      }
+    },
+    "warmth_pass": {
+      "title": "Ricerca del passaggio di calore",
+      "subtitle": "Visualizza le credenziali di fiducia della comunità di qualsiasi membro",
+      "eligible": "Idoneo",
+      "not_eligible": "Non idoneo",
+      "verified": "Verificato",
+      "not_verified": "Non verificato",
+      "loading": "Caricamento pass membro...",
+      "empty_date": "Non impostato",
+      "no_categories": "Nessuna categoria registrata.",
+      "tier_chip": "NEXUSPLACEholder0TOKEN (Livello NEXUSPLACEholder1TOKEN)",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Un Warmth Pass è una credenziale di fiducia portatile che dimostra che un membro ha raggiunto il livello di fiducia, ha ricevuto revisioni tra pari ed è idoneo a fornire assistenza informale di quartiere. I destinatari possono richiedere di vedere il Warmth Pass di un aiutante prima di accettare l'assistenza. Utilizza questa ricerca per verificare le credenziali di un membro su richiesta o per assistere un membro che non è sicuro della propria idoneità."
+      },
+      "lookup": {
+        "title": "Ricerca membri",
+        "member_id": "ID membro",
+        "placeholder": "Inserisci l'ID membro numerico",
+        "button": "Cercare"
+      },
+      "errors": {
+        "no_data": "Nessun dato restituito per questo ID membro.",
+        "lookup_failed": "Membro non trovato o si è verificato un errore."
+      },
+      "not_eligible_notice": {
+        "title": "Il membro non è ancora al livello Affidabile e non possiede un Warmth Pass.",
+        "body": "Per diventare idonei, devono registrare più ore di assistenza e ricevere almeno una revisione tra pari. Possono controllare i propri progressi nella pagina del profilo Trust."
+      },
+      "fields": {
+        "help_categories": "Categorie di aiuto",
+        "hours_logged": "Ore registrate",
+        "identity_verified": "Identità verificata",
+        "member_since": "Membro dal",
+        "pass_active_since": "Passa attivo da",
+        "reviews_received": "Recensioni ricevute",
+        "trust_tier": "Livello di fiducia"
       }
     }
   }

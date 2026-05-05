@@ -117,14 +117,9 @@ export function MyAdCampaignsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await api.get<{ data: AdCampaign[] } | AdCampaign[]>('/v2/me/ad-campaigns');
+      const res = await api.get<AdCampaign[]>('/v2/me/ad-campaigns');
       if (res.success && res.data) {
-        const list = Array.isArray(res.data)
-          ? res.data
-          : 'data' in res.data
-          ? res.data.data
-          : [];
-        setCampaigns(list);
+        setCampaigns(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       logError('MyAdCampaignsPage.fetchCampaigns', err);

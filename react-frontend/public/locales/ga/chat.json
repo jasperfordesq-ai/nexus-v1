@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} fágtha inniu",
   "new_conversation_aria": "Tosaigh comhrá nua",
   "typing_aria": "Tá an IS ag clóscríobh",
+  "sources_label": "Foinsí",
   "error_label": "Earráid",
   "input_aria": "Teachtaireacht",
   "input_placeholder": "Fiafraigh aon rud díom... (Iontráil chun seoladh, Shift+Iontráil le haghaidh líne nua)",

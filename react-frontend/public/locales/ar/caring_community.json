@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
     "progress_to_next": "Progress to {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
-    "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care",
     "link_error": "Care receiver could not be linked",
     "search_label": "Find member",
     "search_placeholder": "Search by name",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Optional context for coordinators or trusted substitutes",
     "cancel": "Cancel",
+    "upcoming_care": "Upcoming care",
+    "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
     "no_recent_care": "No recent care logs yet"
-  },
-  "providers": {
-    "title": "Care Provider Directory",
-    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
-    "search_placeholder": "Search providers...",
-    "filter_all": "All",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Day Centres",
-    "filter_private": "Private",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Volunteers",
-    "verified_badge": "Verified",
-    "contact": "Contact",
-    "website": "Website",
-    "opening_hours": "Opening Hours",
-    "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Dismiss",
-    "severity_info": "Information",
-    "severity_warning": "Warning",
-    "severity_danger": "Emergency",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Cover Care",
@@ -134,26 +106,33 @@
       "assign": "Substitute could not be matched"
     }
   },
-  "warmth_pass": {
-    "title": "My Warmth Pass",
-    "credential_label": "Community Warmth Pass",
-    "not_eligible": "Not yet eligible",
-    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
-    "member_name": "Member",
-    "hours_logged": "Hours logged",
-    "reviews_received": "Reviews received",
-    "identity_verified": "Identity verified",
-    "yes": "Yes",
-    "no": "No",
-    "categories": "Areas I help with",
-    "no_categories": "No categories yet",
-    "member_since": "Member since",
-    "active_since": "Pass active since",
-    "issued_by": "Issued by {{tenant}} via Project NEXUS",
-    "what_is_this": "What is a Warmth Pass?",
-    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
-    "loading": "Loading your pass...",
-    "error": "Could not load your Warmth Pass"
+  "providers": {
+    "title": "Care Provider Directory",
+    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
+    "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
+    "filter_all": "All",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Day Centres",
+    "filter_private": "Private",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Volunteers",
+    "verified_badge": "Verified",
+    "contact": "Contact",
+    "website": "Website",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Opening Hours",
+    "no_providers": "No care providers found",
+    "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "تبديل الشريط الجانبي",
+      "back_to_site": "العودة إلى الموقع",
+      "notifications": "إشعارات",
+      "user_fallback": "مستخدم",
+      "user_menu": "قائمة المستخدم",
+      "my_profile": "ملفي الشخصي",
+      "sign_out": "تسجيل الخروج"
+    },
+    "breadcrumbs": {
+      "aria": "فتات الخبز",
+      "segments": {
+        "caring": "لوحة القيادة",
+        "workflow": "سير العمل",
+        "projects": "المشاريع",
+        "loyalty": "برنامج الولاء",
+        "hour-transfers": "تحويلات الساعة",
+        "regional-points": "النقاط الإقليمية",
+        "sub-regions": "المناطق الفرعية",
+        "federation-peers": "أقران الاتحاد",
+        "sla-dashboard": "لوحة تحكم اتفاقية مستوى الخدمة",
+        "providers": "مقدمي الخدمات",
+        "warmth-pass": "ممر الدفء",
+        "recipient-circle": "دائرة متلقي الرعاية",
+        "nudges": "الوكزات الذكية",
+        "emergency-alerts": "تنبيهات الطوارئ",
+        "surveys": "المسوحات البلدية",
+        "copilot": "مساعد طيار الاتصالات",
+        "civic-digest": "ملخص المدنية",
+        "lead-nurture": "رعاية الرصاص",
+        "success-stories": "قصص النجاح",
+        "feedback": "صندوق الوارد للتعليقات",
+        "verification": "التحقق البلدي",
+        "safeguarding": "تقارير الحماية",
+        "trust-tier": "طبقات الثقة",
+        "launch-readiness": "إطلاق الاستعداد",
+        "pilot-scoreboard": "لوحة نتائج الطيار",
+        "data-quality": "جودة البيانات التجريبية",
+        "operating-policy": "سياسة التشغيل",
+        "disclosure-pack": "حزمة الإفصاح",
+        "commercial-boundary": "الحدود التجارية",
+        "isolated-node": "بوابة العقدة المعزولة",
+        "research": "الشراكات البحثية",
+        "external-integrations": "التكاملات الخارجية",
+        "integration-showcase": "معرض التكامل",
+        "municipal-impact": "تقارير الأثر البلدي",
+        "kpi-baselines": "خطوط الأساس لمؤشرات الأداء الرئيسية",
+        "municipal-roi": "عائد الاستثمار البلدي",
+        "category-coefficients": "معاملات الفئة"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "دليل مقدمي الرعاية - المشرف",
+      "title": "دليل مقدمي الرعاية",
+      "subtitle": "إدارة خدمات الرعاية المنزلية والمراكز النهارية والجمعيات والمجموعات التطوعية",
+      "verified": "تم التحقق منه",
+      "yes": "نعم",
+      "no": "لا",
+      "empty": "لا يوجد مقدمو رعاية حتى الآن - أضف مقدمًا للبدء.",
+      "confirm_delete": "هل تريد حذف \"{{name}}\"؟ سيؤدي هذا إلى إخفائه من الدليل.",
+      "confirm_deactivate": "هل تريد وضع علامة على \"{{name}}\" كغير نشط؟ ويمكنك إعادة تنشيطه لاحقًا.",
+      "actions": {
+        "add_provider": "إضافة موفر",
+        "cancel": "يلغي",
+        "close": "يغلق",
+        "create_provider": "إنشاء موفر",
+        "deactivate_named": "إلغاء تنشيط \"{{name}}\"",
+        "delete_provider": "حذف الموفر",
+        "edit_provider": "تحرير الموفر",
+        "find_duplicates": "البحث عن التكرارات",
+        "save_changes": "حفظ التغييرات",
+        "verify_provider": "التحقق من المزود"
+      },
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "مقدمو الرعاية هم منظمات خارجية تشارك في شبكة الرعاية المجتمعية إلى جانب متطوعين أفراد. ويمكن تعيين طلبات مساعدة لهم، وتلقي دفعات رصيد الوقت، والظهور في دليل الأعضاء.",
+        "verification_label": "تَحَقّق",
+        "verification_body": "يعرض مقدمو الخدمة المعتمدون شارة في الدليل. تحقق من سياسات التسجيل والتأمين والحماية قبل وضع علامة على مقدم الخدمة على أنه تم التحقق منه.",
+        "types_label": "أنواع المزودين",
+        "types_body": "استخدم حقلي النوع والوصف لإظهار الرعاية المقدمة حتى يتمكن الأعضاء والمنسقون من العثور على مقدم الخدمة المناسب لكل طلب."
+      },
+      "duplicates": {
+        "title": "التكرارات المحتملة",
+        "summary": "مقدمو خدمات {{scanned}} النشطون الذين تم فحصهم - أزواج {{total}} أعلى من 65% من التشابه",
+        "scanning": "مسح...",
+        "empty": "لم يتم العثور على التكرارات المحتملة. الدليل يبدو نظيفا.",
+        "vs": "مقابل",
+        "match_percent": "تطابق {{percent}}%"
+      },
+      "errors": {
+        "delete": "فشل في حذف الموفر.",
+        "deactivate": "فشل في إلغاء تنشيط الموفر.",
+        "duplicates": "فشل البحث عن التكرارات.",
+        "load": "فشل تحميل مقدمي الرعاية.",
+        "name_required": "الاسم مطلوب.",
+        "save": "فشل حفظ الموفر.",
+        "type_required": "نوع الموفر مطلوب.",
+        "verify": "فشل التحقق من الموفر."
+      },
+      "fields": {
+        "address": "عنوان",
+        "description": "وصف",
+        "email": "بريد إلكتروني",
+        "name": "اسم",
+        "phone": "هاتف",
+        "status": "حالة",
+        "type": "يكتب",
+        "website": "موقع إلكتروني"
+      },
+      "messages": {
+        "created": "تم إنشاء الموفر بنجاح.",
+        "deactivated": "تم إلغاء تنشيط \"{{name}}\".",
+        "removed": "تمت إزالة الموفر.",
+        "updated": "تم تحديث الموفر بنجاح.",
+        "verified": "تم وضع علامة \"{{name}}\" على أنه تم التحقق منه."
+      },
+      "modal": {
+        "create_title": "إضافة مقدم الرعاية",
+        "edit_title": "تحرير: {{name}}"
+      },
+      "pagination": {
+        "next": "التالي",
+        "previous": "سابق",
+        "summary": "عرض {{from}}-{{to}} لموفري {{total}}"
+      },
+      "placeholders": {
+        "address": "الشارع، المدينة، الرمز البريدي",
+        "description": "وصف مختصر للخدمات المقدمة...",
+        "name": "على سبيل المثال خدمة رعاية المجتمع"
+      },
+      "signals": {
+        "address_overlap": "تداخل العناوين",
+        "email_match": "مباراة البريد الإلكتروني",
+        "name_match": "مطابقة الاسم",
+        "name_similar": "اسم مشابه",
+        "phone_match": "مباراة الهاتف",
+        "website_match": "مباراة الموقع"
+      },
+      "status": {
+        "active": "نشيط",
+        "inactive": "غير نشط"
+      },
+      "table": {
+        "actions": "الإجراءات",
+        "aria": "جدول مقدمي الرعاية",
+        "name": "اسم",
+        "status": "حالة",
+        "type": "يكتب",
+        "verified": "تم التحقق منه"
+      },
+      "types": {
+        "private": "خدمة خاصة",
+        "spitex": "سبيتكس",
+        "tagesstätte": "مركز النهار",
+        "verein": "منظمة",
+        "volunteer": "المجموعة التطوعية"
+      }
+    },
+    "warmth_pass": {
+      "title": "بحث تمرير الدفء",
+      "subtitle": "عرض بيانات اعتماد ثقة المجتمع لأي عضو",
+      "eligible": "صالح",
+      "not_eligible": "غير مؤهل",
+      "verified": "تم التحقق منه",
+      "not_verified": "لم يتم التحقق منها",
+      "loading": "جارٍ تحميل تصريح الأعضاء...",
+      "empty_date": "لم يتم ضبطه",
+      "no_categories": "لا توجد فئات في السجل.",
+      "tier_chip": "{{label}} (المستوى {{tier}})",
+      "about": {
+        "title": "حول هذه الصفحة",
+        "body": "إن Warmth Pass عبارة عن بيانات اعتماد محمولة توضح أن العضو قد وصل إلى مستوى الموثوق به، وتلقى مراجعات النظراء، وأنه مؤهل لتقديم رعاية غير رسمية في الحي. يمكن للمستلمين طلب رؤية Warmth Pass الخاص بالمساعد قبل قبول المساعدة. استخدم هذا البحث للتحقق من بيانات اعتماد العضو عند الطلب، أو لمساعدة عضو غير متأكد من أهليته."
+      },
+      "lookup": {
+        "title": "بحث الأعضاء",
+        "member_id": "معرف العضو",
+        "placeholder": "أدخل معرف العضو الرقمي",
+        "button": "ابحث عن"
+      },
+      "errors": {
+        "no_data": "لم يتم إرجاع أية بيانات لمعرف العضو هذا.",
+        "lookup_failed": "لم يتم العثور على العضو أو حدث خطأ."
+      },
+      "not_eligible_notice": {
+        "title": "العضو لم يصل بعد إلى مستوى \"موثوق\" ولا يحمل بطاقة Warmth Pass.",
+        "body": "لكي يصبحوا مؤهلين، يجب عليهم تسجيل المزيد من ساعات الرعاية والحصول على مراجعة نظير واحدة على الأقل. يمكنهم التحقق من التقدم الذي يحرزونه على صفحة الملف الشخصي للثقة."
+      },
+      "fields": {
+        "help_categories": "فئات المساعدة",
+        "hours_logged": "الساعات المسجلة",
+        "identity_verified": "تم التحقق من الهوية",
+        "member_since": "عضو منذ",
+        "pass_active_since": "تمرير نشط منذ",
+        "reviews_received": "المراجعات المستلمة",
+        "trust_tier": "طبقة الثقة"
       }
     }
   }

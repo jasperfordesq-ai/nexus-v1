@@ -15,9 +15,9 @@ on:
         type: choice
         options:
           - chromium-modern
-          - chromium-civicone
           - firefox-modern
           - mobile-chrome
+          - mobile-safari
           - admin
           - unauthenticated
           - all
@@ -64,11 +64,15 @@ jobs:
             PROJECT="${{ github.event.inputs.project }}"
           fi
           # Skip credential-dependent projects when secrets are not configured.
-          # Without credentials, 200+ tests each time out on login, exhausting
-          # the 30-minute job timeout and making the job fail. When secrets ARE
-          # configured (e.g. in a private fork or workflow_dispatch), tests run normally.
+          # Without credentials, authenticated suites time out on login and
+          # exhaust the 30-minute job timeout. Public unauthenticated checks
+          # can still run without secrets.
+          if [ "$PROJECT" != "unauthenticated" ] && [ "$PROJECT" != "admin" ] && [ -z "$E2E_USER_EMAIL" ]; then
+            echo "::notice::Skipping ${PROJECT} E2E tests - E2E_USER_EMAIL secret not configured in this repo."
+            exit 0
+          fi
           if [ "$PROJECT" = "admin" ] && [ -z "$E2E_ADMIN_EMAIL" ]; then
-            echo "::notice::Skipping admin E2E tests — E2E_ADMIN_EMAIL secret not configured in this repo."
+            echo "::notice::Skipping admin E2E tests - E2E_ADMIN_EMAIL secret not configured in this repo."
             exit 0
           fi
           npx playwright test --project=$PROJECT
@@ -82,7 +86,6 @@ jobs:
             e2e/reports/
             e2e/test-results/
           retention-days: 30
-
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
         if: failure()
@@ -119,51 +122,18 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run E2E tests
-        run: npx playwright test --project=${{ matrix.project }}
+        run: |
+          if [ -z "$E2E_USER_EMAIL" ]; then
+            echo "::notice::Skipping ${{ matrix.project }} E2E tests - E2E_USER_EMAIL secret not configured in this repo."
+            exit 0
+          fi
+          npx playwright test --project=${{ matrix.project }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report-${{ matrix.project }}
-          path: |
-            e2e/reports/
-            e2e/test-results/
-          retention-days: 30
-
-  e2e-theme-comparison:
-    name: Theme Comparison E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Run Modern theme tests
-        run: npx playwright test --project=chromium-modern
-
-      - name: Run CivicOne theme tests
-        run: npx playwright test --project=chromium-civicone
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report-themes
           path: |
             e2e/reports/
             e2e/test-results/

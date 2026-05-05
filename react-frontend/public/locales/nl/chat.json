@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} is vandaag vertrokken",
   "new_conversation_aria": "Start een nieuw gesprek",
   "typing_aria": "AI is aan het typen",
+  "sources_label": "Bronnen",
   "error_label": "Error",
   "input_aria": "Message",
   "input_placeholder": "Vraag me alles... (Druk op Enter om te verzenden, Shift+Enter voor een nieuwe regel)",

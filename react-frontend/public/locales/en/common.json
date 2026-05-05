@@ -1526,6 +1526,55 @@
     "webhook_create_title": "Create a subscription",
     "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
   },
+  "regional_analytics": {
+    "page_title": "Regional Analytics",
+    "contact_subject": "Regional Analytics - Partner enquiry",
+    "privacy_badge": "Privacy-first by design",
+    "hero_title": "Understand your region. Without compromising privacy.",
+    "hero_subtitle": "A paid analytics product for municipalities and SME partners. Bucketed aggregates, suppressed segments below N=10, never any individual data.",
+    "cta_request_access": "Request access",
+    "cta_learn_more": "Learn more",
+    "features_heading": "What's included",
+    "feature_trends_title": "Trends",
+    "feature_trends_body": "Track engagement, member activity, and volunteer hours over time - no individuals, just regional aggregates.",
+    "feature_demand_supply_title": "Demand & Supply",
+    "feature_demand_supply_body": "See where offers and requests cluster by 3-digit postcode and category, with a privacy-bucketed match rate.",
+    "feature_demographics_title": "Demographics",
+    "feature_demographics_body": "Age and gender distribution, suppressed below N=10 - perfect for grant applications and impact reporting.",
+    "feature_footfall_title": "Footfall",
+    "feature_footfall_body": "Anonymised page-view trends across public areas of the platform - measure attention, not identity.",
+    "pricing_heading": "Simple, transparent pricing",
+    "tier_cta": "Request a quote",
+    "privacy_footer": "All metrics are bucketed and anonymised. Segments with N<10 are suppressed. We never expose individual users, names, or addresses to partners.",
+    "tiers": {
+      "basic": {
+        "label": "Basic",
+        "price": "EUR 299 / month",
+        "description": "For small municipalities and community partners.",
+        "feature_1": "Trends + Demographics modules",
+        "feature_2": "Monthly PDF report",
+        "feature_3": "Email support"
+      },
+      "pro": {
+        "label": "Pro",
+        "price": "EUR 799 / month",
+        "description": "For mid-sized municipalities and SME partners with multiple stakeholders.",
+        "feature_1": "All four modules",
+        "feature_2": "Weekly PDF + on-demand reports",
+        "feature_3": "Live partner dashboard",
+        "feature_4": "Priority support"
+      },
+      "enterprise": {
+        "label": "Enterprise",
+        "price": "Custom pricing",
+        "description": "For city governments and federated networks. Custom modules, custom branding, dedicated success manager.",
+        "feature_1": "Custom data feeds & exports",
+        "feature_2": "White-labelled PDFs",
+        "feature_3": "Quarterly review workshops",
+        "feature_4": "Dedicated success manager"
+      }
+    }
+  },
   "provisioning": {
     "meta": {
       "title": "Apply for a Pilot Community",

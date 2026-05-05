@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} rimasti oggi",
   "new_conversation_aria": "Inizia nuova conversazione",
   "typing_aria": "L'IA sta scrivendo",
+  "sources_label": "Fonti",
   "error_label": "Errore",
   "input_aria": "Messaggio",
   "input_placeholder": "Chiedimi qualsiasi cosa... (Invio per inviare, Maiusc+Invio per nuova riga)",

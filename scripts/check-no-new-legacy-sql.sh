@@ -45,10 +45,10 @@ if [[ -n "$NEW_SQL" ]]; then
     echo ""
     echo "Fix: Delete the .sql file and create a Laravel migration instead:"
     echo ""
-    echo "  docker exec nexus-php-app php artisan make:migration describe_your_change"
+    echo "  php artisan make:migration describe_your_change"
     echo ""
     echo "The generated file will appear under database/migrations/."
-    echo "See docs/MIGRATIONS.md for full guidance."
+    echo "See LARAVEL_MIGRATION_PLAN.md for full migration guidance."
     exit 1
 fi
 

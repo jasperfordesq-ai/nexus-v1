@@ -2,13 +2,13 @@
   "page_title": "Feed",
   "title": "Gemeenschapsfeed",
   "subtitle": "Bekijk wat er gebeurt in jouw gemeenschap",
-  "author_unknown": "Unknown",
   "new_post": "Nieuwe Post",
   "whats_on_your_mind": "Wat heb je op je hart?",
   "add_image_aria": "Afbeelding toevoegen",
   "quoted_post_image": "Afbeelding van geciteerd bericht",
   "create_poll_aria": "Peiling maken",
   "create_post": "Post maken",
+  "author_unknown": "Unknown",
   "load_more": "Meer laden",
   "unable_to_load": "Kon feed niet laden",
   "try_again": "Probeer het opnieuw",
@@ -82,6 +82,7 @@
     "post_created": "Bericht aangemaakt!",
     "post_failed": "Bericht aanmaken mislukt.",
     "post_button": "Post",
+    "save_changes": "Save",
     "poll_question_placeholder": "Stel een vraag...",
     "poll_question_required": "Voer een pollvraag in.",
     "poll_min_options": "Voeg minimaal 2 opties toe.",
@@ -99,6 +100,7 @@
     "category_label": "Category",
     "category_placeholder": "Selecteer een categorie",
     "estimated_hours_label": "Geschatte uren",
+    "placeholder_hours": "1",
     "listing_created": "Aanbieding aangemaakt!",
     "listing_failed": "Aanbieding aanmaken mislukt.",
     "create_listing": "Aanbieding aanmaken",
@@ -207,11 +209,12 @@
     "media_upload_error": "Verwerken van afbeeldingen mislukt",
     "sdg_selected_one": "{{count}} doel geselecteerd",
     "sdg_selected_other": "{{count}} doelen geselecteerd",
-    "save_changes": "Save",
-    "placeholder_hours": "1",
     "content_required": "Post content cannot be empty.",
     "content_too_long": "Post is too long (max {{max}} characters).",
     "groups_load_error": "Failed to load groups."
+  },
+  "moderation": {
+    "unauthorized": "You do not have permission to perform this action."
   },
   "card": {
     "edited": "edited",
@@ -238,6 +241,7 @@
     "comment_action": "Comment",
     "write_comment": "Schrijf een reactie...",
     "no_comments": "Nog geen reacties. Wees de eerste om je gedachten te delen!",
+    "scheduled": "Scheduled",
     "edit_post": "Bewerken",
     "not_interested": "Niet geïnteresseerd",
     "admin_delete": "Verwijderen (Admin)",
@@ -281,7 +285,6 @@
     "detail_challenge": "Bekijk Uitdaging",
     "detail_volunteer": "Bekijk Kans",
     "detail_blog": "Lees Artikel",
-    "scheduled": "Scheduled",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -320,6 +323,24 @@
       "level_reached": "Level reached"
     }
   },
+  "poll": {
+    "load_failed": "Failed to load poll data.",
+    "expired": "This poll has ended.",
+    "expiry_past": "Poll expiry date must be in the future.",
+    "min_options_hint": "At least 2 options are required.",
+    "closed": "Closed",
+    "closes_minutes": "Closes in {{minutes}}m",
+    "closes_hours": "Closes in {{hours}}h",
+    "closes_days": "Closes in {{days}}d",
+    "live": "Live",
+    "view_full": "View full poll",
+    "vote_to_see_results": "Vote to see results",
+    "results_hidden_until_close": "Results revealed when poll closes",
+    "your_vote": "Your vote"
+  },
+  "feed": {
+    "end_of_feed": "You're all caught up!"
+  },
   "hashtag": {
     "title": "Hashtag",
     "load_failed": "Mislukt om berichten voor deze hashtag te laden.",
@@ -351,7 +372,11 @@
     "button_label": "Share",
     "button_label_count": "Deel ({{count}})",
     "shared_by": "<0>{{name}}</0> heeft dit gedeeld",
+    "shared_by_text": "shared this",
+    "cannot_share_own_post": "You cannot share your own post",
     "menu_label": "Deelopties",
+    "default_title": "Na",
+    "repost": "Repost",
     "repost_desc": "Deel naar je feed",
     "repost_remove": "Repost verwijderen",
     "repost_remove_desc": "Verwijder repost uit je feed",
@@ -362,6 +387,7 @@
     "quote_content_required": "Voeg alsjeblieft je commentaar toe",
     "quote_posted": "Quote bericht aangemaakt",
     "quote_failed": "Mislukt om quote bericht aan te maken",
+    "quote_submit": "Post",
     "copy_link": "Kopieer link",
     "link_copied": "Link gekopieerd naar klembord",
     "copy_failed": "Mislukt om link te kopiëren",
@@ -375,13 +401,22 @@
     "dm_hint": "Typ minstens 2 tekens om te zoeken",
     "dm_sent": "Bericht gedeeld met {{name}}",
     "dm_failed": "Mislukt om bericht te versturen",
-    "repost": "Repost",
-    "quote_submit": "Post",
     "dm_sent_label": "Sent",
     "dm_send": "Send",
-    "dm_done": "Done",
-    "shared_by_text": "shared this",
-    "cannot_share_own_post": "You cannot share your own post"
+    "dm_done": "Done"
+  },
+  "video": {
+    "select": "Video toevoegen",
+    "too_large": "Video moet kleiner zijn dan {{size}}MB",
+    "invalid_type": "Ongeldig videoformaat. Ondersteund: MP4, WebM, MOV",
+    "remove": "Video verwijderen",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "trending": {
     "title": "Trending",
@@ -503,19 +538,6 @@
     "click_to_remove": "{{label}} (klik om te verwijderen)",
     "react_to_post": "Reageer op deze post"
   },
-  "video": {
-    "select": "Video toevoegen",
-    "too_large": "Video moet kleiner zijn dan {{size}}MB",
-    "invalid_type": "Ongeldig videoformaat. Ondersteund: MP4, WebM, MOV",
-    "remove": "Video verwijderen",
-    "mute": "Mute",
-    "unmute": "Unmute",
-    "pause": "Pause",
-    "play": "Play",
-    "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
-  },
   "why_shown": {
     "label": "Waarom zie ik dit?",
     "title": "Waarom je dit ziet",
@@ -532,18 +554,6 @@
     "active_discussion": "Actieve discussie",
     "frequently_saved": "Vaak opgeslagen door anderen"
   },
-  "analytics": {
-    "title": "Postanalyse",
-    "reactions_breakdown": "Reacties overzicht",
-    "views": "Views",
-    "likes": "Likes",
-    "comments": "Comments",
-    "shares": "Shares",
-    "reach": "Reach",
-    "loading": "Loading analytics...",
-    "load_failed": "Failed to load analytics."
-  },
-  "failed_to_load_analytics": "Failed to load analytics",
   "suggestions": {
     "title": "People You May Know",
     "see_all": "See All",
@@ -555,27 +565,18 @@
     "dismiss": "Dismiss",
     "load_failed": "Failed to load suggestions"
   },
-  "moderation": {
-    "unauthorized": "You do not have permission to perform this action."
+  "analytics": {
+    "title": "Postanalyse",
+    "loading": "Loading analytics...",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach",
+    "reactions_breakdown": "Reacties overzicht",
+    "load_failed": "Failed to load analytics."
   },
-  "poll": {
-    "load_failed": "Failed to load poll data.",
-    "expired": "This poll has ended.",
-    "expiry_past": "Poll expiry date must be in the future.",
-    "min_options_hint": "At least 2 options are required.",
-    "closed": "Closed",
-    "closes_hours": "Closes in {{hours}}h",
-    "closes_days": "Closes in {{days}}d",
-    "closes_minutes": "Closes in {{minutes}}m",
-    "live": "Live",
-    "view_full": "View full poll",
-    "vote_to_see_results": "Vote to see results",
-    "results_hidden_until_close": "Results revealed when poll closes",
-    "your_vote": "Your vote"
-  },
-  "feed": {
-    "end_of_feed": "You're all caught up!"
-  },
+  "failed_to_load_analytics": "Failed to load analytics",
   "you": "You",
   "items_loaded": "{{count}} posts",
   "post_detail": {

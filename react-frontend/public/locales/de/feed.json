@@ -2,13 +2,13 @@
   "page_title": "Feed",
   "title": "Community-Feed",
   "subtitle": "Sehen Sie, was in Ihrer Gemeinschaft passiert",
-  "author_unknown": "Unknown",
   "new_post": "Neuer Beitrag",
   "whats_on_your_mind": "Was beschäftigt Sie?",
   "add_image_aria": "Bild hinzufügen",
   "quoted_post_image": "Zitiertes Beitragsbild",
   "create_poll_aria": "Umfrage erstellen",
   "create_post": "Beitrag erstellen",
+  "author_unknown": "Unknown",
   "load_more": "Mehr laden",
   "unable_to_load": "Feed konnte nicht geladen werden",
   "try_again": "Erneut versuchen",
@@ -82,6 +82,7 @@
     "post_created": "Beitrag erstellt!",
     "post_failed": "Beitrag konnte nicht erstellt werden.",
     "post_button": "Posten",
+    "save_changes": "Speichern",
     "poll_question_placeholder": "Stellen Sie eine Frage...",
     "poll_question_required": "Bitte geben Sie eine Frage für die Umfrage ein.",
     "poll_min_options": "Fügen Sie mindestens 2 Optionen hinzu.",
@@ -99,6 +100,7 @@
     "category_label": "Kategorie",
     "category_placeholder": "Kategorie auswählen",
     "estimated_hours_label": "Geschätzte Stunden",
+    "placeholder_hours": "1",
     "listing_created": "Inserat erstellt!",
     "listing_failed": "Inserat konnte nicht erstellt werden.",
     "create_listing": "Inserat erstellen",
@@ -207,11 +209,12 @@
     "media_upload_error": "Bilder konnten nicht verarbeitet werden",
     "sdg_selected_one": "{{count}} Ziel ausgewählt",
     "sdg_selected_other": "{{count}} Ziele ausgewählt",
-    "save_changes": "Speichern",
-    "placeholder_hours": "1",
     "content_required": "Der Beitragsinhalt darf nicht leer sein.",
     "content_too_long": "Der Beitrag ist zu lang (max. {{max}} Zeichen).",
     "groups_load_error": "Gruppen konnten nicht geladen werden."
+  },
+  "moderation": {
+    "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
   },
   "card": {
     "edited": "bearbeitet",
@@ -238,6 +241,7 @@
     "comment_action": "Kommentieren",
     "write_comment": "Kommentar schreiben...",
     "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!",
+    "scheduled": "Geplant",
     "edit_post": "Beitrag bearbeiten",
     "not_interested": "Nicht interessiert",
     "admin_delete": "Löschen (Admin)",
@@ -281,7 +285,6 @@
     "detail_challenge": "Herausforderung ansehen",
     "detail_volunteer": "Möglichkeit ansehen",
     "detail_blog": "Artikel lesen",
-    "scheduled": "Geplant",
     "edit": "Bearbeiten",
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -320,6 +323,24 @@
       "level_reached": "Stufe erreicht"
     }
   },
+  "poll": {
+    "load_failed": "Umfragedaten konnten nicht geladen werden.",
+    "expired": "Diese Umfrage ist beendet.",
+    "expiry_past": "Das Ablaufdatum der Umfrage muss in der Zukunft liegen.",
+    "min_options_hint": "Es sind mindestens 2 Optionen erforderlich.",
+    "closed": "Geschlossen",
+    "closes_minutes": "Schliesst in {{minutes}} Min.",
+    "closes_hours": "Schliesst in {{hours}} Std.",
+    "closes_days": "Schliesst in {{days}} T.",
+    "live": "Live",
+    "view_full": "Vollständige Umfrage anzeigen",
+    "vote_to_see_results": "Abstimmen, um Ergebnisse zu sehen",
+    "results_hidden_until_close": "Ergebnisse werden bei Schliessung der Umfrage offengelegt",
+    "your_vote": "Ihre Stimme"
+  },
+  "feed": {
+    "end_of_feed": "Sie sind auf dem neuesten Stand!"
+  },
   "hashtag": {
     "title": "Hashtag",
     "load_failed": "Beiträge für diesen Hashtag konnten nicht geladen werden.",
@@ -351,7 +372,11 @@
     "button_label": "Teilen",
     "button_label_count": "Teilen ({{count}})",
     "shared_by": "<0>{{name}}</0> hat dies geteilt",
+    "shared_by_text": "hat dies geteilt",
+    "cannot_share_own_post": "Sie können Ihren eigenen Beitrag nicht teilen",
     "menu_label": "Teilen-Optionen",
+    "default_title": "Post",
+    "repost": "Erneut posten",
     "repost_desc": "In deinem Feed teilen",
     "repost_remove": "Repost entfernen",
     "repost_remove_desc": "Repost aus deinem Feed entfernen",
@@ -362,6 +387,7 @@
     "quote_content_required": "Bitte füge deinen Kommentar hinzu",
     "quote_posted": "Zitierter Beitrag erstellt",
     "quote_failed": "Fehler beim Erstellen des zitierten Beitrags",
+    "quote_submit": "Posten",
     "copy_link": "Link kopieren",
     "link_copied": "Link in die Zwischenablage kopiert",
     "copy_failed": "Fehler beim Kopieren des Links",
@@ -375,13 +401,22 @@
     "dm_hint": "Gib mindestens 2 Zeichen ein, um zu suchen",
     "dm_sent": "Beitrag geteilt mit {{name}}",
     "dm_failed": "Nachricht konnte nicht gesendet werden",
-    "repost": "Erneut posten",
-    "quote_submit": "Posten",
     "dm_sent_label": "Gesendet",
     "dm_send": "Senden",
-    "dm_done": "Fertig",
-    "shared_by_text": "hat dies geteilt",
-    "cannot_share_own_post": "Sie können Ihren eigenen Beitrag nicht teilen"
+    "dm_done": "Fertig"
+  },
+  "video": {
+    "select": "Video hinzufügen",
+    "too_large": "Video muss kleiner als {{size}}MB sein",
+    "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
+    "remove": "Video entfernen",
+    "mute": "Stummschalten",
+    "unmute": "Stummschaltung aufheben",
+    "pause": "Pause",
+    "play": "Play",
+    "aria_label": "Video",
+    "unavailable": "Video unavailable",
+    "unavailable_desc": "This video could not be loaded."
   },
   "trending": {
     "title": "Im Trend",
@@ -503,19 +538,6 @@
     "click_to_remove": "{{label}} (Klicken zum Entfernen)",
     "react_to_post": "Auf diesen Beitrag reagieren"
   },
-  "video": {
-    "select": "Video hinzufügen",
-    "too_large": "Video muss kleiner als {{size}}MB sein",
-    "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
-    "remove": "Video entfernen",
-    "mute": "Stummschalten",
-    "unmute": "Stummschaltung aufheben",
-    "pause": "Pause",
-    "play": "Play",
-    "aria_label": "Video",
-    "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
-  },
   "why_shown": {
     "label": "Warum sehe ich das?",
     "title": "Warum Sie das sehen",
@@ -532,18 +554,6 @@
     "active_discussion": "Aktive Diskussion",
     "frequently_saved": "Häufig von anderen gespeichert"
   },
-  "analytics": {
-    "title": "Beitragsanalyse",
-    "reactions_breakdown": "Reaktionsübersicht",
-    "views": "Aufrufe",
-    "likes": "Gefällt-mir-Angaben",
-    "comments": "Kommentare",
-    "shares": "Geteilt",
-    "reach": "Reichweite",
-    "loading": "Analysen werden geladen...",
-    "load_failed": "Analysen konnten nicht geladen werden."
-  },
-  "failed_to_load_analytics": "Analysen konnten nicht geladen werden",
   "suggestions": {
     "title": "Personen, die Sie kennen könnten",
     "see_all": "Alle anzeigen",
@@ -555,27 +565,18 @@
     "dismiss": "Verwerfen",
     "load_failed": "Vorschläge konnten nicht geladen werden"
   },
-  "moderation": {
-    "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
+  "analytics": {
+    "title": "Beitragsanalyse",
+    "loading": "Analysen werden geladen...",
+    "views": "Aufrufe",
+    "likes": "Gefällt-mir-Angaben",
+    "comments": "Kommentare",
+    "shares": "Geteilt",
+    "reach": "Reichweite",
+    "reactions_breakdown": "Reaktionsübersicht",
+    "load_failed": "Analysen konnten nicht geladen werden."
   },
-  "poll": {
-    "load_failed": "Umfragedaten konnten nicht geladen werden.",
-    "expired": "Diese Umfrage ist beendet.",
-    "expiry_past": "Das Ablaufdatum der Umfrage muss in der Zukunft liegen.",
-    "min_options_hint": "Es sind mindestens 2 Optionen erforderlich.",
-    "closed": "Geschlossen",
-    "closes_hours": "Schliesst in {{hours}} Std.",
-    "closes_days": "Schliesst in {{days}} T.",
-    "closes_minutes": "Schliesst in {{minutes}} Min.",
-    "live": "Live",
-    "view_full": "Vollständige Umfrage anzeigen",
-    "vote_to_see_results": "Abstimmen, um Ergebnisse zu sehen",
-    "results_hidden_until_close": "Ergebnisse werden bei Schliessung der Umfrage offengelegt",
-    "your_vote": "Ihre Stimme"
-  },
-  "feed": {
-    "end_of_feed": "Sie sind auf dem neuesten Stand!"
-  },
+  "failed_to_load_analytics": "Analysen konnten nicht geladen werden",
   "you": "Sie",
   "items_loaded": "{{count}} Beiträge",
   "post_detail": {

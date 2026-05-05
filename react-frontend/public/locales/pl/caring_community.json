@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
     "progress_to_next": "Progress to {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
-    "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care",
     "link_error": "Care receiver could not be linked",
     "search_label": "Find member",
     "search_placeholder": "Search by name",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Optional context for coordinators or trusted substitutes",
     "cancel": "Cancel",
+    "upcoming_care": "Upcoming care",
+    "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
     "no_recent_care": "No recent care logs yet"
-  },
-  "providers": {
-    "title": "Care Provider Directory",
-    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
-    "search_placeholder": "Search providers...",
-    "filter_all": "All",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Day Centres",
-    "filter_private": "Private",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Volunteers",
-    "verified_badge": "Verified",
-    "contact": "Contact",
-    "website": "Website",
-    "opening_hours": "Opening Hours",
-    "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Dismiss",
-    "severity_info": "Information",
-    "severity_warning": "Warning",
-    "severity_danger": "Emergency",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Cover Care",
@@ -134,26 +106,33 @@
       "assign": "Substitute could not be matched"
     }
   },
-  "warmth_pass": {
-    "title": "My Warmth Pass",
-    "credential_label": "Community Warmth Pass",
-    "not_eligible": "Not yet eligible",
-    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
-    "member_name": "Member",
-    "hours_logged": "Hours logged",
-    "reviews_received": "Reviews received",
-    "identity_verified": "Identity verified",
-    "yes": "Yes",
-    "no": "No",
-    "categories": "Areas I help with",
-    "no_categories": "No categories yet",
-    "member_since": "Member since",
-    "active_since": "Pass active since",
-    "issued_by": "Issued by {{tenant}} via Project NEXUS",
-    "what_is_this": "What is a Warmth Pass?",
-    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
-    "loading": "Loading your pass...",
-    "error": "Could not load your Warmth Pass"
+  "providers": {
+    "title": "Care Provider Directory",
+    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
+    "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
+    "filter_all": "All",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Day Centres",
+    "filter_private": "Private",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Volunteers",
+    "verified_badge": "Verified",
+    "contact": "Contact",
+    "website": "Website",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Opening Hours",
+    "no_providers": "No care providers found",
+    "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Przełącz pasek boczny",
+      "back_to_site": "Powrót do serwisu",
+      "notifications": "Powiadomienia",
+      "user_fallback": "Użytkownik",
+      "user_menu": "Menu użytkownika",
+      "my_profile": "Mój profil",
+      "sign_out": "Wyloguj się"
+    },
+    "breadcrumbs": {
+      "aria": "Bułka tarta",
+      "segments": {
+        "caring": "Panel",
+        "workflow": "Przepływ pracy",
+        "projects": "Projektowanie",
+        "loyalty": "Program lojalnościowy",
+        "hour-transfers": "Transfery godzinowe",
+        "regional-points": "Punkty regionalne",
+        "sub-regions": "Podregiony",
+        "federation-peers": "Koledzy Federacji",
+        "sla-dashboard": "Panel SLA",
+        "providers": "Dostawcy",
+        "warmth-pass": "Przepustka Ciepła",
+        "recipient-circle": "Krąg odbiorców opieki",
+        "nudges": "Inteligentne podpowiedzi",
+        "emergency-alerts": "Alerty awaryjne",
+        "surveys": "Ankiety miejskie",
+        "copilot": "Drugi pilot komunikacyjny",
+        "civic-digest": "Przegląd Obywatelski",
+        "lead-nurture": "Pielęgnowanie leadów",
+        "success-stories": "Historie sukcesu",
+        "feedback": "Skrzynka odbiorcza opinii",
+        "verification": "Weryfikacja miejska",
+        "safeguarding": "Raporty zabezpieczające",
+        "trust-tier": "Poziomy zaufania",
+        "launch-readiness": "Gotowość do uruchomienia",
+        "pilot-scoreboard": "Tablica wyników pilota",
+        "data-quality": "Jakość danych pilotażowych",
+        "operating-policy": "Polityka operacyjna",
+        "disclosure-pack": "Pakiet ujawnień",
+        "commercial-boundary": "Granica handlowa",
+        "isolated-node": "Izolowana brama węzła",
+        "research": "Partnerstwa badawcze",
+        "external-integrations": "Integracje zewnętrzne",
+        "integration-showcase": "Pokaz integracji",
+        "municipal-impact": "Miejskie raporty oddziaływania",
+        "kpi-baselines": "Wartości bazowe KPI",
+        "municipal-roi": "Miejski zwrot z inwestycji",
+        "category-coefficients": "Współczynniki kategorii"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Katalog dostawców opieki — administrator",
+      "title": "Katalog dostawców usług opieki",
+      "subtitle": "Zarządzaj usługami opieki domowej, ośrodkami dziennymi, stowarzyszeniami i grupami wolontariuszy",
+      "verified": "Zweryfikowano",
+      "yes": "Tak",
+      "no": "NIE",
+      "empty": "Brak jeszcze dostawców opieki — dodaj jednego, aby rozpocząć.",
+      "confirm_delete": "Usunąć „{{name}}”? Spowoduje to ukrycie go w katalogu.",
+      "confirm_deactivate": "Oznaczyć „{{name}}” jako nieaktywny? Możesz go ponownie aktywować później.",
+      "actions": {
+        "add_provider": "Dodaj dostawcę",
+        "cancel": "Anulować",
+        "close": "Zamknąć",
+        "create_provider": "Utwórz dostawcę",
+        "deactivate_named": "Dezaktywuj „{{name}}”",
+        "delete_provider": "Usuń dostawcę",
+        "edit_provider": "Edytuj dostawcę",
+        "find_duplicates": "Znajdź duplikaty",
+        "save_changes": "Zapisz zmiany",
+        "verify_provider": "Zweryfikuj dostawcę"
+      },
+      "about": {
+        "title": "O tej stronie",
+        "body": "Dostawcy opieki to organizacje zewnętrzne, które wraz z indywidualnymi wolontariuszami uczestniczą w środowiskowej sieci opieki. Można im przypisywać prośby o pomoc, otrzymywać płatności w postaci kredytów czasowych i pojawiać się w katalogu członków.",
+        "verification_label": "Weryfikacja",
+        "verification_body": "Zweryfikowani dostawcy wyświetlają plakietkę w katalogu. Zanim oznaczysz dostawcę jako zweryfikowanego, sprawdź zasady rejestracji, ubezpieczenia i zabezpieczeń.",
+        "types_label": "Typy dostawców",
+        "types_body": "Użyj pól typu i opisu, aby wyświetlić oferowaną opiekę, aby członkowie i koordynatorzy mogli znaleźć odpowiedniego usługodawcę dla każdego żądania."
+      },
+      "duplicates": {
+        "title": "Potencjalne duplikaty",
+        "summary": "Zeskanowani aktywni dostawcy {{scanned}} – pary {{total}} wykazują ponad 65% podobieństwa",
+        "scanning": "Łów...",
+        "empty": "Nie znaleziono prawdopodobnych duplikatów. Katalog wygląda na czysty.",
+        "vs": "vs",
+        "match_percent": "{{percent}}% dopasowania"
+      },
+      "errors": {
+        "delete": "Nie udało się usunąć dostawcy.",
+        "deactivate": "Nie udało się dezaktywować dostawcy.",
+        "duplicates": "Nie udało się przeskanować w poszukiwaniu duplikatów.",
+        "load": "Nie udało się wczytać dostawców opieki.",
+        "name_required": "Imię i nazwisko jest wymagane.",
+        "save": "Nie udało się zapisać dostawcy.",
+        "type_required": "Typ dostawcy jest wymagany.",
+        "verify": "Nie udało się zweryfikować dostawcy."
+      },
+      "fields": {
+        "address": "Adres",
+        "description": "Opis",
+        "email": "E-mail",
+        "name": "Nazwa",
+        "phone": "Telefon",
+        "status": "Status",
+        "type": "Typ",
+        "website": "Strona internetowa"
+      },
+      "messages": {
+        "created": "Dostawca został utworzony pomyślnie.",
+        "deactivated": "„{{name}}” dezaktywowany.",
+        "removed": "Dostawca usunięty.",
+        "updated": "Dostawca został pomyślnie zaktualizowany.",
+        "verified": "„{{name}}” oznaczony jako zweryfikowany."
+      },
+      "modal": {
+        "create_title": "Dodaj dostawcę opieki",
+        "edit_title": "Edycja: {{name}}"
+      },
+      "pagination": {
+        "next": "Następny",
+        "previous": "Poprzedni",
+        "summary": "Wyświetlanie {{from}}-{{to}} dostawców {{total}}"
+      },
+      "placeholders": {
+        "address": "Ulica, miasto, kod pocztowy",
+        "description": "Krótki opis oferowanych usług...",
+        "name": "np. Służba Opieki Społecznej"
+      },
+      "signals": {
+        "address_overlap": "Nakładanie się adresów",
+        "email_match": "Dopasowanie e-mailem",
+        "name_match": "Dopasowanie nazwy",
+        "name_similar": "Imię podobne",
+        "phone_match": "Mecz telefoniczny",
+        "website_match": "Dopasowanie witryny"
+      },
+      "status": {
+        "active": "Aktywny",
+        "inactive": "Nieaktywny"
+      },
+      "table": {
+        "actions": "Działania",
+        "aria": "Tabela dostawców opieki",
+        "name": "Nazwa",
+        "status": "Status",
+        "type": "Typ",
+        "verified": "Zweryfikowano"
+      },
+      "types": {
+        "private": "Usługa prywatna",
+        "spitex": "Spitex",
+        "tagesstätte": "Centrum dzienne",
+        "verein": "Stowarzyszenie",
+        "volunteer": "Grupa Wolontariuszy"
+      }
+    },
+    "warmth_pass": {
+      "title": "Wyszukiwanie przepustki ciepła",
+      "subtitle": "Wyświetl poświadczenia zaufania społeczności dowolnego członka",
+      "eligible": "Odpowiedni",
+      "not_eligible": "Nie kwalifikuje się",
+      "verified": "Zweryfikowano",
+      "not_verified": "Nie zweryfikowano",
+      "loading": "Ładowanie przepustki członkowskiej...",
+      "empty_date": "Nie ustawiono",
+      "no_categories": "Brak zarejestrowanych kategorii.",
+      "tier_chip": "{{label}} (Poziom {{tier}})",
+      "about": {
+        "title": "O tej stronie",
+        "body": "Warmth Pass to przenośne poświadczenie zaufania potwierdzające, że członek osiągnął poziom Zaufany, otrzymał recenzje wzajemne i jest uprawniony do zapewniania nieformalnej opieki sąsiedzkiej. Odbiorcy mogą poprosić o pokazanie Karty Ciepła pomocnika przed przyjęciem pomocy. Użyj tego wyszukiwania, aby na żądanie zweryfikować referencje członka lub pomóc członkowi, który nie jest pewien, czy się kwalifikuje."
+      },
+      "lookup": {
+        "title": "Wyszukiwanie członków",
+        "member_id": "Identyfikator członka",
+        "placeholder": "Wprowadź numeryczny identyfikator członka",
+        "button": "Spojrzeć w górę"
+      },
+      "errors": {
+        "no_data": "Nie zwrócono żadnych danych dla tego identyfikatora członkowskiego.",
+        "lookup_failed": "Nie znaleziono członka lub wystąpił błąd."
+      },
+      "not_eligible_notice": {
+        "title": "Członek nie ma jeszcze poziomu Zaufany i nie posiada Karnetu Ciepła.",
+        "body": "Aby się zakwalifikować, muszą przepracować więcej godzin opieki i otrzymać co najmniej jedną ocenę partnerską. Mogą sprawdzić własne postępy na stronie profilu Trust."
+      },
+      "fields": {
+        "help_categories": "Kategorie pomocy",
+        "hours_logged": "Zarejestrowane godziny",
+        "identity_verified": "Tożsamość zweryfikowana",
+        "member_since": "Członek od",
+        "pass_active_since": "Pass aktywny od",
+        "reviews_received": "Otrzymane recenzje",
+        "trust_tier": "Poziom zaufania"
       }
     }
   }

@@ -126,8 +126,8 @@ return new class extends Migration
         }
 
         $this->safeStatement(
-            'UPDATE caring_cover_requests cr LEFT JOIN caring_support_relationships sr ON sr.id = cr.support_relationship_id SET cr.support_relationship_id = NULL WHERE cr.support_relationship_id IS NOT NULL AND sr.id IS NULL',
-            'Could not clear orphaned caring_cover_requests.support_relationship_id values',
+            'UPDATE caring_cover_requests cr LEFT JOIN caring_support_relationships sr ON sr.id = cr.support_relationship_id AND sr.tenant_id = cr.tenant_id SET cr.support_relationship_id = NULL WHERE cr.support_relationship_id IS NOT NULL AND sr.id IS NULL',
+            'Could not clear orphaned or cross-tenant caring_cover_requests.support_relationship_id values',
         );
 
         $this->safeStatement(

@@ -1,10 +1,14 @@
 {
+  "back": "Indietro",
+  "hours_short": "NEXUSPLACEholder0TOKENh",
+  "error_title": "Qualcosa è andato storto",
   "nav": {
     "dashboard": "Dashboard",
     "feed": "Feed",
     "listings": "Annunci",
     "messages": "Messaggi",
     "community": "Comunità",
+    "caring_community": "Caring Community",
     "members": "Membri",
     "events": "Eventi",
     "groups": "Gruppi",
@@ -19,6 +23,7 @@
     "goals": "Obiettivi",
     "more": "Altro",
     "activity": "Attività",
+    "saved": "Saved",
     "federation": "Federazione",
     "federation_hub": "Hub Federazione",
     "partner_communities": "Comunità Partner",
@@ -49,11 +54,16 @@
     "unread_notifications": "{{count}} notifiche non lette",
     "timebanking": "Banca del tempo",
     "explore": "Esplora",
-    "saved": "Saved",
     "marketplace": "Marketplace",
-    "verify_identity": "Verify Your Identity",
-    "caring_community": "Caring Community",
-    "premium": "Premium"
+    "premium": "Premium",
+    "verify_identity": "Verify Your Identity"
+  },
+  "landing_links": {
+    "title": "Explore this community",
+    "aria_label": "Explore community sections"
+  },
+  "location": {
+    "powered_by_google": "Powered by Google"
   },
   "nav_desc": {
     "feed": "Feed della comunità",
@@ -62,6 +72,7 @@
     "connections": "Le tue connessioni e richieste",
     "events": "Prossimi eventi della comunità",
     "groups": "Unisciti a gruppi di interesse",
+    "caring_community": "Time banking, care support, organisations, and impact",
     "blog": "Articoli e notizie della comunità",
     "volunteering": "Opportunità di volontariato",
     "organisations": "Organizzazioni locali",
@@ -100,7 +111,6 @@
     "timebanking_listings": "Offerte e richieste",
     "messages": "I tuoi messaggi",
     "marketplace": "Compra e vendi nella tua comunità",
-    "caring_community": "Time banking, care support, organisations, and impact",
     "premium": "Premium membership tiers"
   },
   "user_menu": {
@@ -249,11 +259,20 @@
   "members": {
     "title": "Membri",
     "subtitle": "Connettiti con i membri della comunità",
+    "quick_filters": "Member filters",
     "all": "Tutti i Membri",
     "new": "Nuovi Membri",
     "active": "Più Attivi",
     "showing": "Visualizzando {{shown}} di {{total}} membri",
     "search_placeholder": "Cerca membri...",
+    "near_me": "Near me",
+    "near_me_no_location": "Set your location in your profile to use Near me",
+    "applied_filters": "Active filters",
+    "search_filter": "Search: {{query}}",
+    "nearby_filter": "Within {{radius}} km",
+    "clear_search": "Clear search",
+    "radius_label": "Radius",
+    "sort_communityrank": "Community Rank",
     "sort_name": "Nome",
     "sort_newest": "Più recenti",
     "sort_rated": "Meglio valutati",
@@ -266,33 +285,24 @@
     "no_members_community": "Nessun membro in questa comunità ancora",
     "load_more": "Carica altro",
     "results_matching": "{{shown}} di {{total}} membri che corrispondono a \"{{query}}\"",
+    "results_count": "{{count}} members shown",
     "no_location": "Nessun membro con dati di posizione",
     "fallback_name": "Membro",
-    "load_failed": "Impossibile caricare i membri",
-    "load_more_failed": "Impossibile caricare altri membri",
-    "near_me": "Near me",
-    "near_me_no_location": "Set your location in your profile to use Near me",
-    "radius_label": "Radius",
-    "sort_communityrank": "Community Rank",
     "avatar_alt": "{{name}} avatar",
+    "profile_aria": "View {{name}}'s profile",
+    "distance_km": "{{distance}} km",
+    "location_distance": "{{location}} · {{distance}}",
     "joined_date": "Joined {{date}}",
     "showcased_badges": "Showcased badges",
     "verified_member": "Verified member",
     "community_rank_score_tooltip": "CommunityRank score",
     "rating_aria": "Rating: {{rating}} out of 5",
     "hours_exchanged_aria": "{{count}} hours exchanged",
+    "hours_short": "{{count}}h",
+    "load_failed": "Impossibile caricare i membri",
+    "load_more_failed": "Impossibile caricare altri membri",
     "my_profile": "Il mio profilo",
-    "load_more_count": "Carica altro ({{remaining}} rimanenti)",
-    "quick_filters": "Member filters",
-    "applied_filters": "Active filters",
-    "search_filter": "Search: {{query}}",
-    "nearby_filter": "Within {{radius}} km",
-    "clear_search": "Clear search",
-    "results_count": "{{count}} members shown",
-    "profile_aria": "View {{name}}'s profile",
-    "distance_km": "{{distance}} km",
-    "location_distance": "{{location}} · {{distance}}",
-    "hours_short": "{{count}}h"
+    "load_more_count": "Carica altro ({{remaining}} rimanenti)"
   },
   "update_banner": {
     "message": "È disponibile una nuova versione.",
@@ -320,6 +330,371 @@
     "offer_time": "Offer Time",
     "offer_time_desc": "Open the care hub"
   },
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Coordinate time banking, volunteering, organisations, trusted support, and local impact."
+    },
+    "badge": "Integrated module",
+    "title": "Caring Community",
+    "subtitle": "Bring time-bank exchange, verified volunteering, trusted organisations, groups, events, resources, and impact signals into one coordinated care workflow.",
+    "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger.",
+    "actions": {
+      "request_help": "Request help",
+      "request_help_sub": "Ask your community for practical support",
+      "offer_favour": "Offer a Favour",
+      "offer_favour_sub": "Record an informal act of kindness — no credits needed",
+      "offer_time": "Offer time",
+      "offer_time_sub": "List a service or skill you can share",
+      "log_hours": "Log hours",
+      "log_hours_sub": "Record volunteering time for approval",
+      "coordinate_org": "Coordinate organisation",
+      "coordinate_org_sub": "Manage your volunteering organisations",
+      "my_relationships": "My Support Relationships",
+      "my_relationships_sub": "View your ongoing support connections",
+      "markt": "Marktplatz",
+      "markt_sub": "Browse local services, goods and time-credit offers.",
+      "loyalty_history": "My Time Credit Redemptions",
+      "loyalty_history_sub": "See how you've used your earned hours at local merchants.",
+      "future_care_fund": "Future Care Fund",
+      "future_care_fund_sub": "See your banked hours as future-care insurance.",
+      "cover_care": "Accompagnamento sostitutivo",
+      "cover_care_sub": "Organizza un accompagnamento sostitutivo di fiducia quando un familiare assistente ha bisogno di un sostegno.",
+      "hour_gift": "Gift Hours",
+      "hour_gift_sub": "Give your banked hours to family or friends.",
+      "hour_transfer": "Transfer Hours",
+      "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
+      "safeguarding_report": "Report a Concern",
+      "safeguarding_report_sub": "Report safeguarding concerns confidentially.",
+      "projects": "Progetti della comunità",
+      "projects_sub": "Segui gli aggiornamenti progressivi del comune e del quartiere."
+    },
+    "operating_model": {
+      "title": "Operating model",
+      "subtitle": "Designed for KISS-style reciprocal support",
+      "trusted_requests": {
+        "title": "Trusted requests",
+        "description": "Members can ask for practical support through time-bank listings and coordinator-led volunteering."
+      },
+      "verified_hours": {
+        "title": "Verified hours",
+        "description": "Support activity can flow through approvals, logs, reviews, and time-credit balances."
+      },
+      "municipal_value": {
+        "title": "Municipal value",
+        "description": "The module prepares the surface for canton, municipality, and cooperative impact reporting."
+      }
+    },
+    "modules": {
+      "title": "Connected capabilities",
+      "subtitle": "The hub is only visible when the Caring Community switch is enabled.",
+      "open": "Open",
+      "timebank": {
+        "title": "Time bank",
+        "description": "Coordinate offers, requests, reciprocity, and time-credit exchange."
+      },
+      "volunteering": {
+        "title": "Volunteering",
+        "description": "Manage opportunities, applications, shifts, verification, and support hours."
+      },
+      "organisations": {
+        "title": "Organisations",
+        "description": "Bring cooperatives, local partners, and service providers into the care network."
+      },
+      "events": {
+        "title": "Events",
+        "description": "Run conferences, neighborhood cafes, trainings, and community sessions."
+      },
+      "groups": {
+        "title": "Groups",
+        "description": "Support neighborhood circles, canton pilots, and working groups."
+      },
+      "resources": {
+        "title": "Resources",
+        "description": "Share guides, privacy documents, playbooks, and onboarding material."
+      },
+      "goals": {
+        "title": "Goals",
+        "description": "Track personal, community, and municipal support targets."
+      },
+      "federation": {
+        "title": "Federation",
+        "description": "Connect regional nodes, cooperatives, and partner communities."
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Keep member, coordinator, and organisation communication close to the work."
+      },
+      "trust": {
+        "title": "Trust and verification",
+        "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
+      },
+      "clubs": {
+        "title": "Clubs & Associations",
+        "description": "Connect Verein-style associations, clubs, and member groups with the care network."
+      },
+      "markt": "Marktplatz",
+      "projects": {
+        "title": "Community projects",
+        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
+      }
+    },
+    "onboarding": {
+      "title": "What brings you here today?",
+      "intro": "Choose the path that best fits you. You can change this later.",
+      "choice_recipient": "I need support",
+      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
+      "choice_helper": "I want to help",
+      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
+      "choice_browse": "I want to browse",
+      "choice_browse_desc": "Show the full caring community hub.",
+      "show_all": "Show all actions",
+      "show_recommended": "Show recommended",
+      "change_answer": "Change answer"
+    }
+  },
+  "request_help": {
+    "meta": {
+      "title": "Request Help",
+      "description": "Ask your community for support"
+    },
+    "subtitle": "Your neighbours care. Tell us what you need and we'll do our best to help.",
+    "form": {
+      "what_label": "What kind of help do you need?",
+      "what_placeholder": "e.g. Help with grocery shopping, a lift to a medical appointment, company for a walk...",
+      "when_label": "When do you need it?",
+      "when_placeholder": "e.g. Tuesday afternoons, as soon as possible...",
+      "contact_label": "How should we contact you?",
+      "contact_phone": "By phone",
+      "contact_message": "By message",
+      "contact_either": "Either is fine",
+      "submit": "Request Help",
+      "submitting": "Sending request...",
+      "what_too_long": "Per favore mantieni la tua richiesta sotto i 500 caratteri."
+    },
+    "success": {
+      "title": "Request Received",
+      "body": "Your request has been received. A coordinator will be in touch soon.",
+      "back": "Back to Community Hub"
+    },
+    "errors": {
+      "submit_failed": "Could not submit your request. Please try again.",
+      "voice_unsupported": "La registrazione vocale non è supportata da questo browser.",
+      "voice_permission_denied": "L'autorizzazione al microfono è stata negata.",
+      "voice_failed": "Non siamo riusciti a comprendere la tua registrazione. Riprova o compila il modulo."
+    },
+    "voice": {
+      "start": "Tocca per dettare la tua richiesta",
+      "stop": "Termina registrazione",
+      "recording": "Registrazione... {{seconds}} s",
+      "processing": "In ascolto...",
+      "filled_hint": "Abbiamo compilato il modulo a partire dalla tua registrazione. Controlla prima di inviare.",
+      "transcript_label": "Ciò che abbiamo sentito"
+    },
+    "back": "Back to Community Hub"
+  },
+  "hour_gift": {
+    "meta": {
+      "title": "Gift Hours",
+      "description": "Gift your banked hours to another community member"
+    },
+    "title": "Gift Your Hours",
+    "subtitle": "Banked hours can be gifted to family, friends, or anyone who needs them.",
+    "tabs": {
+      "send": "Send",
+      "inbox": "Inbox",
+      "sent": "Sent"
+    },
+    "send": {
+      "recipient_label": "Who would you like to gift hours to?",
+      "recipient_placeholder": "Search by name...",
+      "hours_label": "How many hours?",
+      "hours_balance_helper": "You have {{balance}} hours available",
+      "message_label": "Add a personal message (optional)",
+      "message_placeholder": "Why you're gifting these hours...",
+      "submit": "Gift Hours",
+      "confirm_title": "Gift {{hours}} hours to {{name}}?",
+      "confirm_body": "Your hours will be debited now and credited to them once they accept.",
+      "confirm_button": "Yes, gift hours",
+      "cancel": "Cancel"
+    },
+    "inbox": {
+      "empty": "No gifts to accept right now.",
+      "from": "From {{name}}",
+      "received_at": "Received {{date}}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "decline_reason_label": "Reason for declining (optional)",
+      "decline_button": "Decline gift"
+    },
+    "sent": {
+      "empty": "You haven't sent any gifts yet.",
+      "to": "To {{name}}",
+      "status": {
+        "pending": "Awaiting acceptance",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "reverted": "Withdrawn"
+      },
+      "revert": "Withdraw gift"
+    },
+    "success": {
+      "sent": "Gift sent. {{name}} will be notified.",
+      "accepted": "Gift accepted. The hours are now in your wallet.",
+      "declined": "Gift declined. Hours returned to the sender."
+    },
+    "errors": {
+      "insufficient_balance": "Not enough hours in your wallet.",
+      "send_failed": "Could not send the gift. Please try again."
+    },
+    "back": "Back to Community Hub"
+  },
+  "inter_gen": {
+    "badge": "Intergenerational",
+    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+  },
+  "hour_transfer": {
+    "meta": {
+      "title": "Transfer Banked Hours",
+      "description": "Move your banked hours to another KISS cooperative"
+    },
+    "title": "Transfer Your Banked Hours",
+    "subtitle": "Moving to another community? Your banked hours go with you.",
+    "success_message": "Transfer request submitted. A coordinator will review it before hours move.",
+    "form": {
+      "destination_label": "Destination cooperative",
+      "destination_placeholder": "e.g. zug-kiss",
+      "destination_help": "The slug of the destination KISS cooperative or tenant",
+      "hours_label": "Hours to transfer",
+      "hours_placeholder": "e.g. 25.5",
+      "reason_label": "Reason (optional)",
+      "reason_placeholder": "e.g. Moved house from Cham to Zug",
+      "submit": "Request Transfer",
+      "submitting": "Requesting..."
+    },
+    "history": {
+      "title": "Your transfer history",
+      "date": "Date",
+      "destination": "Destination",
+      "hours": "Hours",
+      "status": "Status",
+      "reason": "Reason",
+      "empty": "No transfers yet."
+    },
+    "status": {
+      "pending": "Awaiting approval",
+      "approved_by_source": "Approved",
+      "sent": "Sent",
+      "received": "Received",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "disclaimer": "Hours will be debited from your wallet here when an admin approves. They will appear in your wallet at the destination cooperative once received.",
+    "back": "Back to Community Hub",
+    "errors": {
+      "submit_failed": "Could not request the transfer. Please try again.",
+      "destination_not_found": "We couldn't find that destination cooperative.",
+      "no_matching_email": "Your email is not registered at the destination cooperative — register there first.",
+      "insufficient_hours": "You don't have enough banked hours."
+    }
+  },
+  "my_support_relationships": {
+    "meta": {
+      "title": "My Support Relationships",
+      "description": "View your ongoing support relationships"
+    },
+    "subtitle": "Your support connections — the people you help and those who help you.",
+    "loading": "Getting your information...",
+    "empty": {
+      "title": "No Support Relationships",
+      "body": "You have no active support relationships."
+    },
+    "role": {
+      "supporter": "Supporter",
+      "recipient": "Recipient"
+    },
+    "frequency": {
+      "weekly": "Weekly",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "ad_hoc": "Ad Hoc"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "log_status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
+    },
+    "next_check_in": "Next check-in",
+    "overdue": "Overdue",
+    "expected_hours": "{{hours}}h expected",
+    "hours_short": "{{hours}}h",
+    "recent_logs": "Recent hours logged",
+    "no_recent_logs": "No hours logged yet",
+    "back": "Back to Community Hub",
+    "errors": {
+      "load_failed": "Could not load your support relationships."
+    }
+  },
+  "future_care_fund": {
+    "meta": {
+      "title": "Your Future Care Fund",
+      "description": "Hours you've banked for future care"
+    },
+    "title": "Your Future Care Fund",
+    "subhead": "Worth approximately CHF {{value}} — care you can call on when you need it",
+    "intro": "These are not just hours. They are the care you've banked in your community — to be drawn on for grocery runs, doctor visits, or simply company, whenever you need it.",
+    "hours_short": "hours",
+    "stats": {
+      "lifetime_given": "Lifetime Given",
+      "lifetime_received": "Lifetime Received",
+      "active_months": "Active Months",
+      "this_month_given": "This Month Given",
+      "this_month_received": "This Month Received",
+      "partner_orgs": "Partner Organisations Helped"
+    },
+    "reciprocity": {
+      "title": "Your Balance",
+      "given_label": "Given",
+      "received_label": "Received",
+      "strong_giver": "You've given far more than you've received — your future fund is strong.",
+      "balanced": "Your balance is healthy.",
+      "strong_receiver": "You've received generously — when ready, give back to your community."
+    },
+    "by_year": {
+      "title": "Year by year",
+      "given": "Given",
+      "received": "Received"
+    },
+    "how_it_works": {
+      "title": "How your future care fund works",
+      "step1": "Help your neighbours and earn hours",
+      "step2": "Hours are banked safely in your community fund",
+      "step3": "When you need help, redeem hours from your fund",
+      "cta_offer": "Offer help now",
+      "cta_browse": "Browse what's needed",
+      "cta_relationships": "See my support relationships"
+    },
+    "first_contribution": "First contribution: {{date}}",
+    "back": "Back to Community Hub",
+    "loading": "Calculating your fund...",
+    "errors": {
+      "load_failed": "Could not load your future care fund."
+    }
+  },
+  "reciprocity": {
+    "title": "Your Reciprocal Balance",
+    "given": "You've given {{hours}} hours",
+    "received": "You've received {{hours}} hours",
+    "net_positive": "Net: +{{hours}} hours banked",
+    "net_negative": "Net: {{hours}} hours used",
+    "view_fund": "View your Future Care Fund"
+  },
   "gif": {
     "search_placeholder": "Cerca GIF...",
     "trending": "Di tendenza",
@@ -330,6 +705,7 @@
     "preview_alt": "Anteprima GIF"
   },
   "loading": "Caricamento...",
+  "go_back": "Go back",
   "feature_error": {
     "load_failed": "Non è stato possibile caricare {{feature}}. Questa sezione potrebbe essere temporaneamente non disponibile."
   },
@@ -423,10 +799,10 @@
   "hours_display_one": "{{count}} ora",
   "hours_display_other": "{{count}} ore",
   "compose": {
-    "aria_insert_link": "Inserisci link",
-    "aria_remove_link": "Rimuovi link",
     "placeholder_url": "https://example.com",
-    "placeholder_hours": "1"
+    "placeholder_hours": "1",
+    "aria_insert_link": "Inserisci link",
+    "aria_remove_link": "Rimuovi link"
   },
   "toast": {
     "aria_notifications": "Notifiche",
@@ -438,232 +814,61 @@
   "verification": {
     "not_id_verified": "Non verificato ID"
   },
-  "page_meta": {
-    "skills_browse": {
-      "title": "Esplora Competenze"
-    },
-    "members": {
-      "description": "Esplora i membri della comunità, connettiti e scambia crediti di tempo.",
-      "title": "Members"
-    }
-  },
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
-  "go_back": "Go back",
+  "page_meta": {
+    "skills_browse": {
+      "title": "Esplora Competenze"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Esplora i membri della comunità, connettiti e scambia crediti di tempo."
+    }
+  },
   "checking_authentication": "Checking authentication...",
   "verification_status": "Verification Status",
   "verify_identity": "Verify Identity",
   "level_short": "Lv. {{level}}",
   "cancel": "Cancel",
   "save": "Save",
-  "caring_community": {
+  "offer_favour": {
     "meta": {
-      "title": "Caring Community",
-      "description": "Coordinate time banking, volunteering, organisations, trusted support, and local impact."
+      "title": "Offer a Favour",
+      "description": "Record an informal act of neighbourly help"
     },
-    "badge": "Integrated module",
-    "title": "Caring Community",
-    "subtitle": "Bring time-bank exchange, verified volunteering, trusted organisations, groups, events, resources, and impact signals into one coordinated care workflow.",
-    "actions": {
-      "request_help": "Request help",
-      "offer_time": "Offer time",
-      "log_hours": "Log hours",
-      "coordinate_org": "Coordinate organisation",
-      "my_relationships": "My Support Relationships",
-      "request_help_sub": "Ask your community for practical support",
-      "offer_favour": "Offer a Favour",
-      "offer_favour_sub": "Record an informal act of kindness — no credits needed",
-      "offer_time_sub": "List a service or skill you can share",
-      "log_hours_sub": "Record volunteering time for approval",
-      "coordinate_org_sub": "Manage your volunteering organisations",
-      "my_relationships_sub": "View your ongoing support connections",
-      "markt": "Marktplatz",
-      "markt_sub": "Browse local services, goods and time-credit offers.",
-      "loyalty_history": "My Time Credit Redemptions",
-      "loyalty_history_sub": "See how you've used your earned hours at local merchants.",
-      "future_care_fund": "Future Care Fund",
-      "future_care_fund_sub": "See your banked hours as future-care insurance.",
-      "hour_gift": "Gift Hours",
-      "hour_gift_sub": "Give your banked hours to family or friends.",
-      "hour_transfer": "Transfer Hours",
-      "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
-      "safeguarding_report": "Report a Concern",
-      "safeguarding_report_sub": "Report safeguarding concerns confidentially.",
-      "cover_care": "Accompagnamento sostitutivo",
-      "cover_care_sub": "Organizza un accompagnamento sostitutivo di fiducia quando un familiare assistente ha bisogno di un sostegno.",
-      "projects": "Progetti della comunità",
-      "projects_sub": "Segui gli aggiornamenti progressivi del comune e del quartiere."
-    },
-    "operating_model": {
-      "title": "Operating model",
-      "subtitle": "Designed for KISS-style reciprocal support",
-      "trusted_requests": {
-        "title": "Trusted requests",
-        "description": "Members can ask for practical support through time-bank listings and coordinator-led volunteering."
-      },
-      "verified_hours": {
-        "title": "Verified hours",
-        "description": "Support activity can flow through approvals, logs, reviews, and time-credit balances."
-      },
-      "municipal_value": {
-        "title": "Municipal value",
-        "description": "The module prepares the surface for canton, municipality, and cooperative impact reporting."
-      }
-    },
-    "modules": {
-      "title": "Connected capabilities",
-      "subtitle": "The hub is only visible when the Caring Community switch is enabled.",
-      "open": "Open",
-      "timebank": {
-        "title": "Time bank",
-        "description": "Coordinate offers, requests, reciprocity, and time-credit exchange."
-      },
-      "volunteering": {
-        "title": "Volunteering",
-        "description": "Manage opportunities, applications, shifts, verification, and support hours."
-      },
-      "organisations": {
-        "title": "Organisations",
-        "description": "Bring cooperatives, local partners, and service providers into the care network."
-      },
-      "events": {
-        "title": "Events",
-        "description": "Run conferences, neighborhood cafes, trainings, and community sessions."
-      },
-      "groups": {
-        "title": "Groups",
-        "description": "Support neighborhood circles, canton pilots, and working groups."
-      },
-      "resources": {
-        "title": "Resources",
-        "description": "Share guides, privacy documents, playbooks, and onboarding material."
-      },
-      "goals": {
-        "title": "Goals",
-        "description": "Track personal, community, and municipal support targets."
-      },
-      "federation": {
-        "title": "Federation",
-        "description": "Connect regional nodes, cooperatives, and partner communities."
-      },
-      "messages": {
-        "title": "Messages",
-        "description": "Keep member, coordinator, and organisation communication close to the work."
-      },
-      "trust": {
-        "title": "Trust and verification",
-        "description": "Use identity, reviews, and compliance signals to support sensitive care workflows."
-      },
-      "clubs": {
-        "title": "Clubs & Associations",
-        "description": "Connect Verein-style associations, clubs, and member groups with the care network."
-      },
-      "markt": "Marktplatz",
-      "projects": {
-        "title": "Community projects",
-        "description": "Follow municipality works, cooperative milestones, and neighbourhood initiatives."
-      }
-    },
-    "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger.",
-    "onboarding": {
-      "title": "What brings you here today?",
-      "intro": "Choose the path that best fits you. You can change this later.",
-      "choice_recipient": "I need support",
-      "choice_recipient_desc": "Prioritise requests, support relationships, and future care options.",
-      "choice_helper": "I want to help",
-      "choice_helper_desc": "Prioritise offers, volunteering, and cover-care actions.",
-      "choice_browse": "I want to browse",
-      "choice_browse_desc": "Show the full caring community hub.",
-      "show_all": "Show all actions",
-      "show_recommended": "Show recommended",
-      "change_answer": "Change answer"
-    }
-  },
-  "my_support_relationships": {
-    "meta": {
-      "title": "My Support Relationships",
-      "description": "View your ongoing support relationships"
-    },
-    "empty": {
-      "title": "No Support Relationships",
-      "body": "You have no active support relationships."
-    },
-    "role": {
-      "supporter": "Supporter",
-      "recipient": "Recipient"
-    },
-    "frequency": {
-      "weekly": "Weekly",
-      "fortnightly": "Fortnightly",
-      "monthly": "Monthly",
-      "ad_hoc": "Ad Hoc"
-    },
-    "status": {
-      "active": "Active",
-      "paused": "Paused",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
-    "next_check_in": "Next check-in",
-    "overdue": "Overdue",
-    "expected_hours": "{{hours}}h expected",
-    "recent_logs": "Recent hours logged",
-    "no_recent_logs": "No hours logged yet",
-    "back": "Back to Community Hub",
-    "errors": {
-      "load_failed": "Could not load your support relationships."
-    },
-    "subtitle": "Your support connections — the people you help and those who help you.",
-    "loading": "Getting your information...",
-    "log_status": {
-      "approved": "Approved",
-      "pending": "Pending",
-      "declined": "Declined"
-    },
-    "hours_short": "{{hours}}h"
-  },
-  "request_help": {
-    "meta": {
-      "title": "Request Help",
-      "description": "Ask your community for support"
-    },
+    "subtitle": "No time credits needed — just record an act of kindness for your community.",
     "form": {
-      "what_label": "What kind of help do you need?",
-      "what_placeholder": "e.g. Help with grocery shopping, a lift to a medical appointment, company for a walk...",
-      "when_label": "When do you need it?",
-      "when_placeholder": "e.g. Tuesday afternoons, as soon as possible...",
-      "contact_label": "How should we contact you?",
-      "contact_phone": "By phone",
-      "contact_message": "By message",
-      "contact_either": "Either is fine",
-      "submit": "Request Help",
-      "submitting": "Sending request...",
-      "what_too_long": "Per favore mantieni la tua richiesta sotto i 500 caratteri."
+      "what_label": "What did you do to help?",
+      "what_placeholder": "e.g. Helped carry shopping, gave a lift, shared a meal...",
+      "category_label": "Category",
+      "categories": {
+        "companionship": "Companionship",
+        "shopping": "Shopping & Errands",
+        "transport": "Transport",
+        "home_help": "Home Help",
+        "gardening": "Gardening",
+        "meals": "Meals",
+        "other": "Other"
+      },
+      "recipient_label": "Who did you help? (optional)",
+      "recipient_placeholder": "Name, or leave blank to keep anonymous",
+      "date_label": "When?",
+      "what_too_long": "Please keep your favour under 500 characters.",
+      "submit": "Record Favour",
+      "submitting": "Recording..."
     },
     "success": {
-      "title": "Request Received",
-      "body": "Your request has been received. A coordinator will be in touch soon.",
+      "title": "Thank You!",
+      "body": "Every act of kindness strengthens your community. Your favour has been recorded.",
       "back": "Back to Community Hub"
     },
     "errors": {
-      "submit_failed": "Could not submit your request. Please try again.",
-      "voice_unsupported": "La registrazione vocale non è supportata da questo browser.",
-      "voice_permission_denied": "L'autorizzazione al microfono è stata negata.",
-      "voice_failed": "Non siamo riusciti a comprendere la tua registrazione. Riprova o compila il modulo."
+      "submit_failed": "Could not record your favour. Please try again."
     },
-    "back": "Back to Community Hub",
-    "subtitle": "Your neighbours care. Tell us what you need and we'll do our best to help.",
-    "voice": {
-      "start": "Tocca per dettare la tua richiesta",
-      "stop": "Termina registrazione",
-      "recording": "Registrazione... {{seconds}} s",
-      "processing": "In ascolto...",
-      "filled_hint": "Abbiamo compilato il modulo a partire dalla tua registrazione. Controlla prima di inviare.",
-      "transcript_label": "Ciò che abbiamo sentito"
-    }
+    "back": "Back to Community Hub"
   },
   "invite": {
     "valid": {
@@ -710,10 +915,10 @@
     },
     "marketplace_unavailable": "The local marketplace is not enabled for this community.",
     "load_more": "Load more",
+    "retry": "Try again",
     "errors": {
       "load_failed": "Could not load the Marktplatz. Please try again."
-    },
-    "retry": "Try again"
+    }
   },
   "proximity": {
     "label": "Near me",
@@ -727,41 +932,14 @@
     },
     "clear": "Clear location"
   },
-  "offer_favour": {
-    "meta": {
-      "title": "Offer a Favour",
-      "description": "Record an informal act of neighbourly help"
-    },
-    "subtitle": "No time credits needed — just record an act of kindness for your community.",
-    "form": {
-      "what_label": "What did you do to help?",
-      "what_placeholder": "e.g. Helped carry shopping, gave a lift, shared a meal...",
-      "category_label": "Category",
-      "categories": {
-        "companionship": "Companionship",
-        "shopping": "Shopping & Errands",
-        "transport": "Transport",
-        "home_help": "Home Help",
-        "gardening": "Gardening",
-        "meals": "Meals",
-        "other": "Other"
-      },
-      "recipient_label": "Who did you help? (optional)",
-      "recipient_placeholder": "Name, or leave blank to keep anonymous",
-      "date_label": "When?",
-      "submit": "Record Favour",
-      "submitting": "Recording...",
-      "what_too_long": "Please keep your favour under 500 characters."
-    },
-    "success": {
-      "title": "Thank You!",
-      "body": "Every act of kindness strengthens your community. Your favour has been recorded.",
-      "back": "Back to Community Hub"
-    },
-    "errors": {
-      "submit_failed": "Could not record your favour. Please try again."
-    },
-    "back": "Back to Community Hub"
+  "sub_region": {
+    "label": "Area",
+    "all_areas": "All areas",
+    "type_quartier": "Neighbourhood",
+    "type_ortsteil": "District",
+    "type_municipality": "Municipality",
+    "type_canton": "Canton",
+    "type_other": "Area"
   },
   "clubs": {
     "meta": {
@@ -782,14 +960,14 @@
     }
   },
   "feed": {
-    "official_badge": "Official",
     "personalisation": {
       "label": "Feed mode",
       "personalised": "Personalised",
       "latest": "Latest",
       "personalised_hint": "Ranked for you based on your activity.",
       "latest_hint": "Newest posts first."
-    }
+    },
+    "official_badge": "Official"
   },
   "loyalty": {
     "section_title": "Use Your Time Credits",
@@ -833,108 +1011,9 @@
       }
     }
   },
-  "future_care_fund": {
-    "meta": {
-      "title": "Your Future Care Fund",
-      "description": "Hours you've banked for future care"
-    },
-    "title": "Your Future Care Fund",
-    "subhead": "Worth approximately CHF {{value}} — care you can call on when you need it",
-    "intro": "These are not just hours. They are the care you've banked in your community — to be drawn on for grocery runs, doctor visits, or simply company, whenever you need it.",
-    "hours_short": "hours",
-    "stats": {
-      "lifetime_given": "Lifetime Given",
-      "lifetime_received": "Lifetime Received",
-      "active_months": "Active Months",
-      "this_month_given": "This Month Given",
-      "this_month_received": "This Month Received",
-      "partner_orgs": "Partner Organisations Helped"
-    },
-    "reciprocity": {
-      "title": "Your Balance",
-      "given_label": "Given",
-      "received_label": "Received",
-      "strong_giver": "You've given far more than you've received — your future fund is strong.",
-      "balanced": "Your balance is healthy.",
-      "strong_receiver": "You've received generously — when ready, give back to your community."
-    },
-    "by_year": {
-      "title": "Year by year",
-      "given": "Given",
-      "received": "Received"
-    },
-    "how_it_works": {
-      "title": "How your future care fund works",
-      "step1": "Help your neighbours and earn hours",
-      "step2": "Hours are banked safely in your community fund",
-      "step3": "When you need help, redeem hours from your fund",
-      "cta_offer": "Offer help now",
-      "cta_browse": "Browse what's needed",
-      "cta_relationships": "See my support relationships"
-    },
-    "first_contribution": "First contribution: {{date}}",
-    "back": "Back to Community Hub",
-    "loading": "Calculating your fund...",
-    "errors": {
-      "load_failed": "Could not load your future care fund."
-    }
-  },
-  "reciprocity": {
-    "title": "Your Reciprocal Balance",
-    "given": "You've given {{hours}} hours",
-    "received": "You've received {{hours}} hours",
-    "net_positive": "Net: +{{hours}} hours banked",
-    "net_negative": "Net: {{hours}} hours used",
-    "view_fund": "View your Future Care Fund"
-  },
   "federation_aggregates": {
     "consent_enabled": "Federation aggregates enabled",
     "consent_disabled": "Federation aggregates disabled"
-  },
-  "hour_transfer": {
-    "meta": {
-      "title": "Transfer Banked Hours",
-      "description": "Move your banked hours to another KISS cooperative"
-    },
-    "title": "Transfer Your Banked Hours",
-    "subtitle": "Moving to another community? Your banked hours go with you.",
-    "form": {
-      "destination_label": "Destination cooperative",
-      "destination_placeholder": "e.g. zug-kiss",
-      "destination_help": "The slug of the destination KISS cooperative or tenant",
-      "hours_label": "Hours to transfer",
-      "hours_placeholder": "e.g. 25.5",
-      "reason_label": "Reason (optional)",
-      "reason_placeholder": "e.g. Moved house from Cham to Zug",
-      "submit": "Request Transfer",
-      "submitting": "Requesting..."
-    },
-    "history": {
-      "title": "Your transfer history",
-      "date": "Date",
-      "destination": "Destination",
-      "hours": "Hours",
-      "status": "Status",
-      "reason": "Reason",
-      "empty": "No transfers yet."
-    },
-    "status": {
-      "pending": "Awaiting approval",
-      "approved_by_source": "Approved",
-      "sent": "Sent",
-      "received": "Received",
-      "completed": "Completed",
-      "rejected": "Rejected"
-    },
-    "disclaimer": "Hours will be debited from your wallet here when an admin approves. They will appear in your wallet at the destination cooperative once received.",
-    "back": "Back to Community Hub",
-    "errors": {
-      "submit_failed": "Could not request the transfer. Please try again.",
-      "destination_not_found": "We couldn't find that destination cooperative.",
-      "no_matching_email": "Your email is not registered at the destination cooperative — register there first.",
-      "insufficient_hours": "You don't have enough banked hours."
-    },
-    "success_message": "Transfer request submitted. A coordinator will review it before hours move."
   },
   "data_export": {
     "meta": {
@@ -965,66 +1044,6 @@
       "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
       "build_failed": "We couldn't build your archive. Please try again or contact support."
     }
-  },
-  "hour_gift": {
-    "meta": {
-      "title": "Gift Hours",
-      "description": "Gift your banked hours to another community member"
-    },
-    "title": "Gift Your Hours",
-    "subtitle": "Banked hours can be gifted to family, friends, or anyone who needs them.",
-    "tabs": {
-      "send": "Send",
-      "inbox": "Inbox",
-      "sent": "Sent"
-    },
-    "send": {
-      "recipient_label": "Who would you like to gift hours to?",
-      "recipient_placeholder": "Search by name...",
-      "hours_label": "How many hours?",
-      "hours_balance_helper": "You have {{balance}} hours available",
-      "message_label": "Add a personal message (optional)",
-      "message_placeholder": "Why you're gifting these hours...",
-      "submit": "Gift Hours",
-      "confirm_title": "Gift {{hours}} hours to {{name}}?",
-      "confirm_body": "Your hours will be debited now and credited to them once they accept.",
-      "confirm_button": "Yes, gift hours",
-      "cancel": "Cancel"
-    },
-    "inbox": {
-      "empty": "No gifts to accept right now.",
-      "from": "From {{name}}",
-      "received_at": "Received {{date}}",
-      "accept": "Accept",
-      "decline": "Decline",
-      "decline_reason_label": "Reason for declining (optional)",
-      "decline_button": "Decline gift"
-    },
-    "sent": {
-      "empty": "You haven't sent any gifts yet.",
-      "to": "To {{name}}",
-      "status": {
-        "pending": "Awaiting acceptance",
-        "accepted": "Accepted",
-        "declined": "Declined",
-        "reverted": "Withdrawn"
-      },
-      "revert": "Withdraw gift"
-    },
-    "success": {
-      "sent": "Gift sent. {{name}} will be notified.",
-      "accepted": "Gift accepted. The hours are now in your wallet.",
-      "declined": "Gift declined. Hours returned to the sender."
-    },
-    "errors": {
-      "insufficient_balance": "Not enough hours in your wallet.",
-      "send_failed": "Could not send the gift. Please try again."
-    },
-    "back": "Back to Community Hub"
-  },
-  "inter_gen": {
-    "badge": "Intergenerational",
-    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
   },
   "safeguarding_reports": {
     "submit": {
@@ -1507,6 +1526,55 @@
     "webhook_create_title": "Create a subscription",
     "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
   },
+  "regional_analytics": {
+    "page_title": "Analisi regionale",
+    "contact_subject": "Analisi regionale: richiesta partner",
+    "privacy_badge": "La privacy viene prima di tutto fin dalla progettazione",
+    "hero_title": "Comprendi la tua regione. Senza compromettere la privacy.",
+    "hero_subtitle": "Un prodotto di analisi a pagamento per i comuni e i partner delle PMI. Aggregati raggruppati, segmenti soppressi inferiori a N=10, mai dati individuali.",
+    "cta_request_access": "Richiedi l'accesso",
+    "cta_learn_more": "Saperne di più",
+    "features_heading": "Cosa è incluso",
+    "feature_trends_title": "Tendenze",
+    "feature_trends_body": "Tieni traccia del coinvolgimento, dell'attività dei membri e delle ore di volontariato nel tempo: nessun individuo, solo aggregati regionali.",
+    "feature_demand_supply_title": "Domanda e offerta",
+    "feature_demand_supply_body": "Scopri dove le offerte e le richieste si raggruppano in base al codice postale a 3 cifre e alla categoria, con un tasso di corrispondenza basato sulla privacy.",
+    "feature_demographics_title": "Dati demografici",
+    "feature_demographics_body": "Distribuzione per età e genere, eliminata al di sotto di N=10: perfetta per le richieste di sovvenzione e la reportistica sull'impatto.",
+    "feature_footfall_title": "Calpestio",
+    "feature_footfall_body": "Tendenze di visualizzazione delle pagine anonimizzate nelle aree pubbliche della piattaforma: misura l'attenzione, non l'identità.",
+    "pricing_heading": "Prezzi semplici e trasparenti",
+    "tier_cta": "Richiedi un preventivo",
+    "privacy_footer": "Tutte le metriche sono raggruppate e anonimizzate. I segmenti con N<10 vengono soppressi. Non mostriamo mai singoli utenti, nomi o indirizzi ai partner.",
+    "tiers": {
+      "basic": {
+        "label": "Di base",
+        "price": "299 euro/mese",
+        "description": "Per i piccoli comuni e i partner della comunità.",
+        "feature_1": "Tendenze + Moduli demografici",
+        "feature_2": "Rapporto mensile in PDF",
+        "feature_3": "Supporto via e-mail"
+      },
+      "pro": {
+        "label": "Pro",
+        "price": "799 euro/mese",
+        "description": "Per comuni di medie dimensioni e partner PMI con molteplici stakeholder.",
+        "feature_1": "Tutti e quattro i moduli",
+        "feature_2": "PDF settimanale + report su richiesta",
+        "feature_3": "Dashboard dei partner dal vivo",
+        "feature_4": "Supporto prioritario"
+      },
+      "enterprise": {
+        "label": "Impresa",
+        "price": "Prezzi personalizzati",
+        "description": "Per amministrazioni comunali e reti federate. Moduli personalizzati, branding personalizzato, success manager dedicato.",
+        "feature_1": "Feed ed esportazioni di dati personalizzati",
+        "feature_2": "PDF con etichetta bianca",
+        "feature_3": "Workshop di revisione trimestrale",
+        "feature_4": "Responsabile del successo dedicato"
+      }
+    }
+  },
   "provisioning": {
     "meta": {
       "title": "Apply for a Pilot Community",
@@ -1739,10 +1807,15 @@
     "or_continue_with_email": "Or continue with email",
     "callback_signing_in": "Signing you in…",
     "callback_failed": "Sign-in failed. Please try again.",
+    "provider_google": "Google",
+    "provider_apple": "Mela",
+    "provider_facebook": "Facebook",
     "connect": "Connect",
     "disconnect": "Disconnect",
+    "disconnected": "Conto disconnesso.",
     "connected_at": "connected",
     "not_connected": "Not connected",
+    "provider_unavailable": "Non disponibile per questa comunità",
     "cannot_disconnect_last": "Cannot disconnect your only sign-in method",
     "connected_accounts": {
       "title": "Connected accounts",
@@ -1876,21 +1949,5 @@
     "reaction_clap": "Clap",
     "reaction_star": "Star",
     "say_thanks": "Say thanks"
-  },
-  "landing_links": {
-    "title": "Explore this community",
-    "aria_label": "Explore community sections"
-  },
-  "sub_region": {
-    "label": "Area",
-    "all_areas": "All areas",
-    "type_quartier": "Neighbourhood",
-    "type_ortsteil": "District",
-    "type_municipality": "Municipality",
-    "type_canton": "Canton",
-    "type_other": "Area"
-  },
-  "location": {
-    "powered_by_google": "Powered by Google"
   }
 }

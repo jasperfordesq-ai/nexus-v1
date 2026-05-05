@@ -118,14 +118,9 @@ export function MyPushCampaignsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await api.get<{ data: PushCampaign[] } | PushCampaign[]>('/v2/me/push-campaigns');
+      const res = await api.get<PushCampaign[]>('/v2/me/push-campaigns');
       if (res.success && res.data) {
-        const list = Array.isArray(res.data)
-          ? res.data
-          : 'data' in res.data
-          ? res.data.data
-          : [];
-        setCampaigns(list);
+        setCampaigns(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       logError('MyPushCampaignsPage.fetchCampaigns', err);

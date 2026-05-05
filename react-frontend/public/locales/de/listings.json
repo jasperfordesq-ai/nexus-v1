@@ -7,8 +7,10 @@
   "request": "Gesuch",
   "offering": "Angebot",
   "requesting": "Gesuch",
+  "hours_short": "{{hours}} Std.",
   "all": "Alle",
   "empty": "Keine Inserate gefunden",
+  "empty_no_listings": "Seien Sie die erste Person, die teilt, was Sie anbieten oder benötigen.",
   "create_first": "Erstellen Sie Ihr erstes Inserat",
   "filters": {
     "all": "Alle",
@@ -77,6 +79,8 @@
     "experience_professional": "Professionell / zertifiziert",
     "experience_some": "Etwas Erfahrung hilfreich",
     "image_upload_failed": "Bild konnte nicht hochgeladen werden. Ihr Inserat wurde ohne Bild gespeichert.",
+    "image_preview_alt": "Auflistungsvorschau",
+    "tags_save_failed": "Skill-Tags konnten nicht gespeichert werden. Sie können den Eintrag bearbeiten, um es erneut zu versuchen.",
     "service_details_toggle": "Optionale Servicedetails",
     "service_type_depends": "Vom Service abhängig",
     "service_type_hybrid": "Online verfügbar",
@@ -91,6 +95,7 @@
   "filter_category_label": "Kategorie",
   "filter_all_categories": "Alle Kategorien",
   "aria_location": "Standort: {{location}}",
+  "aria_hours_estimated": "{{hours}} Stunden geschätzt",
   "show_more": "Mehr anzeigen",
   "show_less": "Weniger anzeigen",
   "aria_grid_view": "Rasteransicht",
@@ -141,6 +146,7 @@
   "detail_saved": "Gespeichert",
   "detail_save": "Speichern",
   "detail_share": "Teilen",
+  "detail_fallback_label": "Auflistung",
   "detail_this_member": "diesem Mitglied",
   "detail_offered_by": "Angeboten von",
   "detail_requested_by": "Gesucht von",
@@ -274,7 +280,8 @@
   "service_type_remote": "Online",
   "community_member": "Gemeinschaftsmitglied",
   "comments_error": "Kommentare konnten nicht geladen werden.",
-  "hours_short": "{{hours}} Std.",
-  "empty_no_listings": "Seien Sie die erste Person, die teilt, was Sie anbieten oder benötigen.",
-  "aria_hours_estimated": "{{hours}} Stunden geschätzt"
+  "user_fallback": "Benutzer",
+  "listing_image_alt": "Auflistungsbild",
+  "distance_meters": "{{distance}} m",
+  "distance_kilometers": "{{distance}} km"
 }

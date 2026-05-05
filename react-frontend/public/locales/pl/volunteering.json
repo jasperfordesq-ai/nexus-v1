@@ -4,6 +4,7 @@
   "page_title": "Volunteering",
   "heading": "Volunteering",
   "subtitle": "Find opportunities and track your impact",
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
   "browse_organisations": "Browse Organisations",
   "tab_opportunities": "Opportunities",
   "tab_applications": "My Applications",
@@ -44,11 +45,13 @@
   "total_hours": "Total Hours",
   "progress": "Progress",
   "hours_of_goal": "{{current}} / {{goal}} hours",
+  "hours_abbrev": "{{hours}}h",
   "hours_progress_aria": "Hours progress: {{hours}} hours",
   "hours_by_organization": "Hours by Organisation",
   "hours_by_month": "Hours by Month",
   "no_hours_logged": "No hours logged yet",
   "no_hours_description": "Start logging your volunteering hours to track your impact",
+  "no_loggable_organisations_description": "Możesz rejestrować godziny po zatwierdzeniu Twojego wniosku przez organizację lub dodaniu Cię jako członka.",
   "log_volunteering_hours": "Log Volunteering Hours",
   "organisation_label": "Organisation",
   "select_organisation": "Select organisation",
@@ -259,6 +262,7 @@
       "amount": "Amount",
       "message": "Message (optional)"
     },
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Donating anonymously",
     "anonymous_toggle_off": "Donate anonymously",
     "cancel": "Cancel",
@@ -319,8 +323,7 @@
     "receipt_method": "Payment Method",
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
-    "receipt_not_found": "Receipt not found.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Receipt not found."
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -331,6 +334,7 @@
     "load_error": "Unable to load safeguarding data.",
     "try_again": "Try Again",
     "fill_required": "Please fill in all required fields.",
+    "description_min": "W opisie proszę podać minimum 20 znaków.",
     "no_training_title": "No training records",
     "no_training_desc": "Add your safeguarding training records to get started.",
     "completed": "Completed",
@@ -423,7 +427,29 @@
   },
   "common": {
     "refresh": "Refresh",
-    "try_again": "Try Again"
+    "try_again": "Try Again",
+    "cancel": "Anulować"
+  },
+  "group_signup": {
+    "title": "Zapisy grupowe",
+    "error_load": "Nie udało się załadować rezerwacji grupowych.",
+    "error_load_generic": "Nie można wczytać rezerwacji grupowych. Spróbuj ponownie.",
+    "empty_title": "Brak zapisów grupowych",
+    "empty_description": "Nie jesteś jeszcze objęty żadną rezerwacją zmiany grupowej. Rejestracje grupowe umożliwiają wolontariat razem ze znajomymi lub członkami zespołu.",
+    "leader": "Lider",
+    "members": "Członkowie",
+    "created": "Stworzony",
+    "add_member": "Dodaj członka",
+    "add_group_member": "Dodaj członka grupy",
+    "add_member_description": "Wpisz adres e-mail osoby, którą chcesz dodać do tej rezerwacji grupowej. Otrzymają zaproszenie do przyłączenia się.",
+    "email_label": "Adres e-mail",
+    "email_placeholder": "członek@przyklad.com",
+    "searching": "Badawczy...",
+    "lookup_error": "Nie można wyszukać członka. Spróbuj ponownie.",
+    "no_member_found": "Nie znaleziono żadnego członka o tym adresie e-mail.",
+    "member_added": "Członek dodany do grupy.",
+    "add_member_error": "Nie udało się dodać członka. Być może są już w grupie lub adres e-mail jest nieprawidłowy.",
+    "add_member_error_generic": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie."
   },
   "recommendations": {
     "title": "Recommended for You",
@@ -446,6 +472,7 @@
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generated_error": "Failed to generate certificate. Please try again.",
     "verified_hours": "{{count}} Verified Hours",
+    "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Generated",
     "download": "Download",
     "verify": "Verify"
@@ -487,6 +514,8 @@
     "mood_good": "Good",
     "mood_great": "Great",
     "score_label": "Wellbeing Score",
+    "score_out_of_100": "{{score}}/100 - {{label}}",
+    "score_aria": "Wynik dobrego samopoczucia: {{score}} na 100",
     "score_excellent": "Excellent",
     "risk_low": "Low Risk",
     "this_week": "This Week",
@@ -496,7 +525,6 @@
     "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
     "recent_checkins": "Recent Mood Check-ins"
   },
-  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
   "page_meta": {
     "create_opportunity": {
       "title": "Create Opportunity"

@@ -35,6 +35,21 @@ const NO_TRANSLATE_PATTERNS = [
   /^[A-Z_]+$/,
 ];
 
+const PLACEHOLDER_OR_TAG_PATTERN = /(\{\{[^}]+\}\}|<[^>]+>|%\{[^}]+\})/g;
+
+const NO_TRANSLATE_VALUES = new Set([
+  'Authy',
+  'Facebook',
+  'Google',
+  'Google Authenticator',
+  'Microsoft Authenticator',
+  'Spitex',
+  'member@example.com',
+  'vs',
+]);
+
+const UNIT_OR_FORMAT_PATTERN = /^[\s\d.,:;()+\-/%]*[a-zA-Z]{0,3}[\s\d.,:;()+\-/%]*$/;
+
 function flattenKeys(obj, prefix = '') {
   const result = {};
 
@@ -52,8 +67,14 @@ function flattenKeys(obj, prefix = '') {
 
 function shouldSkipValue(value) {
   if (typeof value !== 'string') return true;
-  if (!value.trim()) return true;
-  return NO_TRANSLATE_PATTERNS.some((pattern) => pattern.test(value.trim()));
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  if (NO_TRANSLATE_VALUES.has(trimmed)) return true;
+  if (NO_TRANSLATE_PATTERNS.some((pattern) => pattern.test(trimmed))) return true;
+
+  const withoutPlaceholders = trimmed.replace(PLACEHOLDER_OR_TAG_PATTERN, '').trim();
+  if (!withoutPlaceholders) return true;
+  return UNIT_OR_FORMAT_PATTERN.test(withoutPlaceholders);
 }
 
 function readJson(filePath) {

@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} opuścił dzisiaj",
   "new_conversation_aria": "Rozpocznij nową rozmowę",
   "typing_aria": "AI pisze",
+  "sources_label": "Źródła",
   "error_label": "Error",
   "input_aria": "Message",
   "input_placeholder": "Zapytaj mnie o cokolwiek... (Naciśnij Enter, aby wysłać, Shift+Enter, aby dodać nową linię)",

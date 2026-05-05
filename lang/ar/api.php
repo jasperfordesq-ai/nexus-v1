@@ -1168,8 +1168,8 @@ return [
     'organizer_only_update' => 'Only the organizer can update',
     'organizer_only_cancel' => 'Only the organizer can cancel',
     'organizer_only_complete' => 'Only the organizer can complete',
-    'invalid_post_id' => 'Invalid post ID'
-    'invalid_target_type'                  => 'Invalid target type',,
+    'invalid_post_id' => 'Invalid post ID',
+    'invalid_target_type'                  => 'Invalid target type',
     'invalid_user' => 'Invalid user',
     'database_error' => 'Database error',
     'already_reported' => 'Already reported',
@@ -1213,7 +1213,6 @@ return [
     'only_receiver_can_accept' => 'Only the receiver can accept a connection request',
     'invalid_bookmarkable_type' => 'Invalid bookmarkable type provided',
     'invalid_shareable_type'            => 'Invalid shareable type provided',
-],
 
     // PollsController / CommentsController
     'too_many_poll_options'             => 'Too many poll options (max 20).',

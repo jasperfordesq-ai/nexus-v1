@@ -95,11 +95,31 @@ export default defineConfig({
       dependencies: ['setup'],
     },
 
+    // Desktop Firefox - React app
+    {
+      name: 'firefox-modern',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: 'e2e/fixtures/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+
     // Mobile Chrome - Modern Theme
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
+        storageState: 'e2e/fixtures/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+
+    // Mobile Safari - React app
+    {
+      name: 'mobile-safari',
+      use: {
+        ...devices['iPhone 12'],
         storageState: 'e2e/fixtures/.auth/user.json',
       },
       dependencies: ['setup'],

@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
     "progress_to_next": "Progress to {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
-    "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care",
     "link_error": "Care receiver could not be linked",
     "search_label": "Find member",
     "search_placeholder": "Search by name",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Optional context for coordinators or trusted substitutes",
     "cancel": "Cancel",
+    "upcoming_care": "Upcoming care",
+    "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
     "no_recent_care": "No recent care logs yet"
-  },
-  "providers": {
-    "title": "Care Provider Directory",
-    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
-    "search_placeholder": "Search providers...",
-    "filter_all": "All",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Day Centres",
-    "filter_private": "Private",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Volunteers",
-    "verified_badge": "Verified",
-    "contact": "Contact",
-    "website": "Website",
-    "opening_hours": "Opening Hours",
-    "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Dismiss",
-    "severity_info": "Information",
-    "severity_warning": "Warning",
-    "severity_danger": "Emergency",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Cover Care",
@@ -134,26 +106,33 @@
       "assign": "Substitute could not be matched"
     }
   },
-  "warmth_pass": {
-    "title": "My Warmth Pass",
-    "credential_label": "Community Warmth Pass",
-    "not_eligible": "Not yet eligible",
-    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
-    "member_name": "Member",
-    "hours_logged": "Hours logged",
-    "reviews_received": "Reviews received",
-    "identity_verified": "Identity verified",
-    "yes": "Yes",
-    "no": "No",
-    "categories": "Areas I help with",
-    "no_categories": "No categories yet",
-    "member_since": "Member since",
-    "active_since": "Pass active since",
-    "issued_by": "Issued by {{tenant}} via Project NEXUS",
-    "what_is_this": "What is a Warmth Pass?",
-    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
-    "loading": "Loading your pass...",
-    "error": "Could not load your Warmth Pass"
+  "providers": {
+    "title": "Care Provider Directory",
+    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
+    "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
+    "filter_all": "All",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Day Centres",
+    "filter_private": "Private",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Volunteers",
+    "verified_badge": "Verified",
+    "contact": "Contact",
+    "website": "Website",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Opening Hours",
+    "no_providers": "No care providers found",
+    "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Scoránaigh barra taoibh",
+      "back_to_site": "Ar ais go dtí an suíomh",
+      "notifications": "Fógraí",
+      "user_fallback": "Úsáideoir",
+      "user_menu": "Roghchlár úsáideora",
+      "my_profile": "Mo Phróifíl",
+      "sign_out": "Sínigh amach"
+    },
+    "breadcrumbs": {
+      "aria": "Brioscáin aráin",
+      "segments": {
+        "caring": "Deais",
+        "workflow": "Sreabhadh oibre",
+        "projects": "Tionscadail",
+        "loyalty": "Clár Dílseachta",
+        "hour-transfers": "Aistrithe Uair",
+        "regional-points": "Pointí Réigiúnacha",
+        "sub-regions": "Fo-Réigiúin",
+        "federation-peers": "Piaraí Cónaidhme",
+        "sla-dashboard": "Painéal SLA",
+        "providers": "Soláthraithe",
+        "warmth-pass": "Pas Teas",
+        "recipient-circle": "Ciorcal Faighteoirí Cúraim",
+        "nudges": "Nudges Cliste",
+        "emergency-alerts": "Foláirimh Éigeandála",
+        "surveys": "Suirbhéanna Bardasach",
+        "copilot": "Cóipeáil Chumarsáide",
+        "civic-digest": "Achoimre Cathartha",
+        "lead-nurture": "Cothú Luaidhe",
+        "success-stories": "Scéalta Ratha",
+        "feedback": "Bosca Isteach Aiseolais",
+        "verification": "Fíorú Bardasach",
+        "safeguarding": "Tuarascálacha Coimirce",
+        "trust-tier": "Sraitheanna Iontaobhais",
+        "launch-readiness": "Ullmhacht Seoladh",
+        "pilot-scoreboard": "Scórchlár Píolótach",
+        "data-quality": "Cáilíocht Sonraí Píolótach",
+        "operating-policy": "Beartas Oibriúcháin",
+        "disclosure-pack": "Pacáiste Nochta",
+        "commercial-boundary": "Teorainn Tráchtála",
+        "isolated-node": "Geata Nód Scoite",
+        "research": "Comhpháirtíochtaí Taighde",
+        "external-integrations": "Comhtháthaithe Seachtracha",
+        "integration-showcase": "Taispeántas Comhtháthaithe",
+        "municipal-impact": "Tuarascálacha Tionchair Chathrach",
+        "kpi-baselines": "Bunlínte KPI",
+        "municipal-roi": "ROI cathrach",
+        "category-coefficients": "Comhéifeachtaí Catagóire"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Eolaire Soláthraí Cúraim - Riarachán",
+      "title": "Eolaire Soláthraí Cúraim",
+      "subtitle": "Seirbhísí cúram baile, ionaid lae, cumainn agus grúpaí oibrithe deonacha a bhainistiú",
+      "verified": "Fíoraithe",
+      "yes": "Tá",
+      "no": "Níl",
+      "empty": "Níl soláthraithe cúraim ar bith fós - cuir ceann leis chun tús a chur leis.",
+      "confirm_delete": "Scrios \"{{name}}\"? Cuirfidh sé seo i bhfolach ón eolaire é.",
+      "confirm_deactivate": "Marcáil \"{{name}}\" mar neamhghníomhach? Is féidir leat é a athghníomhachtú níos déanaí.",
+      "actions": {
+        "add_provider": "Cuir Soláthraí leis",
+        "cancel": "Cealaigh",
+        "close": "Dún",
+        "create_provider": "Cruthaigh Soláthraí",
+        "deactivate_named": "Díghníomhachtaigh \"{{name}}\"",
+        "delete_provider": "Scrios soláthraí",
+        "edit_provider": "Cuir soláthraí in eagar",
+        "find_duplicates": "Aimsigh Dúblaigh",
+        "save_changes": "Sábháil Athruithe",
+        "verify_provider": "Fíoraigh soláthraí"
+      },
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Is eagraíochtaí seachtracha iad soláthraithe cúraim a ghlacann páirt sa líonra cúraim phobail in éineacht le hoibrithe deonacha aonair. Is féidir iarratais chabhrach a shannadh dóibh, íocaíochtaí creidmheasa ama a fháil, agus a bheith le feiceáil in eolaire na mball.",
+        "verification_label": "Fíorú",
+        "verification_body": "Taispeánann soláthraithe fíoraithe suaitheantas san eolaire. Seiceáil polasaithe clárúcháin, árachais agus cosanta sula marcáil soláthraí mar fhíoraithe.",
+        "types_label": "Cineálacha soláthraithe",
+        "types_body": "Bain úsáid as na réimsí cineáil agus tuairisce chun an cúram a thairgtear a thaispeáint ionas gur féidir le baill agus comhordaitheoirí an soláthraí ceart a aimsiú do gach iarratas."
+      },
+      "duplicates": {
+        "title": "Dúblaigh Féideartha",
+        "summary": "Soláthraithe gníomhacha {{scanned}} scanta - péirí {{total}} os cionn cosúlacht 65%",
+        "scanning": "Ag scanadh...",
+        "empty": "Níor aimsíodh dúblaigh ar dóigh. Breathnaíonn an eolaire glan.",
+        "vs": "vs",
+        "match_percent": "{{percent}}% mheaitseáil"
+      },
+      "errors": {
+        "delete": "Theip ar an soláthraí a scriosadh.",
+        "deactivate": "Theip ar an soláthraí a dhíghníomhachtú.",
+        "duplicates": "Theip ar scanadh le haghaidh dúblaigh.",
+        "load": "Theip ar luchtú soláthraithe cúraim.",
+        "name_required": "Tá ainm ag teastáil.",
+        "save": "Theip ar an soláthraí a shábháil.",
+        "type_required": "Tá cineál soláthraí ag teastáil.",
+        "verify": "Theip ar an soláthraí a fhíorú."
+      },
+      "fields": {
+        "address": "Seoladh",
+        "description": "Cur síos",
+        "email": "Ríomhphost",
+        "name": "Ainm",
+        "phone": "Fón",
+        "status": "Stádas",
+        "type": "Cineál",
+        "website": "Suíomh Gréasáin"
+      },
+      "messages": {
+        "created": "D'éirigh leis an soláthraí a chruthú.",
+        "deactivated": "\"{{name}}\" díghníomhaithe.",
+        "removed": "Baineadh an soláthraí.",
+        "updated": "D'éirigh le nuashonrú an tsoláthraí.",
+        "verified": "\"{{name}}\" marcáilte mar atá fíoraithe."
+      },
+      "modal": {
+        "create_title": "Cuir Soláthraí Cúraim leis",
+        "edit_title": "Cuir: {{name}}"
+      },
+      "pagination": {
+        "next": "Ar aghaidh",
+        "previous": "Roimhe Seo",
+        "summary": "Ag taispeáint {{from}}-{{to}} na soláthraithe {{total}}"
+      },
+      "placeholders": {
+        "address": "Sráid, cathair, cód poist",
+        "description": "Cur síos gairid ar na seirbhísí a chuirtear ar fáil...",
+        "name": "e.g. Seirbhís Cúraim Phobail"
+      },
+      "signals": {
+        "address_overlap": "Seoladh forluí",
+        "email_match": "Cluiche ríomhphoist",
+        "name_match": "Meaitseáil ainm",
+        "name_similar": "Ainm cosúil",
+        "phone_match": "Cluiche fón",
+        "website_match": "Cluiche láithreán gréasáin"
+      },
+      "status": {
+        "active": "Gníomhach",
+        "inactive": "Neamhghníomhach"
+      },
+      "table": {
+        "actions": "Gníomhartha",
+        "aria": "Tábla soláthraithe cúraim",
+        "name": "Ainm",
+        "status": "Stádas",
+        "type": "Cineál",
+        "verified": "Fíoraithe"
+      },
+      "types": {
+        "private": "Seirbhís Phríobháideach",
+        "spitex": "Spitex",
+        "tagesstätte": "Ionad Lae",
+        "verein": "Comhlachas",
+        "volunteer": "Grúpa Oibrithe Deonacha"
+      }
+    },
+    "warmth_pass": {
+      "title": "Cuardach Pas Teas",
+      "subtitle": "Féach ar dhintiúir iontaobhais phobail aon bhall",
+      "eligible": "Incháilithe",
+      "not_eligible": "Níl sé incháilithe",
+      "verified": "Fíoraithe",
+      "not_verified": "Gan fíorú",
+      "loading": "Pas ball á lódáil...",
+      "empty_date": "Gan socraithe",
+      "no_categories": "Níl aon chatagóir ar taifead.",
+      "tier_chip": "{{label}} (Sraith {{tier}})",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Is éard atá i bPas Teasa ná dintiúir iontaobhais iniompartha a thaispeánann go bhfuil leibhéal Iontaofa bainte amach ag ball, go bhfuil athbhreithnithe piaraí faighte aige, agus go bhfuil sé incháilithe chun cúram comharsanachta neamhfhoirmiúil a sholáthar. Is féidir le faighteoirí iarraidh féachaint ar Phas Teasa an chúntóra sula nglacann siad le cúnamh. Bain úsáid as an gcuardach seo chun dintiúr ball a fhíorú ar iarratas, nó chun cabhrú le comhalta nach bhfuil cinnte faoina cháilitheacht."
+      },
+      "lookup": {
+        "title": "Cuardach Ball",
+        "member_id": "Aitheantas Ball",
+        "placeholder": "Cuir isteach ID ball uimhriúil",
+        "button": "Féach suas"
+      },
+      "errors": {
+        "no_data": "Níor tugadh aon sonraí ar ais don aitheantas ball seo.",
+        "lookup_failed": "Níor aimsíodh ball nó tharla earráid."
+      },
+      "not_eligible_notice": {
+        "title": "Níl an ball ag leibhéal Iontaofa fós agus níl Pas Teasa aige.",
+        "body": "Le bheith incháilithe, caithfidh siad níos mó uaireanta cúraim a logáil agus athbhreithniú piaraí amháin ar a laghad a fháil. Is féidir leo a ndul chun cinn féin a sheiceáil ar leathanach próifíle an Iontaobhais."
+      },
+      "fields": {
+        "help_categories": "Catagóirí Cabhrach",
+        "hours_logged": "Uaireanta Logáilte",
+        "identity_verified": "Aitheantais Deimhnithe",
+        "member_since": "Ball Since",
+        "pass_active_since": "Pas Gníomhach Since",
+        "reviews_received": "Léirmheasanna Faighte",
+        "trust_tier": "Sraith Iontaobhais"
       }
     }
   }

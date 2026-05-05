@@ -62,7 +62,7 @@ cleanup() {
     if [ "$maint_enabled_by_us" = "1" ] && [ "$deploy_success" = "0" ]; then
         echo ""
         log_warn "Deploy failed (exit $exit_code) - maintenance mode remains ON"
-        log_warn "Recover with: sudo bash scripts/safe-deploy.sh full --detach"
+        log_warn "Recover with: sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
         log_warn "Or, only after verifying health: sudo bash scripts/maintenance.sh off"
     fi
 

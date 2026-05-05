@@ -16,9 +16,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1024M
+          # PHP memory_limit is 1G; match compose.prod.yml so Apache workers,
+          # OPcache, and request peaks have headroom in the active color.
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
     ports:
       - "${NEXUS_API_PORT:-8190}:80"
     volumes:

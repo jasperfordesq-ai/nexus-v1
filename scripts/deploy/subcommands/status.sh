@@ -58,7 +58,7 @@ show_status() {
     {
         printf "NAMES\tSTATUS\n"
         docker ps --format "{{.Names}}\t{{.Status}}" \
-            | grep -E '^(nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|frontend|sales|queue|scheduler))\t' \
+            | grep -E '^(nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|react|sales|php-queue|php-scheduler))\t' \
             || true
     } | column -t -s $'\t' | tee -a "$LOG_FILE"
 

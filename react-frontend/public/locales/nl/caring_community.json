@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "My Trust Level",
     "subtitle": "Your standing in the community",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Newcomer",
     "tier_member": "Member",
     "tier_trusted": "Trusted",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Reviews received",
     "criteria_identity": "Identity verified",
     "progress_to_next": "Progress to {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Neighbour",
     "relationship_professional": "Professional carer",
     "link_success": "Care receiver linked successfully",
-    "upcoming_care": "Upcoming care",
-    "recent_care": "Recent care",
     "link_error": "Care receiver could not be linked",
     "search_label": "Find member",
     "search_placeholder": "Search by name",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Optional context for coordinators or trusted substitutes",
     "cancel": "Cancel",
+    "upcoming_care": "Upcoming care",
+    "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
     "no_recent_care": "No recent care logs yet"
-  },
-  "providers": {
-    "title": "Care Provider Directory",
-    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
-    "search_placeholder": "Search providers...",
-    "filter_all": "All",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Day Centres",
-    "filter_private": "Private",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Volunteers",
-    "verified_badge": "Verified",
-    "contact": "Contact",
-    "website": "Website",
-    "opening_hours": "Opening Hours",
-    "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search",
-    "filter_aria": "Filter providers by type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Dismiss",
-    "severity_info": "Information",
-    "severity_warning": "Warning",
-    "severity_danger": "Emergency",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Cover Care",
@@ -134,26 +106,33 @@
       "assign": "Substitute could not be matched"
     }
   },
-  "warmth_pass": {
-    "title": "My Warmth Pass",
-    "credential_label": "Community Warmth Pass",
-    "not_eligible": "Not yet eligible",
-    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
-    "member_name": "Member",
-    "hours_logged": "Hours logged",
-    "reviews_received": "Reviews received",
-    "identity_verified": "Identity verified",
-    "yes": "Yes",
-    "no": "No",
-    "categories": "Areas I help with",
-    "no_categories": "No categories yet",
-    "member_since": "Member since",
-    "active_since": "Pass active since",
-    "issued_by": "Issued by {{tenant}} via Project NEXUS",
-    "what_is_this": "What is a Warmth Pass?",
-    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
-    "loading": "Loading your pass...",
-    "error": "Could not load your Warmth Pass"
+  "providers": {
+    "title": "Care Provider Directory",
+    "subtitle": "Find care services, day centres, associations, and volunteers in your region",
+    "search_placeholder": "Search providers...",
+    "filter_aria": "Filter providers by type",
+    "filter_all": "All",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Day Centres",
+    "filter_private": "Private",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Volunteers",
+    "verified_badge": "Verified",
+    "contact": "Contact",
+    "website": "Website",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Opening Hours",
+    "no_providers": "No care providers found",
+    "no_providers_hint": "Try adjusting your filters or search"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Dismiss",
+    "severity_info": "Information",
+    "severity_warning": "Warning",
+    "severity_danger": "Emergency"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "My Warmth Pass",
+    "credential_label": "Community Warmth Pass",
+    "not_eligible": "Not yet eligible",
+    "not_eligible_hint": "Reach Trusted tier to unlock your Warmth Pass",
+    "member_name": "Member",
+    "hours_logged": "Hours logged",
+    "reviews_received": "Reviews received",
+    "identity_verified": "Identity verified",
+    "yes": "Yes",
+    "no": "No",
+    "categories": "Areas I help with",
+    "no_categories": "No categories yet",
+    "member_since": "Member since",
+    "active_since": "Pass active since",
+    "issued_by": "Issued by {{tenant}} via Project NEXUS",
+    "what_is_this": "What is a Warmth Pass?",
+    "what_is_this_body": "Your Warmth Pass shows that you're a verified, trusted community helper. You can show it to care recipients, coordinators, and organisations as proof of your standing in the caring community.",
+    "loading": "Loading your pass...",
+    "error": "Could not load your Warmth Pass"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Zijbalk schakelen",
+      "back_to_site": "Terug naar de site",
+      "notifications": "Meldingen",
+      "user_fallback": "Gebruiker",
+      "user_menu": "Gebruikersmenu",
+      "my_profile": "Mijn profiel",
+      "sign_out": "Meld u af"
+    },
+    "breadcrumbs": {
+      "aria": "Paneermeel",
+      "segments": {
+        "caring": "Dashboard",
+        "workflow": "Werkstroom",
+        "projects": "Projecten",
+        "loyalty": "Loyaliteitsprogramma",
+        "hour-transfers": "Uuroverdrachten",
+        "regional-points": "Regionale punten",
+        "sub-regions": "Subregio's",
+        "federation-peers": "Federatiegenoten",
+        "sla-dashboard": "SLA-dashboard",
+        "providers": "Aanbieders",
+        "warmth-pass": "Warmte pas",
+        "recipient-circle": "Zorgontvangerscirkel",
+        "nudges": "Slimme duwtjes",
+        "emergency-alerts": "Noodwaarschuwingen",
+        "surveys": "Gemeentelijke onderzoeken",
+        "copilot": "Communicatie Copiloot",
+        "civic-digest": "Burgerlijk overzicht",
+        "lead-nurture": "Leid nurture",
+        "success-stories": "Succesverhalen",
+        "feedback": "Feedback-inbox",
+        "verification": "Gemeentelijke Verificatie",
+        "safeguarding": "Beveiligingsrapporten",
+        "trust-tier": "Vertrouwensniveaus",
+        "launch-readiness": "Start gereedheid",
+        "pilot-scoreboard": "Scorebord van de piloot",
+        "data-quality": "Pilotgegevenskwaliteit",
+        "operating-policy": "Operationeel beleid",
+        "disclosure-pack": "Openbaarmakingspakket",
+        "commercial-boundary": "Commerciële grens",
+        "isolated-node": "Geïsoleerde knooppuntpoort",
+        "research": "Onderzoekspartnerschappen",
+        "external-integrations": "Externe integraties",
+        "integration-showcase": "Integratieshow",
+        "municipal-impact": "Gemeentelijke Impactrapporten",
+        "kpi-baselines": "KPI-basislijnen",
+        "municipal-roi": "Gemeentelijke ROI",
+        "category-coefficients": "Categoriecoëfficiënten"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Zorgverlenerslijst - Beheerder",
+      "title": "Zorgaanbiederlijst",
+      "subtitle": "Beheer thuiszorgdiensten, dagcentra, verenigingen en vrijwilligersgroepen",
+      "verified": "Geverifieerd",
+      "yes": "Ja",
+      "no": "Nee",
+      "empty": "Nog geen zorgverleners. Voeg er één toe om aan de slag te gaan.",
+      "confirm_delete": "\"{{name}}\" verwijderen? Hierdoor wordt het verborgen in de map.",
+      "confirm_deactivate": "\"{{name}}\" markeren als inactief? U kunt het later opnieuw activeren.",
+      "actions": {
+        "add_provider": "Aanbieder toevoegen",
+        "cancel": "Annuleren",
+        "close": "Dichtbij",
+        "create_provider": "Aanbieder maken",
+        "deactivate_named": "Deactiveer \"{{name}}\"",
+        "delete_provider": "Aanbieder verwijderen",
+        "edit_provider": "Aanbieder bewerken",
+        "find_duplicates": "Zoek duplicaten",
+        "save_changes": "Wijzigingen opslaan",
+        "verify_provider": "Verifieer aanbieder"
+      },
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Zorgaanbieders zijn externe organisaties die naast individuele vrijwilligers deelnemen aan het gemeenschapszorgnetwerk. Er kunnen hulpverzoeken aan hen worden toegewezen, ze kunnen tijdskredieten ontvangen en ze verschijnen in de ledenlijst.",
+        "verification_label": "Verificatie",
+        "verification_body": "Geverifieerde providers geven een badge weer in de directory. Controleer het registratie-, verzekerings- en beveiligingsbeleid voordat u een aanbieder als geverifieerd markeert.",
+        "types_label": "Soorten aanbieders",
+        "types_body": "Gebruik de velden type en omschrijving om de aangeboden zorg weer te geven, zodat leden en coördinatoren voor elke aanvraag de juiste aanbieder kunnen vinden."
+      },
+      "duplicates": {
+        "title": "Potentiële duplicaten",
+        "summary": "Gescande {{scanned}} actieve providers - {{total}} paren met meer dan 65% gelijkenis",
+        "scanning": "Scannen...",
+        "empty": "Geen waarschijnlijke duplicaten gevonden. De map ziet er schoon uit.",
+        "vs": "versus",
+        "match_percent": "{{percent}}% overeenkomst"
+      },
+      "errors": {
+        "delete": "Kan provider niet verwijderen.",
+        "deactivate": "Kan de provider niet deactiveren.",
+        "duplicates": "Kan niet scannen op duplicaten.",
+        "load": "Kan zorgverleners niet laden.",
+        "name_required": "Naam is vereist.",
+        "save": "Kan provider niet opslaan.",
+        "type_required": "Providertype is vereist.",
+        "verify": "Kan de provider niet verifiëren."
+      },
+      "fields": {
+        "address": "Adres",
+        "description": "Beschrijving",
+        "email": "E-mail",
+        "name": "Naam",
+        "phone": "Telefoon",
+        "status": "Status",
+        "type": "Type",
+        "website": "Website"
+      },
+      "messages": {
+        "created": "Provider is succesvol aangemaakt.",
+        "deactivated": "\"{{name}}\" gedeactiveerd.",
+        "removed": "Aanbieder verwijderd.",
+        "updated": "Aanbieder succesvol bijgewerkt.",
+        "verified": "\"{{name}}\" gemarkeerd als geverifieerd."
+      },
+      "modal": {
+        "create_title": "Zorgverlener toevoegen",
+        "edit_title": "Bewerken: {{name}}"
+      },
+      "pagination": {
+        "next": "Volgende",
+        "previous": "Vorig",
+        "summary": "{{from}}-{{to}} van {{total}}-providers worden weergegeven"
+      },
+      "placeholders": {
+        "address": "Straat, stad, postcode",
+        "description": "Korte beschrijving van de aangeboden diensten...",
+        "name": "bijv. Gemeenschapszorgdienst"
+      },
+      "signals": {
+        "address_overlap": "Adresoverlap",
+        "email_match": "E-mailovereenkomst",
+        "name_match": "Naamovereenkomst",
+        "name_similar": "Naam vergelijkbaar",
+        "phone_match": "Telefoon wedstrijd",
+        "website_match": "Website-match"
+      },
+      "status": {
+        "active": "Actief",
+        "inactive": "Inactief"
+      },
+      "table": {
+        "actions": "Acties",
+        "aria": "Tabel met zorgverleners",
+        "name": "Naam",
+        "status": "Status",
+        "type": "Type",
+        "verified": "Geverifieerd"
+      },
+      "types": {
+        "private": "Privé dienst",
+        "spitex": "Spitex",
+        "tagesstätte": "Dag Centrum",
+        "verein": "Vereniging",
+        "volunteer": "Vrijwilligers groep"
+      }
+    },
+    "warmth_pass": {
+      "title": "Warmtepas opzoeken",
+      "subtitle": "Bekijk de vertrouwensreferenties van de community van elk lid",
+      "eligible": "In aanmerking komend",
+      "not_eligible": "Niet geschikt",
+      "verified": "Geverifieerd",
+      "not_verified": "Niet geverifieerd",
+      "loading": "Ledenpas laden...",
+      "empty_date": "Niet ingesteld",
+      "no_categories": "Geen categorieën geregistreerd.",
+      "tier_chip": "{{label}} (niveau {{tier}})",
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Een Warmtepas is een draagbare vertrouwensreferentie waaruit blijkt dat een lid het Trusted-niveau heeft bereikt, peer reviews heeft ontvangen en in aanmerking komt voor het verlenen van informele buurtzorg. Ontvangers kunnen vragen om de Warmtepas van een helper te zien voordat ze hulp accepteren. Gebruik deze zoekopdracht om op verzoek de inloggegevens van een lid te verifiëren of om een ​​lid te helpen dat niet zeker weet of hij of zij in aanmerking komt."
+      },
+      "lookup": {
+        "title": "Leden opzoeken",
+        "member_id": "Lid-ID",
+        "placeholder": "Voer een numerieke lid-ID in",
+        "button": "Kijk omhoog"
+      },
+      "errors": {
+        "no_data": "Er zijn geen gegevens geretourneerd voor deze lid-ID.",
+        "lookup_failed": "Lid niet gevonden of er is een fout opgetreden."
+      },
+      "not_eligible_notice": {
+        "title": "Het lid heeft nog geen Trusted-niveau en beschikt niet over een Warmtepas.",
+        "body": "Om in aanmerking te komen, moeten ze meer zorguren registreren en minimaal één peer review ontvangen. Ze kunnen hun eigen voortgang controleren op de Trust-profielpagina."
+      },
+      "fields": {
+        "help_categories": "Hulpcategorieën",
+        "hours_logged": "Uren geregistreerd",
+        "identity_verified": "Identiteit geverifieerd",
+        "member_since": "Lid sinds",
+        "pass_active_since": "Pass actief sinds",
+        "reviews_received": "Recensies ontvangen",
+        "trust_tier": "Vertrouwensniveau"
       }
     }
   }

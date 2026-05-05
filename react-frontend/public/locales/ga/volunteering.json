@@ -4,6 +4,7 @@
   "page_title": "Obair Dheonach",
   "heading": "Obair Dheonach",
   "subtitle": "Aimsigh deiseanna agus lean do thionchar",
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
   "browse_organisations": "Brabhsail Eagrais",
   "tab_opportunities": "Deiseanna",
   "tab_applications": "Mo Chuid Iarratas",
@@ -44,11 +45,13 @@
   "total_hours": "Uaireanta Iomlána",
   "progress": "Dul Chun Cinn",
   "hours_of_goal": "{{current}} / {{goal}} uair",
+  "hours_abbrev": "{{hours}}h",
   "hours_progress_aria": "Dul chun cinn uaireanta: {{hours}} uair",
   "hours_by_organization": "Uaireanta de réir Eagrais",
   "hours_by_month": "Uaireanta de réir Mí",
   "no_hours_logged": "Nil aon uaireanta cláraithe fós",
   "no_hours_description": "Tosaigh ag clárú do chuid uaireanta oibre deonaí chun do thionchar a rianú",
+  "no_loggable_organisations_description": "Is féidir leat uaireanta a logáil tar éis d’eagraíocht d’iarratas a fhaomhadh nó tú a chur leis mar bhall.",
   "log_volunteering_hours": "Cláraigh Uaireanta Oibre Deonaí",
   "organisation_label": "Eagras",
   "select_organisation": "Roghnaigh eagras",
@@ -259,6 +262,7 @@
       "amount": "Méid",
       "message": "Teachtaireacht (roghnach)"
     },
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Ag tabhairt gan ainm",
     "anonymous_toggle_off": "Tabhair gan ainm",
     "cancel": "Cealaigh",
@@ -319,8 +323,7 @@
     "receipt_method": "Modh Íocaíochta",
     "receipt_message": "Teachtaireacht",
     "receipt_error": "Theip ar admháil a lódáil.",
-    "receipt_not_found": "Admháil gan aimsiú.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Admháil gan aimsiú."
   },
   "safeguarding": {
     "heading": "Cosaint",
@@ -331,6 +334,7 @@
     "load_error": "Ní féidir sonraí cosanta a lódáil.",
     "try_again": "Bain Triail Eile As",
     "fill_required": "Líon isteach gach réimse riachtanach le do thoil.",
+    "description_min": "Tabhair ar a laghad 20 carachtar sa chur síos.",
     "no_training_title": "Níl taifid oiliúna ann",
     "no_training_desc": "Cuir do thaifid oiliúna cosanta leis chun tosú.",
     "completed": "Críochnaithe",
@@ -423,7 +427,29 @@
   },
   "common": {
     "refresh": "Athnuaigh",
-    "try_again": "Bain Triail Eile As"
+    "try_again": "Bain Triail Eile As",
+    "cancel": "Cealaigh"
+  },
+  "group_signup": {
+    "title": "Cláruithe Grúpa",
+    "error_load": "Theip ar áirithintí grúpa a lódáil.",
+    "error_load_generic": "Ní féidir áirithintí grúpa a luchtú. Bain triail eile as.",
+    "empty_title": "Gan chlárú grúpa",
+    "empty_description": "Níl tú mar chuid d'aon áirithintí aistrithe grúpa fós. Ligeann clárú grúpa duit obair dheonach a dhéanamh le cairde nó le baill foirne.",
+    "leader": "Ceannaire",
+    "members": "Baill",
+    "created": "Cruthaithe",
+    "add_member": "Cuir Ball leis",
+    "add_group_member": "Cuir Ball den Ghrúpa leis",
+    "add_member_description": "Cuir isteach seoladh ríomhphoist an duine ar mhaith leat a chur leis an áirithint ghrúpa seo. Gheobhaidh siad cuireadh chun páirt a ghlacadh.",
+    "email_label": "Seoladh Ríomhphoist",
+    "email_placeholder": "ball@sampla.com",
+    "searching": "Ag cuardach...",
+    "lookup_error": "Ní féidir ball a chuardach. Bain triail eile as.",
+    "no_member_found": "Níor aimsíodh aon bhall leis an seoladh ríomhphoist sin.",
+    "member_added": "Ball curtha leis an ngrúpa.",
+    "add_member_error": "Theip ar bhall a chur leis. Seans go bhfuil siad sa ghrúpa cheana féin nó go bhfuil an ríomhphost neamhbhailí.",
+    "add_member_error_generic": "Ní féidir ball a chur leis. Seiceáil an ríomhphost agus bain triail eile as."
   },
   "recommendations": {
     "title": "Molta Duit",
@@ -446,6 +472,7 @@
     "no_verified_hours": "Níor aimsíodh uaireanta oibre deonaí deimhnithe. Caithfidh uaireanta a bheith ceadaithe sula ngintear teastas.",
     "generated_error": "Theip ar theastas a ghiniúint. Bain triail eile as le do thoil.",
     "verified_hours": "{{count}} Uair Dheimhnithe",
+    "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Ginte",
     "download": "Íoslódáil",
     "verify": "Fíoraigh"
@@ -487,6 +514,8 @@
     "mood_good": "Maith",
     "mood_great": "Ar fheabhas",
     "score_label": "Scór Folláine",
+    "score_out_of_100": "{{score}}/100 - {{label}}",
+    "score_aria": "Scór folláine: {{score}} as 100",
     "score_excellent": "Ar fheabhas",
     "risk_low": "Riosca Íseal",
     "this_week": "An tSeachtain Seo",
@@ -496,7 +525,6 @@
     "rest_days_desc": "Bunaithe ar do ghníomhaíocht le déanaí, molaimid sos a ghlacadh na laethanta seo:",
     "recent_checkins": "Seiceálacha Giúmair Le Déanaí"
   },
-  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
   "page_meta": {
     "create_opportunity": {
       "title": "Create Opportunity"

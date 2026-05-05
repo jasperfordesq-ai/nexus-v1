@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}} ترك اليوم",
   "new_conversation_aria": "ابدأ محادثة جديدة",
   "typing_aria": "الذكاء الاصطناعي يكتب",
+  "sources_label": "مصادر",
   "error_label": "Error",
   "input_aria": "Message",
   "input_placeholder": "اسألني أي شيء... (اضغط Enter للإرسال، Shift+Enter لسطر جديد)",

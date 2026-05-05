@@ -2,6 +2,7 @@
   "trust_tier": {
     "title": "Mon niveau de confiance",
     "subtitle": "Votre statut au sein de la communauté",
+    "back": "Back to Community Hub",
     "tier_newcomer": "Nouveau venu",
     "tier_member": "Membre",
     "tier_trusted": "Personne de confiance",
@@ -13,7 +14,6 @@
     "criteria_reviews": "Évaluations reçues",
     "criteria_identity": "Identité vérifiée",
     "progress_to_next": "Progression vers {{tier}}",
-    "back": "Back to Community Hub",
     "breakdown": {
       "title": "Your trust tier breakdown",
       "subtitle": "Here's how you've earned your current tier and what you need for the next one.",
@@ -49,8 +49,6 @@
     "relationship_neighbour": "Voisin·e",
     "relationship_professional": "Professionnel·le des soins",
     "link_success": "Personne accompagnée liée avec succès",
-    "upcoming_care": "Accompagnement à venir",
-    "recent_care": "Accompagnement récent",
     "link_error": "Impossible de lier la personne accompagnée",
     "search_label": "Trouver un membre",
     "search_placeholder": "Rechercher par nom",
@@ -61,36 +59,10 @@
     "notes_label": "Notes",
     "notes_placeholder": "Contexte facultatif pour les coordinateur·trices ou les remplaçant·es de confiance",
     "cancel": "Annuler",
+    "upcoming_care": "Accompagnement à venir",
+    "recent_care": "Accompagnement récent",
     "no_upcoming_care": "Aucun accompagnement planifié",
     "no_recent_care": "Aucun journal d'accompagnement récent"
-  },
-  "providers": {
-    "title": "Annuaire des prestataires de soins",
-    "subtitle": "Trouvez des services de soins, des centres de jour, des associations et des bénévoles dans votre région",
-    "search_placeholder": "Rechercher des prestataires...",
-    "filter_all": "Tous",
-    "filter_spitex": "Spitex",
-    "filter_tagesstte": "Centres de jour",
-    "filter_private": "Privé",
-    "filter_verein": "Associations",
-    "filter_volunteer": "Bénévoles",
-    "verified_badge": "Vérifié",
-    "contact": "Contact",
-    "website": "Site web",
-    "opening_hours": "Heures d'ouverture",
-    "no_providers": "Aucun prestataire de soins trouvé",
-    "no_providers_hint": "Ajustez vos filtres ou votre recherche",
-    "filter_aria": "Filtrer les prestataires par type",
-    "call_aria": "Call provider at {{phone}}",
-    "email_aria": "Email provider at {{email}}",
-    "website_aria": "Visit provider website {{url}}"
-  },
-  "emergency_alert": {
-    "dismiss": "Fermer",
-    "severity_info": "Information",
-    "severity_warning": "Avertissement",
-    "severity_danger": "Urgence",
-    "region_label": "Emergency alerts"
   },
   "cover": {
     "title": "Accompagnement de remplacement",
@@ -134,26 +106,33 @@
       "assign": "Impossible d'attribuer le ou la remplaçant·e"
     }
   },
-  "warmth_pass": {
-    "title": "Mon laissez-passer de confiance",
-    "credential_label": "Laissez-passer de confiance de la communauté",
-    "not_eligible": "Pas encore éligible",
-    "not_eligible_hint": "Atteignez le niveau «Personne de confiance» pour débloquer votre laissez-passer",
-    "member_name": "Membre",
-    "hours_logged": "Heures enregistrées",
-    "reviews_received": "Évaluations reçues",
-    "identity_verified": "Identité vérifiée",
-    "yes": "Oui",
-    "no": "Non",
-    "categories": "Domaines dans lesquels j'aide",
-    "no_categories": "Aucun domaine pour le moment",
-    "member_since": "Membre depuis",
-    "active_since": "Laissez-passer actif depuis",
-    "issued_by": "Délivré par {{tenant}} via Project NEXUS",
-    "what_is_this": "Qu'est-ce qu'un laissez-passer de confiance ?",
-    "what_is_this_body": "Votre laissez-passer de confiance atteste que vous êtes un·e aidant·e vérifié·e et digne de confiance dans la communauté. Vous pouvez le présenter aux personnes accompagnées, aux coordinateur·trices et aux organisations comme preuve de votre engagement dans la Caring Community.",
-    "loading": "Chargement de votre laissez-passer...",
-    "error": "Impossible de charger votre laissez-passer de confiance"
+  "providers": {
+    "title": "Annuaire des prestataires de soins",
+    "subtitle": "Trouvez des services de soins, des centres de jour, des associations et des bénévoles dans votre région",
+    "search_placeholder": "Rechercher des prestataires...",
+    "filter_aria": "Filtrer les prestataires par type",
+    "filter_all": "Tous",
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Centres de jour",
+    "filter_private": "Privé",
+    "filter_verein": "Associations",
+    "filter_volunteer": "Bénévoles",
+    "verified_badge": "Vérifié",
+    "contact": "Contact",
+    "website": "Site web",
+    "call_aria": "Call provider at {{phone}}",
+    "email_aria": "Email provider at {{email}}",
+    "website_aria": "Visit provider website {{url}}",
+    "opening_hours": "Heures d'ouverture",
+    "no_providers": "Aucun prestataire de soins trouvé",
+    "no_providers_hint": "Ajustez vos filtres ou votre recherche"
+  },
+  "emergency_alert": {
+    "region_label": "Emergency alerts",
+    "dismiss": "Fermer",
+    "severity_info": "Information",
+    "severity_warning": "Avertissement",
+    "severity_danger": "Urgence"
   },
   "federation_picker": {
     "title": "Browse federated communities",
@@ -215,7 +194,79 @@
     "error_toast": "We couldn't generate your export. Please try again or contact support.",
     "back": "Back"
   },
+  "warmth_pass": {
+    "title": "Mon laissez-passer de confiance",
+    "credential_label": "Laissez-passer de confiance de la communauté",
+    "not_eligible": "Pas encore éligible",
+    "not_eligible_hint": "Atteignez le niveau «Personne de confiance» pour débloquer votre laissez-passer",
+    "member_name": "Membre",
+    "hours_logged": "Heures enregistrées",
+    "reviews_received": "Évaluations reçues",
+    "identity_verified": "Identité vérifiée",
+    "yes": "Oui",
+    "no": "Non",
+    "categories": "Domaines dans lesquels j'aide",
+    "no_categories": "Aucun domaine pour le moment",
+    "member_since": "Membre depuis",
+    "active_since": "Laissez-passer actif depuis",
+    "issued_by": "Délivré par {{tenant}} via Project NEXUS",
+    "what_is_this": "Qu'est-ce qu'un laissez-passer de confiance ?",
+    "what_is_this_body": "Votre laissez-passer de confiance atteste que vous êtes un·e aidant·e vérifié·e et digne de confiance dans la communauté. Vous pouvez le présenter aux personnes accompagnées, aux coordinateur·trices et aux organisations comme preuve de votre engagement dans la Caring Community.",
+    "loading": "Chargement de votre laissez-passer...",
+    "error": "Impossible de charger votre laissez-passer de confiance"
+  },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Basculer la barre latérale",
+      "back_to_site": "Retour au site",
+      "notifications": "Notifications",
+      "user_fallback": "Utilisateur",
+      "user_menu": "Menu utilisateur",
+      "my_profile": "Mon profil",
+      "sign_out": "se déconnecter"
+    },
+    "breadcrumbs": {
+      "aria": "Fil d'Ariane",
+      "segments": {
+        "caring": "Tableau de bord",
+        "workflow": "Flux de travail",
+        "projects": "Projets",
+        "loyalty": "Programme de fidélité",
+        "hour-transfers": "Transferts horaires",
+        "regional-points": "Points régionaux",
+        "sub-regions": "Sous-régions",
+        "federation-peers": "Pairs de la Fédération",
+        "sla-dashboard": "Tableau de bord SLA",
+        "providers": "Fournisseurs",
+        "warmth-pass": "Passe Chaleur",
+        "recipient-circle": "Cercle des bénéficiaires de soins",
+        "nudges": "Coups de pouce intelligents",
+        "emergency-alerts": "Alertes d'urgence",
+        "surveys": "Enquêtes municipales",
+        "copilot": "Copilote de communication",
+        "civic-digest": "Recueil civique",
+        "lead-nurture": "Gestion des leads",
+        "success-stories": "Histoires de réussite",
+        "feedback": "Boîte de réception des commentaires",
+        "verification": "Vérification municipale",
+        "safeguarding": "Rapports de sauvegarde",
+        "trust-tier": "Niveaux de confiance",
+        "launch-readiness": "Préparation au lancement",
+        "pilot-scoreboard": "Tableau de bord pilote",
+        "data-quality": "Qualité des données pilotes",
+        "operating-policy": "Politique de fonctionnement",
+        "disclosure-pack": "Dossier de divulgation",
+        "commercial-boundary": "Frontière commerciale",
+        "isolated-node": "Porte de nœud isolée",
+        "research": "Partenariats de recherche",
+        "external-integrations": "Intégrations externes",
+        "integration-showcase": "Vitrine d'intégration",
+        "municipal-impact": "Rapports d'impact municipaux",
+        "kpi-baselines": "Références des KPI",
+        "municipal-roi": "Retour sur investissement municipal",
+        "category-coefficients": "Coefficients de catégorie"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Annuaire des prestataires de soins - Administrateur",
+      "title": "Annuaire des prestataires de soins",
+      "subtitle": "Gérer les services de soins à domicile, les centres de jour, les associations et les groupes bénévoles",
+      "verified": "Vérifié",
+      "yes": "Oui",
+      "no": "Non",
+      "empty": "Aucun prestataire de soins pour l'instant : ajoutez-en un pour commencer.",
+      "confirm_delete": "Supprimer « {{name}} » ? Cela le cachera du répertoire.",
+      "confirm_deactivate": "Marquer « {{name}} » comme inactif ? Vous pourrez le réactiver plus tard.",
+      "actions": {
+        "add_provider": "Ajouter un fournisseur",
+        "cancel": "Annuler",
+        "close": "Fermer",
+        "create_provider": "Créer un fournisseur",
+        "deactivate_named": "Désactiver \"{{name}}\"",
+        "delete_provider": "Supprimer le fournisseur",
+        "edit_provider": "Modifier le fournisseur",
+        "find_duplicates": "Rechercher des doublons",
+        "save_changes": "Enregistrer les modifications",
+        "verify_provider": "Vérifier le fournisseur"
+      },
+      "about": {
+        "title": "À propos de cette page",
+        "body": "Les prestataires de soins sont des organisations externes qui participent au réseau de soins communautaires aux côtés de bénévoles individuels. Ils peuvent se voir attribuer des demandes d'aide, recevoir des paiements de crédits-temps et apparaître dans l'annuaire des membres.",
+        "verification_label": "Vérification",
+        "verification_body": "Les prestataires vérifiés affichent un badge dans l'annuaire. Vérifiez les politiques d’enregistrement, d’assurance et de protection avant de marquer un fournisseur comme vérifié.",
+        "types_label": "Types de fournisseurs",
+        "types_body": "Utilisez les champs de type et de description pour afficher les soins offerts afin que les membres et les coordinateurs puissent trouver le bon prestataire pour chaque demande."
+      },
+      "duplicates": {
+        "title": "Doublons potentiels",
+        "summary": "Fournisseurs actifs {{scanned}} analysés - Paires {{total}} au-dessus de 65 % de similarité",
+        "scanning": "Balayage...",
+        "empty": "Aucun doublon probable trouvé. Le répertoire semble propre.",
+        "vs": "contre",
+        "match_percent": "{{percent}}% correspondance"
+      },
+      "errors": {
+        "delete": "Échec de la suppression du fournisseur.",
+        "deactivate": "Échec de la désactivation du fournisseur.",
+        "duplicates": "Échec de la recherche des doublons.",
+        "load": "Échec du chargement des prestataires de soins.",
+        "name_required": "Le nom est requis.",
+        "save": "Échec de l'enregistrement du fournisseur.",
+        "type_required": "Le type de fournisseur est requis.",
+        "verify": "Échec de la vérification du fournisseur."
+      },
+      "fields": {
+        "address": "Adresse",
+        "description": "Description",
+        "email": "E-mail",
+        "name": "Nom",
+        "phone": "Téléphone",
+        "status": "Statut",
+        "type": "Taper",
+        "website": "Site web"
+      },
+      "messages": {
+        "created": "Fournisseur créé avec succès.",
+        "deactivated": "\"{{name}}\" désactivé.",
+        "removed": "Fournisseur supprimé.",
+        "updated": "Fournisseur mis à jour avec succès.",
+        "verified": "\"{{name}}\" marqué comme vérifié."
+      },
+      "modal": {
+        "create_title": "Ajouter un prestataire de soins",
+        "edit_title": "Edit : {{name}}"
+      },
+      "pagination": {
+        "next": "Suivant",
+        "previous": "Précédent",
+        "summary": "Affichage de {{from}}-{{to}} des fournisseurs {{total}}"
+      },
+      "placeholders": {
+        "address": "Rue, ville, code postal",
+        "description": "Brève description des services offerts...",
+        "name": "par ex. Community Care Service"
+      },
+      "signals": {
+        "address_overlap": "Chevauchement d'adresses",
+        "email_match": "Correspondance par e-mail",
+        "name_match": "Correspondance du nom",
+        "name_similar": "Nom similaire",
+        "phone_match": "Correspondance téléphonique",
+        "website_match": "Correspondance du site Web"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "table": {
+        "actions": "Actes",
+        "aria": "Tableau des prestataires de soins",
+        "name": "Nom",
+        "status": "Statut",
+        "type": "Taper",
+        "verified": "Vérifié"
+      },
+      "types": {
+        "private": "Service privé",
+        "spitex": "Spitex",
+        "tagesstätte": "Centre de jour",
+        "verein": "Association",
+        "volunteer": "Groupe de bénévoles"
+      }
+    },
+    "warmth_pass": {
+      "title": "Recherche de passe de chaleur",
+      "subtitle": "Afficher les informations d'identification de confiance de la communauté d'un membre",
+      "eligible": "Admissible",
+      "not_eligible": "Non éligible",
+      "verified": "Vérifié",
+      "not_verified": "Non vérifié",
+      "loading": "Chargement du pass membre...",
+      "empty_date": "Non défini",
+      "no_categories": "Aucune catégorie enregistrée.",
+      "tier_chip": "{{label}} (Niveau {{tier}})",
+      "about": {
+        "title": "À propos de cette page",
+        "body": "Un Warmth Pass est un identifiant de confiance portable montrant qu'un membre a atteint le niveau de confiance, a reçu des évaluations par les pairs et est éligible pour fournir des soins de quartier informels. Recipients can request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a member's credential on request, or to assist a member who is unsure of their eligibility."
+      },
+      "lookup": {
+        "title": "Recherche de membres",
+        "member_id": "Identifiant du membre",
+        "placeholder": "Entrez l'ID de membre numérique",
+        "button": "Chercher"
+      },
+      "errors": {
+        "no_data": "Aucune donnée renvoyée pour cet ID de membre.",
+        "lookup_failed": "Membre introuvable ou une erreur s'est produite."
+      },
+      "not_eligible_notice": {
+        "title": "Le membre n’a pas encore atteint le niveau Confiance et ne détient pas de Warmth Pass.",
+        "body": "Pour devenir éligibles, ils doivent enregistrer plus d’heures de soins et recevoir au moins une évaluation par les pairs. Ils peuvent vérifier leurs propres progrès sur la page de profil Trust."
+      },
+      "fields": {
+        "help_categories": "Catégories d'aide",
+        "hours_logged": "Heures enregistrées",
+        "identity_verified": "Identité vérifiée",
+        "member_since": "Membre depuis",
+        "pass_active_since": "Passe actif depuis",
+        "reviews_received": "Commentaires reçus",
+        "trust_tier": "Niveau de confiance"
       }
     }
   }

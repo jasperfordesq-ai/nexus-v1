@@ -695,7 +695,7 @@ export function ListingsPage() {
             <EntityMapView
               items={listings}
               getCoordinates={(l) => {
-                if (l.latitude === null || l.latitude === undefined || l.latitude === '' || l.longitude === null || l.longitude === undefined || l.longitude === '') {
+                if (l.latitude === null || l.latitude === undefined || l.longitude === null || l.longitude === undefined) {
                   return null;
                 }
                 const lat = Number(l.latitude);

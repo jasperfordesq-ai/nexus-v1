@@ -6,6 +6,7 @@
   "limits_left_today": "{{count}}が今日残っています",
   "new_conversation_aria": "新しい会話を始める",
   "typing_aria": "AIが入力中です",
+  "sources_label": "情報源",
   "error_label": "Error",
   "input_aria": "Message",
   "input_placeholder": "何でも聞いてください...（送信するにはEnter、改行するにはShift+Enter）",
