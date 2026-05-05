@@ -24,7 +24,7 @@ if [ ! -d "$MIGRATIONS_DIR" ]; then
 fi
 
 pending_raw="$(docker exec "$APP_CONTAINER" php /var/www/html/artisan migrate:status --pending 2>/dev/null || true)"
-if echo "$pending_raw" | grep -qi "Nothing to migrate\|No migrations found"; then
+if echo "$pending_raw" | grep -qi "Nothing to migrate\|No pending migrations\|No migrations found"; then
     log_ok "No pending migrations - safety gate passes vacuously"
     exit 0
 fi
@@ -88,21 +88,21 @@ for f in "${pending_files[@]}"; do
     alter_body="$(printf '%s\n' "$body" | strip_schema_create_blocks)"
     one_line_body="$(printf '%s\n' "$body" | tr '\n' ' ')"
 
-    matches="$(printf '%s\n' "$body" | grep -niE "$DANGEROUS_PHP_PATTERNS" || true)"
+    matches="$(printf '%s\n' "$body" | grep -niE -- "$DANGEROUS_PHP_PATTERNS" || true)"
     if [ -n "$matches" ]; then
         log_err "Destructive schema builder operation in $(basename "$f"):"
         echo "$matches" | sed 's/^/    /'
         violations=$((violations + 1))
     fi
 
-    raw_matches="$(printf '%s\n' "$one_line_body" | grep -oiE "$RAW_DESTRUCTIVE_SQL_PATTERNS" || true)"
+    raw_matches="$(printf '%s\n' "$one_line_body" | grep -oiE -- "$RAW_DESTRUCTIVE_SQL_PATTERNS" || true)"
     if [ -n "$raw_matches" ]; then
         log_err "Raw destructive SQL in $(basename "$f"):"
         echo "$raw_matches" | sed 's/^/    /'
         violations=$((violations + 1))
     fi
 
-    nullable_matches="$(printf '%s\n' "$alter_body" | grep -nP "$NON_NULL_WITHOUT_DEFAULT" || true)"
+    nullable_matches="$(printf '%s\n' "$alter_body" | grep -nP -- "$NON_NULL_WITHOUT_DEFAULT" || true)"
     if [ -n "$nullable_matches" ]; then
         log_err "Non-nullable column add/change on an existing table without nullable() or default() in $(basename "$f"):"
         echo "$nullable_matches" | sed 's/^/    /'
@@ -112,14 +112,14 @@ done
 
 pretend_raw="$(docker exec "$APP_CONTAINER" php /var/www/html/artisan migrate --pretend --force 2>/dev/null || true)"
 if [ -n "$pretend_raw" ]; then
-    pretend_destructive="$(printf '%s\n' "$pretend_raw" | grep -niE "$PRETEND_DESTRUCTIVE_SQL" || true)"
+    pretend_destructive="$(printf '%s\n' "$pretend_raw" | grep -niE -- "$PRETEND_DESTRUCTIVE_SQL" || true)"
     if [ -n "$pretend_destructive" ]; then
         log_err "Destructive SQL detected in migrate --pretend output:"
         echo "$pretend_destructive" | sed 's/^/    /'
         violations=$((violations + 1))
     fi
 
-    pretend_non_null="$(printf '%s\n' "$pretend_raw" | grep -niP "$PRETEND_NON_NULL_ADD" || true)"
+    pretend_non_null="$(printf '%s\n' "$pretend_raw" | grep -niP -- "$PRETEND_NON_NULL_ADD" || true)"
     if [ -n "$pretend_non_null" ]; then
         log_err "Non-nullable column add without DEFAULT detected in migrate --pretend output:"
         echo "$pretend_non_null" | sed 's/^/    /'
