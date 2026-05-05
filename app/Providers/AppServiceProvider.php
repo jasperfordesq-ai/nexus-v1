@@ -245,6 +245,8 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private const TRANSLATION_CACHE_FILE = 'nexus_translations.php';
+
     public function register(): void
     {
         // --- Existing services ---
@@ -1099,37 +1101,91 @@ class AppServiceProvider extends ServiceProvider
             if (!is_dir($basePath)) return;
 
             // Load nested JSON translations for EVERY locale directory, not just
-            // the current one. Critical for queued jobs: the queue worker boots
-            // once with a default locale, but each job may run for a different
-            // tenant/recipient locale. Loading all locales up-front means
-            // __() works regardless of mid-request setLocale() calls.
-            foreach (scandir($basePath) as $entry) {
-                if ($entry === '.' || $entry === '..') continue;
-                $langPath = $basePath . DIRECTORY_SEPARATOR . $entry;
-                if (!is_dir($langPath)) continue;
-                $locale = $entry;
-
-                foreach (glob($langPath . '/*.json') as $file) {
-                    $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails_misc'
-                    $data = json_decode(file_get_contents($file), true);
-                    if (!is_array($data)) continue;
-
-                    // Flatten nested arrays into dot-notation and register with the
-                    // translator. Convert {{var}} placeholders (i18next format used
-                    // in JSON) to :var (Laravel format) so __() parameter
-                    // substitution works.
-                    $flattened = \Illuminate\Support\Arr::dot($data);
-                    foreach ($flattened as $key => $value) {
-                        if (is_string($value)) {
-                            $value = preg_replace('/\{\{(\w+)\}\}/', ':$1', $value);
-                        }
-                        $translator->addLines([$namespace . '.' . $key => $value], $locale);
-                    }
+            // the current one. The flattened result is cached because reading and
+            // decoding hundreds of JSON files on every request is extremely slow
+            // on Docker Desktop bind mounts.
+            foreach ($this->loadCachedJsonTranslations($basePath) as $locale => $lines) {
+                if (!empty($lines)) {
+                    $translator->addLines($lines, $locale);
                 }
             }
         } catch (\Throwable $e) {
             // Non-fatal — emails will show raw keys but the app won't crash
             \Illuminate\Support\Facades\Log::warning('loadJsonTranslations failed: ' . $e->getMessage());
+        }
+    }
+
+    private function loadCachedJsonTranslations(string $basePath): array
+    {
+        $cachePath = base_path('bootstrap/cache/' . self::TRANSLATION_CACHE_FILE);
+
+        if (is_file($cachePath)) {
+            $cached = require $cachePath;
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
+
+        $translations = $this->buildJsonTranslationLines($basePath);
+        $this->writeJsonTranslationCache($cachePath, $translations);
+
+        return $translations;
+    }
+
+    private function buildJsonTranslationLines(string $basePath): array
+    {
+        $translations = [];
+
+        // Loading all locales up-front is important for queued jobs: a queue
+        // worker boots once, then individual jobs may switch locale per tenant
+        // or recipient.
+        foreach (scandir($basePath) as $entry) {
+            if ($entry === '.' || $entry === '..') continue;
+
+            $langPath = $basePath . DIRECTORY_SEPARATOR . $entry;
+            if (!is_dir($langPath)) continue;
+
+            foreach (glob($langPath . '/*.json') as $file) {
+                $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails_misc'
+                $contents = file_get_contents($file);
+                if ($contents === false) continue;
+
+                $data = json_decode($contents, true);
+                if (!is_array($data)) continue;
+
+                // Flatten nested arrays into dot-notation and register with the
+                // translator. Convert {{var}} placeholders (i18next format used
+                // in JSON) to :var (Laravel format) so __() parameter
+                // substitution works.
+                foreach (\Illuminate\Support\Arr::dot($data) as $key => $value) {
+                    if (is_string($value)) {
+                        $value = preg_replace('/\{\{(\w+)\}\}/', ':$1', $value);
+                    }
+                    $translations[$entry][$namespace . '.' . $key] = $value;
+                }
+            }
+        }
+
+        return $translations;
+    }
+
+    private function writeJsonTranslationCache(string $cachePath, array $translations): void
+    {
+        $directory = dirname($cachePath);
+        if (!is_dir($directory) || !is_writable($directory)) {
+            return;
+        }
+
+        $tmpPath = $cachePath . '.' . getmypid() . '.tmp';
+        $contents = "<?php\n\nreturn " . var_export($translations, true) . ";\n";
+
+        if (file_put_contents($tmpPath, $contents, LOCK_EX) === false) {
+            return;
+        }
+
+        @rename($tmpPath, $cachePath);
+        if (is_file($tmpPath)) {
+            @unlink($tmpPath);
         }
     }
 

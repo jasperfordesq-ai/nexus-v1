@@ -54,6 +54,10 @@ vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
 }));
 
+vi.mock('@/hooks/useMediaQuery', () => ({
+  useMediaQuery: vi.fn(() => true),
+}));
+
 vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
@@ -109,6 +113,18 @@ describe('FeedPage', () => {
   it('renders without crashing', () => {
     render(<FeedPage />);
     expect(screen.getByText('Community Feed')).toBeInTheDocument();
+  });
+
+  it('keeps feed controls and desktop sidebar in normal document flow', () => {
+    render(<FeedPage />);
+
+    const feedControls = screen.getByTestId('feed-controls');
+    const sidebarPanel = screen.getByTestId('feed-sidebar-panel');
+
+    expect(feedControls.className).not.toMatch(/\b(sticky|fixed)\b/);
+    expect(sidebarPanel.className).not.toMatch(/\b(sticky|fixed)\b/);
+    expect(sidebarPanel).toHaveClass('static');
+    expect(sidebarPanel).toHaveClass('self-start');
   });
 
   it('shows the page description', () => {

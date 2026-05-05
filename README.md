@@ -71,8 +71,11 @@ cd nexus-v1
 # Copy the example environment file and fill in your values
 cp .env.docker.example .env.docker
 
-# Start with Docker
+# Start backend/database/services with Docker
 docker compose up -d
+
+# Start the React frontend with native Vite on Windows
+npm run dev:frontend
 
 # Run Laravel migrations to set up the database schema
 docker exec nexus-php-app php artisan migrate

@@ -62,6 +62,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { resetImpressions } from '@/hooks/useFeedTracking';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
@@ -145,6 +146,7 @@ export function FeedPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { tenantPath, tenant, hasFeature, hasModule } = useTenant();
+  const showDesktopSidebar = useMediaQuery('(min-width: 1024px)');
   const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -832,9 +834,9 @@ export function FeedPage() {
       description={t("subtitle")}
       noIndex
     />
-    <div className="max-w-6xl mx-auto flex gap-6">
+    <div className="mx-auto flex max-w-6xl items-start justify-center gap-6">
       {/* Main Feed Column */}
-      <div className="flex-1 min-w-0 max-w-2xl space-y-4">
+      <div className="w-full min-w-0 max-w-2xl flex-1 space-y-4">
 
       {/* Pull-to-refresh indicator (mobile only) */}
       {(pullDistance > 0 || isRefreshing) && (
@@ -883,7 +885,7 @@ export function FeedPage() {
       </div>
 
       {/* Feed controls */}
-      <div className="sticky top-[72px] z-30 w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-2.5 shadow-sm backdrop-blur-md">
+      <div data-testid="feed-controls" className="w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-2.5 shadow-sm">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
@@ -1292,12 +1294,14 @@ export function FeedPage() {
       </Modal>
       </div>
 
-      {/* Right Sidebar — Full widget panel (hidden on mobile) */}
-      <aside className="hidden lg:block w-72 flex-shrink-0">
-        <SidebarErrorBoundary>
-          <FeedSidebar />
-        </SidebarErrorBoundary>
-      </aside>
+      {/* Right Sidebar — full widget panel in normal document flow. */}
+      {showDesktopSidebar && (
+        <aside data-testid="feed-sidebar-panel" className="static hidden w-72 shrink-0 self-start lg:block">
+          <SidebarErrorBoundary>
+            <FeedSidebar />
+          </SidebarErrorBoundary>
+        </aside>
+      )}
     </div>
 
     {/* Mobile FAB */}
