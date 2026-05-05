@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Http\Controllers\Api\AdminNewsletterController;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -152,7 +153,151 @@ class AdminNewsletterControllerTest extends TestCase
     }
 
     // ================================================================
-    // BOUNCES — GET /v2/admin/newsletters/bounces
+    // PER-CAMPAIGN REPORTING - stats/openers/clickers
+    // ================================================================
+
+    public function test_campaign_stats_report_recorded_opens_and_clicks(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Stats regression test',
+            'subject' => 'Stats regression test',
+            'content' => '<p>Hello</p>',
+            'status' => 'sent',
+            'total_recipients' => 3,
+            'total_sent' => 3,
+            'target_audience' => 'all_members',
+            'created_by' => $admin->id,
+            'sent_at' => now()->subHour(),
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHour(),
+        ]);
+
+        DB::table('newsletter_opens')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'one@example.test',
+                'user_agent' => 'GoogleImageProxy',
+                'ip_address' => '127.0.0.1',
+                'opened_at' => now()->subMinutes(40),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'one@example.test',
+                'user_agent' => 'GoogleImageProxy',
+                'ip_address' => '127.0.0.1',
+                'opened_at' => now()->subMinutes(39),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'two@example.test',
+                'user_agent' => 'YahooMailProxy',
+                'ip_address' => '127.0.0.2',
+                'opened_at' => now()->subMinutes(30),
+            ],
+        ]);
+
+        DB::table('newsletter_clicks')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'one@example.test',
+                'url' => 'https://hour-timebank.ie/',
+                'link_id' => hash('sha256', 'https://hour-timebank.ie/'),
+                'user_agent' => 'Mozilla',
+                'ip_address' => '127.0.0.1',
+                'clicked_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'two@example.test',
+                'url' => 'https://hour-timebank.ie/',
+                'link_id' => hash('sha256', 'https://hour-timebank.ie/'),
+                'user_agent' => 'Mozilla',
+                'ip_address' => '127.0.0.2',
+                'clicked_at' => now()->subMinutes(10),
+            ],
+        ]);
+
+        $response = $this->apiGet("/v2/admin/newsletters/{$newsletterId}/stats");
+
+        $response->assertOk()
+            ->assertJsonPath('data.engagement.total_opens', 3)
+            ->assertJsonPath('data.engagement.unique_opens', 2)
+            ->assertJsonPath('data.engagement.total_clicks', 2)
+            ->assertJsonPath('data.engagement.unique_clicks', 2)
+            ->assertJsonPath('data.top_links.0.url', 'https://hour-timebank.ie/')
+            ->assertJsonPath('data.top_links.0.clicks', 2);
+    }
+
+    public function test_openers_and_clickers_lists_report_recorded_people(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Activity regression test',
+            'subject' => 'Activity regression test',
+            'content' => '<p>Hello</p>',
+            'status' => 'sent',
+            'total_recipients' => 2,
+            'total_sent' => 2,
+            'target_audience' => 'all_members',
+            'created_by' => $admin->id,
+            'sent_at' => now()->subHour(),
+            'created_at' => now()->subHours(2),
+            'updated_at' => now()->subHour(),
+        ]);
+
+        DB::table('newsletter_opens')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'opened@example.test',
+                'opened_at' => now()->subMinutes(20),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'opened@example.test',
+                'opened_at' => now()->subMinutes(10),
+            ],
+        ]);
+
+        DB::table('newsletter_clicks')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'newsletter_id' => $newsletterId,
+                'email' => 'clicked@example.test',
+                'url' => 'https://hour-timebank.ie/',
+                'link_id' => hash('sha256', 'https://hour-timebank.ie/'),
+                'clicked_at' => now()->subMinutes(5),
+            ],
+        ]);
+
+        $this->apiGet("/v2/admin/newsletters/{$newsletterId}/openers")
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.email', 'opened@example.test')
+            ->assertJsonPath('data.0.open_count', 2);
+
+        $this->apiGet("/v2/admin/newsletters/{$newsletterId}/clickers")
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.email', 'clicked@example.test')
+            ->assertJsonPath('data.0.click_count', 1);
+    }
+
+    // ================================================================
+    // BOUNCES - GET /v2/admin/newsletters/bounces
     // ================================================================
 
     public function test_bounces_returns_200_for_admin(): void

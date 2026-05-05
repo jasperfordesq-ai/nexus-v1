@@ -52,6 +52,15 @@ class NewsletterAnalytics extends Model
                 ->where('newsletter_id', $newsletterId)
                 ->where('tracking_token', $trackingToken)
                 ->first();
+
+            if (!$queue) {
+                $queue = DB::table('newsletter_queue')
+                    ->where('newsletter_id', $newsletterId)
+                    ->where('unsubscribe_token', $trackingToken)
+                    ->orderByDesc('id')
+                    ->first();
+            }
+
             $queueId = $queue->id ?? null;
         }
 
@@ -92,6 +101,15 @@ class NewsletterAnalytics extends Model
                 ->where('newsletter_id', $newsletterId)
                 ->where('tracking_token', $trackingToken)
                 ->first();
+
+            if (!$queue) {
+                $queue = DB::table('newsletter_queue')
+                    ->where('newsletter_id', $newsletterId)
+                    ->where('unsubscribe_token', $trackingToken)
+                    ->orderByDesc('id')
+                    ->first();
+            }
+
             $queueId = $queue->id ?? null;
         }
 

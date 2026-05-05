@@ -257,6 +257,13 @@ class NewsletterController extends BaseApiController
                 ->where('tracking_token', $token)
                 ->orderByDesc('id')
                 ->first(['newsletter_id', 'email']);
+
+            if (!$queue) {
+                $queue = DB::table('newsletter_queue')
+                    ->where('unsubscribe_token', $token)
+                    ->orderByDesc('id')
+                    ->first(['newsletter_id', 'email']);
+            }
         } catch (\Throwable $e) {
             Log::warning('Newsletter click token lookup failed', ['token' => $token, 'error' => $e->getMessage()]);
             return redirect($frontendUrl);

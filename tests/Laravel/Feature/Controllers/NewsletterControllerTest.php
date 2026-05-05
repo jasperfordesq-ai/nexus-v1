@@ -6,11 +6,13 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -30,6 +32,60 @@ class NewsletterControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function createSentNewsletterQueue(
+        ?string $trackingToken = null,
+        ?string $unsubscribeToken = null,
+        string $email = 'recipient@example.test'
+    ): array {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Tracking regression test',
+            'subject' => 'Tracking regression test',
+            'content' => '<p>Hello</p>',
+            'status' => 'sent',
+            'total_recipients' => 1,
+            'total_sent' => 1,
+            'target_audience' => 'all_members',
+            'created_by' => $admin->id,
+            'sent_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $trackingToken ??= Str::random(64);
+        $unsubscribeToken ??= Str::random(64);
+
+        $queueRow = [
+            'newsletter_id' => $newsletterId,
+            'user_id' => $admin->id,
+            'email' => $email,
+            'name' => 'Recipient Person',
+            'first_name' => 'Recipient',
+            'last_name' => 'Person',
+            'status' => 'sent',
+            'unsubscribe_token' => $unsubscribeToken,
+            'tracking_token' => $trackingToken,
+            'sent_at' => now(),
+            'created_at' => now(),
+        ];
+
+        if (Schema::hasColumn('newsletter_queue', 'tenant_id')) {
+            $queueRow['tenant_id'] = $this->testTenantId;
+        }
+
+        $queueId = DB::table('newsletter_queue')->insertGetId($queueRow);
+
+        return [
+            'newsletter_id' => $newsletterId,
+            'queue_id' => $queueId,
+            'email' => $email,
+            'tracking_token' => $trackingToken,
+            'unsubscribe_token' => $unsubscribeToken,
+        ];
     }
 
     // ------------------------------------------------------------------
@@ -113,23 +169,72 @@ class NewsletterControllerTest extends TestCase
         $response->assertRedirect('https://app.example.test');
     }
 
-    public function test_legacy_unprefixed_tracking_pixel_route_works_for_sent_email_links(): void
+    public function test_legacy_unprefixed_tracking_pixel_route_records_open_without_tenant_header(): void
     {
-        $response = $this->get('/v2/newsletter/pixel/legacy-token', $this->withTenantHeader());
+        $queue = $this->createSentNewsletterQueue();
+
+        TenantContext::reset();
+
+        $response = $this->get('/v2/newsletter/pixel/' . $queue['tracking_token']);
 
         $response->assertOk();
         $this->assertSame('image/gif', $response->headers->get('Content-Type'));
+        $this->assertDatabaseHas('newsletter_opens', [
+            'tenant_id' => $this->testTenantId,
+            'newsletter_id' => $queue['newsletter_id'],
+            'queue_id' => $queue['queue_id'],
+            'email' => $queue['email'],
+        ]);
+        $this->assertSame(1, (int) DB::table('newsletters')->where('id', $queue['newsletter_id'])->value('total_opens'));
+        $this->assertSame(1, (int) DB::table('newsletters')->where('id', $queue['newsletter_id'])->value('unique_opens'));
     }
 
-    public function test_legacy_unprefixed_click_route_redirects_for_sent_email_links(): void
+    public function test_legacy_unprefixed_click_route_records_click_without_tenant_header(): void
     {
         config(['app.frontend_url' => 'https://app.example.test']);
+        $queue = $this->createSentNewsletterQueue();
+        $url = 'https://hour-timebank.ie/';
+        $signature = hash_hmac('sha256', $queue['tracking_token'] . '|' . $url, (string) config('app.key'));
+
+        TenantContext::reset();
 
         $response = $this->get(
-            '/v2/newsletter/click/legacy-token?url=' . rawurlencode('https://hour-timebank.ie/'),
-            $this->withTenantHeader()
+            '/v2/newsletter/click/' . $queue['tracking_token'] . '?url=' . rawurlencode($url) . '&sig=' . rawurlencode($signature)
         );
 
-        $response->assertRedirect('https://app.example.test');
+        $response->assertRedirect($url);
+        $this->assertDatabaseHas('newsletter_clicks', [
+            'tenant_id' => $this->testTenantId,
+            'newsletter_id' => $queue['newsletter_id'],
+            'queue_id' => $queue['queue_id'],
+            'email' => $queue['email'],
+            'url' => $url,
+        ]);
+        $this->assertSame(1, (int) DB::table('newsletters')->where('id', $queue['newsletter_id'])->value('total_clicks'));
+        $this->assertSame(1, (int) DB::table('newsletters')->where('id', $queue['newsletter_id'])->value('unique_clicks'));
+    }
+
+    public function test_click_tracking_accepts_legacy_unsubscribe_tokens(): void
+    {
+        config(['app.frontend_url' => 'https://app.example.test']);
+        $legacyToken = Str::random(64);
+        $queue = $this->createSentNewsletterQueue(trackingToken: null, unsubscribeToken: $legacyToken);
+        $url = 'https://hour-timebank.ie/';
+        $signature = hash_hmac('sha256', $legacyToken . '|' . $url, (string) config('app.key'));
+
+        TenantContext::reset();
+
+        $response = $this->get(
+            '/v2/newsletter/click/' . $legacyToken . '?url=' . rawurlencode($url) . '&sig=' . rawurlencode($signature)
+        );
+
+        $response->assertRedirect($url);
+        $this->assertDatabaseHas('newsletter_clicks', [
+            'tenant_id' => $this->testTenantId,
+            'newsletter_id' => $queue['newsletter_id'],
+            'queue_id' => $queue['queue_id'],
+            'email' => $queue['email'],
+            'url' => $url,
+        ]);
     }
 }
