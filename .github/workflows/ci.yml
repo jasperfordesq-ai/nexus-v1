@@ -637,7 +637,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download React build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: react-frontend-build
           path: react-frontend/dist
