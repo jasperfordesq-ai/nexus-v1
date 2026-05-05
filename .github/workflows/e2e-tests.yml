@@ -74,7 +74,7 @@ jobs:
           npx playwright test --project=$PROJECT
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-${{ matrix.project }}
@@ -84,7 +84,7 @@ jobs:
           retention-days: 30
 
       - name: Upload screenshots on failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: e2e-screenshots-${{ matrix.project }}
@@ -122,7 +122,7 @@ jobs:
         run: npx playwright test --project=${{ matrix.project }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-${{ matrix.project }}
@@ -160,7 +160,7 @@ jobs:
         run: npx playwright test --project=chromium-civicone
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-themes
