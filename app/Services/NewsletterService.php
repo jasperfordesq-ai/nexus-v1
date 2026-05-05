@@ -822,18 +822,16 @@ HTML;
                     ];
                 }
 
-                // Add members not already in subscribers and not unsubscribed
-                $users = collect();
-                if (Schema::hasColumn('users', 'newsletter_opt_in')) {
-                    $users = DB::table('users')
-                        ->where('tenant_id', $tenantId)
-                        ->where('is_approved', 1)
-                        ->where('status', 'active')
-                        ->where('newsletter_opt_in', 1)
-                        ->whereNotNull('email')
-                        ->where('email', '!=', '')
-                        ->get(['id', 'email', 'name', 'first_name', 'last_name']);
-                }
+                // Add active members not already in subscribers and not unsubscribed.
+                // The admin "all/both" audiences are member broadcasts; explicit
+                // unsubscribes and suppressions are still respected below.
+                $users = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_approved', 1)
+                    ->where('status', 'active')
+                    ->whereNotNull('email')
+                    ->where('email', '!=', '')
+                    ->get(['id', 'email', 'name', 'first_name', 'last_name']);
 
                 foreach ($users as $user) {
                     $email = strtolower($user->email);
@@ -863,17 +861,13 @@ HTML;
                     ->flip()
                     ->all();
 
-                $users = collect();
-                if (Schema::hasColumn('users', 'newsletter_opt_in')) {
-                    $users = DB::table('users')
-                        ->where('tenant_id', $tenantId)
-                        ->where('is_approved', 1)
-                        ->where('status', 'active')
-                        ->where('newsletter_opt_in', 1)
-                        ->whereNotNull('email')
-                        ->where('email', '!=', '')
-                        ->get(['id', 'email', 'name', 'first_name', 'last_name']);
-                }
+                $users = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_approved', 1)
+                    ->where('status', 'active')
+                    ->whereNotNull('email')
+                    ->where('email', '!=', '')
+                    ->get(['id', 'email', 'name', 'first_name', 'last_name']);
 
                 foreach ($users as $user) {
                     // Skip users who have unsubscribed from newsletters

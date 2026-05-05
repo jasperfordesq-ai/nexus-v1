@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\NewsletterService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Mockery;
 use Tests\Laravel\TestCase;
@@ -172,24 +173,39 @@ class NewsletterServiceTest extends TestCase
         ]);
     }
 
-    public function test_member_recipient_count_requires_newsletter_opt_in(): void
+    public function test_all_members_recipient_count_includes_active_approved_members(): void
     {
         $this->withTenant(999);
 
-        User::factory()->forTenant($this->testTenantId)->create([
+        $memberWithOptInData = [
             'email' => 'member-opt-in@example.test',
             'status' => 'active',
             'is_approved' => 1,
-            'newsletter_opt_in' => 1,
-        ]);
-        User::factory()->forTenant($this->testTenantId)->create([
-            'email' => 'member-opt-out@example.test',
+        ];
+        $memberWithoutOptInData = [
+            'email' => 'member-no-opt-in@example.test',
             'status' => 'active',
             'is_approved' => 1,
-            'newsletter_opt_in' => 0,
+        ];
+        $pendingMemberData = [
+            'email' => 'pending-member@example.test',
+            'status' => 'pending',
+            'is_approved' => 0,
+        ];
+
+        if (Schema::hasColumn('users', 'newsletter_opt_in')) {
+            $memberWithOptInData['newsletter_opt_in'] = 1;
+            $memberWithoutOptInData['newsletter_opt_in'] = 0;
+            $pendingMemberData['newsletter_opt_in'] = 1;
+        }
+
+        User::factory()->forTenant($this->testTenantId)->create($memberWithOptInData);
+        User::factory()->forTenant($this->testTenantId)->create($memberWithoutOptInData);
+        User::factory()->forTenant($this->testTenantId)->create([
+            ...$pendingMemberData,
         ]);
 
-        $this->assertSame(1, NewsletterService::getRecipientCount('all_members'));
+        $this->assertSame(2, NewsletterService::getRecipientCount('all_members'));
     }
 
     public function test_recurring_newsletters_can_queue_same_email_again(): void
