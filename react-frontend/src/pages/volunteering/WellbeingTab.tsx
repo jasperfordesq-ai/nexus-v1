@@ -299,7 +299,7 @@ export function WellbeingTab() {
                   <Activity className="w-5 h-5 text-indigo-400" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-theme-primary">{data.hours_this_week}h</p>
+                  <p className="text-2xl font-bold text-theme-primary">{t('hours_abbrev', { hours: data.hours_this_week })}</p>
                   <p className="text-xs text-theme-muted">{t('wellbeing.this_week', 'This Week')}</p>
                 </div>
               </div>
@@ -312,7 +312,7 @@ export function WellbeingTab() {
                   <CalendarCheck className="w-5 h-5 text-violet-400" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-theme-primary">{data.hours_this_month}h</p>
+                  <p className="text-2xl font-bold text-theme-primary">{t('hours_abbrev', { hours: data.hours_this_month })}</p>
                   <p className="text-xs text-theme-muted">{t('wellbeing.this_month', 'This Month')}</p>
                 </div>
               </div>
@@ -345,7 +345,10 @@ export function WellbeingTab() {
                     {data.burnout_risk === 'low' ? t('wellbeing.risk_low', 'Low Risk') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate', 'Moderate Risk') : t('wellbeing.risk_high', 'High Risk')}
                   </Chip>
                   <span className={`text-sm font-semibold ${getScoreColor(data.score).text}`}>
-                    {data.score}/100 &mdash; {getScoreLabel(data.score, (key, defaultValue) => t(key, defaultValue))}
+                    {t('wellbeing.score_out_of_100', '{{score}}/100 - {{label}}', {
+                      score: data.score,
+                      label: getScoreLabel(data.score, (key, defaultValue) => t(key, defaultValue)),
+                    })}
                   </span>
                 </div>
               </div>
@@ -357,7 +360,7 @@ export function WellbeingTab() {
                   track: 'bg-theme-hover',
                 }}
                 size="lg"
-                aria-label={`Wellbeing score: ${data.score} out of 100`}
+                aria-label={t('wellbeing.score_aria', 'Wellbeing score: {{score}} out of 100', { score: data.score })}
               />
             </GlassCard>
           </motion.div>

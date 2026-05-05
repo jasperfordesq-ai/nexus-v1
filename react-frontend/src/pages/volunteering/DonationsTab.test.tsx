@@ -113,7 +113,7 @@ describe('DonationsTab', () => {
     render(<DonationsTab />);
     expect(screen.getByText('Donations')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Refresh/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Donate/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Donate' })).toBeInTheDocument();
   });
 
   it('shows empty state when no giving days or donations exist', async () => {

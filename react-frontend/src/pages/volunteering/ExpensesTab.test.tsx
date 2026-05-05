@@ -185,10 +185,14 @@ describe('ExpensesTab', () => {
   });
 
   it('retries loading when Try Again is clicked', async () => {
-    let callCount = 0;
-    vi.mocked(api.get).mockImplementation(() => {
-      callCount++;
-      if (callCount === 1) return Promise.resolve({ success: false, data: null });
+    let expenseCallCount = 0;
+    vi.mocked(api.get).mockImplementation((endpoint: string) => {
+      if (endpoint.includes('/v2/volunteering/expenses')) {
+        expenseCallCount++;
+        if (expenseCallCount === 1) return Promise.resolve({ success: false, data: null });
+        return Promise.resolve({ success: true, data: { items: [], has_more: false } });
+      }
+
       return Promise.resolve({ success: true, data: { items: [], has_more: false } });
     });
     render(<ExpensesTab />);
@@ -199,7 +203,7 @@ describe('ExpensesTab', () => {
     const tryAgainBtn = buttons.find((btn) => btn.textContent?.includes('Try Again'));
     fireEvent.click(tryAgainBtn!);
     await waitFor(() => {
-      expect(callCount).toBe(2);
+      expect(expenseCallCount).toBe(2);
     });
   });
 });

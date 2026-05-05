@@ -89,7 +89,9 @@ const AccessibilityTab = React.lazy(() => import('./AccessibilityTab'));
 interface Organization {
   id: number;
   name: string;
-  logo_url: string | null;
+  logo_url?: string | null;
+  status?: string;
+  member_role?: string;
 }
 
 interface Opportunity {
@@ -138,6 +140,24 @@ interface HoursSummary {
   total_declined: number;
   by_organization: { name: string; hours: number }[];
   by_month: { month: string; hours: number }[];
+}
+
+function extractCollectionItems<T>(payload: unknown): T[] {
+  if (Array.isArray(payload)) {
+    return payload as T[];
+  }
+
+  if (payload && typeof payload === 'object') {
+    const wrapped = payload as { items?: T[]; data?: { items?: T[] } };
+    if (Array.isArray(wrapped.items)) {
+      return wrapped.items;
+    }
+    if (Array.isArray(wrapped.data?.items)) {
+      return wrapped.data.items;
+    }
+  }
+
+  return [];
 }
 
 type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
@@ -407,8 +427,7 @@ function OpportunitiesTab() {
       if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
-        const raw = response.data as Application[] | { items?: Application[] };
-        const items = Array.isArray(raw) ? raw : (raw.items ?? []);
+        const items = extractCollectionItems<Opportunity>(response.data);
 
         if (append) {
           setOpportunities((prev) => [...prev, ...items]);
@@ -1001,9 +1020,10 @@ function HoursTab() {
       setIsLoading(true);
       setError(null);
 
-      const [summaryRes, orgsRes] = await Promise.all([
+      const [summaryRes, applicationsRes, myOrgsRes] = await Promise.all([
         api.get<HoursSummary>('/v2/volunteering/hours/summary'),
-        api.get<Organization[]>('/v2/volunteering/organisations?per_page=50'),
+        api.get<unknown>('/v2/volunteering/applications?status=approved&per_page=50'),
+        api.get<unknown>('/v2/volunteering/my-organisations?per_page=50'),
       ]);
 
       if (controller.signal.aborted) return;
@@ -1014,9 +1034,25 @@ function HoursTab() {
         setError(tRef.current('error_load_hours'));
       }
 
-      if (orgsRes.success && orgsRes.data) {
-        setOrganisations(Array.isArray(orgsRes.data) ? orgsRes.data : []);
+      const eligibleOrganisations = new Map<number, Organization>();
+
+      if (applicationsRes.success && applicationsRes.data) {
+        extractCollectionItems<Application>(applicationsRes.data).forEach((application) => {
+          if (application.status === 'approved' && application.organization?.id) {
+            eligibleOrganisations.set(application.organization.id, application.organization);
+          }
+        });
       }
+
+      if (myOrgsRes.success && myOrgsRes.data) {
+        extractCollectionItems<Organization>(myOrgsRes.data)
+          .filter((org) => ['approved', 'active'].includes(org.status ?? ''))
+          .forEach((org) => {
+            eligibleOrganisations.set(org.id, org);
+          });
+      }
+
+      setOrganisations(Array.from(eligibleOrganisations.values()).sort((a, b) => a.name.localeCompare(b.name)));
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load hours summary', err);
@@ -1074,10 +1110,17 @@ function HoursTab() {
           className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
+          isDisabled={isLoading || organisations.length === 0}
         >
           {t('log_hours')}
         </Button>
       </div>
+
+      {!isLoading && !error && organisations.length === 0 && (
+        <GlassCard className="p-4">
+          <p className="text-sm text-theme-muted">{t('no_loggable_organisations_description')}</p>
+        </GlassCard>
+      )}
 
       {/* Error */}
       {error && !isLoading && (
@@ -1213,6 +1256,7 @@ function HoursTab() {
                     <Button
                       className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
                       onPress={onOpen}
+                      isDisabled={organisations.length === 0}
                     >
                       {t('log_hours')}
                     </Button>

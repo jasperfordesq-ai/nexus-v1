@@ -32,9 +32,37 @@ vi.mock("framer-motion", () => ({
   useSpring: () => ({ get: () => 0 }),
 }));
 
+const interpolate = (template: string, opts?: Record<string, unknown>) =>
+  template.replace(/\{\{(\w+)\}\}/g, (_match, key: string) => String(opts?.[key] ?? ""));
+
+const stableT = (
+  key: string,
+  fallbackOrOptions?: string | Record<string, unknown>,
+  opts?: Record<string, unknown>,
+) => {
+  if (typeof fallbackOrOptions === "string") {
+    return interpolate(fallbackOrOptions, opts);
+  }
+
+  if (fallbackOrOptions && typeof fallbackOrOptions === "object") {
+    const translations: Record<string, string> = {
+      hours_abbrev: "{{hours}}h",
+      "wellbeing.score_aria": "Wellbeing score: {{score}} out of 100",
+      "wellbeing.score_out_of_100": "{{score}}/100 - {{label}}",
+    };
+
+    return interpolate(
+      translations[key] ?? String(fallbackOrOptions.defaultValue ?? key),
+      fallbackOrOptions,
+    );
+  }
+
+  return key;
+};
+
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback: string, _opts?: object) => fallback ?? _key,
+    t: stableT,
   }),
 }));
 

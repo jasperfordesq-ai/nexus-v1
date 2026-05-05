@@ -76,6 +76,12 @@ vi.mock("@/lib/logger", () => ({
   logError: vi.fn(),
 }));
 
+vi.mock("@/contexts", () => ({
+  useTenant: () => ({
+    tenantPath: (path: string) => `/hour-timebank${path}`,
+  }),
+}));
+
 import { RecommendedShiftsTab } from "./RecommendedShiftsTab";
 import { api } from "@/lib/api";
 

@@ -184,7 +184,7 @@ export default function MyOrganisationsPage() {
                     <div className="flex items-center gap-4 flex-shrink-0">
                       {org.balance !== undefined && (
                         <div className="text-center">
-                          <p className="text-lg font-bold text-emerald-500">{org.balance}h</p>
+                          <p className="text-lg font-bold text-emerald-500">{t('hours_abbrev', { hours: org.balance })}</p>
                           <p className="text-xs text-theme-subtle">{t('wallet', 'Wallet')}</p>
                         </div>
                       )}

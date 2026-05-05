@@ -51,6 +51,7 @@
   "hours_by_month": "Hours by Month",
   "no_hours_logged": "No hours logged yet",
   "no_hours_description": "Start logging your volunteering hours to track your impact",
+  "no_loggable_organisations_description": "You can log hours after an organisation approves your application or adds you as a member.",
   "log_volunteering_hours": "Log Volunteering Hours",
   "organisation_label": "Organisation",
   "select_organisation": "Select organisation",
@@ -426,7 +427,29 @@
   },
   "common": {
     "refresh": "Refresh",
-    "try_again": "Try Again"
+    "try_again": "Try Again",
+    "cancel": "Cancel"
+  },
+  "group_signup": {
+    "title": "Group Sign-ups",
+    "error_load": "Failed to load group reservations.",
+    "error_load_generic": "Unable to load group reservations. Please try again.",
+    "empty_title": "No group sign-ups",
+    "empty_description": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
+    "leader": "Leader",
+    "members": "Members",
+    "created": "Created",
+    "add_member": "Add Member",
+    "add_group_member": "Add Group Member",
+    "add_member_description": "Enter the email address of the person you would like to add to this group reservation. They will receive an invitation to join.",
+    "email_label": "Email Address",
+    "email_placeholder": "member@example.com",
+    "searching": "Searching...",
+    "lookup_error": "Unable to look up member. Please try again.",
+    "no_member_found": "No member found with that email address.",
+    "member_added": "Member added to the group.",
+    "add_member_error": "Failed to add member. They may already be in the group or the email is invalid.",
+    "add_member_error_generic": "Unable to add member. Please check the email and try again."
   },
   "recommendations": {
     "title": "Recommended for You",
@@ -449,6 +472,7 @@
     "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
     "generated_error": "Failed to generate certificate. Please try again.",
     "verified_hours": "{{count}} Verified Hours",
+    "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Generated",
     "download": "Download",
     "verify": "Verify"
@@ -490,6 +514,8 @@
     "mood_good": "Good",
     "mood_great": "Great",
     "score_label": "Wellbeing Score",
+    "score_out_of_100": "{{score}}/100 - {{label}}",
+    "score_aria": "Wellbeing score: {{score}} out of 100",
     "score_excellent": "Excellent",
     "risk_low": "Low Risk",
     "this_week": "This Week",

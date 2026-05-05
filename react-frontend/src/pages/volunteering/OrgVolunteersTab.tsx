@@ -146,7 +146,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
               </div>
               <div className="flex items-center gap-4 text-sm">
                 <div className="text-center">
-                  <p className="font-semibold text-theme-primary">{vol.total_hours}h</p>
+                  <p className="font-semibold text-theme-primary">{t('hours_abbrev', { hours: vol.total_hours })}</p>
                   <p className="text-xs text-theme-subtle">{t('org_volunteers.hours', 'Hours')}</p>
                 </div>
                 <div className="text-center">
