@@ -58,6 +58,15 @@ interface GroupOption {
   name: string;
 }
 
+const personalizationTags = [
+  { token: '{{first_name}}', labelKey: 'newsletter_form.tag_first_name' },
+  { token: '{{last_name}}', labelKey: 'newsletter_form.tag_last_name' },
+  { token: '{{name}}', labelKey: 'newsletter_form.tag_full_name' },
+  { token: '{{email}}', labelKey: 'newsletter_form.tag_email' },
+  { token: '{{tenant_name}}', labelKey: 'newsletter_form.tag_tenant_name' },
+  { token: '{{unsubscribe_link}}', labelKey: 'newsletter_form.tag_unsubscribe_link' },
+];
+
 const listToCsv = (value: unknown): string => {
   if (!value) return '';
   if (Array.isArray(value)) return value.map(String).join(', ');
@@ -545,6 +554,26 @@ export function NewsletterForm() {
                   isDisabled={saving || isSent}
                 />
               </Suspense>
+              <div className="rounded-lg border border-default-200 bg-default-50 p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-foreground">
+                    {t('newsletter_form.personalization_title')}
+                  </span>
+                  <span className="text-xs text-default-500">
+                    {t('newsletter_form.personalization_desc')}
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {personalizationTags.map((tag) => (
+                    <Chip key={tag.token} size="sm" variant="flat" className="font-mono">
+                      {tag.token} <span className="font-sans text-default-500">{t(tag.labelKey)}</span>
+                    </Chip>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-default-500">
+                  {t('newsletter_form.personalization_body_only')}
+                </p>
+              </div>
             </CardBody>
           </Card>
         </div>

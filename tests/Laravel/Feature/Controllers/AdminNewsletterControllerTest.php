@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Http\Controllers\Api\AdminNewsletterController;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
@@ -21,6 +22,13 @@ use Tests\Laravel\TestCase;
 class AdminNewsletterControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_controller_has_no_constructor_dependencies_before_auth_middleware(): void
+    {
+        $constructor = (new \ReflectionClass(AdminNewsletterController::class))->getConstructor();
+
+        $this->assertNull($constructor, 'Newsletter admin routes must not resolve service dependencies before auth middleware.');
+    }
 
     // ================================================================
     // INDEX — GET /v2/admin/newsletters
@@ -52,6 +60,15 @@ class AdminNewsletterControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/newsletters');
 
         $response->assertStatus(401);
+    }
+
+    public function test_support_endpoints_return_401_for_unauthenticated(): void
+    {
+        $this->apiGet('/v2/admin/newsletters/segments')->assertStatus(401);
+        $this->apiGet('/v2/admin/newsletters/templates')->assertStatus(401);
+        $this->apiPost('/v2/admin/newsletters/recipient-count', [
+            'target_audience' => 'all_members',
+        ])->assertStatus(401);
     }
 
     // ================================================================

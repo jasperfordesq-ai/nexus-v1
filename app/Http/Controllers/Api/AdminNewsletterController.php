@@ -22,10 +22,6 @@ class AdminNewsletterController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly NewsletterService $newsletterService,
-    ) {}
-
     /**
      * Allowed tables for existence checks — prevents SQL injection via table name.
      */
@@ -2028,7 +2024,7 @@ class AdminNewsletterController extends BaseApiController
                     ->all();
 
                 $recipients = array_values(array_filter(
-                    $this->newsletterService->getSegmentRecipients($segmentId),
+                    NewsletterService::getSegmentRecipients($segmentId),
                     fn($recipient) => isset($sentEmails[strtolower((string) ($recipient['email'] ?? ''))])
                 ));
             }
@@ -2072,7 +2068,7 @@ class AdminNewsletterController extends BaseApiController
                 $queuedCount++;
             }
 
-            $processed = $this->newsletterService->processQueue($newsletterId);
+            $processed = NewsletterService::processQueue($newsletterId);
 
             return $this->respondWithData([
                 'success' => true,
@@ -2237,7 +2233,7 @@ class AdminNewsletterController extends BaseApiController
             $targetAudience = $newsletter->target_audience ?? 'all_members';
             $segmentId = $newsletter->segment_id ?? null;
 
-            $queued = $this->newsletterService->sendNow($id, $targetAudience, $segmentId);
+            $queued = NewsletterService::sendNow($id, $targetAudience, $segmentId);
 
             return $this->respondWithData([
                 'queued' => $queued,
@@ -2293,7 +2289,7 @@ class AdminNewsletterController extends BaseApiController
 
             // Test email is sent to the admin themselves — render in their preferred language.
             [$html, $subject] = \App\I18n\LocaleContext::withLocale($admin, fn () => [
-                $this->newsletterService->renderEmail(
+                NewsletterService::renderEmail(
                     (array)$newsletter,
                     $tenantName,
                     'test-unsubscribe-token',
@@ -2329,9 +2325,9 @@ class AdminNewsletterController extends BaseApiController
             $segmentId = $this->inputInt('segment_id');
 
             if ($segmentId) {
-                $count = $this->newsletterService->getSegmentRecipientCount($segmentId);
+                $count = NewsletterService::getSegmentRecipientCount($segmentId);
             } else {
-                $count = $this->newsletterService->getRecipientCount($targetAudience);
+                $count = NewsletterService::getRecipientCount($targetAudience);
             }
 
             return $this->respondWithData(['count' => $count]);
