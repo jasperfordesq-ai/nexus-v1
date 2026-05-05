@@ -29,7 +29,7 @@ import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Settings from 'lucide-react/icons/settings';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { Abbr, PageHeader } from '../../components';
 
@@ -112,6 +112,7 @@ function fmtHours(h: number): string {
 export default function HelpRequestSlaAdminPage() {
   usePageTitle('Help Request SLA Dashboard');
   const { showToast } = useToast();
+  const { tenantPath } = useTenant();
 
   const [data, setData] = useState<SlaDashboard | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,7 +164,7 @@ export default function HelpRequestSlaAdminPage() {
           <div className="flex items-center gap-2">
             <Button
               as={Link}
-              to="/admin/caring-community/operating-policy"
+              to={tenantPath('/caring/operating-policy')}
               size="sm"
               variant="flat"
               startContent={<Settings size={14} />}

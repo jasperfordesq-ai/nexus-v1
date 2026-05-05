@@ -1119,17 +1119,21 @@ class CaringCommunityApiController extends BaseApiController
         }
 
         $sellerId = (int) ($this->query('seller_id') ?? 0);
+        $listingId = (int) ($this->query('listing_id') ?? 0);
         $orderTotalChf = (float) ($this->query('order_total_chf') ?? 0);
 
         if ($sellerId <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
+        }
+        if ($listingId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'listing_id', 422);
         }
         if ($orderTotalChf <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'order_total_chf', 422);
         }
 
         return $this->respondWithData(
-            $this->loyaltyService->calculateAvailableDiscount($userId, $sellerId, $orderTotalChf)
+            $this->loyaltyService->calculateAvailableDiscount($userId, $sellerId, $orderTotalChf, $listingId)
         );
     }
 

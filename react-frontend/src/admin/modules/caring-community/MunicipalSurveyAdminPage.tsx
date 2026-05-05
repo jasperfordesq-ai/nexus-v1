@@ -381,11 +381,14 @@ export default function MunicipalSurveyAdminPage() {
 
   const handleExport = async (id: number, surveyTitle: string) => {
     try {
-      const res = await api.get<BlobPart>(
+      const res = await api.get<Blob>(
         `/v2/admin/caring-community/surveys/${id}/export`,
         { responseType: 'blob' }
       );
-      const blob = new Blob([res.data as BlobPart], { type: 'text/csv' });
+      if (!res.success || !res.data) {
+        throw new Error(res.error ?? 'Export failed');
+      }
+      const blob = res.data;
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;

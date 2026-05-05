@@ -50,7 +50,7 @@ class CaringLoyaltyService
      *   reason?: string
      * }
      */
-    public function calculateAvailableDiscount(int $memberId, int $sellerId, float $orderTotalChf): array
+    public function calculateAvailableDiscount(int $memberId, int $sellerId, float $orderTotalChf, ?int $listingId = null): array
     {
         $tenantId = TenantContext::getId();
 
@@ -69,6 +69,12 @@ class CaringLoyaltyService
 
         if ($orderTotalChf <= 0) {
             return $base + ['reason' => 'invalid_order_total'];
+        }
+
+        try {
+            $this->assertListingBelongsToSeller($tenantId, $sellerId, $listingId);
+        } catch (RuntimeException) {
+            return $base + ['reason' => 'invalid_listing'];
         }
 
         $settings = DB::table('marketplace_seller_loyalty_settings')
@@ -160,6 +166,7 @@ class CaringLoyaltyService
         if (!Schema::hasTable('caring_loyalty_redemptions')) {
             throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
+        $this->assertListingBelongsToSeller($tenantId, $sellerId, $listingId);
 
         // Lock seller settings row first (deterministic order: settings then user)
         $result = DB::transaction(function () use ($tenantId, $memberId, $sellerId, $listingId, $creditsToUse, $orderTotalChf) {
@@ -250,6 +257,28 @@ class CaringLoyaltyService
         ]);
 
         return $result;
+    }
+
+    private function assertListingBelongsToSeller(int $tenantId, int $sellerId, ?int $listingId): void
+    {
+        if ($listingId === null || $listingId <= 0) {
+            throw new RuntimeException(__('caring_community.loyalty.errors.invalid_listing'));
+        }
+        if (!Schema::hasTable('marketplace_listings')) {
+            throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
+        }
+
+        $listing = DB::table('marketplace_listings')
+            ->where('id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->first(['user_id', 'status', 'moderation_status']);
+
+        if (!$listing || (int) $listing->user_id !== $sellerId) {
+            throw new RuntimeException(__('caring_community.loyalty.errors.invalid_listing'));
+        }
+        if ((string) $listing->status !== 'active' || (string) $listing->moderation_status !== 'approved') {
+            throw new RuntimeException(__('caring_community.loyalty.errors.listing_unavailable'));
+        }
     }
 
     /**

@@ -30,7 +30,9 @@ class VolLogTest extends TestCase
     {
         $expected = [
             'tenant_id', 'user_id', 'organization_id', 'opportunity_id',
+            'caring_support_relationship_id', 'support_recipient_id',
             'date_logged', 'hours', 'description', 'status',
+            'assigned_to', 'assigned_at', 'escalated_at', 'escalation_note',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }
@@ -40,6 +42,8 @@ class VolLogTest extends TestCase
         $casts = $this->model->getCasts();
         $this->assertEquals('date', $casts['date_logged']);
         $this->assertEquals('decimal:2', $casts['hours']);
+        $this->assertEquals('datetime', $casts['assigned_at']);
+        $this->assertEquals('datetime', $casts['escalated_at']);
     }
 
     public function test_uses_has_tenant_scope(): void

@@ -231,7 +231,7 @@ class CaringHourTransferService
 
         $signature = $this->signPayload($payload, $secret);
 
-        return DB::transaction(function () use (
+        $result = DB::transaction(function () use (
             $transferId,
             $transfer,
             $sourceTenantId,
@@ -303,33 +303,7 @@ class CaringHourTransferService
 
             // ── 2. Deliver to destination ────────────────────────────────────
             if ($isRemote) {
-                // Cross-platform: HTTP POST to the remote peer's inbound endpoint.
-                // Wallet has already been debited above; if delivery fails, the
-                // source row stays in `sent` for retry. The transaction commits
-                // so the debit is durable; the admin can re-trigger delivery.
-                $deliveryResult = $this->deliverToRemotePeer(
-                    payload: $payload,
-                    signature: $signature,
-                    peer: $remotePeer,
-                    sourceTransferId: $transferId,
-                );
-
-                DB::table('caring_hour_transfers')
-                    ->where('id', $transferId)
-                    ->update([
-                        'status' => $deliveryResult['delivered']
-                            ? self::STATUS_COMPLETED
-                            : self::STATUS_SENT,
-                        'updated_at' => now(),
-                    ]);
-
-                if (! $deliveryResult['delivered']) {
-                    Log::warning('[CaringHourTransfer] Remote delivery failed; row left in `sent` for retry', [
-                        'transfer_id' => $transferId,
-                        'peer_slug'   => $remotePeer['peer_slug'] ?? null,
-                        'error'       => $deliveryResult['error'] ?? null,
-                    ]);
-                }
+                // Remote delivery happens after this transaction commits.
             } else {
                 // Same-platform: insert destination row + credit destination wallet
                 $destinationRowId = $this->deliverToDestination(
@@ -372,8 +346,42 @@ class CaringHourTransferService
                 'status'                  => $finalStatus !== '' ? $finalStatus : self::STATUS_COMPLETED,
                 'destination_transfer_id' => $linkedRow,
                 'remote'                  => $isRemote,
+                'needs_remote_delivery'   => $isRemote,
             ];
         });
+
+        if (!empty($result['needs_remote_delivery'])) {
+            $deliveryResult = $this->deliverToRemotePeer(
+                payload: $payload,
+                signature: $signature,
+                peer: $remotePeer,
+                sourceTransferId: $transferId,
+            );
+
+            DB::table('caring_hour_transfers')
+                ->where('id', $transferId)
+                ->where('tenant_id', $sourceTenantId)
+                ->update([
+                    'status' => $deliveryResult['delivered']
+                        ? self::STATUS_COMPLETED
+                        : self::STATUS_SENT,
+                    'updated_at' => now(),
+                ]);
+
+            if (! $deliveryResult['delivered']) {
+                Log::warning('[CaringHourTransfer] Remote delivery failed; row left in `sent` for retry', [
+                    'transfer_id' => $transferId,
+                    'peer_slug'   => $remotePeer['peer_slug'] ?? null,
+                    'error'       => $deliveryResult['error'] ?? null,
+                ]);
+            }
+
+            $result['status'] = $deliveryResult['delivered'] ? self::STATUS_COMPLETED : self::STATUS_SENT;
+        }
+
+        unset($result['needs_remote_delivery']);
+
+        return $result;
     }
 
     /**

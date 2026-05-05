@@ -11,7 +11,8 @@ describe('Caring Community route config', () => {
     expect(CARING_COMMUNITY_ROUTE.path).toBe('caring-community');
     expect(CARING_COMMUNITY_ROUTE.href).toBe('/caring-community');
     expect(CARING_COMMUNITY_ROUTE.feature).toBe('caring_community');
-    expect(CARING_COMMUNITY_ADMIN_ROUTE.href).toBe('/admin/caring-community');
+    expect(CARING_COMMUNITY_ADMIN_ROUTE.path).toBe('caring');
+    expect(CARING_COMMUNITY_ADMIN_ROUTE.href).toBe('/caring');
     expect(CARING_COMMUNITY_ADMIN_ROUTE.feature).toBe(CARING_COMMUNITY_ROUTE.feature);
   });
 });

@@ -55,11 +55,29 @@ class MunicipalSurveyController extends BaseApiController
 
     private function hasAnnouncerAccess(int $userId, int $tenantId): bool
     {
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($user) {
+            $role = (string) ($user->role ?? '');
+            if (
+                in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+                || (bool) ($user->is_admin ?? false)
+                || (bool) ($user->is_super_admin ?? false)
+                || (bool) ($user->is_tenant_super_admin ?? false)
+                || (bool) ($user->is_god ?? false)
+            ) {
+                return true;
+            }
+        }
+
         return (bool) DB::table('user_roles')
             ->join('roles', 'roles.id', '=', 'user_roles.role_id')
             ->where('user_roles.user_id', $userId)
             ->where('user_roles.tenant_id', $tenantId)
-            ->whereIn('roles.name', ['admin', 'municipality_announcer'])
+            ->where('roles.name', 'municipality_announcer')
             ->exists();
     }
 
@@ -172,9 +190,12 @@ class MunicipalSurveyController extends BaseApiController
      */
     public function adminListSurveys(): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
+
+        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;
@@ -194,9 +215,12 @@ class MunicipalSurveyController extends BaseApiController
      */
     public function adminGetSurvey(int $id): JsonResponse
     {
-        $this->requireAuth();
-        $this->requirePermission('admin');
+        $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
+
+        if (! $this->hasAnnouncerAccess($userId, $tenantId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
 
         if ($err = $this->assertFeatureEnabled()) {
             return $err;

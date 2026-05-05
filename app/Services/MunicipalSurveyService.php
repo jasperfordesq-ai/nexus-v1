@@ -311,75 +311,72 @@ class MunicipalSurveyService
         array $answers,
         ?string $ipHash = null
     ): void {
-        $survey = DB::table(self::TABLE_SURVEYS)
-            ->where('id', $surveyId)
-            ->where('tenant_id', $tenantId)
-            ->first();
+        DB::transaction(function () use ($surveyId, $tenantId, $userId, $answers, $ipHash): void {
+            $survey = DB::table(self::TABLE_SURVEYS)
+                ->where('id', $surveyId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($survey === null) {
-            throw new RuntimeException('Survey not found');
-        }
-
-        if ($survey->status !== 'active') {
-            throw new RuntimeException('This survey is not currently accepting responses');
-        }
-
-        // Expiry check
-        if ($survey->ends_at !== null && Carbon::parse($survey->ends_at)->isPast()) {
-            throw new RuntimeException('This survey has closed');
-        }
-
-        // Dedup check
-        if ($userId !== null && self::hasResponded($surveyId, $tenantId, $userId)) {
-            throw new RuntimeException('You have already responded to this survey');
-        }
-
-        // Load questions
-        $questions = DB::table(self::TABLE_QUESTIONS)
-            ->where('survey_id', $surveyId)
-            ->where('tenant_id', $tenantId)
-            ->get()
-            ->keyBy('id');
-
-        // Validate required questions are answered
-        foreach ($questions as $question) {
-            if (! $question->is_required) {
-                continue;
+            if ($survey === null) {
+                throw new RuntimeException(__('caring_community.survey.errors.not_found'));
             }
-            $qId = (string) $question->id;
-            if (! array_key_exists($qId, $answers) && ! array_key_exists($question->id, $answers)) {
-                throw new InvalidArgumentException(
-                    "Required question #{$question->id} is not answered"
-                );
+
+            if ($survey->status !== 'active') {
+                throw new RuntimeException(__('caring_community.survey.errors.not_accepting'));
             }
-        }
 
-        // Normalise answer keys to string IDs
-        $normAnswers = [];
-        foreach ($answers as $qId => $val) {
-            $normAnswers[(string) $qId] = $val;
-        }
+            if ($survey->ends_at !== null && Carbon::parse($survey->ends_at)->isPast()) {
+                throw new RuntimeException(__('caring_community.survey.errors.closed'));
+            }
 
-        $isAnonymous = (bool) $survey->is_anonymous;
-        $sessionToken = ($userId !== null)
-            ? self::makeSessionToken($userId, $surveyId)
-            : null;
+            if ($userId !== null && self::hasResponded($surveyId, $tenantId, $userId)) {
+                throw new RuntimeException(__('caring_community.survey.errors.already_responded'));
+            }
 
-        DB::table(self::TABLE_RESPONSES)->insert([
-            'survey_id'     => $surveyId,
-            'tenant_id'     => $tenantId,
-            'user_id'       => $isAnonymous ? null : $userId,
-            'session_token' => $sessionToken,
-            'answers'       => json_encode($normAnswers, JSON_THROW_ON_ERROR),
-            'submitted_at'  => Carbon::now(),
-            'ip_hash'       => $ipHash,
-        ]);
+            $questions = DB::table(self::TABLE_QUESTIONS)
+                ->where('survey_id', $surveyId)
+                ->where('tenant_id', $tenantId)
+                ->get()
+                ->keyBy('id');
 
-        // Increment cached response_count atomically
-        DB::table(self::TABLE_SURVEYS)
-            ->where('id', $surveyId)
-            ->where('tenant_id', $tenantId)
-            ->increment('response_count');
+            foreach ($questions as $question) {
+                if (! $question->is_required) {
+                    continue;
+                }
+                $qId = (string) $question->id;
+                if (! array_key_exists($qId, $answers) && ! array_key_exists($question->id, $answers)) {
+                    throw new InvalidArgumentException(
+                        __('caring_community.survey.errors.required_question', ['id' => $question->id])
+                    );
+                }
+            }
+
+            $normAnswers = [];
+            foreach ($answers as $qId => $val) {
+                $normAnswers[(string) $qId] = $val;
+            }
+
+            $isAnonymous = (bool) $survey->is_anonymous;
+            $sessionToken = ($userId !== null)
+                ? self::makeSessionToken($userId, $surveyId)
+                : null;
+
+            DB::table(self::TABLE_RESPONSES)->insert([
+                'survey_id'     => $surveyId,
+                'tenant_id'     => $tenantId,
+                'user_id'       => $isAnonymous ? null : $userId,
+                'session_token' => $sessionToken,
+                'answers'       => json_encode($normAnswers, JSON_THROW_ON_ERROR),
+                'submitted_at'  => Carbon::now(),
+                'ip_hash'       => $ipHash,
+            ]);
+
+            DB::table(self::TABLE_SURVEYS)
+                ->where('id', $surveyId)
+                ->where('tenant_id', $tenantId)
+                ->increment('response_count');
+        });
     }
 
     // ─── Analytics ────────────────────────────────────────────────────────────

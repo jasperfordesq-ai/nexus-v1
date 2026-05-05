@@ -216,6 +216,57 @@
     "error": "Could not load your Warmth Pass"
   },
   "panel": {
+    "header": {
+      "toggle_sidebar": "Toggle sidebar",
+      "back_to_site": "Back to site",
+      "notifications": "Notifications",
+      "user_fallback": "User",
+      "user_menu": "User menu",
+      "my_profile": "My Profile",
+      "sign_out": "Sign out"
+    },
+    "breadcrumbs": {
+      "aria": "Breadcrumbs",
+      "segments": {
+        "caring": "Dashboard",
+        "workflow": "Workflow",
+        "projects": "Projects",
+        "loyalty": "Loyalty Programme",
+        "hour-transfers": "Hour Transfers",
+        "regional-points": "Regional Points",
+        "sub-regions": "Sub-Regions",
+        "federation-peers": "Federation Peers",
+        "sla-dashboard": "SLA Dashboard",
+        "providers": "Providers",
+        "warmth-pass": "Warmth Pass",
+        "recipient-circle": "Care Recipient Circle",
+        "nudges": "Smart Nudges",
+        "emergency-alerts": "Emergency Alerts",
+        "surveys": "Municipal Surveys",
+        "copilot": "Communication Copilot",
+        "civic-digest": "Civic Digest",
+        "lead-nurture": "Lead Nurture",
+        "success-stories": "Success Stories",
+        "feedback": "Feedback Inbox",
+        "verification": "Municipal Verification",
+        "safeguarding": "Safeguarding Reports",
+        "trust-tier": "Trust Tiers",
+        "launch-readiness": "Launch Readiness",
+        "pilot-scoreboard": "Pilot Scoreboard",
+        "data-quality": "Pilot Data Quality",
+        "operating-policy": "Operating Policy",
+        "disclosure-pack": "Disclosure Pack",
+        "commercial-boundary": "Commercial Boundary",
+        "isolated-node": "Isolated Node Gate",
+        "research": "Research Partnerships",
+        "external-integrations": "External Integrations",
+        "integration-showcase": "Integration Showcase",
+        "municipal-impact": "Municipal Impact Reports",
+        "kpi-baselines": "KPI Baselines",
+        "municipal-roi": "Municipal ROI",
+        "category-coefficients": "Category Coefficients"
+      }
+    },
     "sidebar": {
       "brand": "Community Caring",
       "expand": "Expand sidebar",
@@ -269,6 +320,154 @@
         "kpi_baselines": "KPI Baselines",
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
+      }
+    }
+  },
+  "admin": {
+    "providers": {
+      "meta_title": "Care Provider Directory - Admin",
+      "title": "Care Provider Directory",
+      "subtitle": "Manage home care services, day centres, associations, and volunteer groups",
+      "verified": "Verified",
+      "yes": "Yes",
+      "no": "No",
+      "empty": "No care providers yet - add one to get started.",
+      "confirm_delete": "Delete \"{{name}}\"? This will hide it from the directory.",
+      "confirm_deactivate": "Mark \"{{name}}\" as inactive? You can reactivate it later.",
+      "actions": {
+        "add_provider": "Add Provider",
+        "cancel": "Cancel",
+        "close": "Close",
+        "create_provider": "Create Provider",
+        "deactivate_named": "Deactivate \"{{name}}\"",
+        "delete_provider": "Delete provider",
+        "edit_provider": "Edit provider",
+        "find_duplicates": "Find Duplicates",
+        "save_changes": "Save Changes",
+        "verify_provider": "Verify provider"
+      },
+      "about": {
+        "title": "About this page",
+        "body": "Care providers are external organisations that participate in the community care network alongside individual volunteers. They can be assigned help requests, receive time credit payments, and appear in the member directory.",
+        "verification_label": "Verification",
+        "verification_body": "Verified providers display a badge in the directory. Check registration, insurance, and safeguarding policies before marking a provider as verified.",
+        "types_label": "Provider types",
+        "types_body": "Use the type and description fields to show the care offered so members and coordinators can find the right provider for each request."
+      },
+      "duplicates": {
+        "title": "Potential Duplicates",
+        "summary": "Scanned {{scanned}} active providers - {{total}} pairs above 65% similarity",
+        "scanning": "Scanning...",
+        "empty": "No likely duplicates found. The directory looks clean.",
+        "vs": "vs",
+        "match_percent": "{{percent}}% match"
+      },
+      "errors": {
+        "delete": "Failed to delete provider.",
+        "deactivate": "Failed to deactivate provider.",
+        "duplicates": "Failed to scan for duplicates.",
+        "load": "Failed to load care providers.",
+        "name_required": "Name is required.",
+        "save": "Failed to save provider.",
+        "type_required": "Provider type is required.",
+        "verify": "Failed to verify provider."
+      },
+      "fields": {
+        "address": "Address",
+        "description": "Description",
+        "email": "Email",
+        "name": "Name",
+        "phone": "Phone",
+        "status": "Status",
+        "type": "Type",
+        "website": "Website"
+      },
+      "messages": {
+        "created": "Provider created successfully.",
+        "deactivated": "\"{{name}}\" deactivated.",
+        "removed": "Provider removed.",
+        "updated": "Provider updated successfully.",
+        "verified": "\"{{name}}\" marked as verified."
+      },
+      "modal": {
+        "create_title": "Add Care Provider",
+        "edit_title": "Edit: {{name}}"
+      },
+      "pagination": {
+        "next": "Next",
+        "previous": "Previous",
+        "summary": "Showing {{from}}-{{to}} of {{total}} providers"
+      },
+      "placeholders": {
+        "address": "Street, city, postcode",
+        "description": "Brief description of services offered...",
+        "name": "e.g. Community Care Service"
+      },
+      "signals": {
+        "address_overlap": "Address overlap",
+        "email_match": "Email match",
+        "name_match": "Name match",
+        "name_similar": "Name similar",
+        "phone_match": "Phone match",
+        "website_match": "Website match"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "actions": "Actions",
+        "aria": "Care providers table",
+        "name": "Name",
+        "status": "Status",
+        "type": "Type",
+        "verified": "Verified"
+      },
+      "types": {
+        "private": "Private Service",
+        "spitex": "Spitex",
+        "tagesstätte": "Day Centre",
+        "verein": "Association",
+        "volunteer": "Volunteer Group"
+      }
+    },
+    "warmth_pass": {
+      "title": "Warmth Pass Lookup",
+      "subtitle": "View any member's community trust credential",
+      "eligible": "Eligible",
+      "not_eligible": "Not eligible",
+      "verified": "Verified",
+      "not_verified": "Not verified",
+      "loading": "Loading member pass...",
+      "empty_date": "Not set",
+      "no_categories": "No categories on record.",
+      "tier_chip": "{{label}} (Tier {{tier}})",
+      "about": {
+        "title": "About this page",
+        "body": "A Warmth Pass is a portable trust credential showing that a member has reached Trusted tier, has received peer reviews, and is eligible to provide informal neighbourhood care. Recipients can request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a member's credential on request, or to assist a member who is unsure of their eligibility."
+      },
+      "lookup": {
+        "title": "Member Lookup",
+        "member_id": "Member ID",
+        "placeholder": "Enter numeric member ID",
+        "button": "Look up"
+      },
+      "errors": {
+        "no_data": "No data returned for this member ID.",
+        "lookup_failed": "Member not found or an error occurred."
+      },
+      "not_eligible_notice": {
+        "title": "Member is not yet at Trusted tier and does not hold a Warmth Pass.",
+        "body": "To become eligible, they need to log more care hours and receive at least one peer review. They can check their own progress on the Trust profile page."
+      },
+      "fields": {
+        "help_categories": "Help Categories",
+        "hours_logged": "Hours Logged",
+        "identity_verified": "Identity Verified",
+        "member_since": "Member Since",
+        "pass_active_since": "Pass Active Since",
+        "reviews_received": "Reviews Received",
+        "trust_tier": "Trust Tier"
       }
     }
   }

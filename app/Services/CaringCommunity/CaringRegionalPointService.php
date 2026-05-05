@@ -352,6 +352,7 @@ class CaringRegionalPointService
                 ->where('reference_id', $volLogId)
                 ->where('type', 'earned_for_hours')
                 ->where('direction', 'credit')
+                ->lockForUpdate()
                 ->get();
 
             if ($originalIssues->isEmpty()) {
@@ -363,6 +364,7 @@ class CaringRegionalPointService
                 ->where('tenant_id', $tenantId)
                 ->where('reference_type', 'vol_log_reversal')
                 ->where('reference_id', $volLogId)
+                ->lockForUpdate()
                 ->pluck('metadata')
                 ->map(function ($meta) {
                     if (!is_string($meta) || $meta === '') {

@@ -200,7 +200,7 @@ export default function VereinMembersImportPage() {
           variant="flat"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          {t('common.back', 'Back')}
+          {t('back')}
         </Button>
       </div>
 
@@ -232,7 +232,7 @@ export default function VereinMembersImportPage() {
             onValueChange={setCsv}
             minRows={4}
             maxRows={10}
-            placeholder={'email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+41 79 …,member'}
+            placeholder={'email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member'}
           />
           <div className="flex justify-end">
             <Button

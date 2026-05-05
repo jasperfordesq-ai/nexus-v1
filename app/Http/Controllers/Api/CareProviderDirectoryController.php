@@ -76,7 +76,7 @@ class CareProviderDirectoryController extends BaseApiController
         }
 
         try {
-            $provider = $this->service->get($id, TenantContext::getId());
+            $provider = $this->service->getActive($id, TenantContext::getId());
 
             if ($provider === null) {
                 return $this->respondNotFound(__('api.resource_not_found'));
@@ -142,6 +142,7 @@ class CareProviderDirectoryController extends BaseApiController
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email|max:255',
             'website_url'   => 'nullable|url|max:255',
+            'status'        => 'sometimes|string|in:active,inactive',
         ]);
 
         if ($validator->fails()) {

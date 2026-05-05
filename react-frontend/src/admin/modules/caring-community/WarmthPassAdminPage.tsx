@@ -3,7 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -47,8 +49,8 @@ interface WarmthPass {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(iso: string | null): string {
-  if (!iso) return '—';
+function formatDate(iso: string | null, fallback: string): string {
+  if (!iso) return fallback;
   return new Date(iso).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
@@ -61,40 +63,52 @@ function formatDate(iso: string | null): string {
 // ---------------------------------------------------------------------------
 
 export function WarmthPassAdminPage() {
-  const [userId, setUserId] = useState('');
+  const { t } = useTranslation('caring_community');
+  const { userId: routeUserId } = useParams<{ userId?: string }>();
+  const [userId, setUserId] = useState(routeUserId ?? '');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WarmthPass | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  async function handleLookup() {
-    const id = userId.trim();
-    if (!id) return;
+  const lookupMember = useCallback(async (id: string) => {
+    const trimmedId = id.trim();
+    if (!trimmedId) return;
     setLoading(true);
     setResult(null);
     setErrorMsg(null);
     try {
       const res = await api.get<WarmthPass>(
-        `/v2/admin/caring-community/warmth-pass/${id}`,
+        `/v2/admin/caring-community/warmth-pass/${trimmedId}`,
       );
       if (res.success && res.data) {
         setResult(res.data);
       } else {
-        setErrorMsg(res.error ?? 'No data returned for this member ID.');
+        setErrorMsg(res.error ?? t('admin.warmth_pass.errors.no_data'));
       }
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : 'Member not found or an error occurred.';
+        err instanceof Error ? err.message : t('admin.warmth_pass.errors.lookup_failed');
       setErrorMsg(msg);
     } finally {
       setLoading(false);
     }
+  }, [t]);
+
+  async function handleLookup() {
+    await lookupMember(userId);
   }
+
+  useEffect(() => {
+    if (!routeUserId) return;
+    setUserId(routeUserId);
+    void lookupMember(routeUserId);
+  }, [routeUserId, lookupMember]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Warmth Pass Lookup"
-        subtitle="View any member's community trust credential"
+        title={t('admin.warmth_pass.title')}
+        subtitle={t('admin.warmth_pass.subtitle')}
         icon={<Shield className="h-5 w-5" aria-hidden="true" />}
       />
 
@@ -104,12 +118,11 @@ export function WarmthPassAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">
+                {t('admin.warmth_pass.about.title')}
+              </p>
               <p className="text-default-600">
-                A Warmth Pass is a portable trust credential showing that a member has reached Trusted tier (tier 2+),
-                has received peer reviews, and is eligible to provide informal neighbourhood care. Recipients can
-                request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a
-                member's credential on request, or to assist a member who is unsure of their eligibility.
+                {t('admin.warmth_pass.about.body')}
               </p>
             </div>
           </div>
@@ -119,14 +132,14 @@ export function WarmthPassAdminPage() {
       {/* Lookup form */}
       <Card>
         <CardHeader>
-          <p className="font-semibold text-sm">Member Lookup</p>
+          <p className="font-semibold text-sm">{t('admin.warmth_pass.lookup.title')}</p>
         </CardHeader>
         <Divider />
         <CardBody className="p-5">
           <div className="flex items-end gap-3">
             <Input
-              label="Member ID"
-              placeholder="Enter numeric member ID"
+              label={t('admin.warmth_pass.lookup.member_id')}
+              placeholder={t('admin.warmth_pass.lookup.placeholder')}
               value={userId}
               onValueChange={setUserId}
               variant="bordered"
@@ -143,7 +156,7 @@ export function WarmthPassAdminPage() {
               isDisabled={!userId.trim() || loading}
               startContent={!loading && <Search className="h-4 w-4" aria-hidden="true" />}
             >
-              Look up
+              {t('admin.warmth_pass.lookup.button')}
             </Button>
           </div>
         </CardBody>
@@ -152,7 +165,7 @@ export function WarmthPassAdminPage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-10">
-          <Spinner size="lg" label="Loading member pass..." />
+          <Spinner size="lg" label={t('admin.warmth_pass.loading')} />
         </div>
       )}
 
@@ -185,7 +198,7 @@ export function WarmthPassAdminPage() {
                 variant="flat"
                 size="sm"
               >
-                {result.eligible ? 'Eligible' : 'Not eligible'}
+                {result.eligible ? t('admin.warmth_pass.eligible') : t('admin.warmth_pass.not_eligible')}
               </Chip>
             </div>
           </CardHeader>
@@ -195,11 +208,10 @@ export function WarmthPassAdminPage() {
             {result.tier < 2 && (
               <div className="rounded-lg border border-warning-200 bg-warning-50 p-3 dark:border-warning-800 dark:bg-warning-900/20">
                 <p className="text-sm font-semibold text-warning-700 dark:text-warning-400">
-                  Member is not yet at Trusted tier and does not hold a Warmth Pass.
+                  {t('admin.warmth_pass.not_eligible_notice.title')}
                 </p>
                 <p className="mt-1 text-sm text-warning-700 dark:text-warning-400">
-                  To become eligible, they need to log more care hours and receive at least one peer review.
-                  They can check their own progress on the Trust profile page.
+                  {t('admin.warmth_pass.not_eligible_notice.body')}
                 </p>
               </div>
             )}
@@ -208,7 +220,7 @@ export function WarmthPassAdminPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
-                  Trust Tier
+                  {t('admin.warmth_pass.fields.trust_tier')}
                 </p>
                 <Chip
                   size="md"
@@ -222,22 +234,22 @@ export function WarmthPassAdminPage() {
                   variant="flat"
                   className="capitalize font-semibold"
                 >
-                  {result.tier_label} (Tier {result.tier})
+                  {t('admin.warmth_pass.tier_chip', { label: result.tier_label, tier: result.tier })}
                 </Chip>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
-                  Identity Verified
+                  {t('admin.warmth_pass.fields.identity_verified')}
                 </p>
                 {result.identity_verified ? (
                   <div className="flex items-center gap-1.5 text-success">
                     <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-semibold">Verified</span>
+                    <span className="text-sm font-semibold">{t('admin.warmth_pass.verified')}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 text-default-400">
                     <XCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm">Not verified</span>
+                    <span className="text-sm">{t('admin.warmth_pass.not_verified')}</span>
                   </div>
                 )}
               </div>
@@ -250,14 +262,14 @@ export function WarmthPassAdminPage() {
               <div className="rounded-lg border border-divider p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
-                  <p className="text-xs text-default-500">Hours Logged</p>
+                  <p className="text-xs text-default-500">{t('admin.warmth_pass.fields.hours_logged')}</p>
                 </div>
                 <p className="text-2xl font-bold">{result.hours_logged}</p>
               </div>
               <div className="rounded-lg border border-divider p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Star className="h-4 w-4 text-warning" aria-hidden="true" />
-                  <p className="text-xs text-default-500">Reviews Received</p>
+                  <p className="text-xs text-default-500">{t('admin.warmth_pass.fields.reviews_received')}</p>
                 </div>
                 <p className="text-2xl font-bold">{result.reviews_received}</p>
               </div>
@@ -268,7 +280,7 @@ export function WarmthPassAdminPage() {
             {/* Categories */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-2">
-                Help Categories
+                {t('admin.warmth_pass.fields.help_categories')}
               </p>
               {result.categories.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -279,7 +291,7 @@ export function WarmthPassAdminPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-default-400">No categories on record.</p>
+                <p className="text-sm text-default-400">{t('admin.warmth_pass.no_categories')}</p>
               )}
             </div>
 
@@ -289,16 +301,18 @@ export function WarmthPassAdminPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
-                  Member Since
+                  {t('admin.warmth_pass.fields.member_since')}
                 </p>
-                <p className="text-sm font-semibold">{formatDate(result.member_since)}</p>
+                <p className="text-sm font-semibold">
+                  {formatDate(result.member_since, t('admin.warmth_pass.empty_date'))}
+                </p>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
-                  Pass Active Since
+                  {t('admin.warmth_pass.fields.pass_active_since')}
                 </p>
                 <p className="text-sm font-semibold">
-                  {result.pass_active_since ? formatDate(result.pass_active_since) : '—'}
+                  {formatDate(result.pass_active_since, t('admin.warmth_pass.empty_date'))}
                 </p>
               </div>
             </div>

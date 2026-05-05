@@ -10,7 +10,7 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { Route, Navigate, Outlet } from 'react-router-dom';
+import { Route, Navigate, Outlet, useParams } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { SuperAdminRoute } from './SuperAdminRoute';
@@ -20,6 +20,17 @@ import type { TenantFeatures } from '@/types';
 function TenantRedirect({ to }: { to: string }) {
   const { tenantPath } = useTenant();
   return <Navigate to={tenantPath(to)} replace />;
+}
+
+function TenantParamRedirect({ to }: { to: string }) {
+  const { tenantPath } = useTenant();
+  const params = useParams<Record<string, string | undefined>>();
+  const resolved = Object.entries(params).reduce(
+    (path, [key, value]) => path.replace(`:${key}`, value ?? ''),
+    to,
+  );
+
+  return <Navigate to={tenantPath(resolved)} replace />;
 }
 
 /**
@@ -605,7 +616,7 @@ export function AdminRoutes() {
       <Route path="caring-community/sla-dashboard" element={<TenantRedirect to="/caring/sla-dashboard" />} />
       <Route path="caring-community/providers" element={<TenantRedirect to="/caring/providers" />} />
       <Route path="caring-community/warmth-pass" element={<TenantRedirect to="/caring/warmth-pass" />} />
-      <Route path="caring-community/warmth-pass/:userId" element={<TenantRedirect to="/caring/warmth-pass" />} />
+      <Route path="caring-community/warmth-pass/:userId" element={<TenantParamRedirect to="/caring/warmth-pass/:userId" />} />
       <Route path="caring-community/recipient-circle" element={<TenantRedirect to="/caring/recipient-circle" />} />
       <Route path="caring-community/nudges" element={<TenantRedirect to="/caring/nudges" />} />
       <Route path="caring-community/emergency-alerts" element={<TenantRedirect to="/caring/emergency-alerts" />} />
@@ -628,6 +639,7 @@ export function AdminRoutes() {
       <Route path="caring-community/research" element={<TenantRedirect to="/caring/research" />} />
       <Route path="caring-community/external-integrations" element={<TenantRedirect to="/caring/external-integrations" />} />
       <Route path="caring-community/integration-showcase" element={<TenantRedirect to="/caring/integration-showcase" />} />
+      <Route path="caring-community/municipal-impact" element={<TenantRedirect to="/caring/municipal-impact" />} />
       <Route path="caring-community/kpi-baselines" element={<TenantRedirect to="/caring/kpi-baselines" />} />
       <Route path="caring-community/municipal-roi" element={<TenantRedirect to="/caring/municipal-roi" />} />
       <Route path="caring-community/category-coefficients" element={<TenantRedirect to="/caring/category-coefficients" />} />

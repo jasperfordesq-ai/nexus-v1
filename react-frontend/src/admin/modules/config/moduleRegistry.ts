@@ -338,7 +338,7 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     icon: Heart,
     type: 'feature',
     configSource: 'tenant_features',
-    detailPageUrl: '/admin/caring-community',
+    detailPageUrl: '/caring',
     configOptions: [
       { key: 'caring_community.dashboard_enabled', label: 'Dashboard Hub', description: 'Show the integrated Caring Community hub in member navigation', type: 'boolean', defaultValue: true, category: 'Visibility' },
       { key: 'caring_community.show_municipal_reporting', label: 'Municipal Reporting', description: 'Show municipal/canton reporting surfaces when available', type: 'boolean', defaultValue: true, category: 'Reporting' },

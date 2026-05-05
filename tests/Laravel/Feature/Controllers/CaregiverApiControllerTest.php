@@ -65,9 +65,32 @@ class CaregiverApiControllerTest extends TestCase
             'is_primary' => true,
         ]);
 
-        $link->assertStatus(201);
+        $link->assertStatus(202);
         $link->assertJsonPath('data.caregiver_id', $caregiver->id);
         $link->assertJsonPath('data.cared_for_id', $careReceiver->id);
+        $link->assertJsonPath('data.status', 'pending');
+
+        $links = $this->apiGet('/v2/caring-community/caregiver/links');
+        $links->assertStatus(200);
+        $links->assertJsonPath('data', []);
+
+        $pendingRequest = $this->apiPost('/v2/caring-community/caregiver/request-on-behalf', [
+            'cared_for_id' => $careReceiver->id,
+            'title' => 'Medication pickup',
+            'description' => 'Please collect the prescription before Friday afternoon.',
+            'when_needed' => 'Friday afternoon',
+            'contact_preference' => 'message',
+        ]);
+        $pendingRequest->assertStatus(403);
+
+        DB::table('caring_caregiver_links')
+            ->where('id', (int) $link->json('data.id'))
+            ->where('tenant_id', $this->testTenantId)
+            ->update([
+                'status' => 'active',
+                'approved_by' => $caregiver->id,
+                'updated_at' => now(),
+            ]);
 
         $links = $this->apiGet('/v2/caring-community/caregiver/links');
         $links->assertStatus(200);

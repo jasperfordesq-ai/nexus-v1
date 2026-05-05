@@ -115,7 +115,7 @@ export default function CaringCommunityAdmin() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/caring-community/workflow')}
+              to={tenantPath('/caring/workflow')}
               variant="flat"
               size="sm"
               startContent={<ListChecks size={16} />}

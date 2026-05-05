@@ -1551,7 +1551,7 @@ export default function CaringCommunityWorkflowPage() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/reports/municipal-impact')}
+              to={tenantPath('/caring/municipal-impact')}
               variant="flat"
               size="sm"
               startContent={<FileText size={16} />}
@@ -1851,7 +1851,7 @@ export default function CaringCommunityWorkflowPage() {
                 </Button>
                 <Button
                   as={Link}
-                  to="/admin/caring-community/safeguarding"
+                  to={tenantPath('/caring/safeguarding')}
                   size="sm"
                   color="primary"
                   variant="flat"
@@ -1955,7 +1955,7 @@ export default function CaringCommunityWorkflowPage() {
                                 <td className="py-2 pr-3 text-right">
                                   <Button
                                     as={Link}
-                                    to={`/admin/caring-community/safeguarding`}
+                                    to={tenantPath('/caring/safeguarding')}
                                     size="sm"
                                     variant="flat"
                                   >

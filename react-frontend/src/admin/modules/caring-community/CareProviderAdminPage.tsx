@@ -6,13 +6,12 @@
 /**
  * CareProviderAdminPage — AG64 Care-Provider Directory Admin
  *
- * Admin is English-only — NO t() calls. Plain English JSX.
- *
  * Allows admins to create, edit, delete, and verify care providers
  * across all types (Spitex, Tagesstätten, private, Vereine, volunteers).
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -87,18 +86,10 @@ interface DuplicatesResponse {
   scanned: number;
 }
 
-const SIGNAL_LABELS: Record<string, string> = {
-  name_match:      'Name match',
-  name_similar:    'Name similar',
-  email_match:     'Email match',
-  phone_match:     'Phone match',
-  website_match:   'Website match',
-  address_overlap: 'Address overlap',
-};
-
 interface ProviderFormData {
   name: string;
   type: ProviderType | '';
+  status: 'active' | 'inactive';
   description: string;
   address: string;
   contact_phone: string;
@@ -106,9 +97,12 @@ interface ProviderFormData {
   website_url: string;
 }
 
+type ProviderFormErrors = Partial<Record<keyof ProviderFormData, string>>;
+
 const EMPTY_FORM: ProviderFormData = {
   name: '',
   type: '',
+  status: 'active',
   description: '',
   address: '',
   contact_phone: '',
@@ -116,13 +110,7 @@ const EMPTY_FORM: ProviderFormData = {
   website_url: '',
 };
 
-const PROVIDER_TYPES: { value: ProviderType; label: string }[] = [
-  { value: 'spitex',      label: 'Spitex' },
-  { value: 'tagesstätte', label: 'Tagesstätte (Day Centre)' },
-  { value: 'private',     label: 'Private Service' },
-  { value: 'verein',      label: 'Verein (Association)' },
-  { value: 'volunteer',   label: 'Volunteer Group' },
-];
+const PROVIDER_TYPES: ProviderType[] = ['spitex', 'tagesstätte', 'private', 'verein', 'volunteer'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -146,10 +134,14 @@ function typeColor(type: ProviderType): ChipColor {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CareProviderAdminPage() {
-  usePageTitle('Care Provider Directory — Admin');
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.providers.meta_title'));
   const { showToast } = useToast();
 
   const [providers, setProviders] = useState<CareProvider[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [perPage, setPerPage] = useState(20);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -158,7 +150,7 @@ export default function CareProviderAdminPage() {
   const [editTarget, setEditTarget] = useState<CareProvider | null>(null);
   const [form, setForm] = useState<ProviderFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
-  const [formErrors, setFormErrors] = useState<Partial<ProviderFormData>>({});
+  const [formErrors, setFormErrors] = useState<ProviderFormErrors>({});
 
   // Duplicates panel state
   const [duplicates, setDuplicates] = useState<DuplicatesResponse | null>(null);
@@ -171,15 +163,18 @@ export default function CareProviderAdminPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get<DirectoryResponse>('/v2/admin/caring-community/providers');
+      const res = await api.get<DirectoryResponse>(`/v2/admin/caring-community/providers?page=${page}`);
+      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.load'));
       setProviders(res.data?.data ?? []);
+      setTotal(res.data?.total ?? 0);
+      setPerPage(res.data?.per_page ?? 20);
     } catch (err) {
       logError('CareProviderAdminPage.fetch', err);
-      setError('Failed to load care providers.');
+      setError(t('admin.providers.errors.load'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, t]);
 
   useEffect(() => {
     void fetchProviders();
@@ -199,6 +194,7 @@ export default function CareProviderAdminPage() {
     setForm({
       name: provider.name,
       type: provider.type,
+      status: provider.status,
       description: provider.description ?? '',
       address: provider.address ?? '',
       contact_phone: provider.contact_phone ?? '',
@@ -219,9 +215,9 @@ export default function CareProviderAdminPage() {
   // ── Save ─────────────────────────────────────────────────────────────────
 
   async function handleSave() {
-    const errors: Partial<ProviderFormData> = {};
-    if (!form.name.trim()) errors.name = 'Name is required.';
-    if (!form.type) errors.type = '';
+    const errors: ProviderFormErrors = {};
+    if (!form.name.trim()) errors.name = t('admin.providers.errors.name_required');
+    if (!form.type) errors.type = t('admin.providers.errors.type_required');
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -233,6 +229,7 @@ export default function CareProviderAdminPage() {
       const payload = {
         name: form.name.trim(),
         type: form.type,
+        status: form.status,
         description: form.description.trim() || null,
         address: form.address.trim() || null,
         contact_phone: form.contact_phone.trim() || null,
@@ -241,18 +238,20 @@ export default function CareProviderAdminPage() {
       };
 
       if (editTarget) {
-        await api.put(`/v2/admin/caring-community/providers/${editTarget.id}`, payload);
-        showToast('Provider updated successfully.', 'success');
+        const res = await api.put(`/v2/admin/caring-community/providers/${editTarget.id}`, payload);
+        if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.save'));
+        showToast(t('admin.providers.messages.updated'), 'success');
       } else {
-        await api.post('/v2/admin/caring-community/providers', payload);
-        showToast('Provider created successfully.', 'success');
+        const res = await api.post('/v2/admin/caring-community/providers', payload);
+        if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.save'));
+        showToast(t('admin.providers.messages.created'), 'success');
       }
 
       closeModal();
       void fetchProviders();
     } catch (err) {
       logError('CareProviderAdminPage.save', err);
-      showToast('Failed to save provider.', 'error');
+      showToast(t('admin.providers.errors.save'), 'error');
     } finally {
       setSaving(false);
     }
@@ -261,16 +260,17 @@ export default function CareProviderAdminPage() {
   // ── Delete ───────────────────────────────────────────────────────────────
 
   async function handleDelete(provider: CareProvider) {
-    if (!window.confirm(`Delete "${provider.name}"? This will hide it from the directory.`)) {
+    if (!window.confirm(t('admin.providers.confirm_delete', { name: provider.name }))) {
       return;
     }
     try {
-      await api.delete(`/v2/admin/caring-community/providers/${provider.id}`);
-      showToast('Provider removed.', 'success');
+      const res = await api.delete(`/v2/admin/caring-community/providers/${provider.id}`);
+      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.delete'));
+      showToast(t('admin.providers.messages.removed'), 'success');
       void fetchProviders();
     } catch (err) {
       logError('CareProviderAdminPage.delete', err);
-      showToast('Failed to delete provider.', 'error');
+      showToast(t('admin.providers.errors.delete'), 'error');
     }
   }
 
@@ -283,10 +283,11 @@ export default function CareProviderAdminPage() {
       const res = await api.get<DuplicatesResponse>(
         '/v2/admin/caring-community/providers/duplicates?threshold=0.65',
       );
+      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.duplicates'));
       setDuplicates(res.data ?? { pairs: [], total: 0, scanned: 0 });
     } catch (err) {
       logError('CareProviderAdminPage.duplicates', err);
-      showToast('Failed to scan for duplicates.', 'error');
+      showToast(t('admin.providers.errors.duplicates'), 'error');
       setDuplicates({ pairs: [], total: 0, scanned: 0 });
     } finally {
       setDuplicatesLoading(false);
@@ -294,17 +295,18 @@ export default function CareProviderAdminPage() {
   }
 
   async function handleDeactivateProvider(providerId: number, providerName: string) {
-    if (!window.confirm(`Mark "${providerName}" as inactive? You can re-activate it later.`)) {
+    if (!window.confirm(t('admin.providers.confirm_deactivate', { name: providerName }))) {
       return;
     }
     try {
-      await api.delete(`/v2/admin/caring-community/providers/${providerId}`);
-      showToast(`"${providerName}" deactivated.`, 'success');
+      const res = await api.delete(`/v2/admin/caring-community/providers/${providerId}`);
+      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.deactivate'));
+      showToast(t('admin.providers.messages.deactivated', { name: providerName }), 'success');
       await loadDuplicates();
       void fetchProviders();
     } catch (err) {
       logError('CareProviderAdminPage.deactivate', err);
-      showToast('Failed to deactivate provider.', 'error');
+      showToast(t('admin.providers.errors.deactivate'), 'error');
     }
   }
 
@@ -312,12 +314,13 @@ export default function CareProviderAdminPage() {
 
   async function handleVerify(provider: CareProvider) {
     try {
-      await api.post(`/v2/admin/caring-community/providers/${provider.id}/verify`, {});
-      showToast(`"${provider.name}" marked as verified.`, 'success');
+      const res = await api.post(`/v2/admin/caring-community/providers/${provider.id}/verify`, {});
+      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.verify'));
+      showToast(t('admin.providers.messages.verified', { name: provider.name }), 'success');
       void fetchProviders();
     } catch (err) {
       logError('CareProviderAdminPage.verify', err);
-      showToast('Failed to verify provider.', 'error');
+      showToast(t('admin.providers.errors.verify'), 'error');
     }
   }
 
@@ -328,9 +331,9 @@ export default function CareProviderAdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold">Care Provider Directory</h1>
+          <h1 className="text-xl font-semibold">{t('admin.providers.title')}</h1>
           <p className="text-sm text-default-500 mt-0.5">
-            Manage Spitex, day centres, associations, and volunteer groups
+            {t('admin.providers.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -340,14 +343,14 @@ export default function CareProviderAdminPage() {
             onPress={loadDuplicates}
             isLoading={duplicatesLoading && duplicates === null}
           >
-            Find Duplicates
+            {t('admin.providers.actions.find_duplicates')}
           </Button>
           <Button
             color="primary"
             startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
             onPress={openCreate}
           >
-            Add Provider
+            {t('admin.providers.actions.add_provider')}
           </Button>
         </div>
       </div>
@@ -358,17 +361,15 @@ export default function CareProviderAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">
+                {t('admin.providers.about.title')}
+              </p>
               <p className="text-default-600">
-                Care Providers are external organisations (home care agencies, social enterprises,
-                charities) that participate in the community care network alongside individual
-                volunteers. They can be assigned help requests, receive time credit payments, and
-                appear in the provider directory visible to members. Verify each provider's
-                credentials before listing them.
+                {t('admin.providers.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Verification:</strong> Verified providers display a badge in the directory. Verification requires a check of their registration, insurance, and safeguarding policies. Use the shield icon in the Actions column to mark a provider as verified.</p>
-                <p><strong>Provider types:</strong> Spitex (home care), Tagesstätte (day centre), Private service, Verein (association), Volunteer group. Add the description field to list the types of care offered — members and coordinators use this to find the right provider for each request.</p>
+                <p><strong>{t('admin.providers.about.verification_label')}:</strong> {t('admin.providers.about.verification_body')}</p>
+                <p><strong>{t('admin.providers.about.types_label')}:</strong> {t('admin.providers.about.types_body')}</p>
               </div>
             </div>
           </div>
@@ -382,16 +383,16 @@ export default function CareProviderAdminPage() {
             <div>
               <h2 className="text-sm font-semibold flex items-center gap-2">
                 <Layers className="h-4 w-4" aria-hidden="true" />
-                Potential Duplicates
+                {t('admin.providers.duplicates.title')}
               </h2>
               <p className="text-xs text-default-500 mt-0.5">
                 {duplicates
-                  ? `Scanned ${duplicates.scanned} active providers — ${duplicates.total} pair${duplicates.total === 1 ? '' : 's'} above 65% similarity`
-                  : 'Scanning…'}
+                  ? t('admin.providers.duplicates.summary', { scanned: duplicates.scanned, total: duplicates.total })
+                  : t('admin.providers.duplicates.scanning')}
               </p>
             </div>
             <Button size="sm" variant="light" onPress={() => setDuplicatesOpen(false)}>
-              Close
+              {t('admin.providers.actions.close')}
             </Button>
           </div>
 
@@ -401,7 +402,7 @@ export default function CareProviderAdminPage() {
             </div>
           ) : duplicates && duplicates.pairs.length === 0 ? (
             <p className="text-sm text-default-500 py-3">
-              No likely duplicates found. The directory looks clean.
+              {t('admin.providers.duplicates.empty')}
             </p>
           ) : (
             <div className="space-y-2">
@@ -414,7 +415,7 @@ export default function CareProviderAdminPage() {
                     <div className="flex-1 min-w-[260px]">
                       <p className="font-medium text-sm flex items-center gap-1.5">
                         {pair.provider_a.is_verified && (
-                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified" />
+                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label={t('admin.providers.verified')} />
                         )}
                         {pair.provider_a.name}
                       </p>
@@ -422,11 +423,11 @@ export default function CareProviderAdminPage() {
                         #{pair.provider_a.id} · {pair.provider_a.type}
                       </p>
                     </div>
-                    <div className="text-default-400 text-xs self-center">vs</div>
+                    <div className="text-default-400 text-xs self-center">{t('admin.providers.duplicates.vs')}</div>
                     <div className="flex-1 min-w-[260px]">
                       <p className="font-medium text-sm flex items-center gap-1.5">
                         {pair.provider_b.is_verified && (
-                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified" />
+                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label={t('admin.providers.verified')} />
                         )}
                         {pair.provider_b.name}
                       </p>
@@ -439,13 +440,13 @@ export default function CareProviderAdminPage() {
                       color={pair.score >= 0.85 ? 'danger' : pair.score >= 0.75 ? 'warning' : 'default'}
                       variant="flat"
                     >
-                      {Math.round(pair.score * 100)}% match
+                      {t('admin.providers.duplicates.match_percent', { percent: Math.round(pair.score * 100) })}
                     </Chip>
                   </div>
                   <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                     {pair.signals.map((sig) => (
                       <Chip key={sig} size="sm" variant="flat" color="primary">
-                        {SIGNAL_LABELS[sig] ?? sig}
+                        {t(`admin.providers.signals.${sig}`, { defaultValue: sig })}
                       </Chip>
                     ))}
                   </div>
@@ -458,7 +459,7 @@ export default function CareProviderAdminPage() {
                         handleDeactivateProvider(pair.provider_b.id, pair.provider_b.name)
                       }
                     >
-                      Deactivate &ldquo;{pair.provider_b.name}&rdquo;
+                      {t('admin.providers.actions.deactivate_named', { name: pair.provider_b.name })}
                     </Button>
                     <Button
                       size="sm"
@@ -468,7 +469,7 @@ export default function CareProviderAdminPage() {
                         handleDeactivateProvider(pair.provider_a.id, pair.provider_a.name)
                       }
                     >
-                      Deactivate &ldquo;{pair.provider_a.name}&rdquo;
+                      {t('admin.providers.actions.deactivate_named', { name: pair.provider_a.name })}
                     </Button>
                   </div>
                 </div>
@@ -488,90 +489,112 @@ export default function CareProviderAdminPage() {
           {error}
         </div>
       ) : (
-        <Table aria-label="Care providers table" removeWrapper>
-          <TableHeader>
-            <TableColumn>Name</TableColumn>
-            <TableColumn>Type</TableColumn>
-            <TableColumn>Verified</TableColumn>
-            <TableColumn>Status</TableColumn>
-            <TableColumn>Actions</TableColumn>
-          </TableHeader>
-          <TableBody emptyContent="No care providers yet — add one to get started.">
-            {providers.map((provider) => (
-              <TableRow key={provider.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {provider.is_verified && (
-                      <BadgeCheck className="h-4 w-4 text-primary shrink-0" aria-label="Verified" />
-                    )}
-                    <div>
-                      <p className="font-medium">{provider.name}</p>
-                      {provider.address && (
-                        <p className="text-xs text-default-500">{provider.address}</p>
+        <>
+          <Table aria-label={t('admin.providers.table.aria')} removeWrapper>
+            <TableHeader>
+              <TableColumn>{t('admin.providers.table.name')}</TableColumn>
+              <TableColumn>{t('admin.providers.table.type')}</TableColumn>
+              <TableColumn>{t('admin.providers.table.verified')}</TableColumn>
+              <TableColumn>{t('admin.providers.table.status')}</TableColumn>
+              <TableColumn>{t('admin.providers.table.actions')}</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={t('admin.providers.empty')}>
+              {providers.map((provider) => (
+                <TableRow key={provider.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {provider.is_verified && (
+                        <BadgeCheck className="h-4 w-4 text-primary shrink-0" aria-label={t('admin.providers.verified')} />
                       )}
+                      <div>
+                        <p className="font-medium">{provider.name}</p>
+                        {provider.address && (
+                          <p className="text-xs text-default-500">{provider.address}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Chip size="sm" color={typeColor(provider.type)} variant="flat">
-                    {provider.type}
-                  </Chip>
-                </TableCell>
-                <TableCell>
-                  {provider.is_verified ? (
-                    <Chip size="sm" color="success" variant="flat">Yes</Chip>
-                  ) : (
-                    <Chip size="sm" color="default" variant="flat">No</Chip>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    size="sm"
-                    color={provider.status === 'active' ? 'success' : 'default'}
-                    variant="flat"
-                  >
-                    {provider.status}
-                  </Chip>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={typeColor(provider.type)} variant="flat">
+                      {t(`admin.providers.types.${provider.type}`)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {provider.is_verified ? (
+                      <Chip size="sm" color="success" variant="flat">{t('admin.providers.yes')}</Chip>
+                    ) : (
+                      <Chip size="sm" color="default" variant="flat">{t('admin.providers.no')}</Chip>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
                       size="sm"
+                      color={provider.status === 'active' ? 'success' : 'default'}
                       variant="flat"
-                      isIconOnly
-                      onPress={() => openEdit(provider)}
-                      aria-label="Edit provider"
                     >
-                      <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Button>
-                    {!provider.is_verified && (
+                      {t(`admin.providers.status.${provider.status}`)}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
                       <Button
                         size="sm"
                         variant="flat"
-                        color="primary"
                         isIconOnly
-                        onPress={() => handleVerify(provider)}
-                        aria-label="Verify provider"
+                        onPress={() => openEdit(provider)}
+                        aria-label={t('admin.providers.actions.edit_provider')}
                       >
-                        <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      color="danger"
-                      isIconOnly
-                      onPress={() => handleDelete(provider)}
-                      aria-label="Delete provider"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      {!provider.is_verified && (
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          color="primary"
+                          isIconOnly
+                          onPress={() => handleVerify(provider)}
+                          aria-label={t('admin.providers.actions.verify_provider')}
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        color="danger"
+                        isIconOnly
+                        onPress={() => handleDelete(provider)}
+                        aria-label={t('admin.providers.actions.delete_provider')}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {total > perPage && (
+            <div className="flex items-center justify-between gap-3 border-t border-divider pt-4 text-sm text-default-500">
+              <span>
+                {t('admin.providers.pagination.summary', {
+                  page,
+                  total,
+                  from: (page - 1) * perPage + 1,
+                  to: Math.min(page * perPage, total),
+                })}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="flat" isDisabled={page <= 1} onPress={() => setPage((p) => Math.max(1, p - 1))}>
+                  {t('admin.providers.pagination.previous')}
+                </Button>
+                <Button size="sm" variant="flat" isDisabled={page * perPage >= total} onPress={() => setPage((p) => p + 1)}>
+                  {t('admin.providers.pagination.next')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Create / Edit Modal */}
@@ -580,20 +603,22 @@ export default function CareProviderAdminPage() {
           {() => (
             <>
               <ModalHeader>
-                {editTarget ? `Edit: ${editTarget.name}` : 'Add Care Provider'}
+                {editTarget
+                  ? t('admin.providers.modal.edit_title', { name: editTarget.name })
+                  : t('admin.providers.modal.create_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Name"
+                  label={t('admin.providers.fields.name')}
                   isRequired
                   value={form.name}
                   onValueChange={(v) => setForm((f) => ({ ...f, name: v }))}
                   isInvalid={!!formErrors.name}
                   errorMessage={formErrors.name}
-                  placeholder="e.g. Spitex Zürich Sihl"
+                  placeholder={t('admin.providers.placeholders.name')}
                 />
                 <Select
-                  label="Type"
+                  label={t('admin.providers.fields.type')}
                   isRequired
                   selectedKeys={form.type ? new Set([form.type]) : new Set()}
                   onSelectionChange={(keys) => {
@@ -603,32 +628,43 @@ export default function CareProviderAdminPage() {
                   isInvalid={!!formErrors.type}
                   errorMessage={formErrors.type}
                 >
-                  {PROVIDER_TYPES.map(({ value, label }) => (
-                    <SelectItem key={value}>{label}</SelectItem>
+                  {PROVIDER_TYPES.map((value) => (
+                    <SelectItem key={value}>{t(`admin.providers.types.${value}`)}</SelectItem>
                   ))}
                 </Select>
+                <Select
+                  label={t('admin.providers.fields.status')}
+                  selectedKeys={new Set([form.status])}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as 'active' | 'inactive';
+                    setForm((f) => ({ ...f, status: val }));
+                  }}
+                >
+                  <SelectItem key="active">{t('admin.providers.status.active')}</SelectItem>
+                  <SelectItem key="inactive">{t('admin.providers.status.inactive')}</SelectItem>
+                </Select>
                 <Textarea
-                  label="Description"
+                  label={t('admin.providers.fields.description')}
                   value={form.description}
                   onValueChange={(v) => setForm((f) => ({ ...f, description: v }))}
-                  placeholder="Brief description of services offered..."
+                  placeholder={t('admin.providers.placeholders.description')}
                   minRows={2}
                 />
                 <Input
-                  label="Address"
+                  label={t('admin.providers.fields.address')}
                   value={form.address}
                   onValueChange={(v) => setForm((f) => ({ ...f, address: v }))}
-                  placeholder="Street, City, Postcode"
+                  placeholder={t('admin.providers.placeholders.address')}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Phone"
+                    label={t('admin.providers.fields.phone')}
                     value={form.contact_phone}
                     onValueChange={(v) => setForm((f) => ({ ...f, contact_phone: v }))}
-                    placeholder="+41 44 000 00 00"
+                    placeholder="+1 555 123 4567"
                   />
                   <Input
-                    label="Email"
+                    label={t('admin.providers.fields.email')}
                     type="email"
                     value={form.contact_email}
                     onValueChange={(v) => setForm((f) => ({ ...f, contact_email: v }))}
@@ -636,7 +672,7 @@ export default function CareProviderAdminPage() {
                   />
                 </div>
                 <Input
-                  label="Website"
+                  label={t('admin.providers.fields.website')}
                   value={form.website_url}
                   onValueChange={(v) => setForm((f) => ({ ...f, website_url: v }))}
                   placeholder="https://example.com"
@@ -644,10 +680,10 @@ export default function CareProviderAdminPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-                  Cancel
+                  {t('admin.providers.actions.cancel')}
                 </Button>
                 <Button color="primary" onPress={handleSave} isLoading={saving}>
-                  {editTarget ? 'Save Changes' : 'Create Provider'}
+                  {editTarget ? t('admin.providers.actions.save_changes') : t('admin.providers.actions.create_provider')}
                 </Button>
               </ModalFooter>
             </>

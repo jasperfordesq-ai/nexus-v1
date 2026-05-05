@@ -16,8 +16,19 @@
       "redemption_not_found": "Redemption not found.",
       "redemption_not_reversible": "Only applied redemptions can be reversed.",
       "reversal_reason_too_long": "Reversal reason must be 500 characters or fewer.",
+      "invalid_listing": "Listing does not belong to this merchant.",
+      "listing_unavailable": "This listing is not available for loyalty redemption.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
       "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+    }
+  },
+  "survey": {
+    "errors": {
+      "already_responded": "You have already responded to this survey.",
+      "closed": "This survey has closed.",
+      "not_accepting": "This survey is not currently accepting responses.",
+      "not_found": "Survey not found.",
+      "required_question": "Required question #:id is not answered."
     }
   },
   "forecast": {
@@ -102,7 +113,41 @@
     "not_found": "Feedback not found.",
     "invalid_status": "Invalid status.",
     "invalid_assignee": "assigned_user_id must be numeric.",
-    "resolution_notes_required": "Resolution notes are required."
+    "resolution_notes_required": "Resolution notes are required.",
+    "invalid_category": "Invalid category.",
+    "subject_required": "Subject is required.",
+    "subject_too_long": "Subject is too long.",
+    "body_required": "Body is required.",
+    "body_too_long": "Body is too long.",
+    "invalid_sentiment": "Invalid sentiment tag.",
+    "invalid_sub_region": "Sub-region must be numeric."
+  },
+  "external_integrations": {
+    "validation": {
+      "name_required": "Name is required.",
+      "name_too_long": "Name must be 200 characters or fewer.",
+      "category_invalid": "Category is invalid.",
+      "status_invalid": "Status is invalid.",
+      "dsa_status_invalid": "DSA status is invalid.",
+      "owner_email_invalid": "Owner email must be a valid email address.",
+      "interface_spec_url_invalid": "Interface spec URL must be a valid URL.",
+      "sandbox_url_invalid": "Sandbox URL must be a valid URL."
+    }
+  },
+  "success_stories": {
+    "validation": {
+      "title_required": "Title is required.",
+      "title_too_long": "Title must be 200 characters or fewer.",
+      "narrative_required": "Narrative is required.",
+      "narrative_too_long": "Narrative must be 1500 characters or fewer.",
+      "method_caveat_required": "Method caveat is required.",
+      "method_caveat_too_long": "Method caveat must be 500 characters or fewer.",
+      "evidence_source_required": "Evidence source is required.",
+      "evidence_source_too_long": "Evidence source must be 300 characters or fewer.",
+      "metric_source_invalid": "Metric source is invalid.",
+      "unit_too_long": "Unit must be 30 characters or fewer.",
+      "audience_too_long": "Audience must be 50 characters or fewer."
+    }
   },
   "data_quality": {
     "missing_language_positive": "These members will receive emails and notifications in the platform default. Set their preferred language for proper localisation.",

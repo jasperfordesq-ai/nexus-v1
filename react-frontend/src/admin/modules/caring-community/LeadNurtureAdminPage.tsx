@@ -176,21 +176,9 @@ export default function LeadNurtureAdminPage() {
       const params = new URLSearchParams();
       if (segmentFilter) params.set('segment', segmentFilter);
       const qs = params.toString() ? `?${params.toString()}` : '';
-      // We hit fetch directly to get the raw CSV (api.ts default JSON-parses).
-      const res = await fetch(`/api/v2/admin/caring-community/leads/export.csv${qs}`, {
-        credentials: 'include',
+      await api.download(`/v2/admin/caring-community/leads/export.csv${qs}`, {
+        filename: 'lead-nurture-export.csv',
       });
-      if (!res.ok) throw new Error('export failed');
-      const text = await res.text();
-      const blob = new Blob([text], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'lead-nurture-export.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       showToast('Lead list exported', 'success');
     } catch {
       showToast('Failed to export CSV', 'error');

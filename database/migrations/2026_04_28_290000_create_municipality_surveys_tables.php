@@ -96,8 +96,8 @@ return new class extends Migration
                     ->on('municipality_surveys')
                     ->cascadeOnDelete();
 
-                $table->index(['survey_id', 'user_id']);
-                $table->index(['survey_id', 'session_token']);
+                $table->unique(['tenant_id', 'survey_id', 'user_id'], 'msr_tenant_survey_user_unique');
+                $table->unique(['tenant_id', 'survey_id', 'session_token'], 'msr_tenant_survey_session_unique');
                 $table->index(['tenant_id', 'submitted_at']);
             });
         }

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import {
   Button,
@@ -29,6 +30,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
   const { user, logout } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const navigate = useNavigate();
+  const { t } = useTranslation('caring_community');
 
   return (
     <header
@@ -45,7 +47,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
             size="sm"
             onPress={onSidebarToggle}
             className="text-default-500 md:hidden"
-            aria-label="Toggle sidebar"
+            aria-label={t('panel.header.toggle_sidebar')}
           >
             <Menu size={20} />
           </Button>
@@ -56,8 +58,9 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
           onPress={() => navigate(tenantPath('/dashboard'))}
           startContent={<ArrowLeft size={16} />}
           className="text-default-500"
+          aria-label={t('panel.header.back_to_site')}
         >
-          <span className="hidden sm:inline">Back to site</span>
+          <span className="hidden sm:inline">{t('panel.header.back_to_site')}</span>
         </Button>
         {tenant?.name && (
           <span className="text-sm font-medium text-default-400">
@@ -73,7 +76,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
           variant="light"
           size="sm"
           onPress={() => navigate(tenantPath('/notifications'))}
-          aria-label="Notifications"
+          aria-label={t('panel.header.notifications')}
         >
           <Bell size={18} />
         </Button>
@@ -83,24 +86,24 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
             <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
               <Avatar
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
-                name={user?.name || 'User'}
+                name={user?.name || t('panel.header.user_fallback')}
                 size="sm"
                 className="h-8 w-8"
               />
               <span className="hidden text-sm font-medium text-foreground sm:block">
-                {user?.name || 'User'}
+                {user?.name || t('panel.header.user_fallback')}
               </span>
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label="User menu"
+            aria-label={t('panel.header.user_menu')}
             onAction={(key) => {
               if (key === 'profile') navigate(tenantPath('/profile'));
               if (key === 'logout') logout();
             }}
           >
             <DropdownItem key="profile" startContent={<User size={16} />}>
-              My Profile
+              {t('panel.header.my_profile')}
             </DropdownItem>
             <DropdownItem
               key="logout"
@@ -108,7 +111,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
               className="text-danger"
               color="danger"
             >
-              Sign out
+              {t('panel.header.sign_out')}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

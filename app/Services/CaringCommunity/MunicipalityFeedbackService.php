@@ -54,32 +54,32 @@ class MunicipalityFeedbackService
 
         $category = is_string($payload['category'] ?? null) ? $payload['category'] : '';
         if (!in_array($category, self::CATEGORIES, true)) {
-            $errors[] = ['code' => 'INVALID_CATEGORY', 'message' => 'Invalid category.', 'field' => 'category'];
+            $errors[] = ['code' => 'INVALID_CATEGORY', 'message' => __('caring_community.feedback.invalid_category'), 'field' => 'category'];
         }
 
         $subject = trim((string) ($payload['subject'] ?? ''));
         if ($subject === '') {
-            $errors[] = ['code' => 'SUBJECT_REQUIRED', 'message' => 'Subject is required.', 'field' => 'subject'];
+            $errors[] = ['code' => 'SUBJECT_REQUIRED', 'message' => __('caring_community.feedback.subject_required'), 'field' => 'subject'];
         } elseif (mb_strlen($subject) > self::MAX_SUBJECT) {
-            $errors[] = ['code' => 'SUBJECT_TOO_LONG', 'message' => 'Subject is too long.', 'field' => 'subject'];
+            $errors[] = ['code' => 'SUBJECT_TOO_LONG', 'message' => __('caring_community.feedback.subject_too_long'), 'field' => 'subject'];
         }
 
         $body = trim((string) ($payload['body'] ?? ''));
         if ($body === '') {
-            $errors[] = ['code' => 'BODY_REQUIRED', 'message' => 'Body is required.', 'field' => 'body'];
+            $errors[] = ['code' => 'BODY_REQUIRED', 'message' => __('caring_community.feedback.body_required'), 'field' => 'body'];
         } elseif (mb_strlen($body) > self::MAX_BODY) {
-            $errors[] = ['code' => 'BODY_TOO_LONG', 'message' => 'Body is too long.', 'field' => 'body'];
+            $errors[] = ['code' => 'BODY_TOO_LONG', 'message' => __('caring_community.feedback.body_too_long'), 'field' => 'body'];
         }
 
         $sentiment = $payload['sentiment_tag'] ?? null;
         if ($sentiment !== null && $sentiment !== '' && !in_array($sentiment, self::SENTIMENT_TAGS, true)) {
-            $errors[] = ['code' => 'INVALID_SENTIMENT', 'message' => 'Invalid sentiment tag.', 'field' => 'sentiment_tag'];
+            $errors[] = ['code' => 'INVALID_SENTIMENT', 'message' => __('caring_community.feedback.invalid_sentiment'), 'field' => 'sentiment_tag'];
         }
 
         $subRegionId = null;
         if (isset($payload['sub_region_id']) && $payload['sub_region_id'] !== '' && $payload['sub_region_id'] !== null) {
             if (!is_numeric($payload['sub_region_id'])) {
-                $errors[] = ['code' => 'INVALID_SUB_REGION', 'message' => 'Sub-region must be numeric.', 'field' => 'sub_region_id'];
+                $errors[] = ['code' => 'INVALID_SUB_REGION', 'message' => __('caring_community.feedback.invalid_sub_region'), 'field' => 'sub_region_id'];
             } else {
                 $subRegionId = (int) $payload['sub_region_id'];
             }

@@ -12,7 +12,7 @@ export const CARING_COMMUNITY_ROUTE = {
 } as const;
 
 export const CARING_COMMUNITY_ADMIN_ROUTE = {
-  path: 'caring-community',
-  href: '/admin/caring-community',
+  path: 'caring',
+  href: '/caring',
   feature: 'caring_community' satisfies keyof TenantFeatures,
 } as const;

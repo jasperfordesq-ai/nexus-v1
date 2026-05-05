@@ -378,9 +378,9 @@ class SuccessStoryService
         if (!$isPartial || array_key_exists('title', $payload)) {
             $title = isset($payload['title']) ? trim((string) $payload['title']) : '';
             if ($title === '') {
-                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => 'Title is required.', 'field' => 'title'];
+                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => __('caring_community.success_stories.validation.title_required'), 'field' => 'title'];
             } elseif (mb_strlen($title) > 200) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Title must be 200 characters or fewer.', 'field' => 'title'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.title_too_long'), 'field' => 'title'];
             }
         }
 
@@ -388,9 +388,9 @@ class SuccessStoryService
         if (!$isPartial || array_key_exists('narrative', $payload)) {
             $narrative = isset($payload['narrative']) ? trim((string) $payload['narrative']) : '';
             if ($narrative === '') {
-                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => 'Narrative is required.', 'field' => 'narrative'];
+                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => __('caring_community.success_stories.validation.narrative_required'), 'field' => 'narrative'];
             } elseif (mb_strlen($narrative) > 1500) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Narrative must be 1500 characters or fewer.', 'field' => 'narrative'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.narrative_too_long'), 'field' => 'narrative'];
             }
         }
 
@@ -398,9 +398,9 @@ class SuccessStoryService
         if (!$isPartial || array_key_exists('method_caveat', $payload)) {
             $caveat = isset($payload['method_caveat']) ? trim((string) $payload['method_caveat']) : '';
             if ($caveat === '') {
-                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => 'Method caveat is required.', 'field' => 'method_caveat'];
+                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => __('caring_community.success_stories.validation.method_caveat_required'), 'field' => 'method_caveat'];
             } elseif (mb_strlen($caveat) > 500) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Method caveat must be 500 characters or fewer.', 'field' => 'method_caveat'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.method_caveat_too_long'), 'field' => 'method_caveat'];
             }
         }
 
@@ -408,9 +408,9 @@ class SuccessStoryService
         if (!$isPartial || array_key_exists('evidence_source', $payload)) {
             $evidence = isset($payload['evidence_source']) ? trim((string) $payload['evidence_source']) : '';
             if ($evidence === '') {
-                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => 'Evidence source is required.', 'field' => 'evidence_source'];
+                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => __('caring_community.success_stories.validation.evidence_source_required'), 'field' => 'evidence_source'];
             } elseif (mb_strlen($evidence) > 300) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Evidence source must be 300 characters or fewer.', 'field' => 'evidence_source'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.evidence_source_too_long'), 'field' => 'evidence_source'];
             }
         }
 
@@ -418,7 +418,7 @@ class SuccessStoryService
         if (array_key_exists('metric_source', $payload)) {
             $source = (string) $payload['metric_source'];
             if (!in_array($source, self::METRIC_SOURCES, true)) {
-                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => 'Metric source is invalid.', 'field' => 'metric_source'];
+                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => __('caring_community.success_stories.validation.metric_source_invalid'), 'field' => 'metric_source'];
             }
         }
 
@@ -426,7 +426,7 @@ class SuccessStoryService
         if (array_key_exists('unit', $payload)) {
             $unit = trim((string) ($payload['unit'] ?? ''));
             if (mb_strlen($unit) > 30) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Unit must be 30 characters or fewer.', 'field' => 'unit'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.unit_too_long'), 'field' => 'unit'];
             }
         }
 
@@ -434,7 +434,7 @@ class SuccessStoryService
         if (array_key_exists('audience', $payload)) {
             $audience = trim((string) ($payload['audience'] ?? ''));
             if (mb_strlen($audience) > 50) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Audience must be 50 characters or fewer.', 'field' => 'audience'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.success_stories.validation.audience_too_long'), 'field' => 'audience'];
             }
         }
 

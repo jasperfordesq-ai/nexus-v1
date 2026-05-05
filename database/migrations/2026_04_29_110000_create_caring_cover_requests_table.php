@@ -46,6 +46,12 @@ return new class extends Migration
                     ->on('caring_caregiver_links')
                     ->cascadeOnDelete();
 
+                $table->foreign('support_relationship_id', 'ccr_support_relationship_id_foreign')
+                    ->references('id')
+                    ->on('caring_support_relationships')
+                    ->nullOnDelete();
+
+                $table->index('support_relationship_id', 'idx_ccr_support_relationship');
                 $table->index(['tenant_id', 'caregiver_id', 'status']);
                 $table->index(['tenant_id', 'cared_for_id', 'starts_at']);
                 $table->index(['tenant_id', 'status', 'starts_at']);

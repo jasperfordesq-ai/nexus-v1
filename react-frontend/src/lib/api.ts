@@ -629,6 +629,16 @@ class ApiClient {
         };
       }
 
+      if (response.ok && options.responseType === 'blob') {
+        const data = await response.blob();
+        return { success: true, data: data as T };
+      }
+
+      if (response.ok && options.responseType === 'text') {
+        const data = await response.text();
+        return { success: true, data: data as T };
+      }
+
       // Parse JSON response
       let data;
       try {

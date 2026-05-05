@@ -31,6 +31,8 @@ export function CaringRoute() {
     role === 'tenant_admin' ||
     role === 'super_admin' ||
     role === 'god' ||
+    role === 'coordinator' ||
+    role === 'broker' ||
     userRecord?.is_admin === true ||
     userRecord?.is_super_admin === true ||
     userRecord?.is_tenant_super_admin === true ||

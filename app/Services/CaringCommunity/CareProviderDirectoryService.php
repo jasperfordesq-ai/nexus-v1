@@ -121,6 +121,23 @@ class CareProviderDirectoryService
         return $row ? $this->castRow((array) $row) : null;
     }
 
+    /**
+     * Get a member-visible provider by id. Inactive providers stay available
+     * to admin tools through get(), but are hidden from public directory views.
+     */
+    public function getActive(int $id, int $tenantId): ?array
+    {
+        $this->assertAvailable();
+
+        $row = DB::table(self::TABLE)
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->first();
+
+        return $row ? $this->castRow((array) $row) : null;
+    }
+
     // -------------------------------------------------------------------------
     // Admin write methods
     // -------------------------------------------------------------------------
@@ -131,6 +148,11 @@ class CareProviderDirectoryService
     public function create(int $tenantId, array $data, int $adminUserId): array
     {
         $this->assertAvailable();
+
+        $status = (string) ($data['status'] ?? 'active');
+        if (!in_array($status, ['active', 'inactive'], true)) {
+            $status = 'active';
+        }
 
         $payload = [
             'tenant_id'     => $tenantId,
@@ -144,7 +166,7 @@ class CareProviderDirectoryService
             'website_url'   => isset($data['website_url']) ? (string) $data['website_url'] : null,
             'opening_hours' => isset($data['opening_hours']) ? json_encode($data['opening_hours']) : null,
             'is_verified'   => false,
-            'status'        => 'active',
+            'status'        => $status,
             'created_by'    => $adminUserId,
             'created_at'    => now(),
             'updated_at'    => now(),

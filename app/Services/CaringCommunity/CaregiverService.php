@@ -45,7 +45,7 @@ class CaregiverService
      *
      * @return array<int,array<string,mixed>>
      */
-    public function getLinksForCaregiver(int $caregiverId, int $tenantId): array
+    public function getLinksForCaregiver(int $caregiverId, int $tenantId, string $status = 'active'): array
     {
         return DB::table('caring_caregiver_links as cl')
             ->join('users as u', function ($join): void {
@@ -54,7 +54,7 @@ class CaregiverService
             })
             ->where('cl.caregiver_id', $caregiverId)
             ->where('cl.tenant_id', $tenantId)
-            ->where('cl.status', 'active')
+            ->where('cl.status', $status)
             ->select([
                 'cl.id',
                 'cl.cared_for_id',
@@ -107,7 +107,8 @@ class CaregiverService
     }
 
     /**
-     * Create a new caregiver link.
+     * Request a new caregiver link. Member-created links remain pending until
+     * staff verify consent and activate the relationship.
      *
      * @param  array<string,mixed>  $options  Optional: is_primary (bool), notes (string)
      * @return array<string,mixed>
@@ -132,34 +133,39 @@ class CaregiverService
             throw new \RuntimeException(__('api.user_not_found_in_tenant'));
         }
 
-        $existing = DB::table('caring_caregiver_links')
-            ->where('caregiver_id', $caregiverId)
-            ->where('cared_for_id', $caredForId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->first();
+        return DB::transaction(function () use ($caregiverId, $caredForId, $relationshipType, $tenantId, $options): array {
+            $existing = DB::table('caring_caregiver_links')
+                ->where('caregiver_id', $caregiverId)
+                ->where('cared_for_id', $caredForId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['pending', 'active'])
+                ->lockForUpdate()
+                ->first();
 
-        if ($existing !== null) {
-            throw new \RuntimeException(__('api.caring_caregiver_duplicate_link'));
-        }
+            if ($existing !== null) {
+                throw new \RuntimeException(__('api.caring_caregiver_duplicate_link'));
+            }
 
-        $id = DB::table('caring_caregiver_links')->insertGetId([
-            'tenant_id'         => $tenantId,
-            'caregiver_id'      => $caregiverId,
-            'cared_for_id'      => $caredForId,
-            'relationship_type' => $relationshipType,
-            'is_primary'        => (bool) ($options['is_primary'] ?? false),
-            'start_date'        => $options['start_date'] ?? now()->toDateString(),
-            'notes'             => $options['notes'] ?? null,
-            'status'            => 'active',
-            'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
+            $approvedBy = (int) ($options['approved_by'] ?? 0);
+            $id = DB::table('caring_caregiver_links')->insertGetId([
+                'tenant_id'         => $tenantId,
+                'caregiver_id'      => $caregiverId,
+                'cared_for_id'      => $caredForId,
+                'relationship_type' => $relationshipType,
+                'is_primary'        => (bool) ($options['is_primary'] ?? false),
+                'start_date'        => $options['start_date'] ?? now()->toDateString(),
+                'notes'             => $options['notes'] ?? null,
+                'status'            => $approvedBy > 0 ? 'active' : 'pending',
+                'approved_by'       => $approvedBy > 0 ? $approvedBy : null,
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
 
-        /** @var array<string,mixed> $row */
-        $row = (array) DB::table('caring_caregiver_links')->where('id', $id)->first();
+            /** @var array<string,mixed> $row */
+            $row = (array) DB::table('caring_caregiver_links')->where('id', $id)->first();
 
-        return $row;
+            return $row;
+        });
     }
 
     /**
@@ -232,17 +238,17 @@ class CaregiverService
                 })
                 ->where('vl.support_recipient_id', $caredForId)
                 ->where('vl.tenant_id', $tenantId)
-                ->where('vl.logged_at', '>=', now()->subDays(30))
+                ->where('vl.date_logged', '>=', now()->subDays(30)->toDateString())
                 ->select([
                     'vl.id',
-                    'vl.logged_at as date',
+                    'vl.date_logged as date',
                     'vl.hours',
                     'vl.status',
                     'u.id as supporter_id',
                     'u.name as supporter_name',
                     'u.avatar_url as supporter_avatar_url',
                 ])
-                ->orderByDesc('vl.logged_at')
+                ->orderByDesc('vl.date_logged')
                 ->limit(20)
                 ->get()
                 ->map(fn ($row) => (array) $row)
@@ -272,7 +278,7 @@ class CaregiverService
             $sum = DB::table('vol_logs')
                 ->where('user_id', $caregiverId)
                 ->where('tenant_id', $tenantId)
-                ->whereRaw("logged_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")
+                ->where('date_logged', '>=', now()->subDays(7)->toDateString())
                 ->whereIn('status', ['approved', 'pending'])
                 ->sum('hours');
 

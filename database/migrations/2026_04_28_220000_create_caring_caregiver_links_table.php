@@ -24,11 +24,12 @@ return new class extends Migration
                 $table->boolean('is_primary')->default(false);
                 $table->date('start_date');
                 $table->text('notes')->nullable();
-                $table->enum('status', ['active', 'inactive'])->default('active');
+                $table->enum('status', ['pending', 'active', 'inactive'])->default('pending');
                 $table->unsignedInteger('approved_by')->nullable();
                 $table->timestamps();
                 $table->index(['tenant_id', 'caregiver_id']);
                 $table->index(['tenant_id', 'cared_for_id']);
+                $table->unique(['tenant_id', 'caregiver_id', 'cared_for_id', 'status'], 'ccl_tenant_caregiver_recipient_status_unique');
             });
         }
     }

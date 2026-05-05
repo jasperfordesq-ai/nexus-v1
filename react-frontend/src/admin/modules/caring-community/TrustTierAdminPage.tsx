@@ -154,11 +154,11 @@ export function TrustTierAdminPage() {
     if (!confirm('Recompute trust tiers for all active members? This may take a moment.')) return;
     setRecomputing(true);
     try {
-      const result = await api.post<{ data: { updated: number } }>(
+      const result = await api.post<{ updated: number }>(
         '/v2/admin/caring-community/trust-tier/recompute',
         {},
       );
-      const updated = result.data?.data?.updated ?? 0;
+      const updated = result.data?.updated ?? 0;
       showToast(`Tiers recomputed for ${updated} members.`, 'success');
     } catch {
       showToast('Failed to recompute tiers.', 'error');

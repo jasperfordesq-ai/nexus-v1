@@ -1,5 +1,6 @@
 {
   "back": "Back",
+  "hours_short": "{{count}}h",
   "error_title": "Something went wrong",
   "nav": {
     "dashboard": "Dashboard",

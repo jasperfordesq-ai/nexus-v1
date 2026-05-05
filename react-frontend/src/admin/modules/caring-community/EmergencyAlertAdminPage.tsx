@@ -167,12 +167,15 @@ export default function EmergencyAlertAdminPage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await api.post('/v2/admin/caring-community/emergency-alerts', {
+      const res = await api.post('/v2/admin/caring-community/emergency-alerts', {
         title: title.trim(),
         body: body.trim(),
         severity,
         expires_at: expiresAt || null,
       });
+      if (!res.success) {
+        throw new Error(res.error ?? 'Failed to broadcast alert');
+      }
       onClose();
       await fetchAlerts();
     } catch (e: unknown) {
@@ -184,7 +187,10 @@ export default function EmergencyAlertAdminPage() {
 
   const handleDeactivate = async (id: number) => {
     try {
-      await api.delete(`/v2/admin/caring-community/emergency-alerts/${id}`);
+      const res = await api.delete(`/v2/admin/caring-community/emergency-alerts/${id}`);
+      if (!res.success) {
+        throw new Error(res.error ?? 'Failed to deactivate alert');
+      }
       setDeactivatingId(null);
       await fetchAlerts();
     } catch {

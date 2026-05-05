@@ -23,7 +23,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
@@ -54,6 +54,7 @@ const OPTIONS: { value: Cadence; label: string; description: string }[] = [
 export default function CivicDigestAdminPage() {
   usePageTitle('Civic Digest Cadence');
   const { showToast } = useToast();
+  const { tenantPath } = useTenant();
 
   const [cadence, setCadence] = useState<Cadence>('off');
   const [draft, setDraft] = useState<Cadence>('off');
@@ -109,7 +110,7 @@ export default function CivicDigestAdminPage() {
           <div className="flex items-center gap-2">
             <Button
               as={Link}
-              to="/caring-community/civic-digest"
+              to={tenantPath('/caring-community/civic-digest')}
               size="sm"
               variant="flat"
               endContent={<ExternalLink size={14} />}

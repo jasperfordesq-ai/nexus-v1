@@ -257,9 +257,9 @@ class ExternalIntegrationBacklogService
         if (!$isPartial || array_key_exists('name', $payload)) {
             $name = isset($payload['name']) ? trim((string) $payload['name']) : '';
             if ($name === '') {
-                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => 'Name is required.', 'field' => 'name'];
+                $errors[] = ['code' => 'VALIDATION_REQUIRED', 'message' => __('caring_community.external_integrations.validation.name_required'), 'field' => 'name'];
             } elseif (mb_strlen($name) > 200) {
-                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => 'Name must be 200 characters or fewer.', 'field' => 'name'];
+                $errors[] = ['code' => 'VALIDATION_LENGTH', 'message' => __('caring_community.external_integrations.validation.name_too_long'), 'field' => 'name'];
             }
         }
 
@@ -267,7 +267,7 @@ class ExternalIntegrationBacklogService
         if (!$isPartial || array_key_exists('category', $payload)) {
             $category = isset($payload['category']) ? (string) $payload['category'] : '';
             if ($category === '' || !in_array($category, self::CATEGORIES, true)) {
-                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => 'Category is invalid.', 'field' => 'category'];
+                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => __('caring_community.external_integrations.validation.category_invalid'), 'field' => 'category'];
             }
         }
 
@@ -275,7 +275,7 @@ class ExternalIntegrationBacklogService
         if (!$isPartial || array_key_exists('status', $payload)) {
             $status = isset($payload['status']) ? (string) $payload['status'] : '';
             if ($status === '' || !in_array($status, self::STATUSES, true)) {
-                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => 'Status is invalid.', 'field' => 'status'];
+                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => __('caring_community.external_integrations.validation.status_invalid'), 'field' => 'status'];
             }
         }
 
@@ -283,7 +283,7 @@ class ExternalIntegrationBacklogService
         if (!$isPartial || array_key_exists('dsa_status', $payload)) {
             $dsa = isset($payload['dsa_status']) ? (string) $payload['dsa_status'] : '';
             if ($dsa === '' || !in_array($dsa, self::DSA_STATUSES, true)) {
-                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => 'DSA status is invalid.', 'field' => 'dsa_status'];
+                $errors[] = ['code' => 'VALIDATION_ENUM', 'message' => __('caring_community.external_integrations.validation.dsa_status_invalid'), 'field' => 'dsa_status'];
             }
         }
 
@@ -291,7 +291,7 @@ class ExternalIntegrationBacklogService
         if (array_key_exists('owner_email', $payload)) {
             $email = trim((string) ($payload['owner_email'] ?? ''));
             if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = ['code' => 'VALIDATION_EMAIL', 'message' => 'Owner email must be a valid email address.', 'field' => 'owner_email'];
+                $errors[] = ['code' => 'VALIDATION_EMAIL', 'message' => __('caring_community.external_integrations.validation.owner_email_invalid'), 'field' => 'owner_email'];
             }
         }
 
@@ -299,7 +299,7 @@ class ExternalIntegrationBacklogService
         if (array_key_exists('interface_spec_url', $payload)) {
             $url = trim((string) ($payload['interface_spec_url'] ?? ''));
             if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
-                $errors[] = ['code' => 'VALIDATION_URL', 'message' => 'Interface spec URL must be a valid URL.', 'field' => 'interface_spec_url'];
+                $errors[] = ['code' => 'VALIDATION_URL', 'message' => __('caring_community.external_integrations.validation.interface_spec_url_invalid'), 'field' => 'interface_spec_url'];
             }
         }
 
@@ -307,7 +307,7 @@ class ExternalIntegrationBacklogService
         if (array_key_exists('sandbox_url', $payload)) {
             $url = trim((string) ($payload['sandbox_url'] ?? ''));
             if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
-                $errors[] = ['code' => 'VALIDATION_URL', 'message' => 'Sandbox URL must be a valid URL.', 'field' => 'sandbox_url'];
+                $errors[] = ['code' => 'VALIDATION_URL', 'message' => __('caring_community.external_integrations.validation.sandbox_url_invalid'), 'field' => 'sandbox_url'];
             }
         }
 

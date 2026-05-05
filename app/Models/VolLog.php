@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -22,15 +22,23 @@ class VolLog extends Model
         'user_id',
         'organization_id',
         'opportunity_id',
+        'caring_support_relationship_id',
+        'support_recipient_id',
         'date_logged',
         'hours',
         'description',
         'status',
+        'assigned_to',
+        'assigned_at',
+        'escalated_at',
+        'escalation_note',
     ];
 
     protected $casts = [
         'date_logged' => 'date',
         'hours' => 'decimal:2',
+        'assigned_at' => 'datetime',
+        'escalated_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

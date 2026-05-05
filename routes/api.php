@@ -2917,15 +2917,17 @@ Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalS
 Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
 Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey'])
     ->middleware('auth:sanctum');
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminListSurveys']);
-    Route::post('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCreateSurvey']);
-    Route::get('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminGetSurvey']);
-    Route::put('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminUpdateSurvey']);
-    Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminPublishSurvey']);
-    Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
-    Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
-});
+Route::middleware('auth:sanctum')
+    ->withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])
+    ->group(function () {
+        Route::get('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminListSurveys']);
+        Route::post('/v2/admin/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCreateSurvey']);
+        Route::get('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminGetSurvey']);
+        Route::put('/v2/admin/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminUpdateSurvey']);
+        Route::post('/v2/admin/caring-community/surveys/{id}/publish', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminPublishSurvey']);
+        Route::post('/v2/admin/caring-community/surveys/{id}/close', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminCloseSurvey']);
+        Route::get('/v2/admin/caring-community/surveys/{id}/export', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'adminExportCsv']);
+    });
 
 // ============================================
 // AG61 — KI-Agenten Autonomous Agent Framework

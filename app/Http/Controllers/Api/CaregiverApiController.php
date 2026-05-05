@@ -66,7 +66,7 @@ class CaregiverApiController extends BaseApiController
 
     /**
      * POST /v2/caring-community/caregiver/links
-     * Add a new caregiver link.
+     * Request a new caregiver link.
      */
     public function addLink(): JsonResponse
     {
@@ -114,7 +114,7 @@ class CaregiverApiController extends BaseApiController
             return $this->respondWithError('CONFLICT', $e->getMessage(), null, 409);
         }
 
-        return $this->respondWithData($link, null, 201);
+        return $this->respondWithData($link, null, 202);
     }
 
     /**
