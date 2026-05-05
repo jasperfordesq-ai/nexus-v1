@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -103,5 +104,91 @@ class FeedSocialControllerTest extends TestCase
         $response = $this->apiGet('/v2/feed/hashtags/community');
 
         $response->assertStatus(401);
+    }
+
+    public function test_share_rejects_hidden_post(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'content' => 'Hidden post should not be shareable',
+            'type' => 'post',
+            'visibility' => 'public',
+            'is_hidden' => 1,
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->apiPost('/v2/shares', [
+            'type' => 'post',
+            'id' => $postId,
+        ])->assertStatus(404);
+
+        $this->assertDatabaseMissing('post_shares', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $viewer->id,
+            'original_type' => 'post',
+            'original_post_id' => $postId,
+        ]);
+    }
+
+    public function test_hashtag_posts_exclude_hidden_posts(): void
+    {
+        $user = $this->authenticatedUser();
+        $hashtagId = DB::table('hashtags')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'tag' => 'audit',
+            'post_count' => 2,
+            'last_used_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $visiblePostId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'content' => 'Visible hashtag post',
+            'type' => 'post',
+            'visibility' => 'public',
+            'is_hidden' => 0,
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $hiddenPostId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'content' => 'Hidden hashtag post',
+            'type' => 'post',
+            'visibility' => 'public',
+            'is_hidden' => 1,
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        foreach ([$visiblePostId, $hiddenPostId] as $postId) {
+            DB::table('post_hashtags')->insert([
+                'tenant_id' => $this->testTenantId,
+                'post_id' => $postId,
+                'hashtag_id' => $hashtagId,
+                'created_at' => now(),
+            ]);
+        }
+
+        $response = $this->apiGet('/v2/feed/hashtags/audit');
+        $response->assertStatus(200);
+
+        $ids = collect($response->json('data') ?? [])->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $this->assertContains((int) $visiblePostId, $ids);
+        $this->assertNotContains((int) $hiddenPostId, $ids);
+        $this->assertSame(1, (int) $response->json('meta.total_items'));
     }
 }

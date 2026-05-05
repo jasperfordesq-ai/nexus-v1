@@ -58,6 +58,7 @@ return new class extends Migration
         }
 
         $this->dropIndexIfExists($tableName, $indexName);
+        $this->collapsePolymorphicDuplicatesForRollback($tableName);
 
         Schema::table($tableName, function (Blueprint $table): void {
             $table->dropColumn('target_type');
@@ -68,6 +69,31 @@ return new class extends Migration
                 "ALTER TABLE {$tableName} ADD UNIQUE KEY {$indexName} (post_id, user_id, tenant_id)"
             );
         }
+    }
+
+    private function collapsePolymorphicDuplicatesForRollback(string $tableName): void
+    {
+        $countColumn = $tableName === 'feed_clicks' ? 'click_count' : 'view_count';
+
+        DB::statement(
+            "UPDATE {$tableName} keep_row
+             JOIN (
+                 SELECT MIN(id) AS keep_id, post_id, user_id, tenant_id, SUM({$countColumn}) AS total_count, MAX(updated_at) AS latest_update
+                 FROM {$tableName}
+                 GROUP BY post_id, user_id, tenant_id
+             ) grouped ON grouped.keep_id = keep_row.id
+             SET keep_row.{$countColumn} = grouped.total_count,
+                 keep_row.updated_at = grouped.latest_update"
+        );
+
+        DB::statement(
+            "DELETE duplicate_row FROM {$tableName} duplicate_row
+             JOIN {$tableName} keep_row
+               ON keep_row.post_id = duplicate_row.post_id
+              AND keep_row.user_id = duplicate_row.user_id
+              AND keep_row.tenant_id = duplicate_row.tenant_id
+              AND keep_row.id < duplicate_row.id"
+        );
     }
 
     private function indexExists(string $tableName, string $indexName): bool

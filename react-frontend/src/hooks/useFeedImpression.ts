@@ -5,7 +5,7 @@
 
 /**
  * useFeedImpression — tracks when a feed card becomes ≥50% visible for ≥1 second,
- * then fires POST /api/v2/feed/{id}/impression (fire-and-forget).
+ * then fires POST /api/v2/feed/posts/{id}/impression (fire-and-forget).
  *
  * Deduplication is handled by a module-level Set so each post ID fires at most
  * once per feed load. Call `resetFeedImpressions()` when the feed reloads.
@@ -50,7 +50,7 @@ export function useFeedImpression(
             if (reportedIds.has(postId)) return;
             reportedIds.add(postId);
             // Fire-and-forget — never throw or block rendering
-            api.post(`/v2/feed/${postId}/impression`).catch(() => {});
+            api.post(`/v2/feed/posts/${postId}/impression`).catch(() => {});
             observer.disconnect();
           }, 1000);
         } else {

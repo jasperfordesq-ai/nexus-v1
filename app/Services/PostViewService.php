@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,10 @@ class PostViewService
     public function recordView(int $postId, ?int $userId, string $ipHash): void
     {
         $tenantId = TenantContext::getId();
+
+        if (!FeedItemTables::canView('post', $postId, $userId)) {
+            return;
+        }
 
         // Debounce: don't count same viewer within 30 minutes
         $cacheKey = $userId
@@ -75,9 +80,9 @@ class PostViewService
     {
         $tenantId = TenantContext::getId();
 
-        return (int) DB::table('feed_posts')
+        return (int) (DB::table('feed_posts')
             ->where('id', $postId)
             ->where('tenant_id', $tenantId)
-            ->value('views_count') ?? 0;
+            ->value('views_count') ?? 0);
     }
 }

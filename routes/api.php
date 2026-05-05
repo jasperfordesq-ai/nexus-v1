@@ -174,28 +174,30 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // returns JsonResponse from every method, and handles validation via
 // Laravel's ValidationException. See ListingsController.php for the
 // reference implementation pattern to follow for all other controllers.
-Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/listings/saved', [\App\Http\Controllers\Api\ListingsController::class, 'getSavedListings']);
-Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags'])->withoutMiddleware('auth:sanctum');
-Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store'])->middleware('onboarding-required');
-Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
-Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show'])->withoutMiddleware('auth:sanctum');
-Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
-Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
-Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing'])->middleware('throttle:30,1');
-Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing'])->middleware('throttle:30,1');
-Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage'])->middleware('throttle:20,1');
-Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage'])->middleware('throttle:20,1');
-Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages'])->middleware('throttle:20,1');
-Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage'])->middleware('throttle:20,1');
-Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages'])->middleware('throttle:30,1');
-Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
-Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
-Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
-Route::post('/v2/listings/{id}/report', [\App\Http\Controllers\Api\ListingsController::class, 'report']);
+Route::middleware('module:listings')->group(function () {
+    Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/saved', [\App\Http\Controllers\Api\ListingsController::class, 'getSavedListings']);
+    Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags'])->withoutMiddleware('auth:sanctum');
+    Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store'])->middleware('onboarding-required');
+    Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
+    Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show'])->withoutMiddleware('auth:sanctum');
+    Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
+    Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
+    Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing'])->middleware('throttle:30,1');
+    Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing'])->middleware('throttle:30,1');
+    Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage'])->middleware('throttle:20,1');
+    Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage'])->middleware('throttle:20,1');
+    Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages'])->middleware('throttle:20,1');
+    Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage'])->middleware('throttle:20,1');
+    Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages'])->middleware('throttle:30,1');
+    Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
+    Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
+    Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
+    Route::post('/v2/listings/{id}/report', [\App\Http\Controllers\Api\ListingsController::class, 'report']);
+});
 
 // ============================================
 // MIGRATED ROUTES — Messages

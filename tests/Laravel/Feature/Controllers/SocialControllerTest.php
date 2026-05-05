@@ -314,6 +314,32 @@ class SocialControllerTest extends TestCase
                     'status' => 'open',
                     'created_at' => $now, 'updated_at' => $now,
                 ]),
+                'job' => DB::table('job_vacancies')->insertGetId([
+                    'tenant_id' => $tenantId, 'user_id' => $userId,
+                    'title' => 'Test job', 'description' => 'x',
+                    'type' => 'paid', 'commitment' => 'flexible', 'status' => 'open',
+                    'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'blog' => DB::table('blog_posts')->insertGetId([
+                    'tenant_id' => $tenantId, 'author_id' => $userId,
+                    'title' => 'Test blog', 'slug' => 'test-blog-' . uniqid(),
+                    'content' => 'x', 'status' => 'published',
+                    'published_at' => $now, 'created_at' => $now, 'updated_at' => $now,
+                ]),
+                'discussion' => (function () use ($tenantId, $userId, $now): int {
+                    $groupId = DB::table('groups')->insertGetId([
+                        'tenant_id' => $tenantId, 'owner_id' => $userId,
+                        'name' => 'Test group ' . uniqid(), 'slug' => 'test-group-' . uniqid(),
+                        'visibility' => 'public', 'is_active' => 1, 'status' => 'active',
+                        'created_at' => $now, 'updated_at' => $now,
+                    ]);
+
+                    return DB::table('group_discussions')->insertGetId([
+                        'tenant_id' => $tenantId, 'group_id' => $groupId, 'user_id' => $userId,
+                        'title' => 'Test discussion',
+                        'created_at' => $now, 'updated_at' => $now,
+                    ]);
+                })(),
                 default => null,
             };
         } catch (\Throwable $e) {
@@ -350,6 +376,9 @@ class SocialControllerTest extends TestCase
             'review'    => ['review'],
             'volunteer' => ['volunteer'],
             'challenge' => ['challenge'],
+            'job'       => ['job'],
+            'blog'      => ['blog'],
+            'discussion' => ['discussion'],
         ];
     }
 

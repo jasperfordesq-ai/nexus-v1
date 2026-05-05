@@ -68,6 +68,9 @@ return new class extends Migration
                     'volunteer',
                     'challenge',
                     'resource',
+                    'job',
+                    'blog',
+                    'discussion',
                 ];
 
                 if (!in_array($sourceType, $reactableTypes, true)) {

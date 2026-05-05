@@ -196,9 +196,32 @@ class FeedSidebarController extends BaseApiController
         // 4. Popular groups
         try {
             $data['popular_groups'] = DB::table('groups as g')
-                ->leftJoin('group_members as gm', 'g.id', '=', 'gm.group_id')
+                ->leftJoin('group_members as gm', function ($join) use ($tenantId) {
+                    $join->on('g.id', '=', 'gm.group_id')
+                        ->where('gm.tenant_id', $tenantId)
+                        ->where('gm.status', 'active');
+                })
                 ->where('g.tenant_id', $tenantId)
                 ->where('g.is_active', 1)
+                ->where(function ($q) {
+                    $q->whereNull('g.status')
+                        ->orWhere('g.status', 'active');
+                })
+                ->where(function ($q) use ($tenantId, $userId) {
+                    $q->where('g.visibility', 'public');
+
+                    if ($userId) {
+                        $q->orWhere('g.owner_id', $userId)
+                            ->orWhereExists(function ($member) use ($tenantId, $userId) {
+                                $member->select(DB::raw(1))
+                                    ->from('group_members as viewer_gm')
+                                    ->whereColumn('viewer_gm.group_id', 'g.id')
+                                    ->where('viewer_gm.tenant_id', $tenantId)
+                                    ->where('viewer_gm.user_id', $userId)
+                                    ->where('viewer_gm.status', 'active');
+                            });
+                    }
+                })
                 ->select('g.id', 'g.name', 'g.description', 'g.image_url', DB::raw('COUNT(gm.id) as member_count'))
                 ->groupBy('g.id', 'g.name', 'g.description', 'g.image_url')
                 ->orderByDesc('member_count')

@@ -96,7 +96,7 @@ jobs:
           echo "All PHP files passed syntax check."
 
       - name: "BLOCKING: PHPUnit Laravel suite"
-        run: vendor/bin/phpunit --testsuite=Laravel --colors=always
+        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306

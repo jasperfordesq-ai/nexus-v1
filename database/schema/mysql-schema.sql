@@ -6479,7 +6479,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6690,15 +6690,18 @@ DROP TABLE IF EXISTS `listing_images`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `listing_images` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` bigint(20) unsigned NOT NULL,
-  `listing_id` bigint(20) unsigned NOT NULL,
+  `tenant_id` int(11) NOT NULL,
+  `listing_id` int(11) NOT NULL,
   `image_url` varchar(255) NOT NULL,
   `sort_order` smallint(5) unsigned NOT NULL DEFAULT 0,
   `alt_text` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `listing_images_tenant_id_index` (`tenant_id`)
+  KEY `listing_images_tenant_id_index` (`tenant_id`),
+  KEY `listing_images_listing_id_sort_order_index` (`listing_id`,`sort_order`),
+  CONSTRAINT `listing_images_listing_id_foreign` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `listing_images_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `listing_reports`;
@@ -6706,20 +6709,27 @@ DROP TABLE IF EXISTS `listing_reports`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `listing_reports` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` bigint(20) unsigned NOT NULL,
+  `tenant_id` int(11) NOT NULL,
   `listing_id` int(11) NOT NULL,
-  `reporter_id` bigint(20) unsigned NOT NULL,
+  `reporter_id` int(11) NOT NULL,
   `reason` enum('inappropriate','safety_concern','misleading','spam','not_timebank_service','other') NOT NULL,
   `details` text DEFAULT NULL,
   `status` enum('pending','reviewed','dismissed','action_taken') NOT NULL DEFAULT 'pending',
   `admin_notes` text DEFAULT NULL,
-  `reviewed_by` bigint(20) unsigned DEFAULT NULL,
+  `reviewed_by` int(11) DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `listing_reports_listing_id_reporter_id_tenant_id_unique` (`listing_id`,`reporter_id`,`tenant_id`),
   KEY `listing_reports_listing_id_foreign` (`listing_id`),
-  CONSTRAINT `listing_reports_listing_id_foreign` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE
+  KEY `listing_reports_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `listing_reports_reporter_id_foreign` (`reporter_id`),
+  KEY `listing_reports_reviewed_by_foreign` (`reviewed_by`),
+  CONSTRAINT `listing_reports_listing_id_foreign` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `listing_reports_reporter_id_foreign` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `listing_reports_reviewed_by_foreign` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `listing_reports_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `listing_risk_tags`;
@@ -13457,7 +13467,8 @@ INSERT INTO `laravel_migrations` VALUES
 (219,'2026_05_04_140000_scope_federated_identities_by_tenant',97),
 (220,'2026_05_04_141000_enforce_federation_message_idempotency',97),
 (221,'2026_05_04_142000_enforce_verein_event_share_idempotency',97),
-(222,'2026_05_04_143000_add_remote_and_updated_at_to_vol_opportunities',97);
+(222,'2026_05_04_143000_add_remote_and_updated_at_to_vol_opportunities',97),
+(223,'2026_05_05_100000_reconcile_listing_integrity_indexes',98);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

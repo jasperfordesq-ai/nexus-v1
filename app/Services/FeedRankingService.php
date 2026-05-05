@@ -771,8 +771,6 @@ class FeedRankingService
         ];
 
         $authorIds = array_unique(array_filter(array_map(fn ($i) => (int) ($i['user_id'] ?? 0), $items)));
-        $postIds = array_unique(array_filter(array_map(fn ($i) => (int) ($i['id'] ?? $i['post_id'] ?? 0), $items)));
-
         $connectedSet = [];
         $socialScores = [];
         if ($viewerId) {
@@ -802,7 +800,8 @@ class FeedRankingService
         foreach ($items as &$item) {
             $postId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
             $itemType = (string) ($item['type'] ?? $item['source_type'] ?? 'post');
-            $ctrKey = $itemType . ':' . $postId;
+            $signalKey = self::feedItemSignalKey($item);
+            $ctrKey = $signalKey;
             $authorId = (int) ($item['user_id'] ?? 0);
             $score = 1.0;
 
@@ -825,8 +824,8 @@ class FeedRankingService
             $score *= $points > 0 ? 1.0 + min(log(1.0 + $points) * 0.3, 2.0) : 1.05;
 
             // 3. Velocity
-            if (self::VELOCITY_ENABLED && isset($velocityScores[$postId])) {
-                $v = $velocityScores[$postId];
+            if (self::VELOCITY_ENABLED && isset($velocityScores[$signalKey])) {
+                $v = $velocityScores[$signalKey];
                 if ($v >= self::VELOCITY_THRESHOLD) {
                     $rawBoost = min(self::VELOCITY_MAX_BOOST, 1.0 + (($v - self::VELOCITY_THRESHOLD) / self::VELOCITY_THRESHOLD) * 0.4);
                     $postAgeHours = $createdAt ? max(0, (time() - strtotime($createdAt)) / 3600) : 0;
@@ -869,21 +868,21 @@ class FeedRankingService
             $score *= self::contextualBoost($sourceType, $viewerTimezone);
 
             // 10. Conversation Depth
-            if (self::CONVERSATION_DEPTH_ENABLED && isset($conversationDepths[$postId])) {
-                $d = $conversationDepths[$postId];
+            if (self::CONVERSATION_DEPTH_ENABLED && isset($conversationDepths[$signalKey])) {
+                $d = $conversationDepths[$signalKey];
                 if ($d >= self::CONVERSATION_DEPTH_THRESHOLD) {
                     $score *= min(self::CONVERSATION_DEPTH_MAX_BOOST, 1.0 + ($d / (self::CONVERSATION_DEPTH_THRESHOLD * 3)) * 0.5);
                 }
             }
 
             // 11. Reaction Weighting
-            if (isset($reactionScores[$postId]) && $reactionScores[$postId] > 0) {
-                $score *= 1.0 + min($reactionScores[$postId] * 0.1, 1.0);
+            if (isset($reactionScores[$signalKey]) && $reactionScores[$signalKey] > 0) {
+                $score *= 1.0 + min($reactionScores[$signalKey] * 0.1, 1.0);
             }
 
             // 12. Negative Signals
-            if ($viewerId && isset($negativeScores[$postId])) {
-                $score *= $negativeScores[$postId];
+            if ($viewerId && isset($negativeScores[$signalKey])) {
+                $score *= $negativeScores[$signalKey];
             }
 
             // 13. CTR
@@ -905,8 +904,8 @@ class FeedRankingService
             }
 
             // 15. Save/Bookmark
-            if (!empty($config['save_signal_enabled']) && isset($saveScores[$postId])) {
-                $saves = $saveScores[$postId];
+            if (!empty($config['save_signal_enabled']) && isset($saveScores[$signalKey])) {
+                $saves = $saveScores[$signalKey];
                 if ($saves >= ($config['save_signal_min_saves'] ?? 2)) {
                     $saveBoost = min(
                         (float) ($config['save_signal_max_boost'] ?? 1.35),
@@ -965,6 +964,7 @@ class FeedRankingService
             $signals = [];
             $authorId = (int) ($item['user_id'] ?? 0);
             $postId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+            $signalKey = self::feedItemSignalKey($item);
 
             // Social affinity
             if ($viewerId && $authorId && (isset($connectedSet[$authorId]) || (isset($socialScores[$authorId]) && $socialScores[$authorId] > 0))) {
@@ -979,7 +979,7 @@ class FeedRankingService
             }
 
             // Velocity
-            if (isset($velocityScores[$postId]) && $velocityScores[$postId] >= self::VELOCITY_THRESHOLD) {
+            if (isset($velocityScores[$signalKey]) && $velocityScores[$signalKey] >= self::VELOCITY_THRESHOLD) {
                 $signals['velocity'] = 1.8;
             }
 
@@ -1215,7 +1215,7 @@ class FeedRankingService
                 ) AS recent GROUP BY target_id";
                 $params = array_merge([$targetType], $ids, [$tenantId, $hrs, $targetType], $ids, [$tenantId, $hrs]);
                 $rows = DB::select($sql, $params);
-                foreach ($rows as $row) { $r[(int) $row->target_id] = (int) $row->velocity; }
+                foreach ($rows as $row) { $r[$targetType . ':' . (int) $row->target_id] = (int) $row->velocity; }
             }
             return $r;
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
@@ -1243,7 +1243,7 @@ class FeedRankingService
                      GROUP BY target_id",
                     array_merge([$targetType], $ids, [$tenantId])
                 );
-                foreach ($rows as $row) { $r[(int) $row->target_id] = (int) $row->depth; }
+                foreach ($rows as $row) { $r[$targetType . ':' . (int) $row->target_id] = (int) $row->depth; }
             }
             return $r;
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
@@ -1277,9 +1277,10 @@ class FeedRankingService
                 );
                 foreach ($rows as $row) {
                     $pid   = (int) $row->post_id;
+                    $key = $targetType . ':' . $pid;
                     $named = self::EMOJI_REACTION_MAP[$row->emoji] ?? 'like';
                     $weight = self::REACTION_WEIGHTS[$named] ?? 1.0;
-                    $r[$pid] = ($r[$pid] ?? 0) + ($weight * (int) $row->cnt);
+                    $r[$key] = ($r[$key] ?? 0) + ($weight * (int) $row->cnt);
                 }
             }
             return $r;
@@ -1313,7 +1314,7 @@ class FeedRankingService
                     array_merge([$viewerId, $tenantId, $targetType], $ids)
                 );
                 foreach ($rows as $row) {
-                    $result[(int) $row->target_id] = (float) $config['hide_penalty'];
+                    $result[$targetType . ':' . (int) $row->target_id] = (float) $config['hide_penalty'];
                 }
             }
 
@@ -1334,9 +1335,9 @@ class FeedRankingService
                     array_merge([$targetType], $ids, [$tenantId])
                 );
                 foreach ($rows as $row) {
-                    $pid = (int) $row->target_id;
-                    if (!isset($result[$pid])) {
-                        $result[$pid] = max(0.1, 1.0 - (int) $row->report_count * (float) $config['report_penalty_per']);
+                    $key = $targetType . ':' . (int) $row->target_id;
+                    if (!isset($result[$key])) {
+                        $result[$key] = max(0.1, 1.0 - (int) $row->report_count * (float) $config['report_penalty_per']);
                     }
                 }
             }
@@ -1397,7 +1398,7 @@ class FeedRankingService
                 $ph = implode(',', array_fill(0, count($postOnlyIds), '?'));
                 $rows = DB::select(
                     "SELECT fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
-                     FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id
+                     FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id AND fc.user_id=fi.user_id
                      WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id",
                     array_merge($postOnlyIds, [$tenantId])
                 );
@@ -1432,7 +1433,7 @@ class FeedRankingService
             $rows = DB::select(
                 "SELECT fi.target_type, fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
                  FROM feed_impressions fi
-                 LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.target_type=fi.target_type AND fc.tenant_id=fi.tenant_id
+                 LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.target_type=fi.target_type AND fc.tenant_id=fi.tenant_id AND fc.user_id=fi.user_id
                  WHERE fi.tenant_id=? AND (" . implode(' OR ', $clauses) . ")
                  GROUP BY fi.target_type, fi.post_id",
                 array_merge([$tenantId], $params)
@@ -1525,7 +1526,7 @@ class FeedRankingService
             }
 
             $rows = DB::select(
-                "SELECT bookmarkable_id AS source_id, COUNT(*) AS save_count
+                "SELECT bookmarkable_type AS source_type, bookmarkable_id AS source_id, COUNT(*) AS save_count
                  FROM bookmarks
                  WHERE tenant_id = ? AND ($conditions)
                  GROUP BY bookmarkable_type, bookmarkable_id
@@ -1533,7 +1534,7 @@ class FeedRankingService
                 $params
             );
             $r = [];
-            foreach ($rows as $row) { $r[(int) $row->source_id] = (int) $row->save_count; }
+            foreach ($rows as $row) { $r[(string) $row->source_type . ':' . (int) $row->source_id] = (int) $row->save_count; }
             return $r;
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
@@ -1719,6 +1720,14 @@ class FeedRankingService
             // Example future entry: 'volunteer' => 'volunteer_post',
             default => $sourceType,
         };
+    }
+
+    private static function feedItemSignalKey(array $item): string
+    {
+        $sourceType = (string) ($item['type'] ?? $item['source_type'] ?? 'post');
+        $sourceId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+
+        return self::normaliseTargetType($sourceType) . ':' . $sourceId;
     }
 
     private static function getDaysSinceDateStatic(string $dateString): int

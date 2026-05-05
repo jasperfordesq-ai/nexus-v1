@@ -1294,11 +1294,9 @@ export function FeedPage() {
 
       {/* Right Sidebar — Full widget panel (hidden on mobile) */}
       <aside className="hidden lg:block w-72 flex-shrink-0">
-        <div className="sticky top-20">
-          <SidebarErrorBoundary>
-            <FeedSidebar />
-          </SidebarErrorBoundary>
-        </div>
+        <SidebarErrorBoundary>
+          <FeedSidebar />
+        </SidebarErrorBoundary>
       </aside>
     </div>
 

@@ -50,7 +50,15 @@ class PushListingToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            // 3. Only share listings whose federated_visibility allows it
+            // 3. Only share published listings that passed moderation.
+            if (
+                ($event->listing->status ?? 'active') !== 'active'
+                || (($event->listing->moderation_status ?? 'approved') !== 'approved')
+            ) {
+                return;
+            }
+
+            // 4. Only share listings whose federated_visibility allows it
             $visibility = $event->listing->federated_visibility ?? 'local';
             if (!in_array($visibility, ['listed', 'bookable'], true)) {
                 return;

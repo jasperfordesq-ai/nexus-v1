@@ -90,10 +90,13 @@ export function ListingsPage() {
   const [totalItems, setTotalItems] = useState<number | null>(null);
   const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(() => {
     if (searchParams.get('near_me') === '1') {
-      const lat = Number(searchParams.get('near_lat'));
-      const lng = Number(searchParams.get('near_lng'));
+      const rawLat = searchParams.get('near_lat');
+      const rawLng = searchParams.get('near_lng');
+      if (rawLat === null || rawLng === null) return null;
+      const lat = Number(rawLat);
+      const lng = Number(rawLng);
       const km = Number(searchParams.get('radius_km')) || 2;
-      if (lat && lng) return { near_lat: lat, near_lng: lng, radius_km: km };
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { near_lat: lat, near_lng: lng, radius_km: km };
     }
     return null;
   });
@@ -691,9 +694,14 @@ export function ListingsPage() {
           {viewMode === 'map' ? (
             <EntityMapView
               items={listings}
-              getCoordinates={(l) =>
-                l.latitude && l.longitude ? { lat: Number(l.latitude), lng: Number(l.longitude) } : null
-              }
+              getCoordinates={(l) => {
+                if (l.latitude === null || l.latitude === undefined || l.latitude === '' || l.longitude === null || l.longitude === undefined || l.longitude === '') {
+                  return null;
+                }
+                const lat = Number(l.latitude);
+                const lng = Number(l.longitude);
+                return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+              }}
               getMarkerConfig={(l) => ({
                 id: l.id,
                 title: l.title,

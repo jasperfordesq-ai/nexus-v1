@@ -62,7 +62,7 @@ class AdminListingsController extends BaseApiController
         if ($status && $status !== 'all') {
             switch ($status) {
                 case 'pending':
-                    $conditions[] = "l.status = 'pending'";
+                    $conditions[] = "(l.moderation_status = 'pending_review' OR (l.moderation_status IS NULL AND l.status = 'pending'))";
                     break;
                 case 'active':
                     $conditions[] = "l.status = 'active'";
@@ -202,36 +202,17 @@ class AdminListingsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
-        DB::update(
-            "UPDATE listings SET status = 'active' WHERE id = ? AND tenant_id = ?",
-            [$id, $tenantId]
-        );
+        $approved = $this->listingModerationService->approve($tenantId, $id, $adminId);
+        if (! $approved) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.listing_approve_failed'), null, 422);
+        }
 
-        ActivityLog::log($adminId, 'admin_approve_listing', "Approved listing #{$id}: {$item->title}");
-
-        // Load the owner once with preferred_language so both the bell and the
-        // email render under the owner's locale.
+        // Load the owner once with preferred_language so the email renders under the owner's locale.
         $owner = DB::table('users')
             ->where('id', $item->user_id)
             ->where('tenant_id', $tenantId)
             ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
-
-        // Notify listing owner (bell)
-        try {
-            LocaleContext::withLocale($owner, function () use ($item, $id) {
-                $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
-                Notification::create([
-                    'user_id' => (int) $item->user_id,
-                    'message' => __('emails_listings.listings.approved.notification_short', ['title' => $title]),
-                    'link' => "/listings/{$id}",
-                    'type' => 'listing_approved',
-                    'created_at' => now(),
-                ]);
-            });
-        } catch (\Exception $e) {
-            Log::warning("[AdminListingsController] approve notification failed for listing #{$id}: " . $e->getMessage());
-        }
 
         // Send approval email to listing creator
         try {
@@ -428,12 +409,12 @@ class AdminListingsController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         $items = DB::select(
-            'SELECT * FROM listings WHERE tenant_id = ? AND status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-            [$tenantId, 'pending', $perPage, $offset]
+            "SELECT * FROM listings WHERE tenant_id = ? AND (moderation_status = 'pending_review' OR (moderation_status IS NULL AND status = 'pending')) ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            [$tenantId, $perPage, $offset]
         );
         $total = (int) DB::selectOne(
-            'SELECT COUNT(*) as cnt FROM listings WHERE tenant_id = ? AND status = ?',
-            [$tenantId, 'pending']
+            "SELECT COUNT(*) as cnt FROM listings WHERE tenant_id = ? AND (moderation_status = 'pending_review' OR (moderation_status IS NULL AND status = 'pending'))",
+            [$tenantId]
         )->cnt;
 
         return $this->respondWithPaginatedCollection($items, $total, $page, $perPage);

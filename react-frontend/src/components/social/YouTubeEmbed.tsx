@@ -17,6 +17,7 @@
 import { useState, useCallback } from 'react';
 import { Card, Button } from '@heroui/react';
 import Play from 'lucide-react/icons/play';
+import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -50,8 +51,10 @@ function getYouTubeThumbnail(videoId: string): string {
 
 /* ───────────────────────── Component ───────────────────────── */
 
-export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTubeEmbedProps) {
+export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProps) {
+  const { t } = useTranslation('feed');
   const [isPlaying, setIsPlaying] = useState(false);
+  const videoTitle = title ?? t('video.default_title');
 
   const videoId = extractVideoId(embedUrl);
 
@@ -76,7 +79,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
         {isPlaying ? (
           <iframe
             src={embedSrc}
-            title={title}
+            title={videoTitle}
             className="absolute inset-0 w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -87,13 +90,13 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
             variant="flat"
             onPress={handlePlay}
             className="absolute inset-0 w-full h-full group/play cursor-pointer bg-black rounded-none p-0 min-w-0 focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
-            aria-label={`Play video: ${title}`}
+            aria-label={t('video.play_label', { title: videoTitle })}
           >
             {/* Thumbnail */}
             {thumbnail && (
               <img
                 src={thumbnail}
-                alt={`Thumbnail for ${title}`}
+                alt={t('video.thumbnail_alt', { title: videoTitle })}
                 className="w-full h-full object-cover opacity-90 group-hover/play:opacity-100 transition-opacity"
                 loading="lazy"
               />

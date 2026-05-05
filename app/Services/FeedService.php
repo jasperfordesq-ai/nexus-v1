@@ -750,65 +750,73 @@ class FeedService
                     ->pluck('quoted_post_id', 'id');
 
                 if ($quotedMap->isNotEmpty()) {
-                    $quotedPostIds = $quotedMap->values()->unique()->all();
-                    $quotedPosts = DB::table('feed_posts')
-                        ->join('users', 'feed_posts.user_id', '=', 'users.id')
-                        ->whereIn('feed_posts.id', $quotedPostIds)
-                        ->where('feed_posts.tenant_id', $tenantId)
-                        ->select([
-                            'feed_posts.id',
-                            'feed_posts.content',
-                            'feed_posts.image_url',
-                            'feed_posts.created_at',
-                            'feed_posts.user_id',
-                            DB::raw("COALESCE(users.name, CONCAT(users.first_name, ' ', users.last_name)) as author_name"),
-                            'users.avatar_url as author_avatar',
-                        ])
-                        ->get()
-                        ->keyBy('id');
+                    $quotedPostIds = $quotedMap->values()
+                        ->unique()
+                        ->filter(fn ($id) => FeedItemTables::canView('post', (int) $id, $currentUserId))
+                        ->values()
+                        ->all();
 
-                    // Load media for quoted posts
-                    $quotedMediaMap = [];
-                    if ($quotedPosts->isNotEmpty()) {
-                        $quotedMedia = DB::table('post_media')
-                            ->whereIn('post_id', $quotedPostIds)
-                            ->where('tenant_id', $tenantId)
-                            ->orderBy('display_order')
-                            ->get();
-                        foreach ($quotedMedia as $m) {
-                            $quotedMediaMap[$m->post_id][] = [
-                                'id' => (int) $m->id,
-                                'media_type' => $m->media_type,
-                                'file_url' => $m->file_url,
-                                'thumbnail_url' => $m->thumbnail_url,
-                                'alt_text' => $m->alt_text,
-                            ];
-                        }
-                    }
+                    if (!empty($quotedPostIds)) {
+                        $quotedPosts = DB::table('feed_posts')
+                            ->join('users', 'feed_posts.user_id', '=', 'users.id')
+                            ->whereIn('feed_posts.id', $quotedPostIds)
+                            ->where('feed_posts.tenant_id', $tenantId)
+                            ->where('users.tenant_id', $tenantId)
+                            ->select([
+                                'feed_posts.id',
+                                'feed_posts.content',
+                                'feed_posts.image_url',
+                                'feed_posts.created_at',
+                                'feed_posts.user_id',
+                                DB::raw("COALESCE(users.name, CONCAT(users.first_name, ' ', users.last_name)) as author_name"),
+                                'users.avatar_url as author_avatar',
+                            ])
+                            ->get()
+                            ->keyBy('id');
 
-                    foreach ($items as &$item) {
-                        if ($item['type'] === 'post' && isset($quotedMap[$item['id']])) {
-                            $qpId = $quotedMap[$item['id']];
-                            if (isset($quotedPosts[$qpId])) {
-                                $qp = $quotedPosts[$qpId];
-                                $qpContent = $this->truncateWithFlag($qp->content ?? '', 280);
-                                $item['quoted_post'] = [
-                                    'id' => (int) $qp->id,
-                                    'content' => $qpContent['text'],
-                                    'content_truncated' => $qpContent['truncated'],
-                                    'image_url' => $qp->image_url,
-                                    'created_at' => (string) $qp->created_at,
-                                    'author' => [
-                                        'id' => (int) $qp->user_id,
-                                        'name' => $qp->author_name,
-                                        'avatar_url' => $qp->author_avatar ?? '/assets/img/defaults/default_avatar.png',
-                                    ],
-                                    'media' => $quotedMediaMap[$qpId] ?? [],
+                        // Load media for quoted posts
+                        $quotedMediaMap = [];
+                        if ($quotedPosts->isNotEmpty()) {
+                            $quotedMedia = DB::table('post_media')
+                                ->whereIn('post_id', $quotedPostIds)
+                                ->where('tenant_id', $tenantId)
+                                ->orderBy('display_order')
+                                ->get();
+                            foreach ($quotedMedia as $m) {
+                                $quotedMediaMap[$m->post_id][] = [
+                                    'id' => (int) $m->id,
+                                    'media_type' => $m->media_type,
+                                    'file_url' => $m->file_url,
+                                    'thumbnail_url' => $m->thumbnail_url,
+                                    'alt_text' => $m->alt_text,
                                 ];
                             }
                         }
+
+                        foreach ($items as &$item) {
+                            if ($item['type'] === 'post' && isset($quotedMap[$item['id']])) {
+                                $qpId = $quotedMap[$item['id']];
+                                if (isset($quotedPosts[$qpId])) {
+                                    $qp = $quotedPosts[$qpId];
+                                    $qpContent = $this->truncateWithFlag($qp->content ?? '', 280);
+                                    $item['quoted_post'] = [
+                                        'id' => (int) $qp->id,
+                                        'content' => $qpContent['text'],
+                                        'content_truncated' => $qpContent['truncated'],
+                                        'image_url' => $qp->image_url,
+                                        'created_at' => (string) $qp->created_at,
+                                        'author' => [
+                                            'id' => (int) $qp->user_id,
+                                            'name' => $qp->author_name,
+                                            'avatar_url' => $qp->author_avatar ?? '/assets/img/defaults/default_avatar.png',
+                                        ],
+                                        'media' => $quotedMediaMap[$qpId] ?? [],
+                                    ];
+                                }
+                            }
+                        }
+                        unset($item);
                     }
-                    unset($item);
                 }
             }
         } catch (\Exception $e) {
@@ -1211,11 +1219,7 @@ class FeedService
         // Validate quoted_post_id if provided (quote repost)
         $quotedPostId = !empty($data['quoted_post_id']) ? (int) $data['quoted_post_id'] : null;
         if ($quotedPostId) {
-            $quotedExists = DB::table('feed_posts')
-                ->where('id', $quotedPostId)
-                ->where('tenant_id', $tenantId)
-                ->exists();
-            if (!$quotedExists) {
+            if (!FeedItemTables::canView('post', $quotedPostId, $userId)) {
                 return ['error' => __('api_controllers_2.feed.quoted_post_not_found')];
             }
         }
@@ -1534,8 +1538,8 @@ class FeedService
                            (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id{$commentDeleteClause}) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
-                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
-                    [$id, $tenantId]
+                    WHERE p.id = ? AND p.tenant_id = ? AND u.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
+                    [$id, $tenantId, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);
                 break;
@@ -1622,7 +1626,9 @@ class FeedService
         // so MentionService::processText and downstream tenant-scoped code uses
         // the correct tenant. Without this, posts from tenant A could trigger
         // mention processing under tenant B.
-        $posts = FeedPost::where('publish_status', 'scheduled')
+        $previousTenantId = TenantContext::getId();
+        $posts = FeedPost::withoutGlobalScopes()
+            ->where('publish_status', 'scheduled')
             ->where('scheduled_at', '<=', now())
             ->get();
 
@@ -1667,6 +1673,12 @@ class FeedService
 
         if ($count > 0) {
             Log::info("publishScheduledPosts: published {$count} scheduled post(s)");
+        }
+
+        if ($previousTenantId) {
+            TenantContext::setById((int) $previousTenantId);
+        } else {
+            TenantContext::reset();
         }
 
         return $count;

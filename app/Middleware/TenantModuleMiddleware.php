@@ -7,6 +7,9 @@
 namespace App\Middleware;
 
 use App\Core\TenantContext;
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * TenantModuleMiddleware
@@ -85,7 +88,25 @@ class TenantModuleMiddleware
      */
     public static function isEnabled(string $module): bool
     {
-        return TenantContext::hasFeature($module);
+        return TenantContext::hasModule($module);
+    }
+
+    /**
+     * Laravel route middleware entrypoint.
+     */
+    public function handle(Request $request, Closure $next, string $module): Response
+    {
+        if (self::isEnabled($module)) {
+            return $next($request);
+        }
+
+        return response()->json([
+            'errors' => [[
+                'code' => 'MODULE_DISABLED',
+                'message' => __('api.module_disabled_for_community'),
+            ]],
+            'success' => false,
+        ], 403, ['API-Version' => '2.0']);
     }
 
     /**

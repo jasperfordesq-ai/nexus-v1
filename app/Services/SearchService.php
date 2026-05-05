@@ -341,6 +341,7 @@ class SearchService
             'description'   => $listing->description ?? '',
             'location'      => $listing->location ?? '',
             'status'        => $listing->status ?? 'active',
+            'moderation_status' => $listing->moderation_status ?? 'approved',
             'type'          => $listing->type,
             'category_id'   => $listing->category_id,
             'category_name' => $listing->category?->name ?? '',
@@ -350,6 +351,8 @@ class SearchService
             'skill_tags'    => $listing->skillTags->pluck('tag')->all(),
             'created_at'    => $listing->created_at?->timestamp ?? 0,
         ] : $listing;
+
+        $doc['moderation_status'] = $doc['moderation_status'] ?? 'approved';
 
         static::client()->index('listings')->addDocuments([$doc]);
     }
@@ -406,7 +409,7 @@ class SearchService
             return null;
         }
         try {
-            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'", ...$extraFilters];
+            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'", "moderation_status = 'approved'", ...$extraFilters];
             $result = static::client()->index('listings')->search($term, [
                 'filter'               => implode(' AND ', $filterParts),
                 'limit'                => max(0, $limit),
@@ -776,7 +779,7 @@ class SearchService
 
         if ($type === null || $type === 'listings') {
             $hits = $client->index('listings')->search($term, [
-                'filter' => "tenant_id = {$tenantId} AND status = 'active'",
+                'filter' => "tenant_id = {$tenantId} AND status = 'active' AND moderation_status = 'approved'",
                 'limit'  => $limit,
             ])->getHits();
 
@@ -979,7 +982,7 @@ class SearchService
         $like     = '%' . $term . '%';
 
         if ($type === 'all' || $type === 'listings') {
-            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'"];
+            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'", "moderation_status = 'approved'"];
             if (!empty($filters['category_id'])) {
                 $filterParts[] = 'category_id = ' . (int) $filters['category_id'];
             }
@@ -1204,7 +1207,7 @@ class SearchService
         $tenantId = TenantContext::getId();
 
         $listings = $client->index('listings')->search($term, [
-            'filter'               => "tenant_id = {$tenantId} AND status = 'active'",
+            'filter'               => "tenant_id = {$tenantId} AND status = 'active' AND moderation_status = 'approved'",
             'limit'                => $limit,
             'attributesToRetrieve' => ['id', 'title', 'type'],
         ])->getHits();

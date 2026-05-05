@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -65,11 +66,6 @@ class ShareService
         $this->validateType($type);
         $tenantId = TenantContext::getId();
 
-        $ownerId = $this->resolveOwnerId($type, $id, $tenantId);
-        if ($ownerId === null) {
-            throw new \RuntimeException('not_found');
-        }
-
         // Existing share → toggle OFF
         $existing = DB::table('post_shares')
             ->where('tenant_id', $tenantId)
@@ -98,6 +94,15 @@ class ShareService
                 'share_id'   => null,
                 'self_share' => false,
             ];
+        }
+
+        if (!FeedItemTables::canView($type, $id, $userId)) {
+            throw new \RuntimeException('not_found');
+        }
+
+        $ownerId = $this->resolveOwnerId($type, $id, $tenantId);
+        if ($ownerId === null) {
+            throw new \RuntimeException('not_found');
         }
 
         // Self-share is not allowed

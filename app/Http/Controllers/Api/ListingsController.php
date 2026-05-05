@@ -46,6 +46,14 @@ class ListingsController extends BaseApiController
         private readonly PersonalisedFeedService $personalisedFeedService,
     ) {}
 
+    private function listingConfigEnabled(string $key): bool
+    {
+        return filter_var(
+            ListingConfigurationService::get($key, ListingConfigurationService::DEFAULTS[$key] ?? false),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
     // -----------------------------------------------------------------
     //  GET /api/v2/listings
     // -----------------------------------------------------------------
@@ -316,7 +324,7 @@ class ListingsController extends BaseApiController
             return $this->respondWithErrors($errors, 422);
         }
 
-        $result = $this->listingService->getById($listing->id);
+        $result = $this->listingService->getById($listing->id, false, $userId);
 
         // Award XP for creating a listing
         try {
@@ -326,21 +334,23 @@ class ListingsController extends BaseApiController
             \Log::warning('Gamification XP award failed', ['action' => 'create_listing', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
-        // Record feed activity
-        try {
-            app(\App\Services\FeedActivityService::class)->recordActivity(
-                \App\Core\TenantContext::getId(),
-                $userId,
-                'listing',
-                $listing->id,
-                [
-                    'title'     => $data['title'] ?? null,
-                    'content'   => $data['description'] ?? null,
-                    'image_url' => $result['image_url'] ?? null,
-                ]
-            );
-        } catch (\Throwable $e) {
-            \Log::warning('Feed activity recording failed', ['type' => 'listing', 'id' => $listing->id, 'error' => $e->getMessage()]);
+        if (($listing->status ?? 'active') === 'active' && (($listing->moderation_status ?? 'approved') === 'approved')) {
+            // Record feed activity
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    \App\Core\TenantContext::getId(),
+                    $userId,
+                    'listing',
+                    $listing->id,
+                    [
+                        'title'     => $data['title'] ?? null,
+                        'content'   => $data['description'] ?? null,
+                        'image_url' => $result['image_url'] ?? null,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                \Log::warning('Feed activity recording failed', ['type' => 'listing', 'id' => $listing->id, 'error' => $e->getMessage()]);
+            }
         }
 
         return $this->respondWithData($result, null, 201);
@@ -536,6 +546,10 @@ class ListingsController extends BaseApiController
 
     public function getSavedListings(): JsonResponse
     {
+        if (! $this->listingConfigEnabled(ListingConfigurationService::CONFIG_ENABLE_FAVOURITES)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.listing_favourites_disabled'), null, 403);
+        }
+
         $userId = $this->requireAuth();
 
         $savedIds = $this->listingService->getSavedListingIds($userId);
@@ -562,6 +576,10 @@ class ListingsController extends BaseApiController
 
     public function saveListing(int $id): JsonResponse
     {
+        if (! $this->listingConfigEnabled(ListingConfigurationService::CONFIG_ENABLE_FAVOURITES)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.listing_favourites_disabled'), null, 403);
+        }
+
         $userId = $this->requireAuth();
 
         $tenantId = TenantContext::getId();
@@ -640,6 +658,10 @@ class ListingsController extends BaseApiController
 
     public function unsaveListing(int $id): JsonResponse
     {
+        if (! $this->listingConfigEnabled(ListingConfigurationService::CONFIG_ENABLE_FAVOURITES)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.listing_favourites_disabled'), null, 403);
+        }
+
         $userId = $this->requireAuth();
 
         $wasSaved = DB::table('user_saved_listings')
@@ -878,6 +900,10 @@ class ListingsController extends BaseApiController
      */
     public function report(int $id): JsonResponse
     {
+        if (! $this->listingConfigEnabled(ListingConfigurationService::CONFIG_ENABLE_REPORTING)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.listing_reporting_disabled'), null, 403);
+        }
+
         $userId = $this->requireAuth();
         $this->rateLimit('listing_report', 5, 3600);
 
@@ -1194,6 +1220,10 @@ class ListingsController extends BaseApiController
      */
     public function generateDescription(): JsonResponse
     {
+        if (! $this->listingConfigEnabled(ListingConfigurationService::CONFIG_ENABLE_AI_DESCRIPTIONS)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.listing_ai_descriptions_disabled'), null, 403);
+        }
+
         $userId = $this->requireAuth();
         $this->rateLimit('listing_ai_generate', 5, 60);
 

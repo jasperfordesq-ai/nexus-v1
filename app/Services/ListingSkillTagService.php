@@ -142,7 +142,10 @@ class ListingSkillTagService
         return DB::table('listing_skill_tags as lst')
             ->join('listings as l', function ($join) {
                 $join->on('lst.listing_id', '=', 'l.id')
-                     ->where('l.status', '=', 'active');
+                     ->where('l.status', '=', 'active')
+                     ->where(function ($q) {
+                         $q->whereNull('l.moderation_status')->orWhere('l.moderation_status', 'approved');
+                     });
             })
             ->where('lst.tenant_id', $tenantId)
             ->whereIn('lst.tag', $normalizedTags)
@@ -166,7 +169,10 @@ class ListingSkillTagService
         return DB::table('listing_skill_tags as lst')
             ->join('listings as l', function ($join) {
                 $join->on('lst.listing_id', '=', 'l.id')
-                     ->where('l.status', '=', 'active');
+                     ->where('l.status', '=', 'active')
+                     ->where(function ($q) {
+                         $q->whereNull('l.moderation_status')->orWhere('l.moderation_status', 'approved');
+                     });
             })
             ->where('lst.tenant_id', $tenantId)
             ->selectRaw('lst.tag, COUNT(*) as count')
@@ -192,13 +198,20 @@ class ListingSkillTagService
             return [];
         }
 
-        return DB::table('listing_skill_tags')
-            ->where('tenant_id', $tenantId)
-            ->where('tag', 'LIKE', $normalized . '%')
+        return DB::table('listing_skill_tags as lst')
+            ->join('listings as l', function ($join) {
+                $join->on('lst.listing_id', '=', 'l.id')
+                    ->where('l.status', '=', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('l.moderation_status')->orWhere('l.moderation_status', 'approved');
+                    });
+            })
+            ->where('lst.tenant_id', $tenantId)
+            ->where('lst.tag', 'LIKE', $normalized . '%')
             ->distinct()
-            ->orderBy('tag')
+            ->orderBy('lst.tag')
             ->limit($limit)
-            ->pluck('tag')
+            ->pluck('lst.tag')
             ->all();
     }
 

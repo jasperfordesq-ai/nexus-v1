@@ -53,12 +53,21 @@ class PostAnalyticsController extends BaseApiController
         // Gather analytics
         $viewsCount = (int) ($post->views_count ?? 0);
         $likesCount = (int) ($post->likes_count ?? 0);
-        $commentsCount = (int) ($post->comments_count ?? 0);
+        $commentsQuery = DB::table('comments')
+            ->where('target_type', 'post')
+            ->where('target_id', $id)
+            ->where('tenant_id', $tenantId);
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('comments', 'deleted_at')) {
+            $commentsQuery->whereNull('deleted_at');
+        }
+
+        $commentsCount = (int) $commentsQuery->count();
 
         // Shares count
-        $sharesCount = (int) DB::table('feed_posts')
-            ->where('parent_id', $id)
-            ->where('parent_type', 'share')
+        $sharesCount = (int) DB::table('post_shares')
+            ->where('original_type', 'post')
+            ->where('original_post_id', $id)
             ->where('tenant_id', $tenantId)
             ->count();
 

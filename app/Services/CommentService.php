@@ -290,6 +290,7 @@ class CommentService
             ->where('c.target_type', $targetType)
             ->where('c.target_id', $targetId)
             ->where('c.tenant_id', $tenantId)
+            ->whereNull('c.deleted_at')
             ->select([
                 'c.id', 'c.user_id', 'c.content', 'c.parent_id', 'c.created_at', 'c.updated_at',
                 DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
@@ -571,30 +572,37 @@ class CommentService
             throw new \InvalidArgumentException('Invalid reaction type: ' . $emoji);
         }
 
-        $existing = DB::table('reactions')
-            ->where('tenant_id', $tenantId)
-            ->where('target_type', 'comment')
-            ->where('target_id', $commentId)
-            ->where('user_id', $userId)
-            ->first();
+        if (!FeedItemTables::canView('comment', $commentId, $userId)) {
+            throw new \RuntimeException('comment_not_found');
+        }
 
-        if ($existing) {
-            if ($existing->emoji === $emoji) {
-                // Same type: remove
-                DB::table('reactions')
-                    ->where('id', $existing->id)
-                    ->where('tenant_id', $tenantId)
-                    ->delete();
-                $action = 'removed';
-            } else {
+        $action = DB::transaction(function () use ($tenantId, $commentId, $userId, $emoji): string {
+            $existing = DB::table('reactions')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', 'comment')
+                ->where('target_id', $commentId)
+                ->where('user_id', $userId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                if ($existing->emoji === $emoji) {
+                    // Same type: remove
+                    DB::table('reactions')
+                        ->where('id', $existing->id)
+                        ->where('tenant_id', $tenantId)
+                        ->delete();
+                    return 'removed';
+                }
+
                 // Different type: update
                 DB::table('reactions')
                     ->where('id', $existing->id)
                     ->where('tenant_id', $tenantId)
                     ->update(['emoji' => $emoji, 'created_at' => now()]);
-                $action = 'updated';
+                return 'updated';
             }
-        } else {
+
             DB::table('reactions')->insert([
                 'tenant_id'   => $tenantId,
                 'target_type' => 'comment',
@@ -603,8 +611,8 @@ class CommentService
                 'emoji'       => $emoji,
                 'created_at'  => now(),
             ]);
-            $action = 'added';
-        }
+            return 'added';
+        });
 
         // Aggregate updated reactions for this comment
         $reactionCounts = DB::table('reactions')

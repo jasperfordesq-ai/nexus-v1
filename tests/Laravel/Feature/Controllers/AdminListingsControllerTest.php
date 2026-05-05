@@ -218,6 +218,35 @@ class AdminListingsControllerTest extends TestCase
         $this->assertDatabaseHas('listings', [
             'id' => 50001,
             'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+    }
+
+    public function test_admin_approve_rejects_non_pending_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('listings')->insert([
+            'id' => 50011,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Already Active',
+            'description' => 'This listing is not awaiting review',
+            'type' => 'offer',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/admin/listings/50011/approve');
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('listings', [
+            'id' => 50011,
+            'status' => 'active',
+            'moderation_status' => 'approved',
         ]);
     }
 

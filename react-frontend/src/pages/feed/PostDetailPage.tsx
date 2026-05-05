@@ -71,7 +71,7 @@ export function PostDetailPage() {
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
-  const [reportPostId, setReportPostId] = useState<number | null>(null);
+  const [reportTarget, setReportTarget] = useState<{ id: number; type: FeedItem['type'] } | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
 
@@ -156,23 +156,27 @@ export function PostDetailPage() {
   }, [navigate, tenantPath, toast, t]);
 
   const openReportModal = useCallback((feedItem: FeedItem) => {
-    setReportPostId(feedItem.id);
+    setReportTarget({ id: feedItem.id, type: feedItem.type });
     setReportReason('');
     onReportOpen();
   }, [onReportOpen]);
 
   const handleReport = useCallback(async () => {
-    if (!reportPostId || !reportReason.trim()) {
+    if (!reportTarget || !reportReason.trim()) {
       toast.error(t('toast.provide_reason'));
       return;
     }
     try {
       setIsReporting(true);
-      await api.post(`/v2/feed/posts/${reportPostId}/report`, {
+      const reportPath = reportTarget.type === 'post'
+        ? `/v2/feed/posts/${reportTarget.id}/report`
+        : `/v2/feed/items/${reportTarget.type}/${reportTarget.id}/report`;
+      await api.post(reportPath, {
         reason: reportReason.trim(),
+        target_type: reportTarget.type,
       });
       onReportClose();
-      setReportPostId(null);
+      setReportTarget(null);
       setReportReason('');
       toast.success(t('toast.reported'));
     } catch (err) {
@@ -181,7 +185,7 @@ export function PostDetailPage() {
     } finally {
       setIsReporting(false);
     }
-  }, [reportPostId, reportReason, onReportClose, toast, t]);
+  }, [reportTarget, reportReason, onReportClose, toast, t]);
 
   const handleDeletePost = useCallback(async (feedItem: FeedItem) => {
     try {
@@ -266,7 +270,11 @@ export function PostDetailPage() {
       {/* Report Post Modal */}
       <Modal
         isOpen={isReportOpen}
-        onClose={onReportClose}
+        onClose={() => {
+          onReportClose();
+          setReportTarget(null);
+          setReportReason('');
+        }}
         classNames={{
           base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
           backdrop: 'bg-black/60 backdrop-blur-sm',
@@ -301,7 +309,11 @@ export function PostDetailPage() {
           <ModalFooter>
             <Button
               variant="flat"
-              onPress={onReportClose}
+              onPress={() => {
+                onReportClose();
+                setReportTarget(null);
+                setReportReason('');
+              }}
               className="text-[var(--text-muted)]"
             >
               {t('report.cancel')}

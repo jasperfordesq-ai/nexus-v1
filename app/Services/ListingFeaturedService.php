@@ -135,6 +135,7 @@ class ListingFeaturedService
              LEFT JOIN categories c ON l.category_id = c.id
              WHERE l.tenant_id = ?
                AND l.status = 'active'
+               AND (l.moderation_status IS NULL OR l.moderation_status = 'approved')
                AND l.is_featured = 1
                AND (l.featured_until IS NULL OR l.featured_until > NOW())
              ORDER BY l.created_at DESC

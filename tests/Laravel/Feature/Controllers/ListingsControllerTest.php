@@ -6,10 +6,13 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Events\ListingCreated;
 use App\Models\Listing;
 use App\Models\User;
+use App\Services\ListingConfigurationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
@@ -24,6 +27,12 @@ class ListingsControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function tearDown(): void
+    {
+        Cache::forget("listing_config:{$this->testTenantId}");
+        parent::tearDown();
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
@@ -34,6 +43,19 @@ class ListingsControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function ensureListingCategory(int $id = 1): void
+    {
+        DB::table('categories')->insertOrIgnore([
+            'id' => $id,
+            'tenant_id' => $this->testTenantId,
+            'name' => 'General',
+            'slug' => 'general',
+            'type' => 'listing',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     // ================================================================
@@ -54,6 +76,21 @@ class ListingsControllerTest extends TestCase
             'data',
             'meta' => ['per_page', 'has_more'],
         ]);
+    }
+
+    public function test_index_returns_403_when_listings_module_disabled(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update([
+                'configuration' => json_encode(['modules' => ['listings' => false]]),
+            ]);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiGet('/v2/listings');
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'MODULE_DISABLED');
     }
 
     public function test_index_rejects_per_page_above_max(): void
@@ -166,6 +203,30 @@ class ListingsControllerTest extends TestCase
         }
     }
 
+    public function test_index_hides_listings_pending_moderation(): void
+    {
+        $user = $this->authenticatedUser();
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Visible approved listing',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Hidden pending review listing',
+            'status' => 'active',
+            'moderation_status' => 'pending_review',
+        ]);
+
+        $response = $this->apiGet('/v2/listings?search=listing&min_hours=0.1');
+
+        $response->assertStatus(200);
+        $titles = collect($response->json('data'))->pluck('title')->all();
+        $this->assertContains('Visible approved listing', $titles);
+        $this->assertNotContains('Hidden pending review listing', $titles);
+    }
+
     // ================================================================
     // SHOW — Happy path
     // ================================================================
@@ -206,11 +267,7 @@ class ListingsControllerTest extends TestCase
         $user = $this->authenticatedUser(['email' => '']);
 
         // Ensure a category exists for the listing
-        DB::table('categories')->insertOrIgnore([
-            'id' => 1, 'tenant_id' => $this->testTenantId,
-            'name' => 'General', 'slug' => 'general', 'type' => 'listing',
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
+        $this->ensureListingCategory();
 
         $response = $this->apiPost('/v2/listings', [
             'title' => 'Test Listing',
@@ -224,6 +281,93 @@ class ListingsControllerTest extends TestCase
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
         Event::assertDispatched(ListingCreated::class);
+    }
+
+    public function test_store_marks_listing_pending_when_moderation_is_enabled(): void
+    {
+        Event::fake([ListingCreated::class]);
+        $this->authenticatedUser(['email' => '']);
+        $this->ensureListingCategory();
+        ListingConfigurationService::set(ListingConfigurationService::CONFIG_MODERATION_ENABLED, true);
+
+        $response = $this->apiPost('/v2/listings', [
+            'title' => 'Needs Review',
+            'description' => 'A detailed listing that should enter moderation review.',
+            'type' => 'offer',
+            'category_id' => 1,
+            'service_type' => 'physical_only',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $listingId = $response->json('data.id');
+        $this->assertDatabaseHas('listings', [
+            'id' => $listingId,
+            'status' => 'pending',
+            'moderation_status' => 'pending_review',
+        ]);
+    }
+
+    public function test_store_rejects_non_listing_category(): void
+    {
+        $this->authenticatedUser(['email' => '']);
+        DB::table('categories')->insertOrIgnore([
+            'id' => 91001,
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Events',
+            'slug' => 'events-only',
+            'type' => 'event',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/listings', [
+            'title' => 'Wrong Category',
+            'description' => 'This listing uses a category from another module.',
+            'type' => 'offer',
+            'category_id' => 91001,
+            'service_type' => 'physical_only',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_store_enforces_offer_type_toggle(): void
+    {
+        $this->authenticatedUser(['email' => '']);
+        $this->ensureListingCategory();
+        ListingConfigurationService::set(ListingConfigurationService::CONFIG_ALLOW_OFFERS, false);
+        ListingConfigurationService::set(ListingConfigurationService::CONFIG_ALLOW_REQUESTS, true);
+
+        $response = $this->apiPost('/v2/listings', [
+            'title' => 'Offer Disabled',
+            'description' => 'Offers are disabled by tenant listing configuration.',
+            'type' => 'offer',
+            'category_id' => 1,
+            'service_type' => 'physical_only',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_store_enforces_max_listings_per_user(): void
+    {
+        $user = $this->authenticatedUser(['email' => '']);
+        $this->ensureListingCategory();
+        ListingConfigurationService::set(ListingConfigurationService::CONFIG_MAX_PER_USER, 1);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+        ]);
+
+        $response = $this->apiPost('/v2/listings', [
+            'title' => 'Too Many Listings',
+            'description' => 'This listing exceeds the configured maximum per user.',
+            'type' => 'offer',
+            'category_id' => 1,
+            'service_type' => 'physical_only',
+        ]);
+
+        $response->assertStatus(422);
     }
 
     // ================================================================
@@ -294,6 +438,27 @@ class ListingsControllerTest extends TestCase
             'id' => $listing->id,
             'tenant_id' => $this->testTenantId,
             'status' => 'paused',
+        ]);
+    }
+
+    public function test_owner_cannot_reactivate_rejected_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'status' => 'rejected',
+            'moderation_status' => 'rejected',
+        ]);
+
+        $response = $this->apiPut("/v2/listings/{$listing->id}", [
+            'status' => 'active',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('listings', [
+            'id' => $listing->id,
+            'status' => 'rejected',
+            'moderation_status' => 'rejected',
         ]);
     }
 

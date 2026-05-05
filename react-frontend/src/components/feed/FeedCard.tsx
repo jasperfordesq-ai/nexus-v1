@@ -169,6 +169,23 @@ const REACTABLE_FEED_TYPES = new Set<string>([
   'volunteer',
   'challenge',
   'resource',
+  'job',
+  'blog',
+  'discussion',
+]);
+
+const COMMENTABLE_TYPES = new Set<FeedItem['type']>([
+  'post',
+  'listing',
+  'event',
+  'goal',
+  'poll',
+  'review',
+  'volunteer',
+  'challenge',
+  'job',
+  'blog',
+  'discussion',
 ]);
 
 /**
@@ -567,6 +584,17 @@ const FeedCard = React.memo(function FeedCard({
   const [isLoadingPoll, setIsLoadingPoll] = useState(false);
   const [pollLoadError, setPollLoadError] = useState(false);
 
+  useEffect(() => {
+    setLocalCommentsCount(item.comments_count);
+  }, [item.comments_count]);
+
+  useEffect(() => {
+    if (item.type === 'poll' && item.poll_data) {
+      setPollData(item.poll_data);
+      setPollLoadError(false);
+    }
+  }, [item.type, item.poll_data]);
+
   // AG38 — swap original text with translated text in place
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const itemLocale = (item as { locale?: string | null; content_locale?: string | null }).locale
@@ -667,6 +695,8 @@ const FeedCard = React.memo(function FeedCard({
 
   const author = getAuthor(item, t('author_unknown'));
   const isOwnPost = currentUserId === author.id;
+  const canViewAnalytics = isOwnPost && item.type === 'post';
+  const isCommentable = COMMENTABLE_TYPES.has(item.type);
   const config = typeConfig[item.type];
   const typeLabel = config.labelKey ? t(config.labelKey) : null;
   const detailPath = getItemDetailPath(item);
@@ -700,29 +730,6 @@ const FeedCard = React.memo(function FeedCard({
       return;
     }
     onVotePoll(item.id, optionId);
-
-    // Optimistic update: update pollData locally.
-    // total_votes / vote_count may be null (non-creators of open polls) — coalesce to 0.
-    const prevTotal = pollData.total_votes ?? 0;
-    const totalBefore = prevTotal + (pollData.user_vote_option_id ? 0 : 1);
-    const updatedOptions = pollData.options.map((opt) => {
-      let newCount = opt.vote_count ?? 0;
-      if (opt.id === pollData.user_vote_option_id) newCount -= 1;
-      if (opt.id === optionId) newCount += 1;
-      const safeCount = Math.max(0, newCount);
-      return {
-        ...opt,
-        vote_count: safeCount,
-        percentage: totalBefore > 0 ? Math.round((safeCount / totalBefore) * 100 * 10) / 10 : 0,
-      };
-    });
-
-    setPollData({
-      ...pollData,
-      options: updatedOptions,
-      total_votes: totalBefore,
-      user_vote_option_id: optionId,
-    });
   };
 
   const loadComments = async () => {
@@ -956,13 +963,15 @@ const FeedCard = React.memo(function FeedCard({
                   <DropdownMenu aria-label={t('card.post_actions')}>
                     {isOwnPost ? (
                       <>
-                        <DropdownItem
-                          key="analytics"
-                          startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
-                          onPress={() => setShowAnalytics(true)}
-                        >
-                          {t('card.view_analytics')}
-                        </DropdownItem>
+                        {canViewAnalytics && (
+                          <DropdownItem
+                            key="analytics"
+                            startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
+                            onPress={() => setShowAnalytics(true)}
+                          >
+                            {t('card.view_analytics')}
+                          </DropdownItem>
+                        )}
                         {onEditPost && item.type === 'post' && (
                           <DropdownItem
                             key="edit"
@@ -1063,14 +1072,16 @@ const FeedCard = React.memo(function FeedCard({
                 <div className="flex flex-col gap-1">
                   {isOwnPost ? (
                     <>
-                      <Button
-                        variant="light"
-                        className="justify-start text-theme-primary"
-                        startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => { setIsOptionsSheetOpen(false); setShowAnalytics(true); }}
-                      >
-                        {t('card.view_analytics')}
-                      </Button>
+                      {canViewAnalytics && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-theme-primary"
+                          startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); setShowAnalytics(true); }}
+                        >
+                          {t('card.view_analytics')}
+                        </Button>
+                      )}
                       {onEditPost && item.type === 'post' && (
                         <Button
                           variant="light"
@@ -1855,17 +1866,19 @@ const FeedCard = React.memo(function FeedCard({
               </Tooltip>
             )}
 
-            <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
-              <Button
-                size="sm"
-                variant="light"
-                className={`transition-all ${showComments ? 'text-primary font-medium bg-primary/5' : 'text-theme-muted hover:text-primary hover:bg-primary/5'}`}
-                startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-primary/20' : ''}`} aria-hidden="true" />}
-                onPress={toggleComments}
-              >
-                {t('card.comment_action')}
-              </Button>
-            </Tooltip>
+            {isCommentable && (
+              <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
+                <Button
+                  size="sm"
+                  variant="light"
+                  className={`transition-all ${showComments ? 'text-primary font-medium bg-primary/5' : 'text-theme-muted hover:text-primary hover:bg-primary/5'}`}
+                  startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-primary/20' : ''}`} aria-hidden="true" />}
+                  onPress={toggleComments}
+                >
+                  {t('card.comment_action')}
+                </Button>
+              </Tooltip>
+            )}
           </div>
 
           <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -1898,7 +1911,7 @@ const FeedCard = React.memo(function FeedCard({
         </div>
 
         {/* Post Analytics Modal */}
-        {showAnalytics && (
+        {showAnalytics && canViewAnalytics && (
           <PostAnalyticsModal
             isOpen={showAnalytics}
             onClose={() => setShowAnalytics(false)}
@@ -1908,7 +1921,7 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Comments Section */}
         <AnimatePresence>
-          {showComments && (
+          {showComments && isCommentable && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}

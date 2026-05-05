@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -37,6 +38,22 @@ class ListingService
     public function __construct(
         private readonly Listing $listing,
     ) {}
+
+    private static function applyPublicVisibility(Builder $query): Builder
+    {
+        return $query
+            ->where(function (Builder $q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
+            ->where(function (Builder $q) {
+                $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
+            });
+    }
+
+    private static function configBool(array $config, string $key): bool
+    {
+        return filter_var($config[$key] ?? ListingConfigurationService::DEFAULTS[$key] ?? false, FILTER_VALIDATE_BOOLEAN);
+    }
 
     // -----------------------------------------------------------------
     //  Read
@@ -139,10 +156,9 @@ class ListingService
                 $q = Listing::query()
                     ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline,is_verified',
                             'category:id,name,color,slug'])
-                    ->whereIn('id', $ids)
-                    ->where(function (Builder $sq) {
-                        $sq->whereNull('status')->orWhere('status', 'active');
-                    });
+                    ->whereIn('id', $ids);
+
+                self::applyPublicVisibility($q);
 
                 // Multi-type arrays can't be expressed in the Meilisearch filter above
                 if (!empty($filters['type']) && is_array($filters['type'])) {
@@ -217,9 +233,7 @@ class ListingService
 
         // Status filter
         if (empty($filters['include_deleted'])) {
-            $query->where(function (Builder $q) {
-                $q->whereNull('status')->orWhere('status', 'active');
-            });
+            self::applyPublicVisibility($query);
         }
 
         // Type filter
@@ -459,9 +473,7 @@ class ListingService
 
         // Status filter
         if (empty($filters['include_deleted'])) {
-            $query->where(function (Builder $q) {
-                $q->whereNull('status')->orWhere('status', 'active');
-            });
+            self::applyPublicVisibility($query);
         }
 
         // Type filter
@@ -566,6 +578,11 @@ class ListingService
         // Draft/pending/suspended listings are only visible to their owner
         $listingStatus = $listing->status ?? 'active';
         if (!in_array($listingStatus, ['active', null], true) && $listing->user_id !== $currentUserId) {
+            return null;
+        }
+
+        $moderationStatus = $listing->moderation_status;
+        if ($listing->user_id !== $currentUserId && $moderationStatus !== null && $moderationStatus !== 'approved') {
             return null;
         }
 
@@ -715,6 +732,9 @@ class ListingService
             ])
             ->selectRaw("listings.*, {$haversine} AS distance_km", [$lat, $lon, $lat])
             ->where('status', 'active')
+            ->where(function (Builder $q) {
+                $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
+            })
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->having('distance_km', '<=', $radiusKm)
@@ -840,6 +860,9 @@ class ListingService
                 'category:id,name,color',
             ])
             ->where('status', 'active')
+            ->where(function (Builder $q) {
+                $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
+            })
             ->where('is_featured', true)
             ->where(function (Builder $q) {
                 $q->whereNull('featured_until')
@@ -888,13 +911,21 @@ class ListingService
      */
     public static function saveListing(int $userId, int $listingId): bool
     {
+        if (! self::configBool(ListingConfigurationService::getAll(), ListingConfigurationService::CONFIG_ENABLE_FAVOURITES)) {
+            return false;
+        }
+
         // Verify listing exists in tenant and is in a saveable state
         $listing = Listing::query()
             ->where('id', $listingId)
             ->where('tenant_id', TenantContext::getId())
             ->first();
 
-        if (! $listing || ! in_array($listing->status ?? 'active', ['active', 'paused'], true)) {
+        if (! $listing || ($listing->status ?? 'active') !== 'active') {
+            return false;
+        }
+
+        if ($listing->moderation_status !== null && $listing->moderation_status !== 'approved') {
             return false;
         }
 
@@ -935,9 +966,22 @@ class ListingService
     public static function create(int $userId, array $data): Listing
     {
         self::validateData($data);
+        self::enforceMaxListingsPerUser($userId);
+
+        $moderationEnabled = (new ListingModerationService())->isModerationEnabled();
+        $initialStatus = $moderationEnabled ? 'pending' : 'active';
+        $initialModerationStatus = $moderationEnabled ? 'pending_review' : 'approved';
 
         // Fall back to user's location when not provided
-        if (empty($data['location']) || empty($data['latitude']) || empty($data['longitude'])) {
+        if (
+            empty($data['location'])
+            || !array_key_exists('latitude', $data)
+            || $data['latitude'] === null
+            || $data['latitude'] === ''
+            || !array_key_exists('longitude', $data)
+            || $data['longitude'] === null
+            || $data['longitude'] === ''
+        ) {
             $user = User::find($userId);
             if ($user) {
                 $data['location']  = $data['location']  ?? $user->location;
@@ -946,7 +990,7 @@ class ListingService
             }
         }
 
-        $listing = DB::transaction(function () use ($userId, $data) {
+        $listing = DB::transaction(function () use ($userId, $data, $initialStatus, $initialModerationStatus) {
             $listing = new Listing([
                 'user_id'               => $userId,
                 'title'                 => trim($data['title']),
@@ -961,7 +1005,8 @@ class ListingService
                 'service_type'          => $data['service_type'] ?? 'physical_only',
                 'federated_visibility'  => $data['federated_visibility'] ?? 'none',
                 'availability'          => $data['availability'] ?? null,
-                'status'                => 'active',
+                'status'                => $initialStatus,
+                'moderation_status'     => $initialModerationStatus,
             ]);
 
             // tenant_id is set automatically by HasTenantScope
@@ -1045,15 +1090,24 @@ class ListingService
         if (isset($data['status'])) {
             $validStatuses = ['active', 'draft', 'paused', 'pending', 'suspended', 'expired'];
             $currentStatus = $listing->status ?? 'active';
+            $currentModerationStatus = $listing->moderation_status;
 
             if (!in_array($data['status'], $validStatuses, true)) {
                 throw ValidationException::withMessages(['status' => [__('api.listing_invalid_status')]]);
             }
-            // Deleted or suspended listings cannot be reactivated by non-admin callers
+            // Moderated/removed listings cannot be reactivated by non-admin callers
             // (admin reactivation should go through a dedicated admin endpoint)
-            if (!$isAdmin && in_array($currentStatus, ['deleted', 'suspended'], true) && $data['status'] === 'active') {
+            if (
+                !$isAdmin
+                && $data['status'] === 'active'
+                && (
+                    in_array($currentStatus, ['deleted', 'suspended', 'rejected'], true)
+                    || in_array($currentModerationStatus, ['pending_review', 'rejected'], true)
+                )
+            ) {
+                $blockedStatus = $currentModerationStatus ?: $currentStatus;
                 throw ValidationException::withMessages(['status' => [
-                    __('api.listing_cannot_reactivate_status', ['status' => $currentStatus]),
+                    __('api.listing_cannot_reactivate_status', ['status' => $blockedStatus]),
                 ]]);
             }
             // Non-admin callers may only set user-facing statuses
@@ -1273,6 +1327,31 @@ class ListingService
     //  Validation
     // -----------------------------------------------------------------
 
+    private static function enforceMaxListingsPerUser(int $userId): void
+    {
+        $maxListings = (int) ListingConfigurationService::get(
+            ListingConfigurationService::CONFIG_MAX_PER_USER,
+            ListingConfigurationService::DEFAULTS[ListingConfigurationService::CONFIG_MAX_PER_USER]
+        );
+
+        if ($maxListings <= 0) {
+            return;
+        }
+
+        $currentCount = Listing::query()
+            ->where('user_id', $userId)
+            ->where(function (Builder $q) {
+                $q->whereNull('status')->orWhere('status', '!=', 'deleted');
+            })
+            ->count();
+
+        if ($currentCount >= $maxListings) {
+            throw ValidationException::withMessages([
+                'user_id' => [__('api.listing_max_per_user_reached', ['max' => $maxListings])],
+            ]);
+        }
+    }
+
     /**
      * Validate listing input data.
      *
@@ -1281,23 +1360,58 @@ class ListingService
     private static function validateData(array $data, bool $isUpdate = false): void
     {
         $rules = [];
+        $config = ListingConfigurationService::getAll();
+        $minTitle = max(1, min(255, (int) ($config[ListingConfigurationService::CONFIG_MIN_TITLE_LENGTH] ?? 5)));
+        $minDescription = max(1, min(10000, (int) ($config[ListingConfigurationService::CONFIG_MIN_DESCRIPTION_LENGTH] ?? 20)));
+        $allowedTypes = [];
+
+        if (self::configBool($config, ListingConfigurationService::CONFIG_ALLOW_OFFERS)) {
+            $allowedTypes[] = 'offer';
+        }
+        if (self::configBool($config, ListingConfigurationService::CONFIG_ALLOW_REQUESTS)) {
+            $allowedTypes[] = 'request';
+        }
 
         if (! $isUpdate) {
-            $rules['title']       = 'required|string|max:255';
-            $rules['description'] = 'required|string|max:10000';
-            $rules['type']        = 'required|in:offer,request';
+            $rules['title']       = ['required', 'string', "min:{$minTitle}", 'max:255'];
+            $rules['description'] = ['required', 'string', "min:{$minDescription}", 'max:10000'];
+            $rules['type']        = ['required', Rule::in($allowedTypes)];
         } else {
-            $rules['title']       = 'sometimes|string|max:255';
-            $rules['description'] = 'sometimes|string|max:10000';
-            $rules['type']        = 'sometimes|in:offer,request';
+            $rules['title']       = ['sometimes', 'string', "min:{$minTitle}", 'max:255'];
+            $rules['description'] = ['sometimes', 'string', "min:{$minDescription}", 'max:10000'];
+            $rules['type']        = ['sometimes', Rule::in($allowedTypes)];
         }
 
         $tenantId = \App\Core\TenantContext::getId();
-        $rules['category_id']          = "sometimes|nullable|integer|exists:categories,id,tenant_id,{$tenantId}";
+        $categoryRules = [$isUpdate ? 'sometimes' : (self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_CATEGORY) ? 'required' : 'sometimes')];
+        if (! self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_CATEGORY)) {
+            $categoryRules[] = 'nullable';
+        }
+        $categoryRules[] = 'integer';
+        $categoryRules[] = Rule::exists('categories', 'id')->where(fn ($query) => $query
+            ->where('tenant_id', $tenantId)
+            ->where('type', 'listing'));
+
+        $locationRules = [$isUpdate ? 'sometimes' : (self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_LOCATION) ? 'required' : 'sometimes')];
+        if (! self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_LOCATION)) {
+            $locationRules[] = 'nullable';
+        }
+        $locationRules[] = 'string';
+        $locationRules[] = 'max:255';
+
+        $hoursRules = [$isUpdate ? 'sometimes' : (self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_HOURS_ESTIMATE) ? 'required' : 'sometimes')];
+        if (! self::configBool($config, ListingConfigurationService::CONFIG_REQUIRE_HOURS_ESTIMATE)) {
+            $hoursRules[] = 'nullable';
+        }
+        $hoursRules[] = 'numeric';
+        $hoursRules[] = 'min:0.5';
+        $hoursRules[] = 'max:2000';
+
+        $rules['category_id']          = $categoryRules;
         $rules['service_type']         = 'sometimes|in:physical_only,remote_only,hybrid,location_dependent';
         $rules['federated_visibility'] = 'sometimes|in:none,listed,bookable';
-        $rules['hours_estimate']       = 'sometimes|nullable|numeric|min:0.5|max:2000';
-        $rules['location']             = 'sometimes|nullable|string|max:255';
+        $rules['hours_estimate']       = $hoursRules;
+        $rules['location']             = $locationRules;
         $rules['latitude']             = 'sometimes|nullable|numeric|min:-90|max:90';
         $rules['longitude']            = 'sometimes|nullable|numeric|min:-180|max:180';
         $rules['availability']         = 'sometimes|nullable|array';

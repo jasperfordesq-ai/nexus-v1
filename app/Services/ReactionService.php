@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -65,6 +66,14 @@ class ReactionService
 
         if (!in_array($entityType, self::VALID_TARGET_TYPES, true)) {
             throw new \InvalidArgumentException("Invalid entity type: {$entityType}");
+        }
+
+        if (!in_array($reactionType, self::VALID_TYPES, true)) {
+            throw new \InvalidArgumentException("Invalid reaction type: {$reactionType}");
+        }
+
+        if (!FeedItemTables::canView($entityType, $entityId, $userId)) {
+            throw new \RuntimeException('target_not_found');
         }
 
         // Serialise concurrent toggles for the same (user, entity) to avoid duplicate inserts.

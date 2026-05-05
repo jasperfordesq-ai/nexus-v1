@@ -8,8 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\FeedService;
 use App\Services\FeedSocialService;
 use App\Services\ShareService;
+use App\Support\FeedItemTables;
 use App\Support\CursorSigner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -180,6 +182,11 @@ class FeedSocialController extends BaseApiController
             $type = 'post';
         }
 
+        $viewerId = $this->getOptionalUserId();
+        if (!FeedItemTables::canView($type, $id, $viewerId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
+        }
+
         $limit = $this->queryInt('limit', 20, 1, 100);
 
         $sharers = DB::table('post_shares as ps')
@@ -197,7 +204,6 @@ class FeedSocialController extends BaseApiController
         $shareCount = $this->shareService->getShareCount($type, $id, $tenantId);
 
         $hasShared = false;
-        $viewerId = $this->getOptionalUserId();
         if ($viewerId) {
             $hasShared = $this->shareService->isShared($viewerId, $type, $id, $tenantId);
         }
@@ -286,6 +292,7 @@ class FeedSocialController extends BaseApiController
     public function getHashtagPosts(string $tag): JsonResponse
     {
         $tenantId = $this->getTenantId();
+        $viewerId = $this->getOptionalUserId();
         $this->rateLimit('hashtags_posts', 30, 60);
 
         $limit = $this->queryInt('limit', 20, 1, 100);
@@ -303,19 +310,27 @@ class FeedSocialController extends BaseApiController
             return $this->respondWithCollection([], null, $limit, false, ['total_items' => 0]);
         }
 
-        // Count total posts for this hashtag (without cursor/limit)
-        $totalCount = (int) DB::table('post_hashtags as ph')
+        $baseQuery = DB::table('post_hashtags as ph')
             ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
             ->where('ph.hashtag_id', $hashtag->id)
             ->where('ph.tenant_id', $tenantId)
-            ->count();
+            ->where('fp.tenant_id', $tenantId)
+            ->whereNull('fp.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('fp.publish_status')
+                    ->orWhere('fp.publish_status', 'published');
+            })
+            ->where(function ($q) {
+                $q->whereNull('fp.is_hidden')
+                    ->orWhere('fp.is_hidden', 0);
+            });
 
-        $query = DB::table('post_hashtags as ph')
-            ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
-            ->leftJoin('users as u', 'fp.user_id', '=', 'u.id')
-            ->where('ph.hashtag_id', $hashtag->id)
-            ->where('ph.tenant_id', $tenantId)
-            ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
+        $this->applyPostVisibility($baseQuery, $tenantId, $viewerId);
+
+        // Count total viewable posts for this hashtag (without cursor/limit)
+        $totalCount = (int) (clone $baseQuery)->distinct()->count('fp.id');
+
+        $query = (clone $baseQuery)->select('fp.id');
 
         if ($cursor !== null) {
             // HMAC-signed cursor — same scheme as FeedService::getFeedItems().
@@ -333,12 +348,19 @@ class FeedSocialController extends BaseApiController
             $items->pop();
         }
 
+        $feedService = app(FeedService::class);
+        $feedItems = $items
+            ->map(fn ($i) => $feedService->getItem('post', (int) $i->id, $viewerId))
+            ->filter()
+            ->values()
+            ->all();
+
         $nextCursor = $hasMore && $items->isNotEmpty()
             ? CursorSigner::encode(['id' => (int) $items->last()->id])
             : null;
 
         return $this->respondWithCollection(
-            $items->map(fn ($i) => (array) $i)->values()->all(),
+            $feedItems,
             $nextCursor,
             $limit,
             $hasMore,
@@ -360,5 +382,74 @@ class FeedSocialController extends BaseApiController
     public function hashtagPosts(string $tag): JsonResponse
     {
         return $this->getHashtagPosts($tag);
+    }
+
+    private function applyPostVisibility($query, int $tenantId, ?int $viewerId): void
+    {
+        $query->where(function ($q) use ($tenantId, $viewerId) {
+            $q->whereNull('fp.group_id')
+                ->orWhereExists(function ($sub) use ($tenantId) {
+                    $sub->select(DB::raw(1))
+                        ->from('groups as g')
+                        ->whereColumn('g.id', 'fp.group_id')
+                        ->where('g.tenant_id', $tenantId)
+                        ->where(function ($status) {
+                            $status->whereNull('g.status')
+                                ->orWhere('g.status', 'active');
+                        })
+                        ->where('g.visibility', 'public');
+                });
+
+            if ($viewerId) {
+                $q->orWhereExists(function ($sub) use ($tenantId, $viewerId) {
+                    $sub->select(DB::raw(1))
+                        ->from('groups as g')
+                        ->whereColumn('g.id', 'fp.group_id')
+                        ->where('g.tenant_id', $tenantId)
+                        ->where(function ($status) {
+                            $status->whereNull('g.status')
+                                ->orWhere('g.status', 'active');
+                        })
+                        ->where(function ($groupAccess) use ($tenantId, $viewerId) {
+                            $groupAccess->where('g.owner_id', $viewerId)
+                                ->orWhereExists(function ($member) use ($tenantId, $viewerId) {
+                                    $member->select(DB::raw(1))
+                                        ->from('group_members as gm')
+                                        ->whereColumn('gm.group_id', 'g.id')
+                                        ->where('gm.tenant_id', $tenantId)
+                                        ->where('gm.user_id', $viewerId)
+                                        ->where('gm.status', 'active');
+                                });
+                        });
+                });
+            }
+        });
+
+        $query->where(function ($q) use ($tenantId, $viewerId) {
+            $q->whereNull('fp.visibility')
+                ->orWhere('fp.visibility', 'public');
+
+            if ($viewerId) {
+                $q->orWhere('fp.user_id', $viewerId)
+                    ->orWhere(function ($connections) use ($tenantId, $viewerId) {
+                        $connections->whereIn('fp.visibility', ['friends', 'connections'])
+                            ->whereExists(function ($sub) use ($tenantId, $viewerId) {
+                                $sub->select(DB::raw(1))
+                                    ->from('connections as c')
+                                    ->where('c.tenant_id', $tenantId)
+                                    ->where('c.status', 'accepted')
+                                    ->where(function ($pair) use ($viewerId) {
+                                        $pair->where(function ($a) use ($viewerId) {
+                                            $a->where('c.requester_id', $viewerId)
+                                                ->whereColumn('c.receiver_id', 'fp.user_id');
+                                        })->orWhere(function ($b) use ($viewerId) {
+                                            $b->whereColumn('c.requester_id', 'fp.user_id')
+                                                ->where('c.receiver_id', $viewerId);
+                                        });
+                                    });
+                            });
+                    });
+            }
+        });
     }
 }

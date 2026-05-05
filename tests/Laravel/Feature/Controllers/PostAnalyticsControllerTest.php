@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -51,5 +52,46 @@ class PostAnalyticsControllerTest extends TestCase
         $response = $this->apiGet('/v2/feed/posts/1/analytics');
 
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_analytics_uses_live_comment_and_share_counts(): void
+    {
+        $author = $this->authenticatedUser();
+
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'content' => 'Analytics counter regression post',
+            'type' => 'post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+            'share_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('comments')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'content' => 'Count me live',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('post_shares')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'original_type' => 'post',
+            'original_post_id' => $postId,
+            'post_id' => 0,
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet("/v2/feed/posts/{$postId}/analytics");
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.comments_count', 1);
+        $response->assertJsonPath('data.shares_count', 1);
     }
 }

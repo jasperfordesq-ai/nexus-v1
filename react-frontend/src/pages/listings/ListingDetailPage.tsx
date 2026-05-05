@@ -373,6 +373,11 @@ export function ListingDetailPage() {
     profileUrl: tenantPath,
     communityMemberLabel: t('community_member'),
   });
+  const listingLatitude = maybeNumber(listing.latitude);
+  const listingLongitude = maybeNumber(listing.longitude);
+  const listingMapCenter = listingLatitude !== null && listingLongitude !== null
+    ? { lat: listingLatitude, lng: listingLongitude }
+    : null;
 
   return (
     <motion.div
@@ -558,17 +563,17 @@ export function ListingDetailPage() {
         )}
 
         {/* Location Map */}
-        {listing.location && listing.latitude && listing.longitude && (
+        {listing.location && listingMapCenter && (
           <LocationMapCard
             title={t('detail_service_location')}
             locationText={listing.location}
             markers={[{
               id: listing.id,
-              lat: Number(listing.latitude),
-              lng: Number(listing.longitude),
+              lat: listingMapCenter.lat,
+              lng: listingMapCenter.lng,
               title: listing.title,
             }]}
-            center={{ lat: Number(listing.latitude), lng: Number(listing.longitude) }}
+            center={listingMapCenter}
             mapHeight="250px"
             zoom={15}
             className="mt-6"

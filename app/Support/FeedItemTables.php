@@ -261,9 +261,13 @@ final class FeedItemTables
     {
         $comment = DB::table('comments')
             ->where('id', $commentId)
-            ->where('tenant_id', $tenantId)
-            ->select(['target_type', 'target_id'])
-            ->first();
+            ->where('tenant_id', $tenantId);
+
+        if (Schema::hasColumn('comments', 'deleted_at')) {
+            $comment->whereNull('deleted_at');
+        }
+
+        $comment = $comment->select(['target_type', 'target_id'])->first();
 
         if (!$comment) {
             return false;

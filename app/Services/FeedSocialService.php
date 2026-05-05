@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -25,17 +26,25 @@ class FeedSocialService
     {
         $tenantId = TenantContext::getId();
 
-        $shareId = DB::table('post_shares')->insertGetId([
-            'original_post_id' => $postId,
-            'user_id'          => $userId,
-            'tenant_id'        => $tenantId,
-            'comment'          => $comment,
-            'created_at'       => now(),
-        ]);
+        if (!FeedItemTables::canView('post', $postId, $userId)) {
+            throw new \RuntimeException('post_not_found');
+        }
 
-        DB::table('feed_posts')->where('id', $postId)->where('tenant_id', $tenantId)->increment('share_count');
+        return DB::transaction(function () use ($postId, $userId, $tenantId, $comment): int {
+            $shareId = DB::table('post_shares')->insertGetId([
+                'original_type'    => 'post',
+                'original_post_id' => $postId,
+                'post_id'          => 0,
+                'user_id'          => $userId,
+                'tenant_id'        => $tenantId,
+                'comment'          => $comment,
+                'created_at'       => now(),
+            ]);
 
-        return $shareId;
+            DB::table('feed_posts')->where('id', $postId)->where('tenant_id', $tenantId)->increment('share_count');
+
+            return (int) $shareId;
+        });
     }
 
     /**
@@ -51,6 +60,19 @@ class FeedSocialService
             ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
             ->where('ph.tenant_id', $tenantId)
             ->where('fp.tenant_id', $tenantId)
+            ->whereNull('fp.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('fp.publish_status')
+                    ->orWhere('fp.publish_status', 'published');
+            })
+            ->where(function ($q) {
+                $q->whereNull('fp.is_hidden')
+                    ->orWhere('fp.is_hidden', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('fp.visibility')
+                    ->orWhere('fp.visibility', 'public');
+            })
             ->where('fp.created_at', '>=', $since)
             ->select('h.tag as hashtag', DB::raw('COUNT(*) as usage_count'))
             ->groupBy('h.tag')
@@ -79,6 +101,19 @@ class FeedSocialService
             ->where('fp.tenant_id', $tenantId)
             ->where('ph.tenant_id', $tenantId)
             ->where('h.tag', strtolower(ltrim($hashtag, '#')))
+            ->whereNull('fp.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('fp.publish_status')
+                    ->orWhere('fp.publish_status', 'published');
+            })
+            ->where(function ($q) {
+                $q->whereNull('fp.is_hidden')
+                    ->orWhere('fp.is_hidden', 0);
+            })
+            ->where(function ($q) {
+                $q->whereNull('fp.visibility')
+                    ->orWhere('fp.visibility', 'public');
+            })
             ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if ($cursor !== null) {

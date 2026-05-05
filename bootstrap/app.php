@@ -298,6 +298,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'federation.api' => \App\Http\Middleware\FederationApiAuth::class,
             'partner.api' => \App\Http\Middleware\PartnerApiAuth::class,
             'onboarding-required' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'module' => \App\Middleware\TenantModuleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

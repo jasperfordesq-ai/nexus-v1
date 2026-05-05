@@ -33,6 +33,14 @@ class UpdateFeedOnListingCreated implements ShouldQueue
         try {
             // Ensure tenant context is set (required when running via async queue)
             TenantContext::setById($event->tenantId);
+
+            if (
+                ($event->listing->status ?? 'active') !== 'active'
+                || (($event->listing->moderation_status ?? 'approved') !== 'approved')
+            ) {
+                return;
+            }
+
             FeedActivity::create([
                 'tenant_id'   => $event->tenantId,
                 'source_type' => 'listing',

@@ -29,6 +29,12 @@ vi.mock('@/contexts', () => ({
     tenantPath: (p: string) => `/test${p}`,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
+    listingConfig: {
+      'listing.min_title_length': 5,
+      'listing.min_description_length': 20,
+      'listing.require_category': true,
+      'listing.require_hours_estimate': false,
+    },
   })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 

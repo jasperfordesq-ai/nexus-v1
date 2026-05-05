@@ -259,7 +259,7 @@ class AdminFeedController extends BaseApiController
         }
 
         if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
-            return $this->respondWithError('FORBIDDEN', 'Scope violation', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.scope_violation'), null, 403);
         }
 
         $itemTenantId = (int) $row->tenant_id;
@@ -338,7 +338,7 @@ class AdminFeedController extends BaseApiController
         }
 
         if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
-            return $this->respondWithError('FORBIDDEN', 'Scope violation', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.scope_violation'), null, 403);
         }
 
         $itemTenantId = (int) $row->tenant_id;
@@ -405,7 +405,7 @@ class AdminFeedController extends BaseApiController
         $userId = (int) ($this->input('user_id') ?? 0);
 
         if (!$userId) {
-            return $this->respondWithError('VALIDATION', 'user_id is required', null, 422);
+            return $this->respondWithError('VALIDATION', __('api.user_id_required'), null, 422);
         }
 
         // Ensure the user belongs to this tenant
@@ -414,7 +414,7 @@ class AdminFeedController extends BaseApiController
             [$userId, $tenantId]
         );
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found in this tenant', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found_in_tenant'), null, 404);
         }
 
         // Resolve role ID
@@ -422,7 +422,7 @@ class AdminFeedController extends BaseApiController
             "SELECT id FROM roles WHERE name = 'municipality_announcer' LIMIT 1"
         );
         if (!$role) {
-            return $this->respondWithError('NOT_FOUND', 'municipality_announcer role not found — run migrations', null, 500);
+            return $this->respondWithError('NOT_FOUND', __('api.municipal_announcer_role_missing_run_migrations'), null, 500);
         }
 
         // Idempotent insert
@@ -450,7 +450,7 @@ class AdminFeedController extends BaseApiController
             "SELECT id FROM roles WHERE name = 'municipality_announcer' LIMIT 1"
         );
         if (!$role) {
-            return $this->respondWithError('NOT_FOUND', 'municipality_announcer role not found', null, 500);
+            return $this->respondWithError('NOT_FOUND', __('api.municipal_announcer_role_missing'), null, 500);
         }
 
         DB::delete(

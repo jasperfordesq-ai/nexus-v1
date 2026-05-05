@@ -190,6 +190,8 @@ class ReactionController extends BaseApiController
             }
 
             return $this->respondWithData($result);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', __('api.reaction_toggle_failed'), null, 500);
         }

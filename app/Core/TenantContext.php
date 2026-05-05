@@ -599,6 +599,15 @@ class TenantContext
         return !empty($features[$feature]);
     }
 
+    public static function hasModule(string $module): bool
+    {
+        $modules = self::getSetting('modules');
+        $modules = is_array($modules) ? $modules : null;
+        $effectiveModules = \App\Services\TenantFeatureConfig::mergeModules($modules);
+
+        return !empty($effectiveModules[$module]);
+    }
+
     /**
      * Merge DB feature flags with defaults so new/null tenants get correct values.
      */

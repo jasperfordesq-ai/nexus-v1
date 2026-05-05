@@ -32,12 +32,17 @@ class ListingModerationService
         $tenantId = TenantContext::getId();
 
         try {
-            $value = DB::table('tenant_settings')
+            $configured = ListingConfigurationService::get(ListingConfigurationService::CONFIG_MODERATION_ENABLED);
+            if (filter_var($configured, FILTER_VALIDATE_BOOLEAN)) {
+                return true;
+            }
+
+            $legacyValue = DB::table('tenant_settings')
                 ->where('tenant_id', $tenantId)
                 ->where('setting_key', 'general.listing_moderation_enabled')
                 ->value('setting_value');
 
-            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            return filter_var($legacyValue, FILTER_VALIDATE_BOOLEAN);
         } catch (\Exception $e) {
             Log::warning('[ListingModeration] Failed to check moderation enabled status: ' . $e->getMessage());
             return false;

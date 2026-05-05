@@ -275,10 +275,10 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                   isIconOnly
                   variant="light"
                   size="sm"
-                  className={`w-2.5 h-2.5 min-w-0 min-h-0 rounded-full p-0 transition-all ${scale} ${
+                  className={`relative h-8 w-8 min-w-8 rounded-full bg-transparent p-0 transition-all after:absolute after:left-1/2 after:top-1/2 after:h-2.5 after:w-2.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:transition-all ${scale} ${
                     idx === currentIndex
-                      ? 'bg-white scale-110'
-                      : 'bg-white/40 hover:bg-white/60'
+                      ? 'after:bg-white after:scale-110'
+                      : 'after:bg-white/40 hover:after:bg-white/60'
                   }`}
                   onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
                   onClick={(e) => e.stopPropagation()}
@@ -293,10 +293,10 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                 isIconOnly
                 variant="light"
                 size="sm"
-                className={`w-2.5 h-2.5 min-w-0 min-h-0 rounded-full p-0 transition-all ${
+                className={`relative h-8 w-8 min-w-8 rounded-full bg-transparent p-0 transition-all after:absolute after:left-1/2 after:top-1/2 after:h-2.5 after:w-2.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:transition-all ${
                   idx === currentIndex
-                    ? 'bg-white scale-110'
-                    : 'bg-white/40 hover:bg-white/60'
+                    ? 'after:bg-white after:scale-110'
+                    : 'after:bg-white/40 hover:after:bg-white/60'
                 }`}
                 onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
                 onClick={(e) => e.stopPropagation()}

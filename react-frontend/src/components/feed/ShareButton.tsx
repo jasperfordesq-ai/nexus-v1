@@ -54,7 +54,7 @@ export interface ShareButtonProps {
   isShared: boolean;
   isAuthenticated: boolean;
   /** The full FeedItem — needed for quote post and share modals. */
-  post: FeedItem;
+  post?: FeedItem;
   onShareChange?: (newCount: number, newIsShared: boolean) => void;
   /**
    * When true, render an icon-only ghost trigger — used in the feed card footer
@@ -76,7 +76,7 @@ export function ShareButton({
 }: ShareButtonProps) {
   const toast = useToast();
   const { t } = useTranslation('feed');
-  const { tenantSlug } = useTenant();
+  const { tenantPath } = useTenant();
   const [localCount, setLocalCount] = useState(shareCount);
   const [localIsShared, setLocalIsShared] = useState(isShared);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,18 +101,18 @@ export function ShareButton({
   //   3. Fallback to the polymorphic /feed/item/:type/:id route for any other
   //      reactable type without a module-specific page (poll, discussion, etc.).
   const postUrl = (() => {
-    const base = `${window.location.origin}/${tenantSlug}`;
+    const base = window.location.origin;
     if (post) {
       const detailPath = getItemDetailPath(post);
-      if (detailPath) return `${base}${detailPath}`;
+      if (detailPath) return `${base}${tenantPath(detailPath)}`;
     }
     if (resolvedType === 'post') {
-      return `${base}/feed/posts/${resolvedId}`;
+      return `${base}${tenantPath(`/feed/posts/${resolvedId}`)}`;
     }
-    return `${base}/feed/item/${resolvedType}/${resolvedId}`;
+    return `${base}${tenantPath(`/feed/item/${resolvedType}/${resolvedId}`)}`;
   })();
-  const postTitle = post.title || post.content?.slice(0, 80) || 'Post';
-  const postText = post.content?.slice(0, 200) || '';
+  const postTitle = post?.title || post?.content?.slice(0, 80) || t('share.default_title');
+  const postText = post?.content?.slice(0, 200) || '';
 
   const handleRepost = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -296,7 +296,7 @@ export function ShareButton({
             Hidden for typed items — supporting typed quotes needs a schema change
             (quoted_source_type / quoted_source_id on feed_posts).
           */}
-          {isNativePost ? (
+          {isNativePost && post ? (
             <DropdownItem
               key="quote"
               startContent={<Quote className="w-4 h-4" aria-hidden="true" />}
@@ -327,11 +327,13 @@ export function ShareButton({
       </Dropdown>
 
       {/* Quote Post Modal */}
-      <QuotePostModal
-        isOpen={showQuoteModal}
-        onClose={() => setShowQuoteModal(false)}
-        post={post}
-      />
+      {post && (
+        <QuotePostModal
+          isOpen={showQuoteModal}
+          onClose={() => setShowQuoteModal(false)}
+          post={post}
+        />
+      )}
 
       {/* External Share Modal (fallback for Web Share API) */}
       <ExternalShareModal

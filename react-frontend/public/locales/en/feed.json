@@ -375,6 +375,7 @@
     "shared_by_text": "shared this",
     "cannot_share_own_post": "You cannot share your own post",
     "menu_label": "Share options",
+    "default_title": "Post",
     "repost": "Repost",
     "repost_desc": "Share to your feed",
     "repost_remove": "Remove Repost",
@@ -403,6 +404,11 @@
     "dm_sent_label": "Sent",
     "dm_send": "Send",
     "dm_done": "Done"
+  },
+  "video": {
+    "default_title": "Video",
+    "play_label": "Play video: {{title}}",
+    "thumbnail_alt": "Thumbnail for {{title}}"
   },
   "trending": {
     "title": "Trending",
