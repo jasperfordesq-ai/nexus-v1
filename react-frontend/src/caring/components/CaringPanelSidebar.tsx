@@ -156,13 +156,15 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
 
   const role = (user?.role as string) || '';
   const userRecord = user as Record<string, unknown> | null;
-  const hasAdminAccess =
+  const hasFullCaringAccess =
     role === 'admin' ||
     role === 'tenant_admin' ||
     role === 'super_admin' ||
+    role === 'god' ||
     userRecord?.is_admin === true ||
     userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+    userRecord?.is_tenant_super_admin === true ||
+    userRecord?.is_god === true;
 
   const isActive = (path: string) => {
     const current = location.pathname;
@@ -174,12 +176,20 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
   };
 
   const visibleSections = useMemo(() => {
+    const availableSections = hasFullCaringAccess
+      ? SECTIONS
+      : SECTIONS
+          .filter((section) => section.key === 'trust_safety')
+          .map((section) => ({
+            ...section,
+            items: section.items.filter((item) => item.key === 'safeguarding'),
+          }));
     const normalisedQuery = query.trim().toLowerCase();
     if (collapsed || normalisedQuery === '') {
-      return SECTIONS;
+      return availableSections;
     }
 
-    return SECTIONS
+    return availableSections
       .map((section) => {
         const sectionLabel = t(section.titleKey).toLowerCase();
         const items = section.items.filter((item) => {
@@ -194,7 +204,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
         return { ...section, items };
       })
       .filter((section) => section.items.length > 0);
-  }, [collapsed, query, t]);
+  }, [collapsed, hasFullCaringAccess, query, t]);
 
   const renderItem = (item: NavItem) => {
     const active = isActive(item.path);
@@ -330,7 +340,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
             <span>{t('panel.sidebar.help_centre')}</span>
           </Link>
         )}
-        {hasAdminAccess && (
+        {hasFullCaringAccess && (
           <>
             {collapsed ? (
               <Tooltip content={t('panel.sidebar.full_admin')} placement="right">

@@ -22,20 +22,30 @@ export function CaringRoute() {
 
   const role = (user?.role as string) || '';
   const userRecord = user as Record<string, unknown> | null;
-  const hasAdminAccess =
+  const hasFullCaringAccess =
     role === 'admin' ||
     role === 'tenant_admin' ||
     role === 'super_admin' ||
     role === 'god' ||
-    role === 'coordinator' ||
-    role === 'broker' ||
     userRecord?.is_admin === true ||
     userRecord?.is_super_admin === true ||
     userRecord?.is_tenant_super_admin === true ||
     userRecord?.is_god === true;
+  const hasSafeguardingAccess = hasFullCaringAccess || role === 'coordinator' || role === 'broker';
 
-  if (!hasAdminAccess) {
+  if (!hasSafeguardingAccess) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
+  }
+
+  if (!hasFullCaringAccess && !hasFeature('caring_community')) {
+    return <Navigate to={tenantPath('/dashboard')} replace />;
+  }
+
+  if (!hasFullCaringAccess) {
+    const safeguardingPath = tenantPath('/caring/safeguarding');
+    if (!location.pathname.startsWith(safeguardingPath)) {
+      return <Navigate to={safeguardingPath} replace />;
+    }
   }
 
   if (!hasFeature('caring_community')) {

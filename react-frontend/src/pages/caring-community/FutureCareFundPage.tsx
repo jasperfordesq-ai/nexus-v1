@@ -67,6 +67,13 @@ function formatChf(value: number): string {
   });
 }
 
+function formatHoursShort(
+  hours: number,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string {
+  return t('hours_short', { count: formatHours(hours) });
+}
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -143,10 +150,10 @@ function ReciprocityBar({ given, received, t }: ReciprocityBarProps) {
     <div className="w-full">
       <div className="mb-2 flex items-center justify-between text-sm">
         <span className="font-medium text-emerald-600 dark:text-emerald-400">
-          {t('future_care_fund.reciprocity.given_label')}: {formatHours(given)}h
+          {t('future_care_fund.reciprocity.given_label')}: {formatHoursShort(given, t)}
         </span>
         <span className="font-medium text-sky-600 dark:text-sky-400">
-          {t('future_care_fund.reciprocity.received_label')}: {formatHours(received)}h
+          {t('future_care_fund.reciprocity.received_label')}: {formatHoursShort(received, t)}
         </span>
       </div>
       <div className="flex h-3 w-full overflow-hidden rounded-full bg-theme-elevated">
@@ -193,11 +200,11 @@ function ByYearChart({ rows, t }: ByYearChartProps) {
               <span className="font-medium text-theme-primary">{row.year}</span>
               <span className="text-theme-muted">
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                  {t('future_care_fund.by_year.given')} {formatHours(row.hours_given)}h
+                  {t('future_care_fund.by_year.given')} {formatHoursShort(row.hours_given, t)}
                 </span>
                 {' · '}
                 <span className="font-medium text-sky-600 dark:text-sky-400">
-                  {t('future_care_fund.by_year.received')} {formatHours(row.hours_received)}h
+                  {t('future_care_fund.by_year.received')} {formatHoursShort(row.hours_received, t)}
                 </span>
               </span>
             </div>
@@ -336,7 +343,7 @@ export function FutureCareFundPage() {
               <StatCard
                 icon={<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
                 label={t('future_care_fund.stats.lifetime_given')}
-                value={`${formatHours(summary.lifetime_given)}h`}
+                value={formatHoursShort(summary.lifetime_given, t)}
                 hint={
                   summary.partner_organisations_helped > 0
                     ? t('future_care_fund.stats.partner_orgs') +
@@ -349,7 +356,7 @@ export function FutureCareFundPage() {
               <StatCard
                 icon={<HandHeart className="h-5 w-5 text-sky-600 dark:text-sky-400" />}
                 label={t('future_care_fund.stats.lifetime_received')}
-                value={`${formatHours(summary.lifetime_received)}h`}
+                value={formatHoursShort(summary.lifetime_received, t)}
                 accentClass="bg-sky-500/15"
               />
               <StatCard

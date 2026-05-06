@@ -46,6 +46,13 @@ interface HistoryResponse {
   items: LoyaltyRedemption[];
 }
 
+function formatHoursShort(
+  hours: number,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string {
+  return t('hours_short', { count: hours.toFixed(2) });
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -86,7 +93,7 @@ export function LoyaltyHistoryPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -167,7 +174,7 @@ export function LoyaltyHistoryPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-right tabular-nums">
-                    {row.credits_used.toFixed(2)} h
+                    {formatHoursShort(row.credits_used, t)}
                   </td>
                   <td className="px-4 py-3 text-sm text-right tabular-nums">
                     <Chip variant="flat" color="success" size="sm">

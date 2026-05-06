@@ -45,9 +45,6 @@ interface MyFeedbackRow {
   updated_at: string;
 }
 
-const CATEGORY_OPTIONS: FeedbackCategory[] = ['question', 'idea', 'issue_report', 'sentiment'];
-const SENTIMENT_OPTIONS: SentimentTag[] = ['positive', 'neutral', 'negative', 'concerned'];
-
 const STATUS_COLOR: Record<FeedbackStatus, 'default' | 'primary' | 'warning' | 'success' | 'danger'> = {
   new: 'primary',
   triaging: 'warning',

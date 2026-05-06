@@ -49,7 +49,7 @@ export function ProximityFilter({ radiusKm, onRadiusChange, className }: Proximi
           role="radiogroup"
           aria-label={t('proximity.label')}
         >
-          {RADIUS_OPTIONS.map(({ value, labelKey }) => {
+          {RADIUS_OPTIONS.map(({ value }) => {
             const isSelected = value === radiusKm;
             const label =
               value === null

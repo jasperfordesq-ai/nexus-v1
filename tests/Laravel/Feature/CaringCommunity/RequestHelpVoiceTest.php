@@ -16,6 +16,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Testing\File as TestFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -51,7 +52,7 @@ class RequestHelpVoiceTest extends TestCase
 
     private function makeMember(): int
     {
-        return (int) DB::table('users')->insertGetId([
+        $row = [
             'tenant_id'  => self::TENANT_ID,
             'first_name' => 'Voice',
             'last_name'  => 'Tester',
@@ -62,7 +63,16 @@ class RequestHelpVoiceTest extends TestCase
             'status'     => 'active',
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn('users', 'is_approved')) {
+            $row['is_approved'] = 1;
+        }
+        if (Schema::hasColumn('users', 'approved_at')) {
+            $row['approved_at'] = now();
+        }
+
+        return (int) DB::table('users')->insertGetId($row);
     }
 
     private function fakeAudio(): UploadedFile

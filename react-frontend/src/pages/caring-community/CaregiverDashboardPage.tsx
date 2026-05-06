@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Accordion, AccordionItem, Avatar, Button, Chip, Skeleton } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -196,7 +196,9 @@ function SchedulePanel({ caredForId, t }: SchedulePanelProps) {
             {schedule.recent_logs.map((log) => (
               <li key={log.id} className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-theme-muted">{formatDate(log.date)}</span>
-                <span className="font-medium text-theme-primary">{log.hours}h</span>
+                <span className="font-medium text-theme-primary">
+                  {t('caregiver.hours_short', { hours: log.hours })}
+                </span>
                 <span className="text-theme-muted">{log.supporter_name}</span>
                 <Chip
                   size="sm"
