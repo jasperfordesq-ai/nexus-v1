@@ -33,6 +33,7 @@ Time banking is a community-based system where members exchange services using t
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 18 + TypeScript + HeroUI + Tailwind CSS 4 |
+| **Accessible Frontend** | Laravel-rendered HTML + GOV.UK Frontend Sass/JS |
 | **Backend API** | Laravel 12 + PHP 8.2+ |
 | **Database** | MariaDB 10.11 |
 | **Cache** | Redis 7+ |
@@ -51,6 +52,7 @@ Time banking is a community-based system where members exchange services using t
 |------|---------|
 | `app/`, `routes/`, `config/`, `bootstrap/` | Laravel 12 application, API routing, middleware, providers, and runtime configuration |
 | `react-frontend/` | Primary React 18 + TypeScript UI for members and current admin workflows |
+| `accessible-frontend/` | Accessibility-first, HTML-first frontend served by Laravel at `accessible.project-nexus.ie` and `/{tenantSlug}/alpha/...` |
 | `views/` | Laravel Blade/email views plus legacy admin compatibility surfaces only |
 | `httpdocs/` | Apache web root, public health endpoints, and compatibility entrypoints |
 | `database/`, `migrations/`, `schema.sql` | Laravel migrations, legacy SQL history, and schema reference artifacts |
@@ -84,6 +86,7 @@ docker exec nexus-php-app php artisan migrate
 # React Frontend: http://localhost:5173
 # PHP API:        http://localhost:8090
 # Sales Site:     http://localhost:3001
+# Accessible UI:  http://localhost:8090/hour-timebank/alpha
 
 # Native app packaging is separate from the default Docker workflow
 ```
@@ -103,6 +106,7 @@ A legacy schema dump is also available at [schema.sql](schema.sql) if needed for
 This is **version 1.5 — release candidate**, in active production use while undergoing final pre-release validation:
 
 - The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
+- The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel and planned for `accessible.project-nexus.ie`
 - The **Laravel 12 backend** provides the API — all services are native Laravel implementations (zero stubs)
 - The **legacy PHP admin views** are compatibility-only surfaces for `/admin-legacy/` and `/super-admin/`
 - **Zero-downtime blue/green deployments** — production switches between blue and green container stacks with no maintenance window

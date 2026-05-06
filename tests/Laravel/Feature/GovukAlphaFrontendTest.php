@@ -12,12 +12,26 @@ use App\Models\Listing;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
 class GovukAlphaFrontendTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_root_renders_accessible_tenant_chooser(): void
+    {
+        \App\Core\TenantContext::reset();
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.tenant_chooser.title'));
+        $response->assertSee($this->testTenantSlug);
+        $response->assertSee("/{$this->testTenantSlug}/alpha", false);
+        $response->assertSee('AGPL-3.0-or-later');
+    }
 
     public function test_home_login_and_register_pages_render_for_tenant(): void
     {
@@ -31,6 +45,41 @@ class GovukAlphaFrontendTest extends TestCase
             $response->assertSee('class="govuk-phase-banner"', false);
             $response->assertSee('AGPL-3.0-or-later');
         }
+    }
+
+    public function test_accessible_login_persists_token_cookie_for_server_rendered_pages(): void
+    {
+        $email = 'alpha-login-' . bin2hex(random_bytes(4)) . '@example.test';
+
+        User::factory()->forTenant($this->testTenantId)->create([
+            'email' => $email,
+            'password_hash' => Hash::make('CorrectPassword123'),
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $login = $this->post("/{$this->testTenantSlug}/alpha/login", [
+            'email' => $email,
+            'password' => 'CorrectPassword123',
+        ]);
+
+        $login->assertRedirect("/{$this->testTenantSlug}/alpha/feed?status=signed-in");
+        $login->assertCookie('auth_token');
+
+        $cookie = null;
+        foreach ($login->headers->getCookies() as $responseCookie) {
+            if ($responseCookie->getName() === 'auth_token') {
+                $cookie = $responseCookie->getValue();
+                break;
+            }
+        }
+        $this->assertNotNull($cookie);
+
+        $feed = $this->withUnencryptedCookie('auth_token', $cookie)->get("/{$this->testTenantSlug}/alpha/feed");
+
+        $feed->assertOk();
+        $feed->assertDontSee(__('govuk_alpha.states.auth_required'));
+        $feed->assertSee(__('govuk_alpha.feed.post_label'));
     }
 
     public function test_feed_page_renders_govuk_alpha_shell_and_feed_item(): void

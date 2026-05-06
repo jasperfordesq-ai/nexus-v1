@@ -5,6 +5,7 @@
 #
 # Domains:
 #   - api.project-nexus.ie  -> PHP API (port 8090)
+#   - accessible.project-nexus.ie -> Laravel-rendered accessible frontend (PHP API upstream)
 #   - app.project-nexus.ie  -> React Frontend (port 3000)
 #   - project-nexus.ie      -> Sales Site (port 3001)
 #

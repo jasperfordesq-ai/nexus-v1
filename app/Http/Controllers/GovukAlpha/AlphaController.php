@@ -30,6 +30,45 @@ class AlphaController extends Controller
         private readonly RegistrationService $registrationService,
     ) {}
 
+    public function tenantChooser(): Response|RedirectResponse
+    {
+        $tenant = TenantContext::get();
+        if (($tenant['id'] ?? 1) > 1 && !empty($tenant['slug'])) {
+            return redirect()->route('govuk-alpha.home', ['tenantSlug' => $tenant['slug']]);
+        }
+
+        $tenants = DB::table('tenants')
+            ->select('id', 'name', 'slug', 'tagline')
+            ->where('is_active', 1)
+            ->where('id', '>', 1)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (object $tenant): array => (array) $tenant)
+            ->all();
+
+        return $this->view('accessible-frontend::tenant-chooser', [
+            'title' => __('govuk_alpha.tenant_chooser.title'),
+            'tenantSlug' => '',
+            'activeNav' => 'tenant-chooser',
+            'tenants' => $tenants,
+        ]);
+    }
+
+    public function hostHome(): RedirectResponse
+    {
+        return $this->redirectHostTenantRoute('govuk-alpha.home');
+    }
+
+    public function hostLogin(): RedirectResponse
+    {
+        return $this->redirectHostTenantRoute('govuk-alpha.login');
+    }
+
+    public function hostRegister(): RedirectResponse
+    {
+        return $this->redirectHostTenantRoute('govuk-alpha.register');
+    }
+
     public function home(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);
@@ -40,6 +79,11 @@ class AlphaController extends Controller
             'activeNav' => 'home',
             'isAuthenticated' => $this->currentUserId() !== null,
             'status' => $request->query('status'),
+            'modules' => [
+                'feed' => true,
+                'listings' => TenantContext::hasModule('listings'),
+                'members' => true,
+            ],
         ]);
     }
 
@@ -55,9 +99,12 @@ class AlphaController extends Controller
         ]);
     }
 
-    public function storeLogin(string $tenantSlug): RedirectResponse
+    public function storeLogin(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+
+        $previousStatelessHeader = $_SERVER['HTTP_X_STATELESS_AUTH'] ?? null;
+        $_SERVER['HTTP_X_STATELESS_AUTH'] = '1';
 
         try {
             $response = app(\App\Http\Controllers\Api\AuthController::class)->login();
@@ -65,10 +112,33 @@ class AlphaController extends Controller
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+        } finally {
+            if ($previousStatelessHeader === null) {
+                unset($_SERVER['HTTP_X_STATELESS_AUTH']);
+            } else {
+                $_SERVER['HTTP_X_STATELESS_AUTH'] = $previousStatelessHeader;
+            }
         }
 
         if (($payload['success'] ?? false) === true) {
-            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in']);
+            $token = (string) ($payload['access_token'] ?? $payload['token'] ?? $payload['sanctum_token'] ?? '');
+            if ($token === '') {
+                return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+            }
+
+            return redirect()
+                ->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in'])
+                ->withCookie(cookie(
+                    'auth_token',
+                    $token,
+                    60 * 24 * 7,
+                    '/',
+                    null,
+                    $request->isSecure(),
+                    true,
+                    false,
+                    'Lax'
+                ));
         }
 
         if (($payload['requires_2fa'] ?? false) === true) {
@@ -327,6 +397,16 @@ class AlphaController extends Controller
     {
         $tenant = TenantContext::get();
         abort_unless(($tenant['slug'] ?? '') === $tenantSlug, 404);
+    }
+
+    private function redirectHostTenantRoute(string $routeName): RedirectResponse
+    {
+        $tenant = TenantContext::get();
+        if (($tenant['id'] ?? 1) > 1 && !empty($tenant['slug'])) {
+            return redirect()->route($routeName, ['tenantSlug' => $tenant['slug']]);
+        }
+
+        return redirect()->route('govuk-alpha.tenant-chooser');
     }
 
     private function currentUserId(): ?int

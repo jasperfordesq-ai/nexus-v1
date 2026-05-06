@@ -11,6 +11,8 @@ This is the Project NEXUS accessibility-first frontend. It is built as an HTML-f
 
 Recommended public subdomain: `accessible.project-nexus.ie`.
 
+Deployment target: the Laravel/PHP blue-green app container, not the React frontend container.
+
 ## Structure
 
 - `src/`: Sass and TypeScript entrypoints for the accessible frontend build.
@@ -18,6 +20,20 @@ Recommended public subdomain: `accessible.project-nexus.ie`.
 - Built assets are emitted to `httpdocs/build/accessible-frontend/`.
 
 The Laravel route namespace currently remains `/{tenantSlug}/alpha/...` while this track is in alpha.
+
+The generic root path `/` renders a tenant chooser for shared hosts such as local development and `accessible.project-nexus.ie`. Tenant-scoped pages continue under `/{tenantSlug}/alpha/...`.
+
+## Deployment Checks
+
+Run these before deploying accessible frontend changes:
+
+```bash
+npm run build:accessible-frontend
+npm run test:accessible-frontend:php
+npm run test:accessible-frontend:a11y
+```
+
+Commit the generated files under `httpdocs/build/accessible-frontend/` with the source changes unless the deploy pipeline has been updated to build them inside the PHP image.
 
 ## Official Stack
 

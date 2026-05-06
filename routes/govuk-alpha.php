@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::pattern('tenantSlug', '[a-zA-Z0-9_-]+');
 
+Route::get('/', [AlphaController::class, 'tenantChooser'])->name('govuk-alpha.tenant-chooser');
+
+Route::prefix('alpha')
+    ->name('govuk-alpha.host.')
+    ->group(function () {
+        Route::get('/', [AlphaController::class, 'hostHome'])->name('home');
+        Route::get('/login', [AlphaController::class, 'hostLogin'])->name('login');
+        Route::get('/register', [AlphaController::class, 'hostRegister'])->name('register');
+    });
+
 Route::prefix('{tenantSlug}/alpha')
     ->name('govuk-alpha.')
     ->group(function () {

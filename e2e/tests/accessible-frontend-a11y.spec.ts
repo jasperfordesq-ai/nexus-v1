@@ -7,6 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const alphaPages = [
+  '/',
   '/hour-timebank/alpha',
   '/hour-timebank/alpha/login',
   '/hour-timebank/alpha/register',
