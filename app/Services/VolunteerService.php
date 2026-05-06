@@ -434,29 +434,41 @@ class VolunteerService
      */
     public static function getHoursSummary(int $userId): array
     {
+        $tenantId = self::getTenantId();
+
         $total = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->sum('hours');
 
         $pending = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
             ->sum('hours');
 
         $declineStatus = self::getDeclineStatusValue();
         $declined = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', $declineStatus)
             ->sum('hours');
 
-        $totalLogs = VolLog::where('user_id', $userId)->count();
+        $totalLogs = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->count();
 
         $thisMonth = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->where('date_logged', '>=', now()->startOfMonth())
             ->sum('hours');
 
         $byOrg = VolLog::where('vol_logs.user_id', $userId)
+            ->where('vol_logs.tenant_id', $tenantId)
             ->where('vol_logs.status', 'approved')
-            ->join('vol_organizations', 'vol_logs.organization_id', '=', 'vol_organizations.id')
+            ->join('vol_organizations', function ($join) {
+                $join->on('vol_logs.organization_id', '=', 'vol_organizations.id')
+                    ->on('vol_logs.tenant_id', '=', 'vol_organizations.tenant_id');
+            })
             ->selectRaw('vol_organizations.name, SUM(vol_logs.hours) as hours')
             ->groupBy('vol_organizations.id', 'vol_organizations.name')
             ->get()
@@ -464,6 +476,7 @@ class VolunteerService
             ->toArray();
 
         $byMonth = VolLog::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->selectRaw("DATE_FORMAT(date_logged, '%Y-%m') as month, SUM(hours) as hours")
             ->groupByRaw("DATE_FORMAT(date_logged, '%Y-%m')")
@@ -1480,7 +1493,7 @@ class VolunteerService
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(
                             $volunteerId, 'global', 0, 'vol_hours_approved',
-                            "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
+                            __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]),
                             '/wallet',
                             NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
                         );
@@ -1489,7 +1502,7 @@ class VolunteerService
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(
                             $volunteerId, 'global', 0, 'vol_hours_approved',
-                            "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
+                            __('notifications.vol_hours_approved_unpaid_body', ['hours' => $hours]),
                             '/volunteering?tab=hours',
                             NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
                         );
@@ -1503,7 +1516,7 @@ class VolunteerService
                     LocaleContext::withLocale($ownerRow, function () use ($ownerId, $hours, $org) {
                         NotificationDispatcher::dispatch(
                             $ownerId, 'global', 0, 'vol_hours_approved',
-                            "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
+                            __('notifications.vol_hours_org_wallet_insufficient_body', ['hours' => $hours]),
                             '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
                             null
                         );
@@ -1512,7 +1525,7 @@ class VolunteerService
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(
                             $volunteerId, 'global', 0, 'vol_hours_approved',
-                            "Your {$hours}h of volunteering were approved!",
+                            __('notifications.vol_hours_approved_body', ['hours' => $hours]),
                             '/volunteering?tab=hours',
                             NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
                         );
@@ -1521,7 +1534,7 @@ class VolunteerService
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(
                             $volunteerId, 'global', 0, 'vol_hours_declined',
-                            "Your {$hours}h volunteering log was declined.",
+                            __('notifications.vol_hours_declined_body', ['hours' => $hours]),
                             '/volunteering?tab=hours',
                             NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
                         );

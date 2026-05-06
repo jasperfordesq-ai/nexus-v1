@@ -1072,6 +1072,15 @@ function HoursTab() {
     return () => { abortRef.current?.abort(); };
   }, []);
 
+  const handleOpenLogHours = () => {
+    setLogForm((prev) => ({
+      ...prev,
+      organization_id: prev.organization_id || (organisations.length === 1 ? String(organisations[0]?.id ?? '') : ''),
+      date: prev.date || new Date().toISOString().split('T')[0],
+    }));
+    onOpen();
+  };
+
   const handleLogHours = async () => {
     if (!logForm.hours || !logForm.date || !logForm.organization_id) return;
 
@@ -1109,7 +1118,7 @@ function HoursTab() {
         <Button
           className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          onPress={onOpen}
+          onPress={handleOpenLogHours}
           isDisabled={isLoading || organisations.length === 0}
         >
           {t('log_hours')}
@@ -1255,7 +1264,7 @@ function HoursTab() {
                   action={
                     <Button
                       className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
-                      onPress={onOpen}
+                      onPress={handleOpenLogHours}
                       isDisabled={organisations.length === 0}
                     >
                       {t('log_hours')}

@@ -161,7 +161,7 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
         $this->assertNotNull($swapId, 'requestSwap should succeed');
 
         // User A cancels the swap
-        $cancelled = ShiftSwapService::cancel($swapId, $userA);
+        $cancelled = ShiftSwapService::cancel($swapId, $userA, self::TENANT_ID);
         $this->assertTrue($cancelled);
 
         // Assert swap status is cancelled
@@ -202,12 +202,13 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
         );
 
         // Verify check-in
-        $checkIn = VolunteerCheckInService::verifyCheckIn($token);
+        $checkInService = app(VolunteerCheckInService::class);
+        $checkIn = $checkInService->verifyCheckIn($token);
         $this->assertNotNull($checkIn, 'verifyCheckIn should succeed within window');
         $this->assertSame('checked_in', $checkIn['status']);
 
         // Check out
-        $checkedOut = VolunteerCheckInService::checkOut($token);
+        $checkedOut = $checkInService->checkOut($token);
         $this->assertTrue($checkedOut, 'checkOut should succeed');
 
         // Verify DB status

@@ -12,6 +12,18 @@
       "open_workflow": "Open KISS workflow",
       "refresh": "Refresh"
     },
+    "about": {
+      "title": "About this page",
+      "body": "The Caring Community module enables your timebank to coordinate informal neighbourhood care, matching residents who need help with trusted members who can provide it. It adds a trust-tier system, coordinator workflow, pilot evaluation tools, and municipal reporting on top of your existing timebank."
+    },
+    "getting_started": {
+      "title": "Getting started",
+      "step_1": "Configure Operating Policy: set your approval workflow and CHF hourly rate.",
+      "step_2": "Capture a pre-pilot baseline in the Pilot Scoreboard.",
+      "step_3": "Configure Trust Tier thresholds.",
+      "step_4": "Run the Pilot Launch Readiness check.",
+      "step_5": "Once launched, use the Coordinator Workflow as your daily operations dashboard."
+    },
     "stats": {
       "master_switch": "Master switch",
       "connected_capabilities": "Connected capabilities",
@@ -21,6 +33,7 @@
     "switch": {
       "title": "Module kill switch",
       "description": "When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.",
+      "dependency_note": "Caring Community relies on the modules and features listed below being enabled. A disabled module will limit coordinator and reporting features.",
       "aria": "Toggle Caring Community module"
     },
     "capabilities": {

@@ -164,7 +164,7 @@ export function VolunteerHoursAudit() {
       }
     }
     setLoading(false);
-  }, [statusFilter, toast]);
+  }, [statusFilter, toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -216,13 +216,18 @@ export function VolunteerHoursAudit() {
       const orgName = item.org_name || t('volunteering.unknown_org', 'Unknown');
       if (!map.has(orgName)) map.set(orgName, { approved: 0, pending: 0 });
       const entry = map.get(orgName)!;
-      if (item.status === 'approved') entry.approved += item.hours;
-      else if (item.status === 'pending') entry.pending += item.hours;
+      const hours = Number.parseFloat(String(item.hours)) || 0;
+      if (item.status === 'approved') entry.approved += hours;
+      else if (item.status === 'pending') entry.pending += hours;
     });
     return Array.from(map.entries())
-      .map(([name, data]) => ({ name, ...data }))
+      .map(([name, data]) => ({
+        name,
+        approved: Number(data.approved.toFixed(2)),
+        pending: Number(data.pending.toFixed(2)),
+      }))
       .sort((a, b) => (b.approved + b.pending) - (a.approved + a.pending));
-  }, [filteredItems]);
+  }, [filteredItems, t]);
 
 
   // ── Payment reconciliation data ─────────────────────────────────────────────
@@ -237,11 +242,11 @@ export function VolunteerHoursAudit() {
       hours: item.hours,
       status: item.status,
       date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
-      paid: (item.paid === 1 || item.paid === true) ? 'Yes' : 'No',
+      paid: (item.paid === 1 || item.paid === true) ? t('common.yes', 'Yes') : t('common.no', 'No'),
       paid_amount: item.paid_amount || 0,
     }));
     exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
-  }, [filteredItems]);
+  }, [filteredItems, t]);
 
   const columns: Column<HourLog>[] = useMemo(() => [
     {
@@ -335,7 +340,7 @@ export function VolunteerHoursAudit() {
         );
       },
     },
-  ], [actionInProgress, handleVerify]);
+  ], [actionInProgress, handleVerify, t]);
 
   const topContent = useMemo(() => (
     <div className="flex flex-col gap-3">

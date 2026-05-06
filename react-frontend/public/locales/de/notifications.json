@@ -23,6 +23,7 @@
     "unread_count": "ungelesen",
     "empty": "Noch keine Benachrichtigungen",
     "view_all": "Alle Benachrichtigungen ansehen",
+    "close": "Benachrichtigungen schließen",
     "unread_dot_aria": "Ungelesen"
   },
   "type": {

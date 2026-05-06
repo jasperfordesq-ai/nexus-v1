@@ -51,7 +51,7 @@ class VolunteerSecurityRegressionTest extends \Tests\Laravel\TestCase
         $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
 
         $this->assertNull($token);
-        $errors = VolunteerCheckInService::getErrors();
+        $errors = VolunteerCheckInService::getTokenErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('FORBIDDEN', $errors[0]['code']);
 
@@ -80,7 +80,7 @@ class VolunteerSecurityRegressionTest extends \Tests\Laravel\TestCase
         $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
 
-        $checkins = VolunteerCheckInService::getShiftCheckIns($shiftId);
+        $checkins = app(VolunteerCheckInService::class)->getShiftCheckIns($shiftId);
         $this->assertNotEmpty($checkins);
         $this->assertArrayNotHasKey('qr_token', $checkins[0]);
     }

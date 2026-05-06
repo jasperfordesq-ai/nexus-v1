@@ -1671,6 +1671,12 @@ return [
     'no_checkin_available'                 => 'No check-in available for this shift',
     'invalid_checkin_code'                 => 'Invalid check-in code',
     'checkin_not_found_or_completed'       => 'Check-in not found or already completed',
+    'vol_checkin_record_not_found'         => 'Check-in record not found for this token.',
+    'vol_checkin_not_currently_checked_in' => 'Volunteer is not currently checked in.',
+    'vol_checkin_approved_shift_required'  => 'Volunteer is not approved for this shift.',
+    'vol_invalid_checkin_token'            => 'Invalid check-in token.',
+    'vol_checkin_not_yet_available'        => 'Check-in is not yet available. Shift starts at :time',
+    'vol_checkin_already_checked_out'      => 'Volunteer has already checked out.',
     'action_must_be_approve_or_decline'    => 'Action must be approve or decline',
     'type_must_be_org_or_user'             => 'Type must be organization or user',
 

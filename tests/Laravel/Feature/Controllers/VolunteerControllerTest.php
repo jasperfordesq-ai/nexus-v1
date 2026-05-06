@@ -48,6 +48,19 @@ class VolunteerControllerTest extends TestCase
         ]);
     }
 
+    private function addVolunteerToOrganisation(int $userId, int $orgId): void
+    {
+        DB::table('org_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'user_id' => $userId,
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     private function setCaringWorkflowApprovalRequired(bool $approvalRequired): void
     {
         DB::table('tenant_settings')->updateOrInsert(
@@ -186,6 +199,7 @@ public function test_apply_requires_auth(): void
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 20.00, true);
+        $this->addVolunteerToOrganisation($volunteer->id, $orgId);
         $this->setCaringWorkflowApprovalRequired(false);
 
         $logId = VolunteerService::logHours($volunteer->id, [
@@ -222,6 +236,7 @@ public function test_apply_requires_auth(): void
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 1]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 1.00, true);
+        $this->addVolunteerToOrganisation($volunteer->id, $orgId);
         $this->setCaringWorkflowApprovalRequired(false);
 
         $logId = VolunteerService::logHours($volunteer->id, [

@@ -23,6 +23,7 @@
     "unread_count": "unread",
     "empty": "No notifications yet",
     "view_all": "View all notifications",
+    "close": "Close notifications",
     "unread_dot_aria": "Unread"
   },
   "type": {

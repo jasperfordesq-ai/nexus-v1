@@ -46,6 +46,16 @@ class VolunteerCheckInService
     }
 
     /**
+     * Get errors from the last static token operation.
+     *
+     * @return array<int, array{code: string, message: string}>
+     */
+    public static function getTokenErrors(): array
+    {
+        return self::$staticErrors;
+    }
+
+    /**
      * Clear errors.
      */
     private function clearErrors(): void
@@ -115,12 +125,12 @@ class VolunteerCheckInService
                 ->first();
 
             if (!$checkin) {
-                $this->addError('NOT_FOUND', 'Check-in record not found for this token.');
+                $this->addError('NOT_FOUND', __('api.vol_checkin_record_not_found'));
                 return false;
             }
 
             if ($checkin->status !== 'checked_in') {
-                $this->addError('VALIDATION_ERROR', 'Volunteer is not currently checked in.');
+                $this->addError('VALIDATION_ERROR', __('api.vol_checkin_not_currently_checked_in'));
                 return false;
             }
 
@@ -132,7 +142,7 @@ class VolunteerCheckInService
             return true;
         } catch (\Exception $e) {
             Log::error('VolunteerCheckInService::checkOut error: ' . $e->getMessage());
-            $this->addError('INTERNAL_ERROR', 'An unexpected error occurred.');
+            $this->addError('INTERNAL_ERROR', __('api.unexpected_error'));
             return false;
         }
     }
@@ -290,7 +300,7 @@ class VolunteerCheckInService
             ->exists();
 
         if (!$hasApproved) {
-            self::$staticErrors[] = ['code' => 'FORBIDDEN', 'message' => 'Volunteer is not approved for this shift.'];
+            self::$staticErrors[] = ['code' => 'FORBIDDEN', 'message' => __('api.vol_checkin_approved_shift_required')];
             return null;
         }
 
@@ -346,7 +356,7 @@ class VolunteerCheckInService
             ->first();
 
         if (!$checkin) {
-            $this->addError('NOT_FOUND', 'Invalid check-in token.');
+            $this->addError('NOT_FOUND', __('api.vol_invalid_checkin_token'));
             return null;
         }
 
@@ -355,7 +365,7 @@ class VolunteerCheckInService
             $shiftStart = $checkin->shift->start_time;
             $earliestCheckin = $shiftStart->copy()->subMinutes(30);
             if (now()->lt($earliestCheckin)) {
-                $this->addError('VALIDATION_ERROR', 'Check-in is not yet available. Shift starts at ' . $shiftStart->toDateTimeString());
+                $this->addError('VALIDATION_ERROR', __('api.vol_checkin_not_yet_available', ['time' => $shiftStart->toDateTimeString()]));
                 return null;
             }
         }
@@ -378,7 +388,7 @@ class VolunteerCheckInService
         }
 
         if ($checkin->status === 'checked_out') {
-            $this->addError('VALIDATION_ERROR', 'Volunteer has already checked out.');
+            $this->addError('VALIDATION_ERROR', __('api.vol_checkin_already_checked_out'));
             return null;
         }
 

@@ -215,7 +215,10 @@ class VolunteerController extends BaseApiController
                 $organizer = User::find((int) $opportunity->created_by);
                 LocaleContext::withLocale($organizer, function () use ($volunteer, $opportunity) {
                     $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
-                    $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
+                    $notifContent = __('notifications.vol_application_received_body', [
+                        'name' => $volunteerName,
+                        'title' => $opportunity->title,
+                    ]);
                     $orgId = $opportunity->organization_id;
                     $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
 
@@ -303,14 +306,14 @@ class VolunteerController extends BaseApiController
                 $opportunity = VolOpportunity::find($opportunityId);
                 $applicant = User::find((int) $application->user_id);
                 LocaleContext::withLocale($applicant, function () use ($application, $opportunity, $opportunityId, $action) {
-                    $oppTitle = $opportunity->title ?? 'a volunteer opportunity';
+                    $oppTitle = $opportunity->title ?? __('notifications.vol_application_fallback_opportunity');
 
                     if ($action === 'approve') {
-                        $message = "Your volunteer application for \"{$oppTitle}\" was accepted!";
+                        $message = __('notifications.vol_application_approved_body', ['title' => $oppTitle]);
                         $notifType = 'vol_application_approved';
                         $htmlContent = NotificationDispatcher::buildVolApplicationApprovedEmail($oppTitle, $opportunityId);
                     } else {
-                        $message = "Your volunteer application for \"{$oppTitle}\" was not accepted";
+                        $message = __('notifications.vol_application_declined_body', ['title' => $oppTitle]);
                         $notifType = 'vol_application_declined';
                         $htmlContent = NotificationDispatcher::buildVolApplicationDeclinedEmail($oppTitle);
                     }
@@ -393,7 +396,7 @@ class VolunteerController extends BaseApiController
                     $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
                     Notification::createNotification(
                         (int) $shift->opportunity->created_by,
-                        "{$volunteerName} signed up for a shift",
+                        __('notifications.vol_shift_signup_body', ['name' => $volunteerName]),
                         "/volunteering/opportunities/{$shift->opportunity_id}",
                         'volunteering'
                     );

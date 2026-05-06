@@ -52,7 +52,7 @@ interface VolApplication {
 
 export function VolunteerApprovals() {
   const { t } = useTranslation('admin');
-  usePageTitle("Volunteering");
+  usePageTitle(t('volunteering.page_title', 'Volunteering'));
   const toast = useToast();
   const [items, setItems] = useState<VolApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,12 +78,12 @@ export function VolunteerApprovals() {
         }
       }
     } catch {
-      toast.error("Failed to load approvals");
+      toast.error(t('volunteering.failed_to_load_approvals', 'Failed to load approvals'));
       setItems([]);
     }
     setLoading(false);
     setSelectedIds(new Set());
-  }, [toast]);
+  }, [toast, t]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -117,42 +117,42 @@ export function VolunteerApprovals() {
     return result;
   }, [items, statusTab, searchQuery, opportunityFilter]);
 
-  const handleApprove = async (id: number) => {
+  const handleApprove = useCallback(async (id: number) => {
     setActionId(id);
     try {
       const res = await adminVolunteering.approveApplication(id);
       if (res.success) {
-        toast.success("Application Approved");
+        toast.success(t('volunteering.application_approved', 'Application approved'));
         loadData();
       } else {
-        toast.error("Failed to approve application");
+        toast.error(t('volunteering.failed_to_approve_application', 'Failed to approve application'));
       }
     } catch {
-      toast.error("Failed to approve application");
+      toast.error(t('volunteering.failed_to_approve_application', 'Failed to approve application'));
     } finally {
       setActionId(null);
     }
-  };
+  }, [loadData, toast, t]);
 
-  const handleDecline = async (id: number) => {
+  const handleDecline = useCallback(async (id: number) => {
     setActionId(id);
     try {
       const res = await adminVolunteering.declineApplication(id);
       if (res.success) {
-        toast.success("Application Declined");
+        toast.success(t('volunteering.application_declined', 'Application declined'));
         loadData();
       } else {
-        toast.error("Failed to decline application");
+        toast.error(t('volunteering.failed_to_decline_application', 'Failed to decline application'));
       }
     } catch {
-      toast.error("Failed to decline application");
+      toast.error(t('volunteering.failed_to_decline_application', 'Failed to decline application'));
     } finally {
       setActionId(null);
     }
-  };
+  }, [loadData, toast, t]);
 
   // Bulk operations
-  const handleBulkApprove = async () => {
+  const handleBulkApprove = useCallback(async () => {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     let successCount = 0;
@@ -165,9 +165,9 @@ export function VolunteerApprovals() {
     toast.success(t('volunteering.bulk_approved', '{{count}} applications approved', { count: successCount }));
     setBulkLoading(false);
     loadData();
-  };
+  }, [loadData, selectedIds, toast, t]);
 
-  const handleBulkDecline = async () => {
+  const handleBulkDecline = useCallback(async () => {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     let successCount = 0;
@@ -180,26 +180,26 @@ export function VolunteerApprovals() {
     toast.success(t('volunteering.bulk_declined', '{{count}} applications declined', { count: successCount }));
     setBulkLoading(false);
     loadData();
-  };
+  }, [loadData, selectedIds, toast, t]);
 
-  const handleToggleSelect = (id: number) => {
+  const handleToggleSelect = useCallback((id: number) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  };
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (selectedIds.size === filteredItems.length) {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(filteredItems.map(i => i.id)));
     }
-  };
+  }, [filteredItems, selectedIds.size]);
 
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     const exportData = filteredItems.map(i => ({
       name: `${i.first_name} ${i.last_name}`,
       email: i.email,
@@ -209,7 +209,7 @@ export function VolunteerApprovals() {
     }));
     exportToCsv(exportData as Array<Record<string, unknown>>, 'volunteer-approvals.csv');
     toast.success(t('volunteering.export_success', 'Exported successfully'));
-  };
+  }, [filteredItems, toast, t]);
 
   const columns: Column<VolApplication>[] = [
     {
@@ -223,7 +223,7 @@ export function VolunteerApprovals() {
       ),
     },
     {
-      key: 'applicant', label: "Applicant", sortable: true,
+      key: 'applicant', label: t('volunteering.col_applicant', 'Applicant'), sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
           <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" />
@@ -234,17 +234,17 @@ export function VolunteerApprovals() {
         </div>
       ),
     },
-    { key: 'opportunity_title', label: "Opportunity", sortable: true },
+    { key: 'opportunity_title', label: t('volunteering.col_opportunity', 'Opportunity'), sortable: true },
     {
-      key: 'status', label: "Status",
+      key: 'status', label: t('volunteering.col_status', 'Status'),
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'created_at', label: "Applied", sortable: true,
+      key: 'created_at', label: t('volunteering.col_applied', 'Applied'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
-      key: 'actions', label: "Actions",
+      key: 'actions', label: t('volunteering.col_actions', 'Actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -256,7 +256,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            {"Approve"}
+            {t('volunteering.approve', 'Approve')}
           </Button>
           <Button
             size="sm"
@@ -267,7 +267,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            {"Decline"}
+            {t('volunteering.decline', 'Decline')}
           </Button>
         </div>
       ),
@@ -391,8 +391,8 @@ export function VolunteerApprovals() {
   if (!loading && items.length === 0) {
     return (
       <div>
-        <PageHeader title={"Volunteer Approvals"} description={"Review and approve or decline volunteer applications"} />
-        <EmptyState icon={ClipboardCheck} title={"No pending approvals"} description={"All volunteer applications have been reviewed"} />
+        <PageHeader title={t('volunteering.volunteer_approvals_title', 'Volunteer Approvals')} description={t('volunteering.volunteer_approvals_desc', 'Review and approve or decline volunteer applications')} />
+        <EmptyState icon={ClipboardCheck} title={t('volunteering.no_pending_approvals', 'No pending approvals')} description={t('volunteering.desc_all_volunteer_applications_have_been_rev', 'All volunteer applications have been reviewed')} />
       </div>
     );
   }
@@ -400,9 +400,9 @@ export function VolunteerApprovals() {
   return (
     <div>
       <PageHeader
-        title={"Volunteer Approvals"}
-        description={"Review and approve or decline volunteer applications"}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>}
+        title={t('volunteering.volunteer_approvals_title', 'Volunteer Approvals')}
+        description={t('volunteering.volunteer_approvals_desc', 'Review and approve or decline volunteer applications')}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh', 'Refresh')}</Button>}
       />
       <DataTable
         columns={columns}

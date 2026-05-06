@@ -6,48 +6,31 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use App\Services\VolunteerService;
-use App\Models\VolOpportunity;
-use Illuminate\Database\Eloquent\Builder;
-use Mockery;
+use Tests\Laravel\TestCase;
 
-/**
- * @runInSeparateProcess
- * @preserveGlobalState disabled
- */
 class VolunteerServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TenantContext::setById(2);
+    }
+
     public function test_getOpportunities_returns_expected_structure(): void
     {
-        $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('with')->andReturnSelf();
-        $builder->shouldReceive('where')->andReturnSelf();
-        $builder->shouldReceive('orderByDesc')->andReturnSelf();
-        $builder->shouldReceive('limit')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([]));
-        $builder->shouldReceive('count')->andReturn(0);
-
-        Mockery::mock('alias:' . VolOpportunity::class)
-            ->shouldReceive('query')->andReturn($builder);
-
         $result = VolunteerService::getOpportunities();
 
         $this->assertArrayHasKey('items', $result);
         $this->assertArrayHasKey('cursor', $result);
         $this->assertArrayHasKey('has_more', $result);
-        $this->assertEmpty($result['items']);
+        $this->assertIsArray($result['items']);
+        $this->assertIsBool($result['has_more']);
     }
 
     public function test_getById_returns_null_when_not_found(): void
     {
-        $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('with')->andReturnSelf();
-        $builder->shouldReceive('find')->with(999)->andReturn(null);
-
-        Mockery::mock('alias:' . VolOpportunity::class)
-            ->shouldReceive('query')->andReturn($builder);
-
-        $this->assertNull(VolunteerService::getById(999));
+        $this->assertNull(VolunteerService::getById(2147483647));
     }
 }
