@@ -48,11 +48,12 @@ class VolunteerCertificateServiceTest extends TestCase
         DB::shouldReceive('table')->with('vol_certificates')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
+        DB::shouldReceive('limit')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));
 
         $result = VolunteerCertificateService::getUserCertificates(1);
         $this->assertIsArray($result);
-        $this->assertEmpty($result);
+        $this->assertSame(['items' => [], 'cursor' => null, 'has_more' => false], $result);
     }
 
     public function test_generateHtml_returns_null_when_cert_not_found(): void

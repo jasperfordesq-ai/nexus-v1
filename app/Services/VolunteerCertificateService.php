@@ -188,13 +188,12 @@ class VolunteerCertificateService
             return null;
         }
 
-        $cert = DB::table('vol_certificates as vc')
+        $query = DB::table('vol_certificates as vc')
             ->join('users as u', function ($join) {
                 $join->on('vc.user_id', '=', 'u.id')
                      ->on('vc.tenant_id', '=', 'u.tenant_id');
             })
             ->where('vc.verification_code', $code)
-            ->when(TenantContext::getId(), fn ($query, $tenantId) => $query->where('vc.tenant_id', $tenantId))
             ->select(
                 'vc.id',
                 'vc.verification_code',
@@ -205,8 +204,14 @@ class VolunteerCertificateService
                 'vc.generated_at',
                 'u.first_name',
                 'u.last_name'
-            )
-            ->first();
+            );
+
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            $query->where('vc.tenant_id', $tenantId);
+        }
+
+        $cert = $query->first();
 
         if (!$cert) {
             return null;

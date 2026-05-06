@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Page, expect, Locator } from '@playwright/test';
+import { Page, expect, Locator } from '../../node_modules/@playwright/test';
 
 /**
  * Test Utilities for Project NEXUS E2E Tests

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from '../../../node_modules/@playwright/test';
 import { tenantUrl, dismissBlockingModals } from '../../helpers/test-utils';
 
 const opportunity = {
