@@ -180,7 +180,10 @@ class ResearchPartnershipService
         $this->assertAvailable();
 
         $query = DB::table(self::TABLE_EXPORTS . ' as exports')
-            ->leftJoin(self::TABLE_PARTNERS . ' as partners', 'partners.id', '=', 'exports.partner_id')
+            ->leftJoin(self::TABLE_PARTNERS . ' as partners', function ($join): void {
+                $join->on('partners.id', '=', 'exports.partner_id')
+                    ->on('partners.tenant_id', '=', 'exports.tenant_id');
+            })
             ->where('exports.tenant_id', $tenantId);
 
         if ($partnerId !== null) {
@@ -239,13 +242,19 @@ class ResearchPartnershipService
 
         if (Schema::hasTable('vol_logs')) {
             foreach (DB::select(
-                "SELECT DATE_FORMAT(date_logged, '%Y-%m') AS period,
+                "SELECT DATE_FORMAT(vol_logs.date_logged, '%Y-%m') AS period,
                         COUNT(*) AS activity_count,
-                        COUNT(DISTINCT user_id) AS participant_count,
-                        COALESCE(SUM(hours), 0) AS approved_hours
+                        COUNT(DISTINCT vol_logs.user_id) AS participant_count,
+                        COALESCE(SUM(vol_logs.hours), 0) AS approved_hours
                  FROM vol_logs
-                 WHERE tenant_id = ? AND status = 'approved' AND date_logged BETWEEN ? AND ?
-                 GROUP BY DATE_FORMAT(date_logged, '%Y-%m')
+                 INNER JOIN caring_research_consents crc
+                    ON crc.tenant_id = vol_logs.tenant_id
+                   AND crc.user_id = vol_logs.user_id
+                   AND crc.consent_status = 'opted_in'
+                   AND crc.consented_at IS NOT NULL
+                   AND crc.revoked_at IS NULL
+                 WHERE vol_logs.tenant_id = ? AND vol_logs.status = 'approved' AND vol_logs.date_logged BETWEEN ? AND ?
+                 GROUP BY DATE_FORMAT(vol_logs.date_logged, '%Y-%m')
                  ORDER BY period",
                 [$tenantId, $periodStart, $periodEnd]
             ) as $row) {

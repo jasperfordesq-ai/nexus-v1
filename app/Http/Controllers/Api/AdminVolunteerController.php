@@ -1214,7 +1214,7 @@ class AdminVolunteerController extends BaseApiController
             $sql = "SELECT vd.id, vd.user_id, vd.amount, vd.is_anonymous, vd.created_at as donated_at,
                            u.name as user_name, u.email as user_email, u.avatar_url
                     FROM vol_donations vd
-                    LEFT JOIN users u ON vd.user_id = u.id
+                    LEFT JOIN users u ON vd.user_id = u.id AND u.tenant_id = vd.tenant_id
                     WHERE vd.giving_day_id = ? AND vd.tenant_id = ? AND vd.status = 'completed'";
             $params = [$id, $tenantId];
 
@@ -1233,7 +1233,7 @@ class AdminVolunteerController extends BaseApiController
             $items = array_map(fn($r) => [
                 'id' => (int) $r->id,
                 'user_id' => $r->user_id ? (int) $r->user_id : null,
-                'name' => $r->is_anonymous ? 'Anonymous' : ($r->user_name ?? 'Guest'),
+                'name' => $r->is_anonymous ? null : ($r->user_name ?? null),
                 'email' => $r->is_anonymous ? null : $r->user_email,
                 'avatar_url' => $r->is_anonymous ? null : $r->avatar_url,
                 'amount' => (float) $r->amount,
@@ -1244,36 +1244,23 @@ class AdminVolunteerController extends BaseApiController
             $lastItem = end($items);
             $nextCursor = ($hasMore && $lastItem) ? base64_encode((string) $lastItem['id']) : null;
 
-            return response()->json([
-                'success' => true,
-                'data' => $items,
+            return $this->respondWithData($items, [
                 'stats' => [
                     'total_donors' => (int) ($stats->total_donors ?? 0),
                     'anonymous_count' => (int) ($stats->anonymous_count ?? 0),
                     'total_raised' => (float) ($stats->total_raised ?? 0),
                 ],
-                'meta' => [
-                    'per_page' => $perPage,
-                    'has_more' => $hasMore,
-                    'cursor' => $nextCursor,
-                    'stats' => [
-                        'total_donors' => (int) ($stats->total_donors ?? 0),
-                        'anonymous_count' => (int) ($stats->anonymous_count ?? 0),
-                        'total_raised' => (float) ($stats->total_raised ?? 0),
-                    ],
-                ],
+                'per_page' => $perPage,
+                'has_more' => $hasMore,
+                'cursor' => $nextCursor,
             ]);
         } catch (\Exception $e) {
             Log::error("AdminVolunteerController::givingDayDonors error: " . $e->getMessage());
-            return response()->json([
-                'success' => true, 'data' => [],
+            return $this->respondWithData([], [
+                'per_page' => $perPage,
+                'has_more' => false,
+                'cursor' => null,
                 'stats' => ['total_donors' => 0, 'anonymous_count' => 0, 'total_raised' => 0],
-                'meta' => [
-                    'per_page' => $perPage,
-                    'has_more' => false,
-                    'cursor' => null,
-                    'stats' => ['total_donors' => 0, 'anonymous_count' => 0, 'total_raised' => 0],
-                ],
             ]);
         }
     }
@@ -1352,7 +1339,7 @@ class AdminVolunteerController extends BaseApiController
         try {
             $rows = DB::select("
                 SELECT DATE_FORMAT(created_at, ?) as period,
-                       COUNT(DISTINCT user_id) as donors,
+                       COUNT(DISTINCT COALESCE(user_id, id)) as donors,
                        COALESCE(SUM(amount), 0) as amount
                 FROM vol_donations
                 WHERE giving_day_id = ? AND tenant_id = ? AND status = 'completed'

@@ -218,7 +218,9 @@ describe("CreateOpportunityPage", () => {
   it("does not call POST when form is submitted with no title", async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockApprovedOrg] });
     render(<CreateOpportunityPage />);
-    await waitFor(() => screen.getAllByText("Post Volunteer Opportunity").length > 0);
+    await waitFor(() => {
+      expect(screen.getAllByText("Post Volunteer Opportunity").length).toBeGreaterThan(0);
+    });
 
     const submitBtn = screen.getByRole("button", { name: /Publish Opportunity|Submit|Save/i });
     fireEvent.click(submitBtn);

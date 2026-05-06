@@ -38,7 +38,6 @@ import Heart from 'lucide-react/icons/heart';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Laugh from 'lucide-react/icons/laugh';
-import Angry from 'lucide-react/icons/angry';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -143,11 +142,12 @@ function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStruct
 /* ───────────────────────── Emoji Picker ───────────────────────── */
 
 const REACTION_EMOJIS = [
-  { emoji: 'heart', icon: Heart, label: 'Love' },
-  { emoji: 'thumbs_up', icon: ThumbsUp, label: 'Like' },
-  { emoji: 'thumbs_down', icon: ThumbsDown, label: 'Dislike' },
-  { emoji: 'laugh', icon: Laugh, label: 'Haha' },
-  { emoji: 'angry', icon: Angry, label: 'Angry' },
+  { emoji: 'love', icon: Heart },
+  { emoji: 'like', icon: ThumbsUp },
+  { emoji: 'laugh', icon: Laugh },
+  { emoji: 'wow', icon: Smile },
+  { emoji: 'sad', icon: ThumbsDown },
+  { emoji: 'celebrate', icon: Smile },
 ];
 
 /* ───────────────────────── Main Component ───────────────────────── */
@@ -298,7 +298,16 @@ export function BlogPostPage() {
     setComments((prev) => updateCommentReaction(prev, commentId, emoji));
 
     try {
-      await api.post(`/v2/comments/${commentId}/reactions`, { emoji });
+      const response = await api.post<{ action: string; reactions: Record<string, number> }>(
+        `/v2/comments/${commentId}/reactions`,
+        { reaction_type: emoji }
+      );
+      if (response.success && response.data) {
+        const { action, reactions } = response.data;
+        setComments((prev) =>
+          updateCommentReactionFromServer(prev, commentId, emoji, action, reactions)
+        );
+      }
     } catch (err) {
       logError('Failed to toggle reaction', err);
       // Revert on error
@@ -688,11 +697,12 @@ function CommentItem({
   };
 
   const reactionIconMap: Record<string, typeof Heart> = {
-    heart: Heart,
-    thumbs_up: ThumbsUp,
-    thumbs_down: ThumbsDown,
+    love: Heart,
+    like: ThumbsUp,
     laugh: Laugh,
-    angry: Angry,
+    wow: Smile,
+    sad: ThumbsDown,
+    celebrate: Smile,
   };
 
   return (
@@ -941,6 +951,28 @@ function updateCommentReaction(
     }
     if (c.replies && c.replies.length > 0) {
       return { ...c, replies: updateCommentReaction(c.replies, commentId, emoji) };
+    }
+    return c;
+  });
+}
+
+function updateCommentReactionFromServer(
+  comments: BlogComment[],
+  commentId: number,
+  reactionType: string,
+  action: string,
+  reactions: Record<string, number>
+): BlogComment[] {
+  return comments.map((c) => {
+    if (c.id === commentId) {
+      return {
+        ...c,
+        user_reactions: action === 'removed' ? [] : [reactionType],
+        reactions,
+      };
+    }
+    if (c.replies && c.replies.length > 0) {
+      return { ...c, replies: updateCommentReactionFromServer(c.replies, commentId, reactionType, action, reactions) };
     }
     return c;
   });

@@ -16,7 +16,7 @@
  * API: POST/DELETE /api/v2/feed/posts/{id}/share
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -85,6 +85,14 @@ export function ShareButton({
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showExternalShareModal, setShowExternalShareModal] = useState(false);
   const [showDMModal, setShowDMModal] = useState(false);
+
+  useEffect(() => {
+    setLocalCount(shareCount);
+  }, [shareCount]);
+
+  useEffect(() => {
+    setLocalIsShared(isShared);
+  }, [isShared]);
 
   // Resolve the polymorphic identity with a safe fallback to the legacy postId path.
   const resolvedType: FeedItem['type'] = type ?? 'post';

@@ -18,6 +18,7 @@ import { GroupDiscussionTab } from '../tabs/GroupDiscussionTab';
 import type { Discussion, DiscussionDetail } from '../tabs/GroupDiscussionTab';
 import { GroupMembersTab } from '../tabs/GroupMembersTab';
 import type { GroupMember } from '../tabs/GroupMembersTab';
+import type { ReactionType } from '@/components/social';
 import { GroupEventsTab } from '../tabs/GroupEventsTab';
 import { GroupFilesTab } from '../tabs/GroupFilesTab';
 import { GroupAnnouncementsTab } from '../tabs/GroupAnnouncementsTab';
@@ -51,6 +52,7 @@ interface GroupTabContentProps {
   onLoadMoreFeed: () => void;
   onRefreshFeed?: () => void | Promise<void>;
   onToggleLike: (item: FeedItem) => void;
+  onReact: (item: FeedItem, reactionType: ReactionType) => void;
   onHidePost: (item: FeedItem) => void;
   onMuteUser: (userId: number) => void;
   onReportPost: (postId: number) => void;
@@ -106,6 +108,7 @@ export function GroupTabContent({
   onLoadMoreFeed,
   onRefreshFeed,
   onToggleLike,
+  onReact,
   onHidePost,
   onMuteUser,
   onReportPost,
@@ -172,6 +175,7 @@ export function GroupTabContent({
           onLoadMore={onLoadMoreFeed}
           onRefresh={onRefreshFeed}
           onToggleLike={onToggleLike}
+          onReact={onReact}
           onHidePost={onHidePost}
           onMuteUser={onMuteUser}
           onReportPost={onReportPost}

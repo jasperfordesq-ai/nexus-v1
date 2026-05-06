@@ -34,14 +34,15 @@ import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
-import type { FeedItem } from '@/components/feed/types';
+import type { FeedItem, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { dispatchFeedSync } from '@/lib/feedSync';
+import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
+import type { ReactionType } from '@/components/social';
 
 // Reactable feed-item types supported by the polymorphic backend endpoint.
 // Must stay in sync with the allowlist in SocialController::showItem.
@@ -117,6 +118,16 @@ export function PostDetailPage() {
     return () => { abortRef.current?.abort(); };
   }, [id, itemType, t]);
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const payload = (event as CustomEvent<FeedSyncPayload>).detail;
+      setItem((prev) => prev ? applyFeedSyncToItem(prev, payload) : prev);
+    };
+
+    window.addEventListener(FEED_SYNC_EVENT, handler);
+    return () => window.removeEventListener(FEED_SYNC_EVENT, handler);
+  }, []);
+
   // Handlers wrapped in useCallback so FeedCard's React.memo isn't defeated by
   // inline arrows being recreated every render.
   const handleToggleLike = useCallback(async (feedItem: FeedItem) => {
@@ -124,11 +135,39 @@ export function PostDetailPage() {
     const newLikesCount = newIsLiked ? feedItem.likes_count + 1 : feedItem.likes_count - 1;
     setItem((prev) => prev ? { ...prev, is_liked: newIsLiked, likes_count: newLikesCount } : null);
     try {
-      await api.post('/v2/feed/like', { target_type: feedItem.type, target_id: feedItem.id });
-      dispatchFeedSync({ targetType: feedItem.type, targetId: feedItem.id, patch: { is_liked: newIsLiked, likes_count: newLikesCount } });
+      const response = await api.post<{ action?: string; likes_count: number }>('/v2/feed/like', { target_type: feedItem.type, target_id: feedItem.id });
+      if (response.success && response.data) {
+        const serverLiked = response.data.action === 'liked'
+          ? true
+          : response.data.action === 'unliked'
+            ? false
+            : newIsLiked;
+        const serverLikesCount = response.data.likes_count;
+        setItem((prev) => prev ? { ...prev, is_liked: serverLiked, likes_count: serverLikesCount } : null);
+        dispatchFeedSync({ targetType: feedItem.type, targetId: feedItem.id, patch: { is_liked: serverLiked, likes_count: serverLikesCount } });
+      }
     } catch (err) {
       logError('Failed to toggle like', err);
       setItem((prev) => prev ? { ...prev, is_liked: feedItem.is_liked, likes_count: feedItem.likes_count } : null);
+    }
+  }, []);
+
+  const handleReact = useCallback(async (feedItem: FeedItem, reactionType: ReactionType) => {
+    const previousReactions = feedItem.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
+    try {
+      const response = await api.post<{ reactions: FeedItem['reactions'] }>('/v2/reactions', {
+        target_type: feedItem.type,
+        target_id: feedItem.id,
+        reaction_type: reactionType,
+      });
+      if (response.success && response.data?.reactions) {
+        const reactions = response.data.reactions;
+        setItem((prev) => prev ? { ...prev, reactions } : null);
+        dispatchFeedSync({ targetType: feedItem.type, targetId: feedItem.id, patch: { reactions } });
+      }
+    } catch (err) {
+      logError('Failed to react', err);
+      setItem((prev) => prev ? { ...prev, reactions: previousReactions } : null);
     }
   }, []);
 
@@ -200,7 +239,13 @@ export function PostDetailPage() {
 
   const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
     try {
-      await api.post(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
+      const response = await api.post<PollData>(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
+      if (response.success && response.data) {
+        setItem((prev) => prev && prev.id === pollId && prev.type === 'poll'
+          ? { ...prev, poll_data: response.data }
+          : prev
+        );
+      }
     } catch (err) {
       logError('Failed to vote on poll', err);
       toast.error(t('toast.vote_failed'));
@@ -253,6 +298,7 @@ export function PostDetailPage() {
           <FeedCard
             item={item}
             onToggleLike={handleToggleLike}
+            onReact={handleReact}
             onHidePost={handleHidePost}
             onMuteUser={handleMuteUser}
             onReportPost={openReportModal}

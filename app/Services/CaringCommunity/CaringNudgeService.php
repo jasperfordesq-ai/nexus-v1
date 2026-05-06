@@ -11,6 +11,7 @@ namespace App\Services\CaringCommunity;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\CaringTandemMatchingService;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -43,7 +44,7 @@ class CaringNudgeService
     private const SIGNAL_SCORE_HIGH = 0.85;
     private const SIGNAL_SCORE_MEDIUM = 0.7;
 
-    /** @var array<int,bool> userId => optedOut (per-tenant ephemeral cache) */
+    /** @var array<string,bool> "tenant:user" => optedOut */
     private array $optOutCache = [];
 
     /** @var array<string,bool> "tenant:source:target" => recently-nudged */
@@ -52,7 +53,7 @@ class CaringNudgeService
     /** @var array<string,bool> "tenant:target:related" => recently-nudged */
     private array $recentNudgePairCache = [];
 
-    /** @var array<int,string> userId => name */
+    /** @var array<string,string> "tenant:user" => name */
     private array $userNameCache = [];
 
     public function __construct(
@@ -268,39 +269,119 @@ class CaringNudgeService
 
             $lang = $preferredLang[$targetId] ?? '';
 
-            // Wrap the bell render + insert in the recipient's locale so the
-            // message is translated to their preferred_language regardless of
-            // the queue worker's default locale.
-            $notificationId = LocaleContext::withLocale(
-                $lang !== '' ? $lang : null,
-                fn () => Notification::createNotification(
-                    $targetId,
-                    (string) __($notificationKey, $notificationParams),
-                    $url,
-                    'caring_smart_nudge',
-                    false,
-                    $tenantId,
-                ),
-            );
+            $dispatchKey = $this->dispatchKey($tenantId, $candidate, $config['cooldown_days']);
+            $supportsDispatchKey = Schema::hasColumn('caring_smart_nudges', 'dispatch_key');
 
-            $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId([
-                'tenant_id' => $tenantId,
-                'target_user_id' => $targetId,
-                'related_user_id' => $relatedId > 0 ? $relatedId : null,
-                'source_type' => $sourceType,
-                'score' => $candidate['score'],
-                'signals' => json_encode($candidate['signals']),
-                'notification_id' => $notificationId,
-                'status' => 'sent',
-                'sent_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            try {
+                $delivery = DB::transaction(function () use (
+                    $tenantId,
+                    $targetId,
+                    $relatedId,
+                    $sourceType,
+                    $candidate,
+                    $dispatchKey,
+                    $lang,
+                    $notificationKey,
+                    $notificationParams,
+                    $url,
+                    $supportsDispatchKey
+                ): array {
+                    $existing = $supportsDispatchKey
+                        ? DB::table('caring_smart_nudges')
+                            ->where('tenant_id', $tenantId)
+                            ->where('dispatch_key', $dispatchKey)
+                            ->lockForUpdate()
+                            ->first(['id', 'notification_id', 'status'])
+                        : null;
+
+                    if ($existing) {
+                        return [
+                            'duplicated' => true,
+                            'nudge_id' => (int) $existing->id,
+                            'notification_id' => $existing->notification_id ? (int) $existing->notification_id : null,
+                        ];
+                    }
+
+                    $now = now();
+                    $insert = [
+                        'tenant_id' => $tenantId,
+                        'target_user_id' => $targetId,
+                        'related_user_id' => $relatedId > 0 ? $relatedId : null,
+                        'source_type' => $sourceType,
+                        'score' => $candidate['score'],
+                        'signals' => json_encode($candidate['signals']),
+                        'notification_id' => null,
+                        'status' => 'dispatching',
+                        'sent_at' => $now,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    if ($supportsDispatchKey) {
+                        $insert['dispatch_key'] = $dispatchKey;
+                    }
+
+                    $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId($insert);
+
+                    // Wrap the bell render + insert in the recipient's locale
+                    // so the message is translated to their preferred_language.
+                    $notificationId = LocaleContext::withLocale(
+                        $lang !== '' ? $lang : null,
+                        fn () => Notification::createNotification(
+                            $targetId,
+                            (string) __($notificationKey, $notificationParams),
+                            $url,
+                            'caring_smart_nudge',
+                            false,
+                            $tenantId,
+                        ),
+                    );
+
+                    DB::table('caring_smart_nudges')
+                        ->where('tenant_id', $tenantId)
+                        ->where('id', $nudgeId)
+                        ->update([
+                            'notification_id' => $notificationId,
+                            'status' => 'sent',
+                            'updated_at' => now(),
+                        ]);
+
+                    return [
+                        'duplicated' => false,
+                        'nudge_id' => $nudgeId,
+                        'notification_id' => $notificationId,
+                    ];
+                });
+            } catch (QueryException $e) {
+                if (! $this->isDuplicateKeyException($e)) {
+                    throw $e;
+                }
+
+                $existing = $supportsDispatchKey
+                    ? DB::table('caring_smart_nudges')
+                        ->where('tenant_id', $tenantId)
+                        ->where('dispatch_key', $dispatchKey)
+                        ->first(['id', 'notification_id'])
+                    : null;
+                $delivery = [
+                    'duplicated' => true,
+                    'nudge_id' => $existing ? (int) $existing->id : null,
+                    'notification_id' => $existing && $existing->notification_id ? (int) $existing->notification_id : null,
+                ];
+            }
+
+            if (! empty($delivery['duplicated'])) {
+                $items[] = $candidate + [
+                    'status' => 'skipped_duplicate',
+                    'nudge_id' => $delivery['nudge_id'],
+                    'notification_id' => $delivery['notification_id'],
+                ];
+                continue;
+            }
 
             $items[] = $candidate + [
                 'status' => 'sent',
-                'nudge_id' => $nudgeId,
-                'notification_id' => $notificationId,
+                'nudge_id' => $delivery['nudge_id'],
+                'notification_id' => $delivery['notification_id'],
             ];
             $sent++;
         }
@@ -780,8 +861,9 @@ class CaringNudgeService
 
     private function memberOptedOut(int $tenantId, int $userId): bool
     {
-        if (array_key_exists($userId, $this->optOutCache)) {
-            return $this->optOutCache[$userId];
+        $cacheKey = $this->userCacheKey($tenantId, $userId);
+        if (array_key_exists($cacheKey, $this->optOutCache)) {
+            return $this->optOutCache[$cacheKey];
         }
 
         $raw = DB::table('users')
@@ -790,7 +872,7 @@ class CaringNudgeService
             ->value('notification_preferences');
 
         $result = $this->parseOptedOut($raw);
-        $this->optOutCache[$userId] = $result;
+        $this->optOutCache[$cacheKey] = $result;
         return $result;
     }
 
@@ -830,7 +912,7 @@ class CaringNudgeService
 
         $missing = array_values(array_filter(
             $userIds,
-            fn ($id) => !array_key_exists((int) $id, $this->optOutCache),
+            fn ($id) => !array_key_exists($this->userCacheKey($tenantId, (int) $id), $this->optOutCache),
         ));
         if (count($missing) === 0) {
             return;
@@ -844,13 +926,13 @@ class CaringNudgeService
         $seen = [];
         foreach ($rows as $row) {
             $id = (int) $row->id;
-            $this->optOutCache[$id] = $this->parseOptedOut($row->notification_preferences);
+            $this->optOutCache[$this->userCacheKey($tenantId, $id)] = $this->parseOptedOut($row->notification_preferences);
             $seen[$id] = true;
         }
         // Users with no row default to NOT opted out.
         foreach ($missing as $id) {
             if (!isset($seen[(int) $id])) {
-                $this->optOutCache[(int) $id] = false;
+                $this->optOutCache[$this->userCacheKey($tenantId, (int) $id)] = false;
             }
         }
     }
@@ -930,7 +1012,7 @@ class CaringNudgeService
     {
         $userIds = array_values(array_unique(array_filter(
             $userIds,
-            fn ($v) => (int) $v > 0 && !isset($this->userNameCache[(int) $v]),
+            fn ($v) => (int) $v > 0 && !isset($this->userNameCache[$this->userCacheKey($tenantId, (int) $v)]),
         )));
         if (count($userIds) === 0) {
             return;
@@ -942,12 +1024,13 @@ class CaringNudgeService
             ->get(['id', 'name']);
 
         foreach ($rows as $r) {
-            $this->userNameCache[(int) $r->id] = (string) ($r->name ?? '');
+            $this->userNameCache[$this->userCacheKey($tenantId, (int) $r->id)] = (string) ($r->name ?? '');
         }
         // Fill in any missing IDs as empty string.
         foreach ($userIds as $id) {
-            if (!isset($this->userNameCache[(int) $id])) {
-                $this->userNameCache[(int) $id] = '';
+            $cacheKey = $this->userCacheKey($tenantId, (int) $id);
+            if (!isset($this->userNameCache[$cacheKey])) {
+                $this->userNameCache[$cacheKey] = '';
             }
         }
     }
@@ -957,10 +1040,43 @@ class CaringNudgeService
         if ($userId <= 0) {
             return '';
         }
-        if (!isset($this->userNameCache[$userId])) {
+        $cacheKey = $this->userCacheKey($tenantId, $userId);
+        if (!isset($this->userNameCache[$cacheKey])) {
             $this->preloadUserNames($tenantId, [$userId]);
         }
-        return $this->userNameCache[$userId] ?? '';
+        return $this->userNameCache[$cacheKey] ?? '';
+    }
+
+    private function userCacheKey(int $tenantId, int $userId): string
+    {
+        return $tenantId . ':' . $userId;
+    }
+
+    /**
+     * @param array<string,mixed> $candidate
+     */
+    private function dispatchKey(int $tenantId, array $candidate, int $cooldownDays): string
+    {
+        $signals = is_array($candidate['signals'] ?? null) ? $candidate['signals'] : [];
+        $identity = [
+            'tenant_id' => $tenantId,
+            'source_type' => (string) ($candidate['source_type'] ?? 'tandem_candidate'),
+            'target_user_id' => (int) ($candidate['target_user']['id'] ?? 0),
+            'related_user_id' => (int) ($candidate['related_user']['id'] ?? 0),
+            'help_request_id' => isset($signals['help_request_id']) ? (int) $signals['help_request_id'] : null,
+            'sub_region_id' => isset($signals['sub_region_id']) ? (int) $signals['sub_region_id'] : null,
+            'cooldown_bucket' => intdiv(time(), max(1, $cooldownDays) * 86400),
+        ];
+
+        return hash('sha256', json_encode($identity, JSON_UNESCAPED_SLASHES));
+    }
+
+    private function isDuplicateKeyException(\Throwable $e): bool
+    {
+        $code = (string) $e->getCode();
+        $message = strtolower($e->getMessage());
+
+        return $code === '23000' || str_contains($message, 'duplicate');
     }
 
     private function optedOutCount(int $tenantId): int

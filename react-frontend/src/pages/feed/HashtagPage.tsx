@@ -43,7 +43,9 @@ import { usePageTitle } from '@/hooks';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { api } from '@/lib/api';
+import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
+import type { ReactionType } from '@/components/social';
 
 export function HashtagPage() {
   const { t } = useTranslation('feed');
@@ -55,7 +57,7 @@ export function HashtagPage() {
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
-  const [reportPostId, setReportPostId] = useState<number | null>(null);
+  const [reportTarget, setReportTarget] = useState<{ id: number; type: FeedItem['type'] } | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
 
@@ -129,6 +131,17 @@ export function HashtagPage() {
     return () => { abortRef.current?.abort(); };
   }, [tag]);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const payload = (e as CustomEvent<FeedSyncPayload>).detail;
+      setItems((prev) =>
+        prev.map((item) => applyFeedSyncToItem(item, payload))
+      );
+    };
+    window.addEventListener(FEED_SYNC_EVENT, handler);
+    return () => window.removeEventListener(FEED_SYNC_EVENT, handler);
+  }, []);
+
   // Stable refs for toast/t so callbacks don't re-create when i18n loads.
   const toastRef = useRef(toast);
   toastRef.current = toast;
@@ -150,21 +163,84 @@ export function HashtagPage() {
 
   // Feed interactions — wrapped in useCallback to keep FeedCard's React.memo effective.
   const handleToggleLike = useCallback(async (item: FeedItem) => {
+    const originalIsLiked = item.is_liked;
+    const originalLikesCount = item.likes_count;
     setItems((prev) =>
       prev.map((fi) =>
         fi.id === item.id && fi.type === item.type
-          ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+          ? {
+              ...fi,
+              is_liked: !originalIsLiked,
+              likes_count: Math.max(0, originalLikesCount + (originalIsLiked ? -1 : 1)),
+            }
           : fi
       )
     );
     try {
-      await api.post('/v2/feed/like', { target_type: item.type, target_id: item.id });
+      const response = await api.post<{ action: 'liked' | 'unliked'; likes_count: number }>(
+        '/v2/feed/like',
+        { target_type: item.type, target_id: item.id }
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Like toggle failed');
+      }
+      const nextPatch = {
+        is_liked: response.data.action === 'liked',
+        likes_count: response.data.likes_count,
+      };
+      setItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type ? { ...fi, ...nextPatch } : fi
+        )
+      );
+      dispatchFeedSync({
+        targetType: item.type,
+        targetId: item.id,
+        patch: nextPatch,
+      });
     } catch (err) {
       logError('Failed to toggle like', err);
       setItems((prev) =>
         prev.map((fi) =>
           fi.id === item.id && fi.type === item.type
-            ? { ...fi, is_liked: !fi.is_liked, likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1 }
+            ? { ...fi, is_liked: originalIsLiked, likes_count: originalLikesCount }
+            : fi
+        )
+      );
+      toastRef.current.error(tRef.current('toast.like_failed'));
+    }
+  }, []);
+
+  const handleReact = useCallback(async (item: FeedItem, reactionType: ReactionType) => {
+    const originalReactions = item.reactions;
+    try {
+      const response = await api.post<{ reactions: NonNullable<FeedItem['reactions']> }>('/v2/reactions', {
+        target_type: item.type,
+        target_id: item.id,
+        reaction_type: reactionType,
+      });
+      if (!response.success || !response.data?.reactions) {
+        throw new Error(response.error || 'Reaction failed');
+      }
+      const reactions = response.data.reactions;
+      setItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions }
+            : fi
+        )
+      );
+      dispatchFeedSync({
+        targetType: item.type,
+        targetId: item.id,
+        patch: { reactions },
+      });
+    } catch (err) {
+      logError('Failed to react to feed item', err);
+      setItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions: originalReactions }
             : fi
         )
       );
@@ -225,23 +301,23 @@ export function HashtagPage() {
   }, []);
 
   const openReportModal = useCallback((item: FeedItem) => {
-    setReportPostId(item.id);
+    setReportTarget({ id: item.id, type: item.type });
     setReportReason('');
     onReportOpen();
   }, [onReportOpen]);
 
   const handleReport = async () => {
-    if (!reportPostId || !reportReason.trim()) {
+    if (!reportTarget || !reportReason.trim()) {
       toast.error(t('toast.provide_reason'));
       return;
     }
     try {
       setIsReporting(true);
-      await api.post(`/v2/feed/posts/${reportPostId}/report`, {
+      await api.post(`/v2/feed/items/${reportTarget.type}/${reportTarget.id}/report`, {
         reason: reportReason.trim(),
       });
       onReportClose();
-      setReportPostId(null);
+      setReportTarget(null);
       setReportReason('');
       toast.success(t('toast.reported'));
     } catch (err) {
@@ -336,6 +412,7 @@ export function HashtagPage() {
                       onReportPost={openReportModal}
                       onDeletePost={handleDeletePost}
                       onVotePoll={handleVotePoll}
+                      onReact={handleReact}
                       feedMode="recent"
                       isAuthenticated={isAuthenticated}
                       currentUserId={user?.id}
@@ -411,7 +488,10 @@ export function HashtagPage() {
         <ModalFooter>
           <Button
             variant="flat"
-            onPress={onReportClose}
+            onPress={() => {
+              onReportClose();
+              setReportTarget(null);
+            }}
             className="text-[var(--text-muted)]"
           >
             {t('report.cancel')}

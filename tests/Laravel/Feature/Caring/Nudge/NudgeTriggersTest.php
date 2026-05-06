@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\CaringNudgeService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
@@ -129,5 +130,51 @@ class NudgeTriggersTest extends TestCase
 
         $matching = collect($candidates)->where('source_type', 'helper_at_risk')->where('target_user.id', $helper->id);
         $this->assertCount(0, $matching, 'helper_at_risk candidate should be suppressed by cooldown');
+    }
+
+    public function test_nudge_dispatch_is_tenant_cache_safe_and_idempotent(): void
+    {
+        $this->bootTenant();
+        if (!Schema::hasTable('vol_logs') || !Schema::hasTable('caring_smart_nudges')) {
+            $this->markTestSkipped('Required tables missing.');
+        }
+
+        NotificationFacade::fake();
+
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'caring_community.nudges.enabled'],
+            [
+                'setting_value' => '1',
+                'setting_type' => 'boolean',
+                'category' => 'caring_community',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+
+        $helper = User::factory()->forTenant($this->testTenantId)->create([
+            'notification_preferences' => json_encode(['caring_smart_nudges' => true]),
+        ]);
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $helper->id,
+            'date_logged' => date('Y-m-d', strtotime('-50 days')),
+            'hours' => 2.0,
+            'description' => 'Old',
+            'status' => 'approved',
+            'created_at' => now()->subDays(50),
+        ]);
+
+        $service = app(CaringNudgeService::class);
+        $first = $service->dispatchDue($this->testTenantId, 10);
+        $second = $service->dispatchDue($this->testTenantId, 10);
+
+        $this->assertGreaterThanOrEqual(1, $first['sent']);
+        $this->assertGreaterThanOrEqual(0, $second['sent']);
+        $this->assertSame(1, (int) DB::table('caring_smart_nudges')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('target_user_id', $helper->id)
+            ->where('source_type', 'helper_at_risk')
+            ->count());
     }
 }

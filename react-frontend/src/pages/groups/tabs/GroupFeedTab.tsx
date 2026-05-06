@@ -26,6 +26,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
+import type { ReactionType } from '@/components/social';
 
 interface GroupFeedTabProps {
   isMember: boolean;
@@ -40,6 +41,7 @@ interface GroupFeedTabProps {
   /** Optional pull-to-refresh handler — when provided, mobile pull gesture refreshes the feed */
   onRefresh?: () => void | Promise<void>;
   onToggleLike: (item: FeedItem) => void;
+  onReact: (item: FeedItem, reactionType: ReactionType) => void;
   onHidePost: (item: FeedItem) => void;
   onMuteUser: (userId: number) => void;
   onReportPost: (postId: number) => void;
@@ -59,6 +61,7 @@ export function GroupFeedTab({
   onLoadMore,
   onRefresh,
   onToggleLike,
+  onReact,
   onHidePost,
   onMuteUser,
   onReportPost,
@@ -123,14 +126,14 @@ export function GroupFeedTab({
         <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onComposeOpen}>
           <div className="flex items-center gap-3">
             <Avatar
-              name={currentUser?.first_name || 'You'}
+              name={currentUser?.first_name || t('detail.you')}
               src={resolveAvatarUrl(currentUser?.avatar)}
               size="sm"
               isBordered
               className="ring-2 ring-[var(--border-default)]"
             />
             <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
-              {t('detail.feed_whats_on_your_mind', "What's on your mind?")}
+              {t('detail.feed_whats_on_your_mind')}
             </div>
           </div>
         </GlassCard>
@@ -183,6 +186,7 @@ export function GroupFeedTab({
                 <FeedCard
                   item={item}
                   onToggleLike={() => onToggleLike(item)}
+                  onReact={(feedItem, reactionType) => onReact(feedItem, reactionType)}
                   onHidePost={() => onHidePost(item)}
                   onMuteUser={() => onMuteUser(getAuthor(item).id)}
                   onReportPost={() => onReportPost(item.id)}

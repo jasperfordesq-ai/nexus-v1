@@ -26,8 +26,9 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { dispatchFeedSync } from '@/lib/feedSync';
+import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import type { FeedItem } from '@/components/feed/types';
+import type { ReactionType } from '@/components/social';
 import type { Group, User, FeedPost, Event } from '@/types/api';
 
 // Tab types
@@ -305,7 +306,7 @@ export function GroupDetailPage() {
     } catch (err) {
       logError('Failed to load group feed', err);
       if (!append) {
-        toastRef.current.error(tRef.current('toast.feed_load_failed', 'Failed to load feed'));
+        toastRef.current.error(tRef.current('toast.feed_load_failed'));
       }
     } finally {
       setFeedLoading(false);
@@ -313,6 +314,16 @@ export function GroupDetailPage() {
       setFeedLoaded(true);
     }
   }, [id]);
+
+  useEffect(() => {
+    const handler = (event: globalThis.Event) => {
+      const payload = (event as unknown as CustomEvent<FeedSyncPayload>).detail;
+      setFeedItems((prev) => prev.map((item) => applyFeedSyncToItem(item, payload)));
+    };
+
+    window.addEventListener(FEED_SYNC_EVENT, handler as EventListener);
+    return () => window.removeEventListener(FEED_SYNC_EVENT, handler as EventListener);
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'feed' && !feedLoaded && group && isMember(group)) {
@@ -335,8 +346,23 @@ export function GroupDetailPage() {
       )
     );
     try {
-      await api.post('/v2/feed/like', { target_type: item.type, target_id: item.id });
-      dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { is_liked: newIsLiked, likes_count: newLikesCount } });
+      const response = await api.post<{ action?: string; likes_count: number }>('/v2/feed/like', { target_type: item.type, target_id: item.id });
+      if (response.success && response.data) {
+        const serverLiked = response.data.action === 'liked'
+          ? true
+          : response.data.action === 'unliked'
+            ? false
+            : newIsLiked;
+        const serverLikesCount = response.data.likes_count;
+        setFeedItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, is_liked: serverLiked, likes_count: serverLikesCount }
+              : fi
+          )
+        );
+        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { is_liked: serverLiked, likes_count: serverLikesCount } });
+      }
     } catch (err) {
       logError('Failed to toggle like', err);
       setFeedItems((prev) =>
@@ -349,14 +375,45 @@ export function GroupDetailPage() {
     }
   };
 
+  const handleFeedReact = async (item: FeedItem, reactionType: ReactionType) => {
+    const previousReactions = item.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
+    try {
+      const response = await api.post<{ reactions: FeedItem['reactions'] }>('/v2/reactions', {
+        target_type: item.type,
+        target_id: item.id,
+        reaction_type: reactionType,
+      });
+      if (response.success && response.data?.reactions) {
+        const reactions = response.data.reactions;
+        setFeedItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, reactions }
+              : fi
+          )
+        );
+        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { reactions } });
+      }
+    } catch (err) {
+      logError('Failed to react', err);
+      setFeedItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions: previousReactions }
+            : fi
+        )
+      );
+    }
+  };
+
   const handleFeedHidePost = async (item: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
       setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.post_hidden', 'Post hidden'));
+      toastRef.current.success(tRef.current('toast.post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toastRef.current.error(tRef.current('toast.hide_failed', 'Failed to hide post'));
+      toastRef.current.error(tRef.current('toast.hide_failed'));
     }
   };
 
@@ -367,10 +424,10 @@ export function GroupDetailPage() {
         const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
         return !author || author.id !== userId;
       }));
-      toastRef.current.success(tRef.current('toast.user_muted', 'User muted'));
+      toastRef.current.success(tRef.current('toast.user_muted'));
     } catch (err) {
       logError('Failed to mute user', err);
-      toastRef.current.error(tRef.current('toast.mute_failed', 'Failed to mute user'));
+      toastRef.current.error(tRef.current('toast.mute_failed'));
     }
   };
 
@@ -382,7 +439,7 @@ export function GroupDetailPage() {
 
   const handleFeedReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toastRef.current.error(tRef.current('toast.provide_reason', 'Please provide a reason'));
+      toastRef.current.error(tRef.current('toast.provide_reason'));
       return;
     }
     try {
@@ -391,10 +448,10 @@ export function GroupDetailPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toastRef.current.success(tRef.current('toast.reported', 'Post reported'));
+      toastRef.current.success(tRef.current('toast.reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toastRef.current.error(tRef.current('toast.report_failed', 'Failed to report post'));
+      toastRef.current.error(tRef.current('toast.report_failed'));
     } finally {
       setIsReporting(false);
     }
@@ -404,10 +461,10 @@ export function GroupDetailPage() {
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.deleted', 'Post deleted'));
+      toastRef.current.success(tRef.current('toast.post_deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toastRef.current.error(tRef.current('toast.delete_failed', 'Failed to delete post'));
+      toastRef.current.error(tRef.current('toast.post_delete_failed'));
     }
   };
 
@@ -425,7 +482,7 @@ export function GroupDetailPage() {
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toastRef.current.error(tRef.current('toast.vote_failed', 'Failed to vote'));
+      toastRef.current.error(tRef.current('toast.vote_failed'));
     }
   };
 
@@ -1077,6 +1134,7 @@ export function GroupDetailPage() {
         onLoadMoreFeed={() => loadGroupFeed(true)}
         onRefreshFeed={() => { feedCursorRef.current = undefined; return loadGroupFeed(false); }}
         onToggleLike={handleFeedToggleLike}
+        onReact={handleFeedReact}
         onHidePost={handleFeedHidePost}
         onMuteUser={handleFeedMuteUser}
         onReportPost={openFeedReportModal}

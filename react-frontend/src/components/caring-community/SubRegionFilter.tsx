@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Select, SelectItem } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
+import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -43,7 +44,7 @@ export interface SubRegionFilterProps {
   label?: string;
 }
 
-const STORAGE_KEY = 'nexus.caring.subRegions.cache.v1';
+const STORAGE_KEY_PREFIX = 'nexus.caring.subRegions.cache.v1';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 interface CachedPayload {
@@ -51,9 +52,13 @@ interface CachedPayload {
   regions: SubRegion[];
 }
 
-function readCache(): SubRegion[] | null {
+function storageKey(tenantKey: string): string {
+  return `${STORAGE_KEY_PREFIX}.${tenantKey}`;
+}
+
+function readCache(tenantKey: string): SubRegion[] | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey(tenantKey));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CachedPayload;
     if (!parsed?.fetched_at || !Array.isArray(parsed.regions)) return null;
@@ -64,10 +69,10 @@ function readCache(): SubRegion[] | null {
   }
 }
 
-function writeCache(regions: SubRegion[]): void {
+function writeCache(tenantKey: string, regions: SubRegion[]): void {
   try {
     const payload: CachedPayload = { fetched_at: Date.now(), regions };
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    window.localStorage.setItem(storageKey(tenantKey), JSON.stringify(payload));
   } catch {
     /* ignore quota / privacy-mode failures */
   }
@@ -80,30 +85,39 @@ export function SubRegionFilter({
   label,
 }: SubRegionFilterProps) {
   const { t } = useTranslation('common');
-  const [regions, setRegions] = useState<SubRegion[] | null>(() => readCache());
+  const { tenant, tenantSlug } = useTenant();
+  const tenantKey = tenant?.slug ?? tenantSlug ?? (tenant?.id ? String(tenant.id) : 'global');
+  const [regions, setRegions] = useState<SubRegion[] | null>(() => readCache(tenantKey));
   const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    const cached = readCache(tenantKey);
+    if (cached) {
+      setRegions(cached);
+    } else {
+      setRegions(null);
+    }
+    setLoadFailed(false);
     void (async () => {
       try {
         const res = await api.get<SubRegionListResponse>('/v2/caring-community/sub-regions');
         if (cancelled) return;
         const list = (res.data?.data ?? []).filter((r) => r.status === 'active');
         setRegions(list);
-        writeCache(list);
+        writeCache(tenantKey, list);
       } catch (err) {
         if (cancelled) return;
         logError('SubRegionFilter.fetch', err);
         // Soft-fail: hide the filter for tenants without the feature, keep cached if present.
-        if (!regions) setLoadFailed(true);
+        if (!cached) setLoadFailed(true);
       }
     })();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tenantKey]);
 
   const grouped = useMemo(() => {
     if (!regions) return null;

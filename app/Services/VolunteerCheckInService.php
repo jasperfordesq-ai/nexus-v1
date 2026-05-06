@@ -9,8 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Models\VolApplication;
 use App\Models\VolShift;
-use App\Models\VolShiftCheckin;
-use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -71,6 +70,11 @@ class VolunteerCheckInService
         $this->errors[] = ['code' => $code, 'message' => $message];
     }
 
+    private static function dateTimeString(mixed $value): ?string
+    {
+        return $value ? Carbon::parse($value)->toDateTimeString() : null;
+    }
+
     /**
      * Check in a volunteer for an opportunity (legacy-compatible signature).
      */
@@ -84,7 +88,8 @@ class VolunteerCheckInService
                 return false;
             }
 
-            $checkin = VolShiftCheckin::where('shift_id', $shift->id)
+            $checkin = DB::table('vol_shift_checkins')
+                ->where('shift_id', $shift->id)
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->first();
@@ -97,10 +102,10 @@ class VolunteerCheckInService
                 return true; // already checked in
             }
 
-            $checkin->update([
-                'status' => 'checked_in',
-                'checked_in_at' => now(),
-            ]);
+            DB::table('vol_shift_checkins')
+                ->where('id', $checkin->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'checked_in', 'checked_in_at' => now(), 'updated_at' => now()]);
 
             return true;
         } catch (\Exception $e) {
@@ -120,7 +125,8 @@ class VolunteerCheckInService
         $this->clearErrors();
 
         try {
-            $checkin = VolShiftCheckin::where('qr_token', $token)
+            $checkin = DB::table('vol_shift_checkins')
+                ->where('qr_token', $token)
                 ->where('tenant_id', TenantContext::getId())
                 ->first();
 
@@ -134,10 +140,10 @@ class VolunteerCheckInService
                 return false;
             }
 
-            $checkin->update([
-                'status' => 'checked_out',
-                'checked_out_at' => now(),
-            ]);
+            DB::table('vol_shift_checkins')
+                ->where('id', $checkin->id)
+                ->where('tenant_id', TenantContext::getId())
+                ->update(['status' => 'checked_out', 'checked_out_at' => now(), 'updated_at' => now()]);
 
             return true;
         } catch (\Exception $e) {
@@ -160,7 +166,8 @@ class VolunteerCheckInService
                 return false;
             }
 
-            $checkin = VolShiftCheckin::where('shift_id', $shift->id)
+            $checkin = DB::table('vol_shift_checkins')
+                ->where('shift_id', $shift->id)
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'checked_in')
@@ -170,10 +177,10 @@ class VolunteerCheckInService
                 return false;
             }
 
-            $checkin->update([
-                'status' => 'checked_out',
-                'checked_out_at' => now(),
-            ]);
+            DB::table('vol_shift_checkins')
+                ->where('id', $checkin->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'checked_out', 'checked_out_at' => now(), 'updated_at' => now()]);
 
             return true;
         } catch (\Exception $e) {
@@ -192,21 +199,33 @@ class VolunteerCheckInService
                 ->where('tenant_id', $tenantId)
                 ->pluck('id');
 
-            return VolShiftCheckin::with('user')
-                ->whereIn('shift_id', $shiftIds)
-                ->where('tenant_id', $tenantId)
-                ->orderBy('created_at', 'asc')
-                ->get()
+            return DB::table('vol_shift_checkins as c')
+                ->leftJoin('users as u', function ($join) {
+                    $join->on('c.user_id', '=', 'u.id')
+                        ->on('c.tenant_id', '=', 'u.tenant_id');
+                })
+                ->whereIn('c.shift_id', $shiftIds)
+                ->where('c.tenant_id', $tenantId)
+                ->orderBy('c.created_at', 'asc')
+                ->get([
+                    'c.id',
+                    'c.user_id',
+                    'c.status',
+                    'c.checked_in_at',
+                    'c.checked_out_at',
+                    'u.name as user_name',
+                    'u.avatar_url',
+                ])
                 ->map(fn ($c) => [
-                    'id' => $c->id,
+                    'id' => (int) $c->id,
                     'user' => [
-                        'id' => $c->user_id,
-                        'name' => $c->user->name ?? '',
-                        'avatar_url' => $c->user->avatar_url ?? null,
+                        'id' => (int) $c->user_id,
+                        'name' => $c->user_name ?? '',
+                        'avatar_url' => $c->avatar_url ?? null,
                     ],
                     'status' => $c->status,
-                    'checked_in_at' => $c->checked_in_at?->toDateTimeString(),
-                    'checked_out_at' => $c->checked_out_at?->toDateTimeString(),
+                    'checked_in_at' => self::dateTimeString($c->checked_in_at),
+                    'checked_out_at' => self::dateTimeString($c->checked_out_at),
                 ])
                 ->toArray();
         } catch (\Exception $e) {
@@ -225,7 +244,8 @@ class VolunteerCheckInService
                 ->where('tenant_id', $tenantId)
                 ->pluck('id');
 
-            return VolShiftCheckin::whereIn('shift_id', $shiftIds)
+            return DB::table('vol_shift_checkins')
+                ->whereIn('shift_id', $shiftIds)
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'checked_in')
@@ -257,7 +277,8 @@ class VolunteerCheckInService
             return null;
         }
 
-        $checkin = VolShiftCheckin::where('shift_id', $shiftId)
+        $checkin = DB::table('vol_shift_checkins')
+            ->where('shift_id', $shiftId)
             ->where('user_id', $userId)
             ->where('tenant_id', $tenantId)
             ->first();
@@ -273,8 +294,8 @@ class VolunteerCheckInService
             'qr_token' => $checkin->qr_token,
             'qr_url' => $baseUrl . '/api/v2/volunteering/checkin/verify/' . $checkin->qr_token,
             'status' => $checkin->status,
-            'checked_in_at' => $checkin->checked_in_at?->toDateTimeString(),
-            'checked_out_at' => $checkin->checked_out_at?->toDateTimeString(),
+            'checked_in_at' => self::dateTimeString($checkin->checked_in_at),
+            'checked_out_at' => self::dateTimeString($checkin->checked_out_at),
         ];
     }
 
@@ -305,7 +326,8 @@ class VolunteerCheckInService
         }
 
         // Check for existing token (tenant-scoped)
-        $existing = VolShiftCheckin::where('shift_id', $shiftId)
+        $existing = DB::table('vol_shift_checkins')
+            ->where('shift_id', $shiftId)
             ->where('user_id', $volunteerId)
             ->where('tenant_id', $tenantId)
             ->whereNotNull('qr_token')
@@ -317,12 +339,14 @@ class VolunteerCheckInService
 
         $token = bin2hex(random_bytes(32));
 
-        VolShiftCheckin::create([
+        DB::table('vol_shift_checkins')->insert([
             'tenant_id' => $tenantId,
             'shift_id' => $shiftId,
             'user_id' => $volunteerId,
             'qr_token' => $token,
             'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return $token;
@@ -333,7 +357,8 @@ class VolunteerCheckInService
      */
     public static function getShiftIdByToken(string $token, int $tenantId): ?int
     {
-        $shiftId = VolShiftCheckin::where('qr_token', $token)
+        $shiftId = DB::table('vol_shift_checkins')
+            ->where('qr_token', $token)
             ->where('tenant_id', $tenantId)
             ->value('shift_id');
 
@@ -350,9 +375,29 @@ class VolunteerCheckInService
     {
         $this->clearErrors();
 
-        $checkin = VolShiftCheckin::with(['shift', 'user:id,first_name,last_name,avatar_url'])
-            ->where('qr_token', $token)
-            ->where('tenant_id', TenantContext::getId())
+        $tenantId = TenantContext::getId();
+        $checkin = DB::table('vol_shift_checkins as c')
+            ->leftJoin('vol_shifts as s', function ($join) {
+                $join->on('c.shift_id', '=', 's.id')
+                    ->on('c.tenant_id', '=', 's.tenant_id');
+            })
+            ->leftJoin('users as u', function ($join) {
+                $join->on('c.user_id', '=', 'u.id')
+                    ->on('c.tenant_id', '=', 'u.tenant_id');
+            })
+            ->where('c.qr_token', $token)
+            ->where('c.tenant_id', $tenantId)
+            ->select([
+                'c.id',
+                'c.shift_id',
+                'c.user_id',
+                'c.status',
+                'c.checked_in_at',
+                's.start_time',
+                's.end_time',
+                'u.name as user_name',
+                'u.avatar_url',
+            ])
             ->first();
 
         if (!$checkin) {
@@ -361,8 +406,8 @@ class VolunteerCheckInService
         }
 
         // Check if the shift has started (allow 30 min early)
-        if ($checkin->shift && $checkin->shift->start_time) {
-            $shiftStart = $checkin->shift->start_time;
+        if ($checkin->start_time) {
+            $shiftStart = Carbon::parse($checkin->start_time);
             $earliestCheckin = $shiftStart->copy()->subMinutes(30);
             if (now()->lt($earliestCheckin)) {
                 $this->addError('VALIDATION_ERROR', __('api.vol_checkin_not_yet_available', ['time' => $shiftStart->toDateTimeString()]));
@@ -373,16 +418,16 @@ class VolunteerCheckInService
         if ($checkin->status === 'checked_in') {
             return [
                 'status' => 'already_checked_in',
-                'checked_in_at' => $checkin->checked_in_at?->toDateTimeString(),
+                'checked_in_at' => self::dateTimeString($checkin->checked_in_at),
                 'user' => [
-                    'id' => $checkin->user_id,
-                    'name' => $checkin->user->name ?? '',
-                    'avatar_url' => $checkin->user->avatar_url ?? null,
+                    'id' => (int) $checkin->user_id,
+                    'name' => $checkin->user_name ?? '',
+                    'avatar_url' => $checkin->avatar_url ?? null,
                 ],
                 'shift' => [
-                    'id' => $checkin->shift_id,
-                    'start_time' => $checkin->shift->start_time?->toDateTimeString(),
-                    'end_time' => $checkin->shift->end_time?->toDateTimeString(),
+                    'id' => (int) $checkin->shift_id,
+                    'start_time' => self::dateTimeString($checkin->start_time),
+                    'end_time' => self::dateTimeString($checkin->end_time),
                 ],
             ];
         }
@@ -392,23 +437,23 @@ class VolunteerCheckInService
             return null;
         }
 
-        $checkin->update([
-            'status' => 'checked_in',
-            'checked_in_at' => now(),
-        ]);
+        DB::table('vol_shift_checkins')
+            ->where('id', $checkin->id)
+            ->where('tenant_id', $tenantId)
+            ->update(['status' => 'checked_in', 'checked_in_at' => now(), 'updated_at' => now()]);
 
         return [
             'status' => 'checked_in',
             'checked_in_at' => now()->toDateTimeString(),
             'user' => [
-                'id' => $checkin->user_id,
-                'name' => $checkin->user->name ?? '',
-                'avatar_url' => $checkin->user->avatar_url ?? null,
+                'id' => (int) $checkin->user_id,
+                'name' => $checkin->user_name ?? '',
+                'avatar_url' => $checkin->avatar_url ?? null,
             ],
             'shift' => [
-                'id' => $checkin->shift_id,
-                'start_time' => $checkin->shift->start_time?->toDateTimeString(),
-                'end_time' => $checkin->shift->end_time?->toDateTimeString(),
+                'id' => (int) $checkin->shift_id,
+                'start_time' => self::dateTimeString($checkin->start_time),
+                'end_time' => self::dateTimeString($checkin->end_time),
             ],
         ];
     }
@@ -418,7 +463,8 @@ class VolunteerCheckInService
      */
     public static function getUserIdByToken(string $token): ?int
     {
-        $userId = VolShiftCheckin::where('qr_token', $token)
+        $userId = DB::table('vol_shift_checkins')
+            ->where('qr_token', $token)
             ->where('tenant_id', TenantContext::getId())
             ->value('user_id');
 
@@ -433,21 +479,33 @@ class VolunteerCheckInService
      */
     public function getShiftCheckIns(int $shiftId): array
     {
-        return VolShiftCheckin::with('user')
-            ->where('shift_id', $shiftId)
-            ->where('tenant_id', TenantContext::getId())
-            ->orderBy('created_at', 'asc')
-            ->get()
+        return DB::table('vol_shift_checkins as c')
+            ->leftJoin('users as u', function ($join) {
+                $join->on('c.user_id', '=', 'u.id')
+                    ->on('c.tenant_id', '=', 'u.tenant_id');
+            })
+            ->where('c.shift_id', $shiftId)
+            ->where('c.tenant_id', TenantContext::getId())
+            ->orderBy('c.created_at', 'asc')
+            ->get([
+                'c.id',
+                'c.user_id',
+                'c.status',
+                'c.checked_in_at',
+                'c.checked_out_at',
+                'u.name as user_name',
+                'u.avatar_url',
+            ])
             ->map(fn ($c) => [
-                'id' => $c->id,
+                'id' => (int) $c->id,
                 'user' => [
-                    'id' => $c->user_id,
-                    'name' => $c->user->name ?? '',
-                    'avatar_url' => $c->user->avatar_url ?? null,
+                    'id' => (int) $c->user_id,
+                    'name' => $c->user_name ?? '',
+                    'avatar_url' => $c->avatar_url ?? null,
                 ],
                 'status' => $c->status,
-                'checked_in_at' => $c->checked_in_at?->toDateTimeString(),
-                'checked_out_at' => $c->checked_out_at?->toDateTimeString(),
+                'checked_in_at' => self::dateTimeString($c->checked_in_at),
+                'checked_out_at' => self::dateTimeString($c->checked_out_at),
             ])
             ->toArray();
     }

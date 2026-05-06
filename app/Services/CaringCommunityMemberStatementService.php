@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\CsvExportSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -302,7 +303,10 @@ class CaringCommunityMemberStatementService
     {
         $lines = [];
         foreach ($rows as $row) {
-            $lines[] = implode(',', array_map(fn (string $value): string => '"' . str_replace('"', '""', $value) . '"', $row));
+            $lines[] = implode(',', array_map(
+                fn (string $value): string => '"' . str_replace('"', '""', $value) . '"',
+                CsvExportSanitizer::row($row),
+            ));
         }
 
         return implode("\n", $lines) . "\n";

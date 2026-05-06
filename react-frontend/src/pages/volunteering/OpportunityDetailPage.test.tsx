@@ -142,7 +142,7 @@ describe('OpportunityDetailPage', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<OpportunityDetailPage />);
     // LoadingScreen renders during data fetch — document should be in loading state
-    expect(document.body).toBeTruthy();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('renders opportunity title and organisation on success', async () => {

@@ -719,9 +719,8 @@ function RemindersTab() {
   const [reminders, setReminders] = useState<ReminderSetting[]>(defaultReminders);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [testingKey, setTestingKey] = useState<string | null>(null);
+  const [runningReminderJob, setRunningReminderJob] = useState(false);
   const { isOpen: isTestOpen, onOpen: onTestOpen, onClose: onTestClose } = useDisclosure();
-  const [testReminderLabel, setTestReminderLabel] = useState('');
 
   // Delivery log state
   interface DeliveryLog {
@@ -806,13 +805,8 @@ function RemindersTab() {
     setSaving(false);
   };
 
-  const openTestConfirm = (reminder: ReminderSetting) => {
-    setTestingKey(reminder.key);
-    setTestReminderLabel(reminder.label);
-    onTestOpen();
-  };
-
   const handleTestSend = async () => {
+    setRunningReminderJob(true);
     try {
       const res = await adminVolunteering.sendShiftReminders();
       if (!res.success) {
@@ -820,16 +814,15 @@ function RemindersTab() {
       }
       onTestClose();
       toast.success(
-        t('volunteering.test_reminder_sent', 'Reminder job sent {{count}} notification(s)', {
+        t('volunteering.reminder_job_sent', 'Reminder job sent {{count}} notification(s)', {
           count: (res.data as { reminders_sent?: number } | undefined)?.reminders_sent ?? 0,
-          label: testReminderLabel,
         }),
       );
       loadDeliveryLogs();
     } catch {
-      toast.error(t('volunteering.test_reminder_failed', 'Failed to send reminder job'));
+      toast.error(t('volunteering.reminder_job_failed', 'Failed to send reminder job'));
     } finally {
-      setTestingKey(null);
+      setRunningReminderJob(false);
     }
   };
 
@@ -840,6 +833,9 @@ function RemindersTab() {
         <div className="flex gap-2">
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('common.refresh', 'Refresh')}
+          </Button>
+          <Button variant="flat" color="primary" startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
+            {t('volunteering.run_due_reminders', 'Run Due Reminders')}
           </Button>
           <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>
             {t('common.save', 'Save')}
@@ -863,18 +859,6 @@ function RemindersTab() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {reminder.enabled && (
-                      <Button
-                        size="sm"
-                        variant="flat"
-                        color="primary"
-                        startContent={<Send size={14} />}
-                        onPress={() => openTestConfirm(reminder)}
-                        isLoading={testingKey === reminder.key}
-                      >
-                        {t('volunteering.send_test', 'Send Test')}
-                      </Button>
-                    )}
                     <Chip size="sm" variant="flat" color={reminder.enabled ? 'success' : 'default'}>
                       {reminder.enabled
                         ? t('volunteering.enabled', 'Enabled')
@@ -1040,23 +1024,22 @@ function RemindersTab() {
         )}
       </div>
 
-      {/* Test Send Confirmation Modal */}
+      {/* Reminder Job Confirmation Modal */}
       <Modal isOpen={isTestOpen} onClose={onTestClose} size="sm">
         <ModalContent>
-          <ModalHeader>{t('volunteering.test_reminder_title', 'Send Test Notification')}</ModalHeader>
+          <ModalHeader>{t('volunteering.run_reminder_job_title', 'Run Due Shift Reminders')}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">
               {t(
-                'volunteering.test_reminder_confirm',
-                'Send a test "{{label}}" notification to yourself?',
-                { label: testReminderLabel },
+                'volunteering.run_reminder_job_confirm',
+                'Send due shift reminders for active opportunities in this community?',
               )}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onTestClose}>{t('common.cancel', 'Cancel')}</Button>
-            <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend}>
-              {t('volunteering.confirm_send_test', 'Send Test')}
+            <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
+              {t('volunteering.confirm_run_reminders', 'Run Reminders')}
             </Button>
           </ModalFooter>
         </ModalContent>

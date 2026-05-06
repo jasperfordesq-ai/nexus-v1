@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -224,5 +225,63 @@ class HourTransferTest extends TestCase
             'reason'                  => 'test',
         ]);
         $resp->assertStatus(403);
+    }
+
+    public function test_remote_transfer_failure_records_retryable_outbox_and_retry_completes_once(): void
+    {
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $email = 'remote.' . uniqid() . '@example.com';
+        $sourceUser = $this->makeUser(self::SOURCE_TENANT_ID, $email, 25);
+        $admin = $this->makeUser(self::SOURCE_TENANT_ID, 'admin.remote.' . uniqid() . '@example.com', 0);
+        $peerSlug = 'remote-coop-' . substr(uniqid(), -6);
+
+        DB::table('caring_federation_peers')->insert([
+            'tenant_id' => self::SOURCE_TENANT_ID,
+            'peer_slug' => $peerSlug,
+            'display_name' => 'Remote Coop',
+            'base_url' => 'https://remote.example.test',
+            'shared_secret' => str_repeat('a', 64),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Http::fakeSequence()
+            ->push(['accepted' => false, 'error' => 'temporary outage'], 503)
+            ->push(['accepted' => false, 'error' => 'temporary outage'], 503)
+            ->push(['accepted' => false, 'error' => 'temporary outage'], 503)
+            ->push(['accepted' => true, 'destination_transfer_id' => 987], 200);
+
+        $service = app(CaringHourTransferService::class);
+        $init = $service->initiate($sourceUser, $peerSlug, 5.0, 'Remote move');
+        $result = $service->approveAtSource($init['transfer_id'], $admin);
+
+        $this->assertSame('sent', $result['status']);
+        $this->assertEqualsWithDelta(20.0, (float) DB::table('users')->where('id', $sourceUser)->value('balance'), 0.001);
+
+        $row = DB::table('caring_hour_transfers')->where('id', $init['transfer_id'])->first();
+        $this->assertSame('sent', $row->status);
+        $this->assertSame('retry', $row->remote_delivery_status);
+        $this->assertSame(1, (int) $row->remote_delivery_attempts);
+        $this->assertNotNull($row->remote_delivery_next_retry_at);
+
+        DB::table('caring_hour_transfers')
+            ->where('id', $init['transfer_id'])
+            ->update(['remote_delivery_next_retry_at' => now()->subMinute()]);
+
+        $retry = $service->retryRemoteDeliveries(self::SOURCE_TENANT_ID, 10);
+        $this->assertSame(1, $retry['processed']);
+        $this->assertSame(1, $retry['delivered'], json_encode($retry));
+        $this->assertSame(0, $retry['failed']);
+
+        $completed = DB::table('caring_hour_transfers')->where('id', $init['transfer_id'])->first();
+        $this->assertSame('completed', $completed->status);
+        $this->assertSame('delivered', $completed->remote_delivery_status);
+        $this->assertSame(2, (int) $completed->remote_delivery_attempts);
+        $this->assertNotNull($completed->remote_delivered_at);
+        $this->assertEqualsWithDelta(20.0, (float) DB::table('users')->where('id', $sourceUser)->value('balance'), 0.001);
+
+        $secondRetry = $service->retryRemoteDeliveries(self::SOURCE_TENANT_ID, 10);
+        $this->assertSame(0, $secondRetry['processed']);
     }
 }

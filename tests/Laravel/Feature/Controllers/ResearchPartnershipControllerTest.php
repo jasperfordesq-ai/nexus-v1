@@ -68,6 +68,21 @@ class ResearchPartnershipControllerTest extends TestCase
         $updatedConsent->assertStatus(200);
         $updatedConsent->assertJsonPath('data.consent_status', 'opted_in');
 
+        foreach (array_slice($members, 1) as $member) {
+            DB::table('caring_research_consents')->updateOrInsert(
+                ['tenant_id' => $this->testTenantId, 'user_id' => $member->id],
+                [
+                    'consent_status' => 'opted_in',
+                    'consent_version' => 'research-v1',
+                    'consented_at' => now(),
+                    'revoked_at' => null,
+                    'notes' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            );
+        }
+
         Sanctum::actingAs($admin);
         $partner = $this->apiPost('/v2/admin/caring-community/research/partners', [
             'name' => 'Pilot Evaluation 2026',
@@ -145,5 +160,77 @@ class ResearchPartnershipControllerTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+    }
+
+    public function test_research_export_only_counts_explicitly_opted_in_members(): void
+    {
+        $this->requireResearchTables();
+        $this->setCaringCommunityFeature(true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+        $optedIn = [];
+        for ($i = 0; $i < 5; $i++) {
+            $optedIn[] = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        }
+        $optedOut = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $revoked = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        foreach ($optedIn as $member) {
+            DB::table('caring_research_consents')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'consent_status' => 'opted_in',
+                'consent_version' => 'research-v1',
+                'consented_at' => now(),
+                'revoked_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        foreach ([[$optedOut, 'opted_out', null], [$revoked, 'revoked', now()]] as [$member, $status, $revokedAt]) {
+            DB::table('caring_research_consents')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'consent_status' => $status,
+                'consent_version' => 'research-v1',
+                'consented_at' => null,
+                'revoked_at' => $revokedAt,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach (array_merge($optedIn, [$optedOut, $revoked]) as $member) {
+            DB::table('vol_logs')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'organization_id' => null,
+                'date_logged' => '2026-04-10',
+                'hours' => 2.00,
+                'description' => 'Consent filtered support activity.',
+                'status' => 'approved',
+                'created_at' => '2026-04-10 09:00:00',
+                'updated_at' => '2026-04-10 09:00:00',
+            ]);
+        }
+
+        Sanctum::actingAs($admin);
+        $partner = $this->apiPost('/v2/admin/caring-community/research/partners', [
+            'name' => 'Consent Boundary Study',
+            'institution' => 'Privacy Institute',
+            'status' => 'active',
+        ]);
+        $partner->assertStatus(201);
+        $partnerId = (int) $partner->json('data.id');
+
+        $export = $this->apiPost("/v2/admin/caring-community/research/partners/{$partnerId}/dataset-exports", [
+            'period_start' => '2026-04-01',
+            'period_end' => '2026-04-30',
+        ]);
+
+        $export->assertStatus(201);
+        $export->assertJsonPath('data.dataset.rows.0.suppressed', false);
+        $export->assertJsonPath('data.dataset.rows.0.participant_count', 5);
+        $export->assertJsonPath('data.dataset.rows.0.approved_hours', 10);
     }
 }
