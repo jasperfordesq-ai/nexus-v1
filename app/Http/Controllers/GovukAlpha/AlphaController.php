@@ -239,10 +239,13 @@ class AlphaController extends Controller
         }
 
         try {
-            $this->feedService->createPost($userId, [
+            $post = $this->feedService->createPost($userId, [
                 'content' => $content,
                 'visibility' => 'public',
             ]);
+            if (is_array($post) && isset($post['error'])) {
+                return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-failed']);
+            }
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-failed']);

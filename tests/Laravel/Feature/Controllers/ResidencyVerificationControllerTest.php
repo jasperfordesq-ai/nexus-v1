@@ -88,6 +88,24 @@ class ResidencyVerificationControllerTest extends TestCase
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
     }
 
+    public function test_member_residency_declaration_rejects_values_that_exceed_column_limits(): void
+    {
+        $this->requireResidencyTable();
+        $this->setCaringCommunityFeature(true);
+
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create());
+
+        $response = $this->apiPost('/v2/me/residency-verification', [
+            'declared_municipality' => str_repeat('M', 121),
+            'declared_postcode' => '12345',
+            'declared_address' => 'A globally valid address',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+        $response->assertJsonPath('errors.0.field', 'declared_municipality');
+    }
+
     private function requireResidencyTable(): void
     {
         if (! Schema::hasTable('member_residency_verifications')) {

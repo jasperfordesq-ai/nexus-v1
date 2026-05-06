@@ -147,6 +147,53 @@ class CaregiverApiControllerTest extends TestCase
         ]);
     }
 
+    public function test_caregiver_can_relink_receiver_after_previous_link_was_removed(): void
+    {
+        $this->requireCaregiverTables();
+        $this->setCaringCommunityFeature(true);
+
+        $caregiver = User::factory()->forTenant($this->testTenantId)->create();
+        $careReceiver = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($caregiver);
+
+        $first = $this->apiPost('/v2/caring-community/caregiver/links', [
+            'cared_for_id' => $careReceiver->id,
+            'relationship_type' => 'family',
+            'start_date' => now()->toDateString(),
+        ]);
+        $first->assertStatus(202);
+
+        DB::table('caring_caregiver_links')
+            ->where('id', (int) $first->json('data.id'))
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['status' => 'active', 'approved_by' => $caregiver->id]);
+
+        $deleteFirst = $this->apiDelete('/v2/caring-community/caregiver/links/' . $first->json('data.id'));
+        $deleteFirst->assertStatus(204);
+
+        $second = $this->apiPost('/v2/caring-community/caregiver/links', [
+            'cared_for_id' => $careReceiver->id,
+            'relationship_type' => 'family',
+            'start_date' => now()->toDateString(),
+        ]);
+        $second->assertStatus(202);
+
+        DB::table('caring_caregiver_links')
+            ->where('id', (int) $second->json('data.id'))
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['status' => 'active', 'approved_by' => $caregiver->id]);
+
+        $deleteSecond = $this->apiDelete('/v2/caring-community/caregiver/links/' . $second->json('data.id'));
+        $deleteSecond->assertStatus(204);
+
+        $this->assertDatabaseHas('caring_caregiver_links', [
+            'tenant_id' => $this->testTenantId,
+            'caregiver_id' => $caregiver->id,
+            'cared_for_id' => $careReceiver->id,
+            'status' => 'inactive',
+        ]);
+    }
+
     public function test_caregiver_routes_respect_caring_community_feature_gate(): void
     {
         $this->requireCaregiverTables();

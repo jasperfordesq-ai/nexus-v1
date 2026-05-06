@@ -88,6 +88,10 @@ export default function MunicipalityFeedbackPage() {
     setLoadingList(true);
     try {
       const res = await api.get<MyFeedbackRow[]>('/v2/caring-community/feedback/mine');
+      if (!res.success) {
+        showToast(res.error || t('submit_error'), 'error');
+        return;
+      }
       setItems(Array.isArray(res.data) ? res.data : []);
     } catch {
       showToast(t('submit_error'), 'error');
@@ -107,7 +111,7 @@ export default function MunicipalityFeedbackPage() {
     }
     setSubmitting(true);
     try {
-      await api.post('/v2/caring-community/feedback', {
+      const res = await api.post('/v2/caring-community/feedback', {
         category,
         subject: subject.trim(),
         body: body.trim(),
@@ -115,6 +119,10 @@ export default function MunicipalityFeedbackPage() {
         is_anonymous: isAnonymous,
         is_public: isPublic,
       });
+      if (!res.success) {
+        showToast(res.error || t('submit_error'), 'error');
+        return;
+      }
       showToast(t('submit_success'), 'success');
       setSubject('');
       setBody('');

@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -50,7 +51,8 @@ class VolunteerCertificateControllerTest extends TestCase
 
         $response = $this->apiGet('/v2/volunteering/certificates');
 
-        $this->assertLessThan(500, $response->status());
+        $response->assertOk()
+            ->assertJsonStructure(['data', 'meta']);
     }
 
     public function test_my_credentials_authenticated_smoke(): void
@@ -59,7 +61,8 @@ class VolunteerCertificateControllerTest extends TestCase
 
         $response = $this->apiGet('/v2/volunteering/credentials');
 
-        $this->assertLessThan(500, $response->status());
+        $response->assertOk()
+            ->assertJsonStructure(['data' => ['credentials'], 'meta']);
     }
 
     public function test_verify_certificate_is_public_smoke(): void
@@ -67,6 +70,34 @@ class VolunteerCertificateControllerTest extends TestCase
         // verifyCertificate has ->withoutMiddleware('auth:sanctum') — public route
         $response = $this->apiGet('/v2/volunteering/certificates/verify/FAKE-CODE');
 
-        $this->assertLessThan(500, $response->status());
+        $response->assertNotFound()
+            ->assertJsonStructure(['errors' => [['code', 'message']]]);
+    }
+
+    public function test_verify_certificate_is_tenant_scoped(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        DB::table('vol_certificates')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'verification_code' => 'TENANT2CERT',
+            'total_hours' => 12.5,
+            'date_range_start' => '2026-01-01',
+            'date_range_end' => '2026-02-01',
+            'organizations' => json_encode([['name' => 'Green Streets', 'hours' => 12.5]]),
+            'generated_at' => now(),
+        ]);
+
+        $this->apiGet('/v2/volunteering/certificates/verify/TENANT2CERT')
+            ->assertOk()
+            ->assertJsonPath('data.verification_code', 'TENANT2CERT');
+
+        $this->withTenant(999)
+            ->apiGet('/v2/volunteering/certificates/verify/TENANT2CERT')
+            ->assertNotFound();
     }
 }

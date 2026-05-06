@@ -17,6 +17,10 @@ use Illuminate\Http\JsonResponse;
  */
 class ResidencyVerificationController extends BaseApiController
 {
+    private const MAX_MUNICIPALITY_LENGTH = 120;
+    private const MAX_POSTCODE_LENGTH = 24;
+    private const MAX_ADDRESS_LENGTH = 255;
+
     protected bool $isV2Api = true;
 
     public function __construct(
@@ -64,6 +68,16 @@ class ResidencyVerificationController extends BaseApiController
 
         if ($postcode === '') {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'declared_postcode']), 'declared_postcode', 422);
+        }
+
+        foreach ([
+            'declared_municipality' => [$municipality, self::MAX_MUNICIPALITY_LENGTH],
+            'declared_postcode' => [$postcode, self::MAX_POSTCODE_LENGTH],
+            'declared_address' => [$address, self::MAX_ADDRESS_LENGTH],
+        ] as $field => [$value, $max]) {
+            if ($value !== '' && mb_strlen($value) > $max) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.field_too_long', ['field' => $field, 'max' => $max]), $field, 422);
+            }
         }
 
         $verification = $this->service->submitDeclaration($tenantId, $userId, [

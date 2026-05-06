@@ -612,6 +612,7 @@ export function AdminRoutes() {
       <Route path="caring-community/loyalty" element={<TenantRedirect to="/caring/loyalty" />} />
       <Route path="caring-community/hour-transfers" element={<TenantRedirect to="/caring/hour-transfers" />} />
       <Route path="caring-community/sub-regions" element={<TenantRedirect to="/caring/sub-regions" />} />
+      <Route path="caring-community/regional-points" element={<TenantRedirect to="/caring/regional-points" />} />
       <Route path="caring-community/federation-peers" element={<TenantRedirect to="/caring/federation-peers" />} />
       <Route path="caring-community/sla-dashboard" element={<TenantRedirect to="/caring/sla-dashboard" />} />
       <Route path="caring-community/providers" element={<TenantRedirect to="/caring/providers" />} />

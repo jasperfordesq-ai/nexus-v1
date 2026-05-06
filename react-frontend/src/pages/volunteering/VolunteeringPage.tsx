@@ -211,6 +211,13 @@ export function VolunteeringPage() {
   }, [tab, isTabAllowed, setTab]);
 
   useEffect(() => {
+    const nextTab = requestedTab && VOLUNTEER_TABS.includes(requestedTab) ? requestedTab : 'opportunities';
+    if (nextTab !== tab && isTabAllowed(nextTab)) {
+      setTabState(nextTab);
+    }
+  }, [requestedTab, tab, isTabAllowed]);
+
+  useEffect(() => {
     if (!hasFeature('volunteering')) return;
     let cancelled = false;
     if (isAuthenticated) {
@@ -346,6 +353,7 @@ export function VolunteeringPage() {
                   key={key}
                   role="tab"
                   id={`vol-tab-${key}`}
+                  aria-controls={`vol-panel-${key}`}
                   aria-selected={activeTab === key}
                   variant={activeTab === key ? 'solid' : 'flat'}
                   className={activeTab === key ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
@@ -358,7 +366,7 @@ export function VolunteeringPage() {
             </div>
 
             {/* Tab Content */}
-            {activeTab && <div role="tabpanel" aria-labelledby={`vol-tab-${activeTab}`}>
+            {activeTab && <div role="tabpanel" id={`vol-panel-${activeTab}`} aria-labelledby={`vol-tab-${activeTab}`}>
               {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
               {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
               {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}
@@ -646,7 +654,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
 
   return (
     <GlassCard className="p-5">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
             <Link to={tenantPath(`/organisations/${opportunity.organization.id}`)}>
@@ -725,11 +733,11 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-2 flex-shrink-0">
+        <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-shrink-0">
           <Button
             size="sm"
             variant="light"
-            className="text-theme-muted"
+            className="text-theme-muted w-full sm:w-auto"
             onPress={() => navigate(tenantPath(`/volunteering/opportunities/${opportunity.id}`))}
             endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
           >
@@ -738,7 +746,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           {onApply && (
             <Button
               size="sm"
-              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+              className="bg-linear-to-r from-rose-500 to-pink-600 text-white w-full sm:w-auto"
               onPress={onApply}
               endContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >

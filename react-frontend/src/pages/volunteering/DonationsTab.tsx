@@ -21,6 +21,8 @@ import {
   useDisclosure,
   Textarea,
   Progress,
+  RadioGroup,
+  Radio,
 } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Calendar from 'lucide-react/icons/calendar';
@@ -162,7 +164,7 @@ export function DonationsTab() {
         setDonations(items);
       }
 
-      // Compute aggregate stats from giving days data
+      // The giving-days API includes completed donation totals/counts for each campaign.
       const totalRaised = days.reduce((sum, d) => sum + (Number(d.raised_amount) || 0), 0);
       const totalDonors = days.reduce((sum, d) => sum + (Number(d.donor_count) || 0), 0);
       const activeCampaigns = days.filter((d) => d.status === 'active' || d.is_active).length;
@@ -214,7 +216,7 @@ export function DonationsTab() {
       });
 
       if (response.success) {
-        toastRef.current.success(tRef.current('donations.submit_success', 'Donation recorded!'));
+        toastRef.current.success(tRef.current('donations.submit_success', 'Offline pledge recorded.'));
         onClose();
         load();
       } else {
@@ -490,7 +492,7 @@ export function DonationsTab() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-theme-primary">{t('donations.modal_title', 'Make a Donation')}</ModalHeader>
+              <ModalHeader className="text-theme-primary">{t('donations.modal_title', 'Record an Offline Pledge')}</ModalHeader>
               <ModalBody className="gap-4">
                 <Input
                   label={t('donations.form.amount', 'Amount')}
@@ -504,19 +506,18 @@ export function DonationsTab() {
                   startContent={<Banknote className="w-4 h-4 text-theme-subtle" />}
                   isRequired
                 />
-                <div className="flex flex-wrap gap-2">
+                <RadioGroup
+                  label={t('donations.form.payment_method', 'Payment method')}
+                  orientation="horizontal"
+                  value={form.payment_method}
+                  onValueChange={(value) => setForm((f) => ({ ...f, payment_method: value as typeof PAYMENT_METHODS[number] }))}
+                >
                   {PAYMENT_METHODS.map((pm) => (
-                    <Chip
-                      key={pm}
-                      variant={form.payment_method === pm ? 'solid' : 'flat'}
-                      color={form.payment_method === pm ? 'primary' : 'default'}
-                      className="cursor-pointer"
-                      onClick={() => setForm((f) => ({ ...f, payment_method: pm }))}
-                    >
+                    <Radio key={pm} value={pm}>
                       {t(`donations.payment_methods.${pm}`, pm.replace('_', ' '))}
-                    </Chip>
+                    </Radio>
                   ))}
-                </div>
+                </RadioGroup>
                 <Textarea
                   label={t('donations.form.message', 'Message (optional)')}
                   variant="bordered"

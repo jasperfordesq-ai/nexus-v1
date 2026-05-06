@@ -239,6 +239,7 @@ class VolunteerFormService
     {
         try {
             return VolAccessibilityNeed::where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->orderBy('need_type')
                 ->get()
                 ->map(fn ($row) => $row->toArray())
@@ -262,7 +263,9 @@ class VolunteerFormService
         try {
             DB::transaction(function () use ($userId, $data, $tenantId) {
                 // Delete existing needs for this user
-                VolAccessibilityNeed::where('user_id', $userId)->delete();
+                VolAccessibilityNeed::where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
 
                 // Insert new needs
                 if (!empty($data)) {

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\CsvExportSanitizer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -554,7 +555,7 @@ class MunicipalSurveyService
         }
 
         $lines = [];
-        $lines[] = self::csvRow($headers);
+        $lines[] = self::csvRow(CsvExportSanitizer::row($headers));
 
         foreach ($responses as $resp) {
             $answers = json_decode((string) $resp->answers, true) ?? [];
@@ -575,7 +576,7 @@ class MunicipalSurveyService
                 $row[] = (string) $val;
             }
 
-            $lines[] = self::csvRow($row);
+            $lines[] = self::csvRow(CsvExportSanitizer::row($row));
         }
 
         return implode("\n", $lines);

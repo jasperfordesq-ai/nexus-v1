@@ -180,7 +180,7 @@ class VolOrgWalletService
 
         $tenantId = TenantContext::getId();
 
-        return DB::transaction(function () use ($userId, $volOrgId, $amount, $note, $tenantId) {
+        $result = DB::transaction(function () use ($userId, $volOrgId, $amount, $note, $tenantId) {
             // Lock user row to prevent concurrent balance changes
             $user = DB::selectOne(
                 "SELECT id, balance, name FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -227,7 +227,7 @@ class VolOrgWalletService
             DB::insert("
                 INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, type, amount, balance_after, description, created_at)
                 VALUES (?, ?, ?, 'deposit', ?, ?, ?, NOW())
-            ", [$tenantId, $volOrgId, $userId, $amount, $newBalance, $note ?: "Deposit from {$user->name}"]);
+            ", [$tenantId, $volOrgId, $userId, $intAmount, $newBalance, $note ?: __('svc_notifications_2.vol_org_wallet.deposit_from_user', ['name' => $user->name])]);
 
             return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.deposit_successful'), 'new_balance' => $newBalance, '_deposit_user_id' => $userId, '_org_name' => $org->name, '_amount' => $intAmount];
         });
@@ -285,7 +285,7 @@ class VolOrgWalletService
 
         $tenantId = TenantContext::getId();
 
-        return DB::transaction(function () use ($volOrgId, $volunteerId, $amount, $adminId, $note, $logId, $tenantId) {
+        $result = DB::transaction(function () use ($volOrgId, $volunteerId, $amount, $adminId, $note, $logId, $tenantId) {
             // Lock org row
             $org = DB::selectOne(
                 "SELECT id, name, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -336,11 +336,14 @@ class VolOrgWalletService
             }
 
             // Record in vol_org_transactions
-            $description = $note ?: "Payment to {$volunteer->name}" . ($logId ? " for approved hours" : '');
+            $description = $note ?: __('svc_notifications_2.vol_org_wallet.payment_to_volunteer', [
+                'name' => $volunteer->name,
+                'context' => $logId ? __('svc_notifications_2.vol_org_wallet.for_approved_hours') : '',
+            ]);
             DB::insert("
                 INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
                 VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
-            ", [$tenantId, $volOrgId, $volunteerId, $logId, -$amount, $newOrgBalance, $description]);
+            ", [$tenantId, $volOrgId, $volunteerId, $logId, -$netOrgDebit, $newOrgBalance, $description]);
 
             // Also record in main transactions table (uses existing 'volunteer' type)
             DB::insert("

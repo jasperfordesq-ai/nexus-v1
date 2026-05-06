@@ -210,11 +210,15 @@ export function RequestHelpPage() {
 
     setSubmitting(true);
     try {
-      await api.post('/v2/caring-community/request-help', {
+      const response = await api.post('/v2/caring-community/request-help', {
         what: what.trim(),
         when: when.trim(),
         contact_preference: contactPref,
       });
+      if (!response.success) {
+        setError(response.error || t('request_help.errors.submit_failed'));
+        return;
+      }
       setSubmitted(true);
     } catch {
       setError(t('request_help.errors.submit_failed'));

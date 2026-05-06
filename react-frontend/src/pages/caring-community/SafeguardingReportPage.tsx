@@ -80,7 +80,7 @@ export default function SafeguardingReportPage(): JSX.Element {
 
     setSubmitting(true);
     try {
-      await api.post('/v2/caring-community/safeguarding/report', {
+      const response = await api.post('/v2/caring-community/safeguarding/report', {
         category,
         severity,
         description: description.trim(),
@@ -90,6 +90,10 @@ export default function SafeguardingReportPage(): JSX.Element {
           : undefined,
         evidence_url: evidenceUrl.trim() || undefined,
       });
+      if (!response.success) {
+        setError(response.error || t('safeguarding_reports.submit.errors.submit_failed'));
+        return;
+      }
       setSubmitted(true);
     } catch {
       setError(t('safeguarding_reports.submit.errors.submit_failed'));

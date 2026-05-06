@@ -190,7 +190,15 @@ class VolunteerDonationService
                 'id', 'title', 'description', 'start_date', 'end_date',
                 'goal_amount', 'raised_amount', 'is_active', 'created_at',
             ])
-            ->map(fn ($row) => self::formatGivingDay($row->toArray()))
+            ->map(function ($row) {
+                $day = $row->toArray();
+                $day['donor_count'] = VolDonation::where('giving_day_id', $row->id)
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('status', 'completed')
+                    ->distinct('user_id')
+                    ->count('user_id');
+                return self::formatGivingDay($day);
+            })
             ->toArray();
     }
 
@@ -203,14 +211,15 @@ class VolunteerDonationService
      */
     public static function getGivingDayStats(int $givingDayId): array
     {
-        $givingDay = VolGivingDay::find($givingDayId);
+        $givingDay = VolGivingDay::where('tenant_id', TenantContext::getId())->find($givingDayId);
 
         if (!$givingDay) {
-            throw new \RuntimeException('Giving day not found.');
+            throw new \RuntimeException(__('api.vol_giving_day_not_found'));
         }
 
         $donorCount = VolDonation::where('giving_day_id', $givingDayId)
-            ->where('status', '!=', 'refunded')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'completed')
             ->distinct('user_id')
             ->count('user_id');
 
@@ -399,6 +408,16 @@ class VolunteerDonationService
         $day['target_amount'] = (float) ($day['target_amount'] ?? $goalAmount);
         $day['target_hours'] = (float) ($day['target_hours'] ?? 0);
         $day['raised_amount'] = (float) ($day['raised_amount'] ?? 0);
+        $day['donor_count'] = (int) ($day['donor_count'] ?? 0);
+
+        if (!isset($day['status'])) {
+            $today = now()->startOfDay();
+            $start = !empty($day['start_date']) ? \Carbon\Carbon::parse($day['start_date'])->startOfDay() : null;
+            $end = !empty($day['end_date']) ? \Carbon\Carbon::parse($day['end_date'])->endOfDay() : null;
+            $day['status'] = !$day['is_active']
+                ? 'ended'
+                : (($start && $start->gt($today)) ? 'upcoming' : (($end && $end->lt($today)) ? 'ended' : 'active'));
+        }
 
         return $day;
     }

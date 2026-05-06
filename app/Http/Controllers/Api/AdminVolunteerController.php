@@ -573,6 +573,15 @@ class AdminVolunteerController extends BaseApiController
         }
     }
 
+    private function ensureFeature(): void
+    {
+        if (!TenantContext::hasFeature('volunteering')) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
+            );
+        }
+    }
+
     /** POST /api/v2/admin/volunteering/organizations */
     public function createOrganization(): JsonResponse
     {
@@ -886,6 +895,7 @@ class AdminVolunteerController extends BaseApiController
     public function sendShiftReminders(): JsonResponse
     {
         $this->requireSuperAdmin();
+        $this->ensureFeature();
 
         $tenantId = TenantContext::getId();
 
@@ -910,6 +920,7 @@ class AdminVolunteerController extends BaseApiController
     public function adjustOrgWallet(int $id): JsonResponse
     {
         $this->requireSuperAdmin();
+        $this->ensureFeature();
         // Defence-in-depth: even super-admin adjustments should be rate-limited
         // so an accidental loop or compromised session cannot drain/inflate a
         // vol org wallet in seconds.
@@ -987,6 +998,7 @@ class AdminVolunteerController extends BaseApiController
     public function orgWalletTransactions(int $id): JsonResponse
     {
         $this->requireSuperAdmin();
+        $this->ensureFeature();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 50),
@@ -1005,6 +1017,7 @@ class AdminVolunteerController extends BaseApiController
     public function trends(): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
         $period = $this->query('period', 'week');
         $format = $period === 'month' ? '%Y-%m' : '%Y-%u';
@@ -1058,6 +1071,7 @@ class AdminVolunteerController extends BaseApiController
     public function reminderLogs(): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
         $perPage = $this->queryInt('per_page', 20, 1, 50);
         $cursor = $this->query('cursor');
@@ -1143,14 +1157,15 @@ class AdminVolunteerController extends BaseApiController
     public function reorderCustomFields(): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
         $fieldIds = $this->input('field_ids');
 
         if (!is_array($fieldIds) || empty($fieldIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'field_ids must be a non-empty array', 'field_ids', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.field_ids_required'), 'field_ids', 400);
         }
         if (count($fieldIds) > 100) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Too many fields (max 100)', 'field_ids', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.too_many_fields', ['max' => 100]), 'field_ids', 400);
         }
 
         try {
@@ -1165,7 +1180,7 @@ class AdminVolunteerController extends BaseApiController
             return $this->respondWithData(['success' => true, 'updated_count' => $updated]);
         } catch (\Exception $e) {
             Log::error("AdminVolunteerController::reorderCustomFields error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to reorder fields', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_reorder_fields'), null, 500);
         }
     }
 
@@ -1173,12 +1188,13 @@ class AdminVolunteerController extends BaseApiController
     public function givingDayDonors(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
 
         // Verify giving day belongs to this tenant
         $givingDay = DB::selectOne("SELECT id FROM vol_giving_days WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$givingDay) {
-            return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.giving_day_not_found'), null, 404);
         }
 
         $perPage = $this->queryInt('per_page', 20, 1, 50);
@@ -1236,14 +1252,28 @@ class AdminVolunteerController extends BaseApiController
                     'anonymous_count' => (int) ($stats->anonymous_count ?? 0),
                     'total_raised' => (float) ($stats->total_raised ?? 0),
                 ],
-                'meta' => ['per_page' => $perPage, 'has_more' => $hasMore, 'cursor' => $nextCursor],
+                'meta' => [
+                    'per_page' => $perPage,
+                    'has_more' => $hasMore,
+                    'cursor' => $nextCursor,
+                    'stats' => [
+                        'total_donors' => (int) ($stats->total_donors ?? 0),
+                        'anonymous_count' => (int) ($stats->anonymous_count ?? 0),
+                        'total_raised' => (float) ($stats->total_raised ?? 0),
+                    ],
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error("AdminVolunteerController::givingDayDonors error: " . $e->getMessage());
             return response()->json([
                 'success' => true, 'data' => [],
                 'stats' => ['total_donors' => 0, 'anonymous_count' => 0, 'total_raised' => 0],
-                'meta' => ['per_page' => $perPage, 'has_more' => false, 'cursor' => null],
+                'meta' => [
+                    'per_page' => $perPage,
+                    'has_more' => false,
+                    'cursor' => null,
+                    'stats' => ['total_donors' => 0, 'anonymous_count' => 0, 'total_raised' => 0],
+                ],
             ]);
         }
     }
@@ -1252,6 +1282,7 @@ class AdminVolunteerController extends BaseApiController
     public function activityFeed(): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
         $limit = $this->queryInt('limit', 50, 1, 100);
         $days = $this->queryInt('days', 30, 1, 365);
@@ -1306,12 +1337,13 @@ class AdminVolunteerController extends BaseApiController
     public function givingDayTrends(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $this->ensureFeature();
         $tenantId = TenantContext::getId();
 
         // Verify giving day belongs to this tenant
         $givingDay = DB::selectOne("SELECT id FROM vol_giving_days WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$givingDay) {
-            return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.giving_day_not_found'), null, 404);
         }
 
         $granularity = $this->query('granularity', 'day');

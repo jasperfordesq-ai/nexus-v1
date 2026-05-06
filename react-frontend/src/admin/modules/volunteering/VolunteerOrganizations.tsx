@@ -221,7 +221,9 @@ export function VolunteerOrganizations() {
       if (res.success && res.data) {
         const payload = res.data as unknown;
         if (Array.isArray(payload)) {
-          setTransactions(payload);
+          setTransactions(payload as Transaction[]);
+          setTxCursor((res.meta as { cursor?: string; next_cursor?: string } | undefined)?.cursor || (res.meta as { next_cursor?: string } | undefined)?.next_cursor || null);
+          setTxHasMore(Boolean((res.meta as { has_more?: boolean } | undefined)?.has_more));
         } else if (payload && typeof payload === 'object' && 'data' in payload) {
           const p = payload as { data: Transaction[]; meta?: { next_cursor?: string; has_more?: boolean } };
           setTransactions(p.data || []);
@@ -243,7 +245,11 @@ export function VolunteerOrganizations() {
       const res = await adminVolunteering.getOrgTransactions(txOrg.id, txCursor);
       if (res.success && res.data) {
         const payload = res.data as unknown;
-        if (payload && typeof payload === 'object' && 'data' in payload) {
+        if (Array.isArray(payload)) {
+          setTransactions((prev) => [...prev, ...(payload as Transaction[])]);
+          setTxCursor((res.meta as { cursor?: string; next_cursor?: string } | undefined)?.cursor || (res.meta as { next_cursor?: string } | undefined)?.next_cursor || null);
+          setTxHasMore(Boolean((res.meta as { has_more?: boolean } | undefined)?.has_more));
+        } else if (payload && typeof payload === 'object' && 'data' in payload) {
           const p = payload as { data: Transaction[]; meta?: { next_cursor?: string; has_more?: boolean } };
           setTransactions((prev) => [...prev, ...(p.data || [])]);
           setTxCursor(p.meta?.next_cursor || null);

@@ -153,9 +153,10 @@ export function VolunteerExpenses() {
     try {
       const res = await adminVolunteering.getExpenses();
       if (res.success && res.data) {
-        const payload = parsePayload<{ expenses?: Expense[]; stats?: ExpenseStats }>(res.data);
-        setExpenses(payload.expenses || []);
-        setStats(payload.stats || null);
+        const payload = parsePayload<{ items?: Expense[]; expenses?: Expense[]; stats?: ExpenseStats } | Expense[]>(res.data);
+        const rows = Array.isArray(payload) ? payload : payload.items || payload.expenses || [];
+        setExpenses(rows);
+        setStats(Array.isArray(payload) ? null : payload.stats || null);
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_expenses', 'Failed to load expenses'));

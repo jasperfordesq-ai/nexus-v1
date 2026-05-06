@@ -194,6 +194,7 @@ class VolunteerCertificateService
                      ->on('vc.tenant_id', '=', 'u.tenant_id');
             })
             ->where('vc.verification_code', $code)
+            ->when(TenantContext::getId(), fn ($query, $tenantId) => $query->where('vc.tenant_id', $tenantId))
             ->select(
                 'vc.id',
                 'vc.verification_code',

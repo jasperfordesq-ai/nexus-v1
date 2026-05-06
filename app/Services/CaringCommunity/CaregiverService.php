@@ -175,14 +175,35 @@ class CaregiverService
      */
     public function removeLink(int $linkId, int $caregiverId, int $tenantId): void
     {
-        $affected = DB::table('caring_caregiver_links')
-            ->where('id', $linkId)
-            ->where('caregiver_id', $caregiverId)
-            ->where('tenant_id', $tenantId)
-            ->update([
-                'status'     => 'inactive',
-                'updated_at' => now(),
-            ]);
+        $affected = DB::transaction(function () use ($linkId, $caregiverId, $tenantId): int {
+            $link = DB::table('caring_caregiver_links')
+                ->where('id', $linkId)
+                ->where('caregiver_id', $caregiverId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($link === null) {
+                return 0;
+            }
+
+            DB::table('caring_caregiver_links')
+                ->where('tenant_id', $tenantId)
+                ->where('caregiver_id', $caregiverId)
+                ->where('cared_for_id', (int) $link->cared_for_id)
+                ->where('status', 'inactive')
+                ->where('id', '<>', $linkId)
+                ->delete();
+
+            return DB::table('caring_caregiver_links')
+                ->where('id', $linkId)
+                ->where('caregiver_id', $caregiverId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'status'     => 'inactive',
+                    'updated_at' => now(),
+                ]);
+        });
 
         if ($affected === 0) {
             throw new \RuntimeException(__('api.caring_caregiver_link_not_found'));

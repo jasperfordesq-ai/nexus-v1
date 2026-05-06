@@ -198,7 +198,7 @@ class AdminMunicipalityFeedbackController extends BaseApiController
     /**
      * GET /v2/admin/caring-community/feedback/export.csv
      */
-    public function exportCsv(): Response
+    public function exportCsv(): Response|JsonResponse
     {
         $this->requireAdmin();
         if ($r = $this->ensureCaringCommunity()) {

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\CaringCommunity;
 
+use App\Support\CsvExportSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -463,7 +464,7 @@ class MunicipalityFeedbackService
                 ? '(anonymous)'
                 : (string) ($r['submitter_user_id'] ?? '');
 
-            fputcsv($fh, [
+            fputcsv($fh, CsvExportSanitizer::row([
                 (int) ($r['id'] ?? 0),
                 (string) ($r['created_at'] ?? ''),
                 (string) ($r['category'] ?? ''),
@@ -478,7 +479,7 @@ class MunicipalityFeedbackService
                 (string) ($r['triage_notes'] ?? ''),
                 (string) ($r['resolution_notes'] ?? ''),
                 (string) ($r['body'] ?? ''),
-            ]);
+            ]));
         }
 
         rewind($fh);

@@ -100,8 +100,8 @@ export function useApi<T>(
     return () => {
       mountedRef.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- url tracked via urlRef; deps are caller-provided
-  }, [immediate, ...deps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- endpoint and caller deps intentionally drive refetches
+  }, [immediate, endpoint, ...deps]);
 
   return {
     ...state,

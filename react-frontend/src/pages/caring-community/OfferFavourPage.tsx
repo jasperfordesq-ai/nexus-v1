@@ -52,13 +52,17 @@ export function OfferFavourPage() {
 
     setSubmitting(true);
     try {
-      await api.post('/v2/caring-community/offer-favour', {
+      const response = await api.post('/v2/caring-community/offer-favour', {
         description: description.trim(),
         category: category || undefined,
         received_by_name: recipientName.trim() || undefined,
         favour_date: favourDate,
         is_anonymous: !recipientName.trim(),
       });
+      if (!response.success) {
+        setError(response.error || t('offer_favour.errors.submit_failed'));
+        return;
+      }
       setSubmitted(true);
     } catch {
       setError(t('offer_favour.errors.submit_failed'));

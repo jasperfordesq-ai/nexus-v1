@@ -137,6 +137,7 @@
   "hours_logged_success": "Hours logged successfully!",
   "hours_log_failed": "Failed to log hours. Please try again.",
   "organisers_note": "Organiser's note:",
+  "organiser_note": "Organiser's note:",
   "date_range_sr": "Opportunity date range",
   "loading": "Loading...",
   "tab_expenses": "Expenses",
@@ -292,18 +293,19 @@
     "donors_count": "{{count}} donors",
     "my_donations": "My Donations",
     "anonymous": "Anonymous",
-    "modal_title": "Make a Donation",
+    "modal_title": "Record an Offline Pledge",
     "form": {
       "amount": "Amount",
+      "payment_method": "Payment method",
       "message": "Message (optional)"
     },
     "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Donating anonymously",
     "anonymous_toggle_off": "Donate anonymously",
     "cancel": "Cancel",
-    "confirm": "Confirm Donation",
+    "confirm": "Record Pledge",
     "invalid_amount": "Please enter a valid amount.",
-    "submit_success": "Donation recorded!",
+    "submit_success": "Offline pledge recorded.",
     "submit_error": "Failed to record donation.",
     "submit_error_retry": "Failed to record donation. Please try again.",
     "payment_methods": {
@@ -723,6 +725,17 @@
     "suggested_rest_days": "Suggested Rest Days",
     "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
     "recent_checkins": "Recent Mood Check-ins"
+  },
+  "check_in": {
+    "title": "Shift Check-in",
+    "instructions": "Show this QR code to your shift coordinator when you arrive.",
+    "status_checked_in": "Checked In",
+    "status_checked_out": "Checked Out",
+    "status_pending": "Pending",
+    "qr_alt": "QR code for check-in",
+    "checked_in_at": "Checked in: {{time}}",
+    "checked_out_at": "Checked out: {{time}}",
+    "some_unavailable": "Check-in QR codes are not yet available for some shifts."
   },
   "page_meta": {
     "create_opportunity": {

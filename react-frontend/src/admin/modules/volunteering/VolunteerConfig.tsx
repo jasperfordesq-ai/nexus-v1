@@ -95,6 +95,18 @@ interface ReminderSetting {
   sms_enabled: boolean;
 }
 
+interface ReminderSettingResponse {
+  reminder_type: string;
+  enabled: boolean;
+  hours_before: number | null;
+  hours_after: number | null;
+  days_inactive: number | null;
+  days_before_expiry: number | null;
+  email_enabled: boolean;
+  push_enabled: boolean;
+  sms_enabled: boolean;
+}
+
 // ─── Webhook types ─────────────────────────────────────────────────────────────
 
 interface WebhookEntry {
@@ -671,6 +683,35 @@ const defaultReminders: ReminderSetting[] = [
   { key: 'training_expiry', label: 'Training Expiry', enabled: true, timing_value: 14, timing_unit: 'days before', email_enabled: true, push_enabled: true, sms_enabled: false },
 ];
 
+function fromReminderResponse(row: ReminderSettingResponse): ReminderSetting {
+  const template = defaultReminders.find((item) => item.key === row.reminder_type);
+  const timingValue = row.hours_before ?? row.hours_after ?? row.days_inactive ?? row.days_before_expiry ?? template?.timing_value ?? 0;
+  return {
+    key: row.reminder_type,
+    label: template?.label ?? row.reminder_type,
+    enabled: row.enabled,
+    timing_value: timingValue,
+    timing_unit: template?.timing_unit ?? '',
+    email_enabled: row.email_enabled,
+    push_enabled: row.push_enabled,
+    sms_enabled: row.sms_enabled,
+  };
+}
+
+function toReminderRequest(reminder: ReminderSetting): Record<string, unknown> {
+  return {
+    reminder_type: reminder.key,
+    enabled: reminder.enabled,
+    hours_before: reminder.key === 'pre_shift' ? reminder.timing_value : null,
+    hours_after: reminder.key === 'post_shift_feedback' ? reminder.timing_value : null,
+    days_inactive: reminder.key === 'lapsed_volunteer' ? reminder.timing_value : null,
+    days_before_expiry: ['credential_expiry', 'training_expiry'].includes(reminder.key) ? reminder.timing_value : null,
+    email_enabled: reminder.email_enabled,
+    push_enabled: reminder.push_enabled,
+    sms_enabled: reminder.sms_enabled,
+  };
+}
+
 function RemindersTab() {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -708,15 +749,15 @@ function RemindersTab() {
       const res = await adminVolunteering.getReminderSettings();
       if (res.success && res.data) {
         const payload = res.data as unknown;
-        let data: ReminderSetting[];
+        let data: ReminderSettingResponse[];
         if (Array.isArray(payload)) {
           data = payload;
         } else if (payload && typeof payload === 'object' && 'data' in payload) {
-          data = (payload as { data: ReminderSetting[] }).data || [];
+          data = (payload as { data: ReminderSettingResponse[] }).data || [];
         } else {
           data = [];
         }
-        if (data.length > 0) setReminders(data);
+        if (data.length > 0) setReminders(data.map(fromReminderResponse));
       }
     } catch {
       // Use defaults on failure
@@ -733,9 +774,10 @@ function RemindersTab() {
         per_page: 10,
       });
       if (res.success && res.data) {
-        const payload = res.data as unknown as { data?: DeliveryLog[]; stats?: DeliveryStats };
-        setDeliveryLogs(payload.data || []);
-        if (payload.stats) setDeliveryStats(payload.stats);
+        const rows = Array.isArray(res.data) ? res.data as DeliveryLog[] : [];
+        const meta = res.meta as { stats?: DeliveryStats } | undefined;
+        setDeliveryLogs(rows);
+        if (meta?.stats) setDeliveryStats(meta.stats);
       }
     } catch {
       setDeliveryLogs([]);
@@ -753,7 +795,10 @@ function RemindersTab() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminVolunteering.updateReminderSettings({ reminders });
+      const results = await Promise.all(reminders.map((reminder) => adminVolunteering.updateReminderSettings(toReminderRequest(reminder))));
+      if (results.some((res) => !res.success)) {
+        throw new Error('reminder_settings_update_failed');
+      }
       toast.success(t('volunteering.reminders_saved', 'Reminder settings saved'));
     } catch {
       toast.error(t('volunteering.failed_to_save_reminders', 'Failed to save reminder settings'));
@@ -767,14 +812,25 @@ function RemindersTab() {
     onTestOpen();
   };
 
-  const handleTestSend = () => {
-    onTestClose();
-    toast.success(
-      t('volunteering.test_reminder_sent', 'Test "{{label}}" notification sent to your account', {
-        label: testReminderLabel,
-      }),
-    );
-    setTestingKey(null);
+  const handleTestSend = async () => {
+    try {
+      const res = await adminVolunteering.sendShiftReminders();
+      if (!res.success) {
+        throw new Error('send_shift_reminders_failed');
+      }
+      onTestClose();
+      toast.success(
+        t('volunteering.test_reminder_sent', 'Reminder job sent {{count}} notification(s)', {
+          count: (res.data as { reminders_sent?: number } | undefined)?.reminders_sent ?? 0,
+          label: testReminderLabel,
+        }),
+      );
+      loadDeliveryLogs();
+    } catch {
+      toast.error(t('volunteering.test_reminder_failed', 'Failed to send reminder job'));
+    } finally {
+      setTestingKey(null);
+    }
   };
 
   return (

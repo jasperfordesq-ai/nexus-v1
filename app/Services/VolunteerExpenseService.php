@@ -133,6 +133,7 @@ class VolunteerExpenseService
                 $monthEnd = now()->endOfMonth()->toDateString();
 
                 $monthlyTotal = (float) VolExpense::where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
                     ->where('organization_id', $organizationId)
                     ->whereBetween('submitted_at', [$monthStart, $monthEnd])
                     ->where('status', '!=', 'rejected')
@@ -250,7 +251,9 @@ class VolunteerExpenseService
      */
     public static function getExpense(int $id): ?array
     {
-        $expense = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization'])->find($id);
+        $expense = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization'])
+            ->where('tenant_id', TenantContext::getId())
+            ->find($id);
 
         if (!$expense) {
             return null;
@@ -281,12 +284,13 @@ class VolunteerExpenseService
         }
 
         // Prevent admins from approving their own expenses
-        $expense = VolExpense::find($id);
+        $expense = VolExpense::where('tenant_id', TenantContext::getId())->find($id);
         if ($expense && (int) $expense->user_id === $reviewerId) {
             throw new \InvalidArgumentException("You cannot review your own expense.");
         }
 
         $affected = VolExpense::where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'pending')
             ->update([
                 'status' => $status,
@@ -297,7 +301,7 @@ class VolunteerExpenseService
 
         if ($affected > 0) {
             try {
-                $expense = VolExpense::find($id);
+                $expense = VolExpense::where('tenant_id', TenantContext::getId())->find($id);
                 if ($expense) {
                     $isApproved = $status === 'approved';
                     $subjectKey = $isApproved ? 'emails_misc.expense.approved_subject' : 'emails_misc.expense.rejected_subject';
@@ -348,6 +352,7 @@ class VolunteerExpenseService
     public static function markPaid(int $id, int $adminId, ?string $paymentReference = null): bool
     {
         $affected = VolExpense::where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'approved')
             ->update([
                 'status' => 'paid',
@@ -357,7 +362,7 @@ class VolunteerExpenseService
 
         if ($affected > 0) {
             try {
-                $expense = VolExpense::find($id);
+                $expense = VolExpense::where('tenant_id', TenantContext::getId())->find($id);
                 if ($expense) {
                     $tenantId  = TenantContext::getId();
                     $user      = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
@@ -408,8 +413,14 @@ class VolunteerExpenseService
     {
         $query = VolExpense::query()
             ->where('vol_expenses.tenant_id', $tenantId)
-            ->join('users as u', 'vol_expenses.user_id', '=', 'u.id')
-            ->leftJoin('vol_organizations as org', 'vol_expenses.organization_id', '=', 'org.id')
+            ->join('users as u', function ($join) {
+                $join->on('vol_expenses.user_id', '=', 'u.id')
+                    ->on('vol_expenses.tenant_id', '=', 'u.tenant_id');
+            })
+            ->leftJoin('vol_organizations as org', function ($join) {
+                $join->on('vol_expenses.organization_id', '=', 'org.id')
+                    ->on('vol_expenses.tenant_id', '=', 'org.tenant_id');
+            })
             ->select([
                 'vol_expenses.id',
                 'u.first_name',
@@ -460,7 +471,8 @@ class VolunteerExpenseService
      */
     public static function getPolicies(int $tenantId): array
     {
-        return VolExpensePolicy::orderBy('organization_id')
+        return VolExpensePolicy::where('tenant_id', $tenantId)
+            ->orderBy('organization_id')
             ->orderBy('expense_type')
             ->get()
             ->map(function ($row) {
@@ -519,6 +531,7 @@ class VolunteerExpenseService
     {
         // Try org-specific policy first
         $policy = VolExpensePolicy::where('organization_id', $organizationId)
+            ->where('tenant_id', $tenantId)
             ->where('expense_type', $expenseType)
             ->first();
 
@@ -528,6 +541,7 @@ class VolunteerExpenseService
 
         // Fall back to tenant-wide policy
         return VolExpensePolicy::whereNull('organization_id')
+            ->where('tenant_id', $tenantId)
             ->where('expense_type', $expenseType)
             ->first();
     }

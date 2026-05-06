@@ -1320,6 +1320,7 @@ export const adminVolunteering = {
   // Reminders
   getReminderSettings: () => api.get('/v2/admin/volunteering/reminder-settings'),
   updateReminderSettings: (data: Record<string, unknown>) => api.put('/v2/admin/volunteering/reminder-settings', data),
+  sendShiftReminders: () => api.post('/v2/admin/volunteering/send-shift-reminders', {}),
 
   // Webhooks
   getWebhooks: () => api.get('/v2/admin/volunteering/webhooks'),

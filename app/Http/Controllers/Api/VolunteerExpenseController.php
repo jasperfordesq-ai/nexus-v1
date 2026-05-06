@@ -148,7 +148,7 @@ class VolunteerExpenseController extends BaseApiController
 
         $allowedStatuses = ['approved', 'rejected', 'paid'];
         if (!in_array($status, $allowedStatuses, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid status. Must be one of: ' . implode(', ', $allowedStatuses), 'status', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status_allowed', ['statuses' => implode(', ', $allowedStatuses)]), 'status', 422);
         }
 
         try {

@@ -10,6 +10,7 @@ use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Listing;
 use App\Models\User;
+use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -105,7 +106,131 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('id="main-content"', false);
         $response->assertSee('class="govuk-phase-banner"', false);
         $response->assertSee('AGPL-3.0-or-later');
+        $response->assertSee('class="govuk-fieldset"', false);
+        $response->assertSee('class="govuk-textarea"', false);
+        $response->assertSee('class="govuk-select"', false);
+        $response->assertSee('class="govuk-tag govuk-tag--grey"', false);
         $response->assertSee('Alpha feed verification post');
+    }
+
+    public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.auth_required'));
+        $response->assertSee(__('govuk_alpha.feed.auth_required_detail', ['community' => 'hOUR Timebank']));
+        $response->assertSee('class="govuk-notification-banner"', false);
+        $response->assertSee(route('govuk-alpha.login', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertDontSee('name="content"', false);
+        $response->assertSee('class="govuk-select"', false);
+        $response->assertSee(__('govuk_alpha.feed.empty'));
+    }
+
+    public function test_feed_page_renders_post_empty_error_state(): void
+    {
+        $this->authenticatedUser();
+
+        $redirect = $this->post("/{$this->testTenantSlug}/alpha/feed/posts", [
+            'content' => '   ',
+        ]);
+
+        $redirect->assertRedirect("/{$this->testTenantSlug}/alpha/feed?status=post-empty");
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed?status=post-empty");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.post_empty'));
+        $response->assertSee('class="govuk-error-summary"', false);
+        $response->assertSee('class="govuk-error-message"', false);
+        $response->assertSee('govuk-textarea--error', false);
+        $response->assertSee('href="#content"', false);
+    }
+
+    public function test_feed_page_renders_post_created_success_state(): void
+    {
+        $this->authenticatedUser();
+
+        $redirect = $this->post("/{$this->testTenantSlug}/alpha/feed/posts", [
+            'content' => 'Created from the accessible frontend feature test.',
+        ]);
+
+        $redirect->assertRedirect("/{$this->testTenantSlug}/alpha/feed?status=post-created");
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed?status=post-created");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.post_created'));
+        $response->assertSee('govuk-notification-banner--success', false);
+    }
+
+    public function test_feed_page_keeps_tenant_items_isolated(): void
+    {
+        $user = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant(999)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $visiblePost = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'content' => 'Visible alpha tenant post',
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'post',
+            'source_id' => $visiblePost->id,
+            'user_id' => $user->id,
+            'content' => 'Visible alpha tenant post',
+        ]);
+
+        $otherPost = FeedPost::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+            'content' => 'Other tenant alpha feed post',
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant(999)->create([
+            'source_type' => 'post',
+            'source_id' => $otherPost->id,
+            'user_id' => $otherUser->id,
+            'content' => 'Other tenant alpha feed post',
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed");
+
+        $response->assertOk();
+        $response->assertSee('Visible alpha tenant post');
+        $response->assertDontSee('Other tenant alpha feed post');
+    }
+
+    public function test_feed_page_renders_pagination_when_more_items_exist(): void
+    {
+        $user = $this->authenticatedUser();
+
+        foreach (['First paginated alpha post', 'Second paginated alpha post'] as $index => $content) {
+            $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+                'user_id' => $user->id,
+                'content' => $content,
+                'visibility' => 'public',
+                'created_at' => now()->subMinutes($index),
+            ]);
+            FeedActivity::factory()->forTenant($this->testTenantId)->create([
+                'source_type' => 'post',
+                'source_id' => $post->id,
+                'user_id' => $user->id,
+                'content' => $content,
+                'created_at' => now()->subMinutes($index),
+            ]);
+        }
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed?per_page=1");
+
+        $response->assertOk();
+        $response->assertSee('class="govuk-pagination govuk-pagination--block', false);
+        $response->assertSee(__('govuk_alpha.actions.load_more'));
+        $response->assertSee(__('govuk_alpha.feed.more_results_label'));
+        $response->assertSee('rel="next"', false);
     }
 
     public function test_listings_page_renders_filters_results_and_tenant_isolation(): void
@@ -127,8 +252,29 @@ class GovukAlphaFrontendTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('class="govuk-phase-banner"', false);
+        $response->assertSee('class="govuk-fieldset"', false);
+        $response->assertSee('type="search"', false);
+        $response->assertSee('class="govuk-select"', false);
+        $response->assertSee('class="govuk-tag govuk-tag--blue"', false);
         $response->assertSee('Alpha listing verification');
+        $response->assertSee(__('govuk_alpha.actions.view_details'));
         $response->assertDontSee('Other tenant alpha listing');
+    }
+
+    public function test_listings_page_renders_module_disabled_state(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['configuration' => json_encode(['modules' => ['listings' => false]])]);
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings");
+
+        $response->assertStatus(403);
+        $response->assertSee(__('govuk_alpha.states.module_disabled'));
+        $response->assertSee('class="govuk-notification-banner"', false);
     }
 
     public function test_listing_detail_page_renders_summary(): void
@@ -145,7 +291,9 @@ class GovukAlphaFrontendTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Alpha detail listing');
+        $response->assertSee('class="govuk-back-link"', false);
         $response->assertSee('class="govuk-summary-list"', false);
+        $response->assertSee('class="govuk-tag govuk-tag--purple"', false);
     }
 
     public function test_members_page_renders_directory_for_authenticated_user(): void
@@ -155,9 +303,15 @@ class GovukAlphaFrontendTest extends TestCase
             'name' => 'Alpha Directory Member',
             'first_name' => 'Alpha',
             'last_name' => 'Member',
+            'location' => 'Alpha Town',
+            'bio' => 'Alpha directory test member biography.',
+            'avatar_url' => '/assets/img/defaults/default_avatar.png',
+            'onboarding_completed' => true,
             'status' => 'active',
             'is_approved' => true,
+            'is_verified' => true,
             'privacy_search' => true,
+            'created_at' => now()->addYear(),
         ]);
         User::factory()->forTenant(999)->create([
             'name' => 'Other Tenant Member',
@@ -165,10 +319,16 @@ class GovukAlphaFrontendTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members?q=Alpha%20Directory%20Member");
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members?sort=joined&order=DESC");
 
         $response->assertOk();
-        $response->assertSee('Alpha Directory Member');
+        $response->assertSee('class="govuk-fieldset"', false);
+        $response->assertSee('type="search"', false);
+        $response->assertSee('class="govuk-select"', false);
+        $response->assertSee('Alpha Member');
+        $response->assertSee('Alpha Town');
+        $response->assertSee('class="govuk-tag govuk-tag--green"', false);
+        $response->assertSee("/{$this->testTenantSlug}/profile/", false);
         $response->assertDontSee('Other Tenant Member');
         $response->assertSee('AGPL-3.0-or-later');
     }
@@ -180,6 +340,25 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.states.auth_required'));
         $response->assertSee('class="govuk-notification-banner"', false);
+        $response->assertSee(route('govuk-alpha.login', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_members_page_renders_empty_state_for_authenticated_user(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Only Visible Member']);
+
+        DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('id', '!=', $viewer->id)
+            ->update(['privacy_search' => 0]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.empty_title'));
+        $response->assertSee(__('govuk_alpha.members.empty'));
+        $response->assertSee('class="govuk-inset-text"', false);
     }
 
     private function authenticatedUser(array $overrides = []): User

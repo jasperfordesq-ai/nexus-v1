@@ -248,16 +248,16 @@ export default function VolunteerGivingDays() {
     try {
       const res = await adminVolunteering.getGivingDayDonors(givingDayId, cursor);
       if (res.success && res.data) {
-        const payload = res.data as unknown as DonorResponse;
-        const newDonors = payload.data || [];
+        const newDonors = Array.isArray(res.data) ? res.data as Donor[] : [];
         if (cursor) {
           setDonors((prev) => [...prev, ...newDonors]);
         } else {
           setDonors(newDonors);
         }
-        if (payload.stats) setDonorStats(payload.stats);
-        setDonorCursor(payload.meta?.cursor || null);
-        setDonorHasMore(payload.meta?.has_more || false);
+        const meta = res.meta as (DonorResponse['meta'] & { stats?: DonorResponse['stats'] }) | undefined;
+        if (meta?.stats) setDonorStats(meta.stats);
+        setDonorCursor(meta?.cursor || null);
+        setDonorHasMore(meta?.has_more || false);
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_donors', 'Failed to load donors'));

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { FullConfig } from '@playwright/test';
+import type { FullConfig } from '@playwright/test';
 
 /**
  * Global Teardown for E2E Tests

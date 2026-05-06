@@ -259,6 +259,7 @@ export default function CareProviderDirectoryPage() {
         {/* Search + sub-region filter */}
         <div className="flex flex-col gap-3">
           <Input
+            aria-label={t('providers.search_placeholder')}
             placeholder={t('providers.search_placeholder')}
             value={search}
             onValueChange={setSearch}

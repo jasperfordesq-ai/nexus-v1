@@ -81,6 +81,7 @@ class VolunteerCertificateController extends BaseApiController
 
     public function verifyCertificate($code): JsonResponse
     {
+        $this->ensureFeature();
         $this->rateLimit('volunteering_cert_verify', 60, 60);
 
         $cert = $this->volunteerCertificateService->verify($code);
@@ -95,6 +96,7 @@ class VolunteerCertificateController extends BaseApiController
     /** Returns raw HTML for certificate printing/PDF -- not JSON */
     public function certificateHtml($code): Response|JsonResponse
     {
+        $this->ensureFeature();
         $this->rateLimit('volunteering_cert_html', 10, 60);
 
         $html = $this->volunteerCertificateService->generateHtml($code);
@@ -135,7 +137,9 @@ class VolunteerCertificateController extends BaseApiController
             return [
                 'id' => (int) ($row->id ?? 0),
                 'credential_type' => $type,
-                'file_url' => $row->file_url ?? null,
+                'file_url' => str_starts_with((string) ($row->file_url ?? ''), 'private:')
+                    ? '/api/v2/volunteering/credentials/' . (int) ($row->id ?? 0) . '/download'
+                    : ($row->file_url ?? null),
                 'file_name' => $row->file_name ?? null,
                 'status' => $row->status ?? 'pending',
                 'expires_at' => $row->expires_at ?? null,
@@ -205,8 +209,22 @@ class VolunteerCertificateController extends BaseApiController
             }
         }
 
-        $fileUrl = \App\Core\ImageUploader::upload($uploadedFile, 'credentials');
         $fileName = $uploadedFile['name'] ?? null;
+        $mimeType = $uploadedFile['type'] ?? null;
+        if (!$mimeType && !empty($uploadedFile['tmp_name'])) {
+            $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($uploadedFile['tmp_name']);
+        }
+
+        if ($mimeType === 'application/pdf') {
+            $storagePath = 'volunteer-credentials/' . $tenantId . '/' . bin2hex(random_bytes(16)) . '.pdf';
+            \Illuminate\Support\Facades\Storage::disk('local')->put(
+                $storagePath,
+                file_get_contents($uploadedFile['tmp_name'])
+            );
+            $fileUrl = 'private:' . $storagePath;
+        } else {
+            $fileUrl = \App\Core\ImageUploader::upload($uploadedFile, 'credentials');
+        }
 
         DB::insert(
             "INSERT INTO vol_credentials (tenant_id, user_id, credential_type, file_url, file_name, status, expires_at, created_at, updated_at)
@@ -220,6 +238,32 @@ class VolunteerCertificateController extends BaseApiController
         ], null, 201);
     }
 
+    public function downloadCredential($id)
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_credential_download', 30, 60);
+
+        $credential = DB::selectOne(
+            "SELECT id, file_url, file_name FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            [(int) $id, $userId, TenantContext::getId()]
+        );
+
+        if (!$credential || !str_starts_with((string) $credential->file_url, 'private:')) {
+            return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
+        }
+
+        $path = substr((string) $credential->file_url, strlen('private:'));
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
+        }
+
+        return response()->download(
+            \Illuminate\Support\Facades\Storage::disk('local')->path($path),
+            $credential->file_name ?: basename($path)
+        );
+    }
+
     public function deleteCredential($id): JsonResponse
     {
         $this->ensureFeature();
@@ -227,6 +271,11 @@ class VolunteerCertificateController extends BaseApiController
         $this->rateLimit('vol_credential_delete', 10, 60);
 
         $tenantId = TenantContext::getId();
+        $credential = DB::selectOne(
+            "SELECT file_url FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            [(int) $id, $userId, $tenantId]
+        );
+
         $affected = DB::delete(
             "DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
             [(int) $id, $userId, $tenantId]
@@ -234,6 +283,10 @@ class VolunteerCertificateController extends BaseApiController
 
         if ($affected === 0) {
             return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
+        }
+
+        if ($credential && str_starts_with((string) $credential->file_url, 'private:')) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete(substr((string) $credential->file_url, strlen('private:')));
         }
 
         return $this->respondWithData(['success' => true]);

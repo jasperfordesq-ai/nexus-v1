@@ -74,6 +74,23 @@ class VolOrgWalletServiceTest extends TestCase
         $this->assertEquals(2, (int) $tx->tenant_id);
     }
 
+    public function test_fractional_deposit_debits_and_records_only_whole_hours(): void
+    {
+        $user = User::factory()->forTenant(2)->create(['balance' => 10]);
+        $orgId = $this->makeOrg(2, 0.00);
+
+        $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 1.75);
+
+        $this->assertTrue($result['success'], $result['message'] ?? '');
+        $this->assertEquals(1.00, (float) $result['new_balance']);
+        $this->assertEquals(9, (int) DB::table('users')->where('id', $user->id)->value('balance'));
+        $this->assertEquals(1.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+
+        $tx = DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->orderByDesc('id')->first();
+        $this->assertEquals(1.00, (float) $tx->amount);
+        $this->assertEquals(1.00, (float) $tx->balance_after);
+    }
+
     public function test_deposit_rejects_zero_and_negative_amounts(): void
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 100]);
@@ -128,6 +145,27 @@ class VolOrgWalletServiceTest extends TestCase
                 ->where('transaction_type', 'volunteer')
                 ->exists()
         );
+    }
+
+    public function test_fractional_pay_volunteer_does_not_lose_or_overpay_hours(): void
+    {
+        $admin = User::factory()->forTenant(2)->create();
+        $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
+        $orgId = $this->makeOrg(2, 10.0, $admin->id);
+
+        $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 2.75, $admin->id);
+
+        $this->assertTrue($result['success'], $result['message'] ?? '');
+        $this->assertEquals(8.0, (float) $result['new_balance']);
+        $this->assertEquals(8.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(2, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+
+        $orgTx = DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->orderByDesc('id')->first();
+        $this->assertEquals(-2.00, (float) $orgTx->amount);
+        $this->assertEquals(8.00, (float) $orgTx->balance_after);
+
+        $mainTx = DB::table('transactions')->where('receiver_id', $volunteer->id)->orderByDesc('id')->first();
+        $this->assertEquals(2, (int) $mainTx->amount);
     }
 
     public function test_pay_volunteer_rejects_when_org_balance_insufficient(): void

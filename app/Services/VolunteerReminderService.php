@@ -27,6 +27,32 @@ class VolunteerReminderService
     }
 
     /**
+     * Shift assignments currently use approved vol_applications.shift_id, while
+     * older reminder code used vol_shift_signups. Read both sources so reminders
+     * reach volunteers regardless of which flow assigned the shift.
+     *
+     * @return array<int>
+     */
+    private static function confirmedShiftUserIds(int $tenantId, int $shiftId): array
+    {
+        $signupUsers = DB::table('vol_shift_signups')
+            ->where('shift_id', $shiftId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'confirmed')
+            ->pluck('user_id')
+            ->all();
+
+        $applicationUsers = DB::table('vol_applications')
+            ->where('shift_id', $shiftId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'approved')
+            ->pluck('user_id')
+            ->all();
+
+        return array_values(array_unique(array_map('intval', array_merge($signupUsers, $applicationUsers))));
+    }
+
+    /**
      * Send reminders for an opportunity's upcoming shifts.
      *
      * Finds confirmed volunteers for shifts belonging to the given opportunity
@@ -66,12 +92,7 @@ class VolunteerReminderService
 
         foreach ($shifts as $shift) {
             // Get confirmed volunteers for this shift
-            $signups = DB::table('vol_shift_signups')
-                ->where('shift_id', $shift->id)
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'confirmed')
-                ->pluck('user_id')
-                ->all();
+            $signups = self::confirmedShiftUserIds($tenantId, (int) $shift->id);
 
             // Fetch the opportunity title for this shift once per shift
             $opportunity = DB::table('vol_opportunities')
@@ -423,12 +444,7 @@ class VolunteerReminderService
                     $opportunityLocation = htmlspecialchars($opportunity->location ?? '', ENT_QUOTES, 'UTF-8');
 
                     // Get confirmed volunteers for this shift
-                    $signups = DB::table('vol_shift_signups')
-                        ->where('shift_id', $shift->id)
-                        ->where('tenant_id', $tenantId)
-                        ->where('status', 'confirmed')
-                        ->pluck('user_id')
-                        ->all();
+                    $signups = self::confirmedShiftUserIds($tenantId, (int) $shift->id);
 
                     foreach ($signups as $userId) {
                         // Skip if already reminded
@@ -592,12 +608,7 @@ class VolunteerReminderService
                     $opportunityTitle = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
 
                     // Get confirmed volunteers
-                    $signups = DB::table('vol_shift_signups')
-                        ->where('shift_id', $shift->id)
-                        ->where('tenant_id', $tenantId)
-                        ->where('status', 'confirmed')
-                        ->pluck('user_id')
-                        ->all();
+                    $signups = self::confirmedShiftUserIds($tenantId, (int) $shift->id);
 
                     foreach ($signups as $userId) {
                         // Skip if post-shift feedback already sent for this shift+user

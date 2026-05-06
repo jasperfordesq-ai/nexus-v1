@@ -337,6 +337,7 @@ Route::get('/v2/connections/suggestions', [\App\Http\Controllers\Api\ConnectionS
 // ============================================
 // MIGRATED ROUTES — Users (controller routes only)
 // Source: httpdocs/routes/users.php
+Route::get('/v2/users/search', [\App\Http\Controllers\Api\UsersController::class, 'search']);
 Route::get('/v2/users', [\App\Http\Controllers\Api\UsersController::class, 'index']); // Member directory
 // ============================================
 Route::get('/v2/me/stats', [\App\Http\Controllers\Api\UsersController::class, 'stats']);
@@ -2569,6 +2570,7 @@ Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers
 Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'certificateHtml'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCredentials']);
 Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential'])->middleware('throttle:20,1');
+Route::get('/v2/volunteering/credentials/{id}/download', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'downloadCredential']);
 Route::delete('/v2/volunteering/credentials/{id}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'deleteCredential']);
 Route::get('/v2/volunteering/emergency-alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'myEmergencyAlerts']);
 Route::post('/v2/volunteering/emergency-alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'createEmergencyAlert']);

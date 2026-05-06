@@ -104,9 +104,10 @@ export function VolunteerTraining() {
     try {
       const res = await adminVolunteering.getTraining();
       if (res.success && res.data) {
-        const payload = parsePayload<{ records?: TrainingRecord[]; stats?: TrainingStats }>(res.data);
-        setRecords(payload.records || []);
-        setStats(payload.stats || null);
+        const payload = parsePayload<{ items?: TrainingRecord[]; records?: TrainingRecord[]; stats?: TrainingStats } | TrainingRecord[]>(res.data);
+        const rows = Array.isArray(payload) ? payload : payload.items || payload.records || [];
+        setRecords(rows);
+        setStats(Array.isArray(payload) ? null : payload.stats || null);
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_training', 'Failed to load training records'));
