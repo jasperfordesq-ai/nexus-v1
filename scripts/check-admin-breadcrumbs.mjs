@@ -39,6 +39,7 @@ for (const m of routesSrc.matchAll(/path="([^"]+)"/g)) {
   if (p === '*' || p === '') continue;
   for (const seg of p.split('/')) {
     if (!seg) continue;
+    if (seg === '*') continue;
     if (seg.startsWith(':')) continue;
     if (/^\d+$/.test(seg)) continue;
     segments.add(seg);

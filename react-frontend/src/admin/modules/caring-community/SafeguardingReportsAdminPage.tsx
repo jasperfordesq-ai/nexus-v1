@@ -31,7 +31,6 @@ import {
 } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

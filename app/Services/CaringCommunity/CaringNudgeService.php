@@ -969,16 +969,23 @@ class CaringNudgeService
             return 0;
         }
 
-        // Push the JSON predicate down to MySQL so the database filters at the
-        // storage engine instead of streaming every user row to PHP for decode.
-        // Mirrors the `caring_smart_nudges` key path read by parseOptedOut().
-        // JSON_EXTRACT returns the JSON literal `false` (not the SQL FALSE),
-        // so compare with CAST(... AS JSON) to be robust across MySQL/MariaDB.
-        return (int) DB::table('users')
+        // Keep this on the same tolerant parser used by dispatch eligibility.
+        // MariaDB and MySQL differ enough around JSON booleans that a raw SQL
+        // predicate can under-count or fail on perfectly valid stored prefs.
+        $count = 0;
+        DB::table('users')
             ->where('tenant_id', $tenantId)
             ->whereNotNull('notification_preferences')
-            ->whereRaw("JSON_EXTRACT(notification_preferences, '$.caring_smart_nudges') = CAST('false' AS JSON)")
-            ->count();
+            ->orderBy('id')
+            ->chunkById(500, function ($rows) use (&$count): void {
+                foreach ($rows as $row) {
+                    if ($this->parseOptedOut($row->notification_preferences ?? null)) {
+                        $count++;
+                    }
+                }
+            });
+
+        return $count;
     }
 
     /**

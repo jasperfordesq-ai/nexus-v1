@@ -471,6 +471,10 @@ class AdminCaringCommunityControllerTest extends TestCase
         $supporter = User::factory()->forTenant($this->testTenantId)->create(['balance' => 2]);
         $owner = User::factory()->forTenant($this->testTenantId)->create();
         Sanctum::actingAs($admin);
+        $existingPendingCount = (int) DB::table('vol_logs')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('status', 'pending')
+            ->count();
 
         $orgId = DB::table('vol_organizations')->insertGetId([
             'tenant_id' => $this->testTenantId,
@@ -502,7 +506,7 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonPath('data.review.status', 'approved');
         $response->assertJsonPath('data.review.payment_result', 'paid');
-        $response->assertJsonPath('data.review.summary.stats.pending_count', 0);
+        $response->assertJsonPath('data.review.summary.stats.pending_count', $existingPendingCount);
 
         $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
         $this->assertEqualsWithDelta(7.25, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'), 0.001);

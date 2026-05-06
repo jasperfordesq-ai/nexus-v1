@@ -29,10 +29,9 @@ export function CaringPanelBreadcrumbs() {
     if (!segment || /^\d+$/.test(segment)) continue;
 
     currentPath += `/${segment}`;
-    const label = t(
-      `panel.breadcrumbs.segments.${segment}`,
-      { defaultValue: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ') },
-    );
+    const labelKey = `panel.breadcrumbs.segments.${segment}`;
+    const translated = t(labelKey);
+    const label = translated !== labelKey ? translated : `[missing: ${segment}]`;
     const isLast = i === segments.length - 1;
 
     crumbs.push({ label, href: isLast ? undefined : currentPath });
@@ -41,18 +40,18 @@ export function CaringPanelBreadcrumbs() {
   if (crumbs.length <= 1) return null;
 
   return (
-    <nav aria-label={t('panel.breadcrumbs.aria')} className="mb-4">
-      <ol className="flex items-center gap-1.5 text-sm text-default-500">
+    <nav aria-label={t('panel.breadcrumbs.aria')} className="mb-4 max-w-full overflow-x-auto pb-1">
+      <ol className="flex w-max max-w-full items-center gap-1.5 text-sm text-default-500">
         {crumbs.map((crumb, index) => (
-          <li key={crumb.label} className="flex items-center gap-1.5">
-            {index > 0 && <ChevronRight size={14} className="text-default-300" />}
-            {index === 0 && <LayoutDashboard size={14} className="mr-1" />}
+          <li key={crumb.label} className="flex min-w-0 items-center gap-1.5">
+            {index > 0 && <ChevronRight size={14} className="shrink-0 text-default-300" />}
+            {index === 0 && <LayoutDashboard size={14} className="mr-1 shrink-0" />}
             {crumb.href ? (
-              <Link to={crumb.href} className="hover:text-foreground transition-colors">
+              <Link to={crumb.href} className="max-w-[9rem] truncate hover:text-foreground transition-colors sm:max-w-[14rem]">
                 {crumb.label}
               </Link>
             ) : (
-              <span className="font-medium text-foreground">{crumb.label}</span>
+              <span className="max-w-[12rem] truncate font-medium text-foreground sm:max-w-[18rem]">{crumb.label}</span>
             )}
           </li>
         ))}

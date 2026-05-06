@@ -184,11 +184,14 @@ class KpiBaselineService
             ];
         }
 
+        $claimTargets = $this->pilotClaimTargets($comparison);
+
         return [
             'baseline' => $baseline,
             'current' => $currentMetrics,
             'comparison' => $comparison,
-            'pilot_claim_targets' => $this->pilotClaimTargets($comparison),
+            'pilot_claim_targets' => $claimTargets,
+            'agoris_claim_targets' => $claimTargets,
         ];
     }
 

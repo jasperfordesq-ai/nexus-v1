@@ -42,6 +42,10 @@ class NationalKissDashboardTest extends TestCase
             $this->markTestSkipped('tenant_category column missing — run migrations first.');
         }
 
+        DB::table('tenants')
+            ->where('tenant_category', 'kiss_cooperative')
+            ->update(['tenant_category' => 'community']);
+
         $this->kissTenantA = (int) DB::table('tenants')->insertGetId([
             'name' => 'Test KISS Coop Alpha',
             'slug' => 'test-kiss-coop-alpha-' . uniqid(),

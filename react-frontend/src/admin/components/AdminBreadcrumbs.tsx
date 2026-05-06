@@ -23,12 +23,9 @@ interface AdminBreadcrumbsProps {
   items?: BreadcrumbItem[];
 }
 
-function humanizeSegment(segment: string): string {
-  return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
-}
-
 // Map URL segments to i18n keys for breadcrumb labels
 const SEGMENT_LABEL_KEYS: Record<string, string> = {
+  '*': 'breadcrumbs.not_found',
   // Core
   admin: 'breadcrumbs.admin',
   create: 'breadcrumbs.create',
@@ -65,6 +62,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Matching & Broker — broker-controls retired; legacy URL redirects to
   // /broker/* via TenantRedirect in admin/routes.tsx.
+  'broker-controls': 'breadcrumbs.broker_controls',
   'smart-matching': 'breadcrumbs.smart_matching',
   configuration: 'breadcrumbs.configuration',
   'match-approvals': 'breadcrumbs.match_approvals',
@@ -131,6 +129,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Federation
   federation: 'breadcrumbs.federation',
+  aggregates: 'breadcrumbs.aggregates',
   partnerships: 'breadcrumbs.partnerships',
   directory: 'breadcrumbs.directory',
   profile: 'breadcrumbs.profile',
@@ -193,6 +192,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Analytics & Reporting
   analytics: 'breadcrumbs.analytics',
+  regional: 'breadcrumbs.regional',
   'community-analytics': 'breadcrumbs.community_analytics',
   'impact-report': 'breadcrumbs.impact_report',
   members: 'breadcrumbs.members',
@@ -212,6 +212,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Marketplace
   marketplace: 'breadcrumbs.marketplace',
+  coupons: 'breadcrumbs.coupons',
   sellers: 'breadcrumbs.sellers',
 
   // Billing
@@ -220,8 +221,47 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   revenue: 'breadcrumbs.revenue',
   'checkout-return': 'breadcrumbs.checkout_return',
 
+  // Caring Community legacy admin redirects
+  'caring-community': 'breadcrumbs.caring_community',
+  workflow: 'breadcrumbs.workflow',
+  loyalty: 'breadcrumbs.loyalty',
+  'hour-transfers': 'breadcrumbs.hour_transfers',
+  'sub-regions': 'breadcrumbs.sub_regions',
+  'federation-peers': 'breadcrumbs.federation_peers',
+  'sla-dashboard': 'breadcrumbs.sla_dashboard',
+  providers: 'breadcrumbs.providers',
+  'warmth-pass': 'breadcrumbs.warmth_pass',
+  'recipient-circle': 'breadcrumbs.recipient_circle',
+  nudges: 'breadcrumbs.nudges',
+  'emergency-alerts': 'breadcrumbs.emergency_alerts',
+  surveys: 'breadcrumbs.surveys',
+  copilot: 'breadcrumbs.copilot',
+  'civic-digest': 'breadcrumbs.civic_digest',
+  'lead-nurture': 'breadcrumbs.lead_nurture',
+  'success-stories': 'breadcrumbs.success_stories',
+  feedback: 'breadcrumbs.feedback',
+  verification: 'breadcrumbs.verification',
+  'trust-tier': 'breadcrumbs.trust_tier',
+  'launch-readiness': 'breadcrumbs.launch_readiness',
+  'pilot-scoreboard': 'breadcrumbs.pilot_scoreboard',
+  'data-quality': 'breadcrumbs.data_quality',
+  'operating-policy': 'breadcrumbs.operating_policy',
+  'disclosure-pack': 'breadcrumbs.disclosure_pack',
+  'commercial-boundary': 'breadcrumbs.commercial_boundary',
+  'isolated-node': 'breadcrumbs.isolated_node',
+  research: 'breadcrumbs.research',
+  'external-integrations': 'breadcrumbs.external_integrations',
+  'integration-showcase': 'breadcrumbs.integration_showcase',
+  'municipal-impact': 'breadcrumbs.municipal_impact',
+  'kpi-baselines': 'breadcrumbs.kpi_baselines',
+  'municipal-roi': 'breadcrumbs.municipal_roi',
+  'category-coefficients': 'breadcrumbs.category_coefficients',
+  'regional-points': 'breadcrumbs.regional_points',
+
   // Config / Setup
+  advertising: 'breadcrumbs.advertising',
   'api-docs': 'breadcrumbs.api_docs',
+  'api-partners': 'breadcrumbs.api_partners',
   'badge-config': 'breadcrumbs.badge_config',
   'cc-config': 'breadcrumbs.cc_config',
   'consent-types': 'breadcrumbs.consent_types',
@@ -231,6 +271,21 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   tenant: 'breadcrumbs.tenant',
   webhooks: 'breadcrumbs.webhooks',
   login: 'breadcrumbs.login',
+  'member-premium': 'breadcrumbs.member_premium',
+  fadp: 'breadcrumbs.fadp',
+  'push-campaigns': 'breadcrumbs.push_campaigns',
+  ai: 'breadcrumbs.ai',
+  'ki-agents': 'breadcrumbs.ki_agents',
+  agents: 'breadcrumbs.agents',
+  proposals: 'breadcrumbs.proposals',
+  runs: 'breadcrumbs.runs',
+  platform: 'breadcrumbs.platform',
+  'pilot-inquiries': 'breadcrumbs.pilot_inquiries',
+  'provisioning-requests': 'breadcrumbs.provisioning_requests',
+  national: 'breadcrumbs.national',
+  kiss: 'breadcrumbs.kiss',
+  'regional-analytics': 'breadcrumbs.regional_analytics',
+  help: 'breadcrumbs.help',
 
   // Groups / Community
   'external-partners': 'breadcrumbs.external_partners',
