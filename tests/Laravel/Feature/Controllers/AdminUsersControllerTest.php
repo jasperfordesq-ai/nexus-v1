@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -69,6 +70,42 @@ class AdminUsersControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_show_returns_badges_using_current_schema_columns(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('badges')->insertOrIgnore([
+            'tenant_id' => $this->testTenantId,
+            'badge_key' => 'welcome-helper',
+            'name' => 'Welcome Helper',
+            'description' => 'Completed the welcome helper path.',
+            'icon' => 'fa-award',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('user_badges')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'badge_key' => 'welcome-helper',
+            'name' => 'Legacy Welcome Helper',
+            'title' => 'Legacy Welcome Helper',
+            'icon' => 'fa-star',
+            'awarded_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/users/' . $user->id);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.badges.0.slug', 'welcome-helper');
+        $response->assertJsonPath('data.badges.0.name', 'Welcome Helper');
+        $response->assertJsonPath('data.badges.0.description', 'Completed the welcome helper path.');
+        $response->assertJsonPath('data.badges.0.icon', 'fa-award');
     }
 
     public function test_show_returns_404_for_nonexistent_user(): void

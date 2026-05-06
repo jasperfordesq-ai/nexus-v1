@@ -997,9 +997,15 @@ abstract class BaseApiController extends Controller
     private function resolveUserId(): ?int
     {
         // Try Laravel Auth first (covers Sanctum, Passport, session guard)
-        $user = Auth::user();
-        if ($user) {
-            return (int) $user->id;
+        try {
+            $user = Auth::user();
+            if ($user) {
+                return (int) $user->id;
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[BaseApiController] Auth user resolution failed', [
+                'error' => $e->getMessage(),
+            ]);
         }
 
         // Legacy session fallback

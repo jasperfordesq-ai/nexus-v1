@@ -29,11 +29,25 @@ class Authenticate
         $guards = empty($guards) ? ['sanctum'] : $guards;
 
         foreach ($guards as $guard) {
-            if (auth()->guard($guard)->check()) {
+            try {
+                $guardInstance = auth()->guard($guard);
+                $guardAuthenticated = $guardInstance->check();
+            } catch (\Throwable $e) {
+                // Sanctum attempts to parse any bearer token before the legacy
+                // JWT fallback below. A malformed/stale Sanctum token or schema
+                // drift must not turn otherwise-valid JWT requests into 500s.
+                Log::warning('[Auth] Guard check failed; trying legacy token fallback', [
+                    'guard' => $guard,
+                    'error' => $e->getMessage(),
+                ]);
+                continue;
+            }
+
+            if ($guardAuthenticated) {
                 // Validate that the authenticated user belongs to the resolved tenant.
                 // Without this check, Sanctum tokens work across any tenant since they
                 // bypass the JWT tenant_id mismatch detection in TenantContext::resolve().
-                $user = auth()->guard($guard)->user();
+                $user = $guardInstance->user();
                 $tenantId = \App\Core\TenantContext::getId();
                 if ($user && $tenantId && (int) $user->tenant_id !== $tenantId) {
                     if (!$user->is_super_admin && !$user->is_god && !in_array($user->role ?? '', ['super_admin', 'god'], true)) {

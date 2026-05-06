@@ -216,9 +216,15 @@ class AdminUsersController extends BaseApiController
         $badges = [];
         try {
             $badgeRows = DB::select(
-                "SELECT ub.id, ub.badge_key, ub.awarded_at, ub.badge_name, ub.badge_description, ub.badge_icon
-                 FROM user_badges ub WHERE ub.user_id = ? ORDER BY ub.awarded_at DESC",
-                [$id]
+                "SELECT ub.id, ub.badge_key, ub.awarded_at,
+                        COALESCE(b.name, ub.name, NULLIF(ub.title, ''), ub.badge_key) AS badge_name,
+                        COALESCE(b.description, '') AS badge_description,
+                        COALESCE(b.icon, ub.icon) AS badge_icon
+                 FROM user_badges ub
+                 LEFT JOIN badges b ON b.badge_key = ub.badge_key AND b.tenant_id = ub.tenant_id
+                 WHERE ub.user_id = ? AND ub.tenant_id = ?
+                 ORDER BY ub.awarded_at DESC",
+                [$id, $tenantId]
             );
             $badges = array_map(fn($b) => [
                 'id' => (int) $b->id,

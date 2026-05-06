@@ -272,7 +272,11 @@ class WebAuthnChallengeStore
      */
     private static function getCacheDir(): string
     {
-        return sys_get_temp_dir() . '/nexus_webauthn_challenges';
+        if (function_exists('storage_path')) {
+            return storage_path('framework/cache/webauthn_challenges');
+        }
+
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'nexus_webauthn_challenges';
     }
 
     /**
@@ -280,7 +284,7 @@ class WebAuthnChallengeStore
      */
     private static function getCacheFile(string $key): string
     {
-        $safeKey = preg_replace('/[^a-zA-Z0-9_\-:]/', '_', $key);
-        return self::getCacheDir() . '/' . $safeKey . '.json';
+        $safeKey = hash('sha256', $key);
+        return self::getCacheDir() . DIRECTORY_SEPARATOR . $safeKey . '.json';
     }
 }
