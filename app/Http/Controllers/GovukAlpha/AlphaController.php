@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Services\FeedService;
 use App\Services\ListingService;
 use App\Services\OnboardingConfigService;
+use App\Services\RegistrationService;
 use App\Services\SearchService;
 use App\Services\TokenService;
 use Illuminate\Http\RedirectResponse;
@@ -26,11 +27,88 @@ class AlphaController extends Controller
     public function __construct(
         private readonly FeedService $feedService,
         private readonly ListingService $listingService,
+        private readonly RegistrationService $registrationService,
     ) {}
 
-    public function redirectToFeed(string $tenantSlug): RedirectResponse
+    public function home(Request $request, string $tenantSlug): Response
     {
-        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::home', [
+            'title' => __('govuk_alpha.home.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'home',
+            'isAuthenticated' => $this->currentUserId() !== null,
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function login(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::login', [
+            'title' => __('govuk_alpha.auth.login_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'login',
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function storeLogin(string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        try {
+            $response = app(\App\Http\Controllers\Api\AuthController::class)->login();
+            $payload = $response->getData(true);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+        }
+
+        if (($payload['success'] ?? false) === true) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in']);
+        }
+
+        if (($payload['requires_2fa'] ?? false) === true) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-required']);
+        }
+
+        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+    }
+
+    public function register(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::register', [
+            'title' => __('govuk_alpha.auth.register_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'register',
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function storeRegister(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $result = $this->registrationService->register([
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
+            'location' => $request->input('location'),
+            'password' => $request->input('password'),
+            'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
+        ], TenantContext::getId());
+
+        if (isset($result['error'])) {
+            return redirect()->route('govuk-alpha.register', ['tenantSlug' => $tenantSlug, 'status' => 'register-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'register-created']);
     }
 
     public function feed(Request $request, string $tenantSlug): Response
@@ -225,6 +303,7 @@ class AlphaController extends Controller
         return [
             'assetEntrypoint' => $this->assetEntrypoint(),
             'tenant' => TenantContext::get(),
+            'isAuthenticated' => $this->currentUserId() !== null,
         ];
     }
 

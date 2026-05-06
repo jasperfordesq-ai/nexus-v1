@@ -19,6 +19,20 @@ class GovukAlphaFrontendTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function test_home_login_and_register_pages_render_for_tenant(): void
+    {
+        foreach (['/alpha', '/alpha/login', '/alpha/register'] as $path) {
+            $response = $this->get("/{$this->testTenantSlug}{$path}");
+
+            $response->assertOk();
+            $response->assertHeader('content-type', 'text/html; charset=UTF-8');
+            $response->assertSee('Project NEXUS Accessible');
+            $response->assertSee('class="govuk-skip-link"', false);
+            $response->assertSee('class="govuk-phase-banner"', false);
+            $response->assertSee('AGPL-3.0-or-later');
+        }
+    }
+
     public function test_feed_page_renders_govuk_alpha_shell_and_feed_item(): void
     {
         $user = $this->authenticatedUser();

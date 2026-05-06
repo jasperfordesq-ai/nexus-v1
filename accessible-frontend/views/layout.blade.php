@@ -18,10 +18,12 @@
 
     <header class="nexus-alpha-header" role="banner">
         <div class="govuk-width-container nexus-alpha-header__container">
-            <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">
-                {{ $tenant['name'] ?? __('govuk_alpha.service_name') }}
+            <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) }}">
+                {{ __('govuk_alpha.service_name') }}
             </a>
-            <span class="nexus-alpha-header__service govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.service_name') }}</span>
+            <span class="nexus-alpha-header__service govuk-body govuk-!-margin-bottom-0">
+                {{ __('govuk_alpha.header.community', ['name' => $tenant['name'] ?? $tenantSlug]) }}
+            </span>
         </div>
     </header>
 
@@ -29,6 +31,7 @@
         <div class="govuk-width-container">
             <ul class="govuk-service-navigation__list">
                 @foreach ([
+                    'home' => route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]),
                     'feed' => route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]),
                     'listings' => route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]),
                     'members' => route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]),
@@ -42,6 +45,14 @@
                 <li class="govuk-service-navigation__item">
                     <a class="govuk-service-navigation__link" href="/{{ $tenantSlug }}">{{ __('govuk_alpha.nav.react_app') }}</a>
                 </li>
+                @if (!($isAuthenticated ?? false))
+                    <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'login' ? 'govuk-service-navigation__item--active' : '' }}">
+                        <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'login') aria-current="page" @endif>{{ __('govuk_alpha.nav.login') }}</a>
+                    </li>
+                    <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'register' ? 'govuk-service-navigation__item--active' : '' }}">
+                        <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'register') aria-current="page" @endif>{{ __('govuk_alpha.nav.register') }}</a>
+                    </li>
+                @endif
             </ul>
         </div>
     </nav>

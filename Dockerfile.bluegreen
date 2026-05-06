@@ -153,6 +153,7 @@ COPY docker/preload.php /var/www/html/docker/preload.php
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
 
+COPY accessible-frontend ./accessible-frontend
 COPY app ./app
 COPY assets ./assets
 COPY bootstrap ./bootstrap

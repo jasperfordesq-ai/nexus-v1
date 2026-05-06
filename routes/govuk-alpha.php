@@ -12,7 +12,11 @@ Route::pattern('tenantSlug', '[a-zA-Z0-9_-]+');
 Route::prefix('{tenantSlug}/alpha')
     ->name('govuk-alpha.')
     ->group(function () {
-        Route::get('/', [AlphaController::class, 'redirectToFeed'])->name('home');
+        Route::get('/', [AlphaController::class, 'home'])->name('home');
+        Route::get('/login', [AlphaController::class, 'login'])->name('login');
+        Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
+        Route::get('/register', [AlphaController::class, 'register'])->name('register');
+        Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:30,1')->name('register.store');
 
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->name('feed.posts.store');
