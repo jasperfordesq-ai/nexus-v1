@@ -1,0 +1,101 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+$govuk-font-family: arial, helvetica, sans-serif;
+$govuk-font-family-print: sans-serif;
+$govuk-include-default-font-face: false;
+$govuk-assets-path: "/build/accessible-frontend/assets/";
+
+@import "govuk-frontend/dist/govuk/base";
+@import "govuk-frontend/dist/govuk/core/index";
+@import "govuk-frontend/dist/govuk/objects/index";
+@import "govuk-frontend/dist/govuk/components/back-link/index";
+@import "govuk-frontend/dist/govuk/components/button/index";
+@import "govuk-frontend/dist/govuk/components/error-summary/index";
+@import "govuk-frontend/dist/govuk/components/fieldset/index";
+@import "govuk-frontend/dist/govuk/components/hint/index";
+@import "govuk-frontend/dist/govuk/components/input/index";
+@import "govuk-frontend/dist/govuk/components/label/index";
+@import "govuk-frontend/dist/govuk/components/notification-banner/index";
+@import "govuk-frontend/dist/govuk/components/phase-banner/index";
+@import "govuk-frontend/dist/govuk/components/select/index";
+@import "govuk-frontend/dist/govuk/components/service-navigation/index";
+@import "govuk-frontend/dist/govuk/components/skip-link/index";
+@import "govuk-frontend/dist/govuk/components/summary-list/index";
+@import "govuk-frontend/dist/govuk/components/tag/index";
+@import "govuk-frontend/dist/govuk/components/textarea/index";
+@import "govuk-frontend/dist/govuk/components/warning-text/index";
+@import "govuk-frontend/dist/govuk/utilities/index";
+@import "govuk-frontend/dist/govuk/overrides/index";
+
+.nexus-alpha-header {
+  border-bottom: 10px solid govuk-colour("blue");
+  background: govuk-colour("black");
+}
+
+.nexus-alpha-header__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(3);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: govuk-spacing(3);
+  padding-bottom: govuk-spacing(3);
+}
+
+.nexus-alpha-header__brand,
+.nexus-alpha-header__brand:visited {
+  color: govuk-colour("white");
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nexus-alpha-header__brand:focus {
+  color: govuk-colour("black");
+}
+
+.nexus-alpha-header__service {
+  color: govuk-colour("white");
+}
+
+.nexus-alpha-card-list {
+  border-top: 1px solid $govuk-border-colour;
+}
+
+.nexus-alpha-card {
+  padding-top: govuk-spacing(4);
+  padding-bottom: govuk-spacing(4);
+  border-bottom: 1px solid $govuk-border-colour;
+}
+
+.nexus-alpha-meta {
+  color: $govuk-secondary-text-colour;
+}
+
+.nexus-alpha-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  align-items: center;
+}
+
+.nexus-alpha-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nexus-alpha-summary {
+  display: flex;
+  gap: govuk-spacing(3);
+  align-items: flex-start;
+}
+
+.nexus-alpha-footer {
+  margin-top: govuk-spacing(8);
+  border-top: 1px solid $govuk-border-colour;
+  background: govuk-colour("black", $variant: "tint-95");
+}

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 /**
  * RouteServiceProvider
@@ -33,6 +34,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::addNamespace('accessible-frontend', base_path('accessible-frontend/views'));
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(120)->by(
                 $request->user()?->id ?: $request->ip()
@@ -67,6 +70,13 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
+
+            Route::middleware([
+                \App\Http\Middleware\SecurityHeaders::class,
+                \App\Http\Middleware\ResolveTenant::class,
+                \App\Http\Middleware\CheckMaintenanceMode::class,
+                \App\Http\Middleware\SetLocale::class,
+            ])->group(base_path('routes/govuk-alpha.php'));
 
             // HTTP cron endpoint REMOVED (2026-04-02) — email bombing root cause.
             // The /cron/run-all route allowed a second execution path (curl-based cron)
