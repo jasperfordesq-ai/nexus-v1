@@ -23,6 +23,7 @@
     "unread_count": "unread",
     "empty": "Nog geen notificaties",
     "view_all": "Bekijk alle notificaties",
+    "close": "Meldingen sluiten",
     "unread_dot_aria": "Unread"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "System",
     "default": "Notification"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Mislukt om notificatie als gelezen te markeren",
     "all_read": "Alle notificaties gemarkeerd als gelezen",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }

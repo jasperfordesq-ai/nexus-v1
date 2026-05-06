@@ -25,7 +25,10 @@
  *   --dry-run          Print what would be translated without making changes
  *   --namespace <ns>   Only process files matching <ns> (e.g. --namespace emails)
  *   --lang <code>      Only process one language (e.g. --lang de)
+ *   --missing-only     Only translate absent keys, not existing English fallback values
  *   --force            Re-translate strings even if they already differ from EN
+ *   --include-simple   Translate short/simple strings too (useful for missing UI labels)
+ *   --google           Use Google's public translate endpoint when no API key is available
  *   --summary          Print a summary of gaps before translating
  */
 
@@ -112,7 +115,10 @@ const NO_TRANSLATE_PATTERNS = [
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const MISSING_ONLY = args.includes('--missing-only');
 const FORCE = args.includes('--force');
+const INCLUDE_SIMPLE = args.includes('--include-simple');
+const USE_GOOGLE = args.includes('--google');
 const nsFilter = args.includes('--namespace') ? args[args.indexOf('--namespace') + 1] : null;
 const langFilter = args.includes('--lang') ? args[args.indexOf('--lang') + 1] : null;
 const SUMMARY_ONLY = args.includes('--summary');
@@ -136,7 +142,9 @@ function setNestedKey(obj, keyPath, value) {
   const parts = keyPath.split('.');
   let cur = obj;
   for (let i = 0; i < parts.length - 1; i++) {
-    if (!(parts[i] in cur)) cur[parts[i]] = {};
+    if (typeof cur[parts[i]] !== 'object' || cur[parts[i]] === null || Array.isArray(cur[parts[i]])) {
+      cur[parts[i]] = {};
+    }
     cur = cur[parts[i]];
   }
   cur[parts[parts.length - 1]] = value;
@@ -145,6 +153,11 @@ function setNestedKey(obj, keyPath, value) {
 function shouldSkipValue(val) {
   if (typeof val !== 'string') return true;
   if (!val.trim()) return true;
+  if (INCLUDE_SIMPLE) {
+    return NO_TRANSLATE_PATTERNS
+      .filter(p => p.source !== '^[a-zA-Z0-9_]+$')
+      .some(p => p.test(val.trim()));
+  }
   if (NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
   return false;
 }
@@ -282,7 +295,41 @@ ${JSON.stringify(toTranslate, null, 2)}`;
   return results;
 }
 
+async function translateBatchGoogle(texts, targetLangCode) {
+  const results = [];
+
+  for (const text of texts) {
+    const { escaped, vars } = escapeVars(text);
+    const url = new URL('https://translate.googleapis.com/translate_a/single');
+    url.searchParams.set('client', 'gtx');
+    url.searchParams.set('sl', 'en');
+    url.searchParams.set('tl', targetLangCode);
+    url.searchParams.set('dt', 't');
+    url.searchParams.set('q', escaped);
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Google Translate error ${res.status}: ${err}`);
+    }
+
+    const data = await res.json();
+    const translated = Array.isArray(data?.[0])
+      ? data[0].map((part) => part?.[0] ?? '').join('')
+      : '';
+    results.push(restoreVars(translated, vars));
+
+    await new Promise(r => setTimeout(r, 80));
+  }
+
+  return results;
+}
+
 async function translateBatch(texts, targetLangCode, targetLangDeepL) {
+  if (USE_GOOGLE) {
+    return translateBatchGoogle(texts, targetLangCode);
+  }
+
   if (targetLangCode === 'ga') {
     if (!OPENAI_KEY) {
       throw new Error('Irish translation requires OPENAI_API_KEY because DeepL does not support ga.');
@@ -304,15 +351,16 @@ async function translateBatch(texts, targetLangCode, targetLangDeepL) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (!DEEPL_KEY && !OPENAI_KEY && !DRY_RUN && !SUMMARY_ONLY) {
+  if (!DEEPL_KEY && !OPENAI_KEY && !USE_GOOGLE && !DRY_RUN && !SUMMARY_ONLY) {
     console.error('❌  No translation API key found.');
     console.error('   Option A (recommended): get a FREE DeepL key at https://www.deepl.com/pro-api');
     console.error('   Then run: DEEPL_API_KEY=your_key node scripts/translate-i18n-gaps.mjs');
     console.error('   Option B: set OPENAI_API_KEY in your environment (uses GPT-4o-mini)');
+    console.error('   Option C: pass --google to use Google Translate without storing an API key');
     process.exit(1);
   }
 
-  const backend = USE_OPENAI ? 'OpenAI GPT-4o-mini' : 'DeepL';
+  const backend = USE_GOOGLE ? 'Google Translate public endpoint' : (USE_OPENAI ? 'OpenAI GPT-4o-mini' : 'DeepL');
   if (!DRY_RUN && !SUMMARY_ONLY) {
     console.log(`🔑 Using translation backend: ${backend}`);
   }
@@ -330,11 +378,11 @@ async function main() {
   for (const lang of langs) {
     if (langFilter && lang !== langFilter) continue;
     const deeplCode = LANG_MAP[lang];
-    if (lang === 'ga' && !OPENAI_KEY && !SUMMARY_ONLY && !DRY_RUN) {
+    if (lang === 'ga' && !OPENAI_KEY && !USE_GOOGLE && !SUMMARY_ONLY && !DRY_RUN) {
       console.log('⚠️  ga: DeepL does not support Irish and OPENAI_API_KEY is not set — skipping');
       continue;
     }
-    if (!deeplCode && !OPENAI_KEY && !SUMMARY_ONLY && !DRY_RUN) {
+    if (!deeplCode && !OPENAI_KEY && !USE_GOOGLE && !SUMMARY_ONLY && !DRY_RUN) {
       console.log(`⚠️  ${lang}: No translation backend available — skipping`);
       continue;
     }
@@ -369,7 +417,7 @@ async function main() {
         const langVal = langFlat[key];
         const needsTranslation =
           langVal === undefined ||   // missing
-          langVal === enVal ||       // English fallback (identical to source)
+          (!MISSING_ONLY && langVal === enVal) ||       // English fallback (identical to source)
           FORCE;                     // --force re-translates everything
 
         if (needsTranslation) {

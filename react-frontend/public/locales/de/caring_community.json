@@ -469,6 +469,17 @@
         "reviews_received": "Bewertungen erhalten",
         "trust_tier": "Vertrauensstufe"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Vertrauensstufen für alle aktiven Mitglieder neu berechnen? Dies kann einen Moment dauern.",
+      "messages": {
+        "saved": "Konfiguration der Vertrauensstufe gespeichert. Änderungen werden beim nächsten Neuberechnungslauf wirksam.",
+        "recomputed": "Die Ebenen wurden für {{count}}-Mitglieder neu berechnet."
+      },
+      "errors": {
+        "save_failed": "Die Konfiguration konnte nicht gespeichert werden.",
+        "recompute_failed": "Die Ebenen konnten nicht neu berechnet werden."
+      }
     }
   }
 }

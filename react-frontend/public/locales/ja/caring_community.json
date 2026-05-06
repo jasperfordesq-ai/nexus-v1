@@ -469,6 +469,17 @@
         "reviews_received": "受け取ったレビュー",
         "trust_tier": "トラスト層"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "すべてのアクティブなメンバーの信頼層を再計算しますか?これには少し時間がかかる場合があります。",
+      "messages": {
+        "saved": "信頼層構成が保存されました。変更は次回の再計算実行時に適用されます。",
+        "recomputed": "{{count}} メンバーの階層が再計算されました。"
+      },
+      "errors": {
+        "save_failed": "設定の保存に失敗しました。",
+        "recompute_failed": "層の再計算に失敗しました。"
+      }
     }
   }
 }

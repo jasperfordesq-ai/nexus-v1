@@ -23,6 +23,7 @@
     "unread_count": "unread",
     "empty": "Brak powiadomień jak na razie",
     "view_all": "Zobacz wszystkie powiadomienia",
+    "close": "Zamknij powiadomienia",
     "unread_dot_aria": "Unread"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "System",
     "default": "Notification"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Nie udało się oznaczyć powiadomienia jako przeczytane",
     "all_read": "Wszystkie powiadomienia oznaczone jako przeczytane",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }

@@ -469,6 +469,17 @@
         "reviews_received": "Recensies ontvangen",
         "trust_tier": "Vertrouwensniveau"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Vertrouwensniveaus voor alle actieve leden opnieuw berekenen? Dit kan even duren.",
+      "messages": {
+        "saved": "Configuratie van vertrouwenslaag opgeslagen. Wijzigingen zijn van toepassing bij de volgende herberekeningsrun.",
+        "recomputed": "Niveaus opnieuw berekend voor {{count}} leden."
+      },
+      "errors": {
+        "save_failed": "Kan configuratie niet opslaan.",
+        "recompute_failed": "Kan niveaus niet opnieuw berekenen."
+      }
     }
   }
 }

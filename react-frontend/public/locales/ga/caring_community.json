@@ -469,6 +469,17 @@
         "reviews_received": "Léirmheasanna Faighte",
         "trust_tier": "Sraith Iontaobhais"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "An bhfuil tú in ann sraitheanna iontaobhais a ríomh do gach ball gníomhach? Féadfaidh sé seo nóiméad a ghlacadh.",
+      "messages": {
+        "saved": "Sábháladh cumraíocht sraithe iontaobhais. Beidh athruithe i bhfeidhm ar an gcéad rith ríomha eile.",
+        "recomputed": "Na sraitheanna athríomh do bhaill {{count}}."
+      },
+      "errors": {
+        "save_failed": "Theip ar an chumraíocht a shábháil.",
+        "recompute_failed": "Theip ar na sraitheanna a athríomh."
+      }
     }
   }
 }

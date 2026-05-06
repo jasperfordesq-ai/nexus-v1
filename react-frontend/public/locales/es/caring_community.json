@@ -469,6 +469,17 @@
         "reviews_received": "Reseñas recibidas",
         "trust_tier": "Nivel de confianza"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "¿Volver a calcular los niveles de confianza para todos los miembros activos? Esto puede tardar un momento.",
+      "messages": {
+        "saved": "Se guardó la configuración del nivel de confianza. Los cambios se aplican en la siguiente ejecución de recálculo.",
+        "recomputed": "Niveles recalculados para miembros {{count}}."
+      },
+      "errors": {
+        "save_failed": "No se pudo guardar la configuración.",
+        "recompute_failed": "No se pudieron volver a calcular los niveles."
+      }
     }
   }
 }

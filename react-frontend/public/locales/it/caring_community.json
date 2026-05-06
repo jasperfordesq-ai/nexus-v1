@@ -469,6 +469,17 @@
         "reviews_received": "Recensioni ricevute",
         "trust_tier": "Livello di fiducia"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Ricalcolare i livelli di fiducia per tutti i membri attivi? L'operazione potrebbe richiedere un momento.",
+      "messages": {
+        "saved": "Configurazione del livello di attendibilità salvata. Le modifiche verranno applicate alla successiva esecuzione di ricalcolo.",
+        "recomputed": "Livelli ricalcolati per i membri {{count}}."
+      },
+      "errors": {
+        "save_failed": "Impossibile salvare la configurazione.",
+        "recompute_failed": "Impossibile ricalcolare i livelli."
+      }
     }
   }
 }

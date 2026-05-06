@@ -23,6 +23,7 @@
     "unread_count": "unread",
     "empty": "لا توجد إشعارات بعد",
     "view_all": "عرض جميع الإشعارات",
+    "close": "إغلاق الإخطارات",
     "unread_dot_aria": "Unread"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "System",
     "default": "Notification"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "فشل في وضع علامة على الإشعار كمقروء",
     "all_read": "تم وضع علامة على جميع الإشعارات كمقروءة",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }

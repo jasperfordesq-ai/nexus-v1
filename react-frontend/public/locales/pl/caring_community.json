@@ -469,6 +469,17 @@
         "reviews_received": "Otrzymane recenzje",
         "trust_tier": "Poziom zaufania"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Czy ponownie obliczyć poziomy zaufania dla wszystkich aktywnych członków? Może to chwilę potrwać.",
+      "messages": {
+        "saved": "Zapisano konfigurację warstwy zaufania. Zmiany zostaną zastosowane przy następnym przeliczeniu.",
+        "recomputed": "Poziomy obliczone ponownie dla członków {{count}}."
+      },
+      "errors": {
+        "save_failed": "Nie udało się zapisać konfiguracji.",
+        "recompute_failed": "Nie udało się ponownie obliczyć poziomów."
+      }
     }
   }
 }

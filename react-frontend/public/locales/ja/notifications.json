@@ -23,6 +23,7 @@
     "unread_count": "unread",
     "empty": "まだ通知はありません",
     "view_all": "すべての通知を見る",
+    "close": "通知を閉じる",
     "unread_dot_aria": "Unread"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "System",
     "default": "Notification"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "通知を既読にするのに失敗しました",
     "all_read": "すべての通知が既読にマークされました",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }

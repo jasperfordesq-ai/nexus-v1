@@ -23,6 +23,7 @@
     "unread_count": "sin leer",
     "empty": "Sin notificaciones aún",
     "view_all": "Ver todas las notificaciones",
+    "close": "Cerrar notificaciones",
     "unread_dot_aria": "Sin leer"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "Sistema",
     "default": "Notificación"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Error al marcar la notificación como leída",
     "all_read": "Todas las notificaciones marcadas como leídas",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }

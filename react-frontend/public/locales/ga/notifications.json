@@ -23,6 +23,7 @@
     "unread_count": "neamhléite",
     "empty": "Níl fógraí ann fós",
     "view_all": "Féach ar gach fógra",
+    "close": "Dún fógraí",
     "unread_dot_aria": "Neamhléite"
   },
   "type": {
@@ -36,6 +37,8 @@
     "system": "Córas",
     "default": "Fógra"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Theip ar an bhfógra a mharcáil mar léite",
     "all_read": "Gach fógra marcáilte mar léite",
@@ -71,7 +74,5 @@
   },
   "page_meta": {
     "title": "Notifications"
-  },
-  "load_more": "Load more",
-  "undo": "Undo"
+  }
 }
