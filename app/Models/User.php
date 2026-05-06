@@ -170,7 +170,7 @@ class User extends Authenticatable
                 WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name
                 ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))
             END as name"),
-            'organization_name', 'email', 'role', 'profile_type', 'balance', 'bio', 'tagline',
+            'organization_name', 'email', 'role', 'status', 'profile_type', 'balance', 'bio', 'tagline',
             'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
             'created_at', 'tenant_id', 'is_approved', 'preferred_language',
             'privacy_profile', 'privacy_search', 'privacy_contact',

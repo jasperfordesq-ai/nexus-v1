@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Core\Validator as NexusValidator;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\User;
@@ -41,7 +42,19 @@ class RegistrationService
             'first_name' => 'required|string|max:100',
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|max:255',
+            'phone'      => [
+                'required',
+                'string',
+                'max:30',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (!NexusValidator::isPhone((string) $value)) {
+                        $fail(__('api.phone_invalid'));
+                    }
+                },
+            ],
             'password'   => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+        ], [
+            'phone.required' => __('api.phone_required'),
         ]);
 
         if ($validator->fails()) {
@@ -79,9 +92,7 @@ class RegistrationService
             $user->balance = 0;
 
             // Optional fields from frontend
-            if (!empty($data['phone'])) {
-                $user->phone = $data['phone'];
-            }
+            $user->phone = preg_replace('/[\s\-\(\)\.]/', '', trim((string) $data['phone']));
             if (!empty($data['location'])) {
                 $user->location = $data['location'];
             }

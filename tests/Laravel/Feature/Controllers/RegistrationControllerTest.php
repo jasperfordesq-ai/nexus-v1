@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\RateLimiter;
 
 /**
  * Feature tests for RegistrationController — user registration (public, rate-limited).
@@ -15,6 +16,17 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class RegistrationControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = [];
+            session_destroy();
+        }
+        RateLimiter::clear('api:registration:ip:127.0.0.1');
+        RateLimiter::clear('api:registration:ip:::1');
+    }
 
     // ------------------------------------------------------------------
     //  POST /v2/auth/register (PUBLIC, rate-limited)
@@ -49,12 +61,40 @@ class RegistrationControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [400, 422]);
     }
 
+    public function test_register_requires_phone(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [400, 422]);
+    }
+
+    public function test_register_rejects_invalid_phone(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'phone' => 'not-a-phone',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [400, 422]);
+    }
+
     public function test_register_happy_path(): void
     {
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
+            'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
             'password_confirmation' => 'StrongPassword123!',
         ]);

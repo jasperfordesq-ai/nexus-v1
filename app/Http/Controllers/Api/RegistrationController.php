@@ -24,7 +24,7 @@ class RegistrationController extends BaseApiController
      * POST /api/v2/register
      *
      * Register a new user account.
-     * Body: name, email, password, password_confirmation, phone (optional).
+     * Body: name, email, password, password_confirmation, phone.
      */
     public function register(): JsonResponse
     {

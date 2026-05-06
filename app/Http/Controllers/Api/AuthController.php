@@ -780,7 +780,7 @@ class AuthController extends BaseApiController
         // Fetch user data to populate session — scoped by tenant to prevent cross-tenant session restore
         $tenantId = TenantContext::getId();
         $userRow = DB::selectOne(
-            "SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT id, first_name, last_name, email, role, status, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
         $user = $userRow ? (array)$userRow : null;

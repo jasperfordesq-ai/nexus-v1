@@ -145,14 +145,7 @@ class AdminUsersController extends BaseApiController
         );
 
         $formatted = array_map(function ($row) {
-            $status = 'active';
-            if (!$row->is_approved) {
-                $status = 'pending';
-            } elseif ($row->status === 'suspended') {
-                $status = 'suspended';
-            } elseif ($row->status === 'banned') {
-                $status = 'banned';
-            }
+            $status = $this->formatAdminUserStatus($row->status ?? null, $row->is_approved ?? null);
 
             return [
                 'id' => (int) $row->id,
@@ -204,14 +197,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        $status = 'active';
-        if (!$user->is_approved) {
-            $status = 'pending';
-        } elseif ($user->status === 'suspended') {
-            $status = 'suspended';
-        } elseif ($user->status === 'banned') {
-            $status = 'banned';
-        }
+        $status = $this->formatAdminUserStatus($user->status ?? null, $user->is_approved ?? null);
 
         $badges = [];
         try {
@@ -297,6 +283,7 @@ class AdminUsersController extends BaseApiController
         $input = $this->getAllInput();
         $updates = [];
         $params = [];
+        $statusForNotification = null;
 
         // SECURITY: Restrict role values to prevent privilege escalation (SEC-007)
         $allowedRoles = ['member', 'admin', 'broker', 'moderator', 'newsletter_admin'];
@@ -334,11 +321,18 @@ class AdminUsersController extends BaseApiController
             $params[] = $input['profile_type'];
         }
 
-        if (isset($input['status']) && in_array($input['status'], ['active', 'suspended', 'banned'])) {
+        if (array_key_exists('status', $input)) {
+            $newStatus = is_string($input['status']) ? trim($input['status']) : $input['status'];
+            if (!in_array($newStatus, ['active', 'pending', 'suspended', 'banned'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status', 422);
+            }
             $updates[] = 'status = ?';
-            $params[] = $input['status'];
-            if ($input['status'] === 'active') {
+            $params[] = $newStatus;
+            $statusForNotification = $newStatus;
+            if ($newStatus === 'active') {
                 $updates[] = 'is_approved = 1';
+            } elseif ($newStatus === 'pending') {
+                $updates[] = 'is_approved = 0';
             }
         }
 
@@ -347,7 +341,7 @@ class AdminUsersController extends BaseApiController
         }
 
         // Capture old status before the update for change detection
-        $oldStatus = $user['status'] ?? 'active';
+        $oldStatus = $this->formatAdminUserStatus($user['status'] ?? null, $user['is_approved'] ?? null);
 
         $params[] = $id;
         $params[] = $tenantId;
@@ -363,10 +357,10 @@ class AdminUsersController extends BaseApiController
 
         // Notify user when status changes to suspended/banned via the generic update path
         // (The dedicated suspend()/ban() endpoints have their own richer notifications)
-        if (isset($input['status']) && $input['status'] !== $oldStatus) {
+        if ($statusForNotification !== null && $statusForNotification !== $oldStatus) {
             try {
                 $recipientLocale = $user['preferred_language'] ?? null;
-                if ($input['status'] === 'suspended') {
+                if ($statusForNotification === 'suspended') {
                     LocaleContext::withLocale($recipientLocale, function () use ($id) {
                         Notification::createNotification(
                             $id,
@@ -376,7 +370,7 @@ class AdminUsersController extends BaseApiController
                             true
                         );
                     });
-                } elseif ($input['status'] === 'banned') {
+                } elseif ($statusForNotification === 'banned') {
                     LocaleContext::withLocale($recipientLocale, function () use ($id) {
                         Notification::createNotification(
                             $id,
@@ -393,6 +387,18 @@ class AdminUsersController extends BaseApiController
         }
 
         return $this->show($id);
+    }
+
+    private function formatAdminUserStatus(mixed $rawStatus, mixed $isApproved): string
+    {
+        $status = is_string($rawStatus) ? $rawStatus : '';
+        if (in_array($status, ['banned', 'suspended'], true)) {
+            return $status;
+        }
+        if ($status === 'pending' || !$isApproved) {
+            return 'pending';
+        }
+        return 'active';
     }
 
     // =========================================================================

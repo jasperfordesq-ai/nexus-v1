@@ -112,6 +112,26 @@ class TenantSettingsServiceTest extends TestCase
         $this->assertEquals('AUTH_VERIFICATION_FAILED', $result['code']);
     }
 
+    public function test_checkLoginGates_blocks_pending_account_status(): void
+    {
+        $user = ['role' => 'member', 'tenant_id' => 2, 'status' => 'pending', 'is_approved' => false];
+
+        $result = $this->service->checkLoginGates($user);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('AUTH_ACCOUNT_PENDING_APPROVAL', $result['code']);
+    }
+
+    public function test_checkLoginGates_blocks_unapproved_member_even_when_active(): void
+    {
+        $user = ['role' => 'member', 'tenant_id' => 2, 'status' => 'active', 'is_approved' => false];
+
+        $result = $this->service->checkLoginGates($user);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('AUTH_ACCOUNT_PENDING_APPROVAL', $result['code']);
+    }
+
     public function test_clearCacheForTenant_calls_cache_forget(): void
     {
         Cache::shouldReceive('forget')->once()->with('tenant_settings:2');

@@ -81,9 +81,12 @@ function TestAuthActions() {
           register({
             email: 'new@example.com',
             password: 'password',
+            password_confirmation: 'password',
             first_name: 'Test',
             last_name: 'User',
             tenant_id: 1,
+            phone: '+15551234567',
+            terms_accepted: true,
           })
         }
       >

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\ApiErrorCodes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -145,9 +146,10 @@ class TenantSettingsService
     /**
      * Check login gates for a user array.
      *
-     * Admins and super admins always pass. Regular members may be blocked by:
+     * Suspended/banned/pending account states are blocked for every role.
+     * Admins and super admins otherwise pass policy gates. Regular members may be blocked by:
      * - Pending/failed identity verification
-     * - Unapproved account when admin_approval is required
+     * - Unapproved account
      * - Unverified email when email_verification is required
      *
      * @param array $user User row (must include: role, is_super_admin, is_tenant_super_admin, tenant_id)
@@ -169,6 +171,23 @@ class TenantSettingsService
         $role = $user['role'] ?? 'member';
         $isSuperAdmin = !empty($user['is_super_admin']);
         $isTenantSuperAdmin = !empty($user['is_tenant_super_admin']);
+        $status = strtolower(trim((string)($user['status'] ?? 'active')));
+
+        if (in_array($status, ['suspended', 'banned'], true)) {
+            return [
+                'code' => ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
+                'message' => __('api.account_suspended'),
+                'extra' => ['account_suspended' => true],
+            ];
+        }
+
+        if ($status === 'pending') {
+            return [
+                'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
+                'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
+                'extra' => ['pending_approval' => true],
+            ];
+        }
 
         // Admins and super admins always pass login gates
         if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
@@ -179,6 +198,14 @@ class TenantSettingsService
         }
 
         $tenantId = (int)($user['tenant_id'] ?? 0);
+
+        if (array_key_exists('is_approved', $user) && empty($user['is_approved'])) {
+            return [
+                'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
+                'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
+                'extra' => ['pending_approval' => true],
+            ];
+        }
 
         // Check identity verification status (if present)
         $verificationStatus = $user['verification_status'] ?? null;
@@ -208,11 +235,11 @@ class TenantSettingsService
             }
         }
 
-        // Check admin approval requirement
+        // Check admin approval requirement for callers that do not include is_approved.
         if ($tenantId > 0 && $this->getBool($tenantId, 'admin_approval', false)) {
             if (empty($user['is_approved'])) {
                 return [
-                    'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',
+                    'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
                     'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
                     'extra' => ['pending_approval' => true],
                 ];

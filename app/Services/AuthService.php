@@ -45,6 +45,7 @@ class AuthService
         $user = $this->user->newQuery()
             ->where('email', $email)
             ->where('status', 'active')
+            ->where('is_approved', true)
             ->first();
 
         if (! $user || ! Hash::check($password, $user->password)) {
@@ -93,6 +94,8 @@ class AuthService
             ->where('api_tokens.token', hash('sha256', $token))
             ->where('api_tokens.expires_at', '>', now())
             ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('users.is_approved', true)
             ->select('api_tokens.*')
             ->first();
 
@@ -119,6 +122,8 @@ class AuthService
             ->where('api_tokens.token', $hashed)
             ->where('api_tokens.expires_at', '>', now())
             ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('users.is_approved', true)
             ->select('api_tokens.*')
             ->first();
 

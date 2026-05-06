@@ -88,6 +88,7 @@ class RegistrationServiceTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'not-an-email',
+            'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
         ], $this->testTenantId);
 
@@ -110,6 +111,7 @@ class RegistrationServiceTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => $email,
+            'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
         ], $this->testTenantId);
 

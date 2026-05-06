@@ -106,12 +106,16 @@ export function RegisterPage() {
   const [longitude, setLongitude] = useState<number | undefined>();
   const [phone, setPhone] = useState('');
 
-  // E.164 phone validation (optional field — only validate if user enters something)
+  // E.164 phone validation.
   const isPhoneValid = (value: string) => {
-    if (!value.trim()) return true; // Empty is fine (optional field)
-    return /^\+[1-9]\d{1,14}$/.test(value.replace(/[\s\-()]/g, ''));
+    if (!value.trim()) return false;
+    return /^\+[1-9]\d{6,14}$/.test(value.replace(/[\s\-()]/g, ''));
   };
-  const phoneError = phone.trim() && !isPhoneValid(phone) ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' }) : '';
+  const phoneError = !phone.trim()
+    ? t('register.phone_required')
+    : !isPhoneValid(phone)
+      ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' })
+      : '';
 
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -260,6 +264,7 @@ export function RegisterPage() {
     firstName.trim() &&
     lastName.trim() &&
     (profileType === 'individual' || organizationName.trim()) &&
+    phone.trim() &&
     isPhoneValid(phone);
   const isStep3Valid =
     email.trim() &&
@@ -339,7 +344,7 @@ export function RegisterPage() {
       location: location || undefined,
       latitude,
       longitude,
-      phone: phone || undefined,
+      phone: phone.trim(),
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
       invite_code: requiresInviteCode ? inviteCode.trim().toUpperCase() : undefined,
@@ -381,6 +386,8 @@ export function RegisterPage() {
     passwordValid &&
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
+    phone.trim() &&
+    isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
     (!requiresInviteCode || inviteCodeValid === true);
 
@@ -640,6 +647,7 @@ export function RegisterPage() {
               onChange={(e) => setPhone(e.target.value)}
               startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               autoComplete="tel"
+              isRequired
               isInvalid={!!phoneError}
               errorMessage={phoneError}
               description={phoneError ? undefined : t('register.phone_admin_note')}

@@ -177,6 +177,52 @@ class AdminUsersControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_ban_pending_user_is_reported_as_banned(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'is_approved' => false,
+            'status' => 'active',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $user->id . '/ban');
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'status' => 'banned',
+        ]);
+
+        $this->apiGet('/v2/admin/users/' . $user->id)
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'banned');
+    }
+
+    public function test_update_can_move_active_user_back_to_pending(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'is_approved' => true,
+            'status' => 'active',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPut('/v2/admin/users/' . $user->id, [
+            'status' => 'pending',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.status', 'pending');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'status' => 'pending',
+            'is_approved' => false,
+        ]);
+    }
+
     // ================================================================
     // REACTIVATE — POST /v2/admin/users/{id}/reactivate
     // ================================================================

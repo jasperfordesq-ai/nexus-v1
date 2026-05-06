@@ -6,6 +6,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Core\ApiErrorCodes;
 use App\Services\TokenService;
 use Closure;
 use Illuminate\Http\Request;
@@ -95,6 +96,18 @@ class Authenticate
                     return response()->json([
                         'errors' => [
                             ['code' => 'account_suspended', 'message' => 'Your account has been suspended or deactivated'],
+                        ],
+                        'success' => false,
+                    ], 403, ['API-Version' => '2.0']);
+                }
+
+                if ($user && !$this->isPrivilegedUser($user) && empty($user->is_approved)) {
+                    return response()->json([
+                        'errors' => [
+                            [
+                                'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
+                                'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
+                            ],
                         ],
                         'success' => false,
                     ], 403, ['API-Version' => '2.0']);
@@ -190,6 +203,11 @@ class Authenticate
                 return false;
             }
 
+            if (!$this->isPrivilegedUser($eloquentUser) && empty($eloquentUser->is_approved)) {
+                \Illuminate\Support\Facades\Log::debug('[Auth] User is not approved', ['user_id' => $userId]);
+                return false;
+            }
+
             $tenantId = \App\Core\TenantContext::getId();
             if ($tenantId && (int) $eloquentUser->tenant_id !== $tenantId) {
                 // Allow platform super admins to access any tenant. Tenant
@@ -220,5 +238,13 @@ class Authenticate
             \Illuminate\Support\Facades\Log::error('[Auth] Legacy token exception: ' . $e->getMessage());
             return false;
         }
+    }
+
+    private function isPrivilegedUser(object $user): bool
+    {
+        return !empty($user->is_super_admin)
+            || !empty($user->is_god)
+            || !empty($user->is_tenant_super_admin)
+            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true);
     }
 }

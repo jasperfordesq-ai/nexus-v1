@@ -180,7 +180,7 @@ export interface RegisterRequest {
   location?: string;
   latitude?: number;
   longitude?: number;
-  phone?: string;
+  phone: string;
   terms_accepted: boolean;
   newsletter_opt_in?: boolean;
   invite_code?: string;

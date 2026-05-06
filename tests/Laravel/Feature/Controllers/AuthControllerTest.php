@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\ApiErrorCodes;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
@@ -51,6 +52,50 @@ class AuthControllerTest extends TestCase
             'expires_in',
         ]);
         $response->assertJson(['success' => true]);
+    }
+
+    public function test_login_rejects_pending_user_before_token_issue(): void
+    {
+        $email = 'auth_pending_' . uniqid() . '@example.com';
+        User::factory()->forTenant($this->testTenantId)->create([
+            'email' => $email,
+            'password_hash' => Hash::make('correct-password'),
+            'status' => 'pending',
+            'is_approved' => false,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/auth/login', [
+            'email' => $email,
+            'password' => 'correct-password',
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL);
+        $this->assertArrayNotHasKey('access_token', $response->json());
+        $this->assertArrayNotHasKey('refresh_token', $response->json());
+    }
+
+    public function test_login_rejects_active_unapproved_member_before_token_issue(): void
+    {
+        $email = 'auth_unapproved_' . uniqid() . '@example.com';
+        User::factory()->forTenant($this->testTenantId)->create([
+            'email' => $email,
+            'password_hash' => Hash::make('correct-password'),
+            'status' => 'active',
+            'is_approved' => false,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/auth/login', [
+            'email' => $email,
+            'password' => 'correct-password',
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL);
+        $this->assertArrayNotHasKey('access_token', $response->json());
+        $this->assertArrayNotHasKey('refresh_token', $response->json());
     }
 
     // ================================================================
@@ -214,7 +259,7 @@ class AuthControllerTest extends TestCase
     {
         $response = $this->apiGet('/auth/validate-token');
 
-        // Without a token it should indicate invalid/missing
-        $this->assertContains($response->getStatusCode(), [200, 401]);
+        // Without a token it should indicate a missing token request error.
+        $response->assertStatus(400);
     }
 }
