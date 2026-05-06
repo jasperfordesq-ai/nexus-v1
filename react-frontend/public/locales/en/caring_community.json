@@ -273,6 +273,10 @@
       "collapse": "Collapse sidebar",
       "help_centre": "Help Centre",
       "full_admin": "Full Admin",
+      "search_aria": "Search caring admin pages",
+      "search_placeholder": "Search pages",
+      "clear_search": "Clear search",
+      "no_search_results": "No matching pages",
       "sections": {
         "overview": "Overview",
         "operations": "Operations",

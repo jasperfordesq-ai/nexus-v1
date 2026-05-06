@@ -3,9 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Tooltip } from '@heroui/react';
+import { Button, Input, Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import Heart from 'lucide-react/icons/heart';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
@@ -43,6 +44,8 @@ import PanelLeftClose from 'lucide-react/icons/panel-left-close';
 import PanelLeft from 'lucide-react/icons/panel-left';
 import Settings from 'lucide-react/icons/settings';
 import HelpCircle from 'lucide-react/icons/help-circle';
+import Search from 'lucide-react/icons/search';
+import X from 'lucide-react/icons/x';
 
 interface CaringPanelSidebarProps {
   collapsed: boolean;
@@ -149,6 +152,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
   const { t } = useTranslation('caring_community');
   const { tenantPath, tenant } = useTenant();
   const { user } = useAuth();
+  const [query, setQuery] = useState('');
 
   const role = (user?.role as string) || '';
   const userRecord = user as Record<string, unknown> | null;
@@ -168,6 +172,29 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
     }
     return current.startsWith(tenantPath(path));
   };
+
+  const visibleSections = useMemo(() => {
+    const normalisedQuery = query.trim().toLowerCase();
+    if (collapsed || normalisedQuery === '') {
+      return SECTIONS;
+    }
+
+    return SECTIONS
+      .map((section) => {
+        const sectionLabel = t(section.titleKey).toLowerCase();
+        const items = section.items.filter((item) => {
+          const label = t(item.labelKey).toLowerCase();
+          return (
+            label.includes(normalisedQuery) ||
+            item.key.toLowerCase().includes(normalisedQuery) ||
+            sectionLabel.includes(normalisedQuery)
+          );
+        });
+
+        return { ...section, items };
+      })
+      .filter((section) => section.items.length > 0);
+  }, [collapsed, query, t]);
 
   const renderItem = (item: NavItem) => {
     const active = isActive(item.path);
@@ -210,9 +237,9 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b border-divider px-3">
         {!collapsed && (
-          <Link to={tenantPath('/caring')} className="flex items-center gap-2">
+          <Link to={tenantPath('/caring')} className="flex min-w-0 items-center gap-2">
             <Heart size={20} className="text-primary shrink-0" />
-            <span className="text-sm font-semibold text-foreground leading-tight">
+            <span className="truncate text-sm font-semibold text-foreground leading-tight">
               {t('panel.sidebar.brand')}
             </span>
           </Link>
@@ -231,7 +258,40 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-3">
-        {SECTIONS.map((section, idx) => (
+        {!collapsed && (
+          <div className="mb-3 px-1">
+            <Input
+              aria-label={t('panel.sidebar.search_aria', { defaultValue: 'Search caring admin pages' })}
+              placeholder={t('panel.sidebar.search_placeholder', { defaultValue: 'Search pages' })}
+              size="sm"
+              variant="bordered"
+              value={query}
+              onValueChange={setQuery}
+              startContent={<Search size={15} className="text-default-400" />}
+              endContent={query ? (
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  className="h-6 w-6 min-w-6 text-default-400"
+                  aria-label={t('panel.sidebar.clear_search', { defaultValue: 'Clear search' })}
+                  onPress={() => setQuery('')}
+                >
+                  <X size={14} />
+                </Button>
+              ) : null}
+              classNames={{
+                inputWrapper: 'h-9 min-h-9',
+              }}
+            />
+          </div>
+        )}
+        {visibleSections.length === 0 && !collapsed && (
+          <p className="px-3 py-6 text-center text-sm text-default-400">
+            {t('panel.sidebar.no_search_results', { defaultValue: 'No matching pages' })}
+          </p>
+        )}
+        {visibleSections.map((section, idx) => (
           <div key={section.key} className={idx > 0 ? 'mt-4' : ''}>
             {!collapsed && (
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-default-400">

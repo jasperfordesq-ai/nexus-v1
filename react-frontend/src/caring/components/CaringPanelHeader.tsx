@@ -39,7 +39,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
       }`}
     >
       {/* Left: Mobile menu + Back to site + tenant name */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         {onSidebarToggle && (
           <Button
             isIconOnly
@@ -63,14 +63,14 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
           <span className="hidden sm:inline">{t('panel.header.back_to_site')}</span>
         </Button>
         {tenant?.name && (
-          <span className="text-sm font-medium text-default-400">
+          <span className="hidden max-w-[14rem] truncate text-sm font-medium text-default-400 sm:inline md:max-w-[20rem]">
             {tenant.name}
           </span>
         )}
       </div>
 
       {/* Right: User menu */}
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <Button
           isIconOnly
           variant="light"

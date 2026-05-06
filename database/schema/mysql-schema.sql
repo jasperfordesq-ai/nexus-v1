@@ -1045,13 +1045,14 @@ CREATE TABLE `caring_caregiver_links` (
   `is_primary` tinyint(1) NOT NULL DEFAULT 0,
   `start_date` date NOT NULL,
   `notes` text DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `status` enum('pending','active','inactive') NOT NULL DEFAULT 'pending',
   `approved_by` int(10) unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `caring_caregiver_links_tenant_id_caregiver_id_index` (`tenant_id`,`caregiver_id`),
   KEY `caring_caregiver_links_tenant_id_cared_for_id_index` (`tenant_id`,`cared_for_id`),
+  UNIQUE KEY `ccl_tenant_caregiver_recipient_status_unique` (`tenant_id`,`caregiver_id`,`cared_for_id`,`status`),
   KEY `caring_caregiver_links_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -13471,7 +13472,8 @@ INSERT INTO `laravel_migrations` VALUES
 (221,'2026_05_04_142000_enforce_verein_event_share_idempotency',97),
 (222,'2026_05_04_143000_add_remote_and_updated_at_to_vol_opportunities',97),
 (223,'2026_05_05_100000_reconcile_listing_integrity_indexes',98),
-(224,'2026_05_05_110000_add_newsletter_opt_in_to_users_table',99);
+(224,'2026_05_05_110000_add_newsletter_opt_in_to_users_table',99),
+(225,'2026_05_05_120000_harden_caring_community_audit_findings',99);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

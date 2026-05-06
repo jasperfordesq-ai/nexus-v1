@@ -55,7 +55,7 @@ export function CaringLayout() {
           sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
         }`}
       >
-        <div className="p-3 sm:p-4 md:p-6">
+        <div className="mx-auto w-full max-w-[96rem] px-3 py-4 sm:px-4 md:px-6">
           <CaringPanelBreadcrumbs />
           <Outlet />
         </div>
