@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -59,7 +59,7 @@ jobs:
           exit-code: '0'
 
       - name: Upload Trivy Scan Results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
         if: always()
@@ -89,7 +89,7 @@ jobs:
           SEMGREP_RULES: p/php p/security-audit p/secrets
 
       - name: Upload Semgrep Results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'semgrep-results.sarif'
         if: always()
@@ -140,7 +140,7 @@ jobs:
             --disableOssIndex
 
       - name: Upload Dependency Check Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-report
           path: reports/
@@ -152,7 +152,7 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build Docker Image
         run: docker build -t nexus-app:scan -f Dockerfile .
@@ -189,7 +189,7 @@ jobs:
           exit-code: '0'
 
       - name: Upload Container Scan Results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'container-trivy-results.sarif'
         if: always()
