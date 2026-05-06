@@ -93,11 +93,21 @@ export default function ProjectAnnouncementsPage() {
         const res = await api.get<{ data: ProjectAnnouncement } | ProjectAnnouncement>(
           `/v2/caring-community/projects/${id}`,
         );
+        if (!res.success) {
+          setError(res.error ?? t('errors.load'));
+          setProject(null);
+          return;
+        }
         setProject(res.data ? unwrapData<ProjectAnnouncement>(res.data) : null);
       } else {
         const res = await api.get<{ data: ProjectAnnouncement[] } | ProjectAnnouncement[]>(
           '/v2/caring-community/projects',
         );
+        if (!res.success) {
+          setError(res.error ?? t('errors.load'));
+          setProjects([]);
+          return;
+        }
         setProjects(unwrapData<ProjectAnnouncement[]>(res.data ?? []));
       }
     } catch (err: unknown) {
@@ -116,10 +126,12 @@ export default function ProjectAnnouncementsPage() {
     if (!project) return;
     setSubmitting(true);
     try {
-      if (project.is_subscribed) {
-        await api.delete(`/v2/caring-community/projects/${project.id}/subscribe`);
-      } else {
-        await api.post(`/v2/caring-community/projects/${project.id}/subscribe`);
+      const res = project.is_subscribed
+        ? await api.delete(`/v2/caring-community/projects/${project.id}/subscribe`)
+        : await api.post(`/v2/caring-community/projects/${project.id}/subscribe`);
+      if (!res.success) {
+        setError(res.error ?? t('errors.subscribe'));
+        return;
       }
       await load();
     } catch (err: unknown) {

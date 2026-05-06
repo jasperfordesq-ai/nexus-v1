@@ -103,4 +103,73 @@ class EmergencyAlertControllerTest extends TestCase
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
     }
+
+    public function test_targeted_emergency_alerts_are_visible_only_to_active_targeted_tenant_members(): void
+    {
+        $this->requireEmergencyAlertTable();
+        $this->setCaringCommunityFeature(true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $targeted = User::factory()->forTenant($this->testTenantId)->create();
+        $notTargeted = User::factory()->forTenant($this->testTenantId)->create();
+        $inactiveTarget = User::factory()->forTenant($this->testTenantId)->create(['status' => 'suspended']);
+        $otherTenantTarget = User::factory()->forTenant(999)->create();
+
+        Sanctum::actingAs($admin);
+
+        $create = $this->apiPost('/v2/admin/caring-community/emergency-alerts', [
+            'title' => 'Targeted care safety notice',
+            'body' => 'Only the care recipient circle should see this notice.',
+            'severity' => 'warning',
+            'target_user_ids' => [
+                $targeted->id,
+                $inactiveTarget->id,
+                $otherTenantTarget->id,
+            ],
+        ]);
+
+        $create->assertStatus(201);
+        $alertId = (int) $create->json('data.id');
+
+        $storedTargets = json_decode((string) DB::table('caring_emergency_alerts')
+            ->where('id', $alertId)
+            ->value('target_user_ids'), true);
+
+        $this->assertSame([$targeted->id], $storedTargets);
+
+        Sanctum::actingAs($targeted);
+        $visibleToTarget = $this->apiGet('/v2/caring-community/emergency-alerts');
+        $visibleToTarget->assertStatus(200);
+        $this->assertContains($alertId, array_column($visibleToTarget->json('data'), 'id'));
+
+        Sanctum::actingAs($notTargeted);
+        $hiddenFromOtherMember = $this->apiGet('/v2/caring-community/emergency-alerts');
+        $hiddenFromOtherMember->assertStatus(200);
+        $this->assertNotContains($alertId, array_column($hiddenFromOtherMember->json('data'), 'id'));
+
+        Sanctum::actingAs($admin);
+        $createInvalidTargets = $this->apiPost('/v2/admin/caring-community/emergency-alerts', [
+            'title' => 'Invalid target notice',
+            'body' => 'This should not become a tenant-wide alert.',
+            'severity' => 'warning',
+            'target_user_ids' => [
+                $inactiveTarget->id,
+                $otherTenantTarget->id,
+            ],
+        ]);
+
+        $createInvalidTargets->assertStatus(201);
+        $invalidAlertId = (int) $createInvalidTargets->json('data.id');
+
+        $emptyTargets = json_decode((string) DB::table('caring_emergency_alerts')
+            ->where('id', $invalidAlertId)
+            ->value('target_user_ids'), true);
+
+        $this->assertSame([], $emptyTargets);
+
+        Sanctum::actingAs($notTargeted);
+        $hiddenInvalidTargets = $this->apiGet('/v2/caring-community/emergency-alerts');
+        $hiddenInvalidTargets->assertStatus(200);
+        $this->assertNotContains($invalidAlertId, array_column($hiddenInvalidTargets->json('data'), 'id'));
+    }
 }

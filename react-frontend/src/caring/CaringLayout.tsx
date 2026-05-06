@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CaringPanelSidebar } from './components/CaringPanelSidebar';
@@ -13,8 +13,25 @@ import { CaringPanelBreadcrumbs } from './components/CaringPanelBreadcrumbs';
 export function CaringLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const location = useLocation();
   const { t } = useTranslation('caring_community');
+
+  const closeMobileDrawer = () => {
+    setMobileDrawerOpen(false);
+  };
+
+  const toggleMobileDrawer = () => {
+    setMobileDrawerOpen((prev) => {
+      if (!prev) {
+        returnFocusRef.current = document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      }
+      return !prev;
+    });
+  };
 
   useEffect(() => {
     setMobileDrawerOpen(false);
@@ -25,14 +42,60 @@ export function CaringLayout() {
       return undefined;
     }
 
+    const focusableSelector = [
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+
+    drawerRef.current?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setMobileDrawerOpen(false);
+        closeMobileDrawer();
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const focusable = Array.from(
+        drawerRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
+      ).filter((element) => element.offsetParent !== null);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        drawerRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileDrawerOpen]);
+
+  useEffect(() => {
+    if (mobileDrawerOpen) {
+      return;
+    }
+
+    returnFocusRef.current?.focus();
+    returnFocusRef.current = null;
   }, [mobileDrawerOpen]);
 
   return (
@@ -47,30 +110,32 @@ export function CaringLayout() {
 
       <CaringPanelHeader
         sidebarCollapsed={sidebarCollapsed}
-        onSidebarToggle={() => setMobileDrawerOpen((prev) => !prev)}
+        onSidebarToggle={toggleMobileDrawer}
       />
 
       {mobileDrawerOpen && (
-        <button
-          type="button"
-          aria-label={t('panel.navigation.close')}
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => setMobileDrawerOpen(false)}
-        />
+        <>
+          <button
+            type="button"
+            aria-label={t('panel.navigation.close')}
+            className="fixed inset-0 z-30 bg-black/50 md:hidden"
+            onClick={closeMobileDrawer}
+          />
+          <div
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('panel.navigation.label')}
+            tabIndex={-1}
+            className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden"
+          >
+            <CaringPanelSidebar
+              collapsed={false}
+              onToggle={closeMobileDrawer}
+            />
+          </div>
+        </>
       )}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('panel.navigation.label')}
-        className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden ${
-          mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <CaringPanelSidebar
-          collapsed={false}
-          onToggle={() => setMobileDrawerOpen(false)}
-        />
-      </div>
 
       <main
         className={`min-h-screen pt-16 transition-all duration-300 ${

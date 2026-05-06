@@ -201,6 +201,20 @@ describe('API Client', () => {
       expect(response.data).toEqual({ id: 1, name: 'Test' });
     });
 
+    it('preserves application-level failure envelopes returned with HTTP 2xx', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: false, error: 'Validation failed', code: 'VALIDATION_ERROR' }),
+      } as Response);
+
+      const response = await api.get('/v2/test');
+
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Validation failed');
+      expect(response.code).toBe('VALIDATION_ERROR');
+    });
+
     it('deduplicates concurrent identical GET requests', async () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
@@ -280,6 +294,22 @@ describe('API Client', () => {
       const headers = call[1]?.headers as Headers;
       expect(headers.get('X-CSRF-Token')).toBe('csrf-token');
       expect(headers.get('Content-Type')).toBe('application/json');
+    });
+  });
+
+  describe('file uploads', () => {
+    it('preserves application-level upload failure envelopes returned with HTTP 2xx', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: false, error: 'Upload rejected', code: 'UPLOAD_REJECTED' }),
+      } as Response);
+
+      const response = await api.upload('/v2/files', new File(['x'], 'x.txt'));
+
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Upload rejected');
+      expect(response.code).toBe('UPLOAD_REJECTED');
     });
   });
 

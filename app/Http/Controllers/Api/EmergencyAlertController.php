@@ -43,7 +43,7 @@ class EmergencyAlertController extends BaseApiController
      */
     public function activeAlerts(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
         if (!TenantContext::hasFeature('caring_community')) {
@@ -51,7 +51,7 @@ class EmergencyAlertController extends BaseApiController
         }
 
         try {
-            $alerts = EmergencyAlertService::getActiveAlerts($tenantId);
+            $alerts = EmergencyAlertService::getActiveAlerts($tenantId, $userId);
             return $this->respondWithData($alerts);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 503);
@@ -125,6 +125,8 @@ class EmergencyAlertController extends BaseApiController
             'body'       => 'required|string|max:2000',
             'severity'   => 'nullable|in:info,warning,danger',
             'expires_at' => 'nullable|date',
+            'target_user_ids' => 'nullable|array',
+            'target_user_ids.*' => 'integer|min:1',
         ]);
 
         if ($validator->fails()) {

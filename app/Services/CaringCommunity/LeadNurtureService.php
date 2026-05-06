@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\CaringCommunity;
 
+use App\Support\CsvExportSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -262,7 +263,7 @@ class LeadNurtureService
             return '';
         }
         foreach ($rows as $row) {
-            fputcsv($out, $row);
+            fputcsv($out, CsvExportSanitizer::row($row));
         }
         rewind($out);
         $csv = stream_get_contents($out) ?: '';

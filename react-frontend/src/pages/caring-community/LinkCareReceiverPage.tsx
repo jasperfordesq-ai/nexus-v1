@@ -64,12 +64,16 @@ export function LinkCareReceiverPage() {
 
     setIsSubmitting(true);
     try {
-      await api.post('/v2/caring-community/caregiver/links', {
+      const res = await api.post('/v2/caring-community/caregiver/links', {
         cared_for_id: selectedUser.id,
         relationship_type: relationshipType,
         start_date: startDate,
         notes: notes || undefined,
       });
+      if (!res.success) {
+        showToast(res.error ?? t('caregiver.link_error'), 'error');
+        return;
+      }
       showToast(t('caregiver.link_success'), 'success');
       void navigate(tenantPath('/caring-community/caregiver'), { replace: true });
     } catch (err) {

@@ -91,6 +91,12 @@ export default function CoverCarePage() {
         api.get<{ data: CaregiverLink[] } | CaregiverLink[]>('/v2/caring-community/caregiver/links'),
         api.get<{ data: CoverRequest[] } | CoverRequest[]>('/v2/caring-community/caregiver/cover-requests'),
       ]);
+      if (!linksRes.success || !requestsRes.success) {
+        showToast(linksRes.error ?? requestsRes.error ?? t('cover.errors.load'), 'error');
+        setLinks([]);
+        setRequests([]);
+        return;
+      }
       const nextLinks = unwrapData<CaregiverLink[]>(linksRes.data ?? []);
       setLinks(nextLinks);
       setRequests(unwrapData<CoverRequest[]>(requestsRes.data ?? []));
@@ -114,7 +120,7 @@ export default function CoverCarePage() {
     if (!caredForId || !title.trim() || !startsAt || !endsAt) return;
     setSubmitting(true);
     try {
-      await api.post('/v2/caring-community/caregiver/cover-requests', {
+      const res = await api.post('/v2/caring-community/caregiver/cover-requests', {
         cared_for_id: Number(caredForId),
         title: title.trim(),
         briefing: briefing.trim() || null,
@@ -124,6 +130,10 @@ export default function CoverCarePage() {
         minimum_trust_tier: Number(minimumTrustTier),
         urgency,
       });
+      if (!res.success) {
+        showToast(res.error ?? t('cover.errors.create'), 'error');
+        return;
+      }
       setTitle('');
       setBriefing('');
       setStartsAt('');
@@ -145,6 +155,10 @@ export default function CoverCarePage() {
       const res = await api.get<{ data: Candidate[] } | Candidate[]>(
         `/v2/caring-community/caregiver/cover-requests/${requestId}/candidates`,
       );
+      if (!res.success) {
+        showToast(res.error ?? t('cover.errors.candidates'), 'error');
+        return;
+      }
       setCandidates((prev) => ({ ...prev, [requestId]: unwrapData<Candidate[]>(res.data ?? []) }));
     } catch (err: unknown) {
       logError('CoverCarePage.loadCandidates', err);
@@ -157,9 +171,13 @@ export default function CoverCarePage() {
   const assignCandidate = async (requestId: number, supporterId: number) => {
     setActionId(requestId);
     try {
-      await api.post(`/v2/caring-community/caregiver/cover-requests/${requestId}/assign`, {
+      const res = await api.post(`/v2/caring-community/caregiver/cover-requests/${requestId}/assign`, {
         supporter_id: supporterId,
       });
+      if (!res.success) {
+        showToast(res.error ?? t('cover.errors.assign'), 'error');
+        return;
+      }
       showToast(t('cover.assigned'), 'success');
       await load();
     } catch (err: unknown) {

@@ -661,6 +661,20 @@ class ApiClient {
           return { success: true, data: undefined as T };
         }
 
+        if (typeof data === 'object' && data !== null && 'success' in data && data.success === false) {
+          const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+          const result: ApiResponse<T> = {
+            success: false,
+            error: data.error ?? firstError?.message ?? data.message ?? 'Request failed',
+            code: data.code ?? firstError?.code ?? 'REQUEST_FAILED',
+            meta: data.meta,
+          };
+
+          validateResponse(apiResponseSchema, result, `${options.method || 'GET'} ${endpoint}`);
+
+          return result;
+        }
+
         const result: ApiResponse<T> = {
           success: true,
           data: typeof data === 'object' && data !== null && 'data' in data ? data.data : data,
@@ -945,6 +959,15 @@ class ApiClient {
       if (response.ok) {
         if (data === null || data === undefined) {
           return { success: true, data: undefined as T };
+        }
+        if (typeof data === 'object' && data !== null && 'success' in data && data.success === false) {
+          const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+          return {
+            success: false,
+            error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
+            code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
+            meta: data.meta,
+          };
         }
         return { success: true, data: typeof data === 'object' && 'data' in data ? data.data : data, meta: data.meta };
       }

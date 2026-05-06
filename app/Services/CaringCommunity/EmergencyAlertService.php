@@ -40,10 +40,12 @@ class EmergencyAlertService
     /**
      * Return all currently active alerts for a tenant.
      * Active = is_active = 1 AND (expires_at IS NULL OR expires_at > NOW())
+     * If a member ID is provided, targeted alerts are returned only when that
+     * member is explicitly included. Untargeted alerts remain tenant-wide.
      *
      * @return array<int, array<string, mixed>>
      */
-    public static function getActiveAlerts(int $tenantId): array
+    public static function getActiveAlerts(int $tenantId, ?int $userId = null): array
     {
         if (!self::isAvailable()) {
             throw new \RuntimeException(__('api.caring_emergency_alerts_unavailable'));
@@ -58,7 +60,9 @@ class EmergencyAlertService
             })
             ->orderBy('created_at', 'desc')
             ->get()
+            ->filter(fn ($row): bool => self::alertTargetsUser($row->target_user_ids ?? null, $userId))
             ->map(fn ($row) => (array) $row)
+            ->values()
             ->all();
     }
 
@@ -103,6 +107,9 @@ class EmergencyAlertService
 
         $now = Carbon::now();
 
+        $hasExplicitTargetInput = is_array($data['target_user_ids'] ?? null);
+        $targetUserIds = self::resolveTargetUserIds($tenantId, $data['target_user_ids'] ?? null);
+
         $alertId = DB::table(self::TABLE)->insertGetId([
             'tenant_id'        => $tenantId,
             'title'            => $data['title'],
@@ -111,9 +118,7 @@ class EmergencyAlertService
             'geographic_scope' => isset($data['geographic_scope'])
                 ? json_encode($data['geographic_scope'])
                 : null,
-            'target_user_ids'  => isset($data['target_user_ids'])
-                ? json_encode($data['target_user_ids'])
-                : null,
+            'target_user_ids'  => $hasExplicitTargetInput ? json_encode($targetUserIds) : null,
             'expires_at'       => isset($data['expires_at'])
                 ? Carbon::parse($data['expires_at'])->toDateTimeString()
                 : null,
@@ -125,17 +130,15 @@ class EmergencyAlertService
             'updated_at'       => $now,
         ]);
 
-        // Determine target user IDs
-        if (!empty($data['target_user_ids']) && is_array($data['target_user_ids'])) {
-            $userIds = array_map('intval', $data['target_user_ids']);
-        } else {
-            $userIds = DB::table('users')
+        // Determine push recipients.
+        $userIds = $hasExplicitTargetInput
+            ? $targetUserIds
+            : DB::table('users')
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->pluck('id')
                 ->map(fn ($id) => (int) $id)
                 ->all();
-        }
 
         // Broadcast via FCM with high priority (bypasses quiet hours at OS level)
         $pushResult = FCMPushService::sendToUsers(
@@ -254,6 +257,61 @@ class EmergencyAlertService
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn ($row) => (array) $row)
+            ->all();
+    }
+
+    private static function alertTargetsUser(mixed $targetUserIds, ?int $userId): bool
+    {
+        if ($targetUserIds === null || $targetUserIds === '') {
+            return true;
+        }
+
+        if ($userId === null || $userId <= 0) {
+            return false;
+        }
+
+        $decoded = is_array($targetUserIds)
+            ? $targetUserIds
+            : json_decode((string) $targetUserIds, true);
+
+        if (!is_array($decoded)) {
+            return true;
+        }
+
+        if ($decoded === []) {
+            return false;
+        }
+
+        $ids = array_map('intval', $decoded);
+
+        return in_array($userId, $ids, true);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private static function resolveTargetUserIds(int $tenantId, mixed $targetUserIds): array
+    {
+        if (!is_array($targetUserIds) || $targetUserIds === []) {
+            return [];
+        }
+
+        $requestedIds = array_values(array_unique(array_filter(
+            array_map('intval', $targetUserIds),
+            fn (int $id): bool => $id > 0,
+        )));
+
+        if ($requestedIds === []) {
+            return [];
+        }
+
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->whereIn('id', $requestedIds)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values()
             ->all();
     }
 }

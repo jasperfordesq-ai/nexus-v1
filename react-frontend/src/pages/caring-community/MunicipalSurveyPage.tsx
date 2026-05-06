@@ -241,9 +241,18 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
     setError(null);
     setSubmitting(true);
     try {
-      await api.post(`/v2/caring-community/surveys/${survey.id}/respond`, {
+      const res = await api.post(`/v2/caring-community/surveys/${survey.id}/respond`, {
         answers,
       });
+      if (!res.success) {
+        const message = res.error ?? '';
+        if (message.toLowerCase().includes('already')) {
+          setAlreadyResponded(true);
+          return;
+        }
+        setError(message || t('submit_error'));
+        return;
+      }
       onSuccess();
     } catch (e: unknown) {
       // Check for "already responded" server error
@@ -336,6 +345,11 @@ export default function MunicipalSurveyPage() {
       const res = await api.get<{ data: Survey[] } | Survey[]>(
         '/v2/caring-community/surveys'
       );
+      if (!res.success) {
+        setError(res.error ?? t('load_error'));
+        setSurveys([]);
+        return;
+      }
       const raw = res.data;
       const list: Survey[] = Array.isArray(raw)
         ? raw
@@ -360,6 +374,10 @@ export default function MunicipalSurveyPage() {
       const res = await api.get<{ data: Survey } | Survey>(
         `/v2/caring-community/surveys/${survey.id}`
       );
+      if (!res.success) {
+        setError(res.error ?? t('load_error'));
+        return;
+      }
       const raw = res.data;
       if (!raw) return;
       const detail: Survey = 'data' in raw ? (raw as { data: Survey }).data : raw;

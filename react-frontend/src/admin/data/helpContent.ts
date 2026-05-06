@@ -747,12 +747,12 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Review the provider directory at least twice a year to remove organisations that have closed or changed their services.',
     ],
     relatedPaths: [
-      { label: 'Care Recipient Circle', path: '/caring/care-recipient-circle' },
+      { label: 'Care Recipient Circle', path: '/caring/recipient-circle' },
       { label: 'Coordinator Workflow', path: '/caring/workflow' },
     ],
   },
 
-  '/caring/care-recipient-circle': {
+  '/caring/recipient-circle': {
     title: 'Care Recipient Circles & Beneficiary Management',
     summary:
       'A care recipient circle groups the support network around a specific community member who needs regular care — for example, an elderly person who receives help from three neighbours, a coordinator, and a professional nurse. This page creates and manages those circles.',
@@ -775,7 +775,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/research-partnerships': {
+  '/caring/research': {
     title: 'Research Partnerships — Academic Collaboration',
     summary:
       'Manage formal research partnerships with universities, public health institutes, and social research organisations. Partners can be granted read-only access to anonymised aggregate data for academic studies, subject to a signed data agreement.',
