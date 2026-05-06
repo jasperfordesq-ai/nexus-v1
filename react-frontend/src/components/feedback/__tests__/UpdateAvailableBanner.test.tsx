@@ -36,12 +36,16 @@ import { UpdateAvailableBanner } from '../UpdateAvailableBanner';
 describe('UpdateAvailableBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
+    sessionStorage.clear();
     // Reset global flags
     delete (window as NexusWindow).__nexus_updatePending;
     delete (window as NexusWindow).__nexus_updateSW;
   });
 
   afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
     delete (window as NexusWindow).__nexus_updatePending;
     delete (window as NexusWindow).__nexus_updateSW;
   });
@@ -95,6 +99,12 @@ describe('UpdateAvailableBanner', () => {
   });
 
   it('calls __nexus_updateSW when Update Now is clicked', async () => {
+    const reloadMock = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...originalLocation, reload: reloadMock },
+    });
     const updateSW = vi.fn().mockResolvedValue(undefined);
     (window as NexusWindow).__nexus_updatePending = true;
     (window as NexusWindow).__nexus_updateSW = updateSW;
@@ -105,7 +115,12 @@ describe('UpdateAvailableBanner', () => {
     fireEvent.click(updateBtn);
 
     await waitFor(() => {
-      expect(updateSW).toHaveBeenCalledWith(true);
+      expect(updateSW).toHaveBeenCalledWith(false);
+    });
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
     });
   });
 

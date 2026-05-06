@@ -70,6 +70,7 @@ export default defineConfig(({ command, mode }) => {
       manifest: false, // We use our own public/manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
         // Do not register API calls with Workbox. Leaving them unhandled lets
         // the browser perform normal fetch/CORS handling and avoids Workbox

@@ -20,12 +20,16 @@ describe('useVersionCheck', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    localStorage.clear();
+    sessionStorage.clear();
     fetchSpy = vi.fn();
     global.fetch = fetchSpy;
     dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
   });
 
   afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
@@ -146,6 +150,25 @@ describe('useVersionCheck', () => {
     );
     // Should only fire once even after multiple checks
     expect(updateEvents).toHaveLength(1);
+  });
+
+  it('does not fire while an update from the current commit is already in progress', async () => {
+    localStorage.setItem('nexus_sw_update_from_commit', `test:${Date.now()}`);
+    fetchSpy.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ commit: 'different-commit' }),
+    });
+
+    renderHook(() => useVersionCheck());
+
+    await act(async () => {
+      vi.advanceTimersByTime(16_000);
+    });
+
+    const updateEvents = dispatchEventSpy.mock.calls.filter(
+      (call) => call[0] instanceof CustomEvent && call[0].type === 'nexus:sw_update_available'
+    );
+    expect(updateEvents).toHaveLength(0);
   });
 
   it('checks on visibility change', async () => {

@@ -35,6 +35,7 @@ import { Button } from '@heroui/react';
 // cycles and sessionStorage is wiped even though the waiting SW persists.
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000; // 10 minutes
+const SW_ACTIVATION_TIMEOUT_MS = 5000;
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -49,6 +50,65 @@ function markUpdateTriggered(): void {
   try {
     localStorage.setItem(SW_UPDATE_FROM_COMMIT_KEY, `${__BUILD_COMMIT__}:${Date.now()}`);
   } catch { /* non-blocking */ }
+}
+
+async function refreshServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | undefined> {
+  if (!navigator.serviceWorker) return undefined;
+
+  const registration = await navigator.serviceWorker.getRegistration();
+  try {
+    await registration?.update();
+  } catch {
+    // A failed update check should not block the repair path below.
+  }
+
+  return navigator.serviceWorker.getRegistration();
+}
+
+async function activateWaitingServiceWorker(): Promise<boolean> {
+  const registration = await refreshServiceWorkerRegistration();
+  const waitingWorker = registration?.waiting;
+  if (!waitingWorker) return false;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    let timeout: number;
+    const settle = (activated: boolean) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      navigator.serviceWorker?.removeEventListener('controllerchange', onControllerChange);
+      resolve(activated);
+    };
+    const onControllerChange = () => settle(true);
+    timeout = window.setTimeout(() => settle(false), SW_ACTIVATION_TIMEOUT_MS);
+
+    navigator.serviceWorker?.addEventListener('controllerchange', onControllerChange, { once: true });
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+  });
+}
+
+async function forceClearAppCaches(): Promise<void> {
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+    }
+  } catch {
+    // Cache cleanup is best-effort; unregistering below still helps.
+  }
+
+  try {
+    if (navigator.serviceWorker?.getRegistrations) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    } else {
+      const registration = await navigator.serviceWorker?.getRegistration();
+      await registration?.unregister();
+    }
+  } catch {
+    // Reload anyway; the network may already have the fresh shell.
+  }
 }
 
 /**
@@ -158,58 +218,28 @@ export function UpdateAvailableBanner() {
 
     const updateSW = (window as NexusWindow).__nexus_updateSW;
 
-    // Strategy: tell the SW to skip waiting, then wait for `controllerchange`
-    // (meaning the NEW SW has taken control) before reloading. This ensures
-    // the reload actually fetches new assets from the new SW's precache.
-    // Hard timeout of 5s in case controllerchange never fires.
     const doReload = () => window.location.reload();
 
-    if (typeof updateSW === 'function') {
-      let reloaded = false;
-      const reload = () => {
-        if (reloaded) return;
-        reloaded = true;
-        doReload();
-      };
-
-      // Listen for the new SW to take control BEFORE calling updateSW.
-      // controllerchange fires when a new SW claims the page.
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.addEventListener('controllerchange', reload, { once: true });
-      }
-
-      // Hard safety timeout — if controllerchange never fires, reload anyway.
-      const fallbackTimeout = setTimeout(reload, 5000);
-
+    void (async () => {
       try {
-        const result = updateSW(true);
-        if (result && typeof (result as Promise<void>).then === 'function') {
-          (result as Promise<void>).then(
-            () => {
-              // Promise resolved — SW activated. Give controllerchange 500ms to
-              // fire, then force reload if it hasn't happened yet.
-              clearTimeout(fallbackTimeout);
-              setTimeout(reload, 500);
-            },
-            () => {
-              clearTimeout(fallbackTimeout);
-              reload();
-            }
-          );
+        if (typeof updateSW === 'function') {
+          await updateSW(false);
         }
-        // If updateSW returned void (not a Promise), controllerchange or timeout handles it.
-      } catch {
-        clearTimeout(fallbackTimeout);
-        reload();
+
+        const activated = await activateWaitingServiceWorker();
+        if (!activated) {
+          await forceClearAppCaches();
+        }
+      } finally {
+        doReload();
       }
-    } else {
-      doReload();
-    }
+    })();
   }
 
   function handleDismiss() {
     setShowBanner(false);
   }
+
 
   return (
     <AnimatePresence>

@@ -30,6 +30,7 @@ import { useEffect, useCallback, useRef } from 'react';
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 const INITIAL_DELAY_MS = 15_000;
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
+const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000;
 
 // True when running inside a Capacitor native WebView — evaluated once at
 // module load time so the value is stable across re-renders and safe to use
@@ -50,8 +51,20 @@ export function useVersionCheck() {
     // If the user already clicked "Update" from this build, don't re-fire.
     // The banner suppresses itself based on this same key — re-dispatching
     // the event would be pointless and causes the "click 4-5 times" loop.
-    const fromCommit = sessionStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
-    if (fromCommit && fromCommit === __BUILD_COMMIT__) return;
+    try {
+      const raw = localStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
+      if (raw) {
+        const colonIdx = raw.lastIndexOf(':');
+        const commit = raw.slice(0, colonIdx);
+        const ts = parseInt(raw.slice(colonIdx + 1), 10);
+        if (commit === __BUILD_COMMIT__ && Date.now() - ts < SW_UPDATE_SUPPRESSION_TTL) return;
+        if (commit !== __BUILD_COMMIT__ || Date.now() - ts >= SW_UPDATE_SUPPRESSION_TTL) {
+          localStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY);
+        }
+      }
+    } catch {
+      // Storage can be unavailable in private modes; continue with the network check.
+    }
 
     try {
       const res = await fetch('/build-info.json', { cache: 'no-store' });
