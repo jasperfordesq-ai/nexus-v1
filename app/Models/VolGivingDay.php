@@ -27,6 +27,7 @@ class VolGivingDay extends Model
         'end_date',
         'goal_amount',
         'raised_amount',
+        'target_hours',
         'is_active',
         'created_by',
         'created_at',
@@ -35,6 +36,7 @@ class VolGivingDay extends Model
     protected $casts = [
         'goal_amount' => 'decimal:2',
         'raised_amount' => 'decimal:2',
+        'target_hours' => 'decimal:1',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
     ];

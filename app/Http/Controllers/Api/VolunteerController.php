@@ -855,9 +855,9 @@ class VolunteerController extends BaseApiController
                    vo.id as opportunity_id, vo.title as opportunity_title,
                    vs.start_time as shift_start, vs.end_time as shift_end
             FROM vol_applications va
-            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ?
-            INNER JOIN users u ON va.user_id = u.id
-            LEFT JOIN vol_shifts vs ON va.shift_id = vs.id
+            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ? AND vo.tenant_id = va.tenant_id
+            INNER JOIN users u ON va.user_id = u.id AND u.tenant_id = va.tenant_id
+            LEFT JOIN vol_shifts vs ON va.shift_id = vs.id AND vs.tenant_id = va.tenant_id
             WHERE va.tenant_id = ?
             {$whereClauses}
             ORDER BY va.id DESC
@@ -919,8 +919,8 @@ class VolunteerController extends BaseApiController
                    u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
                    vo.id as opportunity_id, vo.title as opportunity_title
             FROM vol_logs vl
-            INNER JOIN users u ON vl.user_id = u.id
-            LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id
+            INNER JOIN users u ON vl.user_id = u.id AND u.tenant_id = vl.tenant_id
+            LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id AND vo.tenant_id = vl.tenant_id
             WHERE vl.organization_id = ? AND vl.tenant_id = ? AND vl.status = 'pending'
             {$cursorClause}
             ORDER BY vl.id DESC

@@ -24,9 +24,10 @@ const approvedApplication = {
   id: 5001,
   status: 'approved',
   created_at: '2026-05-01T10:00:00Z',
-  opportunity_id: opportunity.id,
-  opportunity_title: opportunity.title,
-  title: opportunity.title,
+  opportunity: {
+    id: opportunity.id,
+    title: opportunity.title,
+  },
   organization: opportunity.organization,
   org_note: 'Bring comfortable shoes.',
 };
@@ -135,8 +136,25 @@ test.describe('Volunteering module', () => {
   });
 
   test('uses the current volunteering API endpoint, not the stale legacy path', async ({ page }) => {
-    const response = await page.request.get('/api/v2/volunteering/opportunities?per_page=1');
-    expect([200, 401, 403]).toContain(response.status());
-    expect(response.status()).not.toBe(404);
+    const requestedUrls: string[] = [];
+    await page.route('**/api/v2/volunteering/opportunities**', async (route) => {
+      requestedUrls.push(route.request().url());
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: [opportunity],
+          meta: { has_more: false, cursor: null },
+        }),
+      });
+    });
+
+    await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });
+    await dismissBlockingModals(page);
+
+    await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();
+    expect(requestedUrls.some((url) => url.includes('/api/v2/volunteering/opportunities'))).toBe(true);
+    expect(requestedUrls.every((url) => !url.includes('/api/volunteering'))).toBe(true);
   });
 });

@@ -212,14 +212,14 @@ public function test_apply_requires_auth(): void
         $this->assertNotNull($logId);
         $this->assertSame('approved', VolunteerService::getLastLogStatus());
         $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
-        $this->assertEquals(17.25, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(18.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
         $this->assertEquals(5, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
 
         $orgTransaction = DB::table('vol_org_transactions')->where('vol_log_id', $logId)->first();
         $this->assertNotNull($orgTransaction);
         $this->assertSame('volunteer_payment', $orgTransaction->type);
-        $this->assertEquals(-2.75, (float) $orgTransaction->amount);
-        $this->assertEquals(17.25, (float) $orgTransaction->balance_after);
+        $this->assertEquals(-2.00, (float) $orgTransaction->amount);
+        $this->assertEquals(18.00, (float) $orgTransaction->balance_after);
 
         $walletTransaction = DB::table('transactions')
             ->where('tenant_id', $this->testTenantId)

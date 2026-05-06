@@ -254,13 +254,17 @@ class VolunteerCertificateController extends BaseApiController
         }
 
         $path = substr((string) $credential->file_url, strlen('private:'));
+        $expectedPrefix = 'volunteer-credentials/' . TenantContext::getId() . '/';
+        if (!str_starts_with($path, $expectedPrefix) || str_contains($path, '..')) {
+            return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
+        }
         if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
             return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
         }
 
         return response()->download(
             \Illuminate\Support\Facades\Storage::disk('local')->path($path),
-            $credential->file_name ?: basename($path)
+            basename((string) ($credential->file_name ?: basename($path)))
         );
     }
 
@@ -286,7 +290,11 @@ class VolunteerCertificateController extends BaseApiController
         }
 
         if ($credential && str_starts_with((string) $credential->file_url, 'private:')) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete(substr((string) $credential->file_url, strlen('private:')));
+            $path = substr((string) $credential->file_url, strlen('private:'));
+            $expectedPrefix = 'volunteer-credentials/' . $tenantId . '/';
+            if (str_starts_with($path, $expectedPrefix) && !str_contains($path, '..')) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+            }
         }
 
         return $this->respondWithData(['success' => true]);

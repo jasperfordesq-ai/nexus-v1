@@ -1205,6 +1205,9 @@ return [
     'job_feature_disabled'                 => 'Job Vacancies module is not enabled for this community',
     'job_vacancy_not_found'                => 'Job vacancy not found',
     'job_vacancy_not_accepting_applications' => 'This vacancy is no longer accepting applications',
+    'job_cannot_apply_own'                 => 'You cannot apply to your own job vacancy',
+    'job_application_submitted'            => 'Application submitted',
+    'job_candidate_label'                  => 'Candidate #:number',
     'job_create_failed'                    => 'Failed to create job vacancy',
     'job_type_invalid'                     => 'Invalid job type',
     'job_type_disabled'                    => 'This job type is not enabled for this community',
@@ -1274,6 +1277,14 @@ return [
     'job_slots_required'                   => 'At least one slot is required',
     'job_date_range_required'              => 'date_from and date_to are required',
     'job_day_config_required'              => 'day_config is required',
+    'job_slots_manage_forbidden'           => 'Only the job owner or a hiring manager can manage interview slots',
+    'job_slots_active_application_required' => 'Only applicants for this job can view or book interview slots',
+    'job_slot_not_found'                   => 'Interview slot not found',
+    'job_slot_already_booked'              => 'This slot has already been booked',
+    'job_slot_passed'                      => 'This slot has already passed',
+    'job_cannot_book_own_slot'             => 'You cannot book your own interview slot',
+    'job_slot_not_booked'                  => 'This slot is not booked',
+    'job_slots_cancel_forbidden'           => 'Only the booked candidate, job owner, or hiring manager can cancel this booking',
 
     // ============================================
     // USER-FACING — VOLUNTEER COMMUNITY (additional)
@@ -2261,6 +2272,23 @@ return [
     'user_not_found_in_tenant' => 'User not found in this tenant',
     'municipal_announcer_role_missing' => 'municipality_announcer role not found',
     'municipal_announcer_role_missing_run_migrations' => 'municipality_announcer role not found - run migrations',
+    'vol_wellbeing_warning_frequency_declining' => 'Your volunteering frequency has decreased compared to last month.',
+    'vol_wellbeing_warning_cancellation_rate' => 'Your cancellation rate is higher than usual. Consider taking on fewer commitments.',
+    'vol_wellbeing_warning_hours_declining' => 'Your logged hours have dropped significantly. Remember to take breaks when needed.',
+    'vol_wellbeing_warning_engagement_gap' => 'It has been a while since your last volunteer activity. We miss you.',
+    'volunteer_auto_payment_description' => 'Auto-payment for :hours h volunteered',
+    'vol_certificate_no_approved_hours' => 'No approved volunteer hours found for this user',
+    'vol_certificate_independent' => 'Independent',
+    'vol_certificate_generate_failed' => 'Failed to generate certificate',
+    'vol_certificate_volunteer_fallback' => 'Volunteer',
+    'vol_certificate_html_title' => 'Volunteer Impact Certificate',
+    'vol_certificate_html_platform' => 'Project NEXUS Community Platform',
+    'vol_certificate_html_total_hours' => 'Total Volunteer Hours',
+    'vol_certificate_html_period' => 'Period',
+    'vol_certificate_html_org' => 'Organisation',
+    'vol_certificate_html_org_hours' => 'Hours',
+    'vol_certificate_html_verification_code' => 'Verification Code',
+    'vol_certificate_html_verification_note' => 'This certificate can be verified online.',
 
     // ============================================
     // ACTIVITY LOG

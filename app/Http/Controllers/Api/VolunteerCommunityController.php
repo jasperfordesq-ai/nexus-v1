@@ -743,7 +743,20 @@ class VolunteerCommunityController extends BaseApiController
         $this->requireAdmin();
 
         $result = $this->volunteerDonationService->adminGetGivingDays();
-        return $this->respondWithData($result);
+        $stats = DB::selectOne(
+            "SELECT COUNT(*) as total_donations, COALESCE(SUM(amount), 0) as total_amount
+             FROM vol_donations
+             WHERE tenant_id = ? AND status = 'completed'",
+            [TenantContext::getId()]
+        );
+
+        return $this->respondWithData([
+            'giving_days' => $result,
+            'donation_stats' => [
+                'total_donations' => (int) ($stats->total_donations ?? 0),
+                'total_amount' => (float) ($stats->total_amount ?? 0),
+            ],
+        ]);
     }
 
     public function createGivingDay(): JsonResponse
