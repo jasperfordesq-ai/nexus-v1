@@ -8,6 +8,8 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
 import type { FeedComment } from '@/components/feed/types';
+import { REACTION_EMOJI_MAP } from '@/components/social/ReactionPicker';
+import type { ReactionType } from '@/components/social/ReactionPicker';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
@@ -41,7 +43,15 @@ export interface MentionUser {
   is_connection?: boolean;
 }
 
-export const AVAILABLE_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🎉'] as const;
+export const AVAILABLE_REACTIONS = ['like', 'love', 'laugh', 'wow', 'sad', 'celebrate'] as const satisfies readonly ReactionType[];
+export const COMMENT_REACTION_EMOJI_MAP: Record<(typeof AVAILABLE_REACTIONS)[number], string> = {
+  like: REACTION_EMOJI_MAP.like,
+  love: REACTION_EMOJI_MAP.love,
+  laugh: REACTION_EMOJI_MAP.laugh,
+  wow: REACTION_EMOJI_MAP.wow,
+  sad: REACTION_EMOJI_MAP.sad,
+  celebrate: REACTION_EMOJI_MAP.celebrate,
+};
 
 /* ─── Hook ──────────────────────────────────────────────────── */
 
@@ -180,13 +190,22 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       const res = await api.delete(`/v2/comments/${commentId}`);
       if (res.success) {
         // Remove from tree locally
+        const countRemovedFromTree = (list: FeedComment[]): number =>
+          list.reduce((total, c) => {
+            if (c.id === commentId) {
+              return total + 1 + (c.replies?.length ? countRemovedFromTree(c.replies) : 0);
+            }
+            return total + (c.replies?.length ? countRemovedFromTree(c.replies) : 0);
+          }, 0);
+        const removedCount = countRemovedFromTree(comments);
         const removeFromTree = (list: FeedComment[]): FeedComment[] =>
           list
             .filter((c) => c.id !== commentId)
             .map((c) => (c.replies?.length ? { ...c, replies: removeFromTree(c.replies) } : c));
         setComments(removeFromTree);
-        setCommentsCount((prev) => Math.max(0, prev - 1));
-        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: -1 } });
+        const delta = Math.max(1, removedCount);
+        setCommentsCount((prev) => Math.max(0, prev - delta));
+        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: -delta } });
         return true;
       }
       return false;
@@ -194,24 +213,24 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to delete comment', err);
       return false;
     }
-  }, []);
+  }, [comments, targetId, targetType]);
 
   /* ───── Reactions ───── */
 
-  const toggleReaction = useCallback(async (commentId: number, emoji: string) => {
+  const toggleReaction = useCallback(async (commentId: number, reactionType: string) => {
     try {
-      const res = await api.post<{ action: string; emoji: string; reactions: Record<string, number> }>(
+      const res = await api.post<{ action: string; reaction_type?: string; reactions: Record<string, number> }>(
         `/v2/comments/${commentId}/reactions`,
-        { emoji }
+        { reaction_type: reactionType }
       );
       if (res.success && res.data) {
         const { action, reactions: updatedReactions } = res.data;
         const updateInTree = (list: FeedComment[]): FeedComment[] =>
           list.map((c) => {
             if (c.id === commentId) {
-              const newUserReactions = action === 'added'
-                ? [...(c.user_reactions || []), emoji]
-                : (c.user_reactions || []).filter((e) => e !== emoji);
+              const newUserReactions = action === 'removed'
+                ? (c.user_reactions || []).filter((e) => e !== reactionType)
+                : [reactionType];
               return { ...c, reactions: updatedReactions, user_reactions: newUserReactions };
             }
             if (c.replies?.length) return { ...c, replies: updateInTree(c.replies) };

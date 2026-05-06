@@ -36,7 +36,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import type { FeedComment } from '@/components/feed/types';
-import { AVAILABLE_REACTIONS } from '@/hooks/useSocialInteractions';
+import { AVAILABLE_REACTIONS, COMMENT_REACTION_EMOJI_MAP } from '@/hooks/useSocialInteractions';
 import type { MentionUser } from '@/hooks/useSocialInteractions';
 import { MentionRenderer } from './MentionRenderer';
 import { UserHoverCard } from './UserHoverCard';
@@ -251,23 +251,26 @@ function CommentItemInner({
         {/* Emoji reactions display */}
         {hasReactions && (
           <div className="flex flex-wrap gap-1 mt-1 px-1">
-            {Object.entries(reactions).map(([emoji, count]) => (
-              <Tooltip key={emoji} content={`${emoji} (${count})`} size="sm" delay={300} closeDelay={0}>
+            {Object.entries(reactions).map(([reactionType, count]) => {
+              const reactionEmoji = COMMENT_REACTION_EMOJI_MAP[reactionType as keyof typeof COMMENT_REACTION_EMOJI_MAP] ?? reactionType;
+              return (
+              <Tooltip key={reactionType} content={`${reactionEmoji} (${count})`} size="sm" delay={300} closeDelay={0}>
                 <Button
                   variant="flat"
                   size="sm"
-                  onPress={() => isAuthenticated && onToggleReaction(comment.id, emoji)}
+                  onPress={() => isAuthenticated && onToggleReaction(comment.id, reactionType)}
                   className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full border transition-colors h-auto min-w-0 ${
-                    userReactions.includes(emoji)
+                    userReactions.includes(reactionType)
                       ? 'border-[var(--color-primary)]/50 bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                       : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text-subtle)]'
                   }`}
                 >
-                  <span>{emoji}</span>
+                  <span>{reactionEmoji}</span>
                   <span>{count as number}</span>
                 </Button>
               </Tooltip>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -280,19 +283,19 @@ function CommentItemInner({
               exit={{ opacity: 0, y: -4 }}
               className="flex gap-1 mt-1 px-1"
             >
-              {AVAILABLE_REACTIONS.map((emoji) => (
+              {AVAILABLE_REACTIONS.map((reactionType) => (
                 <Button
-                  key={emoji}
+                  key={reactionType}
                   isIconOnly
                   size="sm"
                   variant="flat"
-                  onPress={() => { onToggleReaction(comment.id, emoji); setShowReactions(false); }}
+                  onPress={() => { onToggleReaction(comment.id, reactionType); setShowReactions(false); }}
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-sm hover:scale-125 transition-transform min-w-0 ${
-                    userReactions.includes(emoji) ? 'bg-[var(--color-primary)]/20 ring-1 ring-[var(--color-primary)]' : 'hover:bg-[var(--surface-hover)]'
+                    userReactions.includes(reactionType) ? 'bg-[var(--color-primary)]/20 ring-1 ring-[var(--color-primary)]' : 'hover:bg-[var(--surface-hover)]'
                   }`}
-                  aria-label={emoji}
+                  aria-label={t(`reaction.${reactionType}`)}
                 >
-                  {emoji}
+                  {COMMENT_REACTION_EMOJI_MAP[reactionType]}
                 </Button>
               ))}
             </motion.div>

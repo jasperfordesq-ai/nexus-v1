@@ -56,7 +56,7 @@ import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggest
 import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
-import { FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
+import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -67,6 +67,7 @@ import { resetImpressions } from '@/hooks/useFeedTracking';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
 import { FeedAdCard } from '@/components/feed/FeedAdCard';
+import { MobileFAB } from '@/components/feed/MobileFAB';
 import type { AdItem } from '@/components/feed/FeedAdCard';
 import { FeedEmptyIllustration } from '@/components/illustrations';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
@@ -379,19 +380,9 @@ export function FeedPage() {
   // card reflects the change without a full reload.
   useEffect(() => {
     const handler = (e: Event) => {
-      const { targetType, targetId, patch } = (e as CustomEvent<FeedSyncPayload>).detail;
+      const payload = (e as CustomEvent<FeedSyncPayload>).detail;
       setItems((prev) =>
-        prev.map((item) => {
-          if (item.type !== targetType || item.id !== targetId) return item;
-          const next = { ...item };
-          if (patch.is_liked !== undefined) next.is_liked = patch.is_liked;
-          if (patch.likes_count !== undefined) next.likes_count = patch.likes_count;
-          if (patch.comments_count_delta !== undefined) {
-            next.comments_count = Math.max(0, (item.comments_count ?? 0) + patch.comments_count_delta);
-          }
-          if (patch.reactions !== undefined) next.reactions = patch.reactions;
-          return next;
-        })
+        prev.map((item) => applyFeedSyncToItem(item, payload))
       );
     };
     window.addEventListener(FEED_SYNC_EVENT, handler);
@@ -452,6 +443,10 @@ export function FeedPage() {
       // Only surface posts that match the active filter.
       // M5: Use filterRef.current so the closure always has the latest filter value.
       const currentFilter = filterRef.current;
+      if (currentFilter === 'following') {
+        setPendingPostCount((n) => n + 1);
+        return;
+      }
       const matchesFilter = feedItemMatchesFilter(incoming, currentFilter);
 
       if (!matchesFilter) return;
@@ -499,15 +494,29 @@ export function FeedPage() {
         target_type: item.type,
         target_id: item.id,
       });
-      const serverLikes = (res.data as { likes_count?: number } | undefined)?.likes_count;
+      const serverData = res.data as { action?: string; likes_count?: number } | undefined;
+      const serverLikes = serverData?.likes_count;
+      const serverLiked = serverData?.action === 'liked'
+        ? true
+        : serverData?.action === 'unliked'
+          ? false
+          : undefined;
       if (typeof serverLikes === 'number') {
         setItems((prev) =>
           prev.map((fi) =>
             fi.id === item.id && fi.type === item.type
-              ? { ...fi, likes_count: serverLikes }
+              ? { ...fi, likes_count: serverLikes, is_liked: serverLiked ?? fi.is_liked }
               : fi
           )
         );
+        dispatchFeedSync({
+          targetType: item.type,
+          targetId: item.id,
+          patch: {
+            likes_count: serverLikes,
+            ...(serverLiked !== undefined ? { is_liked: serverLiked } : {}),
+          },
+        });
       }
     } catch (err) {
       logError('Failed to toggle like', err);
@@ -515,11 +524,7 @@ export function FeedPage() {
       setItems((prev) =>
         prev.map((fi) =>
           fi.id === item.id && fi.type === item.type
-            ? {
-                ...fi,
-                is_liked: !fi.is_liked,
-                likes_count: fi.is_liked ? Math.max(0, fi.likes_count - 1) : fi.likes_count + 1,
-              }
+            ? { ...fi, is_liked: item.is_liked, likes_count: item.likes_count }
             : fi
         )
       );
@@ -583,6 +588,11 @@ export function FeedPage() {
               : fi
           )
         );
+        dispatchFeedSync({
+          targetType: item.type,
+          targetId: item.id,
+          patch: { reactions: serverReactions },
+        });
       }
     } catch (err) {
       logError('Failed to react', err);
@@ -754,8 +764,9 @@ export function FeedPage() {
     isScrollingRef.current = true;
     setPendingPostCount(0);
 
-    if (feedModeRef.current === 'ranking') {
-      // In ranking mode, trigger a full reload so EdgeRank re-scores and re-orders
+    if (feedModeRef.current === 'ranking' || filterRef.current === 'following') {
+      // Ranking and following both need a server pass: ranking must re-score,
+      // and following requires relationship context that realtime events do not carry.
       pendingPostsRef.current = [];
       cursorRef.current = undefined;
       loadFeedRef.current();
@@ -1035,7 +1046,7 @@ export function FeedPage() {
 
       {/* New posts floating chip — appears when real-time posts arrive while scrolled down */}
       <AnimatePresence>
-        {pendingPostCount > 0 && (feedMode === 'ranking' || isScrolledDown) && (
+        {pendingPostCount > 0 && (feedMode === 'ranking' || filter === 'following' || isScrolledDown) && (
           <motion.div
             key="new-posts-chip"
             initial={{ opacity: 0, y: -20, scale: 0.9 }}
@@ -1304,7 +1315,7 @@ export function FeedPage() {
       )}
     </div>
 
-    {/* Mobile FAB */}
+    {isAuthenticated && <MobileFAB onPress={() => openCompose('post')} />}
 </>
   );
 }

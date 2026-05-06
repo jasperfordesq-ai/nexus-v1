@@ -161,6 +161,7 @@
     "report_submit": "Report",
     "join_to_see_feed_title": "Join to see the feed",
     "join_to_see_feed_desc": "Join this group to view posts and participate in conversations.",
+    "you": "You",
     "feed_whats_on_your_mind": "What's on your mind?",
     "feed_empty_title": "No posts yet",
     "feed_empty_desc": "Be the first to share something with this group!",
@@ -332,6 +333,8 @@
     "provide_reason": "Please provide a reason",
     "reported": "Post reported",
     "report_failed": "Failed to report post",
+    "post_deleted": "Post deleted",
+    "post_delete_failed": "Failed to delete post",
     "vote_failed": "Failed to vote"
   },
   "loading_aria": "Loading groups",
