@@ -99,11 +99,12 @@ describe('UpdateAvailableBanner', () => {
   });
 
   it('calls __nexus_updateSW when Update Now is clicked', async () => {
+    const replaceMock = vi.fn();
     const reloadMock = vi.fn();
     const originalLocation = window.location;
     Object.defineProperty(window, 'location', {
       writable: true,
-      value: { ...originalLocation, reload: reloadMock },
+      value: { ...originalLocation, replace: replaceMock, reload: reloadMock },
     });
     const updateSW = vi.fn().mockResolvedValue(undefined);
     (window as NexusWindow).__nexus_updatePending = true;
@@ -117,6 +118,9 @@ describe('UpdateAvailableBanner', () => {
     await waitFor(() => {
       expect(updateSW).toHaveBeenCalledWith(false);
     });
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining('nexus_refresh='));
+    });
 
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -124,14 +128,15 @@ describe('UpdateAvailableBanner', () => {
     });
   });
 
-  it('falls back to window.location.reload() when no updateSW function', async () => {
-    // jsdom marks location.reload as non-configurable, so vi.spyOn fails.
+  it('falls back to cache-busting navigation when no updateSW function exists', async () => {
+    // jsdom marks location methods as non-configurable, so vi.spyOn fails.
     // Replace the entire location object with a spy-able version instead.
+    const replaceMock = vi.fn();
     const reloadMock = vi.fn();
     const originalLocation = window.location;
     Object.defineProperty(window, 'location', {
       writable: true,
-      value: { ...originalLocation, reload: reloadMock },
+      value: { ...originalLocation, replace: replaceMock, reload: reloadMock },
     });
 
     (window as NexusWindow).__nexus_updatePending = true;
@@ -143,10 +148,36 @@ describe('UpdateAvailableBanner', () => {
     fireEvent.click(updateBtn);
 
     await waitFor(() => {
-      expect(reloadMock).toHaveBeenCalled();
+      expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining('nexus_refresh='));
     });
 
     // Restore original location
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
+    });
+  });
+
+  it('starts the update when the mobile-sized banner message area is clicked', async () => {
+    const replaceMock = vi.fn();
+    const reloadMock = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...originalLocation, replace: replaceMock, reload: reloadMock },
+    });
+
+    (window as NexusWindow).__nexus_updatePending = true;
+
+    render(<UpdateAvailableBanner />);
+
+    const messageButton = screen.getByRole('button', { name: /new version is available/i });
+    fireEvent.click(messageButton);
+
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining('nexus_refresh='));
+    });
+
     Object.defineProperty(window, 'location', {
       writable: true,
       value: originalLocation,

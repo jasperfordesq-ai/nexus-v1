@@ -70,8 +70,10 @@ export default defineConfig(({ command, mode }) => {
       manifest: false, // We use our own public/manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        importScripts: ['sw-rescue.js'],
         // Do not register API calls with Workbox. Leaving them unhandled lets
         // the browser perform normal fetch/CORS handling and avoids Workbox
         // wrapping transient API/CORS failures as uncaught "no-response" errors.

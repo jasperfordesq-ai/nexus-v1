@@ -20,6 +20,16 @@ initSentry();
 // Uses "prompt" mode — new SW is installed but NOT activated until the user
 // explicitly accepts the update. This prevents mid-typing page reloads.
 if (import.meta.env.PROD) {
+  navigator.serviceWorker?.addEventListener('message', (event) => {
+    if (event.data?.type !== 'NEXUS_SW_RESCUE_RELOAD_REQUIRED') return;
+    const url = typeof event.data.url === 'string' ? event.data.url : window.location.href;
+    try {
+      window.location.replace(url);
+    } catch {
+      window.location.href = url;
+    }
+  });
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore — virtual:pwa-register is provided by vite-plugin-pwa
   import('virtual:pwa-register').then(({ registerSW }: { registerSW: (opts?: {

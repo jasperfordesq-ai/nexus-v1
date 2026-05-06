@@ -36,6 +36,9 @@ import { Button } from '@heroui/react';
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000; // 10 minutes
 const SW_ACTIVATION_TIMEOUT_MS = 5000;
+const UPDATE_SW_TIMEOUT_MS = 3000;
+const CACHE_BUST_QUERY_PARAM = 'nexus_refresh';
+const SW_RESCUE_QUERY_PARAM = 'nexus_sw_rescue';
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -65,9 +68,65 @@ async function refreshServiceWorkerRegistration(): Promise<ServiceWorkerRegistra
   return navigator.serviceWorker.getRegistration();
 }
 
+async function waitForInstallingWorker(
+  registration: ServiceWorkerRegistration | undefined,
+): Promise<ServiceWorker | null> {
+  if (!registration) return null;
+  if (registration.waiting) return registration.waiting;
+  if (!registration.installing) return null;
+
+  const installingWorker = registration.installing;
+  if (installingWorker.state === 'installed') return installingWorker;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const settle = (worker: ServiceWorker | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      installingWorker.removeEventListener('statechange', onStateChange);
+      resolve(worker);
+    };
+    const onStateChange = () => {
+      if (registration.waiting) {
+        settle(registration.waiting);
+        return;
+      }
+      if (installingWorker.state === 'installed') settle(installingWorker);
+      if (installingWorker.state === 'activated' || installingWorker.state === 'redundant') settle(null);
+    };
+    const timeout = window.setTimeout(() => settle(registration.waiting ?? null), SW_ACTIVATION_TIMEOUT_MS);
+
+    installingWorker.addEventListener('statechange', onStateChange);
+  });
+}
+
+async function runWithTimeout<T>(task: Promise<T>, timeoutMs: number): Promise<T | undefined> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timeout = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      resolve(undefined);
+    }, timeoutMs);
+
+    task.then((result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(result);
+    }).catch(() => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(undefined);
+    });
+  });
+}
+
 async function activateWaitingServiceWorker(): Promise<boolean> {
   const registration = await refreshServiceWorkerRegistration();
-  const waitingWorker = registration?.waiting;
+  const waitingWorker = registration?.waiting ?? await waitForInstallingWorker(registration);
   if (!waitingWorker) return false;
 
   return new Promise((resolve) => {
@@ -110,6 +169,44 @@ async function forceClearAppCaches(): Promise<void> {
   }
 }
 
+function buildFreshNavigationUrl(): string {
+  const url = new URL(window.location.href);
+  url.searchParams.set(CACHE_BUST_QUERY_PARAM, `${Date.now()}`);
+  return url.toString();
+}
+
+function navigateToFreshAppShell(): void {
+  const url = buildFreshNavigationUrl();
+  try {
+    window.location.replace(url);
+  } catch {
+    window.location.href = url;
+  }
+
+  window.setTimeout(() => {
+    try {
+      window.location.reload();
+    } catch {
+      // The replace() call above is the primary navigation path.
+    }
+  }, 1000);
+}
+
+function removeCacheBustQueryParam(): void {
+  try {
+    const url = new URL(window.location.href);
+    const hasCacheBustParam = url.searchParams.has(CACHE_BUST_QUERY_PARAM);
+    const hasRescueParam = url.searchParams.has(SW_RESCUE_QUERY_PARAM);
+    if (!hasCacheBustParam && !hasRescueParam) return;
+    url.searchParams.delete(CACHE_BUST_QUERY_PARAM);
+    url.searchParams.delete(SW_RESCUE_QUERY_PARAM);
+    const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, document.title, nextUrl);
+  } catch {
+    // Cosmetic only; the update still applied.
+  }
+}
+
 /**
  * Returns true if the user already triggered an update from this exact build
  * recently and the page is still running old code (reload hasn't taken effect).
@@ -145,6 +242,10 @@ export function UpdateAvailableBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const [updating, setUpdating] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    removeCacheBustQueryParam();
+  }, []);
 
   const checkAndShow = useCallback(() => {
     if (isUpdateAlreadyTriggered()) return;
@@ -210,6 +311,8 @@ export function UpdateAvailableBanner() {
   }, [checkAndShow]);
 
   function handleUpdate() {
+    if (updating) return;
+
     // Record which build we're updating FROM so the banner stays suppressed
     // on reload if the same build is still running (update in progress).
     markUpdateTriggered();
@@ -217,12 +320,10 @@ export function UpdateAvailableBanner() {
 
     const updateSW = (window as NexusWindow).__nexus_updateSW;
 
-    const doReload = () => window.location.reload();
-
     void (async () => {
       try {
         if (typeof updateSW === 'function') {
-          await updateSW(false);
+          await runWithTimeout(Promise.resolve(updateSW(false)), UPDATE_SW_TIMEOUT_MS);
         }
 
         const activated = await activateWaitingServiceWorker();
@@ -230,7 +331,7 @@ export function UpdateAvailableBanner() {
           await forceClearAppCaches();
         }
       } finally {
-        doReload();
+        navigateToFreshAppShell();
       }
     })();
   }
@@ -253,12 +354,20 @@ export function UpdateAvailableBanner() {
           role="status"
           aria-live="polite"
         >
-          <div className="bg-indigo-600 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-3">
-            <RefreshCw className={`w-4 h-4 flex-shrink-0${updating ? ' animate-spin' : ''}`} aria-hidden="true" />
-            <span>{t('update_banner.message')}</span>
+          <div className="bg-indigo-600 text-white text-center py-2 px-3 text-sm font-medium flex items-center justify-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={handleUpdate}
+              disabled={updating}
+              className="min-w-0 flex flex-1 items-center justify-center gap-2 rounded px-1 py-1 text-white touch-manipulation disabled:cursor-wait disabled:opacity-90 sm:flex-none"
+              aria-label={t('update_banner.message')}
+            >
+              <RefreshCw className={`w-4 h-4 flex-shrink-0${updating ? ' animate-spin' : ''}`} aria-hidden="true" />
+              <span className="min-w-0 truncate sm:whitespace-normal">{t('update_banner.message')}</span>
+            </button>
             <Button
               size="sm"
-              className="bg-white text-indigo-700 font-semibold min-w-0 h-7 px-3"
+              className="bg-white text-indigo-700 font-semibold min-w-0 h-8 px-3 touch-manipulation"
               onPress={handleUpdate}
               isDisabled={updating}
               isLoading={updating}
