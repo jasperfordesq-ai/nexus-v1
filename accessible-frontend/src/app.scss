@@ -88,6 +88,23 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   border-bottom: 1px solid $govuk-border-colour;
 }
 
+.nexus-alpha-module-row {
+  display: flex;
+  gap: govuk-spacing(3);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+@include govuk-media-query($until: tablet) {
+  .nexus-alpha-module-row {
+    display: block;
+  }
+
+  .nexus-alpha-module-row .govuk-tag {
+    margin-top: govuk-spacing(2);
+  }
+}
+
 .nexus-alpha-meta {
   color: $govuk-secondary-text-colour;
 }
