@@ -690,11 +690,11 @@ export function AdminRoutes() {
       <Route path="resources/categories" element={<Lazy><ResourceCategoriesAdmin /></Lazy>} />
 
       {/* ─── JOBS ─── */}
-      <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
-      <Route path="jobs/moderation" element={<Lazy><JobModerationQueue /></Lazy>} />
-      <Route path="jobs/bias-audit" element={<Lazy><JobBiasAudit /></Lazy>} />
-      <Route path="jobs/pipeline" element={<Lazy><JobPipelineOverview /></Lazy>} />
-      <Route path="jobs/templates" element={<Lazy><JobTemplatesAdmin /></Lazy>} />
+      <Route path="jobs" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobsAdmin /></Lazy></FeatureGatedElement>} />
+      <Route path="jobs/moderation" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobModerationQueue /></Lazy></FeatureGatedElement>} />
+      <Route path="jobs/bias-audit" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobBiasAudit /></Lazy></FeatureGatedElement>} />
+      <Route path="jobs/pipeline" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobPipelineOverview /></Lazy></FeatureGatedElement>} />
+      <Route path="jobs/templates" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobTemplatesAdmin /></Lazy></FeatureGatedElement>} />
 
       {/* ─── MARKETPLACE ─── */}
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />

@@ -33,9 +33,14 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
 
   const loadPipelineRules = useCallback(async () => {
     try {
-      const res = await api.get<{ data: PipelineRule[] }>(`/v2/jobs/${jobId}/pipeline-rules`);
-      if (res.success && res.data) setPipelineRules((res.data as { data: PipelineRule[] }).data ?? []);
+      const res = await api.get<PipelineRule[]>(`/v2/jobs/${jobId}/pipeline-rules`);
+      if (res.success && Array.isArray(res.data)) {
+        setPipelineRules(res.data);
+      } else {
+        setPipelineRules([]);
+      }
     } catch (err) {
+      setPipelineRules([]);
       logError('Failed to load pipeline rules', err);
     }
   }, [jobId]);
@@ -81,7 +86,11 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 variant="flat"
                 onPress={() =>
                   api.delete(`/v2/jobs/pipeline-rules/${rule.id}`)
-                    .then(() => loadPipelineRules())
+                    .then((res) => {
+                      if (res.success) {
+                        loadPipelineRules();
+                      }
+                    })
                     .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); })
                 }
               >
@@ -150,7 +159,11 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 try {
                   await api.post(`/v2/jobs/${jobId}/pipeline-rules`, {
                     ...newRule,
-                    name: `${newRule.trigger_stage} \u2192 ${newRule.action_target || newRule.action} after ${newRule.condition_days}d`,
+                    name: t('pipeline.generated_name', {
+                      stage: newRule.trigger_stage,
+                      target: newRule.action_target || newRule.action,
+                      count: newRule.condition_days,
+                    }),
                   });
                   await loadPipelineRules();
                 } catch (err) {

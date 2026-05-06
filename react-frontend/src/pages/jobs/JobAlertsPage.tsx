@@ -155,9 +155,13 @@ export function JobAlertsPage() {
     if (!deleteTarget) return;
 
     try {
-      await api.delete(`/v2/jobs/alerts/${deleteTarget}`);
-      toastRef.current.success(tRef.current('alerts.delete_success'));
-      setAlerts((prev) => prev.filter((a) => a.id !== deleteTarget));
+      const response = await api.delete(`/v2/jobs/alerts/${deleteTarget}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('alerts.delete_success'));
+        setAlerts((prev) => prev.filter((a) => a.id !== deleteTarget));
+      } else {
+        toastRef.current.error(tRef.current('alerts.delete_error'));
+      }
     } catch (err) {
       logError('Failed to delete alert', err);
       toastRef.current.error(tRef.current('alerts.delete_error'));
@@ -168,13 +172,16 @@ export function JobAlertsPage() {
 
   const handleTogglePause = async (alertId: number, isActive: boolean) => {
     try {
-      if (isActive) {
-        await api.put(`/v2/jobs/alerts/${alertId}/unsubscribe`, {});
-        toastRef.current.success(tRef.current('alerts.unsubscribe_success'));
-      } else {
-        await api.put(`/v2/jobs/alerts/${alertId}/resubscribe`, {});
-        toastRef.current.success(tRef.current('alerts.resubscribe_success'));
+      const response = isActive
+        ? await api.put(`/v2/jobs/alerts/${alertId}/unsubscribe`, {})
+        : await api.put(`/v2/jobs/alerts/${alertId}/resubscribe`, {});
+      if (!response.success) {
+        toastRef.current.error(tRef.current('alerts.toggle_error'));
+        return;
       }
+      toastRef.current.success(
+        tRef.current(isActive ? 'alerts.unsubscribe_success' : 'alerts.resubscribe_success')
+      );
       loadAlerts();
     } catch (err) {
       logError('Failed to toggle alert', err);

@@ -126,6 +126,30 @@ class JobVacanciesController extends BaseApiController
             ->exists();
     }
 
+    private function canSearchTalent(int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+        $user = User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if ($user) {
+            $role = (string) ($user->role ?? '');
+            if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+                || (bool) ($user->is_admin ?? false)
+                || (bool) ($user->is_super_admin ?? false)
+                || (bool) ($user->is_tenant_super_admin ?? false)
+                || (bool) ($user->is_god ?? false)
+            ) {
+                return true;
+            }
+        }
+
+        return JobVacancy::where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->exists();
+    }
+
     private function rejectIfCannotManageVacancy(int $vacancyId, int $userId): ?JsonResponse
     {
         $vacancy = $this->findTenantVacancy($vacancyId);
@@ -138,6 +162,15 @@ class JobVacanciesController extends BaseApiController
         }
 
         return null;
+    }
+
+    private function isVacancyPubliclyVisible(JobVacancy $vacancy): bool
+    {
+        $moderationStatus = $vacancy->moderation_status ?? null;
+
+        return $vacancy->status === 'open'
+            && ($vacancy->deadline === null || $vacancy->deadline->copy()->endOfDay()->isFuture())
+            && ($moderationStatus === null || $moderationStatus === 'approved');
     }
 
     // =====================================================================
@@ -154,9 +187,10 @@ class JobVacanciesController extends BaseApiController
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'public_only' => true,
         ];
 
-        $validStatuses = ['open', 'closed', 'filled', 'draft', 'expired', 'pending_review'];
+        $validStatuses = ['open'];
         $validTypes = ['paid', 'volunteer', 'timebank'];
         $validCommitments = ['full_time', 'part_time', 'one_off', 'flexible'];
 
@@ -238,11 +272,18 @@ class JobVacanciesController extends BaseApiController
 
         $userId = $this->getOptionalUserId();
 
-        $job = $this->jobService->legacyGetById($id, $userId);
-
-        if (!$job) {
+        $vacancy = $this->findTenantVacancy((int) $id);
+        if (!$vacancy) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
+
+        if (!$this->isVacancyPubliclyVisible($vacancy)
+            && (!$userId || !$this->canManageVacancy($vacancy, $userId))
+        ) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
+        }
+
+        $job = $this->jobService->legacyGetById($id, $userId);
 
         // Increment views
         $this->jobService->incrementViews($id, $userId);
@@ -441,6 +482,10 @@ class JobVacanciesController extends BaseApiController
                     $status = 409;
                     break;
                 }
+                if ($error['code'] === 'RESOURCE_FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
             }
 
             return $this->respondWithErrors($errors, $status);
@@ -577,6 +622,10 @@ class JobVacanciesController extends BaseApiController
             if (!$isAdmin) {
                 return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
             }
+        }
+
+        if (!$isApplicant && (bool) ($application->vacancy->blind_hiring ?? false)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         if (empty($application->cv_path)) {
@@ -1439,18 +1488,13 @@ class JobVacanciesController extends BaseApiController
 
         $userId = $this->getUserId();
 
-        // Verify caller owns the vacancy, is the applicant, or is admin
+        // Verify caller owns/manages the vacancy or is admin. Scorecards are internal hiring records.
         $application = JobApplication::with(['vacancy'])->find($id);
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
-        $isApplicant = (int) $application->user_id === $userId;
-        $isPoster = (int) $application->vacancy->user_id === $userId;
-        if (!$isApplicant && !$isPoster) {
-            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
-            }
+        if (!$this->canManageVacancy($application->vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         $cards = JobScorecardService::getForApplication($id);
@@ -1880,7 +1924,10 @@ class JobVacanciesController extends BaseApiController
         if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_PAGE_TALENT_SEARCH, 'job_talent_search_disabled')) {
             return $response;
         }
-        $this->getUserId(); // Requires authentication
+        $userId = $this->getUserId();
+        if (!$this->canSearchTalent($userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
+        }
         $this->rateLimit('talent_search', 30, 60);
 
         $tenantId = TenantContext::getId();
@@ -1913,7 +1960,10 @@ class JobVacanciesController extends BaseApiController
         if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_PAGE_TALENT_SEARCH, 'job_talent_search_disabled')) {
             return $response;
         }
-        $this->getUserId(); // Requires authentication
+        $userId = $this->getUserId();
+        if (!$this->canSearchTalent($userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
+        }
         $this->rateLimit('talent_profile', 60, 60);
 
         $tenantId = TenantContext::getId();
@@ -1966,10 +2016,17 @@ class JobVacanciesController extends BaseApiController
         if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
             return $response;
         }
+        $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_list', 30, 60);
 
         $tenantId = TenantContext::getId();
-        $slots = $this->schedulingService->getAvailableSlots($id, $tenantId);
+        $slots = $this->schedulingService->getAvailableSlots($id, $tenantId, $userId);
+
+        if (empty($slots) && !empty($this->schedulingService->getErrors())) {
+            $errors = $this->schedulingService->getErrors();
+            $status = ($errors[0]['code'] ?? null) === 'RESOURCE_NOT_FOUND' ? 404 : 403;
+            return $this->respondWithErrors($errors, $status);
+        }
 
         return $this->respondWithData($slots);
     }
@@ -2111,11 +2168,11 @@ class JobVacanciesController extends BaseApiController
         if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
             return $response;
         }
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_cancel', 10, 60);
 
         $tenantId = TenantContext::getId();
-        $success = $this->schedulingService->cancelSlotBooking($slotId, $tenantId);
+        $success = $this->schedulingService->cancelSlotBooking($slotId, $tenantId, $userId);
 
         if (!$success) {
             $errors = $this->schedulingService->getErrors();
@@ -2132,11 +2189,11 @@ class JobVacanciesController extends BaseApiController
         if ($response = $this->rejectIfJobConfigDisabled(JobConfigurationService::CONFIG_ENABLE_INTERVIEW_SCHEDULING, 'job_interview_scheduling_disabled')) {
             return $response;
         }
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->rateLimit('jobs_slots_delete', 10, 60);
 
         $tenantId = TenantContext::getId();
-        $success = $this->schedulingService->deleteSlot($slotId, $tenantId);
+        $success = $this->schedulingService->deleteSlot($slotId, $tenantId, $userId);
 
         if (!$success) {
             $errors = $this->schedulingService->getErrors();

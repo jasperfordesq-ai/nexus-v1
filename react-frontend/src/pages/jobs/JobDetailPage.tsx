@@ -66,7 +66,6 @@ import {
 } from '@/components/jobs/JobModals';
 import { SimilarJobs } from '@/components/jobs/SimilarJobs';
 import { AiChatDrawer } from '@/components/jobs/AiChatDrawer';
-import { InterviewSlotsSection } from '@/components/jobs/InterviewSlotsSection';
 
 // ---------------------------------------------------------------------------
 // JSON-LD helper
@@ -349,8 +348,13 @@ export function JobDetailPage() {
           ? parseArrayResponse<InlineOffer>(offersRes.data)
           : [];
 
-        const myInterview = interviews.find((iv) => iv.status === 'proposed');
-        const myOffer = offers.find((of_) => of_.status === 'pending');
+        const applicationId = vacancy.application_id;
+        const myInterview = interviews.find((iv) =>
+          iv.status === 'proposed' && (!applicationId || iv.application_id === applicationId)
+        );
+        const myOffer = offers.find((of_) =>
+          of_.status === 'pending' && (!applicationId || of_.application_id === applicationId)
+        );
 
         if (myInterview) setPendingInterview(myInterview);
         if (myOffer) setPendingOffer(myOffer);
@@ -377,10 +381,14 @@ export function JobDetailPage() {
     if (!pendingInterview) return;
     setIsRespondingInterview(true);
     try {
-      await api.put(`/v2/jobs/interviews/${pendingInterview.id}/accept`, {});
-      toastRef.current.success(tRef.current('inline_response.interview_accepted', 'Interview accepted'));
-      setPendingInterview({ ...pendingInterview, status: 'accepted' });
-      loadVacancy();
+      const response = await api.put(`/v2/jobs/interviews/${pendingInterview.id}/accept`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('inline_response.interview_accepted', 'Interview accepted'));
+        setPendingInterview({ ...pendingInterview, status: 'accepted' });
+        loadVacancy();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('Failed to accept interview', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -393,12 +401,16 @@ export function JobDetailPage() {
     if (!pendingInterview) return;
     setIsRespondingInterview(true);
     try {
-      await api.put(`/v2/jobs/interviews/${pendingInterview.id}/decline`, { notes: declineNotes || undefined });
-      toastRef.current.success(tRef.current('inline_response.interview_declined', 'Interview declined'));
-      setPendingInterview({ ...pendingInterview, status: 'declined' });
-      setShowDeclineInterviewModal(false);
-      setDeclineNotes('');
-      loadVacancy();
+      const response = await api.put(`/v2/jobs/interviews/${pendingInterview.id}/decline`, { notes: declineNotes || undefined });
+      if (response.success) {
+        toastRef.current.success(tRef.current('inline_response.interview_declined', 'Interview declined'));
+        setPendingInterview({ ...pendingInterview, status: 'declined' });
+        setShowDeclineInterviewModal(false);
+        setDeclineNotes('');
+        loadVacancy();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('Failed to decline interview', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -412,10 +424,14 @@ export function JobDetailPage() {
     if (!pendingOffer) return;
     setIsRespondingOffer(true);
     try {
-      await api.put(`/v2/jobs/offers/${pendingOffer.id}/accept`, {});
-      toastRef.current.success(tRef.current('inline_response.offer_accepted', 'Offer accepted'));
-      setPendingOffer({ ...pendingOffer, status: 'accepted' });
-      loadVacancy();
+      const response = await api.put(`/v2/jobs/offers/${pendingOffer.id}/accept`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('inline_response.offer_accepted', 'Offer accepted'));
+        setPendingOffer({ ...pendingOffer, status: 'accepted' });
+        loadVacancy();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('Failed to accept offer', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -428,12 +444,16 @@ export function JobDetailPage() {
     if (!pendingOffer) return;
     setIsRespondingOffer(true);
     try {
-      await api.put(`/v2/jobs/offers/${pendingOffer.id}/reject`, { reason: declineNotes || undefined });
-      toastRef.current.success(tRef.current('inline_response.offer_declined', 'Offer declined'));
-      setPendingOffer({ ...pendingOffer, status: 'rejected' });
-      setShowDeclineOfferModal(false);
-      setDeclineNotes('');
-      loadVacancy();
+      const response = await api.put(`/v2/jobs/offers/${pendingOffer.id}/reject`, { reason: declineNotes || undefined });
+      if (response.success) {
+        toastRef.current.success(tRef.current('inline_response.offer_declined', 'Offer declined'));
+        setPendingOffer({ ...pendingOffer, status: 'rejected' });
+        setShowDeclineOfferModal(false);
+        setDeclineNotes('');
+        loadVacancy();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('Failed to decline offer', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -942,12 +962,6 @@ export function JobDetailPage() {
           isLoading={isRespondingOffer}
           onClose={() => setShowDeclineOfferModal(false)}
           onConfirm={handleDeclineOffer}
-        />
-
-        {/* Interview Self-Scheduling Section */}
-        <InterviewSlotsSection
-          isOwner={!!isOwner}
-          hasApplied={vacancy.has_applied}
         />
 
         {/* Similar Jobs */}

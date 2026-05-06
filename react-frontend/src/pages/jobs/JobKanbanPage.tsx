@@ -152,7 +152,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
               isSelected={isSelected ?? false}
               onValueChange={(checked) => onSelect(application.id, checked)}
               size="sm"
-              aria-label={t('kanban.select_applicant', 'Select {{name}}', { name: application.applicant.name })}
+              aria-label={t('kanban.select_applicant', { name: application.applicant.name })}
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
             />
           </div>
@@ -173,7 +173,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             {aiRanking && (
               <div className="flex items-center gap-1.5 mt-1">
                 <Chip size="sm" variant="flat" color={aiRanking.score >= 70 ? 'success' : aiRanking.score >= 40 ? 'warning' : 'default'}>
-                  AI: {aiRanking.score}/100
+                  {t('kanban.ai_score', { score: aiRanking.score })}
                 </Chip>
                 <Tooltip content={aiRanking.reason}>
                   <span className="text-[10px] text-default-400 cursor-help">#{aiRanking.rank}</span>
@@ -529,7 +529,13 @@ export function JobKanbanPage() {
       prev.map((a) => a.id === appId ? { ...a, status: targetStatus, stage: targetStatus } : a)
     );
     try {
-      await api.put(`/v2/jobs/applications/${appId}`, { status: targetStatus });
+      const response = await api.put(`/v2/jobs/applications/${appId}`, { status: targetStatus });
+      if (!response.success) {
+        setApplications((prev) =>
+          prev.map((a) => a.id === appId ? { ...a, status: app.status, stage: app.stage } : a)
+        );
+        toastRef.current.error(tRef.current('detail.status_update_error'));
+      }
     } catch (err) {
       logError('JobKanbanPage: failed to move card', err);
       // Revert on failure
@@ -545,10 +551,14 @@ export function JobKanbanPage() {
     const appId = interviewModalApp.id;
     setIsSubmittingInterview(true);
     try {
-      await api.post(`/v2/jobs/applications/${appId}/interview`, interviewForm);
-      toastRef.current.success(tRef.current('interview.send_request', 'Interview request sent'));
-      setInterviewModalApp(null);
-      await handleMoveCard(appId, 'interview');
+      const response = await api.post(`/v2/jobs/applications/${appId}/interview`, interviewForm);
+      if (response.success) {
+        toastRef.current.success(tRef.current('interview.send_request', 'Interview request sent'));
+        setInterviewModalApp(null);
+        await handleMoveCard(appId, 'interview');
+      } else {
+        toastRef.current.error(tRef.current('detail.status_update_error'));
+      }
     } catch (err) {
       logError('JobKanbanPage: failed to propose interview', err);
       toastRef.current.error(tRef.current('detail.status_update_error'));
@@ -563,11 +573,15 @@ export function JobKanbanPage() {
     const appId = offerModalApp.id;
     setIsSubmittingOffer(true);
     try {
-      await api.post(`/v2/jobs/applications/${appId}/offer`, offerForm);
-      toastRef.current.success(tRef.current('offer.send', 'Offer sent'));
-      setOfferModalApp(null);
-      setOfferForm({ salary_offered: '', salary_currency: 'EUR', salary_type: 'annual', start_date: '', message: '' });
-      await handleMoveCard(appId, 'offer');
+      const response = await api.post(`/v2/jobs/applications/${appId}/offer`, offerForm);
+      if (response.success) {
+        toastRef.current.success(tRef.current('offer.send', 'Offer sent'));
+        setOfferModalApp(null);
+        setOfferForm({ salary_offered: '', salary_currency: 'EUR', salary_type: 'annual', start_date: '', message: '' });
+        await handleMoveCard(appId, 'offer');
+      } else {
+        toastRef.current.error(tRef.current('detail.status_update_error'));
+      }
       await loadData();
     } catch (err) {
       logError('JobKanbanPage: failed to send offer', err);
@@ -778,7 +792,7 @@ export function JobKanbanPage() {
             {t('kanban.ai_rank', { defaultValue: 'AI Rank' })}
           </Button>
           <Chip variant="flat" color="default">
-            {applications.length} {t('applications', { count: applications.length })}
+            {t('applications', { count: applications.length })}
           </Chip>
         </div>
       </div>
@@ -983,12 +997,12 @@ export function JobKanbanPage() {
                     inputWrapper: 'bg-theme-elevated border-theme-default',
                   }}
                 />
-                <span className="text-xs text-theme-subtle">/ 10</span>
+                <span className="text-xs text-theme-subtle">{t('scorecard.max_score_suffix')}</span>
               </div>
             ))}
             <Textarea
-              label={t('scorecard.notes', 'Reviewer Notes')}
-              placeholder={t('scorecard.notes_placeholder', 'Optional notes about this applicant...')}
+              label={t('scorecard.notes')}
+              placeholder={t('scorecard.notes_placeholder')}
               value={scorecardNotes}
               onValueChange={setScorecardNotes}
               minRows={3}

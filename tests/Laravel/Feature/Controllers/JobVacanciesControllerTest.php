@@ -88,7 +88,7 @@ class JobVacanciesControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_index_pending_review_status_matches_moderation_status(): void
+    public function test_index_does_not_expose_pending_review_jobs(): void
     {
         $user = $this->authenticatedUser();
         $pending = $this->createVacancy([
@@ -104,11 +104,11 @@ class JobVacanciesControllerTest extends TestCase
             'title' => 'Approved Draft Role',
         ]);
 
-        $response = $this->apiGet('/v2/jobs?status=pending_review');
+        $response = $this->apiGet('/v2/jobs');
 
         $response->assertStatus(200);
         $returnedIds = array_column($response->json('data') ?? [], 'id');
-        $this->assertContains($pending->id, $returnedIds);
+        $this->assertNotContains($pending->id, $returnedIds);
     }
 
     public function test_index_supports_search_filter(): void
@@ -267,6 +267,21 @@ class JobVacanciesControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function test_show_hides_non_public_vacancy_from_other_users(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $vacancy = $this->createVacancy([
+            'user_id' => $owner->id,
+            'status' => 'draft',
+            'moderation_status' => 'pending_review',
+        ]);
+        $this->authenticatedUser();
+
+        $response = $this->apiGet("/v2/jobs/{$vacancy->id}");
+
+        $response->assertStatus(404);
+    }
+
     // =====================================================================
     // CORE CRUD — PUT /v2/jobs/{id} (update)
     // =====================================================================
@@ -374,8 +389,19 @@ class JobVacanciesControllerTest extends TestCase
             'message' => 'I would love to contribute to this role.',
         ]);
 
-        // 201 on success, 409 if already applied, 400/404 on validation
-        $this->assertContains($response->status(), [201, 409, 400, 404]);
+        $response->assertStatus(201);
+    }
+
+    public function test_apply_rejects_vacancy_owner(): void
+    {
+        $owner = $this->authenticatedUser();
+        $vacancy = $this->createVacancy(['user_id' => $owner->id, 'status' => 'open']);
+
+        $response = $this->apiPost("/v2/jobs/{$vacancy->id}/apply", [
+            'message' => 'I should not be able to apply to my own vacancy.',
+        ]);
+
+        $response->assertStatus(403);
     }
 
     public function test_apply_duplicate_returns_409(): void
@@ -852,7 +878,8 @@ class JobVacanciesControllerTest extends TestCase
 
     public function test_talent_search_returns_data(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
+        $this->createVacancy(['user_id' => $user->id]);
 
         $response = $this->apiGet('/v2/jobs/talent-search');
 
@@ -862,11 +889,21 @@ class JobVacanciesControllerTest extends TestCase
 
     public function test_talent_search_with_keywords(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
+        $this->createVacancy(['user_id' => $user->id]);
 
         $response = $this->apiGet('/v2/jobs/talent-search?keywords=developer');
 
         $response->assertStatus(200);
+    }
+
+    public function test_talent_search_rejects_users_without_hiring_context(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/jobs/talent-search');
+
+        $response->assertStatus(403);
     }
 
     // =====================================================================

@@ -1241,6 +1241,8 @@ return [
     'job_cv_file_not_found'                => 'CV file not found',
     'job_status_required'                  => 'Status is required',
     'job_status_invalid'                   => 'Invalid job status',
+    'job_application_terminal_status'      => 'Cannot change status from :status because it is a terminal state',
+    'job_application_update_failed'        => 'Failed to update application',
     'job_scheduled_at_required'            => 'scheduled_at is required',
     'job_interview_propose_failed'         => 'Unable to propose interview. Check application ownership and data.',
     'job_interview_accept_failed'          => 'Unable to accept interview. It may not exist or already been actioned.',

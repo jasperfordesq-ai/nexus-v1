@@ -96,6 +96,14 @@ class JobFeedController extends BaseApiController
 
         $jobs = \App\Models\JobVacancy::where('job_vacancies.tenant_id', $tenantId)
             ->where('job_vacancies.status', 'open')
+            ->where(function ($query) {
+                $query->whereNull('job_vacancies.deadline')
+                    ->orWhere('job_vacancies.deadline', '>', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('job_vacancies.moderation_status')
+                    ->orWhere('job_vacancies.moderation_status', 'approved');
+            })
             ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
             ->select('job_vacancies.*', 'o.name as organization_name')
             ->orderByDesc('job_vacancies.created_at')

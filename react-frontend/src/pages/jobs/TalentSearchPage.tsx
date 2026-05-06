@@ -387,7 +387,7 @@ export function TalentSearchPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}
             >
-              <Link to={tenantPath(`/members/${candidate.id}`)}>
+              <Link to={tenantPath(`/profile/${candidate.id}`)}>
                 <GlassCard className="p-5 hover:border-primary/30 transition-colors cursor-pointer h-full">
                   <div className="flex items-start gap-3">
                     <Avatar

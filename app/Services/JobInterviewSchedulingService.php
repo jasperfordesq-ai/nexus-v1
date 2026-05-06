@@ -7,8 +7,11 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\JobApplication;
 use App\Models\JobInterviewSlot;
 use App\Models\JobVacancy;
+use App\Models\JobVacancyTeam;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +30,60 @@ class JobInterviewSchedulingService
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    private function isAdminUser(int $userId, int $tenantId): bool
+    {
+        $user = User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        if (!$user) {
+            return false;
+        }
+
+        return in_array((string) ($user->role ?? ''), ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($user->is_admin ?? false)
+            || (bool) ($user->is_super_admin ?? false)
+            || (bool) ($user->is_tenant_super_admin ?? false)
+            || (bool) ($user->is_god ?? false);
+    }
+
+    private function canManageSlots(JobVacancy $vacancy, int $userId, int $tenantId): bool
+    {
+        if ((int) $vacancy->user_id === $userId || $this->isAdminUser($userId, $tenantId)) {
+            return true;
+        }
+
+        return JobVacancyTeam::where('tenant_id', $tenantId)
+            ->where('vacancy_id', $vacancy->id)
+            ->where('user_id', $userId)
+            ->where('role', 'manager')
+            ->exists();
+    }
+
+    private function hasActiveApplication(int $jobId, int $userId, int $tenantId): bool
+    {
+        return JobApplication::where('tenant_id', $tenantId)
+            ->where('vacancy_id', $jobId)
+            ->where('user_id', $userId)
+            ->whereNotIn('status', ['withdrawn', 'rejected'])
+            ->exists();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function slotPayload(JobInterviewSlot $slot, bool $includePrivate): array
+    {
+        $data = $slot->toArray();
+        unset($data['booked_by_user_id']);
+
+        if (!$includePrivate) {
+            unset($data['meeting_link'], $data['notes']);
+        }
+
+        return $data;
     }
 
     /**
@@ -51,8 +108,8 @@ class JobInterviewSchedulingService
             return [];
         }
 
-        if ((int) $vacancy->user_id !== $employerId) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the job owner can create interview slots'];
+        if (!$this->canManageSlots($vacancy, $employerId, $tenantId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_manage_forbidden')];
             return [];
         }
 
@@ -83,7 +140,7 @@ class JobInterviewSchedulingService
                 'notes' => $slot['notes'] ?? null,
             ]);
 
-            $created[] = $record->toArray();
+            $created[] = $this->slotPayload($record, true);
         }
 
         return $created;
@@ -96,14 +153,33 @@ class JobInterviewSchedulingService
      * @param int $tenantId
      * @return array
      */
-    public function getAvailableSlots(int $jobId, int $tenantId): array
+    public function getAvailableSlots(int $jobId, int $tenantId, int $userId): array
     {
+        $this->errors = [];
+
+        $vacancy = JobVacancy::where('id', $jobId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
+            return [];
+        }
+
+        $canManage = $this->canManageSlots($vacancy, $userId, $tenantId);
+        if (!$canManage && !$this->hasActiveApplication($jobId, $userId, $tenantId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_active_application_required')];
+            return [];
+        }
+
         return JobInterviewSlot::where('tenant_id', $tenantId)
             ->where('job_id', $jobId)
+            ->where('is_booked', false)
             ->where('slot_start', '>', now())
             ->orderBy('slot_start', 'asc')
             ->get()
-            ->toArray();
+            ->map(fn (JobInterviewSlot $slot) => $this->slotPayload($slot, $canManage))
+            ->all();
     }
 
     /**
@@ -123,23 +199,28 @@ class JobInterviewSchedulingService
             ->first();
 
         if (!$slot) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Interview slot not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_slot_not_found')];
             return null;
         }
 
         if ($slot->is_booked) {
-            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => 'This slot has already been booked'];
+            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => __('api.job_slot_already_booked')];
             return null;
         }
 
         if ($slot->slot_start <= now()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This slot has already passed'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.job_slot_passed')];
             return null;
         }
 
         // Prevent employer from booking their own slot
         if ((int) $slot->employer_user_id === $candidateUserId) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You cannot book your own interview slot'];
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_cannot_book_own_slot')];
+            return null;
+        }
+
+        if (!$this->hasActiveApplication((int) $slot->job_id, $candidateUserId, $tenantId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_active_application_required')];
             return null;
         }
 
@@ -149,7 +230,8 @@ class JobInterviewSchedulingService
             'booked_at' => now(),
         ]);
 
-        return $slot->fresh()->toArray();
+        $fresh = $slot->fresh();
+        return $fresh instanceof JobInterviewSlot ? $this->slotPayload($fresh, true) : $this->slotPayload($slot, true);
     }
 
     /**
@@ -159,7 +241,7 @@ class JobInterviewSchedulingService
      * @param int $tenantId
      * @return bool
      */
-    public function cancelSlotBooking(int $slotId, int $tenantId): bool
+    public function cancelSlotBooking(int $slotId, int $tenantId, int $userId): bool
     {
         $this->errors = [];
 
@@ -168,12 +250,21 @@ class JobInterviewSchedulingService
             ->first();
 
         if (!$slot) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Interview slot not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_slot_not_found')];
             return false;
         }
 
         if (!$slot->is_booked) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This slot is not booked'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.job_slot_not_booked')];
+            return false;
+        }
+
+        $vacancy = JobVacancy::where('id', $slot->job_id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$vacancy || ((int) $slot->booked_by_user_id !== $userId && !$this->canManageSlots($vacancy, $userId, $tenantId))) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_cancel_forbidden')];
             return false;
         }
 
@@ -193,7 +284,7 @@ class JobInterviewSchedulingService
      * @param int $tenantId
      * @return bool
      */
-    public function deleteSlot(int $slotId, int $tenantId): bool
+    public function deleteSlot(int $slotId, int $tenantId, int $userId): bool
     {
         $this->errors = [];
 
@@ -202,7 +293,16 @@ class JobInterviewSchedulingService
             ->first();
 
         if (!$slot) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Interview slot not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_slot_not_found')];
+            return false;
+        }
+
+        $vacancy = JobVacancy::where('id', $slot->job_id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$vacancy || !$this->canManageSlots($vacancy, $userId, $tenantId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_manage_forbidden')];
             return false;
         }
 
@@ -243,8 +343,8 @@ class JobInterviewSchedulingService
             return [];
         }
 
-        if ((int) $vacancy->user_id !== $employerId) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the job owner can create interview slots'];
+        if (!$this->canManageSlots($vacancy, $employerId, $tenantId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_slots_manage_forbidden')];
             return [];
         }
 

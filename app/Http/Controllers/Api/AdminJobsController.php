@@ -36,10 +36,23 @@ class AdminJobsController extends BaseApiController
         private readonly JobBiasAuditService $biasAuditService,
     ) {}
 
+    private function requireAdminForJobs(): int
+    {
+        $adminId = $this->requireAdmin();
+
+        if (!TenantContext::hasFeature('job_vacancies')) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', __('api.job_feature_disabled'), null, 403)
+            );
+        }
+
+        return $adminId;
+    }
+
     /** GET /api/v2/admin/jobs */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
 
         $page = $this->queryInt('page', 1, 1);
         $limit = $this->queryInt('limit', 50, 1, 200);
@@ -60,7 +73,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
         return $this->respondWithData($job);
@@ -69,7 +82,7 @@ class AdminJobsController extends BaseApiController
     /** DELETE /api/v2/admin/jobs/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
 
@@ -81,7 +94,7 @@ class AdminJobsController extends BaseApiController
     /** POST /api/v2/admin/jobs/{id}/feature */
     public function feature(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $days = $this->inputInt('duration_days', 7, 1, 90);
 
         $featured = $this->jobVacancyService->featureJob($id, $adminId, $days);
@@ -92,7 +105,7 @@ class AdminJobsController extends BaseApiController
     /** POST /api/v2/admin/jobs/{id}/unfeature */
     public function unfeature(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $unfeatured = $this->jobVacancyService->unfeatureJob($id, $adminId);
         if ($unfeatured) return $this->respondWithData(['featured' => false, 'id' => $id]);
         return $this->respondWithError('UNFEATURE_FAILED', __('api.update_failed', ['resource' => 'job feature']), null, 400);
@@ -101,7 +114,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/{id}/applications */
     public function getApplications(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
 
@@ -113,7 +126,7 @@ class AdminJobsController extends BaseApiController
     /** PUT /api/v2/admin/jobs/applications/{id} */
     public function updateApplicationStatus(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $status = $this->input('status');
         $notes = $this->input('notes');
 
@@ -134,7 +147,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/moderation-queue */
     public function moderationQueue(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
 
         $tenantId = TenantContext::getId();
         $limit = $this->queryInt('limit', 50, 1, 200);
@@ -148,7 +161,7 @@ class AdminJobsController extends BaseApiController
     /** POST /api/v2/admin/jobs/{id}/approve */
     public function approve(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $notes = $this->input('notes');
 
         $approved = JobModerationService::approveJob($id, $adminId, $notes);
@@ -167,7 +180,7 @@ class AdminJobsController extends BaseApiController
     /** POST /api/v2/admin/jobs/{id}/reject */
     public function reject(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $reason = $this->input('reason');
 
         if (empty($reason)) {
@@ -190,7 +203,7 @@ class AdminJobsController extends BaseApiController
     /** POST /api/v2/admin/jobs/{id}/flag */
     public function flag(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireAdminForJobs();
         $reason = $this->input('reason');
 
         if (empty($reason)) {
@@ -213,7 +226,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/moderation-stats */
     public function moderationStats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
 
         $tenantId = TenantContext::getId();
         $stats = JobModerationService::getModerationStats($tenantId);
@@ -228,7 +241,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/spam-stats */
     public function spamStats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
 
         $tenantId = TenantContext::getId();
         $stats = JobSpamDetectionService::getSpamStats($tenantId);
@@ -250,7 +263,7 @@ class AdminJobsController extends BaseApiController
      */
     public function biasAudit(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         // Rate-limit: report aggregates candidate demographics, so prevent
         // rapid enumeration that could be used to harvest PII patterns.
         $this->rateLimit('jobs_bias_audit', 10, 60);
@@ -272,7 +285,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/stats — Platform-wide job statistics. */
     public function stats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $tenantId = TenantContext::getId();
 
         $totalJobs = JobVacancy::where('tenant_id', $tenantId)->count();
@@ -326,7 +339,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/interviews — All interviews across jobs. */
     public function interviews(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $tenantId = TenantContext::getId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -365,7 +378,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/offers — All offers across jobs. */
     public function offers(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $tenantId = TenantContext::getId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -408,7 +421,7 @@ class AdminJobsController extends BaseApiController
     /** GET /api/v2/admin/jobs/templates — List all job templates. */
     public function templates(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $tenantId = TenantContext::getId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -418,6 +431,16 @@ class AdminJobsController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->orderByDesc('use_count')
             ->orderByDesc('updated_at');
+
+        $search = trim((string) $this->query('search', ''));
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('skills_required', 'like', "%{$search}%");
+            });
+        }
 
         $total = $query->count();
         $items = $query->skip(($page - 1) * $limit)->take($limit)->get()->map(function ($t) {
@@ -434,7 +457,7 @@ class AdminJobsController extends BaseApiController
     /** DELETE /api/v2/admin/jobs/templates/{id} */
     public function deleteTemplate(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireAdminForJobs();
         $tenantId = TenantContext::getId();
 
         $deleted = JobTemplate::where('tenant_id', $tenantId)

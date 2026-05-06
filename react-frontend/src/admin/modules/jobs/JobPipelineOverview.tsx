@@ -65,11 +65,6 @@ interface Offer {
   created_at: string;
 }
 
-interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Status color map
 // ─────────────────────────────────────────────────────────────────────────────
@@ -134,12 +129,16 @@ export function JobPipelineOverview() {
       if (interviewsStatus !== 'all') {
         params.set('status', interviewsStatus);
       }
-      const res = await api.get<PaginatedResponse<Interview>>(
+      const res = await api.get<Interview[]>(
         `/v2/admin/jobs/interviews?${params.toString()}`
       );
-      if (res.success && res.data) {
-        setInterviews(res.data.items ?? []);
-        setInterviewsTotal(res.data.total ?? 0);
+      if (res.success && Array.isArray(res.data)) {
+        setInterviews(res.data);
+        setInterviewsTotal(res.meta?.total ?? res.data.length);
+      } else {
+        setInterviews([]);
+        setInterviewsTotal(0);
+        toast.error(t('jobs.pipeline_load_error', 'Failed to load interviews'));
       }
     } catch {
       toast.error(t('jobs.pipeline_load_error', 'Failed to load interviews'));
@@ -160,12 +159,16 @@ export function JobPipelineOverview() {
       if (offersStatus !== 'all') {
         params.set('status', offersStatus);
       }
-      const res = await api.get<PaginatedResponse<Offer>>(
+      const res = await api.get<Offer[]>(
         `/v2/admin/jobs/offers?${params.toString()}`
       );
-      if (res.success && res.data) {
-        setOffers(res.data.items ?? []);
-        setOffersTotal(res.data.total ?? 0);
+      if (res.success && Array.isArray(res.data)) {
+        setOffers(res.data);
+        setOffersTotal(res.meta?.total ?? res.data.length);
+      } else {
+        setOffers([]);
+        setOffersTotal(0);
+        toast.error(t('jobs.pipeline_load_error_offers', 'Failed to load offers'));
       }
     } catch {
       toast.error(t('jobs.pipeline_load_error_offers', 'Failed to load offers'));

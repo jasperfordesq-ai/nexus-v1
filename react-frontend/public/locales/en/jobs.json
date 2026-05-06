@@ -1,5 +1,7 @@
 {
   "title": "Job Vacancies",
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles.",
   "subtitle": "Find opportunities in your community",
   "create_vacancy": "Post Vacancy",
   "edit_vacancy": "Edit Vacancy",
@@ -117,6 +119,7 @@
     "action_move_stage": "Move stage",
     "action_auto_reject": "Auto-reject",
     "action_notify_me": "Notify me",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
     "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
     "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
@@ -308,6 +311,8 @@
   "kanban": {
     "pipeline_title": "Kanban Pipeline",
     "not_authorized": "You are not authorized to view this pipeline.",
+    "select_applicant": "Select {{name}}",
+    "ai_score": "AI: {{score}}/100",
     "download_cv": "Download CV",
     "drop_here": "Drop here",
     "duration_90": "1.5 hours",
@@ -401,6 +406,11 @@
     "duration": "Duration",
     "datetime": "Date & Time",
     "location": "Meeting Link / Location",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics",
     "send_request": "Send Interview Request",
     "accepted": "Interview Confirmed",
     "proposed": "Interview Requested",
@@ -450,6 +460,7 @@
     "save": "Save Scorecard",
     "saved": "Scorecard saved",
     "notes_placeholder": "Optional notes about this applicant...",
+    "max_score_suffix": "/ 10",
     "communication": "Communication",
     "technical": "Technical Skills",
     "cultural_fit": "Cultural Fit",
@@ -559,6 +570,8 @@
     "salary_transparency_hint": "Required under EU Pay Transparency Directive (June 2026)",
     "submit_create": "Post Vacancy",
     "submit_update": "Save Changes",
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved",
     "cancel": "Cancel",
     "creating": "Posting...",
     "updating": "Saving...",
@@ -630,9 +643,13 @@
     "spam_flags_label": "Detection Flags",
     "refresh": "Refresh",
     "loading": "Loading...",
+    "load_error": "Failed to load moderation queue",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Spam Detection",

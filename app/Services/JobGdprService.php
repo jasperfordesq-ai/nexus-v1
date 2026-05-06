@@ -14,6 +14,7 @@ use App\Models\JobAlert;
 use App\Models\JobSavedProfile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * JobGdprService — GDPR data export and erasure for job-related data.
@@ -80,6 +81,20 @@ class JobGdprService
         $tenantId = TenantContext::getId();
 
         try {
+            $cvPaths = JobApplication::where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->whereNotNull('cv_path')
+                ->pluck('cv_path')
+                ->merge(
+                    JobSavedProfile::where('tenant_id', $tenantId)
+                        ->where('user_id', $userId)
+                        ->whereNotNull('cv_path')
+                        ->pluck('cv_path')
+                )
+                ->filter()
+                ->unique()
+                ->values();
+
             DB::transaction(function () use ($userId, $tenantId) {
                 // Anonymise applications: clear message, reviewer_notes, cv_path fields
                 JobApplication::where('tenant_id', $tenantId)
@@ -102,6 +117,18 @@ class JobGdprService
                     ->where('user_id', $userId)
                     ->delete();
             });
+
+            foreach ($cvPaths as $path) {
+                try {
+                    Storage::disk('local')->delete($path);
+                } catch (\Throwable $e) {
+                    Log::warning('JobGdprService::eraseUserData failed to delete CV file', [
+                        'path' => $path,
+                        'error' => $e->getMessage(),
+                    ]);
+                    return false;
+                }
+            }
 
             return true;
         } catch (\Throwable $e) {

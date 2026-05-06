@@ -159,7 +159,17 @@ class JobVacancyService
             ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
             ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo');
 
-        if (!empty($filters['status'])) {
+        if (!empty($filters['public_only'])) {
+            $query->where('job_vacancies.status', 'open')
+                ->where(function (Builder $q) {
+                    $q->whereNull('job_vacancies.deadline')
+                        ->orWhere('job_vacancies.deadline', '>=', now()->startOfDay());
+                })
+                ->where(function (Builder $q) {
+                    $q->whereNull('job_vacancies.moderation_status')
+                        ->orWhere('job_vacancies.moderation_status', 'approved');
+                });
+        } elseif (!empty($filters['status'])) {
             $status = $filters['status'];
             if ($status === 'expired') {
                 // Expired = deadline has passed and vacancy is still open
@@ -707,15 +717,14 @@ class JobVacancyService
 
         $vacancy = $this->vacancy->newQuery()->find($id);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return false;
         }
 
         // Check ownership or admin
         if ((int) $vacancy->user_id !== $adminId) {
-            $user = User::where('id', $adminId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only delete your own job vacancies'];
+            if (!$this->isAdminUser($adminId)) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_edit_own_only')];
                 return false;
             }
         }
@@ -728,7 +737,7 @@ class JobVacancyService
             return true;
         } catch (\Throwable $e) {
             Log::error('JobVacancyService::delete failed: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to delete job vacancy'];
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => __('api.delete_failed', ['resource' => 'job vacancy'])];
             return false;
         }
     }
@@ -747,10 +756,19 @@ class JobVacancyService
         // Verify vacancy exists and is open
         $vacancy = $this->vacancy->newQuery()->find($jobId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
+            return null;
+        }
+
+        if ((int) $vacancy->user_id === $userId) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_cannot_apply_own')];
             return null;
         }
         if ($vacancy->status !== 'open' || ($vacancy->deadline && $vacancy->deadline->copy()->endOfDay()->isPast())) {
+            $this->errors[] = ['code' => 'VACANCY_CLOSED', 'message' => __('api.job_vacancy_not_accepting_applications')];
+            return null;
+        }
+        if ($vacancy->moderation_status && $vacancy->moderation_status !== 'approved') {
             $this->errors[] = ['code' => 'VACANCY_CLOSED', 'message' => __('api.job_vacancy_not_accepting_applications')];
             return null;
         }
@@ -770,6 +788,7 @@ class JobVacancyService
                 }
 
                 return JobApplication::create([
+                    'tenant_id' => TenantContext::getId(),
                     'vacancy_id' => $jobId,
                     'user_id' => $userId,
                     'message' => $data['cover_letter'] ?? null,
@@ -782,17 +801,17 @@ class JobVacancyService
             });
         } catch (\Throwable $e) {
             Log::error('Job application failed', ['error' => $e->getMessage(), 'vacancy_id' => $jobId, 'user_id' => $userId]);
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to submit application'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.create_failed', ['resource' => 'application'])];
             return null;
         }
 
         if ($application === false) {
-            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => 'You have already applied to this vacancy'];
+            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => __('api.job_already_applied')];
             return null;
         }
 
         // Log initial application in history
-        $this->logApplicationHistory($application->id, null, 'applied', $userId, 'Application submitted');
+        $this->logApplicationHistory($application->id, null, 'applied', $userId, __('api.job_application_submitted'));
 
         // Increment applications count
         $this->vacancy->newQuery()
@@ -920,15 +939,14 @@ class JobVacancyService
 
         $vacancy = $this->vacancy->newQuery()->find($jobId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return null;
         }
 
         // Check ownership or admin
         if ((int) $vacancy->user_id !== $adminId) {
-            $user = User::where('id', $adminId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the vacancy owner can view applications'];
+            if (!$this->isAdminUser($adminId)) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
                 return null;
             }
         }
@@ -949,10 +967,10 @@ class JobVacancyService
                 $candidateNumber++;
 
                 if ($isBlindHiring) {
-                    // Anonymize: strip names, avatars, emails (Agent C)
+                    unset($data['user_id'], $data['message'], $data['cv_path'], $data['cv_filename'], $data['cv_size']);
                     $data['applicant'] = [
-                        'id' => (int) $app->user_id,
-                        'name' => 'Candidate #' . $candidateNumber,
+                        'id' => 0,
+                        'name' => __('api.job_candidate_label', ['number' => $candidateNumber]),
                         'avatar_url' => null,
                         'email' => null,
                     ];
@@ -979,7 +997,7 @@ class JobVacancyService
 
         $validStatuses = ['applied', 'pending', 'screening', 'reviewed', 'shortlisted', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
         if (!in_array($status, $validStatuses)) {
-            $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => 'Invalid application status'];
+            $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => __('api.job_status_invalid')];
             return false;
         }
 
@@ -987,22 +1005,23 @@ class JobVacancyService
             ->where('tenant_id', TenantContext::getId())
             ->find($applicationId);
         if (!$application) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_application_not_found')];
             return false;
         }
 
         // Must be tenant-scoped
         $tenantId = TenantContext::getId();
         if (!$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_application_not_found')];
             return false;
         }
 
-        // Check vacancy ownership or admin
-        if ((int) $application->vacancy->user_id !== $adminId) {
-            $user = User::where('id', $adminId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the vacancy owner can update applications'];
+        $isApplicantWithdraw = $status === 'withdrawn' && (int) $application->user_id === $adminId;
+
+        // Check vacancy ownership/admin, or allow applicants to withdraw their own application only.
+        if ((int) $application->vacancy->user_id !== $adminId && !$isApplicantWithdraw) {
+            if (!$this->isAdminUser($adminId)) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
                 return false;
             }
         }
@@ -1012,18 +1031,26 @@ class JobVacancyService
         // Prevent backwards transitions from terminal states (accepted/rejected/withdrawn)
         $terminalStatuses = ['accepted', 'rejected', 'withdrawn'];
         if (in_array($previousStatus, $terminalStatuses, true) && $previousStatus !== $status) {
-            $this->errors[] = ['code' => 'INVALID_TRANSITION', 'message' => "Cannot change status from '{$previousStatus}' — it is a terminal state"];
+            $this->errors[] = [
+                'code' => 'INVALID_TRANSITION',
+                'message' => __('api.job_application_terminal_status', ['status' => $previousStatus]),
+            ];
             return false;
         }
 
         try {
-            $application->update([
+            $updates = [
                 'status' => $status,
                 'stage' => $status,
-                'reviewer_notes' => $notes ? trim($notes) : null,
-                'reviewed_by' => $adminId,
-                'reviewed_at' => now(),
-            ]);
+            ];
+
+            if (!$isApplicantWithdraw) {
+                $updates['reviewer_notes'] = $notes ? trim($notes) : null;
+                $updates['reviewed_by'] = $adminId;
+                $updates['reviewed_at'] = now();
+            }
+
+            $application->update($updates);
 
             $this->logApplicationHistory($applicationId, $previousStatus, $status, $adminId, $notes);
 
@@ -1089,7 +1116,7 @@ class JobVacancyService
             return true;
         } catch (\Throwable $e) {
             Log::error('JobVacancyService::updateApplicationStatus failed: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to update application'];
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => __('api.job_application_update_failed')];
             return false;
         }
     }
@@ -1206,6 +1233,7 @@ class JobVacancyService
 
         $query = JobApplication::join('job_vacancies as jv', 'job_vacancy_applications.vacancy_id', '=', 'jv.id')
             ->where('job_vacancy_applications.user_id', $userId)
+            ->where('job_vacancy_applications.tenant_id', $tenantId)
             ->where('jv.tenant_id', $tenantId)
             ->select(
                 'job_vacancy_applications.*',
@@ -1253,6 +1281,7 @@ class JobVacancyService
                 'is_remote' => (bool) ($data['vacancy_is_remote'] ?? false),
                 'deadline' => $data['vacancy_deadline'] ?? null,
             ];
+            unset($data['reviewer_notes'], $data['reviewed_by'], $data['reviewed_at'], $data['cv_path']);
             unset($data['vacancy_title'], $data['vacancy_type'], $data['vacancy_commitment'],
                   $data['vacancy_status'], $data['vacancy_location'], $data['vacancy_is_remote'],
                   $data['vacancy_deadline']);
@@ -1567,9 +1596,8 @@ class JobVacancyService
         $isOwner = (int) $application->vacancy->user_id === $userId;
 
         if (!$isApplicant && !$isOwner) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+            if (!$this->isAdminUser($userId)) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
                 return null;
             }
         }
@@ -1578,13 +1606,18 @@ class JobVacancyService
             ->where('application_id', $applicationId)
             ->orderBy('changed_at')
             ->get()
-            ->map(function ($entry) {
+            ->map(function ($entry) use ($isApplicant) {
                 $data = $entry->toArray();
                 $data['id'] = (int) $data['id'];
                 $data['application_id'] = (int) $data['application_id'];
                 $data['changed_by_name'] = $entry->changer
                     ? trim(($entry->changer->first_name ?? '') . ' ' . ($entry->changer->last_name ?? ''))
                     : null;
+                if ($isApplicant) {
+                    $data['notes'] = null;
+                    $data['changed_by'] = null;
+                    $data['changed_by_name'] = null;
+                }
                 unset($data['changer']);
                 return $data;
             })
@@ -1902,7 +1935,7 @@ class JobVacancyService
                 ->where('jv.tenant_id', $tenantId)
                 ->whereIn('jva.vacancy_id', $ids)
                 ->where('jva.user_id', $userId)
-                ->select('jva.vacancy_id', 'jva.status', 'jva.stage')
+                ->select('jva.id', 'jva.vacancy_id', 'jva.status', 'jva.stage')
                 ->get();
 
             foreach ($applications as $app) {
@@ -1991,6 +2024,7 @@ class JobVacancyService
             }
 
             $data['has_applied'] = !empty($application);
+            $data['application_id'] = $application ? (int) $application->id : null;
             $data['application_status'] = $application->status ?? null;
             $data['application_stage'] = $application->stage ?? $application->status ?? null;
 

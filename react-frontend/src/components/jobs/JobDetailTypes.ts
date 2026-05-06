@@ -35,6 +35,7 @@ export interface JobVacancy {
     logo_url: string | null;
   } | null;
   has_applied: boolean;
+  application_id: number | null;
   application_status: string | null;
   application_stage: string | null;
   is_saved: boolean;

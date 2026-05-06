@@ -85,7 +85,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
         $this->assertCount(1, $result);
         $this->assertSame($vacancyId, $result[0]['job_id']);
         $this->assertSame('video', $result[0]['interview_type']);
-        $this->assertNull($result[0]['meeting_link']);
+        $this->assertStringStartsWith('https://meet.jit.si/nexus-interview-', $result[0]['meeting_link']);
     }
 
     public function test_createSlots_accepts_optional_fields(): void
@@ -114,7 +114,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
 
     public function test_getAvailableSlots_returns_empty_for_unknown_job(): void
     {
-        $result = $this->service->getAvailableSlots(999999, $this->testTenantId);
+        $result = $this->service->getAvailableSlots(999999, $this->testTenantId, 5);
         $this->assertSame([], $result);
     }
 
@@ -126,7 +126,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
         // Past slot should not appear
         $this->insertTestSlot($vacancyId, 5, '2020-01-01 09:00:00', '2020-01-01 09:30:00');
 
-        $result = $this->service->getAvailableSlots($vacancyId, $this->testTenantId);
+        $result = $this->service->getAvailableSlots($vacancyId, $this->testTenantId, 5);
 
         $this->assertCount(2, $result);
     }
@@ -182,12 +182,13 @@ class JobInterviewSchedulingServiceTest extends TestCase
     {
         $vacancyId = $this->insertTestVacancy(5);
         $slotId = $this->insertTestSlot($vacancyId, 5, '2027-07-01 09:00:00', '2027-07-01 09:30:00');
+        $this->insertTestApplication($vacancyId, 20);
 
         $result = $this->service->bookSlot($slotId, 20, $this->testTenantId);
 
         $this->assertNotNull($result);
         $this->assertTrue((bool) $result['is_booked']);
-        $this->assertSame(20, $result['booked_by_user_id']);
+        $this->assertArrayNotHasKey('booked_by_user_id', $result);
         $this->assertNotNull($result['booked_at']);
         $this->assertSame([], $this->service->getErrors());
     }
@@ -196,7 +197,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
 
     public function test_cancelSlotBooking_returns_false_when_not_found(): void
     {
-        $this->assertFalse($this->service->cancelSlotBooking(999999, $this->testTenantId));
+        $this->assertFalse($this->service->cancelSlotBooking(999999, $this->testTenantId, 20));
         $this->assertSame('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
     }
 
@@ -205,7 +206,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
         $vacancyId = $this->insertTestVacancy(5);
         $slotId = $this->insertTestSlot($vacancyId, 5, '2027-07-01 09:00:00', '2027-07-01 09:30:00');
 
-        $this->assertFalse($this->service->cancelSlotBooking($slotId, $this->testTenantId));
+        $this->assertFalse($this->service->cancelSlotBooking($slotId, $this->testTenantId, 5));
         $this->assertSame('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
     }
 
@@ -218,7 +219,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
             'booked_at' => now(),
         ]);
 
-        $this->assertTrue($this->service->cancelSlotBooking($slotId, $this->testTenantId));
+        $this->assertTrue($this->service->cancelSlotBooking($slotId, $this->testTenantId, 20));
         $this->assertSame([], $this->service->getErrors());
     }
 
@@ -226,7 +227,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
 
     public function test_deleteSlot_returns_false_when_not_found(): void
     {
-        $this->assertFalse($this->service->deleteSlot(999999, $this->testTenantId));
+        $this->assertFalse($this->service->deleteSlot(999999, $this->testTenantId, 5));
         $this->assertSame('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
     }
 
@@ -235,7 +236,7 @@ class JobInterviewSchedulingServiceTest extends TestCase
         $vacancyId = $this->insertTestVacancy(5);
         $slotId = $this->insertTestSlot($vacancyId, 5, '2027-07-01 09:00:00', '2027-07-01 09:30:00');
 
-        $this->assertTrue($this->service->deleteSlot($slotId, $this->testTenantId));
+        $this->assertTrue($this->service->deleteSlot($slotId, $this->testTenantId, 5));
         $this->assertSame([], $this->service->getErrors());
     }
 
@@ -340,5 +341,18 @@ class JobInterviewSchedulingServiceTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ], $extra));
+    }
+
+    private function insertTestApplication(int $jobId, int $userId, string $status = 'applied'): int
+    {
+        return \Illuminate\Support\Facades\DB::table('job_vacancy_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $jobId,
+            'user_id' => $userId,
+            'status' => $status,
+            'stage' => 'applied',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

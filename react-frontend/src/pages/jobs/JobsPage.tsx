@@ -57,6 +57,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
+import type { JobConfig } from '@/types';
 
 interface JobVacancy {
   id: number;
@@ -119,7 +120,8 @@ export function JobsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasFeature, jobConfig = {} } = useTenant();
+  const { tenantPath, hasFeature, jobConfig: tenantJobConfig } = useTenant();
+  const jobConfig: Partial<JobConfig> = tenantJobConfig ?? {};
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -288,9 +290,9 @@ export function JobsPage() {
         <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
           <Briefcase className="w-8 h-8 text-[var(--color-info)]" aria-hidden="true" />
         </div>
-        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
-          {t('feature_not_available_desc', 'The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+          {t('feature_not_available_desc')}
         </p>
       </div>
     );
@@ -311,7 +313,7 @@ export function JobsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title', { defaultValue: 'Job Vacancies' })} description={t('page_description', { defaultValue: 'Find job opportunities, volunteering positions, and timebank roles.' })} />
+      <PageMeta title={t('page_title')} description={t('page_description')} />
       {/* Hero Banner */}
       <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -394,7 +396,7 @@ export function JobsPage() {
               title={
                 <span className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4" aria-hidden="true" />
-                  {t('my_postings.title', 'My Postings')}
+                  {t('my_postings.title')}
                 </span>
               }
             />
@@ -503,7 +505,7 @@ export function JobsPage() {
           </div>
 
           {/* Commitment Filter Chips */}
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_by_commitment', 'Filter by commitment')}>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_by_commitment')}>
             {COMMITMENT_FILTERS.map((filter) => {
               const isSelected = selectedCommitment === filter.id;
               return (

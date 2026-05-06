@@ -87,15 +87,14 @@ export function JobTemplatesAdmin() {
       });
       if (search) params.set('search', search);
 
-      const res = await api.get(`/v2/admin/jobs/templates?${params.toString()}`);
-      if (res.success && res.data) {
-        const payload = res.data as {
-          items?: JobTemplate[];
-          meta?: { total?: number };
-          total?: number;
-        };
-        setItems(payload.items || []);
-        setTotal(payload.meta?.total ?? payload.total ?? 0);
+      const res = await api.get<JobTemplate[]>(`/v2/admin/jobs/templates?${params.toString()}`);
+      if (res.success && Array.isArray(res.data)) {
+        setItems(res.data);
+        setTotal(res.meta?.total ?? res.data.length);
+      } else {
+        setItems([]);
+        setTotal(0);
+        toast.error(t('jobs.templates_load_error', 'Failed to load job templates'));
       }
     } catch {
       toast.error(t('jobs.templates_load_error', 'Failed to load job templates'));

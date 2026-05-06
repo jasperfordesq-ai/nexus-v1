@@ -331,15 +331,15 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             <div className='flex flex-wrap items-center justify-between gap-2'>
               <div className='flex items-center gap-2 text-sm font-medium text-secondary-700 dark:text-secondary-300'>
                 <Video size={14} aria-hidden="true" />
-                {t('interview_inline', 'Interview: {{date}} ({{type}})', {
+                {t('interview_inline', {
                   date: new Date(application.interview.scheduled_at).toLocaleString(undefined, {
                     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                   }),
                   type: application.interview.interview_type === 'video'
-                    ? t('interview.type_video', 'Video Call')
+                    ? t('interview.type_video')
                     : application.interview.interview_type === 'phone'
-                    ? t('interview.type_phone', 'Phone Call')
-                    : t('interview.type_in_person', 'In Person'),
+                    ? t('interview.type_phone')
+                    : t('interview.type_in_person'),
                 })}
               </div>
               <Chip
@@ -348,15 +348,15 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                 color={application.interview.status === 'accepted' ? 'success' : application.interview.status === 'declined' ? 'danger' : 'warning'}
               >
                 {application.interview.status === 'accepted'
-                  ? t('interview.accepted', 'Interview Confirmed')
+                  ? t('interview.accepted')
                   : application.interview.status === 'declined'
-                  ? t('interview.declined', 'Interview Declined')
-                  : t('interview.proposed', 'Interview Requested')}
+                  ? t('interview.declined')
+                  : t('interview.proposed')}
               </Chip>
             </div>
             {application.interview.duration_mins && (
               <div className='text-xs text-secondary-600 dark:text-secondary-400 mt-1'>
-                {t('interview.duration', 'Duration')}: {application.interview.duration_mins} min
+                {t('interview.duration')}: {application.interview.duration_mins} {t('interview.minutes')}
               </div>
             )}
             <div className='flex flex-wrap items-center gap-2 mt-2'>
@@ -372,7 +372,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   variant='flat'
                   startContent={<Video size={14} aria-hidden="true" />}
                 >
-                  {t('interview.join_call', 'Join Video Call')}
+                  {t('interview.join_call')}
                 </Button>
               )}
               {/* Fallback: Meeting link via location_notes for video interviews */}
@@ -387,7 +387,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   variant='flat'
                   startContent={<ExternalLink size={13} aria-hidden="true" />}
                 >
-                  {t('interview_join', 'Join Meeting')}
+                  {t('interview_join')}
                 </Button>
               )}
               {application.interview.interview_type !== 'video' && application.interview.location_notes && (
@@ -405,13 +405,13 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   {onAcceptInterview && (
                     <Button size='sm' color='success' variant='flat'
                       onPress={() => onAcceptInterview(application.interview!.id)}>
-                      {t('interview.accept', 'Accept')}
+                      {t('interview.accept')}
                     </Button>
                   )}
                   {onDeclineInterview && (
                     <Button size='sm' color='danger' variant='flat'
                       onPress={() => onDeclineInterview(application.interview!.id)}>
-                      {t('interview.decline', 'Decline')}
+                      {t('interview.decline')}
                     </Button>
                   )}
                 </>
@@ -432,10 +432,10 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             <div className='flex flex-wrap items-center justify-between gap-2'>
               <div className='text-sm font-medium text-success-700 dark:text-success-300'>
                 {application.offer.salary_offered
-                  ? t('offer_inline', 'Offer: {{salary}}', {
+                  ? t('offer_inline', {
                       salary: `${application.offer.salary_currency} ${Number(application.offer.salary_offered).toLocaleString()} / ${t(`salary.${application.offer.salary_type}`, application.offer.salary_type)}`,
                     })
-                  : t('offer.title', 'You received an offer!')}
+                  : t('offer.title')}
               </div>
               <Chip
                 size='sm'
@@ -443,15 +443,15 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                 color={application.offer.status === 'accepted' ? 'success' : application.offer.status === 'rejected' ? 'danger' : 'warning'}
               >
                 {application.offer.status === 'accepted'
-                  ? t('offer.accepted', 'Offer Accepted')
+                  ? t('offer.accepted')
                   : application.offer.status === 'rejected'
-                  ? t('offer.rejected', 'Offer Declined')
-                  : t('inline_response.offer_pending', 'Offer Pending')}
+                  ? t('offer.rejected')
+                  : t('inline_response.offer_pending')}
               </Chip>
             </div>
             {application.offer.start_date && (
               <div className='text-xs text-success-600 dark:text-success-400 mt-1'>
-                {t('offer_start_date', 'Start: {{date}}', {
+                {t('offer_start_date', {
                   date: new Date(application.offer.start_date).toLocaleDateString(),
                 })}
               </div>
@@ -619,7 +619,7 @@ function CalendarLinks({ interviewId }: { interviewId: number }) {
   if (!links) {
     return (
       <Button size="sm" variant="flat" startContent={<CalendarPlus size={14} />} onPress={fetchLinks} isLoading={loading}>
-        {t('interview.add_to_calendar', { defaultValue: 'Add to Calendar' })}
+        {t('interview.add_to_calendar')}
       </Button>
     );
   }
@@ -628,17 +628,17 @@ function CalendarLinks({ interviewId }: { interviewId: number }) {
     <div className="flex items-center gap-1.5">
       {links.google && (
         <Button size="sm" variant="flat" as="a" href={links.google} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
-          Google
+          {t('interview.calendar_google')}
         </Button>
       )}
       {links.outlook && (
         <Button size="sm" variant="flat" as="a" href={links.outlook} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
-          Outlook
+          {t('interview.calendar_outlook')}
         </Button>
       )}
       {links.ics && (
         <Button size="sm" variant="flat" as="a" href={links.ics} download="interview.ics" startContent={<Download size={12} />}>
-          .ics
+          {t('interview.calendar_ics')}
         </Button>
       )}
     </div>
@@ -816,13 +816,16 @@ export function MyApplicationsPage() {
   // Feature 3: Interview accept/decline handlers
   const handleAcceptInterview = useCallback(async (interviewId: number) => {
     try {
-      await api.put(`/v2/jobs/interviews/${interviewId}/accept`, {});
-      toastRef.current.success(tRef.current('interview.accepted', 'Interview Confirmed'));
-      // Refresh
-      cursorRef.current = null;
-      setHasMore(false);
-      setApplications([]);
-      loadApplications();
+      const response = await api.put(`/v2/jobs/interviews/${interviewId}/accept`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('interview.accepted', 'Interview Confirmed'));
+        cursorRef.current = null;
+        setHasMore(false);
+        setApplications([]);
+        loadApplications();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('MyApplicationsPage.handleAcceptInterview', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -831,12 +834,16 @@ export function MyApplicationsPage() {
 
   const handleDeclineInterview = useCallback(async (interviewId: number) => {
     try {
-      await api.put(`/v2/jobs/interviews/${interviewId}/decline`, {});
-      toastRef.current.success(tRef.current('interview.declined', 'Interview Declined'));
-      cursorRef.current = null;
-      setHasMore(false);
-      setApplications([]);
-      loadApplications();
+      const response = await api.put(`/v2/jobs/interviews/${interviewId}/decline`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('interview.declined', 'Interview Declined'));
+        cursorRef.current = null;
+        setHasMore(false);
+        setApplications([]);
+        loadApplications();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('MyApplicationsPage.handleDeclineInterview', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -846,12 +853,16 @@ export function MyApplicationsPage() {
   // Feature 3: Offer accept/reject handlers
   const handleAcceptOffer = useCallback(async (offerId: number) => {
     try {
-      await api.put(`/v2/jobs/offers/${offerId}/accept`, {});
-      toastRef.current.success(tRef.current('offer.accepted', 'Offer Accepted! Congratulations!'));
-      cursorRef.current = null;
-      setHasMore(false);
-      setApplications([]);
-      loadApplications();
+      const response = await api.put(`/v2/jobs/offers/${offerId}/accept`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('offer.accepted', 'Offer Accepted! Congratulations!'));
+        cursorRef.current = null;
+        setHasMore(false);
+        setApplications([]);
+        loadApplications();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('MyApplicationsPage.handleAcceptOffer', err);
       toastRef.current.error(tRef.current('something_wrong'));
@@ -860,12 +871,16 @@ export function MyApplicationsPage() {
 
   const handleRejectOffer = useCallback(async (offerId: number) => {
     try {
-      await api.put(`/v2/jobs/offers/${offerId}/reject`, {});
-      toastRef.current.success(tRef.current('offer.rejected', 'Offer declined'));
-      cursorRef.current = null;
-      setHasMore(false);
-      setApplications([]);
-      loadApplications();
+      const response = await api.put(`/v2/jobs/offers/${offerId}/reject`, {});
+      if (response.success) {
+        toastRef.current.success(tRef.current('offer.rejected', 'Offer declined'));
+        cursorRef.current = null;
+        setHasMore(false);
+        setApplications([]);
+        loadApplications();
+      } else {
+        toastRef.current.error(tRef.current('something_wrong'));
+      }
     } catch (err) {
       logError('MyApplicationsPage.handleRejectOffer', err);
       toastRef.current.error(tRef.current('something_wrong'));

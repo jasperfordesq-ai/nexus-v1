@@ -18,6 +18,7 @@ class JobApplicationFactory extends Factory
     public function definition(): array
     {
         return [
+            'tenant_id'      => 2,
             'vacancy_id'     => JobVacancy::factory(),
             'user_id'        => User::factory(),
             'message'        => $this->faker->paragraph(),
@@ -31,6 +32,10 @@ class JobApplicationFactory extends Factory
 
     public function forTenant(int $id): static
     {
-        return $this->state(fn (array $attributes) => []);
+        return $this->state(fn (array $attributes) => [
+            'tenant_id' => $id,
+            'vacancy_id' => JobVacancy::factory()->forTenant($id),
+            'user_id' => User::factory()->forTenant($id),
+        ]);
     }
 }

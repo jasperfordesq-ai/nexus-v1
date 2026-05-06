@@ -85,14 +85,19 @@ function JobBiasAudit() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (dateFrom) params.set('from', dateFrom);
-      if (dateTo) params.set('to', dateTo);
+      if (dateFrom) params.set('date_from', dateFrom);
+      if (dateTo) params.set('date_to', dateTo);
       if (jobId) params.set('job_id', jobId);
 
       const qs = params.toString();
       const url = `/v2/admin/jobs/bias-audit${qs ? `?${qs}` : ''}`;
       const res = await api.get<BiasReport>(url);
-      if (res.success) setReport(res.data as BiasReport);
+      if (res.success && res.data) {
+        setReport(res.data as BiasReport);
+      } else {
+        setReport(null);
+        toast.error(t('jobs.bias_failed_load', 'Failed to load bias audit data'));
+      }
     } catch {
       toast.error(t('jobs.bias_failed_load', 'Failed to load bias audit data'));
     } finally {
@@ -151,7 +156,7 @@ function JobBiasAudit() {
               onValueChange={setJobId}
               className="w-48"
               variant="bordered"
-              placeholder="All jobs"
+              placeholder={t('jobs.bias_all_jobs_placeholder')}
             />
             <Button
               color="primary"

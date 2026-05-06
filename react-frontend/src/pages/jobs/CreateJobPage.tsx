@@ -353,7 +353,7 @@ export function CreateJobPage() {
     }
   }, [errors]);
 
-  const validate = (): boolean => {
+  const validate = (mode: 'publish' | 'draft' = 'publish'): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!form.title.trim()) {
@@ -377,7 +377,7 @@ export function CreateJobPage() {
     }
 
     // EU Pay Transparency: salary range required for paid jobs unless negotiable
-    if (form.type === 'paid' && !form.salary_negotiable) {
+    if (mode === 'publish' && form.type === 'paid' && !form.salary_negotiable) {
       if (!form.salary_min && !form.salary_max) {
         newErrors.salary_range = t('form.validation.salary_required', "Salary range required. You may check 'Salary negotiable' to omit.");
       }
@@ -1361,7 +1361,7 @@ export function CreateJobPage() {
                 variant="flat"
                 className="bg-theme-elevated text-theme-muted"
                 onPress={async () => {
-                  if (!validate()) return;
+                  if (!validate('draft')) return;
                   setIsSubmitting(true);
                   try {
                     const payload: Record<string, unknown> = {

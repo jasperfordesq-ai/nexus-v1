@@ -27,6 +27,7 @@ import {
   Avatar,
   Tooltip,
   Divider,
+  Pagination,
 } from '@heroui/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -81,14 +82,7 @@ interface SpamStats {
 
 type ModerationAction = 'approve' | 'reject' | 'flag';
 
-// Flag labels are resolved via t() in the component; this is a fallback map
-const FLAG_LABELS: Record<string, string> = {
-  duplicate_content: 'Duplicate Content',
-  suspicious_links: 'Suspicious Links',
-  excessive_posting_rate: 'Excessive Posting',
-  suspicious_patterns: 'Suspicious Patterns',
-  new_account: 'New Account',
-};
+const PAGE_SIZE = 20;
 
 function getSpamScoreColor(score: number): 'success' | 'warning' | 'danger' | 'default' {
   if (score > 70) return 'danger';
@@ -109,6 +103,8 @@ export function JobModerationQueue() {
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   // Modal state
   const [actionModal, setActionModal] = useState<{
@@ -117,23 +113,33 @@ export function JobModerationQueue() {
     job: PendingJob | null;
   }>({ isOpen: false, action: 'approve', job: null });
   const [actionReason, setActionReason] = useState('');
+  const getFlagLabel = useCallback((flag: string) => t(`spam.flag_labels.${flag}`), [t]);
 
   // Load pending jobs
   const loadPendingJobs = useCallback(async () => {
     setLoading(true);
     try {
+      const params = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        offset: String((page - 1) * PAGE_SIZE),
+      });
       const res = await api.get<{ items: PendingJob[]; total: number }>(
-        '/v2/admin/jobs/moderation-queue'
+        `/v2/admin/jobs/moderation-queue?${params.toString()}`
       );
       if (res.success && res.data) {
         setPendingJobs(res.data.items ?? []);
+        setTotal(res.data.total ?? 0);
+      } else {
+        setPendingJobs([]);
+        setTotal(0);
+        toast.error(t('moderation.load_error'));
       }
     } catch {
-      toast.error(t('moderation.approve_error', 'Failed to load moderation queue'));
+      toast.error(t('moderation.load_error'));
     } finally {
       setLoading(false);
     }
-  }, [t, toast]);
+  }, [page, t, toast]);
 
 
   // Load stats
@@ -190,12 +196,13 @@ export function JobModerationQueue() {
 
       if (res.success) {
         const successKey = `moderation.${action}_success`;
-        toast.success(t(successKey, `Job ${action}d successfully`));
+        toast.success(t(successKey));
         setPendingJobs((prev) => prev.filter((j) => j.id !== job.id));
+        setTotal((prev) => Math.max(0, prev - 1));
         loadStats();
       } else {
         const errorKey = `moderation.${action}_error`;
-        toast.error(t(errorKey, `Failed to ${action} job`));
+        toast.error(t(errorKey));
       }
     } catch {
       toast.error(t('something_wrong', 'Something went wrong. Please try again.'));
@@ -298,7 +305,7 @@ export function JobModerationQueue() {
               <div className="mt-3 flex flex-wrap gap-2">
                 {Object.entries(spamStats.top_flags).map(([flag, count]) => (
                   <Chip key={flag} size="sm" variant="flat" color="default">
-                    {FLAG_LABELS[flag] ?? flag}: {count}
+                    {getFlagLabel(flag)}: {count}
                   </Chip>
                 ))}
               </div>
@@ -340,7 +347,7 @@ export function JobModerationQueue() {
                         <p className="text-xs text-default-500">
                           {job.poster_name
                             ? t('moderation.posted_by', 'Posted by {{name}}', { name: job.poster_name })
-                            : `User #${job.user_id}`}
+                            : t('moderation.user_fallback', { id: job.user_id })}
                           {' '}&middot;{' '}
                           {new Date(job.created_at).toLocaleDateString(undefined, {
                             year: 'numeric',
@@ -378,7 +385,9 @@ export function JobModerationQueue() {
                       {job.spam_score != null && job.spam_score > 0 && (
                         <Tooltip content={
                           job.spam_flags && job.spam_flags.length > 0
-                            ? `Flags: ${job.spam_flags.map((f) => FLAG_LABELS[f] ?? f).join(', ')}`
+                            ? t('moderation.flags_tooltip', {
+                                flags: job.spam_flags.map(getFlagLabel).join(', '),
+                              })
                             : t('moderation.no_flags', 'No specific flags')
                         }>
                           <Chip
@@ -430,6 +439,17 @@ export function JobModerationQueue() {
               </CardBody>
             </Card>
           ))}
+          {total > PAGE_SIZE && (
+            <div className="flex justify-center pt-2">
+              <Pagination
+                showControls
+                page={page}
+                total={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+                onChange={setPage}
+                aria-label={t('moderation.pagination_label')}
+              />
+            </div>
+          )}
         </div>
       )}
 

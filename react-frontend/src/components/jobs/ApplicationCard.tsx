@@ -53,6 +53,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
     const stages: string[] = [];
     switch (currentStage) {
       case 'applied':
+      case 'pending':
         stages.push('screening', 'interview', 'accepted', 'rejected');
         break;
       case 'screening':

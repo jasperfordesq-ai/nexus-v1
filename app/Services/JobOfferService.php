@@ -52,6 +52,10 @@ class JobOfferService
                 return false;
             }
 
+            if ((int) $application->user_id === $employerUserId) {
+                return false;
+            }
+
             // Enforce one offer per application (UNIQUE constraint on application_id)
             $existing = JobOffer::where('application_id', $applicationId)->exists();
             if ($existing) {

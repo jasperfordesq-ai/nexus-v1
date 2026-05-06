@@ -199,11 +199,11 @@ export function JobsAdmin() {
   };
 
   const columns: Column<Job>[] = [
-    { key: 'title', label: t('jobs.col_title'), sortable: true, render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
-    { key: 'organization_name', label: t('jobs.col_organization'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
-    { key: 'type', label: t('jobs.col_type'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.type ? t(`jobs.type_${item.type}`) : '--'}</span> },
-    { key: 'applications_count', label: t('jobs.col_applications'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
-    { key: 'views_count', label: t('jobs.col_views'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
+    { key: 'title', label: t('jobs.col_title'), render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
+    { key: 'organization_name', label: t('jobs.col_organization'), render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
+    { key: 'type', label: t('jobs.col_type'), render: (item) => <span className='text-sm text-default-600'>{item.type ? t(`jobs.type_${item.type}`) : '--'}</span> },
+    { key: 'applications_count', label: t('jobs.col_applications'), render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
+    { key: 'views_count', label: t('jobs.col_views'), render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
     {
       key: 'is_featured', label: t('jobs.col_featured'),
       render: (item) => (
@@ -214,8 +214,8 @@ export function JobsAdmin() {
         </Tooltip>
       ),
     },
-    { key: 'status', label: t('jobs.col_status'), sortable: true, render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{t(`jobs.status_${item.status}`)}</Chip> },
-    { key: 'deadline', label: t('jobs.col_deadline'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
+    { key: 'status', label: t('jobs.col_status'), render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{t(`jobs.status_${item.status}`)}</Chip> },
+    { key: 'deadline', label: t('jobs.col_deadline'), render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
     {
       key: 'actions', label: t('jobs.col_actions'),
       render: (item) => (
