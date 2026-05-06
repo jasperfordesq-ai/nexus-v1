@@ -7,7 +7,7 @@ import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
-import './i18n'; // Initialize i18n before App renders
+import i18n from './i18n'; // Initialize i18n before App renders
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
@@ -111,7 +111,6 @@ createRoot(document.getElementById('root')!).render(
 );
 
 // Error fallback component
-// Note: This renders BEFORE i18n loads — intentionally not translated
 function ErrorFallback() {
   return (
     <div style={{
@@ -125,9 +124,11 @@ function ErrorFallback() {
       backgroundColor: 'var(--color-background, #0f172a)',
       color: 'var(--color-text, #e2e8f0)',
     }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Something went wrong</h1>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+        {i18n.t('common:error_boundary.title')}
+      </h1>
       <p style={{ marginBottom: '2rem', opacity: 0.8 }}>
-        We've been notified and are looking into it. Please try refreshing the page.
+        {i18n.t('common:error_boundary.description')}
       </p>
       <button
         onClick={() => window.location.reload()}
@@ -141,7 +142,7 @@ function ErrorFallback() {
           cursor: 'pointer',
         }}
       >
-        Reload Page
+        {i18n.t('common:error_boundary.try_again')}
       </button>
     </div>
   );

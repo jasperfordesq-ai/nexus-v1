@@ -791,7 +791,16 @@
       "advanced": "Zaawansowany",
       "expert": "Ekspert"
     },
-    "aria_clear_search": "Wyczyść wyszukiwanie",
+      "proficiency_aria": "Poziom umiejętności: {{level}}",
+      "remove_skill_aria": "Usuń {{skill}}",
+      "no_user_skills": "Nie dodano jeszcze żadnych umiejętności. Dodaj pierwszą umiejętność poniżej.",
+      "add_skill": "Dodaj umiejętność",
+      "add_a_skill": "Dodaj umiejętność",
+      "search_result_category": "w {{category}}",
+      "no_matching_custom": "Nie znaleziono pasującej umiejętności. Możesz dodać \"{{query}}\" jako umiejętność niestandardową.",
+      "use_custom": "Użyj \"{{query}}\"",
+      "skill_to_add": "Umiejętność do dodania:",
+      "aria_clear_search": "Wyczyść wyszukiwanie",
     "aria_close_members_list": "Zamknij listę członków",
     "category_optional": "Kategoria (opcjonalna)",
     "proficiency_level": "Poziom umiejętności"

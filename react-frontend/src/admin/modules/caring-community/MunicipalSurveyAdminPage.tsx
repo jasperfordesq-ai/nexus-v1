@@ -7,8 +7,6 @@
  * MunicipalSurveyAdminPage — AG62 Municipality Survey & Feedback Tool
  *
  * Admin management console for Gemeinde-grade surveys.
- * English-only — NO t() calls (admin panel policy).
- *
  * Features:
  *  - Survey list table with status, question count, response count, actions
  *  - 2-step create modal (survey details → question builder)
@@ -43,6 +41,7 @@ import {
   TableRow,
   Textarea,
   useDisclosure,
+  Progress,
 } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -53,6 +52,8 @@ import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Users from 'lucide-react/icons/users';
 import XCircle from 'lucide-react/icons/x-circle';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
@@ -194,12 +195,12 @@ function AnalyticsView({ analytics }: { analytics: Analytics }) {
           {q.breakdown && q.breakdown.map((b) => (
             <div key={b.option} className="flex items-center gap-3">
               <span className="text-xs w-40 shrink-0 truncate">{b.option}</span>
-              <div className="flex-1 bg-default-100 rounded-full h-2 overflow-hidden">
-                <div
-                  className="h-2 bg-primary rounded-full transition-all"
-                  style={{ width: `${b.percentage}%` }}
-                />
-              </div>
+              <Progress
+                aria-label={`${b.option}: ${b.percentage}%`}
+                value={b.percentage}
+                className="flex-1"
+                classNames={{ indicator: 'bg-primary' }}
+              />
               <span className="text-xs text-default-500 w-20 text-right shrink-0">
                 {b.percentage}% ({b.count})
               </span>
@@ -216,6 +217,8 @@ function AnalyticsView({ analytics }: { analytics: Analytics }) {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalSurveyAdminPage() {
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('panel.sidebar.items.surveys'));
   const createModal    = useDisclosure();
   const analyticsModal = useDisclosure();
 

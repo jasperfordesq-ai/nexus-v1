@@ -584,7 +584,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden">
                   <img
                     src={imagePreview}
-                    alt="Story preview"
+                    alt={t('creator.preview_alt')}
                     className="w-full h-full object-cover"
                     style={{ filter: activeFilterCss }}
                   />
@@ -931,7 +931,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   {textContent}
                 </p>
               ) : (
-                <p className="text-white/40 text-lg">Start typing...</p>
+                <p className="text-white/40 text-lg">{t('creator.text_placeholder')}</p>
               )}
             </div>
 
@@ -1035,7 +1035,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               {pollQuestion ? (
                 <h3 className="text-white text-xl font-bold text-center">{pollQuestion}</h3>
               ) : (
-                <p className="text-white/40 text-lg">Your question...</p>
+                <p className="text-white/40 text-lg">{t('creator.poll_question_placeholder')}</p>
               )}
               <div className="w-full max-w-sm flex flex-col gap-2">
                 {pollOptions.filter((o) => o.trim()).map((option, idx) => (

@@ -78,6 +78,12 @@
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
   "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "Rank Your Preferences",
+  "all_categories": "All Categories",
+  "ranked_instructions": "Drag options or use arrows to rank from most preferred (top) to least preferred (bottom).",
+  "view_ranked_results": "View Ranked Results",
+  "winner_label": "Winner: {{name}}",
+  "submit_rankings": "Submit Rankings",
   "aria": {
     "export_csv": "Export results as CSV"
   },

@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { Button, Card, CardBody, CardHeader, Chip, Divider, Input, Select, SelectItem, Spinner, Switch, Textarea } from '@heroui/react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
@@ -2858,47 +2859,30 @@ function PrintableInviteCard({
   inviteUrl: string;
   expiresAt: string;
 }) {
+  const { t } = useTranslation('admin');
+
   return (
-    <div
-      style={{
-        fontFamily: 'Georgia, serif',
-        border: '3px solid #333',
-        borderRadius: '12px',
-        padding: '32px',
-        maxWidth: '400px',
-        margin: '0 auto',
-        textAlign: 'center',
-      }}
-    >
-      <p style={{ fontSize: '13px', color: '#666', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-        Caring Community
+    <div className="mx-auto max-w-[400px] rounded-xl border-[3px] border-default-800 p-8 text-center font-serif">
+      <p className="mb-1 text-[13px] font-semibold uppercase tracking-wider text-default-500">
+        {t('caring_workflow.invite_card.brand')}
       </p>
-      <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px' }}>
-        Your Invitation Code
+      <p className="mb-5 text-[13px] text-default-400">
+        {t('caring_workflow.invite_card.subtitle')}
       </p>
-      <div
-        style={{
-          border: '2px solid #333',
-          borderRadius: '8px',
-          padding: '16px 24px',
-          display: 'inline-block',
-          marginBottom: '20px',
-          background: '#f9f9f9',
-        }}
-      >
-        <span style={{ fontSize: '40px', fontFamily: 'monospace', fontWeight: 'bold', letterSpacing: '0.25em', color: '#111' }}>
+      <div className="mb-5 inline-block rounded-lg border-2 border-default-800 bg-default-50 px-6 py-4 dark:bg-default-100">
+        <span className="font-mono text-[40px] font-bold tracking-[0.25em] text-default-900">
           {code}
         </span>
       </div>
       {label && (
-        <p style={{ fontSize: '14px', color: '#555', marginBottom: '12px', fontStyle: 'italic' }}>{label}</p>
+        <p className="mb-3 text-sm italic text-default-600">{label}</p>
       )}
-      <p style={{ fontSize: '12px', color: '#555', marginBottom: '8px' }}>
-        Visit the link below or ask your coordinator to help you get started.
+      <p className="mb-2 text-xs text-default-600">
+        {t('caring_workflow.invite_card.instructions')}
       </p>
-      <p style={{ fontSize: '11px', color: '#333', wordBreak: 'break-all', fontFamily: 'monospace' }}>{inviteUrl}</p>
-      <p style={{ fontSize: '11px', color: '#999', marginTop: '12px' }}>
-        Valid until {new Date(expiresAt).toLocaleDateString()}
+      <p className="break-all font-mono text-[11px] text-default-700">{inviteUrl}</p>
+      <p className="mt-3 text-[11px] text-default-400">
+        {t('caring_workflow.invite_card.valid_until', { date: new Date(expiresAt).toLocaleDateString() })}
       </p>
     </div>
   );

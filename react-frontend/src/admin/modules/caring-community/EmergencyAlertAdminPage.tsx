@@ -46,6 +46,8 @@ import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import Info from 'lucide-react/icons/info';
 import Send from 'lucide-react/icons/send';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
@@ -109,6 +111,8 @@ function severityChip(severity: string, label: string) {
 // ---------------------------------------------------------------------------
 
 export default function EmergencyAlertAdminPage() {
+  const { t } = useTranslation('admin');
+  usePageTitle(t('caring_emergency.title'));
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);

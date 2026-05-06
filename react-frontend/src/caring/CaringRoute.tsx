@@ -20,10 +20,6 @@ export function CaringRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  if (!hasFeature('caring_community')) {
-    return <Navigate to={tenantPath('/admin')} replace />;
-  }
-
   const role = (user?.role as string) || '';
   const userRecord = user as Record<string, unknown> | null;
   const hasAdminAccess =
@@ -40,6 +36,17 @@ export function CaringRoute() {
 
   if (!hasAdminAccess) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
+  }
+
+  if (!hasFeature('caring_community')) {
+    const caringPath = tenantPath('/caring');
+    const isCaringOverview =
+      location.pathname === caringPath ||
+      location.pathname === `${caringPath}/`;
+
+    if (!isCaringOverview) {
+      return <Navigate to={tenantPath('/caring')} replace />;
+    }
   }
 
   return <Outlet />;

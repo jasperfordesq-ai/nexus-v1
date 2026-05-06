@@ -66,6 +66,7 @@ CLAUDE.md
 !/scripts/purge-cloudflare-cache.sh
 !/scripts/refresh-schema-dump.sh
 !/scripts/check-i18n.sh
+!/scripts/check-i18n-literals.mjs
 !/scripts/generate-announcement-pdf.mjs
 !/scripts/check-i18n-drift.mjs
 !/scripts/check-i18n-stubs.mjs

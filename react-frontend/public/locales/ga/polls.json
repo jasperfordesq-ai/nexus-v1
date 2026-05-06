@@ -83,5 +83,11 @@
   "ranked_results_title": "Round-by-Round Results",
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}"
+  "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "Cuir do roghanna in ord",
+  "all_categories": "Gach catagóir",
+  "ranked_instructions": "Tarraing na roghanna nó úsáid na saigheada chun iad a chur ón rogha is fearr (barr) go dtí an rogha is ísle (bun).",
+  "view_ranked_results": "Féach ar na torthaí rangaithe",
+  "winner_label": "Buaiteoir: {{name}}",
+  "submit_rankings": "Cuir an rangú isteach"
 }

@@ -328,7 +328,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
             startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
             onPress={() => onRankedVote(poll)}
           >
-            Rank Your Preferences
+            {t('rank_preferences')}
           </Button>
         )}
 
@@ -1027,7 +1027,7 @@ export function PollsPage() {
             onPress={() => setSelectedCategory(null)}
             startContent={<Filter className="w-3.5 h-3.5" aria-hidden="true" />}
           >
-            All Categories
+            {t('all_categories')}
           </Button>
           {categories.map((cat) => (
             <Button
@@ -1151,7 +1151,7 @@ export function PollsPage() {
           <ModalHeader className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-[var(--text-primary)]">
               <ListOrdered className="w-5 h-5 text-purple-400" aria-hidden="true" />
-              Rank Your Preferences
+              {t('rank_preferences')}
             </div>
             {rankedPoll && (
               <p className="text-sm text-[var(--text-muted)] font-normal">{rankedPoll.question}</p>
@@ -1161,7 +1161,7 @@ export function PollsPage() {
             {rankedPoll && (
               <div className="space-y-4">
                 <p className="text-xs text-[var(--text-subtle)]">
-                  Drag options or use arrows to rank from most preferred (top) to least preferred (bottom).
+                  {t('ranked_instructions')}
                 </p>
 
                 <div className="space-y-2">
@@ -1218,7 +1218,7 @@ export function PollsPage() {
                       onPress={() => loadRankedResults(rankedPoll.id)}
                       isLoading={isLoadingRanked}
                     >
-                      View Ranked Results
+                      {t('view_ranked_results')}
                     </Button>
                     {rankedResults && (
                       <div className="mt-3 p-3 rounded-xl bg-theme-elevated space-y-3">
@@ -1228,7 +1228,7 @@ export function PollsPage() {
                           <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                             <TrendingUp className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                             <span className="text-sm font-medium text-emerald-400">
-                              Winner: {String(rankedResults.winner)}
+                              {t('winner_label', { name: String(rankedResults.winner) })}
                             </span>
                           </div>
                         ) : null}
@@ -1278,7 +1278,7 @@ export function PollsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onRankedClose} className="text-[var(--text-muted)]">
-              Cancel
+              {t('confirm_delete.cancel')}
             </Button>
             {rankedPoll?.status === 'open' && (
               <Button
@@ -1286,7 +1286,7 @@ export function PollsPage() {
                 onPress={handleRankedSubmit}
                 isLoading={isSubmittingRank}
               >
-                Submit Rankings
+                {t('submit_rankings')}
               </Button>
             )}
           </ModalFooter>

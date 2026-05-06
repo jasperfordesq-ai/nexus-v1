@@ -165,7 +165,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             type="number"
             min="0.25"
             step="0.25"
-            endContent={<span className="text-theme-muted text-sm">hours</span>}
+            endContent={<span className="text-theme-muted text-sm">{t('hours')}</span>}
             description={t('donate_balance_info', { balance: currentBalance })}
             classNames={{
               input: 'bg-transparent text-theme-primary',

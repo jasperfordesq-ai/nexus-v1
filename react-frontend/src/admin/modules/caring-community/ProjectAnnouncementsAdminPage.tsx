@@ -40,6 +40,8 @@ import PauseCircle from 'lucide-react/icons/pause-circle';
 import Plus from 'lucide-react/icons/plus';
 import Rocket from 'lucide-react/icons/rocket';
 import Send from 'lucide-react/icons/send';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -94,6 +96,8 @@ const STATUS_FILTER_ITEMS: Array<{ key: string; label: string }> = [
 ];
 
 export default function ProjectAnnouncementsAdminPage() {
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('panel.sidebar.items.projects'));
   const createModal = useDisclosure();
   const updateModal = useDisclosure();
 

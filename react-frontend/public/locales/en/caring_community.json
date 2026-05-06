@@ -469,6 +469,17 @@
         "reviews_received": "Reviews Received",
         "trust_tier": "Trust Tier"
       }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Recompute trust tiers for all active members? This may take a moment.",
+      "messages": {
+        "saved": "Trust tier configuration saved. Changes apply on the next recompute run.",
+        "recomputed": "Tiers recomputed for {{count}} members."
+      },
+      "errors": {
+        "save_failed": "Failed to save configuration.",
+        "recompute_failed": "Failed to recompute tiers."
+      }
     }
   }
 }

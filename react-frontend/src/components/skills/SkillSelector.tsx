@@ -69,11 +69,11 @@ interface SkillSearchResult {
 // Proficiency Config
 // ─────────────────────────────────────────────────────────────────────────────
 
-const proficiencyConfig: Record<string, { label: string; color: string; dots: number }> = {
-  beginner: { label: 'Beginner', color: 'text-emerald-500', dots: 1 },
-  intermediate: { label: 'Intermediate', color: 'text-[var(--color-info)]', dots: 2 },
-  advanced: { label: 'Advanced', color: 'text-purple-500', dots: 3 },
-  expert: { label: 'Expert', color: 'text-[var(--color-warning)]', dots: 4 },
+const proficiencyConfig: Record<string, { color: string; dots: number }> = {
+  beginner: { color: 'text-emerald-500', dots: 1 },
+  intermediate: { color: 'text-[var(--color-info)]', dots: 2 },
+  advanced: { color: 'text-purple-500', dots: 3 },
+  expert: { color: 'text-[var(--color-warning)]', dots: 4 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -81,9 +81,13 @@ const proficiencyConfig: Record<string, { label: string; color: string; dots: nu
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ProficiencyDots({ level }: { level: string }) {
-  const config = proficiencyConfig[level] ?? proficiencyConfig['beginner'] ?? { label: 'Beginner', color: 'text-emerald-500', dots: 1 };
+  const { t } = useTranslation('common');
+  const normalizedLevel = proficiencyConfig[level] ? level : 'beginner';
+  const config = proficiencyConfig[normalizedLevel] ?? { color: 'text-emerald-500', dots: 1 };
+  const label = t(`skills.proficiency.${normalizedLevel}`);
+
   return (
-    <div className="flex items-center gap-1" aria-label={`Proficiency: ${config.label}`}>
+    <div className="flex items-center gap-1" aria-label={t('skills.proficiency_aria', { level: label })}>
       {[1, 2, 3, 4].map((dot) => (
         <div
           key={dot}
@@ -94,7 +98,7 @@ export function ProficiencyDots({ level }: { level: string }) {
           }`}
         />
       ))}
-      <span className={`text-xs ml-1 ${config.color}`}>{config.label}</span>
+      <span className={`text-xs ml-1 ${config.color}`}>{label}</span>
     </div>
   );
 }
@@ -114,6 +118,8 @@ export function SkillChip({
   showProficiency?: boolean;
   endorsementCount?: number;
 }) {
+  const { t } = useTranslation('common');
+
   return (
     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
       <span className="text-sm font-medium text-theme-primary">{skill.skill_name}</span>
@@ -133,7 +139,7 @@ export function SkillChip({
           variant="light"
           onPress={onRemove}
           className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-[var(--color-error)] transition-colors min-w-0 w-auto h-auto"
-          aria-label={`Remove ${skill.skill_name}`}
+          aria-label={t('skills.remove_skill_aria', { skill: skill.skill_name })}
         >
           <X className="w-3 h-3" />
         </Button>
@@ -285,7 +291,7 @@ export function SkillSelector({
             />
           ))
         ) : (
-          <p className="text-sm text-theme-subtle italic">No skills added yet. Add your first skill below.</p>
+          <p className="text-sm text-theme-subtle italic">{tc('skills.no_user_skills')}</p>
         )}
       </div>
 
@@ -296,7 +302,7 @@ export function SkillSelector({
         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
         onPress={onOpen}
       >
-        Add Skill
+        {tc('skills.add_skill')}
       </Button>
 
       {/* Add Skill Modal */}
@@ -315,7 +321,7 @@ export function SkillSelector({
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-indigo-500" aria-hidden="true" />
               </div>
-              Add a Skill
+              {tc('skills.add_a_skill')}
             </div>
           </ModalHeader>
           <ModalBody>
@@ -350,7 +356,7 @@ export function SkillSelector({
                     className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors justify-start h-auto"
                   >
                     <span className="text-sm font-medium text-theme-primary">{result.name}</span>
-                    <span className="text-xs text-theme-subtle ml-2">in {result.category_name}</span>
+                    <span className="text-xs text-theme-subtle ml-2">{tc('skills.search_result_category', { category: result.category_name })}</span>
                   </Button>
                 ))}
               </div>
@@ -360,7 +366,7 @@ export function SkillSelector({
             {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
               <div className="px-3 py-2 rounded-lg bg-theme-elevated border border-theme-default">
                 <p className="text-sm text-theme-muted">
-                  No matching skill found. You can add &quot;{searchQuery}&quot; as a custom skill.
+                  {tc('skills.no_matching_custom', { query: searchQuery })}
                 </p>
                 <Button
                   size="sm"
@@ -368,7 +374,7 @@ export function SkillSelector({
                   className="mt-2 bg-indigo-500/10 text-indigo-500"
                   onPress={() => setSelectedSkill(searchQuery)}
                 >
-                  Use &quot;{searchQuery}&quot;
+                  {tc('skills.use_custom', { query: searchQuery })}
                 </Button>
               </div>
             )}
@@ -412,7 +418,7 @@ export function SkillSelector({
             {/* Selected skill preview */}
             {(selectedSkill || searchQuery) && (
               <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
-                <p className="text-xs text-theme-subtle mb-1">Skill to add:</p>
+                <p className="text-xs text-theme-subtle mb-1">{tc('skills.skill_to_add')}</p>
                 <div className="flex items-center gap-3">
                   <Chip variant="flat" className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-300">
                     {selectedSkill || searchQuery}
@@ -424,7 +430,7 @@ export function SkillSelector({
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">
-              Cancel
+              {tc('cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -432,7 +438,7 @@ export function SkillSelector({
               isLoading={isAdding}
               isDisabled={!selectedSkill && !searchQuery}
             >
-              Add Skill
+              {tc('skills.add_skill')}
             </Button>
           </ModalFooter>
         </ModalContent>

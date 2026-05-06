@@ -791,7 +791,16 @@
       "advanced": "Avancé",
       "expert": "Expert"
     },
-    "aria_clear_search": "Effacer la recherche",
+      "proficiency_aria": "Niveau de compétence : {{level}}",
+      "remove_skill_aria": "Supprimer {{skill}}",
+      "no_user_skills": "Aucune compétence ajoutée pour le moment. Ajoutez votre première compétence ci-dessous.",
+      "add_skill": "Ajouter une compétence",
+      "add_a_skill": "Ajouter une compétence",
+      "search_result_category": "dans {{category}}",
+      "no_matching_custom": "Aucune compétence correspondante trouvée. Vous pouvez ajouter \"{{query}}\" comme compétence personnalisée.",
+      "use_custom": "Utiliser \"{{query}}\"",
+      "skill_to_add": "Compétence à ajouter :",
+      "aria_clear_search": "Effacer la recherche",
     "aria_close_members_list": "Fermer la liste des membres",
     "category_optional": "Catégorie (facultatif)",
     "proficiency_level": "Niveau de compétence"

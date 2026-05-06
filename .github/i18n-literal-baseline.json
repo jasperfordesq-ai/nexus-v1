@@ -1,0 +1,72 @@
+{
+  "count": 410,
+  "updated": "2026-05-06T09:27:50.527Z",
+  "source": "scripts/check-i18n-literals.mjs",
+  "scope": "react-frontend/src excluding src/admin",
+  "topFiles": [
+    {
+      "file": "src/pages/platform/PlatformTermsPage.tsx",
+      "count": 165
+    },
+    {
+      "file": "src/pages/platform/PlatformPrivacyPage.tsx",
+      "count": 122
+    },
+    {
+      "file": "src/pages/platform/PlatformDisclaimerPage.tsx",
+      "count": 105
+    },
+    {
+      "file": "src/components/jobs/JobPipelineRules.tsx",
+      "count": 3
+    },
+    {
+      "file": "src/components/compose/shared/ComposeEditor.tsx",
+      "count": 2
+    },
+    {
+      "file": "src/components/stories/StoryViewer.tsx",
+      "count": 2
+    },
+    {
+      "file": "src/pages/kb/KnowledgeBasePage.tsx",
+      "count": 2
+    },
+    {
+      "file": "src/components/compose/shared/ImageUploader.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/compose/tabs/ListingTab.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/feed/ImageCarousel.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/ideation/TeamDocuments.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/jobs/JobModals.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/search/SavedSearches.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/stories/StoryHighlights.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/ui/LevelProgress.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/pages/coupons/CouponDetailPage.tsx",
+      "count": 1
+    }
+  ]
+}

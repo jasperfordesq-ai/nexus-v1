@@ -72,7 +72,6 @@ async function activateWaitingServiceWorker(): Promise<boolean> {
 
   return new Promise((resolve) => {
     let settled = false;
-    let timeout: number;
     const settle = (activated: boolean) => {
       if (settled) return;
       settled = true;
@@ -81,7 +80,7 @@ async function activateWaitingServiceWorker(): Promise<boolean> {
       resolve(activated);
     };
     const onControllerChange = () => settle(true);
-    timeout = window.setTimeout(() => settle(false), SW_ACTIVATION_TIMEOUT_MS);
+    const timeout = window.setTimeout(() => settle(false), SW_ACTIVATION_TIMEOUT_MS);
 
     navigator.serviceWorker?.addEventListener('controllerchange', onControllerChange, { once: true });
     waitingWorker.postMessage({ type: 'SKIP_WAITING' });

@@ -791,7 +791,16 @@
       "advanced": "上級",
       "expert": "エキスパート"
     },
-    "aria_clear_search": "検索をクリア",
+      "proficiency_aria": "習熟度: {{level}}",
+      "remove_skill_aria": "{{skill}}を削除",
+      "no_user_skills": "まだスキルが追加されていません。下から最初のスキルを追加してください。",
+      "add_skill": "スキルを追加",
+      "add_a_skill": "スキルを追加",
+      "search_result_category": "{{category}}内",
+      "no_matching_custom": "一致するスキルが見つかりません。\"{{query}}\"をカスタムスキルとして追加できます。",
+      "use_custom": "\"{{query}}\"を使う",
+      "skill_to_add": "追加するスキル:",
+      "aria_clear_search": "検索をクリア",
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
     "proficiency_level": "習熟度"

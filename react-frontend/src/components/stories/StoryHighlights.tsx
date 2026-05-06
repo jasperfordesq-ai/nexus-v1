@@ -430,7 +430,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                 isLoading={isSavingTitle}
                 isDisabled={!editTitle.trim() || editTitle.trim() === editingHighlight?.title}
               >
-                Save
+                {t('common:save')}
               </Button>
             </div>
 
@@ -447,7 +447,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                 </div>
               ) : editStories.length === 0 ? (
                 <p className="text-sm text-[var(--text-muted)] py-4 text-center">
-                  No stories in this highlight yet.
+                  {t('highlights.no_stories')}
                 </p>
               ) : (
                 <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
@@ -461,7 +461,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                         {story.media_url ? (
                           <img
                             src={resolveAssetUrl(story.media_url)}
-                            alt="Story"
+                            alt={t('creator.preview_alt')}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -510,7 +510,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={handleEditClose}>
-              Done
+              {t('common:common.dismiss')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -632,7 +632,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
   const sections = useAdminNav();
   const location = useLocation();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath } = useTenant();
   const brokerPanelLabel = t('broker_panel');
   const caringPanelLabel = t('caring_community');
 
@@ -1041,28 +1041,26 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
               )}
             </li>
 
-            {/* Caring Community panel — pinned below Broker Panel, gated by caring_community feature */}
-            {hasFeature('caring_community') && (
-              <li>
-                {collapsed ? (
-                  <Link
-                    to={tenantPath('/caring')}
-                    className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
-                    title={caringPanelLabel}
-                  >
-                    <Heart size={18} />
-                  </Link>
-                ) : (
-                  <Link
-                    to={tenantPath('/caring')}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                  >
-                    <Heart size={18} className="shrink-0" />
-                    <span>{caringPanelLabel}</span>
-                  </Link>
-                )}
-              </li>
-            )}
+            {/* Caring Community panel — pinned below Broker Panel for setup and daily operations */}
+            <li>
+              {collapsed ? (
+                <Link
+                  to={tenantPath('/caring')}
+                  className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
+                  title={caringPanelLabel}
+                >
+                  <Heart size={18} />
+                </Link>
+              ) : (
+                <Link
+                  to={tenantPath('/caring')}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <Heart size={18} className="shrink-0" />
+                  <span>{caringPanelLabel}</span>
+                </Link>
+              )}
+            </li>
 
             {/* Recent pages — shown if 2+ visits and sidebar is expanded */}
             {showRecent && (

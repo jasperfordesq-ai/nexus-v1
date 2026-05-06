@@ -18,7 +18,9 @@ import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { useApi } from '@/hooks/useApi';
 import api from '@/lib/api';
 
@@ -108,6 +110,8 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
 // ---------------------------------------------------------------------------
 
 export function TrustTierAdminPage() {
+  const { t } = useTranslation('caring_community');
+  usePageTitle(t('panel.sidebar.items.trust_tier'));
   const { showToast } = useToast();
 
   const { data, isLoading, error, refetch } = useApi<TierConfigResponse>(
@@ -140,18 +144,18 @@ export function TrustTierAdminPage() {
     setSaving(true);
     try {
       await api.put('/v2/admin/caring-community/trust-tier/config', { criteria });
-      showToast('Trust tier configuration saved. Changes apply on the next recompute run.', 'success');
+      showToast(t('admin.trust_tier.messages.saved'), 'success');
       setLocalCriteria(null);
       void refetch();
     } catch {
-      showToast('Failed to save configuration.', 'error');
+      showToast(t('admin.trust_tier.errors.save_failed'), 'error');
     } finally {
       setSaving(false);
     }
   }
 
   async function handleRecompute() {
-    if (!confirm('Recompute trust tiers for all active members? This may take a moment.')) return;
+    if (!window.confirm(t('admin.trust_tier.recompute_confirm'))) return;
     setRecomputing(true);
     try {
       const result = await api.post<{ updated: number }>(
@@ -159,9 +163,9 @@ export function TrustTierAdminPage() {
         {},
       );
       const updated = result.data?.updated ?? 0;
-      showToast(`Tiers recomputed for ${updated} members.`, 'success');
+      showToast(t('admin.trust_tier.messages.recomputed', { count: updated }), 'success');
     } catch {
-      showToast('Failed to recompute tiers.', 'error');
+      showToast(t('admin.trust_tier.errors.recompute_failed'), 'error');
     } finally {
       setRecomputing(false);
     }

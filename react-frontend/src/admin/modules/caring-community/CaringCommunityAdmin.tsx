@@ -139,11 +139,11 @@ export default function CaringCommunityAdmin() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">
+                {t('caring_community.about.title')}
+              </p>
               <p className="text-default-600">
-                The Caring Community module enables your timebank to coordinate informal neighbourhood care — matching
-                residents who need help with trusted members who can provide it. It adds a trust-tier system,
-                coordinator workflow, pilot evaluation tools, and municipal reporting on top of your existing timebank.
+                {t('caring_community.about.body')}
               </p>
             </div>
           </div>
@@ -152,13 +152,16 @@ export default function CaringCommunityAdmin() {
 
       <Card className="mb-6 border border-default-200" shadow="none">
         <CardBody className="px-4 py-3">
-          <p className="mb-2 text-sm font-semibold text-default-800">Getting started</p>
+          <p className="mb-2 text-sm font-semibold text-default-800">
+            {t('caring_community.getting_started.title')}
+          </p>
           <ol className="space-y-1.5 text-sm text-default-600">
-            <li><span className="font-semibold text-default-800">1.</span> Configure Operating Policy — set your approval workflow and CHF hourly rate.</li>
-            <li><span className="font-semibold text-default-800">2.</span> Capture a pre-pilot baseline in the Pilot Scoreboard.</li>
-            <li><span className="font-semibold text-default-800">3.</span> Configure Trust Tier thresholds.</li>
-            <li><span className="font-semibold text-default-800">4.</span> Run the Pilot Launch Readiness check.</li>
-            <li><span className="font-semibold text-default-800">5.</span> Once launched, use the Coordinator Workflow as your daily operations dashboard.</li>
+            {[1, 2, 3, 4, 5].map((step) => (
+              <li key={step}>
+                <span className="font-semibold text-default-800">{step}.</span>{' '}
+                {t(`caring_community.getting_started.step_${step}`)}
+              </li>
+            ))}
           </ol>
         </CardBody>
       </Card>
@@ -193,8 +196,7 @@ export default function CaringCommunityAdmin() {
                 {t('caring_community.switch.description')}
               </p>
               <p className="mt-2 text-xs text-default-400">
-                Caring Community relies on the modules and features listed below being enabled. A disabled module
-                will limit coordinator and reporting features.
+                {t('caring_community.switch.dependency_note')}
               </p>
             </div>
             <Switch

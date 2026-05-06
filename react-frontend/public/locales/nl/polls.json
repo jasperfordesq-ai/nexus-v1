@@ -83,5 +83,11 @@
   "ranked_results_title": "Round-by-Round Results",
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}"
+  "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "Rangschik je voorkeuren",
+  "all_categories": "Alle categorieën",
+  "ranked_instructions": "Sleep opties of gebruik de pijlen om ze te rangschikken van hoogste voorkeur (bovenaan) naar laagste voorkeur (onderaan).",
+  "view_ranked_results": "Gerangschikte resultaten bekijken",
+  "winner_label": "Winnaar: {{name}}",
+  "submit_rankings": "Rangschikking indienen"
 }

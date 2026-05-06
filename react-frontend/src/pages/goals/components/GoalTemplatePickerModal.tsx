@@ -193,7 +193,7 @@ export function GoalTemplatePickerModal({
                       : 'bg-theme-elevated text-theme-muted'}
                     onPress={() => setSelectedCategory(null)}
                   >
-                    All
+                    {t('template.all_categories')}
                   </Button>
                   {categories.map((cat) => (
                     <Button
@@ -244,7 +244,7 @@ export function GoalTemplatePickerModal({
                               className="text-[10px] bg-theme-elevated text-theme-subtle"
                             >
                               <Target className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                              Target: {template.target_value}
+                              {t('template.target_label', { value: template.target_value })}
                             </Chip>
                             {template.category && (
                               <Chip
@@ -261,7 +261,7 @@ export function GoalTemplatePickerModal({
                                 variant="flat"
                                 className="text-[10px] bg-theme-elevated text-theme-subtle"
                               >
-                                {template.duration_days}d
+                                {t('template.duration_days', { days: template.duration_days })}
                               </Chip>
                             )}
                           </div>
@@ -273,7 +273,7 @@ export function GoalTemplatePickerModal({
                           onPress={() => handleUseTemplate(template)}
                           isLoading={creatingFromId === template.id}
                           isDisabled={creatingFromId !== null}
-                          aria-label={`Use template: ${template.title}`}
+                          aria-label={t('template.use_template_aria', { title: template.title })}
                         >
                           <ChevronRight className="w-4 h-4" />
                         </Button>
@@ -294,7 +294,7 @@ export function GoalTemplatePickerModal({
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} className="text-theme-muted">
-            Cancel
+            {t('template.cancel')}
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -44,7 +44,7 @@ export default defineConfig({
   lint: {
     ignoredAttributes: ['data-testid', 'aria-label', 'aria-hidden', 'role'],
     ignoredTags: ['code', 'pre'],
-    ignore: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
+    ignore: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/admin/**'],
     checkInterpolationParams: true,
   },
   types: {

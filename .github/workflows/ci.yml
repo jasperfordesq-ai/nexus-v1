@@ -413,8 +413,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Install React i18n tooling
+        run: npm ci --prefix react-frontend
+
       - name: "BLOCKING: Check for translation key mismatches"
         run: node scripts/check-i18n-drift.mjs
+
+      - name: "BLOCKING: Prevent non-admin React hardcoded-string regressions"
+        run: node scripts/check-i18n-literals.mjs
 
       - name: "BLOCKING: Check for hardcoded strings in PHP code"
         run: bash scripts/check-i18n.sh

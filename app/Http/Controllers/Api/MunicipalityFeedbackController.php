@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Services\CaringCommunity\MunicipalityFeedbackService;
 use Illuminate\Http\JsonResponse;
 
@@ -36,6 +37,11 @@ class MunicipalityFeedbackController extends BaseApiController
      */
     public function submit(): JsonResponse
     {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) {
+            return $disabled;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
@@ -63,6 +69,11 @@ class MunicipalityFeedbackController extends BaseApiController
      */
     public function myList(): JsonResponse
     {
+        $disabled = $this->guardCaringCommunity();
+        if ($disabled) {
+            return $disabled;
+        }
+
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
@@ -71,5 +82,14 @@ class MunicipalityFeedbackController extends BaseApiController
         $items = $this->service->listForMember($tenantId, $userId, $limit);
 
         return $this->respondWithData($items);
+    }
+
+    private function guardCaringCommunity(): ?JsonResponse
+    {
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        return null;
     }
 }

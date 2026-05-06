@@ -630,7 +630,7 @@ export function ResourcesPage() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                   <Folder className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                  Categories
+                  {t('common:skills.categories')}
                 </h3>
                 <Button
                   size="sm"

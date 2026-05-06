@@ -33,4 +33,8 @@ echo "Running local i18n guardrails before push..."
 # check:admin-i18n REMOVED 2026-04-22 — admin panel is English-only, no i18n audit needed.
 # See memory/feedback_admin_english_only.md.
 npm run check:i18n:drift
+npm run check:i18n:literals
 npm run check:i18n:baseline
+npm run check:i18n:coverage
+npm run check:i18n:vars
+npm run check:i18n:php

@@ -791,7 +791,16 @@
       "advanced": "Avanzado",
       "expert": "Experto"
     },
-    "aria_clear_search": "Limpiar búsqueda",
+      "proficiency_aria": "Nivel de competencia: {{level}}",
+      "remove_skill_aria": "Eliminar {{skill}}",
+      "no_user_skills": "Todavía no se han añadido habilidades. Añade tu primera habilidad abajo.",
+      "add_skill": "Añadir habilidad",
+      "add_a_skill": "Añadir una habilidad",
+      "search_result_category": "en {{category}}",
+      "no_matching_custom": "No se encontró ninguna habilidad coincidente. Puedes añadir \"{{query}}\" como habilidad personalizada.",
+      "use_custom": "Usar \"{{query}}\"",
+      "skill_to_add": "Habilidad para añadir:",
+      "aria_clear_search": "Limpiar búsqueda",
     "aria_close_members_list": "Cerrar lista de miembros",
     "category_optional": "Categoría (opcional)",
     "proficiency_level": "Nivel de competencia"

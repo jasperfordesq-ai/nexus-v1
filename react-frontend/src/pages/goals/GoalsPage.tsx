@@ -113,7 +113,7 @@ type GoalTab = 'my' | 'buddying' | 'discover';
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function GoalsPage() {
-  const { t } = useTranslation('gamification');
+  const { t } = useTranslation(['gamification', 'goals']);
   usePageTitle(t('goals.page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
@@ -974,7 +974,7 @@ function GoalCard({
   onOpenDetail,
   onCheckin,
 }: GoalCardProps) {
-  const { t } = useTranslation('gamification');
+  const { t } = useTranslation(['gamification', 'goals']);
   const { tenantPath } = useTenant();
   const isCompleted = goal.status === 'completed' || goal.progress_percentage >= 100;
   const deadlineDate = goal.deadline ? new Date(goal.deadline) : null;
@@ -1128,7 +1128,7 @@ function GoalCard({
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onCheckin(goal)}
             >
-              Check In
+              {t('goals:checkin.check_in_button')}
             </Button>
           )}
 

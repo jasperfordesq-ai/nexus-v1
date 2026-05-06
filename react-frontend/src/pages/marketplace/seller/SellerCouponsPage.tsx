@@ -44,7 +44,7 @@ interface Coupon {
 }
 
 export default function SellerCouponsPage() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'marketplace']);
   const toast = useToast();
   const { tenantPath } = useTenant();
   usePageTitle(t('coupon.seller.page_title'));
@@ -150,7 +150,7 @@ export default function SellerCouponsPage() {
                           isIconOnly
                           size="sm"
                           variant="light"
-                          aria-label="Edit"
+                          aria-label={t('marketplace:edit.action_edit')}
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -159,7 +159,7 @@ export default function SellerCouponsPage() {
                           size="sm"
                           variant="light"
                           color="danger"
-                          aria-label="Delete"
+                          aria-label={t('common.delete')}
                           onPress={() => handleDelete(c.id)}
                         >
                           <Trash2 className="w-4 h-4" />

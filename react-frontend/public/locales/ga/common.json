@@ -791,7 +791,16 @@
       "advanced": "Ardleibhéal",
       "expert": "Saineolaí"
     },
-    "aria_clear_search": "Glan cuardach",
+      "proficiency_aria": "Leibhéal cumais: {{level}}",
+      "remove_skill_aria": "Bain {{skill}}",
+      "no_user_skills": "Níl aon scileanna curtha leis fós. Cuir do chéad scil leis thíos.",
+      "add_skill": "Cuir scil leis",
+      "add_a_skill": "Cuir scil leis",
+      "search_result_category": "i {{category}}",
+      "no_matching_custom": "Níor aimsíodh scil mheaitseála. Is féidir leat \"{{query}}\" a chur leis mar scil shaincheaptha.",
+      "use_custom": "Úsáid \"{{query}}\"",
+      "skill_to_add": "Scil le cur leis:",
+      "aria_clear_search": "Glan cuardach",
     "aria_close_members_list": "Dún liosta ball",
     "category_optional": "Catagóir (roghnach)",
     "proficiency_level": "Leibhéal Inniúlachta"

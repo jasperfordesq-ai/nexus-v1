@@ -83,5 +83,11 @@
   "ranked_results_title": "Round-by-Round Results",
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}"
+  "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "رتّب تفضيلاتك",
+  "all_categories": "كل الفئات",
+  "ranked_instructions": "اسحب الخيارات أو استخدم الأسهم لترتيبها من الأكثر تفضيلاً (في الأعلى) إلى الأقل تفضيلاً (في الأسفل).",
+  "view_ranked_results": "عرض نتائج الترتيب",
+  "winner_label": "الفائز: {{name}}",
+  "submit_rankings": "إرسال الترتيب"
 }

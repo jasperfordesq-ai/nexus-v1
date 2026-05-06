@@ -648,7 +648,7 @@ export function MerchantOnboardingPage() {
               {avatarPreview ? (
                 <img
                   src={avatarPreview}
-                  alt="avatar"
+                  alt={t('steps.photo')}
                   className="w-24 h-24 rounded-full object-cover border-2 border-primary"
                 />
               ) : (
@@ -695,7 +695,7 @@ export function MerchantOnboardingPage() {
               {coverPreview && (
                 <img
                   src={coverPreview}
-                  alt="cover"
+                  alt={t('upload_cover')}
                   className="w-full h-32 object-cover rounded-xl border border-default-200"
                 />
               )}
@@ -760,7 +760,7 @@ export function MerchantOnboardingPage() {
                 <div className="flex items-center gap-2 pt-1">
                   <img
                     src={avatarPreview}
-                    alt="avatar"
+                    alt={t('steps.photo')}
                     className="w-10 h-10 rounded-full object-cover border border-default-200"
                   />
                 </div>

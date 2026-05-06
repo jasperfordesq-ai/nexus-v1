@@ -83,5 +83,11 @@
   "ranked_results_title": "Round-by-Round Results",
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}"
+  "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "希望順位を並べる",
+  "all_categories": "すべてのカテゴリ",
+  "ranked_instructions": "選択肢をドラッグするか矢印を使って、最も希望するもの（上）から最も低いもの（下）へ並べ替えてください。",
+  "view_ranked_results": "順位結果を見る",
+  "winner_label": "勝者: {{name}}",
+  "submit_rankings": "順位を送信"
 }

@@ -83,5 +83,11 @@
   "ranked_results_title": "Round-by-Round Results",
   "round_number": "Round {{number}}",
   "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}"
+  "total_ballots": "Total ballots: {{count}}",
+  "rank_preferences": "Ordene as suas preferências",
+  "all_categories": "Todas as categorias",
+  "ranked_instructions": "Arraste as opções ou use as setas para ordená-las da maior preferência (em cima) para a menor preferência (em baixo).",
+  "view_ranked_results": "Ver resultados ordenados",
+  "winner_label": "Vencedor: {{name}}",
+  "submit_rankings": "Enviar classificação"
 }

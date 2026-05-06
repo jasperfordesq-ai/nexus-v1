@@ -88,7 +88,7 @@ export function FadpConsentBanner() {
               {/* Dismiss (no preference recorded) */}
               <button
                 onClick={dismiss}
-                aria-label="Dismiss"
+                aria-label={t('common:common.dismiss')}
                 className="flex-shrink-0 text-default-400 hover:text-default-600 transition-colors mt-0.5"
               >
                 <X size={16} />

@@ -791,7 +791,16 @@
       "advanced": "Gevorderd",
       "expert": "Expert"
     },
-    "aria_clear_search": "Zoekopdracht wissen",
+      "proficiency_aria": "Vaardigheidsniveau: {{level}}",
+      "remove_skill_aria": "{{skill}} verwijderen",
+      "no_user_skills": "Er zijn nog geen vaardigheden toegevoegd. Voeg hieronder je eerste vaardigheid toe.",
+      "add_skill": "Vaardigheid toevoegen",
+      "add_a_skill": "Een vaardigheid toevoegen",
+      "search_result_category": "in {{category}}",
+      "no_matching_custom": "Geen overeenkomende vaardigheid gevonden. Je kunt \"{{query}}\" als aangepaste vaardigheid toevoegen.",
+      "use_custom": "\"{{query}}\" gebruiken",
+      "skill_to_add": "Toe te voegen vaardigheid:",
+      "aria_clear_search": "Zoekopdracht wissen",
     "aria_close_members_list": "Ledenlijst sluiten",
     "category_optional": "Categorie (optioneel)",
     "proficiency_level": "Vaardigheidsniveau"

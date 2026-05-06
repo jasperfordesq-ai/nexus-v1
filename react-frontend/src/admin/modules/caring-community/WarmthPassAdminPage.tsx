@@ -25,6 +25,7 @@ import Star from 'lucide-react/icons/star';
 import User from 'lucide-react/icons/user';
 import XCircle from 'lucide-react/icons/x-circle';
 import { PageHeader } from '../../components';
+import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
@@ -64,6 +65,7 @@ function formatDate(iso: string | null, fallback: string): string {
 
 export function WarmthPassAdminPage() {
   const { t } = useTranslation('caring_community');
+  usePageTitle(t('admin.warmth_pass.title'));
   const { userId: routeUserId } = useParams<{ userId?: string }>();
   const [userId, setUserId] = useState(routeUserId ?? '');
   const [loading, setLoading] = useState(false);

@@ -361,6 +361,12 @@
         "description": "Limited review authority for approved hour logs and community trust signals."
       }
     },
+    "invite_card": {
+      "brand": "Caring Community",
+      "subtitle": "Your Invitation Code",
+      "instructions": "Visit the link below or ask your coordinator to help you get started.",
+      "valid_until": "Valid until {{date}}"
+    },
     "stages": {
       "title": "KISS operating model",
       "description": "The workflow path this module should make explicit for evaluators and coordinators.",
