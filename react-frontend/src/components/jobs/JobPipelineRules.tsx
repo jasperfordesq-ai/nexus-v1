@@ -67,7 +67,12 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
               <div>
                 <span className="font-medium">{rule.name}</span>
                 <span className="text-theme-muted ml-2 text-xs">
-                  If in &ldquo;{rule.trigger_stage}&rdquo; for {rule.condition_days}d &rarr; {rule.action}{rule.action_target ? ` \u2192 ${rule.action_target}` : ''}
+                  {t(rule.action_target ? 'pipeline.rule_summary_with_target' : 'pipeline.rule_summary', {
+                    stage: rule.trigger_stage,
+                    count: rule.condition_days,
+                    action: rule.action,
+                    target: rule.action_target ?? '',
+                  })}
                 </span>
               </div>
               <Button

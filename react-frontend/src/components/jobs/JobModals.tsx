@@ -87,7 +87,9 @@ export function ApplyModal({
                     <div className="flex-1 text-theme-primary">
                       {t('saved_profile.found', 'Saved application profile found')}
                       {savedProfile.cv_filename && (
-                        <span className="ml-1 text-xs text-theme-subtle">— CV: {savedProfile.cv_filename}</span>
+                        <span className="ml-1 text-xs text-theme-subtle">
+                          {t('saved_profile.inline_cv', { filename: savedProfile.cv_filename })}
+                        </span>
                       )}
                     </div>
                     <Button
@@ -150,7 +152,9 @@ export function ApplyModal({
                       <div className="flex items-center justify-center gap-2 text-sm text-foreground">
                         <FileTextIcon size={16} aria-hidden="true" />
                         <span>{cvFile.name}</span>
-                        <span className="text-default-400">({(cvFile.size / 1024).toFixed(0)} KB)</span>
+                        <span className="text-default-400">
+                          {t('apply.cv_size_kb', { count: Number((cvFile.size / 1024).toFixed(0)) })}
+                        </span>
                         <Button
                           size="sm"
                           variant="light"

@@ -219,17 +219,8 @@ export default function VolunteerGivingDays() {
 
   const handleExport = async () => {
     try {
-      const res = await adminVolunteering.exportDonations();
-      if (res.success && res.data) {
-        // Trigger download if the response contains a URL or blob
-        const payload = res.data as unknown;
-        if (typeof payload === 'string') {
-          window.open(payload, '_blank');
-        } else if (payload && typeof payload === 'object' && 'url' in payload) {
-          window.open((payload as { url: string }).url, '_blank');
-        }
-        toast.success(t('volunteering.export_started', 'Export started'));
-      }
+      await adminVolunteering.exportDonations('volunteer-donations.csv');
+      toast.success(t('volunteering.export_started', 'Export started'));
     } catch {
       toast.error(t('volunteering.export_failed', 'Export failed'));
     }

@@ -275,29 +275,30 @@ class AdminVolunteerController extends BaseApiController
                 $nextCursor = base64_encode((string) $lastRow['id']);
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => $rows,
-                'stats' => [
-                    'total_hours' => round((float) ($statsRow->total_hours ?? 0), 1),
-                    'approved_hours' => round((float) ($statsRow->approved_hours ?? 0), 1),
-                    'pending_hours' => round((float) ($statsRow->pending_hours ?? 0), 1),
-                    'total_paid' => round((float) ($statsRow->total_paid ?? 0), 2),
-                ],
-                'meta' => [
-                    'per_page' => $perPage,
-                    'has_more' => $hasMore,
-                    'next_cursor' => $nextCursor,
-                ],
-            ]);
+            $stats = [
+                'total_hours' => round((float) ($statsRow->total_hours ?? 0), 1),
+                'approved_hours' => round((float) ($statsRow->approved_hours ?? 0), 1),
+                'pending_hours' => round((float) ($statsRow->pending_hours ?? 0), 1),
+                'total_paid' => round((float) ($statsRow->total_paid ?? 0), 2),
+            ];
+            $meta = [
+                'per_page' => $perPage,
+                'has_more' => $hasMore,
+                'next_cursor' => $nextCursor,
+            ];
+
+            return $this->respondWithData([
+                'items' => $rows,
+                'stats' => $stats,
+                'meta' => $meta,
+            ], $meta);
         } catch (\Exception $e) {
             Log::error("AdminVolunteerController::listHours error: " . $e->getMessage());
-            return response()->json([
-                'success' => true,
-                'data' => [],
+            return $this->respondWithData([
+                'items' => [],
                 'stats' => ['total_hours' => 0, 'approved_hours' => 0, 'pending_hours' => 0, 'total_paid' => 0],
                 'meta' => ['per_page' => $perPage, 'has_more' => false, 'next_cursor' => null],
-            ]);
+            ], ['per_page' => $perPage, 'has_more' => false, 'next_cursor' => null]);
         }
     }
 
@@ -516,11 +517,14 @@ class AdminVolunteerController extends BaseApiController
             try {
                 // Single query: LEFT JOIN grouped aggregates per org instead of per-row correlated subqueries
                 $results = DB::select(
-                    "SELECT vo.id, vo.id as org_id, vo.name as org_name, vo.status, vo.created_at,
+                    "SELECT vo.id, vo.id as org_id, vo.name as org_name, vo.description,
+                            vo.contact_email, vo.website, vo.org_type, vo.meeting_schedule,
+                            vo.status, vo.created_at, vo.balance,
                             COALESCE(mc.member_count, 0) as member_count,
                             COALESCE(oc.opportunity_count, 0) as opportunity_count,
                             COALESCE(hc.total_hours, 0) as total_hours,
-                            0 as balance, 0 as total_in, 0 as total_out
+                            COALESCE(tx.total_in, 0) as total_in,
+                            COALESCE(tx.total_out, 0) as total_out
                      FROM vol_organizations vo
                      LEFT JOIN (
                          SELECT organization_id, COUNT(*) as member_count
@@ -540,10 +544,18 @@ class AdminVolunteerController extends BaseApiController
                          WHERE tenant_id = ? AND status = 'approved'
                          GROUP BY organization_id
                      ) hc ON hc.organization_id = vo.id
+                     LEFT JOIN (
+                         SELECT vol_organization_id,
+                                SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) as total_in,
+                                SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END) as total_out
+                         FROM vol_org_transactions
+                         WHERE tenant_id = ?
+                         GROUP BY vol_organization_id
+                     ) tx ON tx.vol_organization_id = vo.id
                      WHERE vo.tenant_id = ?
                      ORDER BY vo.name ASC
                      LIMIT 100",
-                    [$tenantId, $tenantId, $tenantId, $tenantId]
+                    [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId]
                 );
                 return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
@@ -559,6 +571,130 @@ class AdminVolunteerController extends BaseApiController
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
+    }
+
+    /** POST /api/v2/admin/volunteering/organizations */
+    public function createOrganization(): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $orgId = $this->volunteerService->createOrganization($this->getUserId(), [
+            'name' => trim((string) $this->input('name', '')),
+            'description' => trim((string) $this->input('description', '')),
+            'contact_email' => trim((string) $this->input('contact_email', '')),
+            'website' => trim((string) $this->input('website', '')),
+        ]);
+
+        if ($orgId === null) {
+            return $this->respondWithErrors($this->volunteerService->getErrors(), 422);
+        }
+
+        $tenantId = $this->getTenantId();
+        $updates = ['status = ?'];
+        $params = ['active'];
+        foreach (['org_type', 'meeting_schedule'] as $field) {
+            if (Schema::hasColumn('vol_organizations', $field) && $this->input($field) !== null) {
+                $updates[] = "{$field} = ?";
+                $params[] = trim((string) $this->input($field));
+            }
+        }
+        $params[] = $orgId;
+        $params[] = $tenantId;
+
+        DB::update(
+            "UPDATE vol_organizations SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+            $params
+        );
+
+        return $this->respondWithData($this->volunteerService->getOrganizationById($orgId, true), null, 201);
+    }
+
+    /** PUT /api/v2/admin/volunteering/organizations/{id} */
+    public function updateOrganization(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = $this->getTenantId();
+        if (!DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$id, $tenantId])) {
+            return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
+        }
+
+        $updates = [];
+        $params = [];
+        foreach (['name', 'description', 'contact_email', 'website'] as $field) {
+            if ($this->input($field) !== null) {
+                $value = trim((string) $this->input($field));
+                if ($field === 'contact_email' && $value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), $field, 422);
+                }
+                if ($field === 'website' && $value !== '' && !filter_var($value, FILTER_VALIDATE_URL)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.valid_url_required'), $field, 422);
+                }
+                $updates[] = "{$field} = ?";
+                $params[] = $value === '' ? null : $value;
+            }
+        }
+
+        foreach (['org_type', 'meeting_schedule'] as $field) {
+            if (Schema::hasColumn('vol_organizations', $field) && $this->input($field) !== null) {
+                $updates[] = "{$field} = ?";
+                $value = trim((string) $this->input($field));
+                $params[] = $value === '' ? null : $value;
+            }
+        }
+
+        if (empty($updates)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 400);
+        }
+
+        $params[] = $id;
+        $params[] = $tenantId;
+        DB::update(
+            "UPDATE vol_organizations SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+            $params
+        );
+
+        return $this->respondWithData($this->volunteerService->getOrganizationById($id, true));
+    }
+
+    /** GET /api/v2/admin/volunteering/organizations/{id}/members */
+    public function organizationMembers(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = $this->getTenantId();
+        if (!DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$id, $tenantId])) {
+            return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
+        }
+
+        $rows = DB::select(
+            "SELECT om.id, om.user_id,
+                    COALESCE(u.first_name, SUBSTRING_INDEX(u.name, ' ', 1), '') as first_name,
+                    COALESCE(u.last_name, TRIM(SUBSTRING(u.name, LENGTH(SUBSTRING_INDEX(u.name, ' ', 1)) + 1)), '') as last_name,
+                    om.role,
+                    COALESCE(SUM(CASE WHEN vl.status = 'approved' THEN vl.hours ELSE 0 END), 0) as total_hours
+             FROM org_members om
+             INNER JOIN users u ON u.id = om.user_id AND u.tenant_id = om.tenant_id
+             LEFT JOIN vol_logs vl ON vl.user_id = om.user_id
+                AND vl.organization_id = om.organization_id
+                AND vl.tenant_id = om.tenant_id
+             WHERE om.organization_id = ? AND om.tenant_id = ? AND om.status = 'active'
+             GROUP BY om.id, om.user_id, u.first_name, u.last_name, u.name, om.role
+             ORDER BY om.id DESC
+             LIMIT 100",
+            [$id, $tenantId]
+        );
+
+        return $this->respondWithData(array_map(fn ($row) => (array) $row, $rows));
     }
 
     /** POST /api/v2/admin/volunteering/applications/{id}/approve */
@@ -577,7 +713,7 @@ class AdminVolunteerController extends BaseApiController
 
         try {
             $app = DB::selectOne(
-                "SELECT va.id, va.status, va.user_id, vo.title as opportunity_title
+                "SELECT va.id, va.status, va.user_id, va.shift_id, vo.title as opportunity_title
                  FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  WHERE va.id = ? AND va.tenant_id = ? AND vo.tenant_id = ?",
                 [$id, $tenantId, $tenantId]
@@ -591,7 +727,34 @@ class AdminVolunteerController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_approved', ['status' => 'pending']), null, 422);
             }
 
-            DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::transaction(function () use ($id, $tenantId, $app) {
+                if (!empty($app->shift_id)) {
+                    $shift = DB::selectOne(
+                        "SELECT id, capacity FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                        [(int) $app->shift_id, $tenantId]
+                    );
+
+                    if (!$shift) {
+                        throw new \DomainException(__('api.volunteer_shift_not_found'));
+                    }
+
+                    if (!empty($shift->capacity)) {
+                        $approvedCount = (int) DB::selectOne(
+                            "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+                            [(int) $app->shift_id, $tenantId]
+                        )->cnt;
+
+                        if ($approvedCount >= (int) $shift->capacity) {
+                            throw new \DomainException(__('api.volunteer_shift_at_capacity'));
+                        }
+                    }
+                }
+
+                DB::update(
+                    "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                );
+            });
 
             // Load applicant once with preferred_language for both notifications and email
             $applicant = DB::table('users')
@@ -650,6 +813,8 @@ class AdminVolunteerController extends BaseApiController
             }
 
             return $this->respondWithData(['message' => __('api_controllers_1.admin_volunteer.application_approved')]);
+        } catch (\DomainException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'shift_id', 422);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'application']), null, 500);
         }

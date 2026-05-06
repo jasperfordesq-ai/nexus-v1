@@ -156,7 +156,9 @@ export function VolunteerApprovals() {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     let successCount = 0;
+    const pendingIds = new Set(items.filter((item) => item.status === 'pending').map((item) => item.id));
     for (const id of selectedIds) {
+      if (!pendingIds.has(id)) continue;
       try {
         const res = await adminVolunteering.approveApplication(id);
         if (res.success) successCount++;
@@ -165,13 +167,15 @@ export function VolunteerApprovals() {
     toast.success(t('volunteering.bulk_approved', '{{count}} applications approved', { count: successCount }));
     setBulkLoading(false);
     loadData();
-  }, [loadData, selectedIds, toast, t]);
+  }, [items, loadData, selectedIds, toast, t]);
 
   const handleBulkDecline = useCallback(async () => {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     let successCount = 0;
+    const pendingIds = new Set(items.filter((item) => item.status === 'pending').map((item) => item.id));
     for (const id of selectedIds) {
+      if (!pendingIds.has(id)) continue;
       try {
         const res = await adminVolunteering.declineApplication(id);
         if (res.success) successCount++;
@@ -180,7 +184,7 @@ export function VolunteerApprovals() {
     toast.success(t('volunteering.bulk_declined', '{{count}} applications declined', { count: successCount }));
     setBulkLoading(false);
     loadData();
-  }, [loadData, selectedIds, toast, t]);
+  }, [items, loadData, selectedIds, toast, t]);
 
   const handleToggleSelect = useCallback((id: number) => {
     setSelectedIds(prev => {
@@ -191,13 +195,18 @@ export function VolunteerApprovals() {
     });
   }, []);
 
+  const pendingFilteredItems = useMemo(
+    () => filteredItems.filter((item) => item.status === 'pending'),
+    [filteredItems],
+  );
+
   const handleSelectAll = useCallback(() => {
-    if (selectedIds.size === filteredItems.length) {
+    if (selectedIds.size === pendingFilteredItems.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredItems.map(i => i.id)));
+      setSelectedIds(new Set(pendingFilteredItems.map(i => i.id)));
     }
-  }, [filteredItems, selectedIds.size]);
+  }, [pendingFilteredItems, selectedIds.size]);
 
   const handleExport = useCallback(() => {
     const exportData = filteredItems.map(i => ({
@@ -215,11 +224,13 @@ export function VolunteerApprovals() {
     {
       key: 'select', label: '',
       render: (item) => (
-        <Checkbox
-          isSelected={selectedIds.has(item.id)}
-          onValueChange={() => handleToggleSelect(item.id)}
-          aria-label={t('volunteering.select_application', 'Select application')}
-        />
+        item.status === 'pending' ? (
+          <Checkbox
+            isSelected={selectedIds.has(item.id)}
+            onValueChange={() => handleToggleSelect(item.id)}
+            aria-label={t('volunteering.select_application', 'Select application')}
+          />
+        ) : null
       ),
     },
     {
@@ -247,28 +258,32 @@ export function VolunteerApprovals() {
       key: 'actions', label: t('volunteering.col_actions', 'Actions'),
       render: (item) => (
         <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="flat"
-            color="success"
-            startContent={<CheckCircle size={14} />}
-            onPress={() => handleApprove(item.id)}
-            isLoading={actionId === item.id}
-            isDisabled={actionId !== null && actionId !== item.id}
-          >
-            {t('volunteering.approve', 'Approve')}
-          </Button>
-          <Button
-            size="sm"
-            variant="flat"
-            color="danger"
-            startContent={<XCircle size={14} />}
-            onPress={() => handleDecline(item.id)}
-            isLoading={actionId === item.id}
-            isDisabled={actionId !== null && actionId !== item.id}
-          >
-            {t('volunteering.decline', 'Decline')}
-          </Button>
+          {item.status === 'pending' && (
+            <>
+              <Button
+                size="sm"
+                variant="flat"
+                color="success"
+                startContent={<CheckCircle size={14} />}
+                onPress={() => handleApprove(item.id)}
+                isLoading={actionId === item.id}
+                isDisabled={actionId !== null && actionId !== item.id}
+              >
+                {t('volunteering.approve', 'Approve')}
+              </Button>
+              <Button
+                size="sm"
+                variant="flat"
+                color="danger"
+                startContent={<XCircle size={14} />}
+                onPress={() => handleDecline(item.id)}
+                isLoading={actionId === item.id}
+                isDisabled={actionId !== null && actionId !== item.id}
+              >
+                {t('volunteering.decline', 'Decline')}
+              </Button>
+            </>
+          )}
         </div>
       ),
     },
@@ -332,10 +347,10 @@ export function VolunteerApprovals() {
 
         <div className="flex items-center gap-2">
           {/* Select all checkbox */}
-          {filteredItems.length > 0 && (
+          {pendingFilteredItems.length > 0 && (
             <Checkbox
-              isSelected={selectedIds.size === filteredItems.length && filteredItems.length > 0}
-              isIndeterminate={selectedIds.size > 0 && selectedIds.size < filteredItems.length}
+              isSelected={selectedIds.size === pendingFilteredItems.length && pendingFilteredItems.length > 0}
+              isIndeterminate={selectedIds.size > 0 && selectedIds.size < pendingFilteredItems.length}
               onValueChange={handleSelectAll}
               size="sm"
             >
@@ -386,7 +401,7 @@ export function VolunteerApprovals() {
         </div>
       </div>
     </div>
-  ), [statusTab, statusCounts, searchQuery, opportunityFilter, opportunityOptions, selectedIds, filteredItems, bulkLoading, t, handleSelectAll, handleBulkApprove, handleBulkDecline, handleExport]);
+  ), [statusTab, statusCounts, searchQuery, opportunityFilter, opportunityOptions, selectedIds, pendingFilteredItems.length, filteredItems, bulkLoading, t, handleSelectAll, handleBulkApprove, handleBulkDecline, handleExport]);
 
   if (!loading && items.length === 0) {
     return (

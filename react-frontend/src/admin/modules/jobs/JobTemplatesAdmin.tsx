@@ -102,7 +102,7 @@ export function JobTemplatesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast]);
+  }, [page, search, t, toast]);
 
 
   useEffect(() => {

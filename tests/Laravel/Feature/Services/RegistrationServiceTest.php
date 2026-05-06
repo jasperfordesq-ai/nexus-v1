@@ -88,6 +88,20 @@ class RegistrationServiceTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'not-an-email',
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+        ], $this->testTenantId);
+
+        $this->assertArrayHasKey('error', $result);
+    }
+
+    public function test_register_fails_without_location(): void
+    {
+        $result = $this->service->register([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'regsvc_' . uniqid() . '@example.com',
             'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
         ], $this->testTenantId);
@@ -111,6 +125,7 @@ class RegistrationServiceTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => $email,
+            'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
         ], $this->testTenantId);

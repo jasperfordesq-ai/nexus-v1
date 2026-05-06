@@ -295,9 +295,9 @@ class JobFeedServiceTest extends TestCase
         $builder->shouldReceive('select')->andReturnSelf();
         $builder->shouldReceive('orderByDesc')->andReturnSelf();
         $builder->shouldReceive('limit')->with(100)->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect($jobs));
+        $builder->shouldReceive('get')->andReturn(new \Illuminate\Database\Eloquent\Collection($jobs));
 
         $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('where')->andReturn($builder);
+        $mock->shouldReceive('withoutGlobalScopes')->andReturn($builder);
     }
 }

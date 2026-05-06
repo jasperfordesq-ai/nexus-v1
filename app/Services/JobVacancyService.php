@@ -168,7 +168,7 @@ class JobVacancyService
                       ->where('job_vacancies.deadline', '<', now());
             } elseif ($status === 'pending_review') {
                 // Pending review = awaiting moderation approval
-                $query->where('job_vacancies.moderation_status', 'pending');
+                $query->where('job_vacancies.moderation_status', 'pending_review');
             } else {
                 $query->where('job_vacancies.status', $status);
             }

@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import type { ReactNode } from 'react';
+
 /**
  * Google Places Autocomplete types for Project NEXUS.
  *
@@ -48,7 +50,7 @@ export interface PlaceAutocompleteInputProps {
   /** Called when user clears the input. */
   onClear?: () => void;
   /** Input label. */
-  label?: string;
+  label?: ReactNode;
   /** Input placeholder text. */
   placeholder?: string;
   /** Whether the field is required. */

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -169,6 +170,80 @@ class MessagesControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data' => ['count']]);
+    }
+
+    public function test_unread_count_excludes_federated_messages_from_direct_messages_badge(): void
+    {
+        if (!Schema::hasTable('federation_messages')) {
+            $this->markTestSkipped('federation_messages table is not available in this test database.');
+        }
+
+        $recipient = $this->authenticatedUser();
+        $directSender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        DB::table('messages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $directSender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Direct unread message',
+            'is_read' => false,
+            'is_federated' => 0,
+            'created_at' => now(),
+        ]);
+
+        DB::table('federation_messages')->insert([
+            'sender_user_id' => 999001,
+            'sender_tenant_id' => 999,
+            'receiver_user_id' => $recipient->id,
+            'receiver_tenant_id' => $this->testTenantId,
+            'subject' => 'Federated unread message',
+            'body' => 'This belongs to the federation inbox, not /messages.',
+            'direction' => 'inbound',
+            'status' => 'unread',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/messages/unread-count');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.count', 1);
+    }
+
+    public function test_unread_count_excludes_messages_hidden_from_receiver_inbox(): void
+    {
+        if (!Schema::hasColumn('messages', 'archived_by_receiver') || !Schema::hasColumn('messages', 'is_deleted_receiver')) {
+            $this->markTestSkipped('Per-user message visibility columns are not available in this test database.');
+        }
+
+        $recipient = $this->authenticatedUser();
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        DB::table('messages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Archived unread message',
+            'is_read' => false,
+            'is_federated' => 0,
+            'archived_by_receiver' => now(),
+            'created_at' => now(),
+        ]);
+
+        DB::table('messages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Deleted-for-receiver unread message',
+            'is_read' => false,
+            'is_federated' => 0,
+            'is_deleted_receiver' => true,
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/messages/unread-count');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.count', 0);
     }
 
     // ================================================================

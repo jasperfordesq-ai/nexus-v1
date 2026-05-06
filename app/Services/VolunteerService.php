@@ -45,7 +45,11 @@ class VolunteerService
 
         $query = VolOpportunity::query()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name', 'category:id,name,color'])
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->whereIn('status', ['open', 'active'])
+            ->whereHas('organization', function (Builder $q) {
+                $q->whereIn('status', ['approved', 'active']);
+            });
 
         if (! empty($filters['organization_id'])) {
             $query->where('organization_id', (int) $filters['organization_id']);
@@ -372,12 +376,20 @@ class VolunteerService
 
         $tenantId = TenantContext::getId();
 
-        $query = DB::table('vol_shift_signups as ss')
-            ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
-            ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
-            ->where('ss.user_id', $userId)
-            ->where('o.tenant_id', $tenantId)
-            ->select('s.*', 'o.title as opportunity_title', 'o.location');
+        $query = DB::table('vol_applications as a')
+            ->join('vol_shifts as s', function ($join) {
+                $join->on('a.shift_id', '=', 's.id')
+                    ->on('a.tenant_id', '=', 's.tenant_id');
+            })
+            ->join('vol_opportunities as o', function ($join) {
+                $join->on('s.opportunity_id', '=', 'o.id')
+                    ->on('s.tenant_id', '=', 'o.tenant_id');
+            })
+            ->where('a.user_id', $userId)
+            ->where('a.status', 'approved')
+            ->where('a.tenant_id', $tenantId)
+            ->whereNotNull('a.shift_id')
+            ->select('s.*', 'o.title as opportunity_title', 'o.location', 'a.id as application_id');
 
         if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('s.id', '<', (int) $cid);
@@ -623,6 +635,17 @@ class VolunteerService
             return null;
         }
 
+        $viewerCanManage = $viewerId ? self::canManageOpportunity((array) $opp, $viewerId) : false;
+        if (!$viewerCanManage) {
+            $isPublicStatus = ((int) ($opp->is_active ?? 0) === 1)
+                && in_array((string) ($opp->status ?? ''), ['open', 'active'], true)
+                && self::isApprovedOrganizationStatus($opp->org_status ?? null);
+
+            if (!$isPublicStatus) {
+                return null;
+            }
+        }
+
         $formatted = self::formatOpportunity((array) $opp);
         $formatted['shifts'] = self::getShiftsForOpportunity($id);
 
@@ -642,7 +665,7 @@ class VolunteerService
                 'shift_id'   => $userApp->shift_id ? (int) $userApp->shift_id : null,
                 'created_at' => $userApp->created_at,
             ] : null;
-            $formatted['is_owner'] = self::canManageOpportunity((array) $opp, $viewerId);
+            $formatted['is_owner'] = $viewerCanManage;
         }
 
         return $formatted;
@@ -660,8 +683,8 @@ class VolunteerService
             SELECT opp.*, org.user_id as org_owner_id
             FROM vol_opportunities opp
             JOIN vol_organizations org ON opp.organization_id = org.id
-            WHERE opp.id = ? AND org.tenant_id = ?
-        ", [$id, $tenantId]);
+            WHERE opp.id = ? AND opp.tenant_id = ? AND org.tenant_id = ?
+        ", [$id, $tenantId, $tenantId]);
 
         if (!$opp) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
@@ -671,6 +694,21 @@ class VolunteerService
         if (!self::canManageOpportunity((array) $opp, $userId)) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
+        }
+
+        if (array_key_exists('category_id', $data) && $data['category_id'] !== null) {
+            $categoryQuery = "SELECT id FROM categories WHERE id = ?";
+            $categoryParams = [(int) $data['category_id']];
+            if (Schema::hasColumn('categories', 'tenant_id')) {
+                $categoryQuery .= " AND (tenant_id = ? OR tenant_id IS NULL)";
+                $categoryParams[] = $tenantId;
+            }
+            $categoryQuery .= " LIMIT 1";
+
+            if (!DB::selectOne($categoryQuery, $categoryParams)) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.category_not_found'), 'field' => 'category_id'];
+                return false;
+            }
         }
 
         try {
@@ -723,8 +761,8 @@ class VolunteerService
             SELECT opp.*, org.user_id as org_owner_id
             FROM vol_opportunities opp
             JOIN vol_organizations org ON opp.organization_id = org.id
-            WHERE opp.id = ? AND org.tenant_id = ?
-        ", [$id, $tenantId]);
+            WHERE opp.id = ? AND opp.tenant_id = ? AND org.tenant_id = ?
+        ", [$id, $tenantId, $tenantId]);
 
         if (!$opp) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
@@ -788,8 +826,8 @@ class VolunteerService
             SELECT opp.*, org.user_id as org_owner_id
             FROM vol_opportunities opp
             JOIN vol_organizations org ON opp.organization_id = org.id
-            WHERE opp.id = ? AND org.tenant_id = ?
-        ", [$opportunityId, $tenantId]);
+            WHERE opp.id = ? AND opp.tenant_id = ? AND org.tenant_id = ?
+        ", [$opportunityId, $tenantId, $tenantId]);
 
         if (!$opp) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
@@ -808,8 +846,8 @@ class VolunteerService
             SELECT a.*, a.org_note, u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
                    s.start_time as shift_start, s.end_time as shift_end
             FROM vol_applications a
-            JOIN users u ON a.user_id = u.id
-            LEFT JOIN vol_shifts s ON a.shift_id = s.id
+            JOIN users u ON a.user_id = u.id AND u.tenant_id = a.tenant_id
+            LEFT JOIN vol_shifts s ON a.shift_id = s.id AND s.tenant_id = a.tenant_id
             WHERE a.opportunity_id = ? AND a.tenant_id = ?
         ";
         $params = [$opportunityId, $tenantId];
@@ -880,8 +918,8 @@ class VolunteerService
         $app = DB::selectOne("
             SELECT a.*, opp.title, opp.organization_id, org.user_id as org_owner_id
             FROM vol_applications a
-            JOIN vol_opportunities opp ON a.opportunity_id = opp.id
-            JOIN vol_organizations org ON opp.organization_id = org.id
+            JOIN vol_opportunities opp ON a.opportunity_id = opp.id AND opp.tenant_id = a.tenant_id
+            JOIN vol_organizations org ON opp.organization_id = org.id AND org.tenant_id = a.tenant_id
             WHERE a.id = ? AND a.tenant_id = ?
         ", [$applicationId, $tenantId]);
 
@@ -898,12 +936,21 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : 'declined';
 
         try {
-            DB::update(
-                "UPDATE vol_applications SET status = ?, org_note = ? WHERE id = ? AND tenant_id = ?",
-                [$status, $orgNote !== '' ? $orgNote : null, $applicationId, $tenantId]
-            );
+            DB::transaction(function () use ($status, $orgNote, $applicationId, $tenantId, $app) {
+                if ($status === 'approved' && !self::shiftHasApprovalCapacity((int) ($app->shift_id ?? 0), $tenantId)) {
+                    throw new \DomainException(__('api.volunteer_shift_at_capacity'));
+                }
+
+                DB::update(
+                    "UPDATE vol_applications SET status = ?, org_note = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$status, $orgNote !== '' ? $orgNote : null, $applicationId, $tenantId]
+                );
+            });
 
             return true;
+        } catch (\DomainException $e) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => $e->getMessage(), 'field' => 'shift_id'];
+            return false;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::handleApplication error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update application'];
@@ -1737,7 +1784,7 @@ class VolunteerService
             return null;
         }
 
-        if (!$includeNonApproved && ($org->status ?? null) !== 'approved') {
+        if (!$includeNonApproved && !self::isApprovedOrganizationStatus($org->status ?? null)) {
             return null;
         }
 
@@ -2158,7 +2205,35 @@ class VolunteerService
                 'logo_url' => $opp['org_logo'] ?? $opp['logo_url'] ?? null,
             ],
             'created_at' => $opp['created_at'],
+            'status'     => $opp['status'] ?? null,
         ];
+    }
+
+    private static function shiftHasApprovalCapacity(int $shiftId, int $tenantId): bool
+    {
+        if ($shiftId <= 0) {
+            return true;
+        }
+
+        $shift = DB::selectOne(
+            "SELECT id, capacity FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
+            [$shiftId, $tenantId]
+        );
+
+        if (!$shift) {
+            return false;
+        }
+
+        if (empty($shift->capacity)) {
+            return true;
+        }
+
+        $approvedCount = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+            [$shiftId, $tenantId]
+        )->cnt;
+
+        return $approvedCount < (int) $shift->capacity;
     }
 
     /**

@@ -30,6 +30,7 @@ import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 interface VolStats {
   total_opportunities: number;
@@ -102,23 +103,23 @@ function formatActivityType(type: string): string {
   return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function formatTimestamp(ts: string): string {
+function formatTimestamp(ts: string, t: TFunction): string {
   const date = new Date(ts);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t('volunteering.time_just_now', 'Just now');
+  if (mins < 60) return t('volunteering.time_minutes_ago', '{{count}}m ago', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('volunteering.time_hours_ago', '{{count}}h ago', { count: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 7) return t('volunteering.time_days_ago', '{{count}}d ago', { count: days });
   return date.toLocaleDateString();
 }
 
 export function VolunteeringOverview() {
   const { t } = useTranslation('admin');
-  usePageTitle("Volunteering");
+  usePageTitle(t('volunteering.page_title', 'Volunteering'));
   const toast = useToast();
   const navigate = useNavigate();
   const [stats, setStats] = useState<VolStats | null>(null);
@@ -150,7 +151,7 @@ export function VolunteeringOverview() {
         setOpportunities(d.recent_opportunities || []);
       }
     } catch {
-      toast.error("Failed to load volunteering data");
+      toast.error(t('volunteering.failed_to_load_volunteering_data', 'Failed to load volunteering data'));
       setStats(null);
       setOpportunities([]);
     }
@@ -211,10 +212,10 @@ export function VolunteeringOverview() {
   })) : [];
 
   const quickActions: QuickAction[] = [
-    { label: "Review Applications", description: "Review Applications.", icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
-    { label: "Verify Hours", description: "Verify Hours.", icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
-    { label: "Manage Organizations", description: "Manage Organizations.", icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
-    { label: "View Expenses", description: "View Expenses.", icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
+    { label: t('volunteering.review_applications', 'Review Applications'), description: t('volunteering.review_applications_desc', 'Review new volunteer applications.'), icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
+    { label: t('volunteering.verify_hours', 'Verify Hours'), description: t('volunteering.verify_hours_desc', 'Approve or decline submitted hours.'), icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
+    { label: t('volunteering.manage_organizations', 'Manage Organizations'), description: t('volunteering.manage_organizations_desc', 'Manage volunteer organisations and wallets.'), icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
+    { label: t('volunteering.view_expenses', 'View Expenses'), description: t('volunteering.view_expenses_desc', 'Review volunteer expense claims.'), icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
   ];
 
   // Build alert banners for urgent items
@@ -232,9 +233,9 @@ export function VolunteeringOverview() {
   return (
     <div>
       <PageHeader
-        title={"Volunteering Overview"}
-        description={"Overview of volunteering activity, organisations, and applications"}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{"Refresh"}</Button>}
+        title={t('volunteering.volunteering_overview_title', 'Volunteering Overview')}
+        description={t('volunteering.volunteering_overview_desc', 'Overview of volunteering activity, organisations, and applications')}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{t('common.refresh', 'Refresh')}</Button>}
       />
 
       {/* Alert Banners */}
@@ -258,33 +259,33 @@ export function VolunteeringOverview() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-        <StatCard label={"Active Opportunities"} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
-        <StatCard label={"Pending Applications"} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
-        <StatCard label={"Total Hours Logged"} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
+        <StatCard label={t('volunteering.label_active_opportunities', 'Active Opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_pending_applications', 'Pending Applications')} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
+        <StatCard label={t('volunteering.label_total_hours_logged', 'Total Hours Logged')} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
-        <StatCard label={"Total Opportunities"} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
-        <StatCard label={"Total Applications"} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
-        <StatCard label={"Active Volunteers"} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
+        <StatCard label={t('volunteering.label_total_opportunities', 'Total Opportunities')} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
+        <StatCard label={t('volunteering.label_total_applications', 'Total Applications')} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_active_volunteers', 'Active Volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
 
       {/* Trends Chart */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
-          <h3 className="text-lg font-semibold">{"Trends"}</h3>
+          <h3 className="text-lg font-semibold">{t('volunteering.trends_title', 'Trends')}</h3>
           <ButtonGroup size="sm" variant="flat">
             <Button
               color={trendPeriod === 'week' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('week')}
             >
-              {"Weekly"}
+              {t('volunteering.weekly', 'Weekly')}
             </Button>
             <Button
               color={trendPeriod === 'month' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('month')}
             >
-              {"Monthly"}
+              {t('volunteering.monthly', 'Monthly')}
             </Button>
           </ButtonGroup>
         </CardHeader>
@@ -296,7 +297,7 @@ export function VolunteeringOverview() {
           ) : chartData.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Activity size={40} className="mb-2" />
-              <p>{"No trend data found"}</p>
+              <p>{t('volunteering.no_trend_data', 'No trend data found')}</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
@@ -329,7 +330,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="hours"
-                  name={"Chart Hours"}
+                  name={t('volunteering.chart_hours', 'Hours')}
                   stroke="var(--chart-color-success, #22c55e)"
                   fill="url(#gradHours)"
                   strokeWidth={2}
@@ -337,7 +338,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="applications"
-                  name={"Chart Applications"}
+                  name={t('volunteering.chart_applications', 'Applications')}
                   stroke="var(--chart-color-info, #3b82f6)"
                   fill="url(#gradApplications)"
                   strokeWidth={2}
@@ -345,7 +346,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="volunteers"
-                  name={"Chart Volunteers"}
+                  name={t('volunteering.chart_volunteers', 'Volunteers')}
                   stroke="var(--chart-color-accent, #a855f7)"
                   fill="url(#gradVolunteers)"
                   strokeWidth={2}
@@ -392,12 +393,12 @@ export function VolunteeringOverview() {
 
       {/* Recent Opportunities */}
       <Card shadow="sm" className="mb-6">
-        <CardHeader><h3 className="text-lg font-semibold">{"Recent Opportunities"}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_opportunities', 'Recent Opportunities')}</h3></CardHeader>
         <CardBody>
           {opportunities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Heart size={40} className="mb-2" />
-              <p>{"No opportunities yet"}</p>
+              <p>{t('volunteering.no_opportunities_yet', 'No opportunities yet')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -405,7 +406,9 @@ export function VolunteeringOverview() {
                 <div key={opp.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
-                      <p className="text-xs text-default-400">{`By Name`}</p>
+                      <p className="text-xs text-default-400">
+                        {t('volunteering.by_name', 'By {{name}}', { name: [opp.first_name, opp.last_name].filter(Boolean).join(' ') || t('volunteering.unknown_org', 'Unknown') })}
+                      </p>
                   </div>
                   <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>
@@ -417,7 +420,7 @@ export function VolunteeringOverview() {
 
       {/* Activity Feed */}
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">{"Activity Feed"}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed', 'Activity Feed')}</h3></CardHeader>
         <CardBody>
           {activitiesLoading ? (
             <div className="space-y-4">
@@ -434,7 +437,7 @@ export function VolunteeringOverview() {
           ) : activities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Clock size={40} className="mb-2" />
-              <p>{"No recent activity found"}</p>
+              <p>{t('volunteering.no_recent_activity', 'No recent activity found')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -456,7 +459,7 @@ export function VolunteeringOverview() {
                         </Chip>
                       </div>
                       <p className="text-sm text-default-500 mt-0.5">{item.description}</p>
-                      <p className="text-xs text-default-400 mt-1">{formatTimestamp(item.timestamp)}</p>
+                      <p className="text-xs text-default-400 mt-1">{formatTimestamp(item.timestamp, t)}</p>
                     </div>
                   </div>
                 );

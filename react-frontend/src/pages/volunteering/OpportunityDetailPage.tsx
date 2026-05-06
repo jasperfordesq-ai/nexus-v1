@@ -501,11 +501,15 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           <div className="flex justify-center py-8">
             <Spinner size="md" />
           </div>
-        ) : applications.length === 0 ? (
+        ) : filteredApplications.length === 0 ? (
           <div className="text-center py-8">
             <Users className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
             <p className="text-sm text-theme-muted">
-              {statusFilter === 'all' ? t('applications.none_yet', 'No applications yet.') : t('applications.none_filtered', 'No {{status}} applications.', { status: statusFilter })}
+              {nameSearch.trim()
+                ? t('applications.none_matching_search', 'No applications match your search.')
+                : statusFilter === 'all'
+                  ? t('applications.none_yet', 'No applications yet.')
+                  : t('applications.none_filtered', 'No {{status}} applications.', { status: statusFilter })}
             </p>
           </div>
         ) : (
@@ -737,7 +741,7 @@ export function OpportunityDetailPage() {
 
       <Breadcrumbs
         items={[
-          { label: t('breadcrumb_volunteering', 'Volunteering'), href: '/volunteering' },
+          { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
           { label: opp.title },
         ]}
       />

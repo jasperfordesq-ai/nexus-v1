@@ -72,4 +72,15 @@ describe('RegisterPage', () => {
     render(<RegisterPage />);
     expect(screen.getByText(/already have an account/i)).toBeInTheDocument();
   });
+
+  it('marks phone and location as required without initial phone error styling', () => {
+    render(<RegisterPage />);
+
+    const locationInput = screen.getByLabelText(/location/i);
+    const phoneInput = screen.getByLabelText(/phone number/i);
+
+    expect(locationInput).toBeRequired();
+    expect(phoneInput).toBeRequired();
+    expect(phoneInput).not.toHaveAttribute('aria-invalid', 'true');
+  });
 });

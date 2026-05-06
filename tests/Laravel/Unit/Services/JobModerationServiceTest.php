@@ -195,6 +195,7 @@ class JobModerationServiceTest extends TestCase
     public function test_approveJob_returns_true_on_success(): void
     {
         $jobMock = Mockery::mock();
+        $jobMock->user_id = 7;
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_status'] === 'approved'
                 && $data['status'] === 'open'
@@ -208,6 +209,7 @@ class JobModerationServiceTest extends TestCase
 
         $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $result = JobModerationService::approveJob(42, 5);
 
@@ -217,6 +219,7 @@ class JobModerationServiceTest extends TestCase
     public function test_approveJob_stores_notes(): void
     {
         $jobMock = Mockery::mock();
+        $jobMock->user_id = 7;
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_notes'] === 'Looks good to me';
         }))->andReturn(true);
@@ -227,6 +230,7 @@ class JobModerationServiceTest extends TestCase
 
         $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $result = JobModerationService::approveJob(42, 5, 'Looks good to me');
 
@@ -268,6 +272,7 @@ class JobModerationServiceTest extends TestCase
     public function test_rejectJob_returns_true_on_success(): void
     {
         $jobMock = Mockery::mock();
+        $jobMock->user_id = 7;
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_status'] === 'rejected'
                 && $data['status'] === 'closed'
@@ -282,6 +287,7 @@ class JobModerationServiceTest extends TestCase
 
         $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $result = JobModerationService::rejectJob(42, 5, 'Violates policy');
 

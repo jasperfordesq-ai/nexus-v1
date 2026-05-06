@@ -67,6 +67,21 @@ class RegistrationControllerTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => 'Toronto, Canada',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [400, 422]);
+    }
+
+    public function test_register_requires_location(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
             'password_confirmation' => 'StrongPassword123!',
         ]);
@@ -80,6 +95,7 @@ class RegistrationControllerTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => 'Toronto, Canada',
             'phone' => 'not-a-phone',
             'password' => 'StrongPassword123!',
             'password_confirmation' => 'StrongPassword123!',
@@ -94,6 +110,7 @@ class RegistrationControllerTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
             'password_confirmation' => 'StrongPassword123!',

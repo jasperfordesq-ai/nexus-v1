@@ -118,6 +118,7 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  formatDateValue: vi.fn((value) => String(value ?? '')),
 }));
 
 import { JobDetailPage } from './JobDetailPage';

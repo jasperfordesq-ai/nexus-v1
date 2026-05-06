@@ -120,6 +120,12 @@ export default function CreateOpportunityPage() {
       newErrors.title = t('form_title_min_length');
     }
 
+    if (!formData.description.trim()) {
+      newErrors.description = t('form_desc_required', 'Description is required');
+    } else if (formData.description.trim().length < 20) {
+      newErrors.description = t('form_desc_min_length', 'Description must be at least 20 characters');
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -287,6 +293,8 @@ export default function CreateOpportunityPage() {
             placeholder={t('form_desc_placeholder')}
             value={formData.description}
             onChange={(e) => updateField('description', e.target.value)}
+            isInvalid={!!errors.description}
+            errorMessage={errors.description}
             minRows={4}
             classNames={{
               input: 'bg-transparent text-theme-primary',

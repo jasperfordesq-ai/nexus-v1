@@ -203,8 +203,10 @@ export function VolunteeringPage() {
   ), [isAuthenticated, isTabEnabled]);
 
   useEffect(() => {
-    if (!isTabAllowed(tab) && tab !== 'opportunities') {
-      setTab('opportunities');
+    if (isTabAllowed(tab)) return;
+    const fallbackTab = VOLUNTEER_TABS.find(isTabAllowed);
+    if (fallbackTab && fallbackTab !== tab) {
+      setTab(fallbackTab);
     }
   }, [tab, isTabAllowed, setTab]);
 
@@ -325,10 +327,19 @@ export function VolunteeringPage() {
           if (t.authOnly && !isAuthenticated) return false;
           return isTabEnabled(t.key);
         });
-        const activeTab = visibleTabs.some(({ key }) => key === tab) ? tab : 'opportunities';
+        const activeTab = visibleTabs.some(({ key }) => key === tab)
+          ? tab
+          : visibleTabs[0]?.key;
 
         return (
           <>
+            {visibleTabs.length === 0 && (
+              <EmptyState
+                icon={<Heart className="w-12 h-12" aria-hidden="true" />}
+                title={t('no_tabs_available', 'No volunteering sections are available')}
+                description={t('no_tabs_available_desc', 'Volunteering is enabled, but all sections are disabled for this community.')}
+              />
+            )}
             <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections', 'Volunteering sections')}>
               {visibleTabs.map(({ key, icon: Icon, label }) => (
                 <Button
@@ -347,7 +358,7 @@ export function VolunteeringPage() {
             </div>
 
             {/* Tab Content */}
-            <div role="tabpanel" aria-labelledby={`vol-tab-${activeTab}`}>
+            {activeTab && <div role="tabpanel" aria-labelledby={`vol-tab-${activeTab}`}>
               {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
               {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
               {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}
@@ -367,7 +378,7 @@ export function VolunteeringPage() {
                 {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
                 {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
               </Suspense>
-            </div>
+            </div>}
           </>
         );
       })()}

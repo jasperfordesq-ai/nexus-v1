@@ -44,8 +44,11 @@ vi.mock("react-i18next", () => ({
         "volunteering.register_org_link": "Register an Organisation",
         "volunteering.form_cancel": "Cancel",
         "volunteering.form_title_label": "Title",
+        "volunteering.form_title_placeholder": "Opportunity title",
         "volunteering.form_desc_label": "Description",
+        "volunteering.form_desc_placeholder": "Describe the opportunity and requirements",
         "volunteering.form_submit": "Publish Opportunity",
+        "volunteering.form_submit_opportunity": "Publish Opportunity",
         "volunteering.form_location_label": "Location",
         "volunteering.form_skills_label": "Skills Required",
         "volunteering.form_capacity_label": "Capacity",
@@ -228,24 +231,12 @@ describe("CreateOpportunityPage", () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockApprovedOrg] });
     vi.mocked(api.post).mockResolvedValue({ success: true, data: { id: 42 } });
     render(<CreateOpportunityPage />);
-    await waitFor(() => screen.getAllByText("Post Volunteer Opportunity").length > 0);
+    await waitFor(() => expect(screen.getByDisplayValue("Helping Hands")).toBeInTheDocument());
 
-    // Find title input and fill it
-    const inputs = screen.getAllByRole("textbox");
-    const titleInput = inputs.find(
-      (el) => el.getAttribute("placeholder") && /title|opportunit/i.test(el.getAttribute("placeholder") ?? ""),
-    );
-    if (titleInput) {
-      fireEvent.change(titleInput, { target: { value: "Help at the food bank" } });
-    } else {
-      // Fallback: find by label text
-      const allInputs = document.querySelectorAll("input[type=text], input:not([type])");
-      allInputs.forEach((inp) => {
-        if ((inp as HTMLInputElement).readOnly === false) {
-          fireEvent.change(inp, { target: { value: "Help at the food bank" } });
-        }
-      });
-    }
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Help at the food bank" } });
+    fireEvent.change(screen.getByLabelText("Description"), {
+      target: { value: "Help sort donations and prepare food parcels for local families." },
+    });
 
     const submitBtn = screen.getByRole("button", { name: /Publish Opportunity|Submit|Save/i });
     fireEvent.click(submitBtn);

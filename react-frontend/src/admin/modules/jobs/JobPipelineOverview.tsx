@@ -146,7 +146,7 @@ export function JobPipelineOverview() {
     } finally {
       setInterviewsLoading(false);
     }
-  }, [interviewsPage, interviewsStatus, toast]);
+  }, [interviewsPage, interviewsStatus, t, toast]);
 
 
   // ── Fetch offers ────────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ export function JobPipelineOverview() {
     } finally {
       setOffersLoading(false);
     }
-  }, [offersPage, offersStatus, toast]);
+  }, [offersPage, offersStatus, t, toast]);
 
 
   // ── Effects ─────────────────────────────────────────────────────────────
@@ -257,7 +257,7 @@ export function JobPipelineOverview() {
         ),
       },
     ],
-    []
+    [t]
   );
 
   // ── Offer columns ─────────────────────────────────────────────────────
@@ -335,7 +335,7 @@ export function JobPipelineOverview() {
             : '—',
       },
     ],
-    []
+    [t]
   );
 
   // ── Render ──────────────────────────────────────────────────────────────

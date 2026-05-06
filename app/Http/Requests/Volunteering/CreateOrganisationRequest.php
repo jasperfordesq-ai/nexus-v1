@@ -22,8 +22,8 @@ class CreateOrganisationRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:5000'],
-            'contact_email' => ['nullable', 'email', 'max:255'],
+            'description' => ['required', 'string', 'min:20', 'max:5000'],
+            'contact_email' => ['required', 'email', 'max:255'],
             'website' => ['nullable', 'url', 'max:500'],
         ];
     }

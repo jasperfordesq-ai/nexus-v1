@@ -1295,7 +1295,8 @@ export const adminVolunteering = {
   getGivingDays: () => api.get('/v2/admin/volunteering/giving-days'),
   createGivingDay: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/giving-days', data),
   updateGivingDay: (id: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/giving-days/${id}`, data),
-  exportDonations: () => api.get('/v2/admin/volunteering/donations/export'),
+  exportDonations: (filename?: string) =>
+    api.download('/v2/admin/volunteering/donations/export', { filename }),
 
   // Guardian Consents
   getGuardianConsents: () => api.get('/v2/admin/volunteering/guardian-consents'),
@@ -1312,9 +1313,9 @@ export const adminVolunteering = {
   deleteCustomField: (id: number) => api.delete(`/v2/admin/volunteering/custom-fields/${id}`),
 
   // Organization CRUD + Members
-  getOrgMembers: (orgId: number) => api.get(`/v2/volunteering/organisations/${orgId}/volunteers`),
-  createOrganization: (data: Record<string, unknown>) => api.post('/v2/volunteering/organisations', data),
-  updateOrganization: (orgId: number, data: Record<string, unknown>) => api.put(`/v2/volunteering/organisations/${orgId}`, data),
+  getOrgMembers: (orgId: number) => api.get(`/v2/admin/volunteering/organizations/${orgId}/members`),
+  createOrganization: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/organizations', data),
+  updateOrganization: (orgId: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/organizations/${orgId}`, data),
 
   // Reminders
   getReminderSettings: () => api.get('/v2/admin/volunteering/reminder-settings'),

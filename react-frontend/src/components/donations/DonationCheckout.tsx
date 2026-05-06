@@ -33,6 +33,7 @@ import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { detectTenantFromUrl, tenantPath } from '@/lib/tenant-routing';
 import { useToast } from '@/contexts';
 import { StripePaymentForm } from './StripePaymentForm';
 
@@ -263,7 +264,13 @@ export function DonationCheckout({
                       variant="flat"
                       size="sm"
                       startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => window.open(`/donations/${donationId}/receipt`, '_blank')}
+                      onPress={() => {
+                        const detected = detectTenantFromUrl();
+                        const receiptPath = detected.source === 'path'
+                          ? tenantPath(`/donations/${donationId}/receipt`, detected.slug)
+                          : `/donations/${donationId}/receipt`;
+                        window.open(receiptPath, '_blank');
+                      }}
                     >
                       {t('donations.view_receipt', 'View Receipt')}
                     </Button>

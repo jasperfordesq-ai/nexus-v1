@@ -88,6 +88,29 @@ class JobVacanciesControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_index_pending_review_status_matches_moderation_status(): void
+    {
+        $user = $this->authenticatedUser();
+        $pending = $this->createVacancy([
+            'user_id' => $user->id,
+            'status' => 'draft',
+            'moderation_status' => 'pending_review',
+            'title' => 'Moderation Pending Role',
+        ]);
+        $this->createVacancy([
+            'user_id' => $user->id,
+            'status' => 'draft',
+            'moderation_status' => 'approved',
+            'title' => 'Approved Draft Role',
+        ]);
+
+        $response = $this->apiGet('/v2/jobs?status=pending_review');
+
+        $response->assertStatus(200);
+        $returnedIds = array_column($response->json('data') ?? [], 'id');
+        $this->assertContains($pending->id, $returnedIds);
+    }
+
     public function test_index_supports_search_filter(): void
     {
         $user = $this->authenticatedUser();
@@ -977,7 +1000,7 @@ class JobVacanciesControllerTest extends TestCase
         $response = $this->apiGet('/v2/jobs/templates');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data' => ['data']]);
+        $response->assertJsonStructure(['data']);
     }
 
     public function test_templates_create_requires_auth(): void
@@ -1050,7 +1073,7 @@ class JobVacanciesControllerTest extends TestCase
         $response = $this->apiGet("/v2/jobs/{$vacancy->id}/team");
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data' => ['data']]);
+        $response->assertJsonStructure(['data']);
     }
 
     public function test_add_team_member_requires_auth(): void
@@ -1177,7 +1200,7 @@ class JobVacanciesControllerTest extends TestCase
         $response = $this->apiGet('/v2/jobs/gdpr-export');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data' => ['data']]);
+        $response->assertJsonStructure(['data']);
     }
 
     // =====================================================================

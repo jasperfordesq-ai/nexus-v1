@@ -42,6 +42,7 @@ class RegistrationService
             'first_name' => 'required|string|max:100',
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|max:255',
+            'location'   => 'required|string|max:255',
             'phone'      => [
                 'required',
                 'string',
@@ -54,6 +55,7 @@ class RegistrationService
             ],
             'password'   => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
         ], [
+            'location.required' => __('api.location_required'),
             'phone.required' => __('api.phone_required'),
         ]);
 
@@ -93,9 +95,7 @@ class RegistrationService
 
             // Optional fields from frontend
             $user->phone = preg_replace('/[\s\-\(\)\.]/', '', trim((string) $data['phone']));
-            if (!empty($data['location'])) {
-                $user->location = $data['location'];
-            }
+            $user->location = trim((string) $data['location']);
             if (!empty($data['latitude'])) {
                 $user->latitude = (float) $data['latitude'];
             }

@@ -116,7 +116,9 @@
     "delete": "Delete",
     "action_move_stage": "Move stage",
     "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_notify_me": "Notify me",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Employer Profile",
@@ -335,6 +337,7 @@
     "cv_dropzone_aria": "Click or drop file to upload CV",
     "cv_too_large": "CV file must be under 5MB",
     "cv_invalid_type": "Only PDF, DOC, or DOCX files are supported",
+    "cv_size_kb": "({{count}} KB)",
     "message_employer": "Message Employer",
     "cv_parse_error": "Failed to parse CV. You can still submit your application manually."
   },
@@ -456,7 +459,9 @@
   "saved_profile": {
     "found": "Saved application profile found",
     "use": "Use Saved Profile",
-    "start_fresh": "Start Fresh"
+    "start_fresh": "Start Fresh",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Hiring Team",
@@ -701,6 +706,8 @@
     "acceptance_rate": "Acceptance Rate",
     "rejection_rate": "Rejection Rate",
     "days": "days",
+    "stages": "stages",
+    "not_available": "N/A",
     "funnel_title": "Application Funnel",
     "funnel_description": "How candidates progress through pipeline stages",
     "rejection_rates_title": "Rejection Rates by Stage",
@@ -735,6 +742,7 @@
     "generate": "Generate Report",
     "loading": "Generating report...",
     "no_data": "No application data available for the selected period",
+    "access_denied": "Access denied",
     "load_error": "Failed to load bias audit report",
     "note_privacy": "This report analyzes process metrics only. No demographic data is collected or used."
   },

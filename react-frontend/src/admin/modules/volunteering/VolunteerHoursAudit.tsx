@@ -120,8 +120,8 @@ export function VolunteerHoursAudit() {
       if (res.success) {
         const payload = res.data as unknown;
 
-        // The endpoint returns { data: [...], stats: {...}, meta: {...} }
-        // But it may also be double-wrapped as { data: { data: [...], stats: {...}, meta: {...} } }
+        // Current endpoint returns { data: { items, stats, meta }, meta }.
+        // Older responses used { data: [...], stats, meta }, so keep both.
         let hours: HourLog[] = [];
         let newStats: HoursStats | null = null;
         let meta: { next_cursor?: string; has_more?: boolean } | null = null;
@@ -133,7 +133,9 @@ export function VolunteerHoursAudit() {
             ? p.data as Record<string, unknown>
             : p;
 
-          if (Array.isArray(inner.data)) {
+          if (Array.isArray(inner.items)) {
+            hours = inner.items as HourLog[];
+          } else if (Array.isArray(inner.data)) {
             hours = inner.data as HourLog[];
           } else if (Array.isArray(inner)) {
             hours = inner as unknown as HourLog[];
@@ -146,6 +148,8 @@ export function VolunteerHoursAudit() {
             meta = inner.meta as { next_cursor?: string; has_more?: boolean };
           }
         }
+
+        meta = meta || (res.meta as { next_cursor?: string; has_more?: boolean } | undefined) || null;
 
         if (appendCursor) {
           setItems((prev) => [...prev, ...hours]);

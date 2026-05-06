@@ -593,17 +593,17 @@ export function AdminRoutes() {
       <Route path="geocode-groups" element={<Lazy><GroupGeocode /></Lazy>} />
       <Route path="smart-match-users" element={<Lazy><SmartMatchUsers /></Lazy>} />
       <Route path="smart-match-monitoring" element={<Lazy><SmartMatchMonitoring /></Lazy>} />
-      <Route path="volunteering" element={<Lazy><VolunteeringOverview /></Lazy>} />
-      <Route path="volunteering/approvals" element={<Lazy><VolunteerApprovals /></Lazy>} />
-      <Route path="volunteering/organizations" element={<Lazy><VolunteerOrganizations /></Lazy>} />
-      <Route path="volunteering/expenses" element={<Lazy><VolunteerExpenses /></Lazy>} />
-      <Route path="volunteering/training" element={<Lazy><VolunteerTraining /></Lazy>} />
-      <Route path="volunteering/safeguarding" element={<Lazy><VolunteerSafeguarding /></Lazy>} />
-      <Route path="volunteering/hours" element={<Lazy><VolunteerHoursAudit /></Lazy>} />
-      <Route path="volunteering/giving-days" element={<Lazy><VolunteerGivingDays /></Lazy>} />
-      <Route path="volunteering/consents" element={<Lazy><VolunteerConsents /></Lazy>} />
-      <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
-      <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
+      <Route path="volunteering" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteeringOverview /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/approvals" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerApprovals /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/organizations" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerOrganizations /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/expenses" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerExpenses /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/training" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerTraining /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/safeguarding" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerSafeguarding /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/hours" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerHoursAudit /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/giving-days" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerGivingDays /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/consents" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerConsents /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/projects" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerProjects /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/config" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerConfig /></Lazy></FeatureGatedElement>} />
       {/* ─── CARING COMMUNITY — retired from /admin, now lives at /caring/* ─── */}
       {/* These redirects preserve bookmarks to the old /admin/caring-community/* URLs. */}
       <Route path="caring-community" element={<TenantRedirect to="/caring" />} />

@@ -12,7 +12,6 @@ use App\Models\Message;
 use App\Models\User;
 use App\Services\SafeguardingTriggerService;
 use App\Services\VettingService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -99,13 +98,16 @@ class MessageService
 
         $unreadCounts = [];
         if (!empty($partnerIds)) {
-            $rows = DB::table('messages')
+            $unreadQuery = DB::table('messages')
                 ->selectRaw('sender_id, COUNT(*) as cnt')
                 ->where('tenant_id', $tenantId)
                 ->where('is_federated', 0)
                 ->where('receiver_id', $userId)
-                ->where('is_read', false)
-                ->whereIn('sender_id', $partnerIds)
+                ->where('is_read', false);
+
+            self::applyReceiverUnreadVisibilityFilters($unreadQuery);
+
+            $rows = $unreadQuery->whereIn('sender_id', $partnerIds)
                 ->groupBy('sender_id')
                 ->get();
             foreach ($rows as $row) {
@@ -397,11 +399,14 @@ class MessageService
      */
     public static function getUnreadCount(int $userId): int
     {
-        return Message::query()
+        $query = Message::query()
             ->where('receiver_id', $userId)
             ->where('is_read', false)
-            ->where('is_federated', 0)
-            ->count();
+            ->where('is_federated', 0);
+
+        self::applyReceiverUnreadVisibilityFilters($query);
+
+        return $query->count();
     }
 
     // -----------------------------------------------------------------
@@ -442,12 +447,14 @@ class MessageService
             return null;
         }
 
-        $unreadCount = Message::query()
+        $unreadQuery = Message::query()
             ->where('sender_id', $otherUserId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
-            ->where('is_federated', 0)
-            ->count();
+            ->where('is_federated', 0);
+
+        self::applyReceiverUnreadVisibilityFilters($unreadQuery);
+        $unreadCount = $unreadQuery->count();
 
         $messageCount = Message::query()
             ->betweenUsers($userId, $otherUserId)
@@ -484,6 +491,28 @@ class MessageService
 
     /** @var bool|null Cached result of schema introspection for per-user delete columns */
     private static ?bool $hasPerUserDeleteColumns = null;
+
+    /**
+     * Keep unread counts aligned with messages that are visible in the receiver's inbox.
+     */
+    private static function applyReceiverUnreadVisibilityFilters($query)
+    {
+        if (self::hasArchivedColumns()) {
+            $query->whereNull('archived_by_receiver');
+        }
+
+        if (self::hasPerUserDeleteColumns()) {
+            $query->where('is_deleted_receiver', false);
+        }
+
+        if (self::hasDeletedColumn()) {
+            $query->where(function ($inner) {
+                $inner->where('is_deleted', false)->orWhereNull('is_deleted');
+            });
+        }
+
+        return $query;
+    }
 
     /**
      * Check if messages table has archived columns (cached per-request).

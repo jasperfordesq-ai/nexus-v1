@@ -336,7 +336,7 @@ export function BiasAuditPage() {
             <MetricCard
               icon={<Clock className="w-5 h-5 text-blue-400" aria-hidden="true" />}
               label={t('bias_audit.hiring_velocity')}
-              value={report.hiring_velocity_days !== null ? `${report.hiring_velocity_days} ${t('bias_audit.days')}` : 'N/A'}
+              value={report.hiring_velocity_days !== null ? `${report.hiring_velocity_days} ${t('bias_audit.days')}` : t('bias_audit.not_available')}
             />
             <MetricCard
               icon={<TrendingUp className="w-5 h-5 text-green-400" aria-hidden="true" />}
@@ -346,7 +346,7 @@ export function BiasAuditPage() {
             <MetricCard
               icon={<BarChart3 className="w-5 h-5 text-amber-400" aria-hidden="true" />}
               label={t('bias_audit.funnel_title')}
-              value={`${report.funnel.length} ${t('bias_audit.stage.applied', { defaultValue: 'stages' })}`}
+              value={`${report.funnel.length} ${t('bias_audit.stages')}`}
             />
           </div>
 

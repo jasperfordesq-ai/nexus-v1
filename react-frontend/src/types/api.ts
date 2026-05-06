@@ -177,7 +177,7 @@ export interface RegisterRequest {
   tenant_slug?: string;
   profile_type?: 'individual' | 'organisation';
   organization_name?: string;
-  location?: string;
+  location: string;
   latitude?: number;
   longitude?: number;
   phone: string;

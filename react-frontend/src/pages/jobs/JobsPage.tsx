@@ -119,7 +119,7 @@ export function JobsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasFeature, jobConfig } = useTenant();
+  const { tenantPath, hasFeature, jobConfig = {} } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 

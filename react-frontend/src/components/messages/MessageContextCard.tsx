@@ -41,11 +41,11 @@ interface MessageContextCardProps {
   contextId: number;
 }
 
-const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; basePath: string }> = {
-  listing: { icon: ListChecks, labelKey: 'context_type_listing', color: 'primary', basePath: '/listings' },
-  event: { icon: Calendar, labelKey: 'context_type_event', color: 'secondary', basePath: '/events' },
-  job: { icon: Briefcase, labelKey: 'context_type_job', color: 'warning', basePath: '/jobs' },
-  volunteering: { icon: Heart, labelKey: 'context_type_volunteering', color: 'danger', basePath: '/volunteering' },
+const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; apiPath: string; detailPath: string }> = {
+  listing: { icon: ListChecks, labelKey: 'context_type_listing', color: 'primary', apiPath: '/listings', detailPath: '/listings' },
+  event: { icon: Calendar, labelKey: 'context_type_event', color: 'secondary', apiPath: '/events', detailPath: '/events' },
+  job: { icon: Briefcase, labelKey: 'context_type_job', color: 'warning', apiPath: '/jobs', detailPath: '/jobs' },
+  volunteering: { icon: Heart, labelKey: 'context_type_volunteering', color: 'danger', apiPath: '/volunteering/opportunities', detailPath: '/volunteering/opportunities' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
           return;
         }
 
-        const res = await api.get(`/v2${config.basePath}/${contextId}`);
+        const res = await api.get(`/v2${config.apiPath}/${contextId}`);
         if (res.success && res.data) {
           const data = res.data as Record<string, unknown>;
           setContext({
@@ -99,7 +99,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
   if (!config) return null;
 
   const Icon = config.icon;
-  const detailPath = `${config.basePath}/${contextId}`;
+  const detailPath = `${config.detailPath}/${contextId}`;
 
   if (loading) {
     return (

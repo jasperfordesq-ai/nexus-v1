@@ -7,7 +7,6 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Volunteering\ApplyOpportunityRequest;
 use App\Http\Requests\Volunteering\CreateOpportunityRequest;
 use App\Http\Requests\Volunteering\CreateOrganisationRequest;
@@ -110,7 +109,8 @@ class VolunteerController extends BaseApiController
     {
         $this->ensureFeature();
         $this->rateLimit('volunteering_show', 120, 60);
-        $opportunity = $this->volunteerService->getOpportunityById((int) $id, Auth::id());
+        $viewerId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $opportunity = $this->volunteerService->getOpportunityById((int) $id, $viewerId);
         if (!$opportunity) return $this->respondWithError('NOT_FOUND', __('api.opportunity_not_found'), null, 404);
         return $this->respondWithData($opportunity);
     }
@@ -682,7 +682,7 @@ class VolunteerController extends BaseApiController
                 (SELECT COALESCE(SUM(vl2.hours), 0) FROM vol_logs vl2
                  WHERE vl2.organization_id = ? AND vl2.tenant_id = ? AND vl2.status = 'approved') as total_approved_hours,
                 (SELECT COUNT(*) FROM vol_opportunities vo3
-                 WHERE vo3.organization_id = ? AND vo3.tenant_id = ? AND vo3.status = 'active') as active_opportunities
+                 WHERE vo3.organization_id = ? AND vo3.tenant_id = ? AND vo3.is_active = 1 AND vo3.status IN ('open', 'active')) as active_opportunities
         ", [$orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId]);
 
         return $this->respondWithData([

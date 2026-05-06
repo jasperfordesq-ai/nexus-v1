@@ -1893,6 +1893,9 @@ Route::get('/v2/admin/volunteering', [\App\Http\Controllers\Api\AdminVolunteerCo
 Route::get('/v2/admin/volunteering/applications', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'applications']);
 Route::get('/v2/admin/volunteering/approvals', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'approvals']);
 Route::get('/v2/admin/volunteering/organizations', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'organizations']);
+Route::post('/v2/admin/volunteering/organizations', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'createOrganization']);
+Route::put('/v2/admin/volunteering/organizations/{id}', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'updateOrganization']);
+Route::get('/v2/admin/volunteering/organizations/{id}/members', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'organizationMembers']);
 Route::post('/v2/admin/volunteering/approvals/{id}/approve', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'approveApplication']);
 Route::post('/v2/admin/volunteering/approvals/{id}/decline', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'declineApplication']);
 Route::post('/v2/admin/volunteering/send-shift-reminders', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'sendShiftReminders']);

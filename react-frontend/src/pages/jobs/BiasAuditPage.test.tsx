@@ -45,7 +45,7 @@ const mockTenant = {
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
-    user: { id: 1, first_name: 'Test', name: 'Test User' },
+    user: { id: 1, first_name: 'Test', name: 'Test User', is_admin: true },
     isAuthenticated: true,
   })),
   useTenant: vi.fn(() => mockTenant),

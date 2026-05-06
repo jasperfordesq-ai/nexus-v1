@@ -124,6 +124,17 @@ vi.mock('react-router-dom', async () => {
 // Comprehensive DataTable mock rendering all column cells
 vi.mock('../../components', () => ({
   PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+  StatCard: ({ label, value, description }: {
+    label: string;
+    value: React.ReactNode;
+    description?: React.ReactNode;
+  }) => (
+    <div data-testid='stat-card'>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {description ? <small>{description}</small> : null}
+    </div>
+  ),
   DataTable: ({ columns, data, isLoading, emptyContent }: {
     columns: { key: string; label: string; render?: (row: Record<string, unknown>) => React.ReactNode }[];
     data: Record<string, unknown>[];

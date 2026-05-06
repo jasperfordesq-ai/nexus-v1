@@ -54,6 +54,34 @@ interface AnalyticsData {
   status: string;
 }
 
+interface JobPredictionsData {
+  expected_applications: { value: number; current: number; label: string };
+  estimated_time_to_fill: { value: number | null; days_posted: number; label: string };
+  conversion_rate: { yours: number; average: number; label: string };
+  salary_comparison: { your_salary: number; market_avg: number; diff_percent: number; label: string } | null;
+  similar_jobs_analyzed: number;
+  ai_insights?: string[];
+}
+
+function isJobPredictionsData(value: unknown): value is JobPredictionsData {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const data = value as Partial<JobPredictionsData>;
+  return Boolean(
+    data.expected_applications
+      && typeof data.expected_applications.value === 'number'
+      && typeof data.expected_applications.current === 'number'
+      && data.estimated_time_to_fill
+      && typeof data.estimated_time_to_fill.days_posted === 'number'
+      && data.conversion_rate
+      && typeof data.conversion_rate.yours === 'number'
+      && typeof data.conversion_rate.average === 'number'
+      && typeof data.similar_jobs_analyzed === 'number'
+  );
+}
+
 const STAGE_COLORS: Record<string, string> = {
   applied: 'bg-warning/20 text-warning',
   screening: 'bg-primary/20 text-primary',
@@ -75,14 +103,7 @@ export function JobAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [predictions, setPredictions] = useState<{
-    expected_applications: { value: number; current: number; label: string };
-    estimated_time_to_fill: { value: number | null; days_posted: number; label: string };
-    conversion_rate: { yours: number; average: number; label: string };
-    salary_comparison: { your_salary: number; market_avg: number; diff_percent: number; label: string } | null;
-    similar_jobs_analyzed: number;
-    ai_insights?: string[];
-  } | null>(null);
+  const [predictions, setPredictions] = useState<JobPredictionsData | null>(null);
   const [predictionsLoading, setPredictionsLoading] = useState(true);
 
   // AbortController ref to cancel stale requests
@@ -125,7 +146,7 @@ export function JobAnalyticsPage() {
     setPredictionsLoading(true);
     try {
       const res = await api.get(`/v2/jobs/${id}/predictions`);
-      if (res.success && res.data) setPredictions(res.data as typeof predictions);
+      setPredictions(res.success && isJobPredictionsData(res.data) ? res.data : null);
     } catch { /* silent */ }
     finally { setPredictionsLoading(false); }
   }, [id]);
@@ -461,7 +482,7 @@ export function JobAnalyticsPage() {
                     <p className="text-sm text-default-500">{t('analytics.yours', { defaultValue: 'Yours' })}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
                   </div>
-                  <div className="text-default-300">vs</div>
+                  <div className="text-default-300">{t('analytics.versus', { defaultValue: 'vs' })}</div>
                   <div>
                     <p className="text-sm text-default-500">{t('analytics.market_avg', { defaultValue: 'Market Avg' })}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>

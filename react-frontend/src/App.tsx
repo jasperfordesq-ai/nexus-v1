@@ -209,6 +209,7 @@ const CreateOpportunityPage = lazyWithRetry(() => import('@/pages/volunteering/C
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
 const VolOrgDashboardPage = lazyWithRetry(() => import('@/pages/volunteering/VolOrgDashboardPage'));
 const MyOrganisationsPage = lazyWithRetry(() => import('@/pages/volunteering/MyOrganisationsPage'));
+const DonationReceiptPage = lazyWithRetry(() => import('@/pages/volunteering/DonationReceiptPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
@@ -1470,6 +1471,13 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="volunteering/my-applications" element={<Navigate to="../volunteering?tab=applications" replace />} />
+          <Route path="donations/:id/receipt" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+              <FeatureErrorBoundary featureName="Donations">
+                <DonationReceiptPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
 
           {/* Feature-gated: Organisations (register only — view routes are public) */}
           <Route path="organisations/register" element={

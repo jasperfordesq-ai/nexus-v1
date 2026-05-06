@@ -890,15 +890,17 @@ export function SettingsPage() {
       {/* Tabs */}
       <motion.div
         variants={itemVariants}
-        className="relative after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-[var(--background)] after:to-transparent sm:after:hidden"
+        className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:rounded-r-lg after:bg-gradient-to-l after:from-[var(--background)] after:via-[var(--background)]/80 after:to-transparent after:shadow-[-10px_0_18px_rgba(0,0,0,0.08)] sm:after:hidden"
       >
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={handleTabSelection}
           classNames={{
-            tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
+            base: 'w-full max-w-full',
+            tabList: 'w-full max-w-full justify-start gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap overscroll-x-contain scrollbar-hide',
             cursor: 'bg-theme-hover',
-            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
+            tab: 'w-auto flex-none px-2.5 sm:px-3 text-sm text-theme-muted data-[selected=true]:text-theme-primary',
+            tabContent: 'whitespace-nowrap',
           }}
         >
           <Tab

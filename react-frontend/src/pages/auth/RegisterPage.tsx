@@ -105,6 +105,15 @@ export function RegisterPage() {
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
   const [phone, setPhone] = useState('');
+  const [locationTouched, setLocationTouched] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+
+  const requiredLabel = (label: string) => (
+    <span className="inline-flex items-center gap-0.5">
+      <span>{label}</span>
+      <span className="text-danger" aria-hidden="true">*</span>
+    </span>
+  );
 
   // E.164 phone validation.
   const isPhoneValid = (value: string) => {
@@ -116,6 +125,7 @@ export function RegisterPage() {
     : !isPhoneValid(phone)
       ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' })
       : '';
+  const locationError = !location.trim() ? t('register.location_required') : '';
 
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -264,6 +274,7 @@ export function RegisterPage() {
     firstName.trim() &&
     lastName.trim() &&
     (profileType === 'individual' || organizationName.trim()) &&
+    location.trim() &&
     phone.trim() &&
     isPhoneValid(phone);
   const isStep3Valid =
@@ -341,7 +352,7 @@ export function RegisterPage() {
       tenant_id: tenantId,
       profile_type: profileType,
       organization_name: profileType === 'organisation' ? organizationName : undefined,
-      location: location || undefined,
+      location: location.trim(),
       latitude,
       longitude,
       phone: phone.trim(),
@@ -386,6 +397,7 @@ export function RegisterPage() {
     passwordValid &&
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
+    location.trim() &&
     phone.trim() &&
     isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
@@ -617,20 +629,28 @@ export function RegisterPage() {
 
             {/* Location */}
             <PlaceAutocompleteInput
-              label={t('register.location_label')}
+              label={requiredLabel(t('register.location_label'))}
               placeholder={t('register.location_placeholder')}
               value={location}
-              onChange={(val) => setLocation(val)}
+              onChange={(val) => {
+                setLocation(val);
+                setLocationTouched(true);
+              }}
               onPlaceSelect={(place) => {
                 setLocation(place.formattedAddress);
                 setLatitude(place.lat);
                 setLongitude(place.lng);
+                setLocationTouched(true);
               }}
               onClear={() => {
                 setLocation('');
                 setLatitude(undefined);
                 setLongitude(undefined);
+                setLocationTouched(true);
               }}
+              isRequired
+              isInvalid={locationTouched && !!locationError}
+              errorMessage={locationTouched ? locationError : ''}
               classNames={{
                 inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
@@ -641,16 +661,17 @@ export function RegisterPage() {
             {/* Phone */}
             <Input
               type="tel"
-              label={t('register.phone_label')}
+              label={requiredLabel(t('register.phone_label'))}
               placeholder={t('register.phone_placeholder')}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              onBlur={() => setPhoneTouched(true)}
               startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               autoComplete="tel"
               isRequired
-              isInvalid={!!phoneError}
-              errorMessage={phoneError}
-              description={phoneError ? undefined : t('register.phone_admin_note')}
+              isInvalid={phoneTouched && !!phoneError}
+              errorMessage={phoneTouched ? phoneError : ''}
+              description={phoneTouched && phoneError ? undefined : t('register.phone_admin_note')}
               classNames={{
                 inputWrapper:
                   'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',

@@ -44,6 +44,11 @@ interface VolOrg {
   id: number;
   org_id: number;
   org_name: string;
+  description?: string | null;
+  contact_email?: string | null;
+  website?: string | null;
+  org_type?: 'organisation' | 'club' | null;
+  meeting_schedule?: string | null;
   status: string;
   balance: number;
   total_in: number;
@@ -82,6 +87,7 @@ interface OrgFormData {
 }
 
 const EMPTY_ORG_FORM: OrgFormData = { name: '', description: '', contact_email: '', website: '', org_type: 'organisation', meeting_schedule: '' };
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'> = {
   active: 'success',
@@ -272,11 +278,11 @@ export function VolunteerOrganizations() {
     setEditOrg(org);
     setEditForm({
       name: org.org_name || '',
-      description: '',
-      contact_email: '',
-      website: '',
-      org_type: 'organisation',
-      meeting_schedule: '',
+      description: org.description || '',
+      contact_email: org.contact_email || '',
+      website: org.website || '',
+      org_type: org.org_type || 'organisation',
+      meeting_schedule: org.meeting_schedule || '',
     });
     editModal.onOpen();
   }, [editModal]);
@@ -287,6 +293,14 @@ export function VolunteerOrganizations() {
       toast.error(t('volunteering.name_required', 'Organization name is required'));
       return;
     }
+    if (editForm.description.trim().length < 20) {
+      toast.error(t('volunteering.description_min_length', 'Description must be at least 20 characters'));
+      return;
+    }
+    if (!EMAIL_PATTERN.test(editForm.contact_email.trim())) {
+      toast.error(t('volunteering.contact_email_required', 'A valid contact email is required'));
+      return;
+    }
     setEditSubmitting(true);
     try {
       const res = await adminVolunteering.updateOrganization(editOrg.org_id || editOrg.id, {
@@ -294,6 +308,8 @@ export function VolunteerOrganizations() {
         description: editForm.description.trim(),
         contact_email: editForm.contact_email.trim(),
         website: editForm.website.trim(),
+        org_type: editForm.org_type,
+        meeting_schedule: editForm.meeting_schedule.trim() || undefined,
       });
       if (res.success) {
         toast.success(t('volunteering.org_updated', 'Organization updated'));
@@ -340,6 +356,14 @@ export function VolunteerOrganizations() {
   const handleCreateSubmit = useCallback(async () => {
     if (!createForm.name.trim()) {
       toast.error(t('volunteering.name_required', 'Organization name is required'));
+      return;
+    }
+    if (createForm.description.trim().length < 20) {
+      toast.error(t('volunteering.description_min_length', 'Description must be at least 20 characters'));
+      return;
+    }
+    if (!EMAIL_PATTERN.test(createForm.contact_email.trim())) {
+      toast.error(t('volunteering.contact_email_required', 'A valid contact email is required'));
       return;
     }
     setCreateSubmitting(true);
@@ -799,7 +823,7 @@ export function VolunteerOrganizations() {
                   placeholder="https://"
                 />
                 <Select
-                  label="Type"
+                  label={t('volunteering.org_type_label', 'Type')}
                   selectedKeys={new Set([createForm.org_type])}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as 'organisation' | 'club';
@@ -807,16 +831,16 @@ export function VolunteerOrganizations() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="organisation">Organisation</SelectItem>
-                  <SelectItem key="club">Club (Verein)</SelectItem>
+                  <SelectItem key="organisation">{t('volunteering.org_type_organisation', 'Organisation')}</SelectItem>
+                  <SelectItem key="club">{t('volunteering.org_type_club', 'Club')}</SelectItem>
                 </Select>
                 {createForm.org_type === 'club' && (
                   <Input
-                    label="Meeting Schedule"
+                    label={t('volunteering.meeting_schedule_label', 'Meeting Schedule')}
                     value={createForm.meeting_schedule}
                     onValueChange={(v) => setCreateForm(prev => ({ ...prev, meeting_schedule: v }))}
                     variant="bordered"
-                    placeholder="e.g. Every Tuesday 19:00"
+                    placeholder={t('volunteering.meeting_schedule_placeholder', 'e.g. Every Tuesday 19:00')}
                   />
                 )}
               </ModalBody>

@@ -342,7 +342,7 @@ class SeedAgorisDemoData extends Command
                 $this->upsert('vol_applications', ['tenant_id' => $tenantId, 'opportunity_id' => $opportunityId, 'user_id' => $users[$helperKey]], [
                     'message' => 'Ich kann diese Aufgabe regelmaessig uebernehmen und freue mich auf die Koordination.',
                     'shift_id' => $shiftId,
-                    'status' => 'accepted',
+                    'status' => 'approved',
                     'updated_at' => now(),
                 ]);
 
