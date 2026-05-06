@@ -1926,7 +1926,7 @@ class CaringCommunityApiController extends BaseApiController
     }
 
     /**
-     * Export the member's profile row, stripping credential / token columns.
+     * Export only member-owned profile fields, never credential/admin/internal columns.
      */
     private function exportUserProfile(int $tenantId, int $userId): ?array
     {
@@ -1943,25 +1943,43 @@ class CaringCommunityApiController extends BaseApiController
             return null;
         }
 
-        $excluded = [
-            'password',
-            'password_hash',
-            'remember_token',
-            'remember_me_token',
-            'two_factor_secret',
-            'two_factor_recovery_codes',
-            'totp_secret',
-            'mfa_secret',
-            'webauthn_user_handle',
-            'api_token',
-            'api_token_hash',
+        $allowed = [
+            'id',
+            'tenant_id',
+            'name',
+            'first_name',
+            'last_name',
+            'display_name',
+            'email',
+            'phone',
+            'bio',
+            'location',
+            'latitude',
+            'longitude',
+            'avatar',
+            'avatar_url',
+            'date_of_birth',
+            'preferred_language',
+            'preferred_theme',
+            'timezone',
+            'skills',
+            'interests',
+            'availability',
+            'trust_tier',
+            'verification_status',
+            'balance',
+            'created_at',
+            'updated_at',
         ];
 
         $arr = (array) $row;
-        foreach ($excluded as $col) {
-            unset($arr[$col]);
+        $profile = [];
+        foreach ($allowed as $col) {
+            if (array_key_exists($col, $arr)) {
+                $profile[$col] = $arr[$col];
+            }
         }
 
-        return $arr;
+        return $profile;
     }
 }

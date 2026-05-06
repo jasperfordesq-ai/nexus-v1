@@ -1249,10 +1249,12 @@ Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\Cari
 
 // Member-facing caring community endpoints (auth:sanctum via global middleware)
 Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
-    Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp']);
+    Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp'])
+        ->middleware('throttle:10,1');
     Route::post('/v2/caring-community/request-help/voice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelpVoice'])
         ->middleware('throttle:20,1');
-    Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour']);
+    Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour'])
+        ->middleware('throttle:10,1');
 });
 
 Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);

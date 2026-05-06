@@ -11,6 +11,7 @@ namespace App\Services\CaringCommunity;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -523,20 +524,25 @@ class CareProviderDirectoryService
         }
 
         if (! Schema::hasTable('caring_sub_regions') || ! Schema::hasColumn(self::TABLE, 'sub_region_id')) {
-            return null;
+            throw new InvalidArgumentException(__('api.caring_sub_region_not_found'));
         }
 
         $id = (int) $value;
         if ($id <= 0) {
-            return null;
+            throw new InvalidArgumentException(__('api.caring_sub_region_not_found'));
         }
 
-        return DB::table('caring_sub_regions')
+        $exists = DB::table('caring_sub_regions')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
             ->exists()
-                ? $id
-                : null;
+        ;
+
+        if (! $exists) {
+            throw new InvalidArgumentException(__('api.caring_sub_region_not_found'));
+        }
+
+        return $id;
     }
 
     private function loadSubRegion(array $row): ?array

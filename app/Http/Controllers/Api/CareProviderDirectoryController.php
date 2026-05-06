@@ -160,6 +160,8 @@ class CareProviderDirectoryController extends BaseApiController
         try {
             $provider = $this->service->create(TenantContext::getId(), $input, $userId);
             return $this->respondWithData($provider, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'sub_region_id', 422);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
         }
@@ -213,6 +215,8 @@ class CareProviderDirectoryController extends BaseApiController
 
             $provider = $this->service->update($id, $tenantId, $input);
             return $this->respondWithData($provider);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'sub_region_id', 422);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('FEATURE_DISABLED', $e->getMessage(), null, 403);
         }

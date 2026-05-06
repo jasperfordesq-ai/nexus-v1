@@ -441,8 +441,13 @@ class CaregiverService
             throw new InvalidArgumentException(__('api.caring_cover_dates_required'));
         }
 
-        $starts = new \DateTimeImmutable($startsAt);
-        $ends = new \DateTimeImmutable($endsAt);
+        try {
+            $starts = new \DateTimeImmutable($startsAt);
+            $ends = new \DateTimeImmutable($endsAt);
+        } catch (\Exception $e) {
+            throw new InvalidArgumentException(__('api.caring_cover_dates_invalid'), 0, $e);
+        }
+
         if ($ends <= $starts) {
             throw new InvalidArgumentException(__('api.caring_cover_dates_invalid'));
         }

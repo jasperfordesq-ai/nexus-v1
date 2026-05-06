@@ -124,4 +124,37 @@ class CaregiverCoverRequestControllerTest extends TestCase
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FORBIDDEN');
     }
+
+    public function test_cover_request_rejects_invalid_dates_without_server_error(): void
+    {
+        $this->requireCoverTables();
+        $this->setCaringCommunityFeature(true);
+
+        $caregiver = User::factory()->forTenant($this->testTenantId)->create();
+        $caredFor = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('caring_caregiver_links')->insert([
+            'tenant_id' => $this->testTenantId,
+            'caregiver_id' => $caregiver->id,
+            'cared_for_id' => $caredFor->id,
+            'relationship_type' => 'family',
+            'is_primary' => true,
+            'start_date' => '2026-04-29',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Sanctum::actingAs($caregiver);
+
+        $response = $this->apiPost('/v2/caring-community/caregiver/cover-requests', [
+            'cared_for_id' => $caredFor->id,
+            'title' => 'Holiday cover',
+            'starts_at' => 'not-a-date',
+            'ends_at' => '2026-05-10 12:00:00',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+    }
 }

@@ -268,6 +268,10 @@
       }
     },
     "sidebar": {
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Clear search",
+      "no_search_results": "No matching pages found",
       "brand": "Community Caring",
       "expand": "Expand sidebar",
       "collapse": "Collapse sidebar",
@@ -321,6 +325,10 @@
         "municipal_roi": "Municipal ROI",
         "category_coefficients": "Category Coefficients"
       }
+    },
+    "navigation": {
+      "label": "Caring community navigation",
+      "close": "Close caring community navigation"
     }
   },
   "admin": {

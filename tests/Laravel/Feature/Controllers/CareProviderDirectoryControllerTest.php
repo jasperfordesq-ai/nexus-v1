@@ -98,4 +98,43 @@ class CareProviderDirectoryControllerTest extends TestCase
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
     }
+
+    public function test_admin_provider_create_rejects_cross_tenant_sub_region(): void
+    {
+        $this->requireProviderTable();
+        if (! Schema::hasTable('caring_sub_regions') || ! Schema::hasColumn('caring_care_providers', 'sub_region_id')) {
+            $this->markTestSkipped('Care provider sub-region columns are not present in the test database.');
+        }
+
+        $this->setCaringCommunityFeature(true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $otherTenantId = DB::table('tenants')->where('id', '!=', $this->testTenantId)->value('id');
+        if ($otherTenantId === null) {
+            $this->markTestSkipped('A second tenant is required for cross-tenant sub-region validation.');
+        }
+
+        $subRegionId = DB::table('caring_sub_regions')->insertGetId([
+            'tenant_id' => (int) $otherTenantId,
+            'name' => 'Other Tenant Region',
+            'slug' => 'other-tenant-region-' . uniqid(),
+            'type' => 'quartier',
+            'status' => 'active',
+            'created_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/caring-community/providers', [
+            'name' => 'Regional Spitex Team',
+            'type' => 'spitex',
+            'sub_region_id' => $subRegionId,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+        $response->assertJsonPath('errors.0.field', 'sub_region_id');
+    }
 }

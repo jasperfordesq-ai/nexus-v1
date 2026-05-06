@@ -90,7 +90,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/trust-tiers': {
+  '/caring/trust-tier': {
     title: 'Trust Tiers — Reputation Ladder',
     summary:
       'The Trust Tier system grades member reliability on a five-level scale: Newcomer (0) → Member (1) → Trusted (2) → Verified (3) → Coordinator (4). Tier determines what a member can do — for example, only Trusted+ members can export a Warmth Pass or take on intensive caring exchanges.',
@@ -132,7 +132,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     caution:
       'Do not issue passes to members with any unresolved safeguarding reports, even if their tier technically qualifies them.',
     relatedPaths: [
-      { label: 'Trust Tiers', path: '/caring/trust-tiers' },
+      { label: 'Trust Tiers', path: '/caring/trust-tier' },
       { label: 'Federation Peers', path: '/caring/federation-peers' },
     ],
   },
@@ -355,7 +355,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Snoozed requests still appear on the compliance report. Frequent snoozing of Critical requests will be flagged in the data quality audit.',
     relatedPaths: [
       { label: 'Safeguarding', path: '/caring/safeguarding' },
-      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Smart Nudges', path: '/caring/nudges' },
       { label: 'Operating Policy', path: '/caring/operating-policy' },
     ],
   },
@@ -427,7 +427,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/smart-nudges': {
+  '/caring/nudges': {
     title: 'Smart Nudges — Automated Engagement',
     summary:
       'Smart Nudges are automated, personalised messages sent to inactive or at-risk members to re-engage them. Rules are defined by inactivity threshold, member trust tier, and care category. All nudges are previewed before they go live.',
@@ -444,7 +444,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Never use nudges for safeguarding follow-up — use the Safeguarding module for that.',
     ],
     relatedPaths: [
-      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'Communication Copilot', path: '/caring/copilot' },
       { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
     ],
   },
@@ -468,11 +468,11 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Do not use Emergency Alerts for routine communications. Alert fatigue will cause members to ignore future genuine alerts.',
     relatedPaths: [
       { label: 'Sub-Regions', path: '/caring/sub-regions' },
-      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'Communication Copilot', path: '/caring/copilot' },
     ],
   },
 
-  '/caring/municipal-surveys': {
+  '/caring/surveys': {
     title: 'Municipal Surveys',
     summary:
       'Create and distribute surveys to your municipality contacts — council officers, health department staff, and funding bodies. Surveys can be used to gather needs assessments, satisfaction feedback, or evidence for grant reporting.',
@@ -493,7 +493,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/communication-copilot': {
+  '/caring/copilot': {
     title: 'Communication Copilot — AI-Assisted Drafting',
     summary:
       'An AI writing assistant trained on KISS community communication standards. Paste a rough idea and the Copilot returns a polished draft in a warm, inclusive tone appropriate for timebanking communities. You review and edit before sending.',
@@ -511,7 +511,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     caution:
       'Never send a Copilot draft to external stakeholders (canton, media, funders) without a human review. AI can misstate figures or use unsuitable phrasing for formal contexts.',
     relatedPaths: [
-      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Smart Nudges', path: '/caring/nudges' },
       { label: 'Emergency Alerts', path: '/caring/emergency-alerts' },
       { label: 'Civic Digest', path: '/caring/civic-digest' },
     ],
@@ -533,8 +533,8 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Weekly digests sent on Tuesday or Wednesday mornings tend to get the highest open rates in community platforms.',
     ],
     relatedPaths: [
-      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
-      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'Smart Nudges', path: '/caring/nudges' },
+      { label: 'Communication Copilot', path: '/caring/copilot' },
     ],
   },
 
@@ -554,7 +554,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Contacts who have been in the same pipeline stage for 60+ days are highlighted — consider whether they need a different approach or should be moved to Declined.',
     ],
     relatedPaths: [
-      { label: 'Municipal Surveys', path: '/caring/municipal-surveys' },
+      { label: 'Municipal Surveys', path: '/caring/surveys' },
       { label: 'Pilot Inquiries', path: '/admin/pilot-inquiries' },
     ],
   },
@@ -582,7 +582,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/feedback-inbox': {
+  '/caring/feedback': {
     title: 'Feedback Inbox — Municipality Feedback Triage',
     summary:
       'Centralises feedback submitted by municipal partners and stakeholders — concerns, questions, suggestions, and complaints. Each item is triaged by severity, assigned to a coordinator, and tracked through to resolution.',
@@ -598,12 +598,12 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Pattern recognition: if three or more feedback items touch the same theme (e.g. "slow coordinator response"), it signals a systemic issue to investigate.',
     ],
     relatedPaths: [
-      { label: 'Communication Copilot', path: '/caring/communication-copilot' },
+      { label: 'Communication Copilot', path: '/caring/copilot' },
       { label: 'SLA Dashboard', path: '/caring/sla-dashboard' },
     ],
   },
 
-  '/caring/municipal-verification': {
+  '/caring/verification': {
     title: 'Municipal Verification — DNS/Attestation Badge',
     summary:
       'Verified municipality partners are awarded a digital badge displayed on their community profile and in impact reports. Verification requires DNS record confirmation (proving control of the municipality\'s official domain) and a signed attestation letter.',
@@ -878,7 +878,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     caution:
       'Never raise the auto-apply threshold for agents that can initiate financial transfers, safeguarding escalations, or member tier changes. These must always require human review.',
     relatedPaths: [
-      { label: 'Smart Nudges', path: '/caring/smart-nudges' },
+      { label: 'Smart Nudges', path: '/caring/nudges' },
       { label: 'National KISS Dashboard', path: '/admin/national/kiss' },
     ],
   },

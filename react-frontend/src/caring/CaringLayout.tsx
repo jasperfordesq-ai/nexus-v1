@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CaringPanelSidebar } from './components/CaringPanelSidebar';
 import { CaringPanelHeader } from './components/CaringPanelHeader';
 import { CaringPanelBreadcrumbs } from './components/CaringPanelBreadcrumbs';
@@ -13,10 +14,26 @@ export function CaringLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation('caring_community');
 
   useEffect(() => {
     setMobileDrawerOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!mobileDrawerOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileDrawerOpen]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,12 +51,17 @@ export function CaringLayout() {
       />
 
       {mobileDrawerOpen && (
-        <div
+        <button
+          type="button"
+          aria-label={t('panel.navigation.close')}
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
           onClick={() => setMobileDrawerOpen(false)}
         />
       )}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('panel.navigation.label')}
         className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden ${
           mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}

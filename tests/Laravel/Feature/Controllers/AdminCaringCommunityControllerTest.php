@@ -133,6 +133,23 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_broker_without_safeguarding_manage_permission_cannot_manage_reports(): void
+    {
+        $this->setCaringCommunityFeature(true);
+        $broker = User::factory()->forTenant($this->testTenantId)->create([
+            'role' => 'broker',
+        ]);
+        Sanctum::actingAs($broker);
+
+        $response = $this->apiPost('/v2/admin/caring-community/safeguarding/reports/999/status', [
+            'status' => 'closed',
+            'notes' => 'Reviewed.',
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'AUTH_INSUFFICIENT_PERMISSIONS');
+    }
+
     public function test_member_statement_returns_kiss_support_and_wallet_context(): void
     {
         $this->setCaringCommunityFeature(true);

@@ -83,7 +83,11 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
 
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
+            <Button
+              variant="light"
+              className="flex items-center gap-2 px-2 py-1 h-auto min-w-0"
+              aria-label={t('panel.header.user_menu')}
+            >
               <Avatar
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
                 name={user?.name || t('panel.header.user_fallback')}

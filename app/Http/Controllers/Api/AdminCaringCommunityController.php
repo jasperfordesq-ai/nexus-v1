@@ -234,10 +234,13 @@ class AdminCaringCommunityController extends BaseApiController
             ->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
         $role = $user ? (string) ($user->role ?? 'member') : 'member';
 
-        if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god', 'coordinator', 'broker'], true)) {
+        if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)) {
             return null;
         }
         if ($user && (($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false))) {
+            return null;
+        }
+        if ($level === 'view' && in_array($role, ['coordinator', 'broker'], true)) {
             return null;
         }
 
@@ -2372,7 +2375,7 @@ class AdminCaringCommunityController extends BaseApiController
         if (!in_array($sourceTable, self::CATEGORY_COEFFICIENT_TABLES, true)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_FIELD',
-                'Invalid source_table',
+                __('api.caring_category_coefficient_invalid_source_table'),
                 'source_table',
                 422,
             );
@@ -2381,7 +2384,7 @@ class AdminCaringCommunityController extends BaseApiController
         if (!Schema::hasTable($sourceTable) || !Schema::hasColumn($sourceTable, 'substitution_coefficient')) {
             return $this->respondWithError(
                 'MIGRATION_PENDING',
-                'The substitution_coefficient column has not been migrated yet. Run `php artisan migrate`.',
+                __('api.caring_category_coefficient_migration_pending'),
                 null,
                 503,
             );
@@ -2390,7 +2393,7 @@ class AdminCaringCommunityController extends BaseApiController
         if (!array_key_exists('substitution_coefficient', $input)) {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',
-                'substitution_coefficient is required',
+                __('api.caring_category_coefficient_required'),
                 'substitution_coefficient',
                 422,
             );
@@ -2400,7 +2403,7 @@ class AdminCaringCommunityController extends BaseApiController
         if (!is_numeric($rawCoefficient)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_FIELD',
-                'substitution_coefficient must be a number',
+                __('api.caring_category_coefficient_numeric'),
                 'substitution_coefficient',
                 422,
             );
@@ -2410,7 +2413,7 @@ class AdminCaringCommunityController extends BaseApiController
         if ($coefficient < 0.0 || $coefficient > 9.99) {
             return $this->respondWithError(
                 'VALIDATION_OUT_OF_RANGE',
-                'substitution_coefficient must be between 0.00 and 9.99',
+                __('api.caring_category_coefficient_range'),
                 'substitution_coefficient',
                 422,
             );
@@ -2425,7 +2428,7 @@ class AdminCaringCommunityController extends BaseApiController
         if ($existing === null) {
             return $this->respondWithError(
                 'NOT_FOUND',
-                'Category not found',
+                __('api.category_not_found'),
                 null,
                 404,
             );

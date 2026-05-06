@@ -225,6 +225,10 @@
       "my_profile": "My Profile",
       "sign_out": "Sign out"
     },
+    "navigation": {
+      "label": "Caring community navigation",
+      "close": "Close caring community navigation"
+    },
     "breadcrumbs": {
       "aria": "Breadcrumbs",
       "segments": {
