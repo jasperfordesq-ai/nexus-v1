@@ -466,6 +466,7 @@
       "description": "Ask your community for support"
     },
     "subtitle": "Your neighbours care. Tell us what you need and we'll do our best to help.",
+    "on_behalf_notice": "You are creating this request for someone you support as a caregiver.",
     "form": {
       "what_label": "What kind of help do you need?",
       "what_placeholder": "e.g. Help with grocery shopping, a lift to a medical appointment, company for a walk...",

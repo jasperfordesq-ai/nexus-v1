@@ -96,7 +96,7 @@ class CaringHourTransferService
         // a remote federation peer is registered with that slug, accept the
         // initiation without resolving a local destination user. The remote
         // install will look up the matching email at delivery time.
-        $remotePeer = $this->peers?->findByPeerSlug($sourceTenantId, $destinationTenantSlug);
+        $remotePeer = $this->peerRegistry()->findByPeerSlug($sourceTenantId, $destinationTenantSlug);
 
         // Resolve destination tenant (must be a different tenant if local)
         $destinationTenant = DB::table('tenants')
@@ -180,7 +180,7 @@ class CaringHourTransferService
 
         // Resolve destination — either a local tenant (same-platform) or a
         // registered remote peer (cross-platform).
-        $remotePeer = $this->peers?->findByPeerSlug($sourceTenantId, (string) $transfer->counterpart_tenant_slug);
+        $remotePeer = $this->peerRegistry()->findByPeerSlug($sourceTenantId, (string) $transfer->counterpart_tenant_slug);
 
         $destinationTenant = DB::table('tenants')
             ->where('slug', $transfer->counterpart_tenant_slug)
@@ -188,6 +188,9 @@ class CaringHourTransferService
 
         if (! $destinationTenant && ! $remotePeer) {
             throw new RuntimeException('Destination cooperative no longer exists.');
+        }
+        if ($remotePeer && (string) ($remotePeer['status'] ?? '') !== 'active') {
+            throw new RuntimeException('Destination cooperative federation peer is not active.');
         }
 
         $destinationUser = null;
@@ -299,7 +302,7 @@ class CaringHourTransferService
                     'payload_json' => json_encode($payload),
                     'is_remote'    => $isRemote ? 1 : 0,
                     'updated_at'   => $now,
-                ]);
+                ] + $this->remoteDeliveryPendingFields($isRemote, $now));
 
             // ── 2. Deliver to destination ────────────────────────────────────
             if ($isRemote) {
@@ -351,22 +354,13 @@ class CaringHourTransferService
         });
 
         if (!empty($result['needs_remote_delivery'])) {
-            $deliveryResult = $this->deliverToRemotePeer(
+            $deliveryResult = $this->attemptRemoteDelivery(
+                tenantId: $sourceTenantId,
+                sourceTransferId: $transferId,
                 payload: $payload,
                 signature: $signature,
                 peer: $remotePeer,
-                sourceTransferId: $transferId,
             );
-
-            DB::table('caring_hour_transfers')
-                ->where('id', $transferId)
-                ->where('tenant_id', $sourceTenantId)
-                ->update([
-                    'status' => $deliveryResult['delivered']
-                        ? self::STATUS_COMPLETED
-                        : self::STATUS_SENT,
-                    'updated_at' => now(),
-                ]);
 
             if (! $deliveryResult['delivered']) {
                 Log::warning('[CaringHourTransfer] Remote delivery failed; row left in `sent` for retry', [
@@ -382,6 +376,90 @@ class CaringHourTransferService
         unset($result['needs_remote_delivery']);
 
         return $result;
+    }
+
+    /**
+     * Retry source-side remote transfers whose delivery outbox is due.
+     *
+     * @return array{processed:int,delivered:int,failed:int,items:list<array<string,mixed>>}
+     */
+    public function retryRemoteDeliveries(int $tenantId, int $limit = 25): array
+    {
+        if (! Schema::hasTable('caring_hour_transfers')) {
+            return ['processed' => 0, 'delivered' => 0, 'failed' => 0, 'items' => []];
+        }
+
+        $limit = max(1, min(250, $limit));
+        $query = DB::table('caring_hour_transfers')
+            ->where('tenant_id', $tenantId)
+            ->where('role', 'source')
+            ->where('is_remote', 1)
+            ->where('status', self::STATUS_SENT)
+            ->whereNotNull('payload_json')
+            ->whereNotNull('signature')
+            ->orderBy('updated_at')
+            ->limit($limit);
+
+        if (Schema::hasColumn('caring_hour_transfers', 'remote_delivery_next_retry_at')) {
+            $query->where(function ($q): void {
+                $q->whereNull('remote_delivery_next_retry_at')
+                    ->orWhere('remote_delivery_next_retry_at', '<=', now());
+            });
+        }
+        if (Schema::hasColumn('caring_hour_transfers', 'remote_delivery_status')) {
+            $query->where(function ($q): void {
+                $q->whereNull('remote_delivery_status')
+                    ->orWhereIn('remote_delivery_status', ['pending', 'retry', 'failed']);
+            });
+        }
+
+        $rows = $query->get();
+        $items = [];
+        $delivered = 0;
+        $failed = 0;
+
+        foreach ($rows as $row) {
+            $peer = $this->peerRegistry()->findByPeerSlug($tenantId, (string) $row->counterpart_tenant_slug);
+            if (! $peer || (string) ($peer['status'] ?? '') !== 'active') {
+                $result = $this->recordRemoteDeliveryFailure(
+                    tenantId: $tenantId,
+                    sourceTransferId: (int) $row->id,
+                    error: 'federation_peer_inactive_or_missing',
+                );
+            } else {
+                $payload = json_decode((string) $row->payload_json, true);
+                if (! is_array($payload)) {
+                    $result = $this->recordRemoteDeliveryFailure(
+                        tenantId: $tenantId,
+                        sourceTransferId: (int) $row->id,
+                        error: 'payload_invalid',
+                    );
+                } else {
+                    $result = $this->attemptRemoteDelivery(
+                        tenantId: $tenantId,
+                        sourceTransferId: (int) $row->id,
+                        payload: $payload,
+                        signature: (string) $row->signature,
+                        peer: $peer,
+                    );
+                }
+            }
+
+            $result['transfer_id'] = (int) $row->id;
+            $items[] = $result;
+            if (! empty($result['delivered'])) {
+                $delivered++;
+            } else {
+                $failed++;
+            }
+        }
+
+        return [
+            'processed' => count($items),
+            'delivered' => $delivered,
+            'failed' => $failed,
+            'items' => $items,
+        ];
     }
 
     /**
@@ -642,6 +720,138 @@ class CaringHourTransferService
     }
 
     /**
+     * @return array{delivered:bool,status:int,error:?string,response:array<string,mixed>|null,attempts:int}
+     */
+    private function attemptRemoteDelivery(
+        int $tenantId,
+        int $sourceTransferId,
+        array $payload,
+        string $signature,
+        ?array $peer,
+    ): array {
+        if ($peer === null) {
+            return $this->recordRemoteDeliveryFailure($tenantId, $sourceTransferId, 'federation_peer_missing');
+        }
+
+        $deliveryResult = $this->deliverToRemotePeer(
+            payload: $payload,
+            signature: $signature,
+            peer: $peer,
+            sourceTransferId: $sourceTransferId,
+        );
+
+        if (! empty($deliveryResult['delivered'])) {
+            $now = now();
+            DB::table('caring_hour_transfers')
+                ->where('id', $sourceTransferId)
+                ->where('tenant_id', $tenantId)
+                ->update($this->withRemoteDeliveryColumns([
+                    'status' => self::STATUS_COMPLETED,
+                    'updated_at' => $now,
+                ], [
+                    'remote_delivery_status' => 'delivered',
+                    'remote_delivery_attempts' => DB::raw('remote_delivery_attempts + 1'),
+                    'remote_delivery_last_error' => null,
+                    'remote_delivery_next_retry_at' => null,
+                    'remote_delivered_at' => $now,
+                ]));
+
+            $deliveryResult['attempts'] = $this->remoteDeliveryAttempts($tenantId, $sourceTransferId);
+            return $deliveryResult;
+        }
+
+        return $this->recordRemoteDeliveryFailure(
+            tenantId: $tenantId,
+            sourceTransferId: $sourceTransferId,
+            error: (string) ($deliveryResult['error'] ?? 'remote_delivery_failed'),
+            status: (int) ($deliveryResult['status'] ?? 0),
+            response: is_array($deliveryResult['response'] ?? null) ? $deliveryResult['response'] : null,
+        );
+    }
+
+    /**
+     * @return array{delivered:bool,status:int,error:string,response:array<string,mixed>|null,attempts:int}
+     */
+    private function recordRemoteDeliveryFailure(
+        int $tenantId,
+        int $sourceTransferId,
+        string $error,
+        int $status = 0,
+        ?array $response = null,
+    ): array {
+        $attempts = $this->remoteDeliveryAttempts($tenantId, $sourceTransferId) + 1;
+        $delayMinutes = min(24 * 60, max(5, 5 * (2 ** min(8, $attempts - 1))));
+        $now = now();
+
+        DB::table('caring_hour_transfers')
+            ->where('id', $sourceTransferId)
+            ->where('tenant_id', $tenantId)
+            ->update($this->withRemoteDeliveryColumns([
+                'status' => self::STATUS_SENT,
+                'updated_at' => $now,
+            ], [
+                'remote_delivery_status' => $attempts >= 12 ? 'failed' : 'retry',
+                'remote_delivery_attempts' => $attempts,
+                'remote_delivery_last_error' => mb_substr($error, 0, 4000),
+                'remote_delivery_next_retry_at' => $now->copy()->addMinutes($delayMinutes),
+            ]));
+
+        return [
+            'delivered' => false,
+            'status' => $status,
+            'error' => $error,
+            'response' => $response,
+            'attempts' => $attempts,
+        ];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function remoteDeliveryPendingFields(bool $isRemote, mixed $now): array
+    {
+        if (! $isRemote) {
+            return [];
+        }
+
+        return $this->withRemoteDeliveryColumns([], [
+            'remote_delivery_status' => 'pending',
+            'remote_delivery_attempts' => 0,
+            'remote_delivery_last_error' => null,
+            'remote_delivery_next_retry_at' => $now,
+            'remote_delivered_at' => null,
+        ]);
+    }
+
+    private function remoteDeliveryAttempts(int $tenantId, int $sourceTransferId): int
+    {
+        if (! Schema::hasColumn('caring_hour_transfers', 'remote_delivery_attempts')) {
+            return 0;
+        }
+
+        return (int) (DB::table('caring_hour_transfers')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $sourceTransferId)
+            ->value('remote_delivery_attempts') ?? 0);
+    }
+
+    /**
+     * @param array<string,mixed> $base
+     * @param array<string,mixed> $delivery
+     * @return array<string,mixed>
+     */
+    private function withRemoteDeliveryColumns(array $base, array $delivery): array
+    {
+        foreach ($delivery as $column => $value) {
+            if (Schema::hasColumn('caring_hour_transfers', $column)) {
+                $base[$column] = $value;
+            }
+        }
+
+        return $base;
+    }
+
+    /**
      * Inbound entry point used by `FederationHourTransferController::inbound()`.
      * Verifies the signature against the registered peer's shared secret,
      * applies idempotency, and credits the destination user's wallet.
@@ -873,6 +1083,11 @@ class CaringHourTransferService
         $message = strtolower($e->getMessage());
 
         return $code === '23000' || str_contains($message, 'duplicate');
+    }
+
+    private function peerRegistry(): FederationPeerService
+    {
+        return $this->peers ?? app(FederationPeerService::class);
     }
 
     /**

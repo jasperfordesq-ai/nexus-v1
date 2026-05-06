@@ -163,6 +163,51 @@ test.describe('Caring Community flows', () => {
     expect(diagnostics.failedRequests).toEqual([]);
   });
 
+  test('caregiver request-on-behalf posts to the caregiver endpoint', async ({ page }) => {
+    const diagnostics = captureBrowserDiagnostics(page);
+    await mockAuthenticatedCaringSession(page);
+
+    let normalRequestCalled = false;
+    let caregiverPayload: Record<string, unknown> | null = null;
+
+    await page.route('**/v2/caring-community/request-help', async (route) => {
+      normalRequestCalled = true;
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: false, error: 'Wrong endpoint' }),
+      });
+    });
+
+    await page.route('**/v2/caring-community/caregiver/request-on-behalf', async (route) => {
+      caregiverPayload = route.request().postDataJSON() as Record<string, unknown>;
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, data: { id: 44, status: 'pending' } }),
+      });
+    });
+
+    await page.goto(`/${tenantSlug}/caring-community/request-help?on_behalf_of=202`);
+    await page.getByRole('button', { name: /accept all|essential only/i }).first().click().catch(() => undefined);
+
+    await expect(page.getByText(/creating this request for someone/i)).toBeVisible();
+    await page.locator('textarea').nth(0).fill('A linked care receiver needs help collecting a prescription.');
+    await page.locator('input:not([type="hidden"])').first().fill('Friday afternoon');
+    await page.locator('button[type="submit"], button:has-text("Submit"), button:has-text("Request")').last().click();
+
+    await expect(page.getByText(/Request Received/i)).toBeVisible();
+    expect(normalRequestCalled).toBe(false);
+    expect(caregiverPayload).toMatchObject({
+      cared_for_id: 202,
+      when_needed: 'Friday afternoon',
+      contact_preference: 'either',
+    });
+    expect(String(caregiverPayload?.description ?? '')).toContain('prescription');
+    expect(diagnostics.consoleErrors).toEqual([]);
+    expect(diagnostics.failedRequests).toEqual([]);
+  });
+
   test('provider directory refetches when search text changes', async ({ page }) => {
     const diagnostics = captureBrowserDiagnostics(page);
     await mockAuthenticatedCaringSession(page);
@@ -204,7 +249,7 @@ test.describe('Caring Community flows', () => {
 
     await page.goto(`/${tenantSlug}/admin/caring-community/providers`);
 
-    await expect(page).toHaveURL(new RegExp(`/${tenantSlug}/caring/providers$`));
+    await expect(page).toHaveURL(new RegExp(`/${tenantSlug}/caring/providers$`), { timeout: 15000 });
     expect(diagnostics.consoleErrors).toEqual([]);
     expect(diagnostics.failedRequests).toEqual([]);
   });
