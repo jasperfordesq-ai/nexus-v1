@@ -39,18 +39,18 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.0",
-    "dotenv": "^17.2.3",
+    "@playwright/test": "^1.59.1",
+    "dotenv": "^17.4.2",
     "govuk-frontend": "^6.1.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "pa11y": "^9.0.1",
+    "lint-staged": "^17.0.2",
+    "pa11y": "^9.1.1",
     "picocolors": "^1.1.1",
-    "prisma": "^5.22.0",
+    "prisma": "^7.8.0",
     "sass": "^1.99.0",
     "sharp": "^0.34.5",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.2"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   },
   "lint-staged": {
     "react-frontend/src/**/*.{ts,tsx}": [
@@ -62,9 +62,9 @@
     ]
   },
   "dependencies": {
-    "@capacitor/cli": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
-    "@prisma/client": "^5.22.0"
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@prisma/client": "^7.8.0"
   },
   "overrides": {
     "@xmldom/xmldom": ">=0.8.13",
