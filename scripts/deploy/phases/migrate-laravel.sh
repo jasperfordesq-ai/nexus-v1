@@ -31,9 +31,12 @@ run_laravel_artisan_migrate() {
     fi
 
     log_info "Running php artisan migrate --force..."
-    if docker exec "$app_container" php /var/www/html/artisan migrate --force 2>&1 | tee -a "$LOG_FILE"; then
+    repair_laravel_runtime_ownership "$app_container"
+    if docker_exec_app_user "$app_container" php /var/www/html/artisan migrate --force 2>&1 | tee -a "$LOG_FILE"; then
+        repair_laravel_runtime_ownership "$app_container"
         log_ok "Laravel artisan migrations completed"
     else
+        repair_laravel_runtime_ownership "$app_container"
         log_err "Laravel artisan migrate failed"
         return 1
     fi

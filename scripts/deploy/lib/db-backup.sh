@@ -25,7 +25,7 @@ db_pending_migration_count() {
     local out
     # `migrate:status --pending` exits 0 with no rows when nothing is pending,
     # and 1 when the migrations table is missing — treat both as 0.
-    out="$(docker exec "$app_container" php /var/www/html/artisan migrate:status --pending 2>/dev/null || true)"
+    out="$(docker_exec_app_user "$app_container" php /var/www/html/artisan migrate:status --pending 2>/dev/null || true)"
     if echo "$out" | grep -qi "Nothing to migrate\|No migrations found"; then
         echo 0
         return 0

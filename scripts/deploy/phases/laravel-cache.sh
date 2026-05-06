@@ -16,21 +16,23 @@ run_laravel_cache() {
 
     # Clear stale caches first
     log_info "Clearing Laravel caches..."
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan config:clear 2>&1 | tee -a "$LOG_FILE" || true
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan route:clear 2>&1 | tee -a "$LOG_FILE" || true
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan event:clear 2>&1 | tee -a "$LOG_FILE" || true
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan view:clear 2>&1 | tee -a "$LOG_FILE" || true
+    repair_laravel_runtime_ownership "$PHP_CONTAINER"
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan config:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan route:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan event:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan view:clear 2>&1 | tee -a "$LOG_FILE" || true
 
     # Rebuild caches for production via optimize (runs config/route/event/view:cache
     # plus any app-registered Artisan::optimizeUsing() callbacks in correct order)
     log_info "Rebuilding Laravel caches..."
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan optimize 2>&1 | tee -a "$LOG_FILE"
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan optimize 2>&1 | tee -a "$LOG_FILE"
 
     # Signal queue workers to gracefully reload new code (workers finish current job then restart)
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan queue:restart 2>&1 | tee -a "$LOG_FILE" || true
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan queue:restart 2>&1 | tee -a "$LOG_FILE" || true
 
     # Ensure storage:link exists
-    docker exec "$PHP_CONTAINER" php /var/www/html/artisan storage:link 2>&1 | tee -a "$LOG_FILE" || true
+    docker_exec_app_user "$PHP_CONTAINER" php /var/www/html/artisan storage:link 2>&1 | tee -a "$LOG_FILE" || true
+    repair_laravel_runtime_ownership "$PHP_CONTAINER"
 
     log_ok "Laravel caches rebuilt"
 }

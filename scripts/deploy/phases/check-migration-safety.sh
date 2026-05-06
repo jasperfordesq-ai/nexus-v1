@@ -23,7 +23,7 @@ if [ ! -d "$MIGRATIONS_DIR" ]; then
     exit 0
 fi
 
-pending_raw="$(docker exec "$APP_CONTAINER" php /var/www/html/artisan migrate:status --pending 2>/dev/null || true)"
+pending_raw="$(docker_exec_app_user "$APP_CONTAINER" php /var/www/html/artisan migrate:status --pending 2>/dev/null || true)"
 if echo "$pending_raw" | grep -qi "Nothing to migrate\|No pending migrations\|No migrations found"; then
     log_ok "No pending migrations - safety gate passes vacuously"
     exit 0
@@ -110,7 +110,7 @@ for f in "${pending_files[@]}"; do
     fi
 done
 
-pretend_raw="$(docker exec "$APP_CONTAINER" php /var/www/html/artisan migrate --pretend --force 2>/dev/null || true)"
+pretend_raw="$(docker_exec_app_user "$APP_CONTAINER" php /var/www/html/artisan migrate --pretend --force 2>/dev/null || true)"
 if [ -n "$pretend_raw" ]; then
     pretend_destructive="$(printf '%s\n' "$pretend_raw" | grep -niE -- "$PRETEND_DESTRUCTIVE_SQL" || true)"
     if [ -n "$pretend_destructive" ]; then

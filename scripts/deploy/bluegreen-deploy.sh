@@ -378,14 +378,16 @@ optimize_candidate_laravel() {
     app_container="$(container_name "$color" app)"
 
     phase "Candidate Laravel Cache ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
-    docker exec "$app_container" php /var/www/html/artisan config:clear
-    docker exec "$app_container" php /var/www/html/artisan route:clear
-    docker exec "$app_container" php /var/www/html/artisan event:clear
-    docker exec "$app_container" php /var/www/html/artisan view:clear
-    docker exec "$app_container" php /var/www/html/artisan optimize
+    repair_laravel_runtime_ownership "$app_container"
+    docker_exec_app_user "$app_container" php /var/www/html/artisan config:clear
+    docker_exec_app_user "$app_container" php /var/www/html/artisan route:clear
+    docker_exec_app_user "$app_container" php /var/www/html/artisan event:clear
+    docker_exec_app_user "$app_container" php /var/www/html/artisan view:clear
+    docker_exec_app_user "$app_container" php /var/www/html/artisan optimize
     # Signal any already-running workers for this color to gracefully reload
-    docker exec "$app_container" php /var/www/html/artisan queue:restart 2>/dev/null || true
-    docker exec "$app_container" php /var/www/html/artisan storage:link || true
+    docker_exec_app_user "$app_container" php /var/www/html/artisan queue:restart 2>/dev/null || true
+    docker_exec_app_user "$app_container" php /var/www/html/artisan storage:link || true
+    repair_laravel_runtime_ownership "$app_container"
     log_ok "Candidate Laravel caches rebuilt"
 }
 
@@ -418,7 +420,9 @@ run_candidate_migrations() {
         return 1
     fi
 
-    docker exec "$app_container" php /var/www/html/artisan migrate --force --isolated
+    repair_laravel_runtime_ownership "$app_container"
+    docker_exec_app_user "$app_container" php /var/www/html/artisan migrate --force --isolated
+    repair_laravel_runtime_ownership "$app_container"
 
     local pending_after
     pending_after="$(db_pending_migration_count "$app_container")"
@@ -520,6 +524,19 @@ smoke_color() {
         return 1
     fi
     log_ok "Tenant bootstrap passed"
+
+    local webauthn_challenge
+    webauthn_challenge="$(curl -sf -X POST "http://127.0.0.1:$api_port/api/webauthn/auth-challenge" \
+        -H 'Host: api.project-nexus.ie' \
+        -H 'Origin: https://hour-timebank.ie' \
+        -H 'Accept: application/json' \
+        -H 'Content-Type: application/json' \
+        --data '{}' || true)"
+    if ! echo "$webauthn_challenge" | grep -q '"challenge_id"'; then
+        log_err "WebAuthn auth challenge failed on candidate API"
+        return 1
+    fi
+    log_ok "WebAuthn auth challenge passed"
 
     html="$(curl -sf "http://127.0.0.1:$frontend_port/" || true)"
     if ! echo "$html" | grep -q 'id="root"'; then
@@ -726,7 +743,7 @@ stop_queue_for_color() {
     docker update --restart=no "$queue" >/dev/null 2>&1 || true
     if docker ps --format '{{.Names}}' | grep -qx "$queue"; then
         log_info "Gracefully terminating Horizon in $queue"
-        docker exec "$queue" php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || \
+        docker_exec_app_user "$queue" php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || \
             log_warn "horizon:terminate failed in $queue; falling back to docker stop"
         wait_for_container_stopped "$queue" 180 || docker stop -t 120 "$queue" >/dev/null 2>&1 || true
     fi
@@ -743,7 +760,7 @@ stop_scheduler_for_color() {
 
     docker update --restart=no "$scheduler" >/dev/null 2>&1 || true
     if docker ps --format '{{.Names}}' | grep -qx "$scheduler"; then
-        docker exec "$scheduler" php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
+        docker_exec_app_user "$scheduler" php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
         docker stop -t 90 "$scheduler" >/dev/null 2>&1 || true
     fi
 }
@@ -756,11 +773,11 @@ stop_workers_for_color() {
     # Legacy single-color names from before blue/green
     docker update --restart=no nexus-php-queue nexus-php-scheduler >/dev/null 2>&1 || true
     if docker ps --format '{{.Names}}' | grep -qx "nexus-php-queue"; then
-        docker exec nexus-php-queue php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || true
+        docker_exec_app_user nexus-php-queue php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || true
         wait_for_container_stopped nexus-php-queue 180 || docker stop -t 120 nexus-php-queue >/dev/null 2>&1 || true
     fi
     if docker ps --format '{{.Names}}' | grep -qx "nexus-php-scheduler"; then
-        docker exec nexus-php-scheduler php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
+        docker_exec_app_user nexus-php-scheduler php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true
         docker stop -t 90 nexus-php-scheduler >/dev/null 2>&1 || true
     fi
     log_ok "Old workers stopped"
@@ -799,6 +816,18 @@ post_cutover_smoke() {
         return 1
     fi
     log_ok "Public tenant bootstrap passed"
+
+    local webauthn_challenge
+    webauthn_challenge="$(curl -sf -X POST https://api.project-nexus.ie/api/webauthn/auth-challenge \
+        -H 'Origin: https://hour-timebank.ie' \
+        -H 'Accept: application/json' \
+        -H 'Content-Type: application/json' \
+        --data '{}' || true)"
+    if ! echo "$webauthn_challenge" | grep -q '"challenge_id"'; then
+        log_err "Public WebAuthn auth challenge failed"
+        return 1
+    fi
+    log_ok "Public WebAuthn auth challenge passed"
 
     curl -sf https://app.project-nexus.ie/ >/dev/null
     log_ok "Public React frontend passed"
