@@ -354,10 +354,11 @@ class FeedControllerTest extends TestCase
 
     public function test_report_post_succeeds_with_valid_post_id(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
+        $postId = $this->createFeedPost($user->id);
 
         $response = $this->apiPost('/feed/report', [
-            'post_id' => 1,
+            'post_id' => $postId,
         ]);
 
         $response->assertStatus(200);

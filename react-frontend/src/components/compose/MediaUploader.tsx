@@ -119,7 +119,7 @@ function SortableMediaItem({
       {/* Image preview */}
       <img
         src={item.preview}
-        alt={item.altText || `Upload preview ${index + 1}`}
+        alt={item.altText || t('compose.upload_preview_alt', { number: index + 1 })}
         className="w-full aspect-square object-cover"
         draggable={false}
       />
@@ -131,7 +131,7 @@ function SortableMediaItem({
         size="sm"
         className="absolute top-1.5 right-1.5 bg-black/60 text-white min-w-8 w-8 h-8 backdrop-blur-sm z-10"
         onPress={() => onRemove(index)}
-        aria-label={`Remove image ${index + 1}`}
+        aria-label={t('compose.image_remove_number_aria', { number: index + 1 })}
       >
         <X className="w-4 h-4" />
       </Button>
@@ -147,7 +147,7 @@ function SortableMediaItem({
             : 'bg-black/60 text-white opacity-0 group-hover/item:opacity-100 focus:opacity-100'
         } transition-opacity`}
         onPress={() => setShowAltInput(!showAltInput)}
-        aria-label={item.altText ? 'Edit alt text' : 'Add alt text'}
+        aria-label={item.altText ? t('compose.alt_text_edit') : t('compose.alt_text_add')}
       >
         <Type className="w-3.5 h-3.5" />
       </Button>

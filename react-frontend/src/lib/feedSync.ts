@@ -30,6 +30,9 @@ export const FEED_SYNC_EVENT = 'nexus:feedSync';
 export interface FeedSyncPatch {
   is_liked?: boolean;
   likes_count?: number;
+  is_bookmarked?: boolean;
+  is_shared?: boolean;
+  share_count?: number;
   /** Delta applied to comments_count: +1 on add, -1 on delete. */
   comments_count_delta?: number;
   reactions?: {
@@ -55,6 +58,9 @@ interface SyncableFeedItem {
   type: string;
   is_liked?: boolean;
   likes_count?: number;
+  is_bookmarked?: boolean;
+  is_shared?: boolean;
+  share_count?: number;
   comments_count?: number;
   reactions?: FeedSyncPatch['reactions'];
 }
@@ -78,6 +84,15 @@ export function applyFeedSyncToItem<T extends SyncableFeedItem>(item: T, payload
   }
   if (patch.likes_count !== undefined) {
     next.likes_count = Math.max(0, patch.likes_count);
+  }
+  if (patch.is_bookmarked !== undefined) {
+    next.is_bookmarked = patch.is_bookmarked;
+  }
+  if (patch.is_shared !== undefined) {
+    next.is_shared = patch.is_shared;
+  }
+  if (patch.share_count !== undefined) {
+    next.share_count = Math.max(0, patch.share_count);
   }
   if (patch.comments_count_delta !== undefined) {
     next.comments_count = Math.max(0, (item.comments_count ?? 0) + patch.comments_count_delta);

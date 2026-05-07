@@ -206,7 +206,9 @@ class SocialNotificationService
             'poll' => '/polls',
             'resource' => '/resources',
             'volunteering' => '/volunteering/opportunities/' . $contentId,
+            'volunteer' => '/volunteering/opportunities/' . $contentId,
             'ideation_challenge' => '/ideation/' . $contentId,
+            'challenge' => '/ideation/' . $contentId,
             'challenge_idea' => '/ideation/' . $contentId,
             'review' => '/dashboard',
             'comment' => '/feed',
@@ -356,7 +358,7 @@ class SocialNotificationService
 
                 case 'blog_post':
                 case 'blog':
-                    $userId = DB::table('blog_posts')
+                    $userId = DB::table('posts')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->value('author_id');
@@ -447,7 +449,7 @@ class SocialNotificationService
 
                 case 'blog_post':
                 case 'blog':
-                    $row = DB::table('blog_posts')
+                    $row = DB::table('posts')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->select(['title', 'excerpt'])

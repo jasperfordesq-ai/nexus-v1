@@ -265,10 +265,41 @@ class CommentService
     /**
      * Delete a comment (owner only).
      */
-    public static function delete(int $commentId, int $userId): bool
+    public static function delete(int $commentId, int $userId): int
     {
-        return (bool) Comment::where('id', $commentId)
+        $tenantId = TenantContext::getId();
+
+        $comment = Comment::where('id', $commentId)
+            ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
+            ->first();
+
+        if (!$comment) {
+            return 0;
+        }
+
+        $ids = [$commentId];
+        $frontier = [$commentId];
+
+        while (!empty($frontier)) {
+            $children = DB::table('comments')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('parent_id', $frontier)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            $children = array_values(array_diff($children, $ids));
+            if (empty($children)) {
+                break;
+            }
+
+            $ids = array_merge($ids, $children);
+            $frontier = $children;
+        }
+
+        return Comment::where('tenant_id', $tenantId)
+            ->whereIn('id', $ids)
             ->delete();
     }
 
@@ -653,8 +684,8 @@ class CommentService
     {
         // Map target_type → [table, owner_column]
         $map = [
-            'blog_post'  => ['blog_posts',    'author_id'],
-            'blog'       => ['blog_posts',    'author_id'],
+            'blog_post'  => ['posts',         'author_id'],
+            'blog'       => ['posts',         'author_id'],
             'listing'    => ['listings',       'user_id'],
             'feed_post'  => ['feed_posts',     'user_id'],
             'post'       => ['feed_posts',     'user_id'],

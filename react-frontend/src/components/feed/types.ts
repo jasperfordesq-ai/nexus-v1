@@ -35,7 +35,7 @@ export interface FeedItem {
   };
   created_at: string;
   updated_at?: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'badge_earned' | 'level_up';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up';
   likes_count: number;
   comments_count: number;
   views_count?: number;
@@ -210,6 +210,7 @@ export function getItemDetailPath(item: FeedItem): string | null {
     case 'blog':
       return `/blog/${item.id}`;
     case 'discussion':
+    case 'resource':
     case 'badge_earned':
     case 'level_up':
       return null;
