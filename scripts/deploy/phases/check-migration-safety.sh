@@ -75,6 +75,33 @@ strip_schema_create_blocks() {
     '
 }
 
+# Strip the body of any down() method. up() and any helper methods it calls
+# stay in scope (helpers can be private/protected and still own destructive
+# ops we need to catch). down() only runs on manual migrate:rollback, never
+# on forward deploy, so its drop*/rename* calls are not a deploy-time risk.
+strip_down_methods() {
+    awk '
+        /function[[:space:]]+down[[:space:]]*\(/ {
+            in_down=1
+            depth=0
+            seen_open=0
+            next
+        }
+        in_down {
+            opens=gsub(/\{/, "{")
+            closes=gsub(/\}/, "}")
+            depth += opens - closes
+            if (opens > 0) seen_open=1
+            if (seen_open && depth <= 0) {
+                in_down=0
+                seen_open=0
+            }
+            next
+        }
+        { print }
+    '
+}
+
 violations=0
 for f in "${pending_files[@]}"; do
     [ -f "$f" ] || continue
@@ -84,7 +111,7 @@ for f in "${pending_files[@]}"; do
         /\*\// { in_block=0; next }
         in_block { next }
         { sub(/\/\/.*/, ""); print }
-    ' "$f")"
+    ' "$f" | strip_down_methods)"
     alter_body="$(printf '%s\n' "$body" | strip_schema_create_blocks)"
     one_line_body="$(printf '%s\n' "$body" | tr '\n' ' ')"
 
