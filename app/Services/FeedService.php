@@ -989,7 +989,7 @@ class FeedService
             'event'     => 'events',
             'poll'      => 'polls',
             'job'       => 'job_vacancies',
-            'blog'      => 'blog_posts',
+            'blog'      => 'posts',
             'goal'      => 'goals',
             'challenge' => 'ideation_challenges',
             'volunteer' => 'vol_opportunities',
@@ -1171,6 +1171,9 @@ class FeedService
     public function createPost(int $userId, array $data): FeedPost|array
     {
         $tenantId = TenantContext::getId();
+        if (!isset($data['content']) && isset($data['body'])) {
+            $data['content'] = $data['body'];
+        }
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content'] ?? ''));
         $image = $data['image_url'] ?? $data['image'] ?? null;
@@ -1369,6 +1372,10 @@ class FeedService
 
         if (!$post) {
             return ['success' => false, 'error' => __('api_controllers_2.feed.post_not_found_or_not_owned')];
+        }
+
+        if (!isset($data['content']) && isset($data['body'])) {
+            $data['content'] = $data['body'];
         }
 
         $content = isset($data['content'])

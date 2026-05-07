@@ -190,7 +190,10 @@ class FeedSocialController extends BaseApiController
         $limit = $this->queryInt('limit', 20, 1, 100);
 
         $sharers = DB::table('post_shares as ps')
-            ->join('users as u', 'ps.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('ps.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('ps.original_type', $type)
             ->where('ps.original_post_id', $id)
             ->where('ps.tenant_id', $tenantId)

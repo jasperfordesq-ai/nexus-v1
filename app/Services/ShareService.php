@@ -47,7 +47,7 @@ class ShareService
         'event'      => ['table' => 'events',               'owner_col' => 'user_id'],
         'poll'       => ['table' => 'polls',                'owner_col' => 'user_id'],
         'job'        => ['table' => 'job_vacancies',        'owner_col' => 'user_id'],
-        'blog'       => ['table' => 'blog_posts',           'owner_col' => 'author_id'],
+        'blog'       => ['table' => 'posts',                'owner_col' => 'author_id'],
         'discussion' => ['table' => 'group_discussions',    'owner_col' => 'user_id'],
         'goal'       => ['table' => 'goals',                'owner_col' => 'user_id'],
         'challenge'  => ['table' => 'ideation_challenges',  'owner_col' => 'user_id'],
@@ -77,6 +77,7 @@ class ShareService
         if ($existing) {
             DB::table('post_shares')
                 ->where('id', $existing->id)
+                ->where('tenant_id', $tenantId)
                 ->delete();
 
             // Decrement aggregated counter on feed_posts (posts only — typed items

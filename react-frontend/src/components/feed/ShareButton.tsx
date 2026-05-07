@@ -159,14 +159,13 @@ export function ShareButton({
       if (response.data) {
         setLocalIsShared(response.data.shared);
         setLocalCount(response.data.count);
+        onShareChange?.(response.data.count, response.data.shared);
       }
       if (newIsShared) {
         toast.success(t('toast.post_shared'));
       } else {
         toast.info(t('toast.share_removed'));
       }
-
-      onShareChange?.(Math.max(0, newCount), newIsShared);
     } catch (err) {
       logError('Failed to toggle share', err);
       setLocalIsShared(isShared);

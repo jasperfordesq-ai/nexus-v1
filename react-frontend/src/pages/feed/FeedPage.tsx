@@ -381,9 +381,13 @@ export function FeedPage() {
   useEffect(() => {
     const handler = (e: Event) => {
       const payload = (e as CustomEvent<FeedSyncPayload>).detail;
-      setItems((prev) =>
-        prev.map((item) => applyFeedSyncToItem(item, payload))
-      );
+      setItems((prev) => {
+        const next = prev.map((item) => applyFeedSyncToItem(item, payload));
+        if (filterRef.current === 'saved' && payload.patch.is_bookmarked === false) {
+          return next.filter((item) => !(item.type === payload.targetType && item.id === payload.targetId));
+        }
+        return next;
+      });
     };
     window.addEventListener(FEED_SYNC_EVENT, handler);
     return () => window.removeEventListener(FEED_SYNC_EVENT, handler);
@@ -494,6 +498,9 @@ export function FeedPage() {
         target_type: item.type,
         target_id: item.id,
       });
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Like request failed');
+      }
       const serverData = res.data as { action?: string; likes_count?: number } | undefined;
       const serverLikes = serverData?.likes_count;
       const serverLiked = serverData?.action === 'liked'

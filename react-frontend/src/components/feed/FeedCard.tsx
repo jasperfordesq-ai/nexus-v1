@@ -186,6 +186,7 @@ const COMMENTABLE_TYPES = new Set<FeedItem['type']>([
   'job',
   'blog',
   'discussion',
+  'resource',
 ]);
 
 /**
@@ -272,6 +273,13 @@ const typeConfig = {
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
     softGradient: 'from-fuchsia-500/10 to-purple-500/10',
     accentGradient: 'from-fuchsia-500 via-purple-500 to-fuchsia-500',
+  },
+  resource: {
+    labelKey: 'card.type_resource',
+    color: 'primary' as const,
+    icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
+    softGradient: 'from-teal-500/10 to-cyan-500/10',
+    accentGradient: 'from-teal-500 via-cyan-500 to-teal-500',
   },
   badge_earned: {
     labelKey: 'card.type_badge_earned',
@@ -809,10 +817,11 @@ const FeedCard = React.memo(function FeedCard({
 
   const handleDeleteComment = async (commentId: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/v2/comments/${commentId}`);
+      const response = await api.delete<{ deleted_count?: number }>(`/v2/comments/${commentId}`);
       if (response.success) {
-        setLocalCommentsCount((prev) => Math.max(0, prev - 1));
-        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: -1 } });
+        const delta = Math.max(1, response.data?.deleted_count ?? 1);
+        setLocalCommentsCount((prev) => Math.max(0, prev - delta));
+        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: -delta } });
         loadComments();
         return true;
       }
@@ -1896,6 +1905,13 @@ const FeedCard = React.memo(function FeedCard({
                 isShared={item.is_shared ?? false}
                 isAuthenticated={isAuthenticated}
                 post={item}
+                onShareChange={(newCount, newIsShared) => {
+                  dispatchFeedSync({
+                    targetType: item.type,
+                    targetId: item.id,
+                    patch: { share_count: newCount, is_shared: newIsShared },
+                  });
+                }}
                 compact
               />
             )}
@@ -1905,7 +1921,18 @@ const FeedCard = React.memo(function FeedCard({
               Keep this list in sync with app/Services/BookmarkService.php::VALID_TYPES.
             */}
             {isAuthenticated && BOOKMARKABLE_TYPES.has(item.type) && (
-              <BookmarkButton type={item.type} id={item.id} isBookmarked={item.is_bookmarked} />
+              <BookmarkButton
+                type={item.type}
+                id={item.id}
+                isBookmarked={item.is_bookmarked}
+                onToggle={(bookmarked) => {
+                  dispatchFeedSync({
+                    targetType: item.type,
+                    targetId: item.id,
+                    patch: { is_bookmarked: bookmarked },
+                  });
+                }}
+              />
             )}
           </div>
         </div>
