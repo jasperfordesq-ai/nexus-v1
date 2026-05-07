@@ -482,7 +482,8 @@
     "success": {
       "title": "Request Received",
       "body": "Your request has been received. A coordinator will be in touch soon.",
-      "back": "Back to Community Hub"
+      "back": "Back to Community Hub",
+      "toast": "Your help request was sent."
     },
     "errors": {
       "submit_failed": "Could not submit your request. Please try again.",
@@ -498,7 +499,8 @@
       "filled_hint": "Abbiamo compilato il modulo a partire dalla tua registrazione. Controlla prima di inviare.",
       "transcript_label": "Ciò che abbiamo sentito"
     },
-    "back": "Back to Community Hub"
+    "back": "Back to Community Hub",
+    "on_behalf_notice": "You are creating this request for someone you support as a caregiver."
   },
   "hour_gift": {
     "meta": {
@@ -905,7 +907,12 @@
       "title": "Invalid Invite",
       "body": "This invite link is not valid. Please check the link and try again."
     },
-    "loading": "Checking your invite..."
+    "loading": "Checking your invite...",
+    "error": {
+      "title": "We couldn't check this invite",
+      "body": "Please check your connection and try again.",
+      "retry": "Try again"
+    }
   },
   "markt": {
     "meta": {

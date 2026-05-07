@@ -17,16 +17,16 @@ import { SuperAdminRoute } from './SuperAdminRoute';
 import type { TenantFeatures } from '@/types';
 
 /** Small wrapper so Navigate targets can use tenantPath() inside Route elements. */
-function TenantRedirect({ to }: { to: string }) {
+export function TenantRedirect({ to }: { to: string }) {
   const { tenantPath } = useTenant();
   return <Navigate to={tenantPath(to)} replace />;
 }
 
-function TenantParamRedirect({ to }: { to: string }) {
+export function TenantParamRedirect({ to }: { to: string }) {
   const { tenantPath } = useTenant();
   const params = useParams<Record<string, string | undefined>>();
   const resolved = Object.entries(params).reduce(
-    (path, [key, value]) => path.replace(`:${key}`, value ?? ''),
+    (path, [key, value]) => path.replace(`:${key}`, encodeURIComponent(value ?? '')),
     to,
   );
 
@@ -690,11 +690,11 @@ export function AdminRoutes() {
       <Route path="resources/categories" element={<Lazy><ResourceCategoriesAdmin /></Lazy>} />
 
       {/* ─── JOBS ─── */}
-      <Route path="jobs" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobsAdmin /></Lazy></FeatureGatedElement>} />
-      <Route path="jobs/moderation" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobModerationQueue /></Lazy></FeatureGatedElement>} />
-      <Route path="jobs/bias-audit" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobBiasAudit /></Lazy></FeatureGatedElement>} />
-      <Route path="jobs/pipeline" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobPipelineOverview /></Lazy></FeatureGatedElement>} />
-      <Route path="jobs/templates" element={<FeatureGatedElement feature="job_vacancies"><Lazy><JobTemplatesAdmin /></Lazy></FeatureGatedElement>} />
+      <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
+      <Route path="jobs/moderation" element={<Lazy><JobModerationQueue /></Lazy>} />
+      <Route path="jobs/bias-audit" element={<Lazy><JobBiasAudit /></Lazy>} />
+      <Route path="jobs/pipeline" element={<Lazy><JobPipelineOverview /></Lazy>} />
+      <Route path="jobs/templates" element={<Lazy><JobTemplatesAdmin /></Lazy>} />
 
       {/* ─── MARKETPLACE ─── */}
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />

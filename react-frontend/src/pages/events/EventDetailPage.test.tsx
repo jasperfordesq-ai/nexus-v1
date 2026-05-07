@@ -56,6 +56,9 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || null),
+  formatDateTime: vi.fn((value) => String(value)),
+  formatDateValue: vi.fn((value) => String(value)),
+  formatMonthShort: vi.fn(() => 'Jun'),
 }));
 
 vi.mock('react-router-dom', async () => {

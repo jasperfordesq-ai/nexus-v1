@@ -46,7 +46,7 @@ export async function dismissDevNoticeModal(page: Page): Promise<void> {
  * This dialog blocks all interactions until dismissed
  */
 export async function dismissCookieConsent(page: Page): Promise<void> {
-  const acceptBtn = page.locator('button:has-text("Accept All"), button:has-text("Accept all cookies")');
+  const acceptBtn = page.getByRole('button', { name: /Accept all|Accept All|Accept all cookies/i });
   if (await acceptBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
     await acceptBtn.first().click();
     await page.waitForTimeout(300);

@@ -179,7 +179,7 @@ describe('AdminDashboard', () => {
 
   it('shows Monthly Trends section', () => {
     render(<Wrapper><AdminDashboard /></Wrapper>);
-    expect(screen.getByText('Monthly Trends')).toBeInTheDocument();
+    expect(screen.getByText('Transaction Trends')).toBeInTheDocument();
   });
 
   it('shows Recent Activity section', () => {
@@ -202,12 +202,12 @@ import { AdminNotFound } from '../modules/AdminNotFound';
 describe('AdminNotFound', () => {
   it('renders 404 message', () => {
     render(<Wrapper><AdminNotFound /></Wrapper>);
-    expect(screen.getByText('Admin Page Not Found')).toBeInTheDocument();
+    expect(screen.getByText('Page Not Found')).toBeInTheDocument();
   });
 
   it('shows back to dashboard button', () => {
     render(<Wrapper><AdminNotFound /></Wrapper>);
-    expect(screen.getByText('Back to Admin Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Back to Dashboard')).toBeInTheDocument();
   });
 });
 
@@ -220,7 +220,7 @@ import { ListingsAdmin } from '../modules/listings/ListingsAdmin';
 describe('ListingsAdmin', () => {
   it('renders without crashing', () => {
     render(<Wrapper><ListingsAdmin /></Wrapper>);
-    expect(screen.getByText('Content Directory')).toBeInTheDocument();
+    expect(screen.getByText('Listings Admin')).toBeInTheDocument();
   });
 });
 
@@ -233,7 +233,7 @@ import { BlogAdmin } from '../modules/blog/BlogAdmin';
 describe('BlogAdmin', () => {
   it('renders without crashing', () => {
     render(<Wrapper><BlogAdmin /></Wrapper>);
-    expect(screen.getByText('Blog Posts')).toBeInTheDocument();
+    expect(screen.getByText('Blog Admin')).toBeInTheDocument();
   });
 });
 
@@ -246,6 +246,6 @@ import { CategoriesAdmin } from '../modules/categories/CategoriesAdmin';
 describe('CategoriesAdmin', () => {
   it('renders without crashing', () => {
     render(<Wrapper><CategoriesAdmin /></Wrapper>);
-    expect(screen.getByText('Categories')).toBeInTheDocument();
+    expect(screen.getByText('Categories Admin')).toBeInTheDocument();
   });
 });

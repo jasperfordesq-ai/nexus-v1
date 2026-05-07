@@ -291,7 +291,8 @@
     "modal_title": "Spende machen",
     "form": {
       "amount": "Betrag",
-      "message": "Nachricht (optional)"
+      "message": "Nachricht (optional)",
+      "payment_method": "Payment method"
     },
     "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Anonyme Spende",
@@ -606,7 +607,8 @@
     "load_more": "Mehr laden",
     "aria_select_all": "Alle sichtbaren ausstehenden Bewerbungen auswählen",
     "aria_select_application": "Bewerbung von {{name}} auswählen",
-    "aria_search_volunteers": "Freiwillige nach Name suchen"
+    "aria_search_volunteers": "Freiwillige nach Name suchen",
+    "none_matching_search": "No applications match your search."
   },
   "org_wallet_balance": "Wallet-Guthaben:",
   "auto_pay_on": "Automatische Zahlung EIN",
@@ -767,5 +769,21 @@
   "my_organisations_none": "Noch keine Organisationen",
   "my_organisations_none_desc": "Registrieren Sie eine Freiwilligenorganisation, um Einsätze zu veröffentlichen, Freiwillige zu verwalten und Zeitguthaben zu vergeben.",
   "my_organisations_pending": "Genehmigung ausstehend",
-  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung"
+  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
+  "form_desc_required": "Description is required",
+  "form_desc_min_length": "Description must be at least 20 characters",
+  "organiser_note": "Organiser's note:",
+  "no_tabs_available": "No volunteering sections are available",
+  "no_tabs_available_desc": "Volunteering is enabled, but all sections are disabled for this community.",
+  "check_in": {
+    "title": "Shift Check-in",
+    "instructions": "Show this QR code to your shift coordinator when you arrive.",
+    "status_checked_in": "Checked In",
+    "status_checked_out": "Checked Out",
+    "status_pending": "Pending",
+    "qr_alt": "QR code for check-in",
+    "checked_in_at": "Checked in: {{time}}",
+    "checked_out_at": "Checked out: {{time}}",
+    "some_unavailable": "Check-in QR codes are not yet available for some shifts."
+  }
 }

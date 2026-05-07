@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import {
   tenantUrl,
   goToTenantPage,
@@ -26,6 +26,20 @@ import {
 
 // Collect console errors per test
 let consoleErrors: string[] = [];
+const hasUserCredentials = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
+const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
+
+async function waitForTenantHydration(page: Page): Promise<void> {
+  const loadingShell = page
+    .locator('[aria-label="Loading community"], [aria-label="Loading"]')
+    .first();
+
+  if (await loadingShell.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await expect(loadingShell).toBeHidden({ timeout: 15000 });
+  }
+
+  await dismissBlockingModals(page);
+}
 
 test.beforeEach(async ({ page }) => {
   consoleErrors = [];
@@ -42,7 +56,9 @@ test.describe('Smoke Tests @smoke', () => {
   test.describe('Public Pages Load', () => {
     test('landing/home page loads without errors', async ({ page }) => {
       await page.goto(tenantUrl(''), { waitUntil: 'domcontentloaded' });
+      await waitForPageLoad(page);
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
       // The page should have rendered something meaningful
       const body = page.locator('body');
@@ -50,7 +66,7 @@ test.describe('Smoke Tests @smoke', () => {
 
       // Should have either a heading, hero section, or main content area
       const hasContent = await page
-        .locator('h1, h2, main, [role="main"], .hero, header')
+        .locator('main, [role="main"], h1, h2, .hero, header')
         .first()
         .isVisible({ timeout: 10000 })
         .catch(() => false);
@@ -146,10 +162,11 @@ test.describe('Smoke Tests @smoke', () => {
 
     test('login with invalid credentials shows error or stays on login', async ({ page }) => {
       await page.goto(tenantUrl('login'), { waitUntil: 'domcontentloaded' });
+      await waitForPageLoad(page);
       await dismissBlockingModals(page);
 
-      const emailInput = page.locator('#login-email, input[name="email"]').first();
-      const passwordInput = page.locator('#login-password, input[name="password"]').first();
+      const emailInput = page.locator('#login-email, input[name="email"], input[type="email"]').first();
+      const passwordInput = page.locator('#login-password, input[name="password"], input[type="password"]').first();
       await emailInput.fill('nonexistent-smoke-test@example.com');
       await passwordInput.fill('WrongPassword123!');
 
@@ -170,15 +187,19 @@ test.describe('Smoke Tests @smoke', () => {
 
     test('registration page renders with form fields', async ({ page }) => {
       await page.goto(tenantUrl('register'), { waitUntil: 'domcontentloaded' });
+      await waitForPageLoad(page);
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
-      // Should have at least one visible form input (first name, email, or password)
-      const hasFirstName = await page.locator('input[name="first_name"]').isVisible({ timeout: 10000 }).catch(() => false);
-      const hasEmail = await page.locator('input[name="email"], input[type="email"]').first().isVisible({ timeout: 3000 }).catch(() => false);
-      const hasPassword = await page.locator('input[name="password"], input[type="password"]').first().isVisible({ timeout: 3000 }).catch(() => false);
-      const hasCreateBtn = await page.getByRole('button', { name: /Create Account|Register|Sign Up/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      // The registration flow may render as a multi-step HeroUI form on narrow
+      // viewports, so assert the shell and at least one actionable control.
+      const hasHeading = await page.getByRole('heading', { name: /Create your account|Create Account|Register|Sign Up/i }).isVisible({ timeout: 10000 }).catch(() => false);
+      const hasFirstName = await page.getByRole('textbox', { name: /First Name/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      const hasEmail = await page.getByRole('textbox', { name: /^Email/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      const hasPassword = await page.getByRole('textbox', { name: /^Password/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      const hasCreateBtn = await page.getByRole('button', { name: /Continue|Create Account|Register|Sign Up/i }).isVisible({ timeout: 3000 }).catch(() => false);
 
-      expect(hasFirstName || hasEmail || hasPassword || hasCreateBtn).toBeTruthy();
+      expect(hasHeading && (hasFirstName || hasEmail || hasPassword || hasCreateBtn)).toBeTruthy();
     });
   });
 
@@ -187,6 +208,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Dashboard - Authenticated', () => {
+    test.skip(!hasUserCredentials, 'No E2E user credentials configured');
+
     test('dashboard loads and shows heading or content', async ({ page }) => {
       await goToTenantPage(page, 'dashboard');
 
@@ -217,6 +240,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Core Feature Pages Load - Authenticated', () => {
+    test.skip(!hasUserCredentials, 'No E2E user credentials configured');
+
     test('listings page loads and shows content area', async ({ page }) => {
       await goToTenantPage(page, 'listings');
 
@@ -297,6 +322,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Admin Panel', () => {
+    test.skip(!hasAdminCredentials, 'No E2E admin credentials configured');
+
     test('admin dashboard loads', async ({ page }) => {
       await page.goto(`/${DEFAULT_TENANT}/admin`, { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);

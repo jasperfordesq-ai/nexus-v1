@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Services\CaringCommunity\CaringNudgeService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DispatchCaringNudges extends Command
 {
@@ -30,32 +31,43 @@ class DispatchCaringNudges extends Command
         $limitOption = $this->option('limit');
         $limit = $limitOption !== null && $limitOption !== '' ? (int) $limitOption : null;
         $totalSent = 0;
+        $failures = 0;
 
         foreach ($tenantIds as $tenantId) {
             if ($tenantId <= 0) {
                 continue;
             }
 
-            TenantContext::setById($tenantId);
-            if (!TenantContext::hasFeature('caring_community')) {
-                $this->line("Tenant {$tenantId}: caring community disabled");
+            try {
+                TenantContext::setById($tenantId);
+                if (!TenantContext::hasFeature('caring_community')) {
+                    $this->line("Tenant {$tenantId}: caring community disabled");
+                    continue;
+                }
+
+                $result = $service->dispatchDue($tenantId, $limit, $dryRun);
+                $totalSent += (int) ($result['sent'] ?? 0);
+                $this->line(sprintf(
+                    'Tenant %d: enabled=%s dry_run=%s candidates=%d sent=%d',
+                    $tenantId,
+                    !empty($result['enabled']) ? 'yes' : 'no',
+                    !empty($result['dry_run']) ? 'yes' : 'no',
+                    (int) ($result['candidates'] ?? 0),
+                    (int) ($result['sent'] ?? 0),
+                ));
+            } catch (\Throwable $e) {
+                $failures++;
+                Log::error('[DispatchCaringNudges] tenant failure', [
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+                $this->error("Tenant {$tenantId}: failed - " . $e->getMessage());
                 continue;
             }
-
-            $result = $service->dispatchDue($tenantId, $limit, $dryRun);
-            $totalSent += (int) ($result['sent'] ?? 0);
-            $this->line(sprintf(
-                'Tenant %d: enabled=%s dry_run=%s candidates=%d sent=%d',
-                $tenantId,
-                !empty($result['enabled']) ? 'yes' : 'no',
-                !empty($result['dry_run']) ? 'yes' : 'no',
-                (int) ($result['candidates'] ?? 0),
-                (int) ($result['sent'] ?? 0),
-            ));
         }
 
-        $this->info("Smart nudges dispatched: {$totalSent}");
+        $this->info("Smart nudges dispatched: {$totalSent}; tenant failures: {$failures}");
 
-        return self::SUCCESS;
+        return $failures > 0 ? self::FAILURE : self::SUCCESS;
     }
 }

@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -41,9 +42,10 @@ import Wallet from 'lucide-react/icons/wallet';
 import Store from 'lucide-react/icons/store';
 import Undo2 from 'lucide-react/icons/undo-2';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { canManageCaring } from '@/caring/access';
 import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,7 +90,10 @@ interface SellerSettings {
 
 export default function LoyaltyAdminPage() {
   const toast = useToast();
-  usePageTitle('Loyalty Programme');
+  const { user } = useAuth();
+  const { t } = useTranslation('caring_community');
+  const canManage = canManageCaring(user);
+  usePageTitle(t('admin.loyalty.title'));
 
   const [data, setData] = useState<RedemptionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,16 +120,16 @@ export default function LoyaltyAdminPage() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        toast.error(res.error || 'Failed to load redemptions');
+        toast.error(res.error || t('admin.loyalty.errors.load_redemptions'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: load redemptions failed', err);
-      toast.error('Failed to load redemptions');
+      toast.error(t('admin.loyalty.errors.load_redemptions'));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void loadRedemptions();
@@ -140,16 +145,16 @@ export default function LoyaltyAdminPage() {
         if (res.success && res.data) {
           setSettings(res.data);
         } else {
-          toast.error(res.error || 'Failed to load seller settings');
+          toast.error(res.error || t('admin.loyalty.errors.load_settings'));
         }
       } catch (err) {
         logError('LoyaltyAdminPage: load settings failed', err);
-        toast.error('Failed to load seller settings');
+        toast.error(t('admin.loyalty.errors.load_settings'));
       } finally {
         setSettingsLoading(false);
       }
     },
-    [toast],
+    [t, toast],
   );
 
   const handleSelectSeller = useCallback(
@@ -167,11 +172,11 @@ export default function LoyaltyAdminPage() {
   const handleSaveSettings = useCallback(async () => {
     if (!settings || !selectedSeller) return;
     if (settings.loyalty_chf_per_hour <= 0) {
-      toast.error('CHF per hour must be greater than 0');
+      toast.error(t('admin.loyalty.errors.rate_positive'));
       return;
     }
     if (settings.loyalty_max_discount_pct < 0 || settings.loyalty_max_discount_pct > 100) {
-      toast.error('Max discount percent must be between 0 and 100');
+      toast.error(t('admin.loyalty.errors.discount_range'));
       return;
     }
 
@@ -185,17 +190,17 @@ export default function LoyaltyAdminPage() {
       });
       if (res.success && res.data) {
         setSettings(res.data);
-        toast.success('Loyalty settings saved');
+        toast.success(t('admin.loyalty.messages.settings_saved'));
       } else {
-        toast.error(res.error || 'Failed to save settings');
+        toast.error(res.error || t('admin.loyalty.errors.save_settings'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: save settings failed', err);
-      toast.error('Failed to save settings');
+      toast.error(t('admin.loyalty.errors.save_settings'));
     } finally {
       setSavingSettings(false);
     }
-  }, [settings, selectedSeller, toast]);
+  }, [settings, selectedSeller, t, toast]);
 
   const openReverseModal = useCallback((row: Redemption) => {
     setReverseTarget(row);
@@ -221,21 +226,21 @@ export default function LoyaltyAdminPage() {
       });
       if (res.success && res.data) {
         toast.success(
-          `Reversed: ${res.data.credits_restored.toFixed(2)} hours restored to member.`,
+          t('admin.loyalty.messages.reversed', { hours: res.data.credits_restored.toFixed(2) }),
         );
         setReverseTarget(null);
         setReverseReason('');
         await loadRedemptions();
       } else {
-        toast.error(res.error || 'Failed to reverse redemption');
+        toast.error(res.error || t('admin.loyalty.errors.reverse'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: reverse failed', err);
-      toast.error('Failed to reverse redemption');
+      toast.error(t('admin.loyalty.errors.reverse'));
     } finally {
       setReversing(false);
     }
-  }, [reverseTarget, reverseReason, toast, loadRedemptions]);
+  }, [reverseTarget, reverseReason, t, toast, loadRedemptions]);
 
   if (loading) {
     return (
@@ -251,8 +256,8 @@ export default function LoyaltyAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Loyalty Programme"
-        description="Time-credit ↔ marketplace bridge. Members earn hours, merchants opt in to accept them as a CHF discount on their listings."
+        title={t('admin.loyalty.title')}
+        description={t('admin.loyalty.description')}
         actions={
           <Button
             size="sm"
@@ -261,7 +266,7 @@ export default function LoyaltyAdminPage() {
             onPress={() => void loadRedemptions()}
             isDisabled={refreshing}
           >
-            Refresh
+            {t('admin.loyalty.refresh')}
           </Button>
         }
       />
@@ -272,18 +277,13 @@ export default function LoyaltyAdminPage() {
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">About this page</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.loyalty.about.title')}</p>
               <p className="text-default-600">
-                The Loyalty programme rewards members for sustained participation beyond direct care
-                exchanges — attending events, completing training, contributing to surveys, or
-                achieving milestones. Rewards are funded by time credits redeemed at participating
-                marketplace sellers. Configure per-seller settings (exchange rate and max discount)
-                and review redemption history here. The programme is optional and can be disabled
-                without affecting core timebank functionality.
+                {t('admin.loyalty.about.body')}
               </p>
               <div className="space-y-0.5 pt-1 text-default-500">
-                <p><strong>Per-seller exchange rate:</strong> How many CHF a member saves for each hour they apply. Set this to match the seller's pricing and the community's standard care credit value.</p>
-                <p><strong>Max discount per order (%):</strong> Cap on how much of the order total can be paid in time credits. Prevents members from redeeming more than the seller intends to accept.</p>
+                <p><strong>{t('admin.loyalty.about.rate_label')}</strong> {t('admin.loyalty.about.rate_body')}</p>
+                <p><strong>{t('admin.loyalty.about.discount_label')}</strong> {t('admin.loyalty.about.discount_body')}</p>
               </div>
             </div>
           </div>
@@ -294,19 +294,19 @@ export default function LoyaltyAdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard
           icon={Coins}
-          label="Total Redemptions"
+          label={t('admin.loyalty.stats.total_redemptions')}
           value={stats.total_redemptions.toLocaleString()}
           color="warning"
         />
         <StatCard
           icon={Wallet}
-          label="Hours Redeemed"
+          label={t('admin.loyalty.stats.hours_redeemed')}
           value={stats.total_credits.toFixed(2)}
           color="primary"
         />
         <StatCard
           icon={Store}
-          label="Total CHF Discount"
+          label={t('admin.loyalty.stats.total_chf_discount')}
           value={`CHF ${stats.total_discount_chf.toFixed(2)}`}
           color="success"
         />
@@ -316,24 +316,23 @@ export default function LoyaltyAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Store className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-semibold">Per-Seller Loyalty Settings</h2>
+          <h2 className="text-base font-semibold">{t('admin.loyalty.settings.title')}</h2>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <p className="text-sm text-default-600">
-            Pick a seller to configure whether they accept time credits as a discount on their
-            listings, the exchange rate (CHF per hour), and the max discount per order.
+            {t('admin.loyalty.settings.description')}
           </p>
 
           <MemberSearchPicker
-            label="Seller (member)"
-            placeholder="Search by name or email"
+            label={t('admin.loyalty.settings.seller_label')}
+            placeholder={t('admin.loyalty.settings.seller_placeholder')}
             value={sellerQuery}
             onValueChange={setSellerQuery}
             selectedMember={selectedSeller}
             onSelectedMemberChange={handleSelectSeller}
-            noResultsText="No matching members"
-            clearText="Clear"
+            noResultsText={t('admin.loyalty.settings.no_matching_members')}
+            clearText={t('admin.loyalty.settings.clear')}
           />
 
           {selectedSeller && (
@@ -348,10 +347,9 @@ export default function LoyaltyAdminPage() {
                 <div className="space-y-4 border-t border-default-200 pt-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium">Accept time credits</p>
+                      <p className="text-sm font-medium">{t('admin.loyalty.settings.accept_time_credits')}</p>
                       <p className="text-xs text-default-500">
-                        When enabled, this seller's listings show a "Use my time credits" card to
-                        members at checkout.
+                        {t('admin.loyalty.settings.accept_time_credits_hint')}
                       </p>
                     </div>
                     <Switch
@@ -360,14 +358,15 @@ export default function LoyaltyAdminPage() {
                         setSettings({ ...settings, accepts_time_credits: v })
                       }
                       color="success"
+                      isDisabled={!canManage}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       type="number"
-                      label="Exchange rate (CHF per hour)"
-                      description="How many CHF a member saves for each hour they apply."
+                      label={t('admin.loyalty.settings.exchange_rate')}
+                      description={t('admin.loyalty.settings.exchange_rate_description')}
                       value={String(settings.loyalty_chf_per_hour)}
                       onValueChange={(v) =>
                         setSettings({
@@ -379,12 +378,12 @@ export default function LoyaltyAdminPage() {
                       step="0.5"
                       startContent={<span className="text-default-400 text-xs">CHF</span>}
                       endContent={<span className="text-default-400 text-xs">/ h</span>}
-                      isDisabled={!settings.accepts_time_credits}
+                      isDisabled={!settings.accepts_time_credits || !canManage}
                     />
                     <Input
                       type="number"
-                      label="Maximum discount per order (%)"
-                      description="Cap on how much of the order total can be paid in time credits."
+                      label={t('admin.loyalty.settings.maximum_discount')}
+                      description={t('admin.loyalty.settings.maximum_discount_description')}
                       value={String(settings.loyalty_max_discount_pct)}
                       onValueChange={(v) =>
                         setSettings({
@@ -396,20 +395,26 @@ export default function LoyaltyAdminPage() {
                       max="100"
                       step="5"
                       endContent={<span className="text-default-400 text-xs">%</span>}
-                      isDisabled={!settings.accepts_time_credits}
+                      isDisabled={!settings.accepts_time_credits || !canManage}
                     />
                   </div>
 
-                  <div className="flex justify-end">
-                    <Button
-                      color="primary"
-                      startContent={<Save className="w-4 h-4" />}
-                      onPress={() => void handleSaveSettings()}
-                      isLoading={savingSettings}
-                    >
-                      Save settings
-                    </Button>
-                  </div>
+                  {!canManage && (
+                    <p className="text-sm text-default-500">{t('admin.loyalty.settings.view_only')}</p>
+                  )}
+
+                  {canManage && (
+                    <div className="flex justify-end">
+                      <Button
+                        color="primary"
+                        startContent={<Save className="w-4 h-4" />}
+                        onPress={() => void handleSaveSettings()}
+                        isLoading={savingSettings}
+                      >
+                        {t('admin.loyalty.settings.save')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -421,7 +426,7 @@ export default function LoyaltyAdminPage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
-          <h2 className="text-base font-semibold">Recent Redemptions</h2>
+          <h2 className="text-base font-semibold">{t('admin.loyalty.ledger.title')}</h2>
           <Chip size="sm" variant="flat" className="ml-auto">
             {redemptions.length}
           </Chip>
@@ -430,23 +435,22 @@ export default function LoyaltyAdminPage() {
         <CardBody className="p-0">
           {redemptions.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">
-              No redemptions yet. Once a merchant opts in and a member redeems credits, the ledger
-              will appear here.
+              {t('admin.loyalty.ledger.empty')}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-default-50">
                   <tr className="text-xs text-default-500 uppercase tracking-wide">
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Member</th>
-                    <th className="text-left px-4 py-3">Merchant</th>
-                    <th className="text-left px-4 py-3 hidden md:table-cell">Item</th>
-                    <th className="text-right px-4 py-3">Hours</th>
-                    <th className="text-right px-4 py-3">Rate</th>
-                    <th className="text-right px-4 py-3">Discount</th>
-                    <th className="text-left px-4 py-3">Status</th>
-                    <th className="text-right px-4 py-3">Actions</th>
+                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.date')}</th>
+                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.member')}</th>
+                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.merchant')}</th>
+                    <th className="text-left px-4 py-3 hidden md:table-cell">{t('admin.loyalty.ledger.item')}</th>
+                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.hours')}</th>
+                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.rate')}</th>
+                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.discount')}</th>
+                    <th className="text-left px-4 py-3">{t('admin.loyalty.ledger.status')}</th>
+                    <th className="text-right px-4 py-3">{t('admin.loyalty.ledger.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -487,7 +491,7 @@ export default function LoyaltyAdminPage() {
                         </Chip>
                       </td>
                       <td className="px-4 py-3 text-sm text-right">
-                        {row.status === 'applied' ? (
+                        {canManage && row.status === 'applied' ? (
                           <Button
                             size="sm"
                             color="danger"
@@ -495,7 +499,7 @@ export default function LoyaltyAdminPage() {
                             startContent={<Undo2 className="w-4 h-4" />}
                             onPress={() => openReverseModal(row)}
                           >
-                            Reverse
+                            {t('admin.loyalty.ledger.reverse')}
                           </Button>
                         ) : (
                           <span className="text-default-400">—</span>
@@ -515,30 +519,36 @@ export default function LoyaltyAdminPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Undo2 className="w-5 h-5 text-danger" />
-            <span>Reverse redemption</span>
+            <span>{t('admin.loyalty.reverse_modal.title')}</span>
           </ModalHeader>
           <ModalBody className="gap-4">
             {reverseTarget && (
               <>
                 <p className="text-sm text-default-700">
-                  This will restore{' '}
-                  <strong>{reverseTarget.credits_used.toFixed(2)} hours</strong> to{' '}
-                  <strong>{reverseTarget.member_name || 'the member'}</strong>'s
-                  wallet and mark the redemption as reversed. This cannot be undone.
+                  {t('admin.loyalty.reverse_modal.body', {
+                    hours: reverseTarget.credits_used.toFixed(2),
+                    member: reverseTarget.member_name || t('admin.loyalty.reverse_modal.member_fallback'),
+                  })}
                 </p>
                 <div className="rounded-md bg-default-100 px-3 py-2 text-xs text-default-600">
-                  <div>Merchant: {reverseTarget.merchant_name || '—'}</div>
                   <div>
-                    Discount: CHF {reverseTarget.discount_chf.toFixed(2)} on order
-                    of CHF {reverseTarget.order_total_chf.toFixed(2)}
+                    {t('admin.loyalty.reverse_modal.merchant', {
+                      merchant: reverseTarget.merchant_name || t('admin.loyalty.table.empty_value'),
+                    })}
                   </div>
                   <div>
-                    Redeemed: {new Date(reverseTarget.redeemed_at).toLocaleString()}
+                    {t('admin.loyalty.reverse_modal.discount', {
+                      discount: reverseTarget.discount_chf.toFixed(2),
+                      total: reverseTarget.order_total_chf.toFixed(2),
+                    })}
+                  </div>
+                  <div>
+                    {t('admin.loyalty.reverse_modal.redeemed', { date: new Date(reverseTarget.redeemed_at).toLocaleString() })}
                   </div>
                 </div>
                 <Textarea
-                  label="Reason (optional)"
-                  placeholder="e.g. Refunded order, member request, error correction"
+                  label={t('admin.loyalty.reverse_modal.reason')}
+                  placeholder={t('admin.loyalty.reverse_modal.reason_placeholder')}
                   value={reverseReason}
                   onValueChange={setReverseReason}
                   variant="bordered"
@@ -551,7 +561,7 @@ export default function LoyaltyAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeReverseModal} isDisabled={reversing}>
-              Cancel
+              {t('admin.loyalty.reverse_modal.cancel')}
             </Button>
             <Button
               color="danger"
@@ -559,7 +569,7 @@ export default function LoyaltyAdminPage() {
               onPress={() => void handleConfirmReverse()}
               isLoading={reversing}
             >
-              Confirm reversal
+              {t('admin.loyalty.reverse_modal.confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>

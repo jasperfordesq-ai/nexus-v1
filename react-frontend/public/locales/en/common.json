@@ -466,6 +466,7 @@
       "description": "Ask your community for support"
     },
     "subtitle": "Your neighbours care. Tell us what you need and we'll do our best to help.",
+    "on_behalf_notice": "You are creating this request for someone you support as a caregiver.",
     "form": {
       "what_label": "What kind of help do you need?",
       "what_placeholder": "e.g. Help with grocery shopping, a lift to a medical appointment, company for a walk...",
@@ -482,7 +483,8 @@
     "success": {
       "title": "Request Received",
       "body": "Your request has been received. A coordinator will be in touch soon.",
-      "back": "Back to Community Hub"
+      "back": "Back to Community Hub",
+      "toast": "Your help request was sent."
     },
     "errors": {
       "submit_failed": "Could not submit your request. Please try again.",
@@ -904,6 +906,11 @@
     "invalid": {
       "title": "Invalid Invite",
       "body": "This invite link is not valid. Please check the link and try again."
+    },
+    "error": {
+      "title": "We couldn't check this invite",
+      "body": "Please check your connection and try again.",
+      "retry": "Try again"
     },
     "loading": "Checking your invite..."
   },

@@ -482,7 +482,8 @@
     "success": {
       "title": "Anfrage erhalten",
       "body": "Deine Anfrage ist eingegangen. Eine Koordinatorin oder ein Koordinator wird sich bald bei dir melden.",
-      "back": "Zurück zur Caring Community"
+      "back": "Zurück zur Caring Community",
+      "toast": "Your help request was sent."
     },
     "errors": {
       "submit_failed": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.",
@@ -498,7 +499,8 @@
       "filled_hint": "Wir haben das Formular aus deiner Aufnahme befüllt. Bitte prüfe es vor dem Absenden.",
       "transcript_label": "Was wir gehört haben"
     },
-    "back": "Zurück zur Caring Community"
+    "back": "Zurück zur Caring Community",
+    "on_behalf_notice": "You are creating this request for someone you support as a caregiver."
   },
   "hour_gift": {
     "meta": {
@@ -799,16 +801,16 @@
       "advanced": "Erweitert",
       "expert": "Experte"
     },
-      "proficiency_aria": "Kenntnisstand: {{level}}",
-      "remove_skill_aria": "{{skill}} entfernen",
-      "no_user_skills": "Noch keine Fähigkeiten hinzugefügt. Fügen Sie unten Ihre erste Fähigkeit hinzu.",
-      "add_skill": "Fähigkeit hinzufügen",
-      "add_a_skill": "Eine Fähigkeit hinzufügen",
-      "search_result_category": "in {{category}}",
-      "no_matching_custom": "Keine passende Fähigkeit gefunden. Sie können \"{{query}}\" als eigene Fähigkeit hinzufügen.",
-      "use_custom": "\"{{query}}\" verwenden",
-      "skill_to_add": "Hinzuzufügende Fähigkeit:",
-      "aria_clear_search": "Suche löschen",
+    "proficiency_aria": "Kenntnisstand: {{level}}",
+    "remove_skill_aria": "{{skill}} entfernen",
+    "no_user_skills": "Noch keine Fähigkeiten hinzugefügt. Fügen Sie unten Ihre erste Fähigkeit hinzu.",
+    "add_skill": "Fähigkeit hinzufügen",
+    "add_a_skill": "Eine Fähigkeit hinzufügen",
+    "search_result_category": "in {{category}}",
+    "no_matching_custom": "Keine passende Fähigkeit gefunden. Sie können \"{{query}}\" als eigene Fähigkeit hinzufügen.",
+    "use_custom": "\"{{query}}\" verwenden",
+    "skill_to_add": "Hinzuzufügende Fähigkeit:",
+    "aria_clear_search": "Suche löschen",
     "aria_close_members_list": "Mitgliederliste schliessen",
     "category_optional": "Kategorie (optional)",
     "proficiency_level": "Kompetenzstufe"
@@ -905,7 +907,12 @@
       "title": "Ungültige Einladung",
       "body": "Dieser Einladungslink ist ungültig. Bitte überprüfe den Link und versuche es erneut."
     },
-    "loading": "Einladung wird geprüft..."
+    "loading": "Einladung wird geprüft...",
+    "error": {
+      "title": "We couldn't check this invite",
+      "body": "Please check your connection and try again.",
+      "retry": "Try again"
+    }
   },
   "markt": {
     "meta": {

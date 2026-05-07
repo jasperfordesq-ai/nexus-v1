@@ -66,7 +66,11 @@ const { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager }
   const mockFetchCsrfToken = vi.fn().mockResolvedValue(undefined);
   const mockTokenManager = {
     getTenantId: vi.fn().mockReturnValue(null),
+    getTenantSlug: vi.fn().mockReturnValue(null),
+    hasAccessToken: vi.fn().mockReturnValue(false),
+    hasRefreshToken: vi.fn().mockReturnValue(false),
     setTenantId: vi.fn(),
+    setTenantSlug: vi.fn(),
   };
   return { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager };
 });
@@ -164,6 +168,10 @@ describe('TenantContext', () => {
     vi.clearAllMocks();
     mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
     mockTokenManager.getTenantId.mockReturnValue(null);
+    mockTokenManager.getTenantSlug.mockReturnValue(null);
+    mockTokenManager.hasAccessToken.mockReturnValue(false);
+    mockTokenManager.hasRefreshToken.mockReturnValue(false);
+    mockTokenManager.setTenantSlug.mockClear();
     mockApiGet.mockResolvedValue({ success: true, data: mockTenantConfig });
   });
 

@@ -87,6 +87,8 @@ vi.mock('@/lib/logger', () => ({
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  formatMonthShort: vi.fn(() => 'Apr'),
+  formatDayOfMonth: vi.fn(() => '15'),
   resolveAssetUrl: vi.fn((url) => url || ''),
 }));
 

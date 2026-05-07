@@ -667,7 +667,63 @@
     "volunteering": "Volunteering",
     "webhooks": "Webhooks",
     "webp_converter": "WebP Converter",
-    "whitelist": "Whitelist"
+    "whitelist": "Whitelist",
+    "not_found": "Not Found",
+    "aggregates": "Aggregates",
+    "regional": "Regional",
+    "coupons": "Coupons",
+    "caring_community": "Caring Community",
+    "workflow": "Workflow",
+    "loyalty": "Loyalty Programme",
+    "hour_transfers": "Hour Transfers",
+    "sub_regions": "Sub-Regions",
+    "federation_peers": "Federation Peers",
+    "sla_dashboard": "SLA Dashboard",
+    "providers": "Providers",
+    "warmth_pass": "Warmth Pass",
+    "recipient_circle": "Care Recipient Circle",
+    "nudges": "Smart Nudges",
+    "emergency_alerts": "Emergency Alerts",
+    "surveys": "Municipal Surveys",
+    "copilot": "Communication Copilot",
+    "civic_digest": "Civic Digest",
+    "lead_nurture": "Lead Nurture",
+    "success_stories": "Success Stories",
+    "feedback": "Feedback Inbox",
+    "verification": "Municipal Verification",
+    "trust_tier": "Trust Tiers",
+    "launch_readiness": "Launch Readiness",
+    "pilot_scoreboard": "Pilot Scoreboard",
+    "data_quality": "Pilot Data Quality",
+    "operating_policy": "Operating Policy",
+    "disclosure_pack": "Disclosure Pack",
+    "commercial_boundary": "Commercial Boundary",
+    "isolated_node": "Isolated Node Gate",
+    "research": "Research Partnerships",
+    "external_integrations": "External Integrations",
+    "integration_showcase": "Integration Showcase",
+    "municipal_impact": "Municipal Impact Reports",
+    "kpi_baselines": "KPI Baselines",
+    "municipal_roi": "Municipal ROI",
+    "category_coefficients": "Category Coefficients",
+    "regional_points": "Regional Points",
+    "advertising": "Advertising",
+    "api_partners": "API Partners",
+    "member_premium": "Member Premium",
+    "fadp": "FADP",
+    "push_campaigns": "Push Campaigns",
+    "ai": "AI",
+    "ki_agents": "KI Agents",
+    "agents": "Agents",
+    "proposals": "Proposals",
+    "runs": "Runs",
+    "platform": "Platform",
+    "pilot_inquiries": "Pilot Inquiries",
+    "provisioning_requests": "Provisioning Requests",
+    "national": "National",
+    "kiss": "KISS",
+    "regional_analytics": "Regional Analytics",
+    "help": "Help"
   },
   "broker": {
     "a_reason_is_required": "A reason is required",
@@ -3259,7 +3315,14 @@
     "webhooks_test_note": "Webhooks Test",
     "webhooks_test_preview_desc": "Webhooks Test Preview.",
     "webhooks_test_preview_title": "Webhooks Test Preview",
-    "your_selected_topics": "Your Selected Topics"
+    "your_selected_topics": "Your Selected Topics",
+    "external_partners": "External Partners",
+    "federation_controls": "Federation Controls",
+    "jwt_federation_auth_platform_intro": "Most partners authenticate via API key, HMAC, or OAuth2; those are configured per partner in",
+    "jwt_federation_auth_platform_middle": "and need no platform setup. If a partner specifically requires JWT auth, the platform super-admin must set",
+    "jwt_federation_auth_platform_suffix": "in the server environment. Status and setup instructions live under",
+    "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
+    "label_super_admin": "Super Admin"
   },
   "gamification": {
     "activate": "Activate",
@@ -3976,7 +4039,22 @@
     "moderation_page_title": "Job Moderation Queue",
     "moderation_page_description": "Review and approve job postings before they go live",
     "templates_empty_description": "Create your first template to save time on future job postings.",
-    "templates_empty_title": "No templates yet"
+    "templates_empty_title": "No templates yet",
+    "cv_label": "CV",
+    "interview_label": "Interview",
+    "offer_label": "Offer",
+    "refresh": "Refresh",
+    "stat_pending_offers": "{{count}} pending offers",
+    "unexpected_error": "Unexpected error",
+    "stage_pending": "Pending",
+    "stage_reviewed": "Reviewed",
+    "stage_shortlisted": "Shortlisted",
+    "status_draft": "Draft",
+    "status_filled": "Filled",
+    "status_pending_review": "Pending review",
+    "type_paid": "Paid",
+    "type_volunteer": "Volunteer",
+    "type_timebank": "Timebank"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -4692,7 +4770,21 @@
     "view_email_content": "View Email Content",
     "winner_selected": "Winner Selected",
     "winner_subject": "Winner Subject",
-    "winning_metric": "Winning Metric"
+    "winning_metric": "Winning Metric",
+    "csv_parse_warning": "Some CSV rows could not be parsed.",
+    "import_rows_found": "{{count}} subscriber found in CSV",
+    "import_rows_found_one": "{{count}} subscriber found in CSV",
+    "import_rows_found_other": "{{count}} subscribers found in CSV",
+    "import_rows_found_plural": "{{count}} subscribers found in CSV",
+    "source_import": "CSV import",
+    "source_manual": "Manual",
+    "source_member": "Platform",
+    "source_member_sync": "Member sync",
+    "source_signup": "Sign-up",
+    "subscriber_total": "{{count}} subscriber total",
+    "subscriber_total_one": "{{count}} subscriber total",
+    "subscriber_total_other": "{{count}} subscribers total",
+    "subscriber_total_plural": "{{count}} subscribers total"
   },
   "no_data": "No data available",
   "not_found": {
@@ -5134,7 +5226,14 @@
     "vetting_garda": "Vetting Garda",
     "vetting_international": "Vetting International",
     "vetting_other": "Vetting Other",
-    "vetting_pvg_scotland": "Vetting Pvg Scotland"
+    "vetting_pvg_scotland": "Vetting Pvg Scotland",
+    "declined": "Declined",
+    "declined_none_apply": "Declined - none apply",
+    "placeholder_display_label": "e.g. I may need additional support during exchanges",
+    "placeholder_guardian_email": "guardian@example.com",
+    "placeholder_help_url": "https://...",
+    "placeholder_option_key": "e.g. needs_additional_support",
+    "placeholder_ward_email": "ward@example.com"
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -7193,7 +7292,11 @@
     "webhook_updated": "Webhook updated",
     "webhook_url": "Webhook URL",
     "webhooks_heading": "Webhooks",
-    "weekly": "Weekly"
+    "weekly": "Weekly",
+    "review_status_approved": "Approved",
+    "review_status_rejected": "Rejected",
+    "review_status_under_review": "Under review",
+    "test_reminder_failed": "Failed to send reminder job"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail API is not enabled",
@@ -7903,7 +8006,18 @@
     "title_edit": "Edit",
     "towns_description": "Towns.",
     "towns_placeholder": "Enter towns...",
-    "unable_to_calculate": "Unable to Calculate"
+    "unable_to_calculate": "Unable to Calculate",
+    "ab_test_enabled": "Enabled ({{a}}/{{b}})",
+    "ab_test_short": "A/B",
+    "personalization_body_only": "These tags are replaced when the email is sent. Personalisation currently applies to the email body.",
+    "personalization_desc": "Use these tags in the content.",
+    "personalization_title": "Personalisation tags",
+    "tag_email": "Email",
+    "tag_first_name": "First name",
+    "tag_full_name": "Full name",
+    "tag_last_name": "Last name",
+    "tag_tenant_name": "Community name",
+    "tag_unsubscribe_link": "Unsubscribe link"
   },
   "newsletter_resend": {
     "clicked": "Clicked",
@@ -8302,7 +8416,8 @@
     "switch": {
       "title": "Module kill switch",
       "description": "When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.",
-      "aria": "Toggle Caring Community module"
+      "aria": "Toggle Caring Community module",
+      "dependency_note": "Caring Community relies on the modules and features listed below being enabled. A disabled module will limit coordinator and reporting features."
     },
     "capabilities": {
       "timebank": "Time bank exchange",
@@ -8337,6 +8452,18 @@
       "active": "Active",
       "enabled": "Enabled",
       "disabled": "Disabled"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Caring Community module enables your timebank to coordinate informal neighbourhood care, matching residents who need help with trusted members who can provide it. It adds a trust-tier system, coordinator workflow, pilot evaluation tools, and municipal reporting on top of your existing timebank."
+    },
+    "getting_started": {
+      "title": "Getting started",
+      "step_1": "Configure Operating Policy: set your approval workflow and CHF hourly rate.",
+      "step_2": "Capture a pre-pilot baseline in the Pilot Scoreboard.",
+      "step_3": "Configure Trust Tier thresholds.",
+      "step_4": "Run the Pilot Launch Readiness check.",
+      "step_5": "Once launched, use the Coordinator Workflow as your daily operations dashboard."
     }
   },
   "caring_workflow": {
@@ -8599,6 +8726,12 @@
       "confirmed": "Paper onboarding confirmed and member account created.",
       "confirm_failed": "Could not confirm this paper onboarding intake.",
       "load_failed": "Could not load paper onboarding intakes."
+    },
+    "invite_card": {
+      "brand": "Caring Community",
+      "subtitle": "Your Invitation Code",
+      "instructions": "Visit the link below or ask your coordinator to help you get started.",
+      "valid_until": "Valid until {{date}}"
     }
   },
   "municipal_reports": {

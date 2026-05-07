@@ -110,8 +110,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    // Default trigger should render a button with "Set status" aria-label
-    expect(screen.getByLabelText('Set status')).toBeInTheDocument();
+    expect(screen.getByLabelText('status.set_status')).toBeInTheDocument();
   });
 
   it('renders children as custom trigger when provided', () => {
@@ -149,10 +148,10 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
 
     // The dropdown menu should appear with status options
-    expect(screen.getByText('status.online')).toBeInTheDocument();
+    expect(screen.getAllByText('status.online').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('status.away')).toBeInTheDocument();
     expect(screen.getByText('status.dnd')).toBeInTheDocument();
   });
@@ -166,9 +165,9 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
 
-    expect(screen.getByText('Set custom status...')).toBeInTheDocument();
+    expect(screen.getByText('status.set_custom')).toBeInTheDocument();
   });
 
   it('shows current custom status text in the dropdown', async () => {
@@ -187,7 +186,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
 
     // Should show the custom status instead of "Set custom status..."
     expect(screen.getByText('\uD83D\uDCC5 In a meeting')).toBeInTheDocument();
@@ -209,9 +208,9 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
 
-    expect(screen.getByText('Clear custom status')).toBeInTheDocument();
+    expect(screen.getByText('status.clear_custom')).toBeInTheDocument();
   });
 
   it('calls setStatus when a status option is selected', async () => {
@@ -223,7 +222,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
     await user.click(screen.getByText('status.away'));
 
     expect(mockSetStatus).toHaveBeenCalledWith('away');
@@ -245,10 +244,12 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
+    await user.click(screen.getByLabelText('status.set_status'));
 
     // The DND option should have the highlight class
-    const dndOption = screen.getByText('status.dnd').closest('[data-key="dnd"]');
+    const dndOption = screen.getAllByText('status.dnd')
+      .map((node) => node.closest('[data-key="dnd"]'))
+      .find(Boolean);
     if (dndOption) {
       expect(dndOption.className).toContain('bg-theme-hover');
     }
@@ -263,11 +264,11 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
-    await user.click(screen.getByText('Set custom status...'));
+    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByText('status.set_custom'));
 
     // Modal should appear with title
-    expect(screen.getByText('Set Custom Status')).toBeInTheDocument();
+    expect(screen.getByText('status.set_custom_title')).toBeInTheDocument();
   });
 
   it('renders emoji and status input fields in custom status modal', async () => {
@@ -279,16 +280,16 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
-    await user.click(screen.getByText('Set custom status...'));
+    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByText('status.set_custom'));
 
     // The modal should contain input fields for Emoji and Status
     // Use getByLabelText for the Emoji field; for Status, use the dialog to scope
-    expect(screen.getByLabelText('Emoji')).toBeInTheDocument();
+    expect(screen.getByLabelText('status.emoji_label')).toBeInTheDocument();
     // "Status" appears in both the dropdown section title and the input label,
     // so query within the dialog
     const dialog = screen.getByRole('dialog');
-    const statusInput = dialog.querySelector('input[aria-label="Status"], label');
+    const statusInput = dialog.querySelector('input[aria-label="status.status_label"], label');
     expect(statusInput).not.toBeNull();
   });
 
@@ -301,11 +302,11 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
-    await user.click(screen.getByText('Set custom status...'));
+    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByText('status.set_custom'));
 
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('cancel')).toBeInTheDocument();
+    expect(screen.getByText('save')).toBeInTheDocument();
   });
 
   it('shows character count in custom status modal', async () => {
@@ -317,13 +318,11 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('Set status'));
-    await user.click(screen.getByText('Set custom status...'));
+    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByText('status.set_custom'));
 
-    // The t() mock returns the fallback string with unresolved template vars
-    // e.g., '{{current}}/80 characters' — so match with a regex
     const dialog = screen.getByRole('dialog');
-    expect(dialog.textContent).toMatch(/\/80 characters/);
+    expect(dialog.textContent).toContain('status.char_count');
   });
 
   it('does not render dropdown when presence is null and no children', () => {
@@ -337,6 +336,6 @@ describe('StatusSelector', () => {
 
     // When presence is null and no children, the component renders <>{children}</> which is empty
     // The "Set status" button should NOT be present
-    expect(screen.queryByLabelText('Set status')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('status.set_status')).not.toBeInTheDocument();
   });
 });

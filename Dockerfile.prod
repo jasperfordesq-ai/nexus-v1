@@ -249,7 +249,7 @@ EXPOSE 80
 # Health Check
 # =============================================================================
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost/up || exit 1
+    CMD curl -f http://localhost/health.php || exit 1
 
 # =============================================================================
 # Default Command

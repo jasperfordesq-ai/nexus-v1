@@ -116,7 +116,10 @@
     "delete": "Delete",
     "action_move_stage": "نقل المرحلة",
     "action_auto_reject": "رفض تلقائي",
-    "action_notify_me": "أعلمني"
+    "action_notify_me": "أعلمني",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "ملف صاحب العمل",
@@ -312,7 +315,8 @@
     "salary_monthly": "Monthly",
     "personal_message": "رسالة شخصية",
     "personal_message_placeholder": "ملاحظة للمرشح...",
-    "select_applicant": "اختر {{name}}"
+    "select_applicant": "اختر {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "قدّم الآن",
@@ -336,7 +340,8 @@
     "cv_too_large": "يجب أن يكون حجم ملف السيرة الذاتية أقل من 5 ميجابايت",
     "cv_invalid_type": "يدعم فقط ملفات PDF و DOC و DOCX",
     "message_employer": "رسالة إلى صاحب العمل",
-    "cv_parse_error": "فشل في تحليل السيرة الذاتية. يمكنك تقديم طلبك يدويًا."
+    "cv_parse_error": "فشل في تحليل السيرة الذاتية. يمكنك تقديم طلبك يدويًا.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "جارٍ تحميل الوظيفة...",
@@ -404,7 +409,12 @@
     "declined": "Interview Declined",
     "accept": "Accept",
     "decline": "Decline",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "You received an offer!",
@@ -451,12 +461,15 @@
     "technical": "المهارات التقنية",
     "cultural_fit": "التوافق الثقافي",
     "experience": "Experience",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "تم العثور على ملف الطلب المحفوظ",
     "use": "استخدم الملف المحفوظ",
-    "start_fresh": "ابدأ من جديد"
+    "start_fresh": "ابدأ من جديد",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "فريق التوظيف",
@@ -567,7 +580,9 @@
       "deadline_past": "يجب أن يكون الموعد النهائي تاريخًا مستقبليًا",
       "salary_required": "نطاق الراتب مطلوب. يمكنك اختيار 'الراتب قابل للتفاوض' لتجاوزه.",
       "salary_range_invalid": "لا يمكن أن يتجاوز الراتب الأدنى الراتب الأقصى"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "توليد الذكاء الاصطناعي",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "كشف البريد المزعج",
@@ -736,7 +755,10 @@
     "loading": "جارٍ إنشاء التقرير...",
     "no_data": "لا توجد بيانات تقديم متاحة للفترة المحددة",
     "load_error": "فشل في تحميل تقرير تدقيق التحيز",
-    "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية."
+    "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "مواعيد المقابلات",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "علامة أصحاب العمل"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

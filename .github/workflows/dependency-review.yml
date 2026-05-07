@@ -3,6 +3,15 @@ name: Dependency Review
 on:
   pull_request:
     branches: [main]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'react-frontend/package.json'
+      - 'react-frontend/package-lock.json'
+      - 'sales-site/package.json'
+      - 'sales-site/package-lock.json'
+      - 'composer.json'
+      - 'composer.lock'
 
 permissions:
   contents: read

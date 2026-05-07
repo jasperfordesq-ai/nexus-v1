@@ -116,7 +116,10 @@
     "delete": "Eliminar",
     "action_move_stage": "Mover etapa",
     "action_auto_reject": "Rechazo automático",
-    "action_notify_me": "Notificarme"
+    "action_notify_me": "Notificarme",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Perfil del Empleador",
@@ -312,7 +315,8 @@
     "salary_monthly": "Mensual",
     "personal_message": "Mensaje Personal",
     "personal_message_placeholder": "Una nota para el candidato...",
-    "select_applicant": "Seleccionar {{name}}"
+    "select_applicant": "Seleccionar {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Solicitar Ahora",
@@ -336,7 +340,8 @@
     "cv_too_large": "El archivo del CV debe ser menor de 5MB",
     "cv_invalid_type": "Solo se admiten archivos PDF, DOC o DOCX",
     "message_employer": "Mensaje al Empleador",
-    "cv_parse_error": "No se pudo analizar el CV. Aún puede enviar su solicitud manualmente."
+    "cv_parse_error": "No se pudo analizar el CV. Aún puede enviar su solicitud manualmente.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Cargando oferta...",
@@ -404,7 +409,12 @@
     "declined": "Entrevista Rechazada",
     "accept": "Aceptar",
     "decline": "Rechazar",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "¡Has recibido una oferta!",
@@ -451,12 +461,15 @@
     "technical": "Habilidades Técnicas",
     "cultural_fit": "Afinidad Cultural",
     "experience": "Experiencia",
-    "motivation": "Motivación"
+    "motivation": "Motivación",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Perfil de solicitud guardado encontrado",
     "use": "Usar Perfil Guardado",
-    "start_fresh": "Empezar de Nuevo"
+    "start_fresh": "Empezar de Nuevo",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Equipo de Contratación",
@@ -567,7 +580,9 @@
       "deadline_past": "La fecha límite debe ser una fecha futura",
       "salary_required": "Se requiere rango salarial. Puede marcar 'Salario negociable' para omitirlo.",
       "salary_range_invalid": "El salario mínimo no puede superar el salario máximo"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "Generar con IA",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Detección de Spam",
@@ -736,7 +755,10 @@
     "loading": "Generando informe...",
     "no_data": "No hay datos de solicitudes disponibles para el período seleccionado",
     "load_error": "No se pudo cargar el informe de auditoría de sesgo",
-    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos."
+    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Horarios de Entrevista",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Marca del empleador"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

@@ -90,7 +90,7 @@ describe('StoryCreator', () => {
 
   it('has an accessible dialog label', () => {
     render(<StoryCreator {...defaultProps} />);
-    expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Create story');
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Create Story');
   });
 
   it('renders the "Create Story" heading', () => {
@@ -142,7 +142,7 @@ describe('StoryCreator', () => {
     render(<StoryCreator {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'Photo mode' }));
     expect(screen.getByRole('button', { name: 'Photo mode' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('Add Photo')).toBeInTheDocument();
+    expect(screen.getByText('Choose from gallery')).toBeInTheDocument();
   });
 
   it('switches to poll mode when Poll tab is clicked', () => {
@@ -153,7 +153,7 @@ describe('StoryCreator', () => {
 
   it('renders "Start typing..." placeholder in text mode', () => {
     render(<StoryCreator {...defaultProps} />);
-    expect(screen.getByText('Start typing...')).toBeInTheDocument();
+    expect(screen.getByText('Type your story...')).toBeInTheDocument();
   });
 
   it('renders gradient background picker buttons in text mode', () => {
@@ -197,7 +197,7 @@ describe('StoryCreator', () => {
   it('shows "Your question..." placeholder in poll mode', () => {
     render(<StoryCreator {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'Poll mode' }));
-    expect(screen.getByText('Your question...')).toBeInTheDocument();
+    expect(screen.getByText('Ask a question...')).toBeInTheDocument();
   });
 
   it('shows error toast when submitting poll with empty question', async () => {
@@ -212,7 +212,7 @@ describe('StoryCreator', () => {
   it('renders photo mode upload area with Select image button', () => {
     render(<StoryCreator {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'Photo mode' }));
-    expect(screen.getByRole('button', { name: 'Select image for story' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Select image from device' })).toBeInTheDocument();
   });
 
   it('renders hidden file input in photo mode', () => {

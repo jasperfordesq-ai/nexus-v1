@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -49,7 +49,7 @@ export function LinkCareReceiverPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Member search
-  const { data: searchResults, isLoading: searching } = useApi<UserSearchResult[]>(
+  const { data: searchResults, isLoading: searching, error: searchError } = useApi<UserSearchResult[]>(
     searchQuery.length >= 2 ? `/v2/users/search?q=${encodeURIComponent(searchQuery)}` : null,
     { immediate: true },
   );
@@ -59,8 +59,12 @@ export function LinkCareReceiverPage() {
     setSearchQuery(user.name);
   }, []);
 
-  const handleSubmit = async () => {
-    if (!selectedUser) return;
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    if (!selectedUser) {
+      showToast(t('caregiver.select_member_error'), 'error');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -111,11 +115,11 @@ export function LinkCareReceiverPage() {
 
         {/* Page header */}
         <GlassCard className="p-6 sm:p-8">
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-500/15">
               <Heart className="h-6 w-6 text-rose-500" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-tight text-theme-primary sm:text-3xl">
                 {t('caregiver.link_title')}
               </h1>
@@ -128,7 +132,7 @@ export function LinkCareReceiverPage() {
 
         {/* Form */}
         <GlassCard className="p-6 sm:p-8">
-          <div className="space-y-5 max-w-lg">
+          <form className="max-w-lg space-y-5" onSubmit={(event) => void handleSubmit(event)} noValidate>
 
             {/* Member search */}
             <div className="space-y-2">
@@ -145,17 +149,25 @@ export function LinkCareReceiverPage() {
                 startContent={<Search className="h-4 w-4 text-theme-muted" aria-hidden="true" />}
                 variant="bordered"
                 isDisabled={isSubmitting}
+                isInvalid={Boolean(searchError)}
+                errorMessage={searchError ? t('caregiver.search_error') : undefined}
               />
 
               {/* Search results dropdown */}
               {!selectedUser && searchQuery.length >= 2 && (
-                <div className="rounded-lg border border-theme-default bg-theme-surface shadow-lg overflow-hidden">
+                <div className="overflow-hidden rounded-lg border border-theme-default bg-theme-surface shadow-lg">
                   {searching ? (
-                    <div className="p-3 text-sm text-theme-muted">{t('caregiver.searching')}</div>
+                    <div className="p-3 text-sm text-theme-muted" role="status" aria-live="polite">
+                      {t('caregiver.searching')}
+                    </div>
+                  ) : searchError ? (
+                    <div className="p-3 text-sm text-danger" role="alert">
+                      {t('caregiver.search_error')}
+                    </div>
                   ) : searchResults && searchResults.length > 0 ? (
-                    <ul className="divide-y divide-theme-default">
+                    <ul className="divide-y divide-theme-default" role="listbox" aria-label={t('caregiver.search_results_aria')}>
                       {searchResults.slice(0, 8).map((user) => (
-                        <li key={user.id}>
+                        <li key={user.id} role="option" aria-selected={false}>
                           <Button
                             type="button"
                             variant="light"
@@ -184,13 +196,13 @@ export function LinkCareReceiverPage() {
 
               {/* Selected user confirmation */}
               {selectedUser && (
-                <div className="flex items-center gap-3 rounded-lg border border-success/40 bg-success/5 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3 rounded-lg border border-success/40 bg-success/5 px-4 py-3">
                   <Avatar
                     src={selectedUser.avatar_url ?? undefined}
                     name={selectedUser.name}
                     size="sm"
                   />
-                  <span className="text-sm font-medium text-success">{selectedUser.name}</span>
+                  <span className="min-w-0 truncate text-sm font-medium text-success">{selectedUser.name}</span>
                 </div>
               )}
             </div>
@@ -232,8 +244,8 @@ export function LinkCareReceiverPage() {
             {/* Submit */}
             <div className="flex gap-3 pt-2">
               <Button
+                type="submit"
                 color="primary"
-                onPress={() => void handleSubmit()}
                 isLoading={isSubmitting}
                 isDisabled={!selectedUser || isSubmitting}
               >
@@ -248,7 +260,7 @@ export function LinkCareReceiverPage() {
                 {t('caregiver.cancel')}
               </Button>
             </div>
-          </div>
+          </form>
         </GlassCard>
       </div>
     </>

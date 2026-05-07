@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import {
   Card,
   CardBody,
+  Button,
   Chip,
   Input,
   Skeleton,
@@ -14,6 +15,7 @@ import {
   Tabs,
 } from '@heroui/react';
 import BadgeCheck from 'lucide-react/icons/badge-check';
+import AlertCircle from 'lucide-react/icons/alert-circle';
 import Building2 from 'lucide-react/icons/building-2';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
@@ -119,14 +121,14 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
       <CardBody className="gap-2.5">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex min-w-0 items-center gap-2">
             {provider.is_verified && (
               <BadgeCheck
                 className="h-4 w-4 shrink-0 text-primary"
                 aria-label={t('providers.verified_badge')}
               />
             )}
-            <h3 className="font-semibold text-theme-primary truncate">{provider.name}</h3>
+            <h3 className="min-w-0 truncate font-semibold text-theme-primary">{provider.name}</h3>
           </div>
           <Chip size="sm" color={typeChipColor(provider.type)} variant="flat" className="shrink-0">
             {providerTypeLabel(provider.type, t)}
@@ -135,14 +137,14 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
 
         {/* Description */}
         {provider.description && (
-          <p className="text-sm text-theme-muted line-clamp-2">{provider.description}</p>
+          <p className="line-clamp-2 break-words text-sm text-theme-muted">{provider.description}</p>
         )}
 
         {/* Address */}
         {provider.address && (
           <div className="flex items-start gap-1.5 text-sm text-theme-muted">
             <Building2 className="h-3.5 w-3.5 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{provider.address}</span>
+            <span className="min-w-0 break-words">{provider.address}</span>
           </div>
         )}
 
@@ -155,7 +157,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Phone className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span>{provider.contact_phone}</span>
+              <span className="break-all">{provider.contact_phone}</span>
             </a>
           )}
           {provider.contact_email && (
@@ -165,7 +167,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
               className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
             >
               <Mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span className="truncate max-w-[180px]">{provider.contact_email}</span>
+              <span className="max-w-[180px] truncate break-all">{provider.contact_email}</span>
             </a>
           )}
           {provider.website_url && (
@@ -231,10 +233,19 @@ export default function CareProviderDirectoryPage() {
   const queryString = params.toString();
   const apiPath = `/v2/caring-community/providers${queryString ? `?${queryString}` : ''}`;
 
-  const { data: response, loading, error } = useApi<DirectoryResponse>(apiPath);
+  const { data: response, loading, error, refetch } = useApi<DirectoryResponse>(apiPath);
 
   if (!hasFeature('caring_community')) {
-    return null;
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <Card className="border border-warning/30 bg-warning/5">
+          <CardBody className="gap-3 p-6 text-center text-warning-700 dark:text-warning-300">
+            <AlertCircle className="mx-auto h-8 w-8" aria-hidden="true" />
+            <p className="font-medium">{t('providers.unavailable')}</p>
+          </CardBody>
+        </Card>
+      </div>
+    );
   }
 
   const providers = response?.data ?? [];
@@ -249,7 +260,7 @@ export default function CareProviderDirectoryPage() {
       <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
         {/* Page header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
+          <h1 className="flex flex-wrap items-center gap-2 text-2xl font-bold text-theme-primary">
             <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
             {t('providers.title')}
           </h1>
@@ -293,8 +304,19 @@ export default function CareProviderDirectoryPage() {
             ))}
           </div>
         ) : error ? (
-          <div className="rounded-xl border border-danger/30 bg-danger/5 p-6 text-center text-danger">
-            {t('providers.no_providers')}
+          <div className="rounded-xl border border-danger/30 bg-danger/5 p-6 text-center text-danger" role="alert">
+            <AlertCircle className="mx-auto mb-3 h-8 w-8" aria-hidden="true" />
+            <p className="font-medium">{t('providers.error_title')}</p>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-danger/90">{t('providers.error_body')}</p>
+            <Button
+              type="button"
+              color="danger"
+              variant="flat"
+              className="mt-4"
+              onPress={() => void refetch()}
+            >
+              {t('providers.retry')}
+            </Button>
           </div>
         ) : providers.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center text-theme-muted">

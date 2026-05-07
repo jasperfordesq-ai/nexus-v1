@@ -42,7 +42,7 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 10s
       timeout: 5s
       retries: 12

@@ -22,6 +22,8 @@
  *   NEXUS_PRERENDER_SITEMAP_URL=https://app.project-nexus.ie/sitemap.xml
  *   NEXUS_PRERENDER_DYNAMIC_LIMIT=80
  *   NEXUS_PRERENDER_SITEMAP_LIMIT=12
+ *   NEXUS_PRERENDER_SITEMAP_TIMEOUT_MS=10000
+ *   NEXUS_PRERENDER_PORT=4173
  *   NEXUS_SKIP_DYNAMIC_PRERENDER=1
  *
  * Requirements:
@@ -38,10 +40,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = join(__dirname, '..', 'dist');
-const PORT = 4173;
+const PORT = Math.max(1, Number.parseInt(process.env.NEXUS_PRERENDER_PORT || '4173', 10) || 4173);
 const DEFAULT_SITEMAP_URL = `${process.env.VITE_APP_URL || 'https://app.project-nexus.ie'}/sitemap.xml`;
 const DYNAMIC_ROUTE_LIMIT = Math.max(0, Number.parseInt(process.env.NEXUS_PRERENDER_DYNAMIC_LIMIT || '80', 10) || 80);
 const SITEMAP_FETCH_LIMIT = Math.max(1, Number.parseInt(process.env.NEXUS_PRERENDER_SITEMAP_LIMIT || '12', 10) || 12);
+const SITEMAP_FETCH_TIMEOUT_MS = Math.max(1000, Number.parseInt(process.env.NEXUS_PRERENDER_SITEMAP_TIMEOUT_MS || '10000', 10) || 10000);
 
 // ─── Public routes to pre-render ─────────────────────────────────────────────
 // These are pages that must be indexable by Google and should load instantly.
@@ -86,6 +89,7 @@ function isDynamicPrerenderRoute(pathname) {
 
 async function fetchSitemapXml(url) {
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(SITEMAP_FETCH_TIMEOUT_MS),
     headers: {
       'User-Agent': 'NexusPrerender/1.0',
       Accept: 'application/xml,text/xml,*/*',
@@ -201,10 +205,14 @@ async function prerenderRoute(page, route) {
   const url = `http://localhost:${PORT}${route}`;
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {
+      // Public pages can keep analytics, maps, or API requests alive. Capture the
+      // settled DOM we have instead of blocking the whole production build.
+    });
 
     // Wait for React Helmet to inject meta tags (data-rh attribute)
-    await page.waitForSelector('[data-rh]', { timeout: 10000 }).catch(() => {
+    await page.waitForSelector('[data-rh]', { timeout: 1500 }).catch(() => {
       // Some pages may not have Helmet tags — that's ok
     });
 

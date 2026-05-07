@@ -76,6 +76,12 @@ export function CaringLayout() {
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
 
+      if (!first || !last) {
+        event.preventDefault();
+        drawerRef.current?.focus();
+        return;
+      }
+
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();

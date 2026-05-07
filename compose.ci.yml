@@ -31,6 +31,8 @@ services:
       - ./src:/var/www/html/src:ro
       - ./views:/var/www/html/views:ro
       - ./config:/var/www/html/config:ro
+      - ./resources:/var/www/html/resources:ro
+      - ./accessible-frontend:/var/www/html/accessible-frontend:ro
       - ./vendor:/var/www/html/vendor:ro
       - ./artisan:/var/www/html/artisan:ro
       - ./bootstrap:/var/www/html/bootstrap:ro
@@ -74,14 +76,17 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - nexus-ci-internal
+      nexus-ci-internal:
+        aliases:
+          # react-frontend/nginx.conf proxies uploads to this production name.
+          - nexus-php-app
     # No ports — tests reach the app via Docker network or docker exec
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
+      start_period: 180s
 
   # ---------------------------------------------------------------------------
   # MariaDB 10.11 Database (CI-tuned: lighter buffer pool, faster startup)
@@ -137,7 +142,7 @@ services:
       context: ./react-frontend
       dockerfile: Dockerfile.prod
       args:
-        VITE_API_BASE: http://nexus-ci-app/api
+        VITE_API_BASE: /api
         VITE_GOOGLE_MAPS_API_KEY: ""
         VITE_GOOGLE_MAPS_MAP_ID: ""
         VITE_SENTRY_DSN: ""
