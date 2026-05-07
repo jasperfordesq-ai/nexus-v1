@@ -146,7 +146,7 @@ class MunicipalSurveyController extends BaseApiController
             return $err;
         }
 
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         $validator = Validator::make($input, [
             'answers'   => 'required|array',
@@ -263,7 +263,7 @@ class MunicipalSurveyController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         $validator = Validator::make($input, [
             'title'                         => 'required|string|max:255',
@@ -329,7 +329,7 @@ class MunicipalSurveyController extends BaseApiController
             );
         }
 
-        $input = $this->getJsonInput();
+        $input = $this->getAllInput();
 
         $validator = Validator::make($input, [
             'title'                         => 'nullable|string|max:255',

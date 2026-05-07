@@ -54,6 +54,7 @@ import Users from 'lucide-react/icons/users';
 import XCircle from 'lucide-react/icons/x-circle';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
@@ -218,6 +219,7 @@ function AnalyticsView({ analytics }: { analytics: Analytics }) {
 
 export default function MunicipalSurveyAdminPage() {
   const { t } = useTranslation('caring_community');
+  const { showToast } = useToast();
   usePageTitle(t('panel.sidebar.items.surveys'));
   const createModal    = useDisclosure();
   const analyticsModal = useDisclosure();
@@ -384,26 +386,15 @@ export default function MunicipalSurveyAdminPage() {
 
   const handleExport = async (id: number, surveyTitle: string) => {
     try {
-      const res = await api.get<Blob>(
+      await api.download(
         `/v2/admin/caring-community/surveys/${id}/export`,
-        { responseType: 'blob' }
+        { filename: `survey-${id}-${surveyTitle.replace(/\s+/g, '-').toLowerCase()}.csv` },
       );
-      if (!res.success || !res.data) {
-        throw new Error(res.error ?? 'Export failed');
-      }
-      const blob = res.data;
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = `survey-${id}-${surveyTitle.replace(/\s+/g, '-').toLowerCase()}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
     } catch {
-      // Silently ignore — the button is still clickable next time
+      showToast(t('admin.surveys.errors.export_failed'), 'error');
     }
   };
-
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>

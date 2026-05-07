@@ -22,6 +22,8 @@ class CsvExportSanitizerTest extends TestCase
             '@cmd',
             "\t=hidden",
             "\r=hidden",
+            '  =hidden',
+            "\n@hidden",
             'ordinary text',
             42,
             false,
@@ -34,9 +36,11 @@ class CsvExportSanitizerTest extends TestCase
         $this->assertSame("'@cmd", $row[3]);
         $this->assertSame("'\t=hidden", $row[4]);
         $this->assertSame("'\r=hidden", $row[5]);
-        $this->assertSame('ordinary text', $row[6]);
-        $this->assertSame('42', $row[7]);
-        $this->assertSame('0', $row[8]);
-        $this->assertSame('', $row[9]);
+        $this->assertSame("'  =hidden", $row[6]);
+        $this->assertSame("'\n@hidden", $row[7]);
+        $this->assertSame('ordinary text', $row[8]);
+        $this->assertSame('42', $row[9]);
+        $this->assertSame('0', $row[10]);
+        $this->assertSame('', $row[11]);
     }
 }

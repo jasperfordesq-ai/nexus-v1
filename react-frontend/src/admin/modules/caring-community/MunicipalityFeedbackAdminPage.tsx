@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -34,8 +35,9 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import XCircle from 'lucide-react/icons/x-circle';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { canManageCaring } from '@/caring/access';
 import { PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -131,7 +133,10 @@ function relativeTime(iso: string): string {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalityFeedbackAdminPage() {
-  usePageTitle('Municipality Feedback Inbox');
+  const { t } = useTranslation('caring_community');
+  const { user } = useAuth();
+  const canManage = canManageCaring(user);
+  usePageTitle(t('admin.feedback.title'));
   const { showToast } = useToast();
 
   const [items, setItems] = useState<FeedbackRow[]>([]);
@@ -180,11 +185,11 @@ export default function MunicipalityFeedbackAdminPage() {
       setItems(Array.isArray(res.data) ? res.data : []);
       setMeta((res.meta as PaginatedMeta | undefined) ?? null);
     } catch {
-      showToast('Failed to load feedback', 'error');
+      showToast(t('admin.feedback.errors.load'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, categoryFilter, subRegionFilter, page, showToast]);
+  }, [statusFilter, categoryFilter, subRegionFilter, page, showToast, t]);
 
   useEffect(() => {
     void loadStats();
@@ -217,21 +222,21 @@ export default function MunicipalityFeedbackAdminPage() {
           triage_notes: triageNotes.trim() === '' ? null : triageNotes.trim(),
         },
       );
-      showToast('Triage saved', 'success');
+      showToast(t('admin.feedback.messages.triage_saved'), 'success');
       if (res.data) setSelected(res.data);
       await loadList();
       await loadStats();
     } catch {
-      showToast('Failed to save triage', 'error');
+      showToast(t('admin.feedback.errors.save_triage'), 'error');
     } finally {
       setSavingTriage(false);
     }
-  }, [selected, triageStatus, triageAssignedUserId, triageAssignedRole, triageNotes, loadList, loadStats, showToast]);
+  }, [selected, triageStatus, triageAssignedUserId, triageAssignedRole, triageNotes, loadList, loadStats, showToast, t]);
 
   const handleResolve = useCallback(async () => {
     if (!selected) return;
     if (resolutionNotes.trim() === '') {
-      showToast('Resolution notes are required', 'error');
+      showToast(t('admin.feedback.errors.resolution_required'), 'error');
       return;
     }
     setSavingTriage(true);
@@ -240,16 +245,16 @@ export default function MunicipalityFeedbackAdminPage() {
         `/v2/admin/caring-community/feedback/${selected.id}/resolve`,
         { resolution_notes: resolutionNotes.trim() },
       );
-      showToast('Marked as resolved', 'success');
+      showToast(t('admin.feedback.messages.resolved'), 'success');
       if (res.data) setSelected(res.data);
       await loadList();
       await loadStats();
     } catch {
-      showToast('Failed to resolve', 'error');
+      showToast(t('admin.feedback.errors.resolve'), 'error');
     } finally {
       setSavingTriage(false);
     }
-  }, [selected, resolutionNotes, loadList, loadStats, showToast]);
+  }, [selected, resolutionNotes, loadList, loadStats, showToast, t]);
 
   const handleClose = useCallback(async () => {
     if (!selected) return;
@@ -259,16 +264,16 @@ export default function MunicipalityFeedbackAdminPage() {
         `/v2/admin/caring-community/feedback/${selected.id}/close`,
         {},
       );
-      showToast('Closed', 'success');
+      showToast(t('admin.feedback.messages.closed'), 'success');
       if (res.data) setSelected(res.data);
       await loadList();
       await loadStats();
     } catch {
-      showToast('Failed to close', 'error');
+      showToast(t('admin.feedback.errors.close'), 'error');
     } finally {
       setSavingTriage(false);
     }
-  }, [selected, loadList, loadStats, showToast]);
+  }, [selected, loadList, loadStats, showToast, t]);
 
   const handleExport = useCallback(async () => {
     try {
@@ -278,15 +283,15 @@ export default function MunicipalityFeedbackAdminPage() {
       const url = `/v2/admin/caring-community/feedback/export.csv${params.toString() ? `?${params.toString()}` : ''}`;
       await api.download(url, { filename: 'municipality-feedback-export.csv' });
     } catch {
-      showToast('Failed to export', 'error');
+      showToast(t('admin.feedback.errors.export'), 'error');
     }
-  }, [statusFilter, categoryFilter, showToast]);
+  }, [statusFilter, categoryFilter, showToast, t]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Municipality Feedback Inbox"
-        subtitle="Receive, triage, and resolve resident feedback — questions, ideas, issues, and complaints routed to the municipality or community team."
+        title={t('admin.feedback.title')}
+        subtitle={t('admin.feedback.subtitle')}
         icon={<Inbox size={20} />}
         actions={
           <div className="flex items-center gap-2">
@@ -302,14 +307,16 @@ export default function MunicipalityFeedbackAdminPage() {
             >
               Refresh
             </Button>
-            <Button
-              size="sm"
-              color="primary"
-              startContent={<Download size={14} />}
-              onPress={handleExport}
-            >
-              Export CSV
-            </Button>
+            {canManage && (
+              <Button
+                size="sm"
+                color="primary"
+                startContent={<Download size={14} />}
+                onPress={handleExport}
+              >
+                Export CSV
+              </Button>
+            )}
           </div>
         }
       />
@@ -629,26 +636,30 @@ export default function MunicipalityFeedbackAdminPage() {
                 <Button variant="flat" onPress={onClose} isDisabled={savingTriage}>
                   Cancel
                 </Button>
-                <Button
-                  color="default"
-                  variant="flat"
-                  startContent={<XCircle size={14} />}
-                  onPress={handleClose}
-                  isLoading={savingTriage}
-                >
-                  Close (no resolution)
-                </Button>
-                <Button
-                  color="success"
-                  startContent={<CheckCircle size={14} />}
-                  onPress={handleResolve}
-                  isLoading={savingTriage}
-                >
-                  Resolve
-                </Button>
-                <Button color="primary" onPress={handleSaveTriage} isLoading={savingTriage}>
-                  Save Triage
-                </Button>
+                {canManage && (
+                  <>
+                    <Button
+                      color="default"
+                      variant="flat"
+                      startContent={<XCircle size={14} />}
+                      onPress={handleClose}
+                      isLoading={savingTriage}
+                    >
+                      Close (no resolution)
+                    </Button>
+                    <Button
+                      color="success"
+                      startContent={<CheckCircle size={14} />}
+                      onPress={handleResolve}
+                      isLoading={savingTriage}
+                    >
+                      Resolve
+                    </Button>
+                    <Button color="primary" onPress={handleSaveTriage} isLoading={savingTriage}>
+                      Save Triage
+                    </Button>
+                  </>
+                )}
               </ModalFooter>
             </>
           )}

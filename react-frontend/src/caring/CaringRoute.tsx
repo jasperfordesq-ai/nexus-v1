@@ -6,6 +6,7 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { hasFullCaringAccess, hasSafeguardingAccess } from './access';
 
 export function CaringRoute() {
   const { user, isAuthenticated, isLoading, status } = useAuth();
@@ -20,28 +21,18 @@ export function CaringRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  const role = (user?.role as string) || '';
-  const userRecord = user as Record<string, unknown> | null;
-  const hasFullCaringAccess =
-    role === 'admin' ||
-    role === 'tenant_admin' ||
-    role === 'super_admin' ||
-    role === 'god' ||
-    userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true ||
-    userRecord?.is_god === true;
-  const hasSafeguardingAccess = hasFullCaringAccess || role === 'coordinator' || role === 'broker';
+  const fullAccess = hasFullCaringAccess(user);
+  const safeguardingAccess = hasSafeguardingAccess(user);
 
-  if (!hasSafeguardingAccess) {
+  if (!safeguardingAccess) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 
-  if (!hasFullCaringAccess && !hasFeature('caring_community')) {
+  if (!fullAccess && !hasFeature('caring_community')) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 
-  if (!hasFullCaringAccess) {
+  if (!fullAccess) {
     const safeguardingPath = tenantPath('/caring/safeguarding');
     if (!location.pathname.startsWith(safeguardingPath)) {
       return <Navigate to={safeguardingPath} replace />;

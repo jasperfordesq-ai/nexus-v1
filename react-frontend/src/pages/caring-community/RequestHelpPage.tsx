@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { Button, Textarea, Input, Radio, RadioGroup } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
+import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
@@ -53,6 +54,8 @@ function formatSuggestedWhen(iso: string | null, locale: string): string {
 export function RequestHelpPage() {
   const { t, i18n } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
+  const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
   usePageTitle(t('request_help.meta.title'));
 
   const [what, setWhat] = useState('');
@@ -61,6 +64,8 @@ export function RequestHelpPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const onBehalfOf = Number.parseInt(searchParams.get('on_behalf_of') ?? '', 10);
+  const caredForId = Number.isFinite(onBehalfOf) && onBehalfOf > 0 ? onBehalfOf : null;
 
   // Voice state
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('idle');
@@ -210,18 +215,31 @@ export function RequestHelpPage() {
 
     setSubmitting(true);
     try {
-      const response = await api.post('/v2/caring-community/request-help', {
-        what: what.trim(),
-        when: when.trim(),
-        contact_preference: contactPref,
-      });
+      const response = caredForId !== null
+        ? await api.post('/v2/caring-community/caregiver/request-on-behalf', {
+            cared_for_id: caredForId,
+            title: what.trim().slice(0, 120),
+            description: what.trim(),
+            when_needed: when.trim(),
+            contact_preference: contactPref,
+          })
+        : await api.post('/v2/caring-community/request-help', {
+            what: what.trim(),
+            when: when.trim(),
+            contact_preference: contactPref,
+          });
       if (!response.success) {
-        setError(response.error || t('request_help.errors.submit_failed'));
+        const message = response.error || t('request_help.errors.submit_failed');
+        setError(message);
+        showToast(message, 'error');
         return;
       }
+      showToast(t('request_help.success.toast'), 'success');
       setSubmitted(true);
     } catch {
-      setError(t('request_help.errors.submit_failed'));
+      const message = t('request_help.errors.submit_failed');
+      setError(message);
+      showToast(message, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -281,18 +299,24 @@ export function RequestHelpPage() {
         </div>
 
         <GlassCard className="p-6 sm:p-8">
-          <div className="mb-7 flex items-center gap-4">
+          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-500/15">
               <Heart className="h-6 w-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-tight text-theme-primary">{t('request_help.meta.title')}</h1>
               <p className="mt-1 text-base leading-7 text-theme-muted">{t('request_help.subtitle')}</p>
             </div>
           </div>
 
+          {caredForId !== null && (
+            <p className="mb-6 rounded-lg bg-secondary/10 px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">
+              {t('request_help.on_behalf_notice')}
+            </p>
+          )}
+
           {supportsVoice && (
-            <div className="mb-6">
+            <div className="mb-6" aria-live="polite">
               <Button
                 type="button"
                 color={voiceStatus === 'recording' ? 'danger' : 'secondary'}
