@@ -282,6 +282,16 @@ export function ListingsPage() {
     return () => { abortRef.current?.abort(); };
   }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode]);
 
+  // In map view, auto-load remaining pages so all geocoded listings are visible
+  // without requiring users to click "Load More". Capped to prevent runaway requests.
+  useEffect(() => {
+    if (viewMode !== 'map') return;
+    if (isLoading) return;
+    if (!hasMore) return;
+    if (listings.length >= 500) return;
+    loadListingsRef.current(false);
+  }, [viewMode, isLoading, hasMore, listings.length]);
+
   // Restore scroll position on back-navigation; save on unmount
   useEffect(() => {
     const key = `listings-scroll${window.location.search}`;
@@ -765,8 +775,8 @@ export function ListingsPage() {
             </>
           )}
 
-          {/* Load More with progress */}
-          {hasMore && (
+          {/* Load More with progress (hidden in map view — auto-loaded) */}
+          {hasMore && viewMode !== 'map' && (
             <div className="space-y-3 pt-4">
               {totalItems != null && totalItems > 0 && (
                 <div className="space-y-1.5">

@@ -105,6 +105,7 @@ const clusterRenderer: Renderer = {
       content: el,
       // clusters sit above regular markers
       zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
+      gmpClickable: true,
     });
   },
 };
@@ -157,7 +158,14 @@ function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
   // Create/destroy the clusterer when the map instance changes
   useEffect(() => {
     if (!map) return;
-    const instance = new MarkerClusterer({ map, renderer: clusterRenderer });
+    const instance = new MarkerClusterer({
+      map,
+      renderer: clusterRenderer,
+      onClusterClick: (_event, cluster, clickedMap) => {
+        if (!cluster.bounds) return;
+        clickedMap.fitBounds(cluster.bounds, 60);
+      },
+    });
     setClusterer(instance);
     return () => {
       instance.clearMarkers();
