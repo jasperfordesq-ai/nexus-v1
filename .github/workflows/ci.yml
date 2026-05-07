@@ -629,9 +629,99 @@ jobs:
           SENDGRID_API_KEY=
           EOF
 
+      - name: Prepare Smoke Database
+        run: |
+          docker compose -f compose.ci.yml up -d --wait db redis
+          docker compose -f compose.ci.yml exec -T db mariadb -u root -pci_root_pass nexus_test < database/schema/mysql-schema.sql
+          docker compose -f compose.ci.yml exec -T db mariadb -u root -pci_root_pass nexus_test <<'SQL'
+          INSERT INTO tenants (
+            id,
+            name,
+            slug,
+            domain,
+            tenant_category,
+            default_layout,
+            theme,
+            features,
+            configuration,
+            layout,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            2,
+            'Hour Timebank',
+            'hour-timebank',
+            'hour-timebank.project-nexus.ie',
+            'community',
+            'modern',
+            'modern',
+            JSON_OBJECT(
+              'listings', true,
+              'events', true,
+              'groups', true,
+              'messages', true,
+              'wallet', true,
+              'resources', true,
+              'volunteering', true,
+              'caring_community', true
+            ),
+            JSON_OBJECT(
+              'modules',
+              JSON_OBJECT(
+                'events', true,
+                'polls', true,
+                'goals', true,
+                'volunteering', true,
+                'resources', true,
+                'caring_community', true
+              )
+            ),
+            'modern',
+            NOW(),
+            NOW()
+          )
+          ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            slug = VALUES(slug),
+            domain = VALUES(domain),
+            tenant_category = VALUES(tenant_category),
+            default_layout = VALUES(default_layout),
+            theme = VALUES(theme),
+            features = VALUES(features),
+            configuration = VALUES(configuration),
+            layout = VALUES(layout),
+            updated_at = NOW();
+
+          INSERT INTO categories (tenant_id, name, slug, sort_order, is_active, type, created_at, updated_at)
+          VALUES
+            (2, 'General', 'general', 0, 1, 'listing', NOW(), NOW()),
+            (2, 'Home & Garden', 'home-garden', 1, 1, 'listing', NOW(), NOW()),
+            (2, 'Technology', 'technology', 2, 1, 'listing', NOW(), NOW()),
+            (2, 'Transport', 'transport', 3, 1, 'listing', NOW(), NOW())
+          ON DUPLICATE KEY UPDATE
+            slug = VALUES(slug),
+            sort_order = VALUES(sort_order),
+            is_active = VALUES(is_active),
+            type = VALUES(type),
+            updated_at = NOW();
+
+          INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type, category, created_at, updated_at)
+          VALUES
+            (2, 'site_name', 'Hour Timebank', 'string', 'general', NOW(), NOW()),
+            (2, 'currency_name', 'Hours', 'string', 'general', NOW(), NOW()),
+            (2, 'currency_symbol', 'hr', 'string', 'general', NOW(), NOW()),
+            (2, 'registration_mode', 'open', 'string', 'general', NOW(), NOW())
+          ON DUPLICATE KEY UPDATE
+            setting_value = VALUES(setting_value),
+            setting_type = VALUES(setting_type),
+            category = VALUES(category),
+            updated_at = NOW();
+          SQL
+
       - name: Start Application Stack
         run: |
-          docker compose -f compose.ci.yml up -d --wait || {
+          docker compose -f compose.ci.yml up -d --wait app frontend || {
             echo "::group::CI stack status"
             docker compose -f compose.ci.yml ps
             echo "::endgroup::"
@@ -649,7 +739,16 @@ jobs:
           echo "CI stack is healthy — all services passed their healthchecks."
 
       - name: Run Playwright Smoke Tests
-        run: npx playwright test e2e/tests/smoke.spec.ts --grep @smoke --project=chromium-modern
+        run: |
+          npx playwright test e2e/tests/smoke.spec.ts --grep @smoke --project=chromium-modern || {
+            echo "::group::App container logs"
+            docker compose -f compose.ci.yml logs --no-color app || true
+            echo "::endgroup::"
+            echo "::group::Frontend container logs"
+            docker compose -f compose.ci.yml logs --no-color frontend || true
+            echo "::endgroup::"
+            exit 1
+          }
         env:
           E2E_BASE_URL: http://localhost:3000
           E2E_API_URL: http://localhost:3000
