@@ -7,9 +7,13 @@
 /**
  * OPcache preload script for Laravel.
  * Loaded at PHP startup (opcache.preload ini directive).
- * Preloads all classes in the Composer classmap into shared memory,
- * eliminating compilation overhead on the first request after deploy.
+ * Preloads application classes from the Composer classmap into shared memory,
+ * avoiding vendor package ordering issues during Apache startup.
  */
+
+if (getenv('APP_ENV') === 'testing') {
+    return;
+}
 
 $autoloadFile = '/var/www/html/vendor/autoload.php';
 if (!file_exists($autoloadFile)) {
@@ -27,6 +31,10 @@ $preloaded = 0;
 $skipped = 0;
 
 foreach ($classMap as $class => $file) {
+    if (!str_starts_with($class, 'App\\')) {
+        $skipped++;
+        continue;
+    }
     if (!file_exists($file)) {
         $skipped++;
         continue;

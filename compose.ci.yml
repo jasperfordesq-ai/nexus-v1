@@ -31,6 +31,8 @@ services:
       - ./src:/var/www/html/src:ro
       - ./views:/var/www/html/views:ro
       - ./config:/var/www/html/config:ro
+      - ./resources:/var/www/html/resources:ro
+      - ./accessible-frontend:/var/www/html/accessible-frontend:ro
       - ./vendor:/var/www/html/vendor:ro
       - ./artisan:/var/www/html/artisan:ro
       - ./bootstrap:/var/www/html/bootstrap:ro
@@ -77,11 +79,11 @@ services:
       - nexus-ci-internal
     # No ports — tests reach the app via Docker network or docker exec
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
+      start_period: 180s
 
   # ---------------------------------------------------------------------------
   # MariaDB 10.11 Database (CI-tuned: lighter buffer pool, faster startup)
