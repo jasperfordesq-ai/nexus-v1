@@ -30,10 +30,15 @@ const hasUserCredentials = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E
 const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
 
 async function waitForTenantHydration(page: Page): Promise<void> {
-  await page
-    .getByText('Loading community')
-    .waitFor({ state: 'hidden', timeout: 15000 })
-    .catch(() => undefined);
+  const loadingShell = page
+    .locator('[aria-label="Loading community"], [aria-label="Loading"]')
+    .first();
+
+  if (await loadingShell.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await expect(loadingShell).toBeHidden({ timeout: 15000 });
+  }
+
+  await dismissBlockingModals(page);
 }
 
 test.beforeEach(async ({ page }) => {
