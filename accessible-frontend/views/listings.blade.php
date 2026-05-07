@@ -7,7 +7,7 @@
 @section('content')
     @php
         $communityName = $tenant['name'] ?? $tenantSlug;
-        $hasFilters = !empty($filters['search']) || !empty($filters['type']) || !empty($filters['category_id']);
+        $hasFilters = !empty($filters['search']) || !empty($filters['type']) || !empty($filters['category_id']) || ($filters['hours'] ?? 'any') !== 'any' || ($filters['service'] ?? 'any') !== 'any' || ($filters['posted'] ?? 'any') !== 'any';
         $listingTypeClass = fn (?string $type): string => ($type === 'request') ? 'govuk-tag--purple' : 'govuk-tag--blue';
         $listingTypeLabel = fn (?string $type): string => __('govuk_alpha.listings.' . (($type === 'request') ? 'request' : 'offer'));
     @endphp
@@ -64,6 +64,46 @@
                         </div>
                     </div>
                 </div>
+
+                <details class="govuk-details" data-module="govuk-details" @if (($filters['hours'] ?? 'any') !== 'any' || ($filters['service'] ?? 'any') !== 'any' || ($filters['posted'] ?? 'any') !== 'any') open @endif>
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">{{ __('govuk_alpha.listings.advanced_filters_title') }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="hours">{{ __('govuk_alpha.listings.hours_filter_label') }}</label>
+                                    <select class="govuk-select" id="hours" name="hours">
+                                        @foreach (['any', 'quick', 'short', 'half_day', 'full_day'] as $hoursOption)
+                                            <option value="{{ $hoursOption }}" @selected(($filters['hours'] ?? 'any') === $hoursOption)>{{ __('govuk_alpha.listings.hours_filters.' . $hoursOption) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="service">{{ __('govuk_alpha.listings.service_filter_label') }}</label>
+                                    <select class="govuk-select" id="service" name="service">
+                                        @foreach (['any', 'remote', 'in_person'] as $serviceOption)
+                                            <option value="{{ $serviceOption }}" @selected(($filters['service'] ?? 'any') === $serviceOption)>{{ __('govuk_alpha.listings.service_filters.' . $serviceOption) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="posted">{{ __('govuk_alpha.listings.posted_filter_label') }}</label>
+                                    <select class="govuk-select" id="posted" name="posted">
+                                        @foreach (['any', '1', '7', '30'] as $postedOption)
+                                            <option value="{{ $postedOption }}" @selected(($filters['posted'] ?? 'any') === $postedOption)>{{ __('govuk_alpha.listings.posted_filters.' . $postedOption) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
 
                 <div class="nexus-alpha-actions">
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
@@ -150,7 +190,7 @@
             @if (!empty($meta['has_more']) && !empty($meta['cursor']))
                 <nav class="govuk-pagination govuk-pagination--block govuk-!-margin-top-6" aria-label="{{ __('govuk_alpha.listings.pagination_label') }}">
                     <div class="govuk-pagination__next">
-                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.listings.index', array_filter(['tenantSlug' => $tenantSlug, 'q' => $filters['search'] ?? null, 'type' => $filters['type'] ?? null, 'category_id' => $filters['category_id'] ?? null, 'cursor' => $meta['cursor']])) }}" rel="next">
+                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.listings.index', array_filter(['tenantSlug' => $tenantSlug, 'q' => $filters['search'] ?? null, 'type' => $filters['type'] ?? null, 'category_id' => $filters['category_id'] ?? null, 'hours' => ($filters['hours'] ?? 'any') !== 'any' ? $filters['hours'] : null, 'service' => ($filters['service'] ?? 'any') !== 'any' ? $filters['service'] : null, 'posted' => ($filters['posted'] ?? 'any') !== 'any' ? $filters['posted'] : null, 'cursor' => $meta['cursor']])) }}" rel="next">
                             <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                                 <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
                             </svg>

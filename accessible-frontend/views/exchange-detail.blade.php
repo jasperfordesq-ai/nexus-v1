@@ -107,7 +107,7 @@
         @endif
     </div>
 
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha.exchanges.detail_title') }}</h2>
+    <h2 class="govuk-heading-l">{{ __('govuk_alpha.exchanges.actions_title') }}</h2>
     @if (!$hasActions)
         <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.no_action') }}</div>
     @else

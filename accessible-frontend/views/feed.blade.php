@@ -11,7 +11,7 @@
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
         $hasItems = !empty($items);
         $visibleCount = count($items);
-        $typeOptions = ['all', 'posts', 'listings', 'events', 'goals', 'polls'];
+        $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
         $feedItemType = fn (?string $type): string => match ($type) {
             'listing' => 'govuk-tag--blue',
             'event' => 'govuk-tag--green',
@@ -26,6 +26,8 @@
             ? route('govuk-alpha.feed', array_filter([
                 'tenantSlug' => $tenantSlug,
                 'type' => $selectedType,
+                'mode' => $selectedMode === 'recent' ? 'recent' : null,
+                'subtype' => $selectedSubtype,
                 'cursor' => $meta['cursor'],
                 'per_page' => $meta['per_page'] ?? null,
             ], fn ($value) => $value !== null && $value !== ''))
@@ -116,13 +118,39 @@
                 <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.feed.filters_title') }}</h2>
             </legend>
             <div id="feed-filter-hint" class="govuk-hint">{{ __('govuk_alpha.feed.filters_hint') }}</div>
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="type">{{ __('govuk_alpha.feed.filter_label') }}</label>
-                <select class="govuk-select" id="type" name="type">
-                    @foreach ($typeOptions as $type)
-                        <option value="{{ $type }}" @selected($selectedType === $type)>{{ __('govuk_alpha.feed.types.' . $type) }}</option>
-                    @endforeach
-                </select>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-third">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="type">{{ __('govuk_alpha.feed.filter_label') }}</label>
+                        <select class="govuk-select" id="type" name="type">
+                            @foreach ($typeOptions as $type)
+                                <option value="{{ $type }}" @selected($selectedType === $type)>{{ __('govuk_alpha.feed.types.' . $type) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="govuk-grid-column-one-third">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="mode">{{ __('govuk_alpha.feed.mode_label') }}</label>
+                        <select class="govuk-select" id="mode" name="mode">
+                            @foreach (['ranking', 'recent'] as $mode)
+                                <option value="{{ $mode }}" @selected($selectedMode === $mode)>{{ __('govuk_alpha.feed.modes.' . $mode) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="govuk-grid-column-one-third">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="subtype">{{ __('govuk_alpha.feed.subtype_label') }}</label>
+                        <select class="govuk-select" id="subtype" name="subtype">
+                            <option value="">{{ __('govuk_alpha.feed.subtypes.all') }}</option>
+                            @foreach (['offer', 'request'] as $subtype)
+                                <option value="{{ $subtype }}" @selected($selectedSubtype === $subtype)>{{ __('govuk_alpha.feed.subtypes.' . $subtype) }}</option>
+                            @endforeach
+                        </select>
+                        <div class="govuk-hint">{{ __('govuk_alpha.feed.subtype_hint') }}</div>
+                    </div>
+                </div>
             </div>
             <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.apply_filters') }}</button>
         </fieldset>

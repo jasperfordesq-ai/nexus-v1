@@ -500,7 +500,11 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         $userId = $this->currentUserId();
-        $type = $this->allowed($request->query('type', 'all'), ['all', 'posts', 'listings', 'events', 'goals', 'polls'], 'all');
+        $type = $this->allowed($request->query('type', 'all'), ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'], 'all');
+        $mode = $this->allowed($request->query('mode', 'ranking'), ['ranking', 'recent'], 'ranking');
+        $subtype = $type === 'listings'
+            ? $this->allowed($request->query('subtype'), ['offer', 'request'], null)
+            : null;
         $perPage = $this->intQuery($request, 'per_page', 10, 1, 50);
 
         $items = [];
@@ -512,7 +516,8 @@ class AlphaController extends Controller
                 $result = $this->feedService->getFeed($userId, [
                     'limit' => $perPage,
                     'type' => $type,
-                    'mode' => 'chronological',
+                    'mode' => $mode === 'recent' ? 'recent' : 'ranked',
+                    'subtype' => $subtype,
                     'cursor' => $request->query('cursor'),
                 ]);
                 $items = $result['items'] ?? [];
@@ -534,6 +539,8 @@ class AlphaController extends Controller
             'items' => $items,
             'meta' => $meta,
             'selectedType' => $type,
+            'selectedMode' => $mode,
+            'selectedSubtype' => $subtype,
             'requiresAuth' => $userId === null,
             'error' => $error,
             'status' => $request->query('status'),
@@ -589,7 +596,7 @@ class AlphaController extends Controller
         $filters = $this->listingFilters($request);
         $query = ['limit' => 12];
 
-        foreach (['type', 'category_id', 'search', 'cursor'] as $key) {
+        foreach (['type', 'category_id', 'search', 'cursor', 'min_hours', 'max_hours', 'service_type', 'posted_within'] as $key) {
             if ($filters[$key] !== null && $filters[$key] !== '') {
                 $query[$key] = $filters[$key];
             }
@@ -1406,13 +1413,46 @@ class AlphaController extends Controller
     private function listingFilters(Request $request): array
     {
         $type = $this->allowed($request->query('type'), ['offer', 'request'], null);
+        $hours = $this->allowed($request->query('hours', 'any'), ['any', 'quick', 'short', 'half_day', 'full_day'], 'any');
+        $service = $this->allowed($request->query('service', 'any'), ['any', 'remote', 'in_person'], 'any');
+        $posted = $this->allowed($request->query('posted', 'any'), ['any', '1', '7', '30'], 'any');
 
-        return [
+        $hoursMap = [
+            'quick' => ['max_hours' => 1],
+            'short' => ['min_hours' => 1, 'max_hours' => 3],
+            'half_day' => ['min_hours' => 3, 'max_hours' => 6],
+            'full_day' => ['min_hours' => 6],
+        ];
+
+        $filters = [
             'search' => trim((string) $request->query('q', '')) ?: null,
             'type' => $type,
             'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
             'cursor' => $request->query('cursor'),
+            'hours' => $hours,
+            'service' => $service,
+            'posted' => $posted,
+            'min_hours' => null,
+            'max_hours' => null,
+            'service_type' => null,
+            'posted_within' => null,
         ];
+
+        if ($hours !== 'any') {
+            $filters = array_merge($filters, $hoursMap[$hours] ?? []);
+        }
+
+        if ($service === 'remote') {
+            $filters['service_type'] = 'remote_only,hybrid';
+        } elseif ($service === 'in_person') {
+            $filters['service_type'] = 'physical_only';
+        }
+
+        if ($posted !== 'any') {
+            $filters['posted_within'] = (int) $posted;
+        }
+
+        return $filters;
     }
 
     private function eventFilters(Request $request): array

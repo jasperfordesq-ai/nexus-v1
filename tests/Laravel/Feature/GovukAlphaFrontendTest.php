@@ -109,6 +109,8 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-fieldset"', false);
         $response->assertSee('class="govuk-textarea"', false);
         $response->assertSee('class="govuk-select"', false);
+        $response->assertSee('name="mode"', false);
+        $response->assertSee('name="subtype"', false);
         $response->assertSee('class="govuk-tag govuk-tag--grey"', false);
         $response->assertSee('Alpha feed verification post');
     }
@@ -255,10 +257,20 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-fieldset"', false);
         $response->assertSee('type="search"', false);
         $response->assertSee('class="govuk-select"', false);
+        $response->assertSee('class="govuk-details"', false);
+        $response->assertSee('name="hours"', false);
+        $response->assertSee('name="service"', false);
+        $response->assertSee('name="posted"', false);
         $response->assertSee('class="govuk-tag govuk-tag--blue"', false);
         $response->assertSee('Alpha listing verification');
         $response->assertSee(__('govuk_alpha.actions.view_details'));
         $response->assertDontSee('Other tenant alpha listing');
+
+        $filtered = $this->get("/{$this->testTenantSlug}/alpha/listings?hours=short&service=in_person&posted=30");
+        $filtered->assertOk();
+        $filtered->assertSee('value="short" selected', false);
+        $filtered->assertSee('value="in_person" selected', false);
+        $filtered->assertSee('value="30" selected', false);
     }
 
     public function test_listings_page_renders_module_disabled_state(): void
@@ -431,6 +443,7 @@ class GovukAlphaFrontendTest extends TestCase
 
         $index = $this->get("/{$this->testTenantSlug}/alpha/messages");
         $index->assertOk();
+        $index->assertSee('class="govuk-tabs"', false);
         $index->assertSee('Accessible message workflow verification.');
         $index->assertSee(route('govuk-alpha.messages.show', ['tenantSlug' => $this->testTenantSlug, 'userId' => $recipient->id]), false);
 

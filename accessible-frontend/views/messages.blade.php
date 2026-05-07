@@ -44,16 +44,17 @@
         </div>
     @endif
 
-    <nav class="govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.messages.title') }}">
-        <ul class="govuk-list nexus-alpha-tabs">
-            <li>
-                <a class="govuk-link{{ !$showArchived ? ' govuk-!-font-weight-bold' : '' }}" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.messages.inbox') }}</a>
+    <div class="govuk-tabs">
+        <h2 class="govuk-tabs__title">{{ __('govuk_alpha.messages.tabs_title') }}</h2>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item{{ !$showArchived ? ' govuk-tabs__list-item--selected' : '' }}">
+                <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.messages.inbox') }}</a>
             </li>
-            <li>
-                <a class="govuk-link{{ $showArchived ? ' govuk-!-font-weight-bold' : '' }}" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1]) }}">{{ __('govuk_alpha.messages.archived') }}</a>
+            <li class="govuk-tabs__list-item{{ $showArchived ? ' govuk-tabs__list-item--selected' : '' }}">
+                <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1]) }}">{{ __('govuk_alpha.messages.archived') }}</a>
             </li>
         </ul>
-    </nav>
+    </div>
 
     @if (empty($items))
         <div class="govuk-inset-text">
