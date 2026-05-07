@@ -291,36 +291,72 @@ class CaringNudgeService
                             ->where('tenant_id', $tenantId)
                             ->where('dispatch_key', $dispatchKey)
                             ->lockForUpdate()
-                            ->first(['id', 'notification_id', 'status'])
+                            ->first(['id', 'notification_id', 'status', 'updated_at'])
                         : null;
 
-                    if ($existing) {
-                        return [
-                            'duplicated' => true,
-                            'nudge_id' => (int) $existing->id,
-                            'notification_id' => $existing->notification_id ? (int) $existing->notification_id : null,
-                        ];
-                    }
-
                     $now = now();
-                    $insert = [
-                        'tenant_id' => $tenantId,
-                        'target_user_id' => $targetId,
-                        'related_user_id' => $relatedId > 0 ? $relatedId : null,
-                        'source_type' => $sourceType,
-                        'score' => $candidate['score'],
-                        'signals' => json_encode($candidate['signals']),
-                        'notification_id' => null,
-                        'status' => 'dispatching',
-                        'sent_at' => $now,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                    if ($supportsDispatchKey) {
-                        $insert['dispatch_key'] = $dispatchKey;
-                    }
+                    if ($existing) {
+                        $notificationId = $existing->notification_id ? (int) $existing->notification_id : null;
+                        if ((string) $existing->status !== 'dispatching' || $notificationId !== null) {
+                            if ((string) $existing->status === 'dispatching' && $notificationId !== null) {
+                                DB::table('caring_smart_nudges')
+                                    ->where('tenant_id', $tenantId)
+                                    ->where('id', (int) $existing->id)
+                                    ->update([
+                                        'status' => 'sent',
+                                        'updated_at' => $now,
+                                    ]);
+                            }
 
-                    $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId($insert);
+                            return [
+                                'duplicated' => true,
+                                'nudge_id' => (int) $existing->id,
+                                'notification_id' => $notificationId,
+                            ];
+                        }
+
+                        $updatedAt = strtotime((string) ($existing->updated_at ?? ''));
+                        if ($updatedAt !== false && $updatedAt > (time() - 15 * 60)) {
+                            return [
+                                'duplicated' => true,
+                                'nudge_id' => (int) $existing->id,
+                                'notification_id' => null,
+                            ];
+                        }
+
+                        $nudgeId = (int) $existing->id;
+                        DB::table('caring_smart_nudges')
+                            ->where('tenant_id', $tenantId)
+                            ->where('id', $nudgeId)
+                            ->update([
+                                'target_user_id' => $targetId,
+                                'related_user_id' => $relatedId > 0 ? $relatedId : null,
+                                'source_type' => $sourceType,
+                                'score' => $candidate['score'],
+                                'signals' => json_encode($candidate['signals']),
+                                'sent_at' => $now,
+                                'updated_at' => $now,
+                            ]);
+                    } else {
+                        $insert = [
+                            'tenant_id' => $tenantId,
+                            'target_user_id' => $targetId,
+                            'related_user_id' => $relatedId > 0 ? $relatedId : null,
+                            'source_type' => $sourceType,
+                            'score' => $candidate['score'],
+                            'signals' => json_encode($candidate['signals']),
+                            'notification_id' => null,
+                            'status' => 'dispatching',
+                            'sent_at' => $now,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                        if ($supportsDispatchKey) {
+                            $insert['dispatch_key'] = $dispatchKey;
+                        }
+
+                        $nudgeId = (int) DB::table('caring_smart_nudges')->insertGetId($insert);
+                    }
 
                     // Wrap the bell render + insert in the recipient's locale
                     // so the message is translated to their preferred_language.
@@ -534,6 +570,7 @@ class CaringNudgeService
         $query = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('target_user_id', $targetId)
+            ->whereIn('status', ['sent', 'converted'])
             ->where('sent_at', '>=', now()->subDays($cooldownDays));
 
         if ($relatedId > 0) {
@@ -561,6 +598,7 @@ class CaringNudgeService
             ->where('tenant_id', $tenantId)
             ->where('target_user_id', $targetId)
             ->where('source_type', $sourceType)
+            ->whereIn('status', ['sent', 'converted'])
             ->where('sent_at', '>=', now()->subDays($cooldownDays))
             ->exists();
 
@@ -953,6 +991,7 @@ class CaringNudgeService
         $hits = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
             ->where('source_type', $sourceType)
+            ->whereIn('status', ['sent', 'converted'])
             ->where('sent_at', '>=', now()->subDays($cooldownDays))
             ->whereIn('target_user_id', $userIds)
             ->distinct()
@@ -986,6 +1025,7 @@ class CaringNudgeService
 
         $rows = DB::table('caring_smart_nudges')
             ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['sent', 'converted'])
             ->where('sent_at', '>=', now()->subDays($cooldownDays))
             ->whereIn('target_user_id', $targetIds)
             ->get(['target_user_id', 'related_user_id']);

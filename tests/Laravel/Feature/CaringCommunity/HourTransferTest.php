@@ -9,11 +9,14 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\CaringCommunity;
 
 use App\Core\TenantContext;
+use App\Events\TransactionCompleted;
 use App\Models\User;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -28,6 +31,8 @@ class HourTransferTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Event::fake([TransactionCompleted::class]);
 
         // Ensure caring_community is enabled on the source tenant
         $this->setCaringCommunityFeature(self::SOURCE_TENANT_ID, true);
@@ -256,6 +261,8 @@ class HourTransferTest extends TestCase
         $init = $service->initiate($sourceUser, $peerSlug, 5.0, 'Remote move');
         $result = $service->approveAtSource($init['transfer_id'], $admin);
 
+        Http::assertSent(fn ($request) => $request->url() === 'https://remote.example.test/api/v2/federation/hour-transfer/inbound');
+
         $this->assertSame('sent', $result['status']);
         $this->assertEqualsWithDelta(20.0, (float) DB::table('users')->where('id', $sourceUser)->value('balance'), 0.001);
 
@@ -283,5 +290,50 @@ class HourTransferTest extends TestCase
 
         $secondRetry = $service->retryRemoteDeliveries(self::SOURCE_TENANT_ID, 10);
         $this->assertSame(0, $secondRetry['processed']);
+    }
+
+    public function test_accept_remote_transfer_is_idempotent_and_credits_once(): void
+    {
+        if (!Schema::hasTable('caring_hour_transfers')) {
+            $this->markTestSkipped('caring_hour_transfers table missing.');
+        }
+
+        $email = 'inbound.' . uniqid() . '@example.com';
+        $destinationUser = $this->makeUser($this->destinationTenantId, $email, 2);
+        $sourceSlug = 'remote-source-' . substr(uniqid(), -6);
+        $peer = ['shared_secret' => str_repeat('b', 64)];
+        $payload = [
+            'source_tenant_slug' => $sourceSlug,
+            'destination_tenant_slug' => $this->destinationSlug,
+            'source_member_email' => $email,
+            'hours' => 3.0,
+            'reason' => 'Inbound retry',
+            'transfer_id' => random_int(10000, 99999),
+            'generated_at' => now()->toIso8601String(),
+        ];
+
+        $service = app(CaringHourTransferService::class);
+        $signature = $service->signPayload($payload, (string) $peer['shared_secret']);
+
+        $first = $service->acceptRemoteTransfer($this->destinationTenantId, $peer, $payload, $signature);
+        $second = $service->acceptRemoteTransfer($this->destinationTenantId, $peer, $payload, $signature);
+
+        $this->assertTrue($first['accepted']);
+        $this->assertFalse($first['duplicated']);
+        $this->assertTrue($second['accepted']);
+        $this->assertTrue($second['duplicated']);
+        $this->assertSame($first['destination_transfer_id'], $second['destination_transfer_id']);
+
+        $this->assertSame(1, (int) DB::table('caring_hour_transfers')
+            ->where('tenant_id', $this->destinationTenantId)
+            ->where('remote_idempotency_key', $sourceSlug . ':' . $payload['transfer_id'])
+            ->count());
+
+        $this->assertSame(1, (int) DB::table('transactions')
+            ->where('tenant_id', $this->destinationTenantId)
+            ->where('description', 'like', '[hour_transfer_in_remote] from ' . $sourceSlug . '%')
+            ->count());
+
+        $this->assertEqualsWithDelta(5.0, (float) DB::table('users')->where('id', $destinationUser)->value('balance'), 0.001);
     }
 }

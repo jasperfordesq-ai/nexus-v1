@@ -10,14 +10,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 4
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "setup",
         "name": "setup",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -31,7 +35,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "chromium-modern",
         "name": "chromium-modern",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -45,7 +51,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "firefox-modern",
         "name": "firefox-modern",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -59,7 +67,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "mobile-chrome",
         "name": "mobile-chrome",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -73,7 +83,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "mobile-safari",
         "name": "mobile-safari",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -87,7 +99,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "admin",
         "name": "admin",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -102,7 +116,9 @@
         "outputDir": "C:/platforms/htdocs/staging/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "unauthenticated",
         "name": "unauthenticated",
         "testDir": "C:/platforms/htdocs/staging/e2e/tests",
@@ -145,25 +161,1076 @@
     "workers": 4,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: Requiring @playwright/test second time, \nFirst:\nError: \n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\index.js:61:33)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\test.js:17:13)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\@playwright\\test\\index.js:17:18)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\playwright.config.ts:6:1)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Module.newCompile2 (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:46:29)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .ts] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at requireOrImport (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\transform\\transform.js:225:18)\n    at loadUserConfig (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:107:89)\n    at loadConfig (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:119:28)\n    at loadConfigFromFile (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:331:10)\n    at runTests (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\program.js:197:18)\n    at i.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\program.js:70:7)\n\nSecond: ",
-      "stack": "Error: Requiring @playwright/test second time, \nFirst:\nError: \n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\index.js:61:33)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\test.js:17:13)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\@playwright\\test\\index.js:17:18)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .js] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\playwright.config.ts:6:1)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Module.newCompile2 (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:46:29)\n    at Object.<anonymous> (node:internal/modules/cjs/loader:1943:10)\n    at Object.newLoader2 [as .ts] (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\third_party\\pirates.js:52:22)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.require (node:internal/modules/cjs/loader:1556:12)\n    at require (node:internal/modules/helpers:152:16)\n    at requireOrImport (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\transform\\transform.js:225:18)\n    at loadUserConfig (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:107:89)\n    at loadConfig (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:119:28)\n    at loadConfigFromFile (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\common\\configLoader.js:331:10)\n    at runTests (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\program.js:197:18)\n    at i.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\playwright\\lib\\program.js:70:7)\n\nSecond: \n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\node_modules\\@playwright\\test\\index.js:17:18)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\playwright.config.ts:6:1)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\e2e\\node_modules\\playwright\\lib\\index.js:57:11)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\e2e\\node_modules\\playwright\\test.js:17:13)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\e2e\\node_modules\\@playwright\\test\\index.js:17:18)\n    at Object.<anonymous> (C:\\platforms\\htdocs\\staging\\e2e\\global.setup.ts:6:1)",
-      "location": {
-        "file": "C:\\platforms\\htdocs\\staging\\playwright.config.ts",
-        "column": 1,
-        "line": 6
-      },
-      "snippet": "\u001b[90m   at \u001b[39m..\\..\\playwright.config.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m// See NOTICE file for attribution and acknowledgements.\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m \u001b[36mimport\u001b[39m { defineConfig\u001b[33m,\u001b[39m devices } \u001b[36mfrom\u001b[39m \u001b[32m'@playwright/test'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m dotenv \u001b[36mfrom\u001b[39m \u001b[32m'dotenv'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m path \u001b[36mfrom\u001b[39m \u001b[32m'path'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m\u001b[0m"
+      "title": "volunteering\\volunteering.spec.ts",
+      "file": "volunteering/volunteering.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Volunteering module",
+          "file": "volunteering/volunteering.spec.ts",
+          "line": 100,
+          "column": 6,
+          "specs": [
+            {
+              "title": "renders opportunities with real controls and mocked data",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-modern",
+                  "projectName": "chromium-modern",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1542,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m\n \u001b[90m 105 |\u001b[39m   test(\u001b[32m'renders opportunities with real controls and mocked data'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/volunteering/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 106
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  104 |\n  105 |   test('renders opportunities with real controls and mocked data', async ({ page }) => {\n> 106 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  107 |     await dismissBlockingModals(page);\n  108 |\n  109 |     await expect(page.getByRole('heading', { name: /volunteering/i })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:47.139Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--b3298-al-controls-and-mocked-data-chromium-modern\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 106
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-70f69083279a5a164c99",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 105,
+              "column": 7
+            },
+            {
+              "title": "syncs the applications tab from the current URL",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-modern",
+                  "projectName": "chromium-modern",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1685,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 119
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 117 |\u001b[39m\n \u001b[90m 118 |\u001b[39m   test(\u001b[32m'syncs the applications tab from the current URL'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 119 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering?tab=applications'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 121 |\u001b[39m\n \u001b[90m 122 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'tab'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/my applications/i\u001b[39m }))\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m'aria-selected'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'true'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 119
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  117 |\n  118 |   test('syncs the applications tab from the current URL', async ({ page }) => {\n> 119 |     await page.goto(tenantUrl('volunteering?tab=applications'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  120 |     await dismissBlockingModals(page);\n  121 |\n  122 |     await expect(page.getByRole('tab', { name: /my applications/i })).toHaveAttribute('aria-selected', 'true');\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:47.218Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--6067d-ns-tab-from-the-current-URL-chromium-modern\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 119
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-231933d7c21749912baa",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 118,
+              "column": 7
+            },
+            {
+              "title": "keeps the volunteering page usable on mobile without horizontal overflow",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-modern",
+                  "projectName": "chromium-modern",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 1522,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 130
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 128 |\u001b[39m   test(\u001b[32m'keeps the volunteering page usable on mobile without horizontal overflow'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 129 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 130 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 131 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 132 |\u001b[39m\n \u001b[90m 133 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 130
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  128 |   test('keeps the volunteering page usable on mobile without horizontal overflow', async ({ page }) => {\n  129 |     await page.setViewportSize({ width: 375, height: 667 });\n> 130 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  131 |     await dismissBlockingModals(page);\n  132 |\n  133 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:47.273Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--e2afe-without-horizontal-overflow-chromium-modern\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 130
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-379562df3c3acc2790f8",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 128,
+              "column": 7
+            },
+            {
+              "title": "uses the current volunteering API endpoint, not the stale legacy path",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-modern",
+                  "projectName": "chromium-modern",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 1687,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 153
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 151 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 152 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 153 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 154 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 155 |\u001b[39m\n \u001b[90m 156 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 153
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  151 |     });\n  152 |\n> 153 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  154 |     await dismissBlockingModals(page);\n  155 |\n  156 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:47.206Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--58bcc-t-not-the-stale-legacy-path-chromium-modern\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 153
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-2cd803164a40a5e45a26",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 138,
+              "column": 7
+            },
+            {
+              "title": "renders opportunities with real controls and mocked data",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-modern",
+                  "projectName": "firefox-modern",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 9513,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m\n \u001b[90m 105 |\u001b[39m   test(\u001b[32m'renders opportunities with real controls and mocked data'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/volunteering/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 106
+                          },
+                          "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  104 |\n  105 |   test('renders opportunities with real controls and mocked data', async ({ page }) => {\n> 106 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  107 |     await dismissBlockingModals(page);\n  108 |\n  109 |     await expect(page.getByRole('heading', { name: /volunteering/i })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:54.138Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--b3298-al-controls-and-mocked-data-firefox-modern\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--b3298-al-controls-and-mocked-data-firefox-modern\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 106
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-0dc31aa197a7ef038314",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 105,
+              "column": 7
+            },
+            {
+              "title": "syncs the applications tab from the current URL",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-modern",
+                  "projectName": "firefox-modern",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 9940,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 119
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 117 |\u001b[39m\n \u001b[90m 118 |\u001b[39m   test(\u001b[32m'syncs the applications tab from the current URL'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 119 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering?tab=applications'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 121 |\u001b[39m\n \u001b[90m 122 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'tab'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/my applications/i\u001b[39m }))\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m'aria-selected'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'true'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 119
+                          },
+                          "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  117 |\n  118 |   test('syncs the applications tab from the current URL', async ({ page }) => {\n> 119 |     await page.goto(tenantUrl('volunteering?tab=applications'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  120 |     await dismissBlockingModals(page);\n  121 |\n  122 |     await expect(page.getByRole('tab', { name: /my applications/i })).toHaveAttribute('aria-selected', 'true');\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:54.148Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--6067d-ns-tab-from-the-current-URL-firefox-modern\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--6067d-ns-tab-from-the-current-URL-firefox-modern\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 119
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-e05657d82cd5a75bb9ef",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 118,
+              "column": 7
+            },
+            {
+              "title": "keeps the volunteering page usable on mobile without horizontal overflow",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-modern",
+                  "projectName": "firefox-modern",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 8220,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 130
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 128 |\u001b[39m   test(\u001b[32m'keeps the volunteering page usable on mobile without horizontal overflow'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 129 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 130 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 131 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 132 |\u001b[39m\n \u001b[90m 133 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 130
+                          },
+                          "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  128 |   test('keeps the volunteering page usable on mobile without horizontal overflow', async ({ page }) => {\n  129 |     await page.setViewportSize({ width: 375, height: 667 });\n> 130 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  131 |     await dismissBlockingModals(page);\n  132 |\n  133 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:54.112Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--e2afe-without-horizontal-overflow-firefox-modern\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--e2afe-without-horizontal-overflow-firefox-modern\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 130
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-2e56c713e99cfb814919",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 128,
+              "column": 7
+            },
+            {
+              "title": "uses the current volunteering API endpoint, not the stale legacy path",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-modern",
+                  "projectName": "firefox-modern",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8633,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 153
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 151 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 152 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 153 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 154 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 155 |\u001b[39m\n \u001b[90m 156 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 153
+                          },
+                          "message": "Error: page.goto: NS_ERROR_UNKNOWN_HOST\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  151 |     });\n  152 |\n> 153 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  154 |     await dismissBlockingModals(page);\n  155 |\n  156 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:09:54.306Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--58bcc-t-not-the-stale-legacy-path-firefox-modern\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--58bcc-t-not-the-stale-legacy-path-firefox-modern\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 153
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-aad5fb7f1dda4e52b616",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 138,
+              "column": 7
+            },
+            {
+              "title": "renders opportunities with real controls and mocked data",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1437,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m\n \u001b[90m 105 |\u001b[39m   test(\u001b[32m'renders opportunities with real controls and mocked data'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/volunteering/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 106
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  104 |\n  105 |   test('renders opportunities with real controls and mocked data', async ({ page }) => {\n> 106 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  107 |     await dismissBlockingModals(page);\n  108 |\n  109 |     await expect(page.getByRole('heading', { name: /volunteering/i })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:16.071Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--b3298-al-controls-and-mocked-data-mobile-chrome\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 106
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-5fea7a619724f825c6c3",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 105,
+              "column": 7
+            },
+            {
+              "title": "syncs the applications tab from the current URL",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1467,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 119
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 117 |\u001b[39m\n \u001b[90m 118 |\u001b[39m   test(\u001b[32m'syncs the applications tab from the current URL'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 119 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering?tab=applications'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 121 |\u001b[39m\n \u001b[90m 122 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'tab'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/my applications/i\u001b[39m }))\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m'aria-selected'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'true'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 119
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering?tab=applications\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  117 |\n  118 |   test('syncs the applications tab from the current URL', async ({ page }) => {\n> 119 |     await page.goto(tenantUrl('volunteering?tab=applications'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  120 |     await dismissBlockingModals(page);\n  121 |\n  122 |     await expect(page.getByRole('tab', { name: /my applications/i })).toHaveAttribute('aria-selected', 'true');\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:16.131Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--6067d-ns-tab-from-the-current-URL-mobile-chrome\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 119
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-a41a91a4589a17571ce3",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 118,
+              "column": 7
+            },
+            {
+              "title": "keeps the volunteering page usable on mobile without horizontal overflow",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 1522,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 130
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 128 |\u001b[39m   test(\u001b[32m'keeps the volunteering page usable on mobile without horizontal overflow'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 129 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 130 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 131 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 132 |\u001b[39m\n \u001b[90m 133 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 130
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  128 |   test('keeps the volunteering page usable on mobile without horizontal overflow', async ({ page }) => {\n  129 |     await page.setViewportSize({ width: 375, height: 667 });\n> 130 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  131 |     await dismissBlockingModals(page);\n  132 |\n  133 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:18.084Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--e2afe-without-horizontal-overflow-mobile-chrome\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 130
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-6fb17b74982e032de803",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 128,
+              "column": 7
+            },
+            {
+              "title": "uses the current volunteering API endpoint, not the stale legacy path",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 1341,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 153
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 151 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 152 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 153 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 154 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 155 |\u001b[39m\n \u001b[90m 156 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 153
+                          },
+                          "message": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at http://staging.timebank.local/hour-timebank/volunteering\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  151 |     });\n  152 |\n> 153 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  154 |     await dismissBlockingModals(page);\n  155 |\n  156 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:18.743Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--58bcc-t-not-the-stale-legacy-path-mobile-chrome\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 153
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-085574be516dc2971fe7",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 138,
+              "column": 7
+            },
+            {
+              "title": "renders opportunities with real controls and mocked data",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3993,
+                      "error": {
+                        "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m\n \u001b[90m 105 |\u001b[39m   test(\u001b[32m'renders opportunities with real controls and mocked data'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/volunteering/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 106
+                          },
+                          "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  104 |\n  105 |   test('renders opportunities with real controls and mocked data', async ({ page }) => {\n> 106 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  107 |     await dismissBlockingModals(page);\n  108 |\n  109 |     await expect(page.getByRole('heading', { name: /volunteering/i })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:106:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:23.885Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--b3298-al-controls-and-mocked-data-mobile-safari\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 106
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-e43fdbe3624de24be860",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 105,
+              "column": 7
+            },
+            {
+              "title": "syncs the applications tab from the current URL",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 4038,
+                      "error": {
+                        "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 119
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 117 |\u001b[39m\n \u001b[90m 118 |\u001b[39m   test(\u001b[32m'syncs the applications tab from the current URL'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 119 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering?tab=applications'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 120 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 121 |\u001b[39m\n \u001b[90m 122 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'tab'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/my applications/i\u001b[39m }))\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m'aria-selected'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'true'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 119
+                          },
+                          "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering?tab=applications\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  117 |\n  118 |   test('syncs the applications tab from the current URL', async ({ page }) => {\n> 119 |     await page.goto(tenantUrl('volunteering?tab=applications'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  120 |     await dismissBlockingModals(page);\n  121 |\n  122 |     await expect(page.getByRole('tab', { name: /my applications/i })).toHaveAttribute('aria-selected', 'true');\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:119:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:23.861Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--6067d-ns-tab-from-the-current-URL-mobile-safari\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 119
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-8133c44a04418922e223",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 118,
+              "column": 7
+            },
+            {
+              "title": "keeps the volunteering page usable on mobile without horizontal overflow",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 2835,
+                      "error": {
+                        "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 130
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 128 |\u001b[39m   test(\u001b[32m'keeps the volunteering page usable on mobile without horizontal overflow'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 129 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 130 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 131 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 132 |\u001b[39m\n \u001b[90m 133 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 130
+                          },
+                          "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  128 |   test('keeps the volunteering page usable on mobile without horizontal overflow', async ({ page }) => {\n  129 |     await page.setViewportSize({ width: 375, height: 667 });\n> 130 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  131 |     await dismissBlockingModals(page);\n  132 |\n  133 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:130:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:26.174Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--e2afe-without-horizontal-overflow-mobile-safari\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 130
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-9127de13386e00388b2a",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 128,
+              "column": 7
+            },
+            {
+              "title": "uses the current volunteering API endpoint, not the stale legacy path",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 2633,
+                      "error": {
+                        "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16",
+                        "location": {
+                          "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                          "column": 16,
+                          "line": 153
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 151 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 152 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 153 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(tenantUrl(\u001b[32m'volunteering'\u001b[39m)\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 154 |\u001b[39m     \u001b[36mawait\u001b[39m dismissBlockingModals(page)\u001b[33m;\u001b[39m\n \u001b[90m 155 |\u001b[39m\n \u001b[90m 156 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m opportunity\u001b[33m.\u001b[39mtitle }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                            "column": 16,
+                            "line": 153
+                          },
+                          "message": "Error: page.goto: Could not resolve hostname\nCall log:\n\u001b[2m  - navigating to \"http://staging.timebank.local/hour-timebank/volunteering\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n  151 |     });\n  152 |\n> 153 |     await page.goto(tenantUrl('volunteering'), { waitUntil: 'domcontentloaded' });\n      |                ^\n  154 |     await dismissBlockingModals(page);\n  155 |\n  156 |     await expect(page.getByRole('link', { name: opportunity.title })).toBeVisible();\n    at C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts:153:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-07T08:10:26.547Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\platforms\\htdocs\\staging\\e2e\\test-results\\volunteering-volunteering--58bcc-t-not-the-stale-legacy-path-mobile-safari\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\platforms\\htdocs\\staging\\e2e\\tests\\volunteering\\volunteering.spec.ts",
+                        "column": 16,
+                        "line": 153
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e5ec63136bfe4d6d1d45-45f625b9e584b3bfd632",
+              "file": "volunteering/volunteering.spec.ts",
+              "line": 138,
+              "column": 7
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-05-06T18:43:17.537Z",
-    "duration": 4527.132999999999,
+    "startTime": "2026-05-07T08:09:34.926Z",
+    "duration": 54705.007000000005,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 16,
     "flaky": 0
   }
 }

@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Services\CaringCommunity\CaringHourTransferService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RetryCaringHourTransferDeliveries extends Command
 {
@@ -30,39 +31,51 @@ class RetryCaringHourTransferDeliveries extends Command
 
         $limit = max(1, min(250, (int) $this->option('limit')));
         $totals = ['processed' => 0, 'delivered' => 0, 'failed' => 0];
+        $tenantFailures = 0;
 
         foreach ($tenantIds as $tenantId) {
             if ($tenantId <= 0) {
                 continue;
             }
 
-            TenantContext::setById($tenantId);
-            if (! TenantContext::hasFeature('caring_community')) {
-                $this->line("Tenant {$tenantId}: caring community disabled");
+            try {
+                TenantContext::setById($tenantId);
+                if (! TenantContext::hasFeature('caring_community')) {
+                    $this->line("Tenant {$tenantId}: caring community disabled");
+                    continue;
+                }
+
+                $result = $service->retryRemoteDeliveries($tenantId, $limit);
+                foreach ($totals as $key => $value) {
+                    $totals[$key] = $value + (int) ($result[$key] ?? 0);
+                }
+
+                $this->line(sprintf(
+                    'Tenant %d: processed=%d delivered=%d failed=%d',
+                    $tenantId,
+                    (int) ($result['processed'] ?? 0),
+                    (int) ($result['delivered'] ?? 0),
+                    (int) ($result['failed'] ?? 0),
+                ));
+            } catch (\Throwable $e) {
+                $tenantFailures++;
+                Log::error('[RetryCaringHourTransferDeliveries] tenant failure', [
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+                $this->error("Tenant {$tenantId}: failed - " . $e->getMessage());
                 continue;
             }
-
-            $result = $service->retryRemoteDeliveries($tenantId, $limit);
-            foreach ($totals as $key => $value) {
-                $totals[$key] = $value + (int) ($result[$key] ?? 0);
-            }
-
-            $this->line(sprintf(
-                'Tenant %d: processed=%d delivered=%d failed=%d',
-                $tenantId,
-                (int) ($result['processed'] ?? 0),
-                (int) ($result['delivered'] ?? 0),
-                (int) ($result['failed'] ?? 0),
-            ));
         }
 
         $this->info(sprintf(
-            'Remote hour-transfer retries: processed=%d delivered=%d failed=%d',
+            'Remote hour-transfer retries: processed=%d delivered=%d failed=%d tenant_failures=%d',
             $totals['processed'],
             $totals['delivered'],
             $totals['failed'],
+            $tenantFailures,
         ));
 
-        return self::SUCCESS;
+        return $tenantFailures > 0 ? self::FAILURE : self::SUCCESS;
     }
 }

@@ -678,7 +678,7 @@ class CaringHourTransferService
             return ['delivered' => false, 'status' => 0, 'error' => 'missing base_url', 'response' => null];
         }
 
-        $endpoint = rtrim($baseUrl, '/') . '/v2/federation/hour-transfer/inbound';
+        $endpoint = $this->remoteInboundEndpoint($baseUrl);
 
         try {
             $response = Http::timeout(10)
@@ -717,6 +717,21 @@ class CaringHourTransferService
             'error'     => $delivered ? null : ('remote-rejected: ' . ($body['error'] ?? $response->body())),
             'response'  => $body,
         ];
+    }
+
+    private function remoteInboundEndpoint(string $baseUrl): string
+    {
+        $base = rtrim($baseUrl, '/');
+
+        if (preg_match('~/api/v2$~', $base) === 1 || preg_match('~/v2$~', $base) === 1) {
+            return $base . '/federation/hour-transfer/inbound';
+        }
+
+        if (preg_match('~/api$~', $base) === 1) {
+            return $base . '/v2/federation/hour-transfer/inbound';
+        }
+
+        return $base . '/api/v2/federation/hour-transfer/inbound';
     }
 
     /**

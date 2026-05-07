@@ -26,6 +26,8 @@ return new class extends Migration
             }
 
             if (! $this->indexExists('caring_smart_nudges', $this->uniqueIndexName)) {
+                $this->normaliseDuplicateDispatchKeys();
+
                 Schema::table('caring_smart_nudges', function (Blueprint $table): void {
                     $table->unique(['tenant_id', 'dispatch_key'], $this->uniqueIndexName);
                 });
@@ -74,5 +76,35 @@ return new class extends Migration
             'SELECT 1 FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ? LIMIT 1',
             [$table, $index],
         ) !== [];
+    }
+
+    private function normaliseDuplicateDispatchKeys(): void
+    {
+        DB::table('caring_smart_nudges')
+            ->where('dispatch_key', '')
+            ->update(['dispatch_key' => null]);
+
+        $duplicates = DB::table('caring_smart_nudges')
+            ->select([
+                'tenant_id',
+                'dispatch_key',
+                DB::raw('MIN(id) as keep_id'),
+            ])
+            ->whereNotNull('dispatch_key')
+            ->where('dispatch_key', '<>', '')
+            ->groupBy('tenant_id', 'dispatch_key')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        foreach ($duplicates as $duplicate) {
+            DB::table('caring_smart_nudges')
+                ->where('tenant_id', (int) $duplicate->tenant_id)
+                ->where('dispatch_key', (string) $duplicate->dispatch_key)
+                ->where('id', '<>', (int) $duplicate->keep_id)
+                ->update([
+                    'dispatch_key' => DB::raw("CONCAT('duplicate:', id)"),
+                    'updated_at' => now(),
+                ]);
+        }
     }
 };

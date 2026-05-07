@@ -8,6 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
+import { hasFullCaringAccess } from '../access';
 import Heart from 'lucide-react/icons/heart';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
@@ -154,17 +155,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
   const { user } = useAuth();
   const [query, setQuery] = useState('');
 
-  const role = (user?.role as string) || '';
-  const userRecord = user as Record<string, unknown> | null;
-  const hasFullCaringAccess =
-    role === 'admin' ||
-    role === 'tenant_admin' ||
-    role === 'super_admin' ||
-    role === 'god' ||
-    userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true ||
-    userRecord?.is_god === true;
+  const fullAccess = hasFullCaringAccess(user);
 
   const isActive = (path: string) => {
     const current = location.pathname;
@@ -176,7 +167,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
   };
 
   const visibleSections = useMemo(() => {
-    const availableSections = hasFullCaringAccess
+    const availableSections = fullAccess
       ? SECTIONS
       : SECTIONS
           .filter((section) => section.key === 'trust_safety')
@@ -204,7 +195,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
         return { ...section, items };
       })
       .filter((section) => section.items.length > 0);
-  }, [collapsed, hasFullCaringAccess, query, t]);
+  }, [collapsed, fullAccess, query, t]);
 
   const renderItem = (item: NavItem) => {
     const active = isActive(item.path);
@@ -340,7 +331,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
             <span>{t('panel.sidebar.help_centre')}</span>
           </Link>
         )}
-        {hasFullCaringAccess && (
+        {fullAccess && (
           <>
             {collapsed ? (
               <Tooltip content={t('panel.sidebar.full_admin')} placement="right">

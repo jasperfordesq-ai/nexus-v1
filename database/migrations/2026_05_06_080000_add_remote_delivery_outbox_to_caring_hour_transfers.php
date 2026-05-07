@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -36,12 +37,14 @@ return new class extends Migration
             }
         });
 
-        Schema::table('caring_hour_transfers', function (Blueprint $table): void {
-            $table->index(
-                ['tenant_id', 'role', 'is_remote', 'status', 'remote_delivery_next_retry_at'],
-                'idx_caring_hour_remote_outbox_due'
-            );
-        });
+        if (! $this->indexExists('idx_caring_hour_remote_outbox_due')) {
+            Schema::table('caring_hour_transfers', function (Blueprint $table): void {
+                $table->index(
+                    ['tenant_id', 'role', 'is_remote', 'status', 'remote_delivery_next_retry_at'],
+                    'idx_caring_hour_remote_outbox_due'
+                );
+            });
+        }
     }
 
     public function down(): void
@@ -50,9 +53,11 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('caring_hour_transfers', function (Blueprint $table): void {
-            $table->dropIndex('idx_caring_hour_remote_outbox_due');
-        });
+        if ($this->indexExists('idx_caring_hour_remote_outbox_due')) {
+            Schema::table('caring_hour_transfers', function (Blueprint $table): void {
+                $table->dropIndex('idx_caring_hour_remote_outbox_due');
+            });
+        }
 
         Schema::table('caring_hour_transfers', function (Blueprint $table): void {
             foreach ([
@@ -67,5 +72,13 @@ return new class extends Migration
                 }
             }
         });
+    }
+
+    private function indexExists(string $index): bool
+    {
+        return DB::select(
+            'SELECT 1 FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ? LIMIT 1',
+            ['caring_hour_transfers', $index],
+        ) !== [];
     }
 };

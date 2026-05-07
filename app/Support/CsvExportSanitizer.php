@@ -29,7 +29,7 @@ final class CsvExportSanitizer
 
         $cell = (string) $value;
 
-        if ($cell !== '' && preg_match('/^[=+\-@\t\r]/', $cell) === 1) {
+        if ($cell !== '' && preg_match('/^[\s\x00-\x1F]*[=+\-@]/u', $cell) === 1) {
             return "'" . $cell;
         }
 

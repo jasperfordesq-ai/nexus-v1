@@ -233,4 +233,60 @@ class ResearchPartnershipControllerTest extends TestCase
         $export->assertJsonPath('data.dataset.rows.0.participant_count', 5);
         $export->assertJsonPath('data.dataset.rows.0.approved_hours', 10);
     }
+
+    public function test_research_export_omits_periods_below_suppression_threshold(): void
+    {
+        $this->requireResearchTables();
+        $this->setCaringCommunityFeature(true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+        $members = [];
+        for ($i = 0; $i < 4; $i++) {
+            $members[] = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        }
+
+        foreach ($members as $member) {
+            DB::table('caring_research_consents')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'consent_status' => 'opted_in',
+                'consent_version' => 'research-v1',
+                'consented_at' => now(),
+                'revoked_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('vol_logs')->insert([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $member->id,
+                'organization_id' => null,
+                'date_logged' => '2026-04-10',
+                'hours' => 2.00,
+                'description' => 'Suppressed support activity.',
+                'status' => 'approved',
+                'created_at' => '2026-04-10 09:00:00',
+                'updated_at' => '2026-04-10 09:00:00',
+            ]);
+        }
+
+        Sanctum::actingAs($admin);
+        $partner = $this->apiPost('/v2/admin/caring-community/research/partners', [
+            'name' => 'Small Cohort Study',
+            'institution' => 'Privacy Institute',
+            'status' => 'active',
+        ]);
+        $partner->assertStatus(201);
+        $partnerId = (int) $partner->json('data.id');
+
+        $export = $this->apiPost("/v2/admin/caring-community/research/partners/{$partnerId}/dataset-exports", [
+            'period_start' => '2026-04-01',
+            'period_end' => '2026-04-30',
+        ]);
+
+        $export->assertStatus(201);
+        $export->assertJsonPath('data.export.row_count', 0);
+        $export->assertJsonPath('data.dataset.anonymization.suppressed_rows_omitted', true);
+        $this->assertSame([], $export->json('data.dataset.rows'));
+    }
 }

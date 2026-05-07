@@ -17,16 +17,16 @@ import { SuperAdminRoute } from './SuperAdminRoute';
 import type { TenantFeatures } from '@/types';
 
 /** Small wrapper so Navigate targets can use tenantPath() inside Route elements. */
-function TenantRedirect({ to }: { to: string }) {
+export function TenantRedirect({ to }: { to: string }) {
   const { tenantPath } = useTenant();
   return <Navigate to={tenantPath(to)} replace />;
 }
 
-function TenantParamRedirect({ to }: { to: string }) {
+export function TenantParamRedirect({ to }: { to: string }) {
   const { tenantPath } = useTenant();
   const params = useParams<Record<string, string | undefined>>();
   const resolved = Object.entries(params).reduce(
-    (path, [key, value]) => path.replace(`:${key}`, value ?? ''),
+    (path, [key, value]) => path.replace(`:${key}`, encodeURIComponent(value ?? '')),
     to,
   );
 

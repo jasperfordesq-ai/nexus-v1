@@ -20,14 +20,17 @@
 import { chromium, type FullConfig } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
+import { fileURLToPath } from 'url';
 
-export const AUTH_FILE = path.join(__dirname, '.auth', 'user.json');
+const E2E_DIR = path.dirname(fileURLToPath(import.meta.url));
+
+export const AUTH_FILE = path.join(E2E_DIR, '.auth', 'user.json');
 export const TENANT_SLUG = process.env.E2E_TENANT ?? 'hour-timebank';
 export const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5173';
 
 export default async function globalSetup(_config: FullConfig) {
   // Ensure the .auth directory exists
-  const authDir = path.join(__dirname, '.auth');
+  const authDir = path.join(E2E_DIR, '.auth');
   if (!fs.existsSync(authDir)) {
     fs.mkdirSync(authDir, { recursive: true });
   }

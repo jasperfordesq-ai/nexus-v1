@@ -18,6 +18,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Card,
@@ -25,9 +26,15 @@ import {
   CardHeader,
   Chip,
   Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Spinner,
   Tab,
   Tabs,
+  Textarea,
 } from '@heroui/react';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Check from 'lucide-react/icons/check';
@@ -35,9 +42,10 @@ import Inbox from 'lucide-react/icons/inbox';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { canManageCaring } from '@/caring/access';
 import { PageHeader } from '../../components';
 
 type TransferStatus =
@@ -84,7 +92,10 @@ const STATUS_COLOR: Record<TransferStatus, 'default' | 'primary' | 'success' | '
 
 export default function HourTransferAdminPage() {
   const toast = useToast();
-  usePageTitle('Hour Transfers');
+  const { user } = useAuth();
+  const { t } = useTranslation('caring_community');
+  const canManage = canManageCaring(user);
+  usePageTitle(t('admin.hour_transfers.title'));
 
   const [tab, setTab] = useState<string>('pending');
   const [pending, setPending] = useState<PendingItem[]>([]);
@@ -92,6 +103,8 @@ export default function HourTransferAdminPage() {
   const [loadingPending, setLoadingPending] = useState(true);
   const [loadingInbound, setLoadingInbound] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
+  const [rejectTargetId, setRejectTargetId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   const loadPending = useCallback(async () => {
     try {
@@ -102,15 +115,15 @@ export default function HourTransferAdminPage() {
       if (res.success && res.data) {
         setPending(res.data.items ?? []);
       } else {
-        toast.error(res.error || 'Failed to load pending transfers');
+        toast.error(res.error || t('admin.hour_transfers.errors.load_pending'));
       }
     } catch (err) {
       logError('HourTransferAdminPage: load pending failed', err);
-      toast.error('Failed to load pending transfers');
+      toast.error(t('admin.hour_transfers.errors.load_pending'));
     } finally {
       setLoadingPending(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   const loadInbound = useCallback(async () => {
     try {
@@ -121,15 +134,15 @@ export default function HourTransferAdminPage() {
       if (res.success && res.data) {
         setInbound(res.data.items ?? []);
       } else {
-        toast.error(res.error || 'Failed to load inbound transfers');
+        toast.error(res.error || t('admin.hour_transfers.errors.load_inbound'));
       }
     } catch (err) {
       logError('HourTransferAdminPage: load inbound failed', err);
-      toast.error('Failed to load inbound transfers');
+      toast.error(t('admin.hour_transfers.errors.load_inbound'));
     } finally {
       setLoadingInbound(false);
     }
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => {
     void loadPending();
@@ -138,7 +151,7 @@ export default function HourTransferAdminPage() {
 
   const handleApprove = useCallback(
     async (id: number) => {
-      if (!window.confirm('Approve this transfer? This debits the source wallet and credits the destination immediately.')) {
+      if (!canManage) {
         return;
       }
       try {
@@ -147,51 +160,55 @@ export default function HourTransferAdminPage() {
           `/v2/admin/caring-community/hour-transfer/${id}/approve`,
         );
         if (res.success) {
-          toast.success('Transfer approved and delivered.');
+          toast.success(t('admin.hour_transfers.messages.approved'));
           void loadPending();
         } else {
-          toast.error(res.error || 'Approval failed');
+          toast.error(res.error || t('admin.hour_transfers.errors.approve'));
         }
       } catch (err) {
         logError('HourTransferAdminPage: approve failed', err);
-        toast.error('Approval failed');
+        toast.error(t('admin.hour_transfers.errors.approve'));
       } finally {
         setActingId(null);
       }
     },
-    [toast, loadPending],
+    [canManage, t, toast, loadPending],
   );
 
   const handleReject = useCallback(
-    async (id: number) => {
-      const reason = window.prompt('Reason for rejection (optional)') ?? '';
+    async () => {
+      if (!canManage || rejectTargetId === null) {
+        return;
+      }
       try {
-        setActingId(id);
+        setActingId(rejectTargetId);
         const res = await api.post<{ status: TransferStatus }>(
-          `/v2/admin/caring-community/hour-transfer/${id}/reject`,
-          { reason },
+          `/v2/admin/caring-community/hour-transfer/${rejectTargetId}/reject`,
+          { reason: rejectReason.trim() },
         );
         if (res.success) {
-          toast.success('Transfer rejected.');
+          toast.success(t('admin.hour_transfers.messages.rejected'));
+          setRejectTargetId(null);
+          setRejectReason('');
           void loadPending();
         } else {
-          toast.error(res.error || 'Rejection failed');
+          toast.error(res.error || t('admin.hour_transfers.errors.reject'));
         }
       } catch (err) {
         logError('HourTransferAdminPage: reject failed', err);
-        toast.error('Rejection failed');
+        toast.error(t('admin.hour_transfers.errors.reject'));
       } finally {
         setActingId(null);
       }
     },
-    [toast, loadPending],
+    [canManage, rejectReason, rejectTargetId, t, toast, loadPending],
   );
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Cooperative Hour Transfers"
-        description="When a member moves to a different cooperative that also runs NEXUS, they can transfer their banked hours with them. Review outbound requests here and approve once you have confirmed the member has registered at the destination cooperative. Approving immediately debits the source wallet and credits the destination — this cannot be undone."
+        title={t('admin.hour_transfers.title')}
+        description={t('admin.hour_transfers.subtitle')}
         actions={
           <Button
             size="sm"
@@ -202,7 +219,7 @@ export default function HourTransferAdminPage() {
               void loadInbound();
             }}
           >
-            Refresh
+            {t('admin.common.refresh')}
           </Button>
         }
       />
@@ -210,14 +227,14 @@ export default function HourTransferAdminPage() {
       <Tabs
         selectedKey={tab}
         onSelectionChange={(k) => setTab(String(k))}
-        aria-label="Hour transfer tabs"
+        aria-label={t('admin.hour_transfers.tabs.aria')}
       >
         <Tab
           key="pending"
           title={
             <div className="flex items-center gap-2">
               <ArrowRightLeft className="w-4 h-4" />
-              <span>Pending Outbound</span>
+              <span>{t('admin.hour_transfers.tabs.pending')}</span>
               <Chip size="sm" variant="flat" color="warning">
                 {pending.length}
               </Chip>
@@ -226,7 +243,7 @@ export default function HourTransferAdminPage() {
         >
           <Card className="mt-4">
             <CardHeader className="flex flex-col items-start gap-1">
-              <span className="text-base font-semibold">Awaiting your approval</span>
+              <span className="text-base font-semibold">{t('admin.hour_transfers.pending.title')}</span>
               <p className="text-sm text-default-500">
                 Each transfer must be manually approved by an admin. Check that the destination member email
                 matches the member&rsquo;s new account before approving.
@@ -240,7 +257,7 @@ export default function HourTransferAdminPage() {
                 </div>
               ) : pending.length === 0 ? (
                 <div className="py-12 text-center text-sm text-default-500">
-                  No pending transfers.
+                  {t('admin.hour_transfers.pending.empty')}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -281,6 +298,7 @@ export default function HourTransferAdminPage() {
                             {row.reason || '—'}
                           </td>
                           <td className="px-4 py-3 text-right">
+                            {canManage ? (
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
@@ -290,7 +308,7 @@ export default function HourTransferAdminPage() {
                                 isLoading={actingId === row.id}
                                 onPress={() => void handleApprove(row.id)}
                               >
-                                Approve
+                                {t('admin.hour_transfers.actions.approve')}
                               </Button>
                               <Button
                                 size="sm"
@@ -298,11 +316,14 @@ export default function HourTransferAdminPage() {
                                 variant="flat"
                                 startContent={<X className="w-4 h-4" />}
                                 isLoading={actingId === row.id}
-                                onPress={() => void handleReject(row.id)}
+                                onPress={() => setRejectTargetId(row.id)}
                               >
-                                Reject
+                                {t('admin.hour_transfers.actions.reject')}
                               </Button>
                             </div>
+                            ) : (
+                              <span className="text-default-400">{t('admin.common.empty_dash')}</span>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -319,7 +340,7 @@ export default function HourTransferAdminPage() {
           title={
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4" />
-              <span>Recent Inbound</span>
+              <span>{t('admin.hour_transfers.tabs.inbound')}</span>
               <Chip size="sm" variant="flat" color="primary">
                 {inbound.length}
               </Chip>
@@ -328,7 +349,7 @@ export default function HourTransferAdminPage() {
         >
           <Card className="mt-4">
             <CardHeader className="flex flex-col items-start gap-1">
-              <span className="text-base font-semibold">Received from other cooperatives (last 90 days)</span>
+              <span className="text-base font-semibold">{t('admin.hour_transfers.inbound.title')}</span>
               <p className="text-sm text-default-500">
                 This is an audit log only — inbound transfers are processed automatically when the source
                 cooperative approves them. No action is required here.
@@ -342,7 +363,7 @@ export default function HourTransferAdminPage() {
                 </div>
               ) : inbound.length === 0 ? (
                 <div className="py-12 text-center text-sm text-default-500">
-                  No transfers received in the last 90 days.
+                  {t('admin.hour_transfers.inbound.empty')}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -394,6 +415,49 @@ export default function HourTransferAdminPage() {
           </Card>
         </Tab>
       </Tabs>
+
+      <Modal
+        isOpen={rejectTargetId !== null}
+        onClose={() => {
+          if (actingId !== null) return;
+          setRejectTargetId(null);
+          setRejectReason('');
+        }}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader>{t('admin.hour_transfers.reject_modal.title')}</ModalHeader>
+          <ModalBody>
+            <Textarea
+              label={t('admin.hour_transfers.reject_modal.reason_label')}
+              placeholder={t('admin.hour_transfers.reject_modal.reason_placeholder')}
+              value={rejectReason}
+              onValueChange={setRejectReason}
+              variant="bordered"
+              minRows={3}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={() => {
+                setRejectTargetId(null);
+                setRejectReason('');
+              }}
+              isDisabled={actingId !== null}
+            >
+              {t('admin.common.cancel')}
+            </Button>
+            <Button
+              color="danger"
+              isLoading={actingId === rejectTargetId}
+              onPress={() => void handleReject()}
+            >
+              {t('admin.hour_transfers.actions.reject')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

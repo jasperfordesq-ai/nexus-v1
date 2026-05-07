@@ -259,13 +259,17 @@ class ResearchPartnershipService
                 [$tenantId, $periodStart, $periodEnd]
             ) as $row) {
                 $participants = (int) $row->participant_count;
+                if ($participants < 5) {
+                    continue;
+                }
+
                 $rows[] = [
                     'period' => (string) $row->period,
                     'metric_family' => 'volunteering',
-                    'activity_count' => $participants >= 5 ? (int) $row->activity_count : null,
-                    'participant_count' => $participants >= 5 ? $participants : null,
-                    'approved_hours' => $participants >= 5 ? round((float) $row->approved_hours, 2) : null,
-                    'suppressed' => $participants < 5,
+                    'activity_count' => (int) $row->activity_count,
+                    'participant_count' => $participants,
+                    'approved_hours' => round((float) $row->approved_hours, 2),
+                    'suppressed' => false,
                 ];
             }
         }
@@ -278,6 +282,7 @@ class ResearchPartnershipService
                 'direct_identifiers' => false,
                 'row_level_member_records' => false,
                 'suppression_threshold' => 5,
+                'suppressed_rows_omitted' => true,
             ],
             'rows' => $rows,
         ];

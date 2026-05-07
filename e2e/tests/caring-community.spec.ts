@@ -157,7 +157,7 @@ test.describe('Caring Community flows', () => {
     await page.locator('input:not([type="hidden"])').first().fill('Tomorrow morning');
     await page.locator('button[type="submit"], button:has-text("Submit"), button:has-text("Request")').last().click();
 
-    await expect(page.getByText('Validation failed')).toBeVisible();
+    await expect(page.locator('#main-content [role="alert"]').filter({ hasText: 'Validation failed' })).toBeVisible();
     await expect(page.getByText(/Your request has been posted|success/i)).toHaveCount(0);
     expect(diagnostics.consoleErrors).toEqual([]);
     expect(diagnostics.failedRequests).toEqual([]);

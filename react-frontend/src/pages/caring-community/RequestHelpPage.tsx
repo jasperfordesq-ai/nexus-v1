@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
+import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
@@ -53,6 +54,7 @@ function formatSuggestedWhen(iso: string | null, locale: string): string {
 export function RequestHelpPage() {
   const { t, i18n } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   usePageTitle(t('request_help.meta.title'));
 
@@ -227,12 +229,17 @@ export function RequestHelpPage() {
             contact_preference: contactPref,
           });
       if (!response.success) {
-        setError(response.error || t('request_help.errors.submit_failed'));
+        const message = response.error || t('request_help.errors.submit_failed');
+        setError(message);
+        showToast(message, 'error');
         return;
       }
+      showToast(t('request_help.success.toast'), 'success');
       setSubmitted(true);
     } catch {
-      setError(t('request_help.errors.submit_failed'));
+      const message = t('request_help.errors.submit_failed');
+      setError(message);
+      showToast(message, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -292,11 +299,11 @@ export function RequestHelpPage() {
         </div>
 
         <GlassCard className="p-6 sm:p-8">
-          <div className="mb-7 flex items-center gap-4">
+          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-500/15">
               <Heart className="h-6 w-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-tight text-theme-primary">{t('request_help.meta.title')}</h1>
               <p className="mt-1 text-base leading-7 text-theme-muted">{t('request_help.subtitle')}</p>
             </div>
@@ -309,7 +316,7 @@ export function RequestHelpPage() {
           )}
 
           {supportsVoice && (
-            <div className="mb-6">
+            <div className="mb-6" aria-live="polite">
               <Button
                 type="button"
                 color={voiceStatus === 'recording' ? 'danger' : 'secondary'}
