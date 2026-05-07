@@ -9,6 +9,7 @@ namespace App\Http\Controllers\GovukAlpha;
 use App\Core\TenantContext;
 use App\Core\Validator;
 use App\Models\Category;
+use App\Services\EventService;
 use App\Services\FeedService;
 use App\Services\ListingService;
 use App\Services\OnboardingConfigService;
@@ -16,6 +17,7 @@ use App\Services\RegistrationService;
 use App\Services\SearchService;
 use App\Services\TokenService;
 use App\Services\UserService;
+use App\Services\VolunteerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -229,6 +231,265 @@ class AlphaController extends Controller
             'listings' => $listings,
             'status' => $request->query('status'),
         ]);
+    }
+
+    public function events(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        if (!TenantContext::hasFeature('events')) {
+            return $this->view('accessible-frontend::events', [
+                'title' => __('govuk_alpha.events.title'),
+                'tenantSlug' => $tenantSlug,
+                'activeNav' => 'events',
+                'items' => [],
+                'categories' => [],
+                'filters' => $this->eventFilters($request),
+                'meta' => ['has_more' => false, 'cursor' => null],
+                'moduleDisabled' => true,
+                'error' => null,
+            ], 403);
+        }
+
+        $filters = $this->eventFilters($request);
+        $query = [
+            'limit' => 12,
+            'when' => $filters['when'],
+        ];
+
+        foreach (['category_id', 'search', 'cursor'] as $key) {
+            if ($filters[$key] !== null && $filters[$key] !== '') {
+                $query[$key] = $filters[$key];
+            }
+        }
+
+        $items = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        $error = null;
+
+        try {
+            $result = EventService::getAll($query);
+            $items = $result['items'] ?? [];
+            $meta = [
+                'has_more' => (bool) ($result['has_more'] ?? false),
+                'cursor' => $result['cursor'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha.states.error_title');
+        }
+
+        return $this->view('accessible-frontend::events', [
+            'title' => __('govuk_alpha.events.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'items' => $items,
+            'categories' => $this->categoriesForTypes(['events', 'event']),
+            'filters' => $filters,
+            'meta' => $meta,
+            'moduleDisabled' => false,
+            'error' => $error,
+        ]);
+    }
+
+    public function event(string $tenantSlug, int $id): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $event = EventService::getById($id, $this->currentUserId());
+        abort_if($event === null, 404);
+
+        return $this->view('accessible-frontend::event-detail', [
+            'title' => $event['title'] ?? __('govuk_alpha.events.detail_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'event' => $event,
+            'requiresAuth' => $this->currentUserId() === null,
+            'status' => request()->query('status'),
+        ]);
+    }
+
+    public function storeEventRsvp(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = $this->allowed($request->input('status', 'going'), ['going', 'interested', 'not_going'], 'going');
+
+        try {
+            if (!EventService::rsvp($id, $userId, $status)) {
+                return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-updated']);
+    }
+
+    public function volunteering(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->view('accessible-frontend::volunteering', [
+                'title' => __('govuk_alpha.volunteering.title'),
+                'tenantSlug' => $tenantSlug,
+                'activeNav' => 'volunteering',
+                'items' => [],
+                'categories' => [],
+                'filters' => $this->volunteeringFilters($request),
+                'meta' => ['has_more' => false, 'cursor' => null],
+                'moduleDisabled' => true,
+                'error' => null,
+                'requiresAuth' => $this->currentUserId() === null,
+                'hoursSummary' => null,
+                'applications' => [],
+                'organizations' => [],
+            ], 403);
+        }
+
+        $filters = $this->volunteeringFilters($request);
+        $query = ['limit' => 12];
+        foreach (['category_id', 'search', 'cursor', 'is_remote'] as $key) {
+            if ($filters[$key] !== null && $filters[$key] !== '') {
+                $query[$key] = $filters[$key];
+            }
+        }
+
+        $items = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        $error = null;
+        $userId = $this->currentUserId();
+
+        try {
+            $result = VolunteerService::getOpportunities($query);
+            $items = $result['items'] ?? [];
+            $meta = [
+                'has_more' => (bool) ($result['has_more'] ?? false),
+                'cursor' => $result['cursor'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha.states.error_title');
+        }
+
+        return $this->view('accessible-frontend::volunteering', [
+            'title' => __('govuk_alpha.volunteering.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'items' => $items,
+            'categories' => $this->categoriesForTypes(['volunteering', 'volunteer']),
+            'filters' => $filters,
+            'meta' => $meta,
+            'moduleDisabled' => false,
+            'error' => $error,
+            'requiresAuth' => $userId === null,
+            'hoursSummary' => $userId ? VolunteerService::getHoursSummary($userId) : null,
+            'applications' => $userId ? (VolunteerService::getMyApplications($userId, ['limit' => 5])['items'] ?? []) : [],
+            'organizations' => $userId ? (VolunteerService::getMyOrganizations($userId, ['limit' => 5])['items'] ?? []) : [],
+        ]);
+    }
+
+    public function volunteerOpportunity(Request $request, string $tenantSlug, int $id): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $opportunity = VolunteerService::getOpportunityById($id, $this->currentUserId());
+        abort_if($opportunity === null, 404);
+
+        return $this->view('accessible-frontend::volunteer-opportunity', [
+            'title' => $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'opportunity' => $opportunity,
+            'requiresAuth' => $this->currentUserId() === null,
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function applyVolunteerOpportunity(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            VolunteerService::apply($id, $userId, [
+                'message' => trim((string) $request->input('message', '')),
+                'shift_id' => $request->input('shift_id') ? (int) $request->input('shift_id') : null,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-created']);
+    }
+
+    public function volunteeringHours(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $applications = VolunteerService::getMyApplications($userId, ['limit' => 50, 'status' => 'approved'])['items'] ?? [];
+        $organizations = VolunteerService::getMyOrganizations($userId, ['limit' => 50])['items'] ?? [];
+
+        return $this->view('accessible-frontend::volunteering-hours', [
+            'title' => __('govuk_alpha.volunteering.hours_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'summary' => VolunteerService::getHoursSummary($userId),
+            'logs' => VolunteerService::getMyHours($userId, ['limit' => 10])['items'] ?? [],
+            'organizations' => $this->volunteeringHourOrganizations($organizations, $applications),
+            'applications' => $applications,
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function storeVolunteeringHours(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            $logId = VolunteerService::logHours($userId, [
+                'organization_id' => (int) $request->input('organization_id'),
+                'opportunity_id' => $request->input('opportunity_id') ? (int) $request->input('opportunity_id') : null,
+                'date' => $request->input('date'),
+                'hours' => (float) $request->input('hours'),
+                'description' => trim((string) $request->input('description', '')),
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $logId = null;
+        }
+
+        if ($logId === null) {
+            return redirect()->route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug, 'status' => 'hours-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug, 'status' => 'hours-created']);
     }
 
     public function feed(Request $request, string $tenantSlug): Response
@@ -568,6 +829,14 @@ class AlphaController extends Controller
             $items['members'] = route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]);
         }
 
+        if (TenantContext::hasFeature('events')) {
+            $items['events'] = route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        if (TenantContext::hasFeature('volunteering')) {
+            $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
+        }
+
         return $items;
     }
 
@@ -835,6 +1104,57 @@ class AlphaController extends Controller
             'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
             'cursor' => $request->query('cursor'),
         ];
+    }
+
+    private function eventFilters(Request $request): array
+    {
+        return [
+            'search' => trim((string) $request->query('q', '')) ?: null,
+            'when' => $this->allowed($request->query('when', 'upcoming'), ['upcoming', 'past', 'all'], 'upcoming'),
+            'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
+            'cursor' => $request->query('cursor'),
+        ];
+    }
+
+    private function volunteeringFilters(Request $request): array
+    {
+        return [
+            'search' => trim((string) $request->query('q', '')) ?: null,
+            'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
+            'is_remote' => $request->boolean('is_remote') ? true : null,
+            'cursor' => $request->query('cursor'),
+        ];
+    }
+
+    private function categoriesForTypes(array $types): array
+    {
+        return Category::whereIn('type', $types)
+            ->where('tenant_id', TenantContext::getId())
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->toArray();
+    }
+
+    private function volunteeringHourOrganizations(array $organizations, array $applications): array
+    {
+        $byId = [];
+
+        foreach ($organizations as $organization) {
+            if (!empty($organization['id'])) {
+                $byId[(int) $organization['id']] = $organization;
+            }
+        }
+
+        foreach ($applications as $application) {
+            $organization = $application['organization'] ?? null;
+            if (is_array($organization) && !empty($organization['id'])) {
+                $byId[(int) $organization['id']] = $organization;
+            }
+        }
+
+        uasort($byId, fn (array $a, array $b): int => strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? '')));
+
+        return array_values($byId);
     }
 
     private function memberFilters(Request $request): array

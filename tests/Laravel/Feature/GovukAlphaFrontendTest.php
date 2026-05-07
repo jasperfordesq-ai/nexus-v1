@@ -296,6 +296,175 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-tag govuk-tag--purple"', false);
     }
 
+    public function test_events_pages_render_filters_detail_and_rsvp_flow(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Alpha event verification',
+            'description' => 'Accessible alpha event detail body.',
+            'location' => 'Alpha Hall',
+            'start_time' => now()->addDays(7),
+            'end_time' => now()->addDays(7)->addHours(2),
+            'max_attendees' => 12,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $index = $this->get("/{$this->testTenantSlug}/alpha/events");
+
+        $index->assertOk();
+        $index->assertSee('class="govuk-fieldset"', false);
+        $index->assertSee('type="search"', false);
+        $index->assertSee('class="govuk-select"', false);
+        $index->assertSee('Alpha event verification');
+        $index->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+
+        $detail->assertOk();
+        $detail->assertSee('Alpha event verification');
+        $detail->assertSee('class="govuk-back-link"', false);
+        $detail->assertSee('class="govuk-summary-list"', false);
+        $detail->assertSee('class="govuk-radios"', false);
+
+        $rsvp = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/rsvp", [
+            'status' => 'going',
+        ]);
+
+        $rsvp->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=rsvp-updated");
+        $this->assertDatabaseHas('event_rsvps', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $user->id,
+            'status' => 'going',
+        ]);
+    }
+
+    public function test_volunteering_pages_render_opportunity_detail_and_application_flow(): void
+    {
+        $user = $this->authenticatedUser();
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'name' => 'Alpha Volunteer Organisation',
+            'slug' => 'alpha-volunteer-organisation',
+            'description' => 'A volunteering organisation for the accessible alpha.',
+            'contact_email' => 'volunteer-alpha@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $user->id,
+            'title' => 'Alpha volunteering opportunity',
+            'description' => 'Accessible volunteering detail body.',
+            'location' => 'Volunteer Centre',
+            'is_remote' => 1,
+            'skills_needed' => 'Listening, organising',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $shiftId = DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'start_time' => now()->addDays(10),
+            'end_time' => now()->addDays(10)->addHours(3),
+            'capacity' => 5,
+            'created_at' => now(),
+        ]);
+
+        $index = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+
+        $index->assertOk();
+        $index->assertSee('class="govuk-fieldset"', false);
+        $index->assertSee('class="govuk-checkboxes ', false);
+        $index->assertSee('Alpha volunteering opportunity');
+        $index->assertSee('Alpha Volunteer Organisation');
+        $index->assertSee(route('govuk-alpha.volunteering.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId]), false);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}");
+
+        $detail->assertOk();
+        $detail->assertSee('Alpha volunteering opportunity');
+        $detail->assertSee('class="govuk-summary-list"', false);
+        $detail->assertSee('class="govuk-textarea"', false);
+        $detail->assertSee('name="shift_id"', false);
+
+        $apply = $this->post("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}/apply", [
+            'message' => 'I can help with this accessible alpha test.',
+            'shift_id' => $shiftId,
+        ]);
+
+        $apply->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}?status=apply-created");
+        $this->assertDatabaseHas('vol_applications', [
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $user->id,
+            'shift_id' => $shiftId,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_volunteering_hours_page_renders_member_hour_logging_form(): void
+    {
+        $user = $this->authenticatedUser();
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'name' => 'Alpha Hours Organisation',
+            'slug' => 'alpha-hours-organisation',
+            'description' => 'Organisation for hour logging.',
+            'contact_email' => 'hours-alpha@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $user->id,
+            'title' => 'Alpha hours opportunity',
+            'description' => 'Opportunity used for hour logging.',
+            'location' => 'Hours Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Support',
+            'start_date' => now()->subWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $user->id,
+            'status' => 'approved',
+            'message' => 'Approved for logging.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/hours");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.volunteering.hours_title'));
+        $response->assertSee('class="govuk-fieldset"', false);
+        $response->assertSee('type="date"', false);
+        $response->assertSee('type="number"', false);
+        $response->assertSee('Alpha Hours Organisation');
+        $response->assertSee('Alpha hours opportunity');
+    }
+
     public function test_members_page_renders_directory_for_authenticated_user(): void
     {
         $viewer = $this->authenticatedUser(['name' => 'Viewer Member']);

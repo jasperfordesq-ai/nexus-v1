@@ -29,6 +29,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:30,1')->name('register.store');
 
         Route::get('/dashboard', [AlphaController::class, 'dashboard'])->name('dashboard');
+        Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
+        Route::get('/events/{id}', [AlphaController::class, 'event'])->whereNumber('id')->name('events.show');
+        Route::post('/events/{id}/rsvp', [AlphaController::class, 'storeEventRsvp'])->whereNumber('id')->name('events.rsvp.store');
+        Route::get('/volunteering', [AlphaController::class, 'volunteering'])->name('volunteering.index');
+        Route::get('/volunteering/hours', [AlphaController::class, 'volunteeringHours'])->name('volunteering.hours');
+        Route::post('/volunteering/hours', [AlphaController::class, 'storeVolunteeringHours'])->middleware('throttle:20,1')->name('volunteering.hours.store');
+        Route::get('/volunteering/opportunities/{id}', [AlphaController::class, 'volunteerOpportunity'])->whereNumber('id')->name('volunteering.show');
+        Route::post('/volunteering/opportunities/{id}/apply', [AlphaController::class, 'applyVolunteerOpportunity'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.apply.store');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->name('feed.posts.store');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');

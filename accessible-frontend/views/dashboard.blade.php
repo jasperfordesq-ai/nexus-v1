@@ -43,6 +43,12 @@
                 @if (\App\Core\TenantContext::hasModule('listings'))
                     <li><a class="govuk-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.view_listings') }}</a></li>
                 @endif
+                @if (\App\Core\TenantContext::hasFeature('events'))
+                    <li><a class="govuk-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.events') }}</a></li>
+                @endif
+                @if (\App\Core\TenantContext::hasFeature('volunteering'))
+                    <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.volunteering') }}</a></li>
+                @endif
             </ul>
         </div>
     </div>
