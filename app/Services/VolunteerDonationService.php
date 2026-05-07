@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Models\VolDonation;
 use App\Models\VolGivingDay;
+use App\Models\VolOpportunity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -119,16 +120,34 @@ class VolunteerDonationService
         $status = 'pending';
 
         if ($amount <= 0) {
-            throw new \InvalidArgumentException('Donation amount must be greater than zero.');
+            throw new \InvalidArgumentException(__('api.vol_donation_amount_positive'));
         }
         if ($amount > 1000000) {
-            throw new \InvalidArgumentException('Donation amount exceeds the maximum allowed (1,000,000).');
+            throw new \InvalidArgumentException(__('api.vol_donation_amount_max'));
         }
         if (strlen($currency) !== 3) {
-            throw new \InvalidArgumentException('Currency must be a 3-letter ISO code.');
+            throw new \InvalidArgumentException(__('api.vol_donation_currency_invalid'));
         }
         if ($paymentMethod === '') {
-            throw new \InvalidArgumentException('Payment method is required.');
+            throw new \InvalidArgumentException(__('api.vol_donation_payment_method_required'));
+        }
+
+        if ($opportunityId !== null) {
+            $opportunityExists = VolOpportunity::where('tenant_id', $tenantId)
+                ->where('id', $opportunityId)
+                ->exists();
+            if (!$opportunityExists) {
+                throw new \InvalidArgumentException(__('api.vol_opportunity_not_found'));
+            }
+        }
+
+        if ($givingDayId !== null) {
+            $givingDayExists = VolGivingDay::where('tenant_id', $tenantId)
+                ->where('id', $givingDayId)
+                ->exists();
+            if (!$givingDayExists) {
+                throw new \InvalidArgumentException(__('api.vol_giving_day_not_found'));
+            }
         }
 
         $now = now();
@@ -155,7 +174,8 @@ class VolunteerDonationService
 
             // Increment giving day raised_amount only for completed donations
             if ($givingDayId !== null && $status === 'completed') {
-                VolGivingDay::where('id', $givingDayId)
+                VolGivingDay::where('tenant_id', $tenantId)
+                    ->where('id', $givingDayId)
                     ->increment('raised_amount', $amount);
             }
 
@@ -280,16 +300,16 @@ class VolunteerDonationService
         $targetHours = isset($data['target_hours']) ? (float) $data['target_hours'] : 0.0;
 
         if ($title === '') {
-            throw new \InvalidArgumentException('Title is required.');
+            throw new \InvalidArgumentException(__('api.vol_giving_day_title_required'));
         }
         if ($startDate === '' || $endDate === '') {
-            throw new \InvalidArgumentException('Start date and end date are required.');
+            throw new \InvalidArgumentException(__('api.vol_giving_day_dates_required'));
         }
         if (strtotime($endDate) <= strtotime($startDate)) {
-            throw new \InvalidArgumentException('End date must be after start date.');
+            throw new \InvalidArgumentException(__('api.vol_giving_day_end_after_start'));
         }
         if ($goalAmount <= 0) {
-            throw new \InvalidArgumentException('Goal amount must be greater than zero.');
+            throw new \InvalidArgumentException(__('api.vol_giving_day_goal_positive'));
         }
 
         $now = now();
@@ -394,7 +414,7 @@ class VolunteerDonationService
         if (isset($data['goal_amount']) || isset($data['target_amount'])) {
             $goalAmount = (float) ($data['goal_amount'] ?? $data['target_amount']);
             if ($goalAmount <= 0) {
-                throw new \InvalidArgumentException('Goal amount must be greater than zero.');
+                throw new \InvalidArgumentException(__('api.vol_giving_day_goal_positive'));
             }
             $updates['goal_amount'] = $goalAmount;
         }

@@ -159,7 +159,7 @@ export function GroupSignUpTab() {
 
       try {
         const searchRes = await api.get<{ id: number; name: string; email: string }[]>(
-          `/v2/users?search=${encodeURIComponent(query.trim())}&per_page=5`
+          `/v2/users?q=${encodeURIComponent(query.trim())}&limit=5`
         );
         if (controller.signal.aborted) return;
         if (searchRes.success && Array.isArray(searchRes.data)) {
@@ -214,7 +214,7 @@ export function GroupSignUpTab() {
       // Fall back to a direct search if no cached match
       if (!matchedUser) {
         const searchRes = await api.get<{ id: number; email: string }[]>(
-          `/v2/users?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
+          `/v2/users?q=${encodeURIComponent(newMemberEmail.trim())}&limit=5`
         );
 
         if (!searchRes.success || !Array.isArray(searchRes.data)) {

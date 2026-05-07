@@ -175,7 +175,10 @@ class VolunteerMatchingService
 
         // Get active opportunities
         $query = DB::table('vol_opportunities as opp')
-            ->leftJoin('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
+            ->leftJoin('vol_organizations as org', function ($join) {
+                $join->on('opp.organization_id', '=', 'org.id')
+                    ->on('opp.tenant_id', '=', 'org.tenant_id');
+            })
             ->where('opp.tenant_id', $tenantId)
             ->where('opp.is_active', true)
             ->select('opp.id', 'opp.title', 'opp.description', 'opp.location', 'opp.skills_needed',
@@ -328,8 +331,14 @@ class VolunteerMatchingService
 
         // Get upcoming shifts with their opportunities
         $query = DB::table('vol_shifts as s')
-            ->join('vol_opportunities as opp', 's.opportunity_id', '=', 'opp.id')
-            ->leftJoin('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
+            ->join('vol_opportunities as opp', function ($join) {
+                $join->on('s.opportunity_id', '=', 'opp.id')
+                    ->on('s.tenant_id', '=', 'opp.tenant_id');
+            })
+            ->leftJoin('vol_organizations as org', function ($join) {
+                $join->on('opp.organization_id', '=', 'org.id')
+                    ->on('opp.tenant_id', '=', 'org.tenant_id');
+            })
             ->where('s.tenant_id', $tenantId)
             ->where('opp.is_active', true)
             ->where('s.start_time', '>', now())

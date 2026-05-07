@@ -144,38 +144,34 @@ class VolunteerEmergencyAlertService
     public static function respond(int $alertId, int $userId, string $response): bool
     {
         self::$errors = [];
+        $tenantId = TenantContext::getId();
 
         if (!in_array($response, ['accepted', 'declined'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Response must be accepted or declined'];
-            return false;
-        }
-
-        // Verify the user was a recipient with pending response
-        $recipient = VolEmergencyAlertRecipient::whereHas('alert', function ($q) {
-            $q->where('tenant_id', TenantContext::getId());
-        })
-            ->where('alert_id', $alertId)
-            ->where('user_id', $userId)
-            ->where('response', 'pending')
-            ->first();
-
-        if (!$recipient) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You were not invited for this alert or have already responded'];
-            return false;
-        }
-
-        // Check alert is still active
-        $alert = VolEmergencyAlert::where('id', $alertId)
-            ->where('status', 'active')
-            ->first();
-
-        if (!$alert) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This alert is no longer active'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_response_invalid')];
             return false;
         }
 
         try {
-            DB::transaction(function () use ($recipient, $response, $alert, $alertId, $userId) {
+            $alert = DB::transaction(function () use ($tenantId, $alertId, $userId, $response) {
+                $alert = VolEmergencyAlert::where('tenant_id', $tenantId)
+                    ->where('id', $alertId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$alert || $alert->status !== 'active') {
+                    throw new \RuntimeException('ALERT_INACTIVE');
+                }
+
+                $recipient = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)
+                    ->where('alert_id', $alertId)
+                    ->where('user_id', $userId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$recipient || $recipient->response !== 'pending') {
+                    throw new \RuntimeException('RECIPIENT_NOT_FOUND');
+                }
+
                 $recipient->update([
                     'response' => $response,
                     'responded_at' => now(),
@@ -188,13 +184,15 @@ class VolunteerEmergencyAlertService
                         'filled_at' => now(),
                     ]);
                 }
+
+                return $alert;
             });
 
             if ($response === 'accepted') {
                 // Notify the coordinator (best-effort)
                 try {
-                    $user = User::find($userId);
-                    $userName = $user->name ?? 'A volunteer';
+                    $user = User::where('tenant_id', $tenantId)->where('id', $userId)->first();
+                    $userName = $user->name ?? __('api.vol_alert_volunteer_fallback');
 
                     \App\Services\NotificationDispatcher::dispatch(
                         (int) $alert->created_by,
@@ -211,9 +209,17 @@ class VolunteerEmergencyAlertService
             }
 
             return true;
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'ALERT_INACTIVE') {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_inactive')];
+                return false;
+            }
+
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_alert_not_invited_or_responded')];
+            return false;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::respond error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process response'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_alert_response_failed')];
             return false;
         }
     }
@@ -227,15 +233,32 @@ class VolunteerEmergencyAlertService
      */
     public static function getUserAlerts(int $userId, array $filters = []): array
     {
+        $tenantId = TenantContext::getId();
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
 
         $query = VolEmergencyAlert::query()
-            ->join('vol_emergency_alert_recipients as r', 'r.alert_id', '=', 'vol_emergency_alerts.id')
-            ->join('vol_shifts as s', 'vol_emergency_alerts.shift_id', '=', 's.id')
-            ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
-            ->join('vol_organizations as org', 'o.organization_id', '=', 'org.id')
-            ->join('users as u', 'vol_emergency_alerts.created_by', '=', 'u.id')
+            ->join('vol_emergency_alert_recipients as r', function ($join) {
+                $join->on('r.alert_id', '=', 'vol_emergency_alerts.id')
+                    ->on('r.tenant_id', '=', 'vol_emergency_alerts.tenant_id');
+            })
+            ->join('vol_shifts as s', function ($join) {
+                $join->on('vol_emergency_alerts.shift_id', '=', 's.id')
+                    ->on('vol_emergency_alerts.tenant_id', '=', 's.tenant_id');
+            })
+            ->join('vol_opportunities as o', function ($join) {
+                $join->on('s.opportunity_id', '=', 'o.id')
+                    ->on('s.tenant_id', '=', 'o.tenant_id');
+            })
+            ->join('vol_organizations as org', function ($join) {
+                $join->on('o.organization_id', '=', 'org.id')
+                    ->on('o.tenant_id', '=', 'org.tenant_id');
+            })
+            ->join('users as u', function ($join) {
+                $join->on('vol_emergency_alerts.created_by', '=', 'u.id')
+                    ->on('vol_emergency_alerts.tenant_id', '=', 'u.tenant_id');
+            })
+            ->where('vol_emergency_alerts.tenant_id', $tenantId)
             ->where('r.user_id', $userId)
             ->where('vol_emergency_alerts.status', 'active')
             ->select([
@@ -301,9 +324,17 @@ class VolunteerEmergencyAlertService
      */
     public static function getCoordinatorAlerts(int $coordinatorId): array
     {
+        $tenantId = TenantContext::getId();
         $alerts = VolEmergencyAlert::query()
-            ->join('vol_shifts as s', 'vol_emergency_alerts.shift_id', '=', 's.id')
-            ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
+            ->join('vol_shifts as s', function ($join) {
+                $join->on('vol_emergency_alerts.shift_id', '=', 's.id')
+                    ->on('vol_emergency_alerts.tenant_id', '=', 's.tenant_id');
+            })
+            ->join('vol_opportunities as o', function ($join) {
+                $join->on('s.opportunity_id', '=', 'o.id')
+                    ->on('s.tenant_id', '=', 'o.tenant_id');
+            })
+            ->where('vol_emergency_alerts.tenant_id', $tenantId)
             ->where('vol_emergency_alerts.created_by', $coordinatorId)
             ->orderByDesc('vol_emergency_alerts.created_at')
             ->limit(50)
@@ -315,10 +346,10 @@ class VolunteerEmergencyAlertService
             ])
             ->get();
 
-        return $alerts->map(function ($a) {
-            $totalNotified = VolEmergencyAlertRecipient::where('alert_id', $a->id)->count();
-            $totalAccepted = VolEmergencyAlertRecipient::where('alert_id', $a->id)->where('response', 'accepted')->count();
-            $totalDeclined = VolEmergencyAlertRecipient::where('alert_id', $a->id)->where('response', 'declined')->count();
+        return $alerts->map(function ($a) use ($tenantId) {
+            $totalNotified = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->count();
+            $totalAccepted = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->where('response', 'accepted')->count();
+            $totalDeclined = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->where('response', 'declined')->count();
 
             return [
                 'id' => $a->id,
@@ -425,7 +456,7 @@ class VolunteerEmergencyAlertService
         }
 
         $notifiedCount = 0;
-        $shift = VolShift::find($shiftId);
+        $shift = VolShift::where('tenant_id', $tenantId)->where('id', $shiftId)->first();
         $shiftDate = $shift ? $shift->start_time->format('M j, Y g:ia') : 'upcoming';
 
         foreach ($candidates as $candidate) {
@@ -492,7 +523,7 @@ class VolunteerEmergencyAlertService
             return true;
         }
 
-        $user = User::find($userId);
+        $user = User::where('tenant_id', TenantContext::getId())->where('id', $userId)->first();
         if ($user && in_array($user->role ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])) {
             return true;
         }

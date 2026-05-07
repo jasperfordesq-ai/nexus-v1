@@ -781,7 +781,7 @@ class VolunteerController extends BaseApiController
         $limit = $this->queryInt('per_page', 20, 1, 50);
         $cursor = $this->query('cursor');
 
-        $params = [$orgId, $tenantId, $tenantId];
+        $params = [$tenantId, $orgId, $tenantId];
         $cursorClause = '';
         if ($cursor) {
             $cursorClause = ' AND u.id < ?';
@@ -795,10 +795,10 @@ class VolunteerController extends BaseApiController
                    COALESCE(SUM(CASE WHEN vl.status = 'approved' THEN vl.hours ELSE 0 END), 0) as total_hours,
                    COUNT(DISTINCT va.id) as applications_count
             FROM users u
-            INNER JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved'
-            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ?
-            LEFT JOIN vol_logs vl ON vl.user_id = u.id AND vl.organization_id = vo.organization_id AND vl.tenant_id = ?
-            WHERE va.tenant_id = ?
+            INNER JOIN vol_applications va ON va.user_id = u.id AND va.tenant_id = u.tenant_id AND va.status = 'approved' AND va.tenant_id = ?
+            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.tenant_id = va.tenant_id AND vo.organization_id = ?
+            LEFT JOIN vol_logs vl ON vl.user_id = u.id AND vl.organization_id = vo.organization_id AND vl.tenant_id = va.tenant_id
+            WHERE u.tenant_id = ?
             {$cursorClause}
             GROUP BY u.id, u.name, u.avatar_url, u.email
             ORDER BY u.id DESC
@@ -1000,6 +1000,6 @@ class VolunteerController extends BaseApiController
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get();
-        return $this->respondWithCollection($opportunities);
+        return $this->respondWithCollection($opportunities->map(fn ($row) => $row->toArray())->all());
     }
 }

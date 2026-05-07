@@ -161,6 +161,30 @@ describe("GroupSignUpTab", () => {
     });
   });
 
+  it("looks up members with the current users API query contract", async () => {
+    vi.mocked(api.get).mockImplementation(async (url: string) => {
+      if (url.startsWith("/v2/users")) {
+        return { success: true, data: [{ id: 44, name: "Charlie Example", email: "charlie@example.com" }] };
+      }
+      return { success: true, data: [mockReservation] };
+    });
+
+    render(<GroupSignUpTab />);
+    await waitFor(() => screen.getByRole("button", { name: /Add Member/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
+    fireEvent.change(screen.getByPlaceholderText("member@example.com"), {
+      target: { value: "charlie@example.com" },
+    });
+    const addButtons = screen.getAllByRole("button", { name: /Add Member/i });
+    fireEvent.click(addButtons[addButtons.length - 1]);
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/v2/users?q=charlie%40example.com&limit=5");
+      expect(api.post).toHaveBeenCalledWith("/v2/volunteering/group-reservations/1/members", { user_id: 44 });
+    });
+  });
+
   it("does not show Add Member button for non-leaders", async () => {
     const nonLeaderReservation = { ...mockReservation, is_leader: false };
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [nonLeaderReservation] });
