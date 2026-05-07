@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import {
   tenantUrl,
   goToTenantPage,
@@ -29,6 +29,13 @@ let consoleErrors: string[] = [];
 const hasUserCredentials = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
 const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
 
+async function waitForTenantHydration(page: Page): Promise<void> {
+  await page
+    .getByText('Loading community')
+    .waitFor({ state: 'hidden', timeout: 15000 })
+    .catch(() => undefined);
+}
+
 test.beforeEach(async ({ page }) => {
   consoleErrors = [];
   page.on('pageerror', (error) => {
@@ -46,6 +53,7 @@ test.describe('Smoke Tests @smoke', () => {
       await page.goto(tenantUrl(''), { waitUntil: 'domcontentloaded' });
       await waitForPageLoad(page);
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
       // The page should have rendered something meaningful
       const body = page.locator('body');
@@ -176,16 +184,17 @@ test.describe('Smoke Tests @smoke', () => {
       await page.goto(tenantUrl('register'), { waitUntil: 'domcontentloaded' });
       await waitForPageLoad(page);
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
       // The registration flow may render as a multi-step HeroUI form on narrow
       // viewports, so assert the shell and at least one actionable control.
-      const hasForm = await page.locator('form').first().isVisible({ timeout: 10000 }).catch(() => false);
-      const hasFirstName = await page.locator('input[name="first_name"]').isVisible({ timeout: 3000 }).catch(() => false);
-      const hasEmail = await page.locator('input[name="email"], input[type="email"]').first().isVisible({ timeout: 3000 }).catch(() => false);
-      const hasPassword = await page.locator('input[name="password"], input[type="password"]').first().isVisible({ timeout: 3000 }).catch(() => false);
+      const hasHeading = await page.getByRole('heading', { name: /Create your account|Create Account|Register|Sign Up/i }).isVisible({ timeout: 10000 }).catch(() => false);
+      const hasFirstName = await page.getByRole('textbox', { name: /First Name/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      const hasEmail = await page.getByRole('textbox', { name: /^Email/i }).isVisible({ timeout: 3000 }).catch(() => false);
+      const hasPassword = await page.getByRole('textbox', { name: /^Password/i }).isVisible({ timeout: 3000 }).catch(() => false);
       const hasCreateBtn = await page.getByRole('button', { name: /Continue|Create Account|Register|Sign Up/i }).isVisible({ timeout: 3000 }).catch(() => false);
 
-      expect(hasForm && (hasFirstName || hasEmail || hasPassword || hasCreateBtn)).toBeTruthy();
+      expect(hasHeading && (hasFirstName || hasEmail || hasPassword || hasCreateBtn)).toBeTruthy();
     });
   });
 
