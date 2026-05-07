@@ -9,10 +9,22 @@
         $type = (($listing['type'] ?? 'offer') === 'request') ? 'request' : 'offer';
         $typeClass = ($type === 'request') ? 'govuk-tag--purple' : 'govuk-tag--blue';
         $authorName = $listing['author_name'] ?? $listing['user']['name'] ?? null;
+        $authorId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
         $createdAt = !empty($listing['created_at']) ? \Illuminate\Support\Carbon::parse($listing['created_at'])->translatedFormat('j F Y') : null;
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
+
+    @if ($status === 'exchange-disabled' || $status === 'own-listing')
+        <div class="govuk-notification-banner" role="region" aria-labelledby="listing-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="listing-status-title">{{ __('govuk_alpha.states.not_available') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">{{ $status === 'own-listing' ? __('govuk_alpha.listings.own_listing') : __('govuk_alpha.listings.exchange_disabled') }}</p>
+            </div>
+        </div>
+    @endif
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -81,9 +93,41 @@
         @endif
     </dl>
 
-    <div class="nexus-alpha-actions govuk-!-margin-top-6 govuk-!-margin-bottom-8">
-        <a class="govuk-button" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
-    </div>
+    <section class="govuk-!-margin-top-7 govuk-!-margin-bottom-8" aria-labelledby="listing-exchange-title">
+        <h2 class="govuk-heading-l" id="listing-exchange-title">{{ __('govuk_alpha.listings.exchange_title') }}</h2>
+
+        @if ($requiresAuth)
+            <div class="govuk-notification-banner" role="region" aria-labelledby="listing-auth-required-title">
+                <div class="govuk-notification-banner__header">
+                    <h3 class="govuk-notification-banner__title" id="listing-auth-required-title">{{ __('govuk_alpha.states.auth_required') }}</h3>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-body">{{ __('govuk_alpha.listings.auth_required_detail') }}</p>
+                    <div class="nexus-alpha-actions">
+                        <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.register') }}</a>
+                    </div>
+                </div>
+            </div>
+        @elseif ($isOwner)
+            <div class="govuk-inset-text">{{ __('govuk_alpha.listings.own_listing_detail') }}</div>
+        @elseif ($exchangeWorkflowEnabled)
+            @if ($activeExchange)
+                <div class="govuk-inset-text">
+                    <p class="govuk-body">{{ __('govuk_alpha.listings.active_exchange_detail') }}</p>
+                    <a class="govuk-button" href="{{ route('govuk-alpha.exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $activeExchange['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.view_exchange') }}</a>
+                </div>
+            @else
+                <p class="govuk-body">{{ __('govuk_alpha.listings.exchange_detail') }}</p>
+                <a class="govuk-button" href="{{ route('govuk-alpha.exchanges.request', ['tenantSlug' => $tenantSlug, 'listingId' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.request_exchange') }}</a>
+            @endif
+        @elseif ($directMessagingEnabled && $authorId > 0)
+            <p class="govuk-body">{{ __('govuk_alpha.listings.direct_message_detail') }}</p>
+            <a class="govuk-button" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $authorId, 'listing' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
+        @else
+            <div class="govuk-inset-text">{{ __('govuk_alpha.listings.messaging_unavailable') }}</div>
+        @endif
+    </section>
 
     @foreach (['member_offers', 'member_requests'] as $section)
         @if (!empty($listing[$section]))

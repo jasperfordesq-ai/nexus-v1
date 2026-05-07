@@ -9,9 +9,13 @@ namespace App\Http\Controllers\GovukAlpha;
 use App\Core\TenantContext;
 use App\Core\Validator;
 use App\Models\Category;
+use App\Services\BrokerControlConfigService;
 use App\Services\EventService;
+use App\Services\ExchangeService;
+use App\Services\ExchangeWorkflowService;
 use App\Services\FeedService;
 use App\Services\ListingService;
+use App\Services\MessageService;
 use App\Services\OnboardingConfigService;
 use App\Services\RegistrationService;
 use App\Services\SearchService;
@@ -632,15 +636,316 @@ class AlphaController extends Controller
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasModule('listings'), 403);
 
+        $userId = $this->currentUserId();
         $listing = $this->listingService->getById($id, false, $this->currentUserId());
         abort_if($listing === null, 404);
+        $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
+        $isOwner = $userId !== null && $ownerId === $userId;
 
         return $this->view('accessible-frontend::listing-detail', [
             'title' => $listing['title'] ?? __('govuk_alpha.listings.detail_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'listings',
             'listing' => $listing,
+            'requiresAuth' => $userId === null,
+            'isOwner' => $isOwner,
+            'exchangeWorkflowEnabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
+            'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
+            'activeExchange' => $userId && !$isOwner ? ExchangeWorkflowService::getActiveExchangeForListing($userId, $id) : null,
+            'status' => request()->query('status'),
         ]);
+    }
+
+    public function requestExchange(string $tenantSlug, int $listingId): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+            return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'exchange-disabled']);
+        }
+
+        $listing = $this->listingService->getById($listingId, false, $userId);
+        abort_if($listing === null, 404);
+
+        if ((int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0) === $userId) {
+            return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'own-listing']);
+        }
+
+        return $this->view('accessible-frontend::exchange-request', [
+            'title' => __('govuk_alpha.exchanges.request_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'exchanges',
+            'listing' => $listing,
+            'config' => BrokerControlConfigService::getConfig('exchange_workflow'),
+            'status' => request()->query('status'),
+        ]);
+    }
+
+    public function storeExchangeRequest(Request $request, string $tenantSlug, int $listingId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+            return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'exchange-disabled']);
+        }
+
+        $hours = max(0.25, min(24, (float) $request->input('proposed_hours', 1)));
+        $prepTime = $request->input('prep_time');
+
+        try {
+            $violations = ExchangeWorkflowService::checkComplianceRequirements($listingId, $userId);
+            if (!empty($violations)) {
+                return redirect()->route('govuk-alpha.exchanges.request', ['tenantSlug' => $tenantSlug, 'listingId' => $listingId, 'status' => 'compliance-failed']);
+            }
+
+            $exchangeId = ExchangeWorkflowService::createRequest($userId, $listingId, [
+                'proposed_hours' => $hours,
+                'prep_time' => $prepTime !== null && $prepTime !== '' ? (float) $prepTime : null,
+                'message' => trim((string) $request->input('message', '')) ?: null,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $exchangeId = null;
+        }
+
+        if (!$exchangeId) {
+            return redirect()->route('govuk-alpha.exchanges.request', ['tenantSlug' => $tenantSlug, 'listingId' => $listingId, 'status' => 'exchange-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $exchangeId, 'status' => 'exchange-created']);
+    }
+
+    public function exchanges(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = $this->allowed($request->query('status_filter'), ['active', 'pending_provider', 'pending_broker', 'accepted', 'in_progress', 'pending_confirmation', 'completed', 'cancelled', 'disputed'], null);
+        $filters = ['limit' => 20];
+        if ($status) {
+            $filters['status'] = $status;
+        }
+        if ($request->query('cursor')) {
+            $filters['cursor'] = $request->query('cursor');
+        }
+
+        $result = app(ExchangeService::class)->getAll($userId, $filters);
+
+        return $this->view('accessible-frontend::exchanges', [
+            'title' => __('govuk_alpha.exchanges.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'exchanges',
+            'items' => $result['items'] ?? [],
+            'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
+            'filters' => ['status_filter' => $status],
+            'workflowEnabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
+            'currentUserId' => $userId,
+        ]);
+    }
+
+    public function exchange(string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $exchange = ExchangeWorkflowService::getExchange($id);
+        abort_if($exchange === null, 404);
+        abort_unless((int) $exchange['requester_id'] === $userId || (int) $exchange['provider_id'] === $userId, 404);
+
+        return $this->view('accessible-frontend::exchange-detail', [
+            'title' => $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'exchanges',
+            'exchange' => $exchange,
+            'history' => ExchangeWorkflowService::getExchangeHistory($id),
+            'status' => request()->query('status'),
+            'currentUserId' => $userId,
+        ]);
+    }
+
+    public function storeExchangeAction(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $exchange = ExchangeWorkflowService::getExchange($id);
+        abort_if($exchange === null, 404);
+        abort_unless((int) $exchange['requester_id'] === $userId || (int) $exchange['provider_id'] === $userId, 404);
+
+        $action = $this->allowed($request->input('action'), ['accept', 'decline', 'start', 'complete', 'confirm', 'cancel'], '');
+        $ok = false;
+
+        try {
+            $ok = match ($action) {
+                'accept' => ExchangeWorkflowService::acceptRequest($id, $userId),
+                'decline' => ExchangeWorkflowService::declineRequest($id, $userId, trim((string) $request->input('reason', ''))),
+                'start' => ExchangeWorkflowService::startProgress($id, $userId),
+                'complete' => ExchangeWorkflowService::markReadyForConfirmation($id, $userId),
+                'confirm' => ExchangeWorkflowService::confirmCompletion($id, $userId, max(0.25, min(24, (float) $request->input('hours', 0)))),
+                'cancel' => ExchangeWorkflowService::cancelExchange($id, $userId, trim((string) $request->input('reason', ''))),
+                default => false,
+            };
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.exchanges.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'exchange-updated' : 'exchange-action-failed',
+        ]);
+    }
+
+    public function messages(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $showArchived = $request->boolean('archived');
+        $result = MessageService::getConversations($userId, [
+            'limit' => 20,
+            'archived' => $showArchived,
+            'cursor' => $request->query('cursor'),
+        ]);
+
+        return $this->view('accessible-frontend::messages', [
+            'title' => __('govuk_alpha.messages.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'messages',
+            'items' => $result['items'] ?? [],
+            'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
+            'showArchived' => $showArchived,
+            'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
+            'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($userId),
+            'status' => $request->query('status'),
+            'currentUserId' => $userId,
+        ]);
+    }
+
+    public function conversation(Request $request, string $tenantSlug, int $userId): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $conversation = MessageService::getConversation($userId, $currentUserId);
+        abort_if($conversation === null, 404);
+
+        $result = MessageService::getMessages($userId, $currentUserId, [
+            'limit' => 50,
+            'cursor' => $request->query('cursor'),
+        ]);
+        MessageService::markAsRead($userId, $currentUserId);
+
+        $listing = null;
+        if ($request->query('listing')) {
+            $listing = $this->listingService->getById((int) $request->query('listing'), false, $currentUserId);
+        }
+
+        return $this->view('accessible-frontend::conversation', [
+            'title' => __('govuk_alpha.messages.conversation_title', ['name' => $conversation['other_user']['name'] ?? __('govuk_alpha.members.unknown_member')]),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'messages',
+            'conversation' => $conversation,
+            'messages' => array_reverse($result['items'] ?? []),
+            'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
+            'listing' => $listing,
+            'status' => $request->query('status'),
+            'currentUserId' => $currentUserId,
+            'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
+            'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($currentUserId),
+        ]);
+    }
+
+    public function storeMessage(Request $request, string $tenantSlug, int $userId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $body = trim((string) $request->input('body', ''));
+        if ($body === '') {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-empty']);
+        }
+
+        if (!BrokerControlConfigService::isDirectMessagingEnabled()) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-disabled']);
+        }
+
+        $message = MessageService::send($currentUserId, [
+            'recipient_id' => $userId,
+            'body' => $body,
+            'context_type' => $request->input('context_type') ?: null,
+            'context_id' => $request->input('context_id') ?: null,
+        ]);
+
+        return redirect()->route('govuk-alpha.messages.show', [
+            'tenantSlug' => $tenantSlug,
+            'userId' => $userId,
+            'status' => !empty($message) ? 'message-sent' : 'message-failed',
+        ]);
+    }
+
+    public function archiveConversation(string $tenantSlug, int $userId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        MessageService::archiveConversation($userId, $currentUserId, 'self');
+
+        return redirect()->route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'status' => 'conversation-archived']);
+    }
+
+    public function restoreConversation(string $tenantSlug, int $userId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        MessageService::unarchiveConversation($userId, $currentUserId);
+
+        return redirect()->route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1, 'status' => 'conversation-restored']);
     }
 
     public function members(Request $request, string $tenantSlug): Response
@@ -815,6 +1120,7 @@ class AlphaController extends Controller
 
         if ($this->currentUserId() !== null) {
             $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+            $items['messages'] = route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]);
         }
 
         if (TenantContext::hasModule('feed')) {
@@ -823,6 +1129,9 @@ class AlphaController extends Controller
 
         if (TenantContext::hasModule('listings')) {
             $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
+            if ($this->currentUserId() !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+                $items['exchanges'] = route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]);
+            }
         }
 
         if (TenantContext::hasFeature('connections')) {

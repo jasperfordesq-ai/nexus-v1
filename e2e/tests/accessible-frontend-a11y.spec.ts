@@ -13,6 +13,7 @@ const alphaPages = [
   '/hour-timebank/alpha/register',
   '/hour-timebank/alpha/feed',
   '/hour-timebank/alpha/listings',
+  '/hour-timebank/alpha/messages',
   '/hour-timebank/alpha/events',
   '/hour-timebank/alpha/volunteering',
   '/hour-timebank/alpha/members',

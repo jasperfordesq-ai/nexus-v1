@@ -296,6 +296,152 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-tag govuk-tag--purple"', false);
     }
 
+    public function test_listing_detail_can_start_accessible_exchange_request(): void
+    {
+        $requester = $this->authenticatedUser(['name' => 'Alpha Requester']);
+        $provider = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Alpha Provider',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->enableExchangeWorkflow();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $provider->id,
+            'title' => 'Alpha exchange listing',
+            'description' => 'Exchange request target.',
+            'type' => 'offer',
+            'hours_estimate' => 2,
+        ]);
+
+        Sanctum::actingAs($requester, ['*']);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.actions.request_exchange'));
+        $detail->assertSee(route('govuk-alpha.exchanges.request', ['tenantSlug' => $this->testTenantSlug, 'listingId' => $listing->id]), false);
+
+        $form = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/exchange-request");
+        $form->assertOk();
+        $form->assertSee('name="proposed_hours"', false);
+        $form->assertSee('class="govuk-textarea"', false);
+
+        $request = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/exchange-request", [
+            'proposed_hours' => 2.5,
+            'prep_time' => 0.5,
+            'message' => 'I can do this through the accessible exchange workflow.',
+        ]);
+
+        $exchangeId = DB::table('exchange_requests')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('listing_id', $listing->id)
+            ->where('requester_id', $requester->id)
+            ->value('id');
+
+        $this->assertNotNull($exchangeId);
+        $request->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=exchange-created");
+        $this->assertDatabaseHas('exchange_requests', [
+            'id' => $exchangeId,
+            'tenant_id' => $this->testTenantId,
+            'provider_id' => $provider->id,
+            'status' => 'pending_provider',
+        ]);
+    }
+
+    public function test_accessible_exchange_detail_supports_provider_lifecycle_actions(): void
+    {
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Exchange Requester',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $provider = $this->authenticatedUser(['name' => 'Exchange Provider']);
+        $this->enableExchangeWorkflow();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $provider->id,
+            'title' => 'Lifecycle exchange listing',
+            'type' => 'offer',
+        ]);
+
+        $exchangeId = DB::table('exchange_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listing->id,
+            'requester_id' => $requester->id,
+            'provider_id' => $provider->id,
+            'proposed_hours' => 3,
+            'requester_notes' => 'Please help with this.',
+            'status' => 'pending_provider',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Sanctum::actingAs($provider, ['*']);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}");
+        $detail->assertOk();
+        $detail->assertSee('Lifecycle exchange listing');
+        $detail->assertSee(__('govuk_alpha.actions.accept'));
+        $detail->assertSee(__('govuk_alpha.actions.decline'));
+
+        $accept = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}", ['action' => 'accept']);
+        $accept->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=exchange-updated");
+        $this->assertDatabaseHas('exchange_requests', ['id' => $exchangeId, 'status' => 'accepted']);
+
+        $start = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}", ['action' => 'start']);
+        $start->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=exchange-updated");
+        $this->assertDatabaseHas('exchange_requests', ['id' => $exchangeId, 'status' => 'in_progress']);
+
+        $complete = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}", ['action' => 'complete']);
+        $complete->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=exchange-updated");
+        $this->assertDatabaseHas('exchange_requests', ['id' => $exchangeId, 'status' => 'pending_confirmation']);
+    }
+
+    public function test_accessible_messages_render_send_and_archive_flow(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Message Sender']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Message Recipient',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        Sanctum::actingAs($sender, ['*']);
+
+        $newConversation = $this->get("/{$this->testTenantSlug}/alpha/messages/new/{$recipient->id}");
+        $newConversation->assertOk();
+        $newConversation->assertSee(__('govuk_alpha.messages.conversation_title', ['name' => 'Message Recipient']));
+        $newConversation->assertSee('class="govuk-textarea"', false);
+
+        $send = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}", [
+            'body' => 'Accessible message workflow verification.',
+        ]);
+
+        $send->assertRedirect("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}?status=message-sent");
+        $this->assertDatabaseHas('messages', [
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Accessible message workflow verification.',
+        ]);
+
+        $conversation = $this->get("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}");
+        $conversation->assertOk();
+        $conversation->assertSee('Accessible message workflow verification.');
+
+        $index = $this->get("/{$this->testTenantSlug}/alpha/messages");
+        $index->assertOk();
+        $index->assertSee('Accessible message workflow verification.');
+        $index->assertSee(route('govuk-alpha.messages.show', ['tenantSlug' => $this->testTenantSlug, 'userId' => $recipient->id]), false);
+
+        $archive = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/archive");
+        $archive->assertRedirect("/{$this->testTenantSlug}/alpha/messages?status=conversation-archived");
+
+        $archived = $this->get("/{$this->testTenantSlug}/alpha/messages?archived=1");
+        $archived->assertOk();
+        $archived->assertSee(__('govuk_alpha.actions.restore_conversation'));
+    }
+
     public function test_events_pages_render_filters_detail_and_rsvp_flow(): void
     {
         $user = $this->authenticatedUser();
@@ -641,5 +787,24 @@ class GovukAlphaFrontendTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    private function enableExchangeWorkflow(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update([
+                'configuration' => json_encode([
+                    'broker_controls' => [
+                        'exchange_workflow' => [
+                            'enabled' => true,
+                            'require_broker_approval' => false,
+                        ],
+                    ],
+                ]),
+            ]);
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
     }
 }
