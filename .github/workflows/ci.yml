@@ -652,6 +652,7 @@ jobs:
         run: npx playwright test e2e/tests/smoke.spec.ts --grep @smoke --project=chromium-modern
         env:
           E2E_BASE_URL: http://localhost:3000
+          E2E_API_URL: http://localhost:3000
           CI: true
 
       - name: Upload Smoke Test Results

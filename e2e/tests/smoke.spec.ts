@@ -26,6 +26,8 @@ import {
 
 // Collect console errors per test
 let consoleErrors: string[] = [];
+const hasUserCredentials = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
+const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
 
 test.beforeEach(async ({ page }) => {
   consoleErrors = [];
@@ -187,6 +189,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Dashboard - Authenticated', () => {
+    test.skip(!hasUserCredentials, 'No E2E user credentials configured');
+
     test('dashboard loads and shows heading or content', async ({ page }) => {
       await goToTenantPage(page, 'dashboard');
 
@@ -217,6 +221,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Core Feature Pages Load - Authenticated', () => {
+    test.skip(!hasUserCredentials, 'No E2E user credentials configured');
+
     test('listings page loads and shows content area', async ({ page }) => {
       await goToTenantPage(page, 'listings');
 
@@ -297,6 +303,8 @@ test.describe('Smoke Tests @smoke', () => {
   // ---------------------------------------------------------------------------
 
   test.describe('Admin Panel', () => {
+    test.skip(!hasAdminCredentials, 'No E2E admin credentials configured');
+
     test('admin dashboard loads', async ({ page }) => {
       await page.goto(`/${DEFAULT_TENANT}/admin`, { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
