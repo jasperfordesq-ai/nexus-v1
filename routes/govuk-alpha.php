@@ -28,9 +28,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/register', [AlphaController::class, 'register'])->name('register');
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:30,1')->name('register.store');
 
+        Route::get('/dashboard', [AlphaController::class, 'dashboard'])->name('dashboard');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->name('feed.posts.store');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');
         Route::get('/listings/{id}', [AlphaController::class, 'listing'])->whereNumber('id')->name('listings.show');
         Route::get('/members', [AlphaController::class, 'members'])->name('members.index');
+        Route::get('/members/{id}', [AlphaController::class, 'memberProfile'])->whereNumber('id')->name('members.show');
+        Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
+        Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
+        Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');
     });

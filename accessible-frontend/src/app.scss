@@ -55,10 +55,7 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 .nexus-alpha-header__container {
   display: flex;
-  flex-wrap: wrap;
-  gap: govuk-spacing(3);
   align-items: center;
-  justify-content: space-between;
   padding-top: govuk-spacing(3);
   padding-bottom: govuk-spacing(3);
 }
@@ -207,6 +204,11 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   height: 64px;
 }
 
+.nexus-alpha-avatar--xl {
+  width: 96px;
+  height: 96px;
+}
+
 .nexus-alpha-avatar--placeholder {
   display: inline-flex;
   align-items: center;
@@ -265,4 +267,69 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   margin-top: govuk-spacing(8);
   border-top: 1px solid $govuk-border-colour;
   background: govuk-colour("black", $variant: "tint-95");
+}
+
+.nexus-alpha-profile-hero {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: govuk-spacing(4);
+  align-items: flex-start;
+  margin-bottom: govuk-spacing(7);
+}
+
+.nexus-alpha-profile-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  align-items: center;
+}
+
+.nexus-alpha-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: govuk-spacing(3);
+  margin: 0;
+}
+
+.nexus-alpha-stat {
+  padding: govuk-spacing(3);
+  border: 1px solid $govuk-border-colour;
+  border-left: 5px solid govuk-colour("blue");
+}
+
+.nexus-alpha-stat dt {
+  margin-bottom: govuk-spacing(1);
+  color: $govuk-secondary-text-colour;
+  @include govuk-font($size: 16);
+}
+
+.nexus-alpha-stat dd {
+  margin: 0;
+  @include govuk-font($size: 27, $weight: bold);
+}
+
+.nexus-alpha-skill-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  align-items: center;
+  padding-top: govuk-spacing(2);
+  padding-bottom: govuk-spacing(2);
+  border-bottom: 1px solid $govuk-border-colour;
+}
+
+@include govuk-media-query($until: tablet) {
+  .nexus-alpha-profile-hero {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: govuk-spacing(3);
+  }
+
+  .nexus-alpha-profile-hero .nexus-alpha-avatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  .nexus-alpha-stat-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\GovukAlpha;
 
 use App\Core\TenantContext;
+use App\Core\Validator;
 use App\Models\Category;
 use App\Services\FeedService;
 use App\Services\ListingService;
@@ -14,6 +15,7 @@ use App\Services\OnboardingConfigService;
 use App\Services\RegistrationService;
 use App\Services\SearchService;
 use App\Services\TokenService;
+use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -80,9 +82,9 @@ class AlphaController extends Controller
             'isAuthenticated' => $this->currentUserId() !== null,
             'status' => $request->query('status'),
             'modules' => [
-                'feed' => true,
+                'feed' => TenantContext::hasModule('feed'),
                 'listings' => TenantContext::hasModule('listings'),
-                'members' => true,
+                'members' => TenantContext::hasFeature('connections'),
             ],
         ]);
     }
@@ -179,6 +181,54 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'register-created']);
+    }
+
+    public function dashboard(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $profile = $this->profileForViewer($userId, $userId);
+        abort_if($profile === null, 404);
+
+        $feedItems = [];
+        $listings = [];
+
+        try {
+            $feed = $this->feedService->getFeed($userId, [
+                'limit' => 5,
+                'type' => 'all',
+                'mode' => 'chronological',
+            ]);
+            $feedItems = $feed['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (TenantContext::hasModule('listings')) {
+            try {
+                $result = $this->listingService->getAll(['limit' => 5]);
+                $listings = $result['items'] ?? [];
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::dashboard', [
+            'title' => __('govuk_alpha.dashboard.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'dashboard',
+            'profile' => $profile,
+            'displayName' => $this->profileDisplayName($profile),
+            'profileStats' => $this->profileStats($profile),
+            'feedItems' => $feedItems,
+            'listings' => $listings,
+            'status' => $request->query('status'),
+        ]);
     }
 
     public function feed(Request $request, string $tenantSlug): Response
@@ -364,6 +414,115 @@ class AlphaController extends Controller
         ]);
     }
 
+    public function myProfile(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->memberProfile($request, $tenantSlug, $userId);
+    }
+
+    public function memberProfile(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $viewerId = $this->currentUserId();
+
+        if ($viewerId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $profile = $this->profileForViewer($id, $viewerId);
+        abort_if($profile === null, 404);
+
+        $displayName = $this->profileDisplayName($profile);
+
+        return $this->view('accessible-frontend::profile', [
+            'title' => $displayName,
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => $id === $viewerId ? 'profile' : 'members',
+            'profile' => $profile,
+            'displayName' => $displayName,
+            'isOwnProfile' => $id === $viewerId,
+            'status' => $request->query('status'),
+            'profileStats' => $this->profileStats($profile),
+            'profileListings' => $this->profileListings($id),
+            'profileSkills' => $this->profileSkills($id, $profile),
+            'profileAvailability' => $this->profileAvailability($id, $profile),
+            'profileReviews' => $this->profileReviews($id),
+        ]);
+    }
+
+    public function profileSettings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $profile = $this->profileForViewer($userId, $userId);
+        abort_if($profile === null, 404);
+
+        return $this->view('accessible-frontend::profile-settings', [
+            'title' => __('govuk_alpha.profile_settings.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'profile',
+            'profile' => $profile,
+            'displayName' => $this->profileDisplayName($profile),
+            'status' => $request->query('status'),
+        ]);
+    }
+
+    public function updateProfileSettings(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $profileType = $this->allowed($request->input('profile_type', 'individual'), ['individual', 'organisation'], 'individual');
+        $privacyProfile = $this->allowed($request->input('privacy_profile', 'public'), ['public', 'members', 'connections'], 'public');
+
+        $data = [
+            'first_name' => trim((string) $request->input('first_name', '')),
+            'last_name' => trim((string) $request->input('last_name', '')),
+            'phone' => trim((string) $request->input('phone', '')),
+            'profile_type' => $profileType,
+            'organization_name' => trim((string) $request->input('organization_name', '')),
+            'tagline' => trim((string) $request->input('tagline', '')),
+            'bio' => trim((string) $request->input('bio', '')),
+            'location' => trim((string) $request->input('location', '')),
+        ];
+
+        if (!$this->profileSettingsInputIsValid($data)) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'profile-update-failed']);
+        }
+
+        $success = UserService::updateProfile($userId, $data);
+        if (!$success) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'profile-update-failed']);
+        }
+
+        DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->update([
+                'name' => trim($data['first_name'] . ' ' . $data['last_name']) ?: ($data['organization_name'] ?: __('govuk_alpha.members.unknown_member')),
+                'privacy_profile' => $privacyProfile,
+                'privacy_search' => $request->boolean('privacy_search'),
+                'updated_at' => now(),
+            ]);
+
+        return redirect()->route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug, 'status' => 'profile-updated']);
+    }
+
     private function view(string $name, array $data = [], int $status = 200): Response
     {
         return response()
@@ -377,7 +536,39 @@ class AlphaController extends Controller
             'assetEntrypoint' => $this->assetEntrypoint(),
             'tenant' => TenantContext::get(),
             'isAuthenticated' => $this->currentUserId() !== null,
+            'alphaNavItems' => $this->alphaNavItems(),
         ];
+    }
+
+    private function alphaNavItems(): array
+    {
+        $tenant = TenantContext::get();
+        $tenantSlug = (string) ($tenant['slug'] ?? '');
+        if ($tenantSlug === '') {
+            return [];
+        }
+
+        $items = [
+            'home' => route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]),
+        ];
+
+        if ($this->currentUserId() !== null) {
+            $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+        }
+
+        if (TenantContext::hasModule('feed')) {
+            $items['feed'] = route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
+        }
+
+        if (TenantContext::hasModule('listings')) {
+            $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        if (TenantContext::hasFeature('connections')) {
+            $items['members'] = route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        return $items;
     }
 
     private function assetEntrypoint(): array
@@ -467,6 +658,171 @@ class AlphaController extends Controller
             ->first(['id']);
 
         return $user ? (int) $user->id : null;
+    }
+
+    private function profileForViewer(int $profileUserId, int $viewerId): ?array
+    {
+        return $profileUserId === $viewerId
+            ? UserService::getOwnProfile($profileUserId)
+            : UserService::getPublicProfile($profileUserId, $viewerId);
+    }
+
+    private function profileDisplayName(array $profile): string
+    {
+        $name = trim((string) ($profile['name'] ?? ''));
+        if ($name !== '') {
+            return $name;
+        }
+
+        $fallback = trim(((string) ($profile['first_name'] ?? '')) . ' ' . ((string) ($profile['last_name'] ?? '')));
+        return $fallback !== '' ? $fallback : __('govuk_alpha.members.unknown_member');
+    }
+
+    private function profileStats(array $profile): array
+    {
+        $stats = $profile['stats'] ?? [];
+
+        return [
+            'hours_given' => (float) ($profile['total_hours_given'] ?? $stats['total_hours_given'] ?? $stats['given_count'] ?? 0),
+            'hours_received' => (float) ($profile['total_hours_received'] ?? $stats['total_hours_received'] ?? $stats['received_count'] ?? 0),
+            'listings_count' => (int) ($stats['listings_count'] ?? 0),
+            'offers_count' => (int) ($stats['offers_count'] ?? 0),
+            'requests_count' => (int) ($stats['requests_count'] ?? 0),
+            'rating' => $profile['rating'] ?? $stats['average_rating'] ?? null,
+            'level' => (int) ($profile['level'] ?? 1),
+            'xp' => (int) ($profile['xp'] ?? 0),
+        ];
+    }
+
+    private function profileListings(int $profileUserId): array
+    {
+        if (!TenantContext::hasModule('listings')) {
+            return [];
+        }
+
+        try {
+            $result = $this->listingService->getAll([
+                'user_id' => $profileUserId,
+                'limit' => 6,
+            ]);
+
+            return $result['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
+    }
+
+    private function profileSkills(int $profileUserId, array $profile): array
+    {
+        $tenantId = TenantContext::getId();
+        $rows = DB::table('user_skills')
+            ->select('skill_name', 'proficiency', 'is_offering', 'is_requesting')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $profileUserId)
+            ->orderByDesc('is_offering')
+            ->orderBy('skill_name')
+            ->limit(20)
+            ->get()
+            ->map(fn (object $row): array => (array) $row)
+            ->all();
+
+        if (!empty($rows)) {
+            return $rows;
+        }
+
+        return collect($profile['skills'] ?? [])
+            ->filter(fn (mixed $skill): bool => trim((string) $skill) !== '')
+            ->map(fn (mixed $skill): array => [
+                'skill_name' => trim((string) $skill),
+                'proficiency' => null,
+                'is_offering' => true,
+                'is_requesting' => false,
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function profileAvailability(int $profileUserId, array $profile): array
+    {
+        $tenantId = TenantContext::getId();
+        $days = [
+            __('govuk_alpha.profile.days.sunday'),
+            __('govuk_alpha.profile.days.monday'),
+            __('govuk_alpha.profile.days.tuesday'),
+            __('govuk_alpha.profile.days.wednesday'),
+            __('govuk_alpha.profile.days.thursday'),
+            __('govuk_alpha.profile.days.friday'),
+            __('govuk_alpha.profile.days.saturday'),
+        ];
+
+        $rows = DB::table('member_availability')
+            ->select('day_of_week', 'start_time', 'end_time', 'specific_date', 'note')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $profileUserId)
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->limit(12)
+            ->get()
+            ->map(function (object $row) use ($days): array {
+                $day = isset($days[(int) $row->day_of_week]) ? $days[(int) $row->day_of_week] : '';
+                return [
+                    'label' => $row->specific_date ?: $day,
+                    'time' => substr((string) $row->start_time, 0, 5) . ' - ' . substr((string) $row->end_time, 0, 5),
+                    'note' => $row->note,
+                ];
+            })
+            ->all();
+
+        if (!empty($rows)) {
+            return $rows;
+        }
+
+        $summary = trim((string) ($profile['availability'] ?? ''));
+        return $summary === '' ? [] : [['label' => $summary, 'time' => '', 'note' => null]];
+    }
+
+    private function profileReviews(int $profileUserId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        return DB::table('reviews as r')
+            ->leftJoin('users as reviewer', function ($join) use ($tenantId) {
+                $join->on('reviewer.id', '=', 'r.reviewer_id')
+                    ->where('reviewer.tenant_id', '=', $tenantId);
+            })
+            ->select(
+                'r.rating',
+                'r.comment',
+                'r.created_at',
+                'r.is_anonymous',
+                DB::raw("CASE WHEN r.is_anonymous = 1 THEN NULL WHEN reviewer.profile_type = 'organisation' AND reviewer.organization_name IS NOT NULL AND reviewer.organization_name != '' THEN reviewer.organization_name ELSE CONCAT(COALESCE(reviewer.first_name, ''), ' ', COALESCE(reviewer.last_name, '')) END as reviewer_name")
+            )
+            ->where('r.tenant_id', $tenantId)
+            ->where('r.receiver_id', $profileUserId)
+            ->where(function ($query) {
+                $query->whereNull('r.status')->orWhere('r.status', 'approved');
+            })
+            ->orderByDesc('r.created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn (object $row): array => (array) $row)
+            ->all();
+    }
+
+    private function profileSettingsInputIsValid(array $data): bool
+    {
+        if (($data['first_name'] ?? '') === '' && ($data['organization_name'] ?? '') === '') {
+            return false;
+        }
+
+        if (($data['phone'] ?? '') !== '' && !Validator::isPhone((string) $data['phone'])) {
+            return false;
+        }
+
+        return mb_strlen((string) ($data['bio'] ?? '')) <= 5000
+            && mb_strlen((string) ($data['tagline'] ?? '')) <= 255
+            && mb_strlen((string) ($data['location'] ?? '')) <= 255;
     }
 
     private function listingFilters(Request $request): array

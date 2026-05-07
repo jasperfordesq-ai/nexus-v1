@@ -82,8 +82,7 @@
     </dl>
 
     <div class="nexus-alpha-actions govuk-!-margin-top-6 govuk-!-margin-bottom-8">
-        <a class="govuk-button" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
-        <a class="govuk-button govuk-button--secondary" href="/{{ $tenantSlug }}">{{ __('govuk_alpha.home.current_app_action') }}</a>
+        <a class="govuk-button" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
     </div>
 
     @foreach (['member_offers', 'member_requests'] as $section)

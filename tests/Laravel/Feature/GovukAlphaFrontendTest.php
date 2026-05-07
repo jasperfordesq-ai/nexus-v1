@@ -328,9 +328,97 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Alpha Member');
         $response->assertSee('Alpha Town');
         $response->assertSee('class="govuk-tag govuk-tag--green"', false);
-        $response->assertSee("/{$this->testTenantSlug}/profile/", false);
+        $response->assertSee("/{$this->testTenantSlug}/alpha/members/", false);
         $response->assertDontSee('Other Tenant Member');
         $response->assertSee('AGPL-3.0-or-later');
+    }
+
+    public function test_member_profile_page_renders_accessible_profile_details(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Profile Viewer']);
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Alpha Profile Member',
+            'first_name' => 'Alpha',
+            'last_name' => 'Profile',
+            'location' => 'Profile Town',
+            'bio' => 'Accessible member profile biography.',
+            'tagline' => 'Useful neighbour',
+            'skills' => 'Gardening, Repairs',
+            'avatar_url' => '/assets/img/defaults/default_avatar.png',
+            'status' => 'active',
+            'is_approved' => true,
+            'is_verified' => true,
+            'privacy_search' => true,
+            'privacy_profile' => 'members',
+            'onboarding_completed' => true,
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
+
+        $response->assertOk();
+        $response->assertSee('Alpha Profile');
+        $response->assertSee('Useful neighbour');
+        $response->assertSee('Accessible member profile biography.');
+        $response->assertSee(__('govuk_alpha.profile.skills_title'));
+        $response->assertSee(__('govuk_alpha.profile.activity_title'));
+        $response->assertSee('class="govuk-summary-list"', false);
+        $response->assertSee('AGPL-3.0-or-later');
+    }
+
+    public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
+    {
+        $user = $this->authenticatedUser([
+            'first_name' => 'Before',
+            'last_name' => 'Member',
+            'name' => 'Before Member',
+            'phone' => '+15551234567',
+            'privacy_profile' => 'public',
+            'privacy_search' => true,
+        ]);
+
+        $profile = $this->get("/{$this->testTenantSlug}/alpha/profile");
+
+        $profile->assertOk();
+        $profile->assertSee(__('govuk_alpha.nav.profile'));
+        $profile->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
+
+        $dashboard = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $dashboard->assertOk();
+        $dashboard->assertSee(__('govuk_alpha.dashboard.title'));
+        $dashboard->assertSee(__('govuk_alpha.dashboard.quick_links_title'));
+        $dashboard->assertSee(route('govuk-alpha.profile.me', ['tenantSlug' => $this->testTenantSlug]), false);
+
+        $settings = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+        $settings->assertOk();
+        $settings->assertSee(__('govuk_alpha.profile_settings.title'));
+        $settings->assertSee('name="privacy_profile"', false);
+
+        $update = $this->post("/{$this->testTenantSlug}/alpha/profile/settings", [
+            'first_name' => 'After',
+            'last_name' => 'Member',
+            'phone' => '+1 555 987 6543',
+            'profile_type' => 'individual',
+            'organization_name' => '',
+            'tagline' => 'Updated accessible tagline',
+            'bio' => 'Updated accessible biography.',
+            'location' => 'Updated Town',
+            'privacy_profile' => 'members',
+            'privacy_search' => '1',
+        ]);
+
+        $update->assertRedirect("/{$this->testTenantSlug}/alpha/profile?status=profile-updated");
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'first_name' => 'After',
+            'last_name' => 'Member',
+            'tagline' => 'Updated accessible tagline',
+            'privacy_profile' => 'members',
+            'privacy_search' => 1,
+        ]);
     }
 
     public function test_members_page_has_html_auth_required_state_when_unauthenticated(): void

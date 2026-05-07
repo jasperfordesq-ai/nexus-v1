@@ -7,7 +7,8 @@
 @section('content')
     @php
         $communityName = $tenant['name'] ?? $tenantSlug;
-        $hasPostError = $status === 'post-empty';
+        $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
+        $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'posts', 'listings', 'events', 'goals', 'polls'];
@@ -44,8 +45,8 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.auth_required') }}</p>
                 <p class="govuk-body">{{ __('govuk_alpha.feed.auth_required_detail', ['community' => $communityName]) }}</p>
                 <div class="nexus-alpha-actions">
-                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.login') }}</a>
-                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.register') }}</a>
+                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
+                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.register') }}</a>
                 </div>
             </div>
         </div>
@@ -80,24 +81,27 @@
             </div>
         </div>
     @elseif ($status === 'post-failed')
-        <div class="govuk-notification-banner" role="region" aria-labelledby="post-failed-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="post-failed-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.post_failed') }}</p>
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a href="#content">{{ __('govuk_alpha.states.post_failed') }}</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     @endif
 
     @if (!$requiresAuth)
         <form method="post" action="{{ route('govuk-alpha.feed.posts.store', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-7">
+            @csrf
             <div class="govuk-form-group{{ $hasPostError ? ' govuk-form-group--error' : '' }}">
                 <label class="govuk-label govuk-label--m" for="content">{{ __('govuk_alpha.feed.post_label') }}</label>
                 <div id="content-hint" class="govuk-hint">{{ __('govuk_alpha.feed.post_hint') }}</div>
                 @if ($hasPostError)
                     <p id="content-error" class="govuk-error-message">
-                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ __('govuk_alpha.states.post_empty') }}
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $postErrorMessage }}
                     </p>
                 @endif
                 <textarea class="govuk-textarea{{ $hasPostError ? ' govuk-textarea--error' : '' }}" id="content" name="content" rows="4" aria-describedby="content-hint{{ $hasPostError ? ' content-error' : '' }}"></textarea>

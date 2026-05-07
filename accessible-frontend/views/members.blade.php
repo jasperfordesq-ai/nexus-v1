@@ -8,7 +8,7 @@
     @php
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasFilters = !empty($filters['q']) || ($filters['sort'] ?? 'name') !== 'name' || ($filters['order'] ?? 'ASC') !== 'ASC';
-        $profileUrl = fn (array $member): string => '/' . $tenantSlug . '/profile/' . $member['id'];
+        $profileUrl = fn (array $member): string => route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $member['id']]);
     @endphp
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.members.caption', ['community' => $communityName]) }}</span>
@@ -24,8 +24,8 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.auth_required') }}</p>
                 <p class="govuk-body">{{ __('govuk_alpha.members.auth_required_detail', ['community' => $communityName]) }}</p>
                 <div class="nexus-alpha-actions">
-                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.login') }}</a>
-                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.register') }}</a>
+                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
+                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.register') }}</a>
                 </div>
             </div>
         </div>

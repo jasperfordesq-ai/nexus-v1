@@ -19,13 +19,8 @@
     <header class="nexus-alpha-header" role="banner">
         <div class="govuk-width-container nexus-alpha-header__container">
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
-                {{ __('govuk_alpha.service_name') }}
+                {{ !empty($tenantSlug) ? __('govuk_alpha.header.community', ['name' => $tenant['name'] ?? $tenantSlug]) : __('govuk_alpha.service_name') }}
             </a>
-            @if (!empty($tenantSlug))
-                <span class="nexus-alpha-header__service govuk-body govuk-!-margin-bottom-0">
-                    {{ __('govuk_alpha.header.community', ['name' => $tenant['name'] ?? $tenantSlug]) }}
-                </span>
-            @endif
         </div>
     </header>
 
@@ -43,12 +38,7 @@
                             {{ __('govuk_alpha.nav.menu') }}
                         </button>
                         <ul class="govuk-service-navigation__list" id="alpha-navigation">
-                            @foreach ([
-                                'home' => route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]),
-                                'feed' => route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]),
-                                'listings' => route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]),
-                                'members' => route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]),
-                            ] as $key => $href)
+                            @foreach (($alphaNavItems ?? []) as $key => $href)
                                 <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === $key ? 'govuk-service-navigation__item--active' : '' }}">
                                     <a class="govuk-service-navigation__link" href="{{ $href }}" @if (($activeNav ?? '') === $key) aria-current="page" @endif>
                                         @if (($activeNav ?? '') === $key)
@@ -59,10 +49,17 @@
                                     </a>
                                 </li>
                             @endforeach
-                            <li class="govuk-service-navigation__item">
-                                <a class="govuk-service-navigation__link" href="/{{ $tenantSlug }}">{{ __('govuk_alpha.nav.react_app') }}</a>
-                            </li>
-                            @if (!($isAuthenticated ?? false))
+                            @if ($isAuthenticated ?? false)
+                                <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'profile' ? 'govuk-service-navigation__item--active' : '' }}">
+                                    <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'profile') aria-current="page" @endif>
+                                        @if (($activeNav ?? '') === 'profile')
+                                            <strong class="govuk-service-navigation__active-fallback">{{ __('govuk_alpha.nav.profile') }}</strong>
+                                        @else
+                                            {{ __('govuk_alpha.nav.profile') }}
+                                        @endif
+                                    </a>
+                                </li>
+                            @else
                                 <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'login' ? 'govuk-service-navigation__item--active' : '' }}">
                                     <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'login') aria-current="page" @endif>
                                         @if (($activeNav ?? '') === 'login')

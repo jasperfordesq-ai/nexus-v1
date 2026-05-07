@@ -52,12 +52,12 @@
 
             <div class="nexus-alpha-actions govuk-!-margin-bottom-8">
                 @if ($isAuthenticated ?? false)
-                    <a class="govuk-button" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.home.primary_authenticated') }}</a>
+                    <a class="govuk-button" href="{{ route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.primary_authenticated') }}</a>
+                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.profile_action') }}</a>
                 @else
-                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.home.primary_guest') }}</a>
-                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.home.secondary_guest') }}</a>
+                    <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.primary_guest') }}</a>
+                    <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.secondary_guest') }}</a>
                 @endif
-                <a class="govuk-button govuk-button--secondary" href="/{{ $tenantSlug }}">{{ __('govuk_alpha.home.current_app_action') }}</a>
             </div>
         </div>
         <div class="govuk-grid-column-one-third">
@@ -118,13 +118,6 @@
                     </dd>
                 </div>
             </dl>
-        </div>
-        <div class="govuk-grid-column-one-third">
-            <h2 class="govuk-heading-m">{{ __('govuk_alpha.home.current_app_title') }}</h2>
-            <p class="govuk-body">{{ __('govuk_alpha.home.current_app_description') }}</p>
-            <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href="/{{ $tenantSlug }}">{{ __('govuk_alpha.home.current_app_link') }}</a>
-            </p>
         </div>
     </div>
 @endsection
