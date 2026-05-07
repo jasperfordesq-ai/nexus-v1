@@ -10,8 +10,8 @@
  * Smoke tests — verify each component renders without crashing.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
@@ -113,6 +113,19 @@ vi.mock('@googlemaps/markerclusterer', () => ({
   },
 };
 
+function mockGoogleMapsConfig(enabled = true) {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      data: {
+        enabled,
+        apiKey: enabled ? 'test-key' : '',
+        mapId: enabled ? 'test-map-id' : null,
+      },
+    }),
+  }));
+}
+
 // ─── Wrapper ─────────────────────────────────────────────────────────────────
 
 function W({ children }: { children: React.ReactNode }) {
@@ -145,7 +158,7 @@ describe('EntityMapView', () => {
     expect(container.querySelector('div')).toBeTruthy();
   });
 
-  it('renders with entities', () => {
+  it('renders with entities', async () => {
     const entities = [
       { id: 1, title: 'Test Listing', latitude: 53.35, longitude: -6.26 },
     ];
@@ -160,16 +173,22 @@ describe('EntityMapView', () => {
         />
       </W>
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    await waitFor(() => expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy());
   });
 });
 
 // ─── GoogleMapsProvider ──────────────────────────────────────────────────────
 
-import { GoogleMapsProvider } from '../GoogleMapsProvider';
+import { GoogleMapsProvider, resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
+
+beforeEach(() => {
+  import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
+  resetGoogleMapsConfigForTests();
+  mockGoogleMapsConfig(true);
+});
 
 describe('GoogleMapsProvider', () => {
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     render(
       <W>
         <GoogleMapsProvider>
@@ -177,10 +196,10 @@ describe('GoogleMapsProvider', () => {
         </GoogleMapsProvider>
       </W>
     );
-    expect(screen.getByText('Test content')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Test content')).toBeInTheDocument());
   });
 
-  it('renders children', () => {
+  it('renders children', async () => {
     const { container } = render(
       <W>
         <GoogleMapsProvider>
@@ -188,7 +207,7 @@ describe('GoogleMapsProvider', () => {
         </GoogleMapsProvider>
       </W>
     );
-    expect(container.querySelector('[data-testid="child-content"]')).toBeTruthy();
+    await waitFor(() => expect(container.querySelector('[data-testid="child-content"]')).toBeTruthy());
   });
 });
 
@@ -202,7 +221,7 @@ describe('LocationMap', () => {
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
   });
 
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     const markers = [
       { id: 1, lat: 53.35, lng: -6.26, title: 'Test Marker' },
     ];
@@ -211,10 +230,10 @@ describe('LocationMap', () => {
         <LocationMap markers={markers} />
       </W>
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    await waitFor(() => expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy());
   });
 
-  it('renders with multiple markers', () => {
+  it('renders with multiple markers', async () => {
     const markers = [
       { id: 1, lat: 53.35, lng: -6.26, title: 'Marker 1' },
       { id: 2, lat: 53.40, lng: -6.30, title: 'Marker 2' },
@@ -224,18 +243,22 @@ describe('LocationMap', () => {
         <LocationMap markers={markers} />
       </W>
     );
-    const markerElements = container.querySelectorAll('[data-testid="marker"]');
-    expect(markerElements.length).toBe(2);
+    await waitFor(() => {
+      const markerElements = container.querySelectorAll('[data-testid="marker"]');
+      expect(markerElements.length).toBe(2);
+    });
   });
 
-  it('returns null when no API key', () => {
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY = '';
+  it('returns null when the runtime config is disabled', async () => {
+    resetGoogleMapsConfigForTests();
+    mockGoogleMapsConfig(false);
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
     const { container } = render(
       <W>
         <LocationMap markers={markers} />
       </W>
     );
+    await waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
   });
 });

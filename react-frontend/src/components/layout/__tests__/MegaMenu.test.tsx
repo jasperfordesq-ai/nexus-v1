@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
         'sections.activity': 'Activity',
         'sections.partner_communities': 'Partner Communities',
         'sections.about': 'About',
+        'aria.more_navigation': 'More navigation',
       };
       return map[key] ?? key;
     },

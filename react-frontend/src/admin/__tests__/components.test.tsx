@@ -364,18 +364,18 @@ import { PageHeader } from '../components/PageHeader';
 
 describe('PageHeader', () => {
   it('renders title', () => {
-    render(<PageHeader title="User Management" />);
+    render(<Wrapper><PageHeader title="User Management" /></Wrapper>);
     expect(screen.getByText('User Management')).toBeInTheDocument();
   });
 
   it('renders description', () => {
-    render(<PageHeader title="Users" description="Manage platform users" />);
+    render(<Wrapper><PageHeader title="Users" description="Manage platform users" /></Wrapper>);
     expect(screen.getByText('Manage platform users')).toBeInTheDocument();
   });
 
   it('renders actions slot', () => {
     render(
-      <PageHeader title="Users" actions={<button>Add User</button>} />
+      <Wrapper><PageHeader title="Users" actions={<button>Add User</button>} /></Wrapper>
     );
     expect(screen.getByText('Add User')).toBeInTheDocument();
   });

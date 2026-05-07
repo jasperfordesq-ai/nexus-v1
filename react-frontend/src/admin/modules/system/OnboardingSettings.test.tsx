@@ -172,13 +172,13 @@ describe('OnboardingSettings', () => {
     expect(screen.getByText('Step Configuration')).toBeInTheDocument();
     expect(screen.getByText('Profile Requirements')).toBeInTheDocument();
     expect(screen.getByText('Listing Creation')).toBeInTheDocument();
-    expect(screen.getByText('Public Visibility Gating')).toBeInTheDocument();
-    expect(screen.getByText('Safeguarding Configuration')).toBeInTheDocument();
+    expect(screen.getByText('Visibility Gating')).toBeInTheDocument();
+    expect(screen.getByText('Safeguarding Config')).toBeInTheDocument();
     expect(screen.getByText('Custom Text')).toBeInTheDocument();
 
     // Verify page header
-    expect(screen.getByText('Onboarding Settings')).toBeInTheDocument();
-    expect(screen.getByText(/Configure the onboarding wizard for Test Community/)).toBeInTheDocument();
+    expect(screen.getByText('System')).toBeInTheDocument();
+    expect(screen.getByText(/Configure the onboarding flow for new members/)).toBeInTheDocument();
 
     // Verify safeguarding options are displayed
     expect(screen.getByText('I consider myself a vulnerable adult')).toBeInTheDocument();
@@ -200,9 +200,7 @@ describe('OnboardingSettings', () => {
       expect(screen.getByText('Module Control')).toBeInTheDocument();
     });
 
-    // Find the "Onboarding enabled" switch — the component renders Switch children
-    // with text "Onboarding enabled". The actual input is inside the Switch.
-    const enabledSwitch = screen.getByText('Onboarding enabled')
+    const enabledSwitch = screen.getByText('Onboarding Enabled')
       .closest('label')
       ?.querySelector('input[type="checkbox"]') as HTMLInputElement;
     expect(enabledSwitch).toBeTruthy();
@@ -236,7 +234,7 @@ describe('OnboardingSettings', () => {
     });
 
     // Find the bio min length input by its label
-    const bioInput = screen.getByLabelText(/Minimum bio length/i) as HTMLInputElement;
+    const bioInput = screen.getByLabelText(/Min Bio Length/i) as HTMLInputElement;
     expect(bioInput).toBeTruthy();
     expect(bioInput.value).toBe('20');
 
@@ -262,7 +260,7 @@ describe('OnboardingSettings', () => {
     render(<OnboardingSettings />);
 
     await waitFor(() => {
-      expect(screen.getByText('Safeguarding Configuration')).toBeInTheDocument();
+      expect(screen.getByText('Safeguarding Config')).toBeInTheDocument();
     });
 
     // The country_preset is 'ireland' (not 'custom'), so "Apply Preset" should be enabled.
@@ -279,7 +277,7 @@ describe('OnboardingSettings', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/Existing custom options will not be overwritten/)).toBeInTheDocument();
+      expect(screen.getByText(/Applying a preset will overwrite your current registration policy settings/)).toBeInTheDocument();
     });
 
     // Cancel button should be visible inside the modal
@@ -292,7 +290,7 @@ describe('OnboardingSettings', () => {
     render(<OnboardingSettings />);
 
     await waitFor(() => {
-      expect(screen.getByText('Safeguarding Configuration')).toBeInTheDocument();
+      expect(screen.getByText('Safeguarding Config')).toBeInTheDocument();
     });
 
     // Open the preset modal
@@ -320,8 +318,8 @@ describe('OnboardingSettings', () => {
     // After success, a toast should be shown and config should be refetched
     await waitFor(() => {
       expect(stableToastValue.success).toHaveBeenCalledWith(
-        'Preset applied',
-        expect.stringContaining('1'),
+        'Preset Applied',
+        'Preset applied and options created',
       );
     });
 

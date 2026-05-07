@@ -145,7 +145,7 @@ describe('VerificationAuditLog', () => {
     renderWithProviders(<VerificationAuditLog />);
 
     await waitFor(() => {
-      expect(screen.getByText('No verification events yet.')).toBeTruthy();
+      expect(screen.getByText('No audit events found.')).toBeTruthy();
     });
   });
 
@@ -185,12 +185,12 @@ describe('VerificationAuditLog', () => {
     expect(screen.getByText('3 events')).toBeTruthy();
 
     // Check table headers
-    expect(screen.getByText('TIME')).toBeTruthy();
-    expect(screen.getByText('USER')).toBeTruthy();
-    expect(screen.getByText('EVENT')).toBeTruthy();
-    expect(screen.getByText('ACTOR')).toBeTruthy();
+    expect(screen.getByText('Time')).toBeTruthy();
+    expect(screen.getByText('User')).toBeTruthy();
+    expect(screen.getByText('Event')).toBeTruthy();
+    expect(screen.getByText('Actor')).toBeTruthy();
     expect(screen.getByText('IP')).toBeTruthy();
-    expect(screen.getByText('DETAILS')).toBeTruthy();
+    expect(screen.getByText('Details')).toBeTruthy();
   });
 
   it('renders parsed JSON details', async () => {
@@ -235,7 +235,7 @@ describe('VerificationAuditLog', () => {
     renderWithProviders(<VerificationAuditLog />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Refresh')).toBeTruthy();
+      expect(screen.getByLabelText('Refresh audit log')).toBeTruthy();
     });
   });
 
@@ -246,7 +246,7 @@ describe('VerificationAuditLog', () => {
     renderWithProviders(<VerificationAuditLog />);
 
     await waitFor(() => {
-      expect(screen.getByText('No verification events yet.')).toBeTruthy();
+      expect(screen.getByText('No audit events found.')).toBeTruthy();
     });
 
     // The Select component with "All events" placeholder
@@ -292,7 +292,7 @@ describe('VerificationAuditLog', () => {
 
     // After error, loading should stop and empty state should show
     await waitFor(() => {
-      expect(screen.getByText('No verification events yet.')).toBeTruthy();
+      expect(screen.getByText('No audit events found.')).toBeTruthy();
     });
   });
 });

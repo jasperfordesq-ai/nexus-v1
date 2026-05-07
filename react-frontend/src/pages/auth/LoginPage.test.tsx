@@ -364,7 +364,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     await user.click(screen.getByText('Sign in with a passkey'));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/test/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/test/feed', { replace: true });
     });
   });
 });
