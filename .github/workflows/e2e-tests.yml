@@ -23,7 +23,7 @@ on:
           - all
 
 env:
-  E2E_BASE_URL: ${{ secrets.E2E_BASE_URL || 'https://app.project-nexus.ie' }}
+  E2E_BASE_URL: ${{ secrets.E2E_BASE_URL }}
   E2E_TENANT: ${{ secrets.E2E_TENANT || 'hour-timebank' }}
   E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
   E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
@@ -62,6 +62,13 @@ jobs:
           PROJECT=${{ matrix.project }}
           if [ "${{ github.event.inputs.project }}" != "" ] && [ "${{ github.event.inputs.project }}" != "all" ]; then
             PROJECT="${{ github.event.inputs.project }}"
+          fi
+          # PR checks must not depend on live production tenant state. Run this
+          # workflow only when a target E2E environment is configured explicitly;
+          # the local Docker smoke job remains the blocking PR environment gate.
+          if [ -z "$E2E_BASE_URL" ]; then
+            echo "::notice::Skipping ${PROJECT} E2E tests - E2E_BASE_URL secret is not configured."
+            exit 0
           fi
           # Skip credential-dependent projects when secrets are not configured.
           # Without credentials, authenticated suites time out on login and
@@ -123,6 +130,10 @@ jobs:
 
       - name: Run E2E tests
         run: |
+          if [ -z "$E2E_BASE_URL" ]; then
+            echo "::notice::Skipping ${{ matrix.project }} E2E tests - E2E_BASE_URL secret is not configured."
+            exit 0
+          fi
           if [ -z "$E2E_USER_EMAIL" ]; then
             echo "::notice::Skipping ${{ matrix.project }} E2E tests - E2E_USER_EMAIL secret not configured in this repo."
             exit 0
