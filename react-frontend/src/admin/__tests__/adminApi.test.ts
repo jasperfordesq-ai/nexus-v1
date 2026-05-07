@@ -413,7 +413,7 @@ describe('adminApi', () => {
 
     it('reviewMessage calls POST', async () => {
       await adminBroker.reviewMessage(5);
-      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/review');
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/broker/messages/5/review', {});
     });
 
     it('flagMessage calls POST', async () => {

@@ -178,10 +178,10 @@ describe('SafeguardingStep', () => {
     render(<SafeguardingStep {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Continue')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Next')).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByText('Continue'));
+    await user.click(screen.getByText('Next'));
     expect(defaultProps.onNext).toHaveBeenCalled();
   });
 
@@ -234,10 +234,8 @@ describe('SafeguardingStep', () => {
     // Initially unchecked
     expect(firstCheckbox.checked).toBe(false);
 
-    // Click the option container (the div with role="button")
-    const optionButton = screen.getByText('I consider myself a vulnerable adult').closest('[role="button"]');
-    expect(optionButton).toBeTruthy();
-    await user.click(optionButton!);
+    const optionCheckbox = screen.getByRole('checkbox', { name: 'I consider myself a vulnerable adult' });
+    await user.click(optionCheckbox);
 
     // Should now be checked
     await waitFor(() => {
@@ -245,7 +243,7 @@ describe('SafeguardingStep', () => {
     });
 
     // Click again to deselect
-    await user.click(optionButton!);
+    await user.click(optionCheckbox);
     await waitFor(() => {
       expect(firstCheckbox.checked).toBe(false);
     });
@@ -286,8 +284,8 @@ describe('SafeguardingStep', () => {
       expect(screen.getByText('I acknowledge the community guidelines')).toBeInTheDocument();
     });
 
-    // Click Continue WITHOUT selecting the required option
-    await user.click(screen.getByText('Continue'));
+    // Click Next WITHOUT selecting the required option
+    await user.click(screen.getByText('Next'));
 
     // Should show error toast about required options
     await waitFor(() => {
@@ -314,8 +312,8 @@ describe('SafeguardingStep', () => {
     });
 
     // Select the first option
-    const optionButton = screen.getByText('I consider myself a vulnerable adult').closest('[role="button"]');
-    await user.click(optionButton!);
+    const optionCheckbox = screen.getByRole('checkbox', { name: 'I consider myself a vulnerable adult' });
+    await user.click(optionCheckbox);
 
     // Button label should change to "Save & Continue" when something is selected
     await waitFor(() => {
@@ -332,7 +330,11 @@ describe('SafeguardingStep', () => {
       });
     });
 
-    // onNext should have been called after successful save
+    await waitFor(() => {
+      expect(screen.getByText('Your safeguarding preferences have been saved')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('Continue'));
     expect(defaultProps.onNext).toHaveBeenCalled();
   });
 });

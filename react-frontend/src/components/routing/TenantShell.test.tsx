@@ -44,6 +44,31 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/TenantContext', () => ({
+  TenantProvider: ({ children, tenantSlug }: { children: React.ReactNode; tenantSlug?: string }) => {
+    capturedTenantSlug = tenantSlug;
+    return <div data-testid="tenant-provider" data-slug={tenantSlug || ''}>{children}</div>;
+  },
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+
+vi.mock('@/contexts/NotificationsContext', () => ({
+  NotificationsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/contexts/PusherContext', () => ({
+  PusherProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/contexts/MenuContext', () => ({
+  MenuProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const mockDetectTenantFromUrl = vi.fn(() => ({ slug: null, source: null }));
 
 vi.mock('@/lib/tenant-routing', () => ({
@@ -91,6 +116,22 @@ vi.mock('@/components/feedback', () => ({
   CookieConsentBanner: () => null,
   LoadingScreen: ({ message }: { message: string }) => <div data-testid="loading-screen">{message}</div>,
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
+}));
+
+vi.mock('@/components/feedback/CookieConsentBanner', () => ({
+  CookieConsentBanner: () => null,
+}));
+
+vi.mock('@/components/seo/PageMeta', () => ({
+  PageMeta: () => null,
+}));
+
+vi.mock('react-helmet-async', () => ({
+  Helmet: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@/pages/public/MaintenancePage', () => ({
+  default: () => <div>Maintenance mode</div>,
 }));
 
 vi.mock('framer-motion', () => {
@@ -206,7 +247,7 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/nonexistent-community/dashboard');
-      expect(screen.getByText('Community Not Found')).toBeInTheDocument();
+      expect(screen.getByText('Community not found')).toBeInTheDocument();
       expect(screen.getByText(/nonexistent-community/)).toBeInTheDocument();
     });
 
@@ -220,7 +261,7 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(screen.getByText('Go Home')).toBeInTheDocument();
+      expect(screen.getByText('Go home')).toBeInTheDocument();
     });
 
     it('shows Find Community button in CommunityNotFound', () => {
@@ -233,7 +274,7 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(screen.getByText('Find Community')).toBeInTheDocument();
+      expect(screen.getByText('Find a community')).toBeInTheDocument();
     });
   });
 
