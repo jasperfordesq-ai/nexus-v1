@@ -49,6 +49,9 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url: string | undefined) => url || ''),
+  formatMonthShort: vi.fn(() => 'Apr'),
+  formatDayOfMonth: vi.fn(() => '15'),
+  formatTime: vi.fn((time: string) => time),
 }));
 
 vi.mock('@/lib/logger', () => ({

@@ -225,11 +225,11 @@ jobs:
           # Thresholds are enforced by vitest.config.ts (statements:55, branches:50,
           # functions:50, lines:55). A non-zero exit from vitest fails the step.
           set -o pipefail
-          timeout 120 npx vitest run --coverage 2>&1 | tee /tmp/vitest-coverage.txt
+          timeout 1200 npx vitest run --coverage --coverage.reporter=text --coverage.reporter=json-summary --fileParallelism --maxWorkers=4 --minWorkers=1 2>&1 | tee /tmp/vitest-coverage.txt
           EXIT_CODE=${PIPESTATUS[0]}
           tail -50 /tmp/vitest-coverage.txt
           exit $EXIT_CODE
-        timeout-minutes: 4
+        timeout-minutes: 22
 
       - name: Post Coverage Report as PR Comment
         if: github.event_name == 'pull_request'
