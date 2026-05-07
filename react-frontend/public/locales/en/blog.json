@@ -49,6 +49,11 @@
     "reaction_thumbs_up": "Like",
     "reaction_thumbs_down": "Dislike",
     "reaction_laugh": "Haha",
-    "reaction_angry": "Angry"
+    "reaction_angry": "Angry",
+    "reaction_love": "Love",
+    "reaction_like": "Like",
+    "reaction_wow": "Wow",
+    "reaction_sad": "Sad",
+    "reaction_celebrate": "Celebrate"
   }
 }

@@ -35,6 +35,8 @@ class ListListingsRequest extends FormRequest
             'min_price' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
             'max_price' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
             'posted_within' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'with_coordinates' => ['nullable', 'in:true,false,1,0'],
+            'personalised' => ['nullable', 'in:true,false,1,0'],
             'cursor' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],

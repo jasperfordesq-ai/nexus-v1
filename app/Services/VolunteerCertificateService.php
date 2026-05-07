@@ -71,7 +71,7 @@ class VolunteerCertificateService
         $totalHours = (float) $query->sum('hours');
 
         if ($totalHours <= 0) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'No approved volunteer hours found for this user'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_certificate_no_approved_hours')];
             return null;
         }
 
@@ -82,7 +82,10 @@ class VolunteerCertificateService
 
         // Aggregate hours per organisation
         $orgQuery = DB::table('vol_logs as vl')
-            ->leftJoin('vol_organizations as vo', 'vl.organization_id', '=', 'vo.id')
+            ->leftJoin('vol_organizations as vo', function ($join) {
+                $join->on('vl.organization_id', '=', 'vo.id')
+                    ->on('vl.tenant_id', '=', 'vo.tenant_id');
+            })
             ->where('vl.user_id', $userId)
             ->where('vl.tenant_id', $tenantId)
             ->where('vl.status', 'approved');
@@ -102,7 +105,7 @@ class VolunteerCertificateService
             ->groupBy('vl.organization_id', 'vo.name')
             ->get()
             ->map(fn ($row) => [
-                'name' => $row->org_name ?? 'Independent',
+                'name' => $row->org_name ?? __('api.vol_certificate_independent'),
                 'hours' => round((float) $row->total_hours, 2),
             ])
             ->all();
@@ -131,7 +134,7 @@ class VolunteerCertificateService
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("VolunteerCertificateService::generate error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to generate certificate'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_certificate_generate_failed')];
             return null;
         }
 
@@ -149,7 +152,7 @@ class VolunteerCertificateService
             'date_range' => ['start' => $dateRangeStart, 'end' => $dateRangeEnd],
             'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $verificationCode,
             'organizations' => $orgs,
-            'user_name' => $user ? trim($user->first_name . ' ' . $user->last_name) : 'Volunteer',
+            'user_name' => $user ? trim($user->first_name . ' ' . $user->last_name) : __('api.vol_certificate_volunteer_fallback'),
             'generated_at' => now()->toIso8601String(),
         ];
 
@@ -291,10 +294,18 @@ class VolunteerCertificateService
         $dateFrom = htmlspecialchars($cert['date_range']['start'], ENT_QUOTES, 'UTF-8');
         $dateTo = htmlspecialchars($cert['date_range']['end'], ENT_QUOTES, 'UTF-8');
         $verifyCode = htmlspecialchars($cert['verification_code'], ENT_QUOTES, 'UTF-8');
+        $htmlTitle = htmlspecialchars(__('api.vol_certificate_html_title'), ENT_QUOTES, 'UTF-8');
+        $platformName = htmlspecialchars(__('api.vol_certificate_html_platform'), ENT_QUOTES, 'UTF-8');
+        $hoursLabel = htmlspecialchars(__('api.vol_certificate_html_total_hours'), ENT_QUOTES, 'UTF-8');
+        $periodLabel = htmlspecialchars(__('api.vol_certificate_html_period'), ENT_QUOTES, 'UTF-8');
+        $orgLabel = htmlspecialchars(__('api.vol_certificate_html_org'), ENT_QUOTES, 'UTF-8');
+        $orgHoursLabel = htmlspecialchars(__('api.vol_certificate_html_org_hours'), ENT_QUOTES, 'UTF-8');
+        $verificationLabel = htmlspecialchars(__('api.vol_certificate_html_verification_code'), ENT_QUOTES, 'UTF-8');
+        $verificationNote = htmlspecialchars(__('api.vol_certificate_html_verification_note'), ENT_QUOTES, 'UTF-8');
 
         $orgRows = '';
         foreach ($cert['organizations'] as $org) {
-            $orgName = htmlspecialchars($org['name'] ?? 'Unknown', ENT_QUOTES, 'UTF-8');
+            $orgName = htmlspecialchars($org['name'] ?? __('api.unknown_user'), ENT_QUOTES, 'UTF-8');
             $orgHours = round((float) ($org['hours'] ?? 0), 2);
             $orgRows .= "<tr><td style=\"padding:8px;border:1px solid #ddd;\">{$orgName}</td><td style=\"padding:8px;border:1px solid #ddd;text-align:center;\">{$orgHours}</td></tr>";
         }
@@ -304,7 +315,7 @@ class VolunteerCertificateService
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Volunteer Impact Certificate</title>
+<title>{$htmlTitle}</title>
 <style>
   body { font-family: Georgia, 'Times New Roman', serif; max-width: 800px; margin: 40px auto; padding: 40px; border: 3px double #2563eb; }
   h1 { text-align: center; color: #1e40af; margin-bottom: 8px; }
@@ -320,18 +331,18 @@ class VolunteerCertificateService
 </style>
 </head>
 <body>
-  <h1>Volunteer Impact Certificate</h1>
-  <p class="subtitle">Project NEXUS Community Platform</p>
+  <h1>{$htmlTitle}</h1>
+  <p class="subtitle">{$platformName}</p>
   <p class="name">{$userName}</p>
-  <p class="hours">{$hours} Total Volunteer Hours</p>
-  <p class="period">Period: {$dateFrom} to {$dateTo}</p>
+  <p class="hours">{$hours} {$hoursLabel}</p>
+  <p class="period">{$periodLabel}: {$dateFrom} - {$dateTo}</p>
   <table>
-    <thead><tr><th>Organisation</th><th style="text-align:center;">Hours</th></tr></thead>
+    <thead><tr><th>{$orgLabel}</th><th style="text-align:center;">{$orgHoursLabel}</th></tr></thead>
     <tbody>{$orgRows}</tbody>
   </table>
   <div class="verify">
-    <p>Verification Code: <code>{$verifyCode}</code></p>
-    <p style="font-size:12px;color:#9ca3af;">This certificate can be verified online.</p>
+    <p>{$verificationLabel}: <code>{$verifyCode}</code></p>
+    <p style="font-size:12px;color:#9ca3af;">{$verificationNote}</p>
   </div>
 </body>
 </html>

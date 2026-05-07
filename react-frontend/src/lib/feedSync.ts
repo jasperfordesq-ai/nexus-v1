@@ -30,12 +30,20 @@ export const FEED_SYNC_EVENT = 'nexus:feedSync';
 export interface FeedSyncPatch {
   is_liked?: boolean;
   likes_count?: number;
+  is_bookmarked?: boolean;
+  is_shared?: boolean;
+  share_count?: number;
   /** Delta applied to comments_count: +1 on add, -1 on delete. */
   comments_count_delta?: number;
   reactions?: {
     counts: Record<string, number>;
     total: number;
     user_reaction: string | null;
+    top_reactors?: Array<{
+      id: number;
+      name: string;
+      avatar_url?: string | null;
+    }>;
   };
 }
 
@@ -45,7 +53,53 @@ export interface FeedSyncPayload {
   patch: FeedSyncPatch;
 }
 
+interface SyncableFeedItem {
+  id: number;
+  type: string;
+  is_liked?: boolean;
+  likes_count?: number;
+  is_bookmarked?: boolean;
+  is_shared?: boolean;
+  share_count?: number;
+  comments_count?: number;
+  reactions?: FeedSyncPatch['reactions'];
+}
+
 /** Broadcast a social state change to all active feed listeners. */
 export function dispatchFeedSync(payload: FeedSyncPayload): void {
   window.dispatchEvent(new CustomEvent<FeedSyncPayload>(FEED_SYNC_EVENT, { detail: payload }));
+}
+
+/** Apply a feed-sync payload to one feed-like item, preserving unrelated fields. */
+export function applyFeedSyncToItem<T extends SyncableFeedItem>(item: T, payload: FeedSyncPayload): T {
+  if (item.type !== payload.targetType || item.id !== payload.targetId) {
+    return item;
+  }
+
+  const next = { ...item };
+  const { patch } = payload;
+
+  if (patch.is_liked !== undefined) {
+    next.is_liked = patch.is_liked;
+  }
+  if (patch.likes_count !== undefined) {
+    next.likes_count = Math.max(0, patch.likes_count);
+  }
+  if (patch.is_bookmarked !== undefined) {
+    next.is_bookmarked = patch.is_bookmarked;
+  }
+  if (patch.is_shared !== undefined) {
+    next.is_shared = patch.is_shared;
+  }
+  if (patch.share_count !== undefined) {
+    next.share_count = Math.max(0, patch.share_count);
+  }
+  if (patch.comments_count_delta !== undefined) {
+    next.comments_count = Math.max(0, (item.comments_count ?? 0) + patch.comments_count_delta);
+  }
+  if (patch.reactions !== undefined) {
+    next.reactions = patch.reactions;
+  }
+
+  return next;
 }

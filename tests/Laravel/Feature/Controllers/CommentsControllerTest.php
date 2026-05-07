@@ -58,6 +58,20 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    private function createReply(int $postId, int $userId, int $parentId, string $content = 'Child comment'): int
+    {
+        return DB::table('comments')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'user_id' => $userId,
+            'parent_id' => $parentId,
+            'content' => $content,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/comments
     // ------------------------------------------------------------------
@@ -130,6 +144,28 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_creates_comment_for_visible_target(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->createPost($user->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'content' => 'A useful reply',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.content', 'A useful reply');
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'user_id' => $user->id,
+            'content' => 'A useful reply',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  PUT /v2/comments/{id}
     // ------------------------------------------------------------------
@@ -141,6 +177,39 @@ class CommentsControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_update_allows_owner_and_rejects_non_owner(): void
+    {
+        $owner = $this->authenticatedUser();
+        $postId = $this->createPost($owner->id);
+        $commentId = $this->createComment($postId, $owner->id);
+
+        $this->apiPut("/v2/comments/{$commentId}", [
+            'content' => 'Updated comment',
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('comments', [
+            'id' => $commentId,
+            'tenant_id' => $this->testTenantId,
+            'content' => 'Updated comment',
+        ]);
+
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($other, ['*']);
+
+        $this->apiPut("/v2/comments/{$commentId}", [
+            'content' => 'Hijacked comment',
+        ])->assertStatus(403);
+
+        $this->assertDatabaseMissing('comments', [
+            'id' => $commentId,
+            'tenant_id' => $this->testTenantId,
+            'content' => 'Hijacked comment',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  DELETE /v2/comments/{id}
     // ------------------------------------------------------------------
@@ -150,6 +219,28 @@ class CommentsControllerTest extends TestCase
         $response = $this->apiDelete('/v2/comments/1');
 
         $response->assertStatus(401);
+    }
+
+    public function test_destroy_soft_deletes_comment_thread_and_returns_deleted_count(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->createPost($user->id);
+        $commentId = $this->createComment($postId, $user->id);
+        $replyId = $this->createReply($postId, $user->id, $commentId);
+        $nestedReplyId = $this->createReply($postId, $user->id, $replyId, 'Nested child comment');
+
+        $response = $this->apiDelete("/v2/comments/{$commentId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.deleted', true);
+        $response->assertJsonPath('data.deleted_count', 3);
+
+        foreach ([$commentId, $replyId, $nestedReplyId] as $id) {
+            $this->assertSoftDeleted('comments', [
+                'id' => $id,
+                'tenant_id' => $this->testTenantId,
+            ]);
+        }
     }
 
     // ------------------------------------------------------------------

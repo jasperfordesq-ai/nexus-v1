@@ -331,6 +331,7 @@ class PostMediaService
             ->join('feed_posts as fp', 'pm.post_id', '=', 'fp.id')
             ->where('pm.id', $mediaId)
             ->where('pm.tenant_id', $tenantId)
+            ->where('fp.tenant_id', $tenantId)
             ->where('fp.user_id', $userId)
             ->exists();
     }

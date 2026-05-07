@@ -162,13 +162,13 @@ class CommentsController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('comments_delete', 30, 60);
 
-        $deleted = $this->commentService->delete($id, $userId);
+        $deletedCount = $this->commentService->delete($id, $userId);
 
-        if (! $deleted) {
+        if ($deletedCount < 1) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.cannot_delete_comment'), null, 403);
         }
 
-        return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        return $this->respondWithData(['deleted' => true, 'id' => $id, 'deleted_count' => $deletedCount]);
     }
 
     // -----------------------------------------------------------------

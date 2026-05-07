@@ -514,7 +514,7 @@ export function WellbeingTab() {
                         ? 'bg-rose-500/20 ring-2 ring-rose-500 scale-110'
                         : 'bg-theme-elevated hover:bg-theme-hover'
                     }`}
-                    aria-label={`Mood: ${mood.label}`}
+                    aria-label={t('wellbeing.mood_aria', { mood: mood.label })}
                     aria-pressed={selectedMood === mood.value}
                   >
                     <span className="text-3xl" role="img" aria-hidden="true">{mood.emoji}</span>

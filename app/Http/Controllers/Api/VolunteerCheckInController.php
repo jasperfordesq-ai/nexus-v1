@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use App\Services\VolunteerCheckInService;
 use App\Services\WebhookDispatchService;
 use App\Core\TenantContext;
-use App\Models\OrgMember;
 
 /**
  * VolunteerCheckInController -- QR check-in, check-out, and verification.
@@ -71,7 +70,15 @@ class VolunteerCheckInController extends BaseApiController
                 return true;
             }
 
-            if (OrgMember::isAdmin((int) $row->organization_id, $userId)) {
+            $isOrgAdmin = DB::table('org_members')
+                ->where('tenant_id', $tenantId)
+                ->where('organization_id', (int) $row->organization_id)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->whereIn('role', ['owner', 'admin', 'manager', 'coordinator'])
+                ->exists();
+
+            if ($isOrgAdmin) {
                 return true;
             }
 

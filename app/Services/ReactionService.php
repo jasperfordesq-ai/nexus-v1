@@ -181,7 +181,10 @@ class ReactionService
 
         // Get a few recent reactor names for the summary
         $topReactors = DB::table('reactions as r')
-            ->join('users as u', 'r.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('r.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('r.tenant_id', $tenantId)
             ->where('r.target_type', $entityType)
             ->where('r.target_id', $entityId)
@@ -218,7 +221,10 @@ class ReactionService
         }
 
         $query = DB::table('reactions as r')
-            ->join('users as u', 'r.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('r.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('r.tenant_id', $tenantId)
             ->where('r.target_type', $entityType)
             ->where('r.target_id', $entityId)

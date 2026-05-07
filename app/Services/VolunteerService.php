@@ -1437,7 +1437,7 @@ class VolunteerService
         // Verify admin owns or is admin of the org
         $org = DB::selectOne("SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $log->organization_id, $tenantId]);
         if (!$org) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_org_manage_forbidden')];
             return false;
         }
 
@@ -1447,7 +1447,7 @@ class VolunteerService
         );
 
         if ((int) $org->user_id !== $adminUserId && !in_array($orgAdminRole->role ?? '', ['owner', 'admin'], true)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_org_manage_forbidden')];
             return false;
         }
 
@@ -1466,20 +1466,26 @@ class VolunteerService
 
                 // 2. If approved and org has auto-pay enabled, pay inline (avoid nested transaction)
                 if ($action === 'approve' && $org->auto_pay_enabled) {
-                    $intHours = (int) floor($hours); // Use floor, not ceil, to prevent phantom debit
+                    $intHours = (int) floor($hours); // users.balance stores whole hours.
+                    $orgDebit = (float) $intHours; // keep fractional remainders in the org wallet.
+                    if ($intHours <= 0) {
+                        return;
+                    }
                     // Lock org row
                     $orgLocked = DB::selectOne(
                         "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                         [(int) $org->id, $tenantId]
                     );
 
-                    if ($orgLocked && (float) $orgLocked->balance >= $hours) {
+                    if ($orgLocked && (float) $orgLocked->balance >= $orgDebit) {
                         // Deduct from org
-                        DB::update(
-                            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                            [$hours, (int) $org->id, $tenantId]
-                        );
-                        $newOrgBalance = (float) $orgLocked->balance - $hours;
+                        if ($orgDebit > 0) {
+                            DB::update(
+                                "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+                                [$orgDebit, (int) $org->id, $tenantId]
+                            );
+                        }
+                        $newOrgBalance = (float) $orgLocked->balance - $orgDebit;
 
                         // Credit to volunteer (INT — use floor to match deduction)
                         if ($intHours > 0) {
@@ -1490,11 +1496,11 @@ class VolunteerService
                         }
 
                         // Record in vol_org_transactions
-                        $description = "Auto-payment for {$hours}h volunteered";
+                        $description = __('api.volunteer_auto_payment_description', ['hours' => $intHours]);
                         DB::insert("
                             INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
                             VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
-                        ", [$tenantId, (int) $org->id, $volunteerId, $logId, -$hours, $newOrgBalance, $description]);
+                        ", [$tenantId, (int) $org->id, $volunteerId, $logId, -$orgDebit, $newOrgBalance, $description]);
 
                         // Record in main transactions table
                         DB::insert("
@@ -2103,20 +2109,26 @@ class VolunteerService
         float $hours,
     ): string {
         $intHours = (int) floor($hours);
+        $orgDebit = (float) $intHours;
+        if ($intHours <= 0) {
+            return 'no_payable_hours';
+        }
         $orgLocked = DB::selectOne(
             "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
             [$organizationId, $tenantId]
         );
 
-        if (!$orgLocked || (float) $orgLocked->balance < $hours) {
+        if (!$orgLocked || (float) $orgLocked->balance < $orgDebit) {
             return 'insufficient_balance';
         }
 
-        DB::update(
-            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-            [$hours, $organizationId, $tenantId]
-        );
-        $newOrgBalance = (float) $orgLocked->balance - $hours;
+        if ($orgDebit > 0) {
+            DB::update(
+                "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+                [$orgDebit, $organizationId, $tenantId]
+            );
+        }
+        $newOrgBalance = (float) $orgLocked->balance - $orgDebit;
 
         if ($intHours > 0) {
             DB::update(
@@ -2125,11 +2137,11 @@ class VolunteerService
             );
         }
 
-        $description = "Auto-payment for {$hours}h volunteered";
+        $description = __('api.volunteer_auto_payment_description', ['hours' => $intHours]);
         DB::insert("
             INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
             VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
-        ", [$tenantId, $organizationId, $volunteerId, $logId, -$hours, $newOrgBalance, $description]);
+        ", [$tenantId, $organizationId, $volunteerId, $logId, -$orgDebit, $newOrgBalance, $description]);
 
         DB::insert("
             INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)

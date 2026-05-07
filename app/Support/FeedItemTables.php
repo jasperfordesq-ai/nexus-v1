@@ -42,7 +42,7 @@ final class FeedItemTables
         'challenge' => 'ideation_challenges',
         'resource'  => 'resources',
         'job'       => 'job_vacancies',
-        'blog'      => 'blog_posts',
+        'blog'      => 'posts',
         'discussion' => 'group_discussions',
     ];
 

@@ -1588,7 +1588,8 @@ Route::put('/v2/caring-community/research/consent', [\App\Http\Controllers\Api\R
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::get('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminIndex']);
 Route::post('/v2/admin/caring-community/research/partners', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminStore']);
-Route::post('/v2/admin/caring-community/research/partners/{partnerId}/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminGenerateDataset']);
+Route::post('/v2/admin/caring-community/research/partners/{partnerId}/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminGenerateDataset'])
+    ->middleware('throttle:bulk-export');
 Route::get('/v2/admin/caring-community/research/dataset-exports', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminDatasetExports']);
 Route::post('/v2/admin/caring-community/research/dataset-exports/{exportId}/revoke', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminRevokeDatasetExport']);
 Route::get('/v2/admin/caring-community/research/agreement-templates', [\App\Http\Controllers\Api\ResearchPartnershipController::class, 'adminListAgreementTemplates']);
@@ -2152,7 +2153,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 // AG23 follow-up — Public inbound federation endpoint (HMAC signature auth, no session)
-Route::post('/v2/federation/hour-transfer/inbound', [\App\Http\Controllers\Api\FederationHourTransferController::class, 'inbound']);
+Route::post('/v2/federation/hour-transfer/inbound', [\App\Http\Controllers\Api\FederationHourTransferController::class, 'inbound'])
+    ->middleware('throttle:30,1');
 
 // AG54 — Verein membership dues (member-facing + verein-admin scoped)
 Route::middleware(['auth:sanctum'])->group(function () {

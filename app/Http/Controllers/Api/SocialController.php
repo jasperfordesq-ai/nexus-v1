@@ -824,6 +824,28 @@ class SocialController extends BaseApiController
         }
 
         $poll = $this->pollService->getById($pollId, $userId);
+
+        try {
+            DB::table('feed_activity')->insertOrIgnore([
+                'tenant_id'   => TenantContext::getId(),
+                'user_id'     => $userId,
+                'source_type' => 'poll',
+                'source_id'   => $pollId,
+                'title'       => $question,
+                'content'     => $question,
+                'metadata'    => null,
+                'is_visible'  => true,
+                'is_hidden'   => false,
+                'created_at'  => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('SocialController::createPollV2 feed_activity sync failed', [
+                'poll_id' => $pollId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return $this->respondWithData($poll, null, 201);
     }
 

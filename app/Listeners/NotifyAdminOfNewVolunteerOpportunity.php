@@ -27,15 +27,16 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
             TenantContext::setById($event->tenantId);
 
             $opportunity = $event->opportunity;
-            $tenantName  = TenantContext::get()['name'] ?? 'Project NEXUS';
+            $tenantName  = TenantContext::get()['name'] ?? __('emails.common.platform_name');
             $baseUrl     = TenantContext::getFrontendUrl();
             $basePath    = TenantContext::getSlugPrefix();
-            $oppUrl      = $baseUrl . $basePath . '/volunteering/' . $opportunity->id;
+            $oppPath     = '/volunteering/opportunities/' . $opportunity->id;
+            $oppUrl      = $baseUrl . $basePath . $oppPath;
 
-            $oppTitle = $opportunity->title ?? 'Untitled opportunity';
+            $oppTitle = $opportunity->title ?? __('emails_misc.admin_notify.new_vol_opp_fallback_title');
 
             // Load the poster's name
-            $posterName = 'A member';
+            $posterName = __('emails.common.fallback_member_name');
             if (!empty($opportunity->user_id)) {
                 $poster = DB::table('users')
                     ->where('id', $opportunity->user_id)
@@ -68,10 +69,10 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                 }
 
                 LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $posterName, $tenantName, $adminEmail, $mailer) {
-                    $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
+                    $adminName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
 
                     $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
-                    Notification::createNotification((int) $admin->id, $bellContent, '/volunteering/' . $opportunity->id, 'new_vol_opp_created');
+                    Notification::createNotification((int) $admin->id, $bellContent, $oppPath, 'new_vol_opp_created');
 
                     $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
 

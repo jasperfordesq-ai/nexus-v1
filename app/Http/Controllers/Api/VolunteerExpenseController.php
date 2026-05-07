@@ -221,7 +221,7 @@ class VolunteerExpenseController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'expense_type']), 'expense_type', 422);
         }
 
-        $policyFields = ['max_amount', 'requires_receipt', 'auto_approve_below', 'description', 'enabled'];
+        $policyFields = ['max_amount', 'max_monthly', 'requires_receipt', 'requires_receipt_above', 'auto_approve_below', 'description', 'enabled'];
         $hasPolicyField = false;
         foreach ($policyFields as $field) {
             if (array_key_exists($field, $data)) {

@@ -141,6 +141,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('caring-nudges-dispatch');
 
+        $schedule->command('caring:hour-transfers-retry')
+            ->everyFiveMinutes()
+            ->withoutOverlapping(10)
+            ->name('caring-hour-transfers-retry');
+
         // AG90 — Personalised civic digest dispatch (email + push).
         // Daily run at 07:00 for members opted into daily cadence; weekly run
         // on Mondays at 07:30. Both have idempotency guards inside the command

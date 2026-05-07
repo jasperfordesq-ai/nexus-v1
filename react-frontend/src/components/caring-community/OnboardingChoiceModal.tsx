@@ -24,17 +24,19 @@ import HandHeart from 'lucide-react/icons/hand-heart';
 import Heart from 'lucide-react/icons/heart';
 import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 export type OnboardingChoice = 'recipient' | 'helper' | 'browse';
 
-const STORAGE_KEY = 'caring_community_onboarding_choice';
+const STORAGE_KEY_PREFIX = 'caring_community_onboarding_choice';
 
 interface OnboardingChoiceModalProps {
   isOpen: boolean;
   onChoice: (choice: OnboardingChoice) => void;
   onClose: () => void;
+  tenantScope?: string | null;
 }
 
 interface ChoiceCardDef {
@@ -65,9 +67,13 @@ const CHOICES: ReadonlyArray<ChoiceCardDef> = [
   },
 ];
 
-export function persistOnboardingChoice(choice: OnboardingChoice): void {
+function storageKey(tenantScope?: string | null): string {
+  return tenantScope ? `${STORAGE_KEY_PREFIX}.${tenantScope}` : STORAGE_KEY_PREFIX;
+}
+
+export function persistOnboardingChoice(choice: OnboardingChoice, tenantScope?: string | null): void {
   try {
-    localStorage.setItem(STORAGE_KEY, choice);
+    localStorage.setItem(storageKey(tenantScope), choice);
   } catch {
     // localStorage may be unavailable (private mode); non-fatal
   }
@@ -79,9 +85,9 @@ export function persistOnboardingChoice(choice: OnboardingChoice): void {
     });
 }
 
-export function readStoredOnboardingChoice(): OnboardingChoice | null {
+export function readStoredOnboardingChoice(tenantScope?: string | null): OnboardingChoice | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey(tenantScope));
     if (raw === 'recipient' || raw === 'helper' || raw === 'browse') {
       return raw;
     }
@@ -91,23 +97,25 @@ export function readStoredOnboardingChoice(): OnboardingChoice | null {
   return null;
 }
 
-export function clearStoredOnboardingChoice(): void {
+export function clearStoredOnboardingChoice(tenantScope?: string | null): void {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey(tenantScope));
   } catch {
     // ignore
   }
 }
 
-export function OnboardingChoiceModal({ isOpen, onChoice, onClose }: OnboardingChoiceModalProps) {
+export function OnboardingChoiceModal({ isOpen, onChoice, onClose, tenantScope }: OnboardingChoiceModalProps) {
   const { t } = useTranslation('common');
+  const { tenant, tenantSlug } = useTenant();
+  const effectiveTenantScope = tenantScope ?? tenant?.slug ?? tenantSlug ?? (tenant?.id ? String(tenant.id) : null);
 
   const handlePick = useCallback(
     (choice: OnboardingChoice) => {
-      persistOnboardingChoice(choice);
+      persistOnboardingChoice(choice, effectiveTenantScope);
       onChoice(choice);
     },
-    [onChoice],
+    [effectiveTenantScope, onChoice],
   );
 
   return (

@@ -8,6 +8,8 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
 import type { FeedComment } from '@/components/feed/types';
+import { REACTION_EMOJI_MAP } from '@/components/social/ReactionPicker';
+import type { ReactionType } from '@/components/social/ReactionPicker';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
@@ -41,7 +43,47 @@ export interface MentionUser {
   is_connection?: boolean;
 }
 
-export const AVAILABLE_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🎉'] as const;
+export const AVAILABLE_REACTIONS = ['like', 'love', 'laugh', 'wow', 'sad', 'celebrate'] as const satisfies readonly ReactionType[];
+export const COMMENT_REACTION_EMOJI_MAP: Record<(typeof AVAILABLE_REACTIONS)[number], string> = {
+  like: REACTION_EMOJI_MAP.like,
+  love: REACTION_EMOJI_MAP.love,
+  laugh: REACTION_EMOJI_MAP.laugh,
+  wow: REACTION_EMOJI_MAP.wow,
+  sad: REACTION_EMOJI_MAP.sad,
+  celebrate: REACTION_EMOJI_MAP.celebrate,
+};
+
+interface CommentReactionResponse {
+  action: 'added' | 'updated' | 'removed';
+  reaction_type?: string | null;
+  reactions:
+    | Record<string, number>
+    | {
+        counts?: Record<string, number>;
+        user_reaction?: string | null;
+      };
+}
+
+function isCanonicalCommentReactionResponse(
+  reactions: CommentReactionResponse['reactions'],
+): reactions is { counts?: Record<string, number>; user_reaction?: string | null } {
+  return 'counts' in reactions || 'user_reaction' in reactions;
+}
+
+function normalizeCommentReactionResponse(data: CommentReactionResponse): {
+  reactions: Record<string, number>;
+  userReactions: string[];
+} {
+  const raw = data.reactions;
+  const isCanonical = isCanonicalCommentReactionResponse(raw);
+  const counts = isCanonical ? raw.counts ?? {} : raw;
+  const userReaction = isCanonical ? raw.user_reaction : data.reaction_type;
+
+  return {
+    reactions: counts,
+    userReactions: data.action === 'removed' || !userReaction ? [] : [userReaction],
+  };
+}
 
 /* ─── Hook ──────────────────────────────────────────────────── */
 
@@ -80,31 +122,34 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     if (isLiking) return;
     // Optimistic update
     const wasLiked = isLiked;
+    const previousLikesCount = likesCount;
     setIsLiked(!wasLiked);
-    setLikesCount((prev) => wasLiked ? prev - 1 : prev + 1);
+    setLikesCount((prev) => wasLiked ? Math.max(0, prev - 1) : prev + 1);
     setIsLiking(true);
     try {
       const res = await api.post<{ status: string; action?: string; likes_count: number }>('/v2/feed/like', {
         target_type: targetType,
         target_id: targetId,
       });
-      if (res.success && res.data) {
-        const newIsLiked = res.data.status === 'liked' || res.data.action === 'liked';
-        const newCount = res.data.likes_count;
-        setIsLiked(newIsLiked);
-        setLikesCount(newCount);
-        // Sync the feed page so the card reflects this change immediately
-        dispatchFeedSync({ targetType, targetId, patch: { is_liked: newIsLiked, likes_count: newCount } });
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Like request failed');
       }
+
+      const newIsLiked = res.data.status === 'liked' || res.data.action === 'liked';
+      const newCount = res.data.likes_count;
+      setIsLiked(newIsLiked);
+      setLikesCount(newCount);
+      // Sync the feed page so the card reflects this change immediately
+      dispatchFeedSync({ targetType, targetId, patch: { is_liked: newIsLiked, likes_count: newCount } });
     } catch (err) {
       // Revert on error
       setIsLiked(wasLiked);
-      setLikesCount((prev) => wasLiked ? prev + 1 : prev - 1);
+      setLikesCount(previousLikesCount);
       logError('Failed to toggle like', err);
     } finally {
       setIsLiking(false);
     }
-  }, [targetType, targetId, isLiked, isLiking]);
+  }, [targetType, targetId, isLiked, isLiking, likesCount]);
 
   /* ───── Comments ───── */
 
@@ -177,16 +222,25 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
 
   const deleteComment = useCallback(async (commentId: number): Promise<boolean> => {
     try {
-      const res = await api.delete(`/v2/comments/${commentId}`);
+      const res = await api.delete<{ deleted_count?: number }>(`/v2/comments/${commentId}`);
       if (res.success) {
         // Remove from tree locally
+        const countRemovedFromTree = (list: FeedComment[]): number =>
+          list.reduce((total, c) => {
+            if (c.id === commentId) {
+              return total + 1 + (c.replies?.length ? countRemovedFromTree(c.replies) : 0);
+            }
+            return total + (c.replies?.length ? countRemovedFromTree(c.replies) : 0);
+          }, 0);
+        const removedCount = countRemovedFromTree(comments);
         const removeFromTree = (list: FeedComment[]): FeedComment[] =>
           list
             .filter((c) => c.id !== commentId)
             .map((c) => (c.replies?.length ? { ...c, replies: removeFromTree(c.replies) } : c));
         setComments(removeFromTree);
-        setCommentsCount((prev) => Math.max(0, prev - 1));
-        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: -1 } });
+        const delta = Math.max(1, res.data?.deleted_count ?? removedCount);
+        setCommentsCount((prev) => Math.max(0, prev - delta));
+        dispatchFeedSync({ targetType, targetId, patch: { comments_count_delta: -delta } });
         return true;
       }
       return false;
@@ -194,25 +248,22 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to delete comment', err);
       return false;
     }
-  }, []);
+  }, [comments, targetId, targetType]);
 
   /* ───── Reactions ───── */
 
-  const toggleReaction = useCallback(async (commentId: number, emoji: string) => {
+  const toggleReaction = useCallback(async (commentId: number, reactionType: string) => {
     try {
-      const res = await api.post<{ action: string; emoji: string; reactions: Record<string, number> }>(
+      const res = await api.post<CommentReactionResponse>(
         `/v2/comments/${commentId}/reactions`,
-        { emoji }
+        { reaction_type: reactionType }
       );
       if (res.success && res.data) {
-        const { action, reactions: updatedReactions } = res.data;
+        const { reactions: updatedReactions, userReactions } = normalizeCommentReactionResponse(res.data);
         const updateInTree = (list: FeedComment[]): FeedComment[] =>
           list.map((c) => {
             if (c.id === commentId) {
-              const newUserReactions = action === 'added'
-                ? [...(c.user_reactions || []), emoji]
-                : (c.user_reactions || []).filter((e) => e !== emoji);
-              return { ...c, reactions: updatedReactions, user_reactions: newUserReactions };
+              return { ...c, reactions: updatedReactions, user_reactions: userReactions };
             }
             if (c.replies?.length) return { ...c, replies: updateInTree(c.replies) };
             return c;
@@ -228,9 +279,9 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
 
   const shareToFeed = useCallback(async (content?: string): Promise<boolean> => {
     try {
-      const res = await api.post('/social/share', {
-        parent_type: targetType,
-        parent_id: targetId,
+      const res = await api.post('/v2/shares', {
+        type: targetType,
+        id: targetId,
         content: content?.trim() ?? '',
       });
       return res.success ?? (res as unknown as { status?: string }).status === 'success';

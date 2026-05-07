@@ -23,8 +23,10 @@ import { useAuth, useToast } from '@/contexts';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { api } from '@/lib/api';
+import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
 import type { FeedItem, PollData } from '@/components/feed/types';
+import type { ReactionType } from '@/components/social';
 
 interface ProfileFeedProps {
   userId: number;
@@ -125,6 +127,16 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     };
   }, [userId]);
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const payload = (event as CustomEvent<FeedSyncPayload>).detail;
+      setItems((prev) => prev.map((item) => applyFeedSyncToItem(item, payload)));
+    };
+
+    window.addEventListener(FEED_SYNC_EVENT, handler);
+    return () => window.removeEventListener(FEED_SYNC_EVENT, handler);
+  }, []);
+
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
@@ -150,22 +162,46 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
 
   const handleToggleLike = useCallback(async (item: FeedItem) => {
     if (!isAuthenticated) return;
+    const originalIsLiked = item.is_liked;
+    const originalLikesCount = item.likes_count;
+    const optimisticIsLiked = !originalIsLiked;
+    const optimisticLikesCount = Math.max(0, originalLikesCount + (originalIsLiked ? -1 : 1));
     setItems((prev) =>
       prev.map((fi) =>
         fi.id === item.id && fi.type === item.type
           ? {
               ...fi,
-              is_liked: !fi.is_liked,
-              likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
+              is_liked: optimisticIsLiked,
+              likes_count: optimisticLikesCount,
             }
           : fi
       )
     );
     try {
-      await api.post('/v2/feed/like', {
+      const response = await api.post<{ action?: string; likes_count: number }>('/v2/feed/like', {
         target_type: item.type,
         target_id: item.id,
       });
+      if (response.success && response.data) {
+        const serverLiked = response.data.action === 'liked'
+          ? true
+          : response.data.action === 'unliked'
+            ? false
+            : optimisticIsLiked;
+        const serverLikesCount = response.data.likes_count;
+        setItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, is_liked: serverLiked, likes_count: serverLikesCount }
+              : fi
+          )
+        );
+        dispatchFeedSync({
+          targetType: item.type,
+          targetId: item.id,
+          patch: { is_liked: serverLiked, likes_count: serverLikesCount },
+        });
+      }
     } catch (err) {
       logError('Failed to toggle like', err);
       // Rollback
@@ -174,13 +210,50 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
           fi.id === item.id && fi.type === item.type
             ? {
                 ...fi,
-                is_liked: !fi.is_liked,
-                likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
+                is_liked: originalIsLiked,
+                likes_count: originalLikesCount,
               }
             : fi
         )
       );
       toastRef.current.error(tRef.current('like_failed'));
+    }
+  }, [isAuthenticated]);
+
+  const handleReact = useCallback(async (item: FeedItem, reactionType: ReactionType) => {
+    if (!isAuthenticated) return;
+
+    const previousReactions = item.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
+    try {
+      const response = await api.post<{ reactions: FeedItem['reactions'] }>('/v2/reactions', {
+        target_type: item.type,
+        target_id: item.id,
+        reaction_type: reactionType,
+      });
+      if (response.success && response.data?.reactions) {
+        const reactions = response.data.reactions;
+        setItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, reactions }
+              : fi
+          )
+        );
+        dispatchFeedSync({
+          targetType: item.type,
+          targetId: item.id,
+          patch: { reactions },
+        });
+      }
+    } catch (err) {
+      logError('Failed to react', err);
+      setItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions: previousReactions }
+            : fi
+        )
+      );
     }
   }, [isAuthenticated]);
 
@@ -305,6 +378,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
             <FeedCard
               item={item}
               onToggleLike={handleToggleLike}
+              onReact={handleReact}
               onHidePost={handleHidePost}
               onDeletePost={handleDeletePost}
               onVotePoll={handleVotePoll}

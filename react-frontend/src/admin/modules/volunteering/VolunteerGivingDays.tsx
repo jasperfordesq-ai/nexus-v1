@@ -64,6 +64,10 @@ interface GivingDay {
   description?: string;
   target_amount: number;
   target_hours: number;
+  raised_amount?: number;
+  donation_count?: number;
+  donor_count?: number;
+  completed_hours?: number;
   start_date: string;
   end_date: string;
   is_active: boolean;
@@ -77,9 +81,9 @@ interface DonationStats {
 
 interface Donor {
   id: number;
-  user_id: number;
-  name: string;
-  email: string;
+  user_id: number | null;
+  name: string | null;
+  email: string | null;
   avatar_url: string | null;
   amount: number;
   is_anonymous: boolean;
@@ -226,12 +230,12 @@ export default function VolunteerGivingDays() {
     }
   };
 
-  // Chart data: donations per giving day (simulated from target amounts as placeholders)
   const chartData = useMemo(() =>
     givingDays.map((day) => ({
       name: day.name.length > 20 ? day.name.slice(0, 18) + '...' : day.name,
+      raised_amount: day.raised_amount || 0,
       target_amount: day.target_amount || 0,
-      target_hours: day.target_hours || 0,
+      donor_count: day.donor_count || 0,
     })),
     [givingDays],
   );
@@ -303,8 +307,7 @@ export default function VolunteerGivingDays() {
       sortable: true,
       render: (row) => {
         const target = row.target_amount || 0;
-        // Simulated progress — in production this would come from actual donation totals
-        const raised = Math.min(target, Math.round(target * (donationStats.total_amount > 0 ? 0.65 : 0)));
+        const raised = row.raised_amount || 0;
         const pct = target > 0 ? Math.round((raised / target) * 100) : 0;
         return (
           <div className="min-w-[120px]">
@@ -312,7 +315,7 @@ export default function VolunteerGivingDays() {
               <span>{raised.toLocaleString()}</span>
               <span className="text-default-400">/ {target.toLocaleString()}</span>
             </div>
-            <Progress size="sm" value={pct} color={getProgressColor(pct)} aria-label="Amount progress" />
+            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.amount_progress_aria', 'Amount progress')} />
           </div>
         );
       },
@@ -323,7 +326,7 @@ export default function VolunteerGivingDays() {
       sortable: true,
       render: (row) => {
         const target = row.target_hours || 0;
-        const logged = Math.min(target, Math.round(target * (donationStats.total_donations > 0 ? 0.45 : 0)));
+        const logged = row.completed_hours || 0;
         const pct = target > 0 ? Math.round((logged / target) * 100) : 0;
         return (
           <div className="min-w-[120px]">
@@ -331,7 +334,7 @@ export default function VolunteerGivingDays() {
               <span>{logged.toLocaleString()}h</span>
               <span className="text-default-400">/ {target.toLocaleString()}h</span>
             </div>
-            <Progress size="sm" value={pct} color={getProgressColor(pct)} aria-label="Hours progress" />
+            <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.hours_progress_aria', 'Hours progress')} />
           </div>
         );
       },
@@ -362,7 +365,7 @@ export default function VolunteerGivingDays() {
       label: t('common.actions', 'Actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label="Edit">
+          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
             <Edit2 size={14} />
           </Button>
           <Button
@@ -370,7 +373,7 @@ export default function VolunteerGivingDays() {
             variant="flat"
             isIconOnly
             onPress={() => handleRowClick(row)}
-            aria-label="View donors"
+            aria-label={t('volunteering.view_donors', 'View donors')}
           >
             <Users size={14} />
           </Button>
@@ -380,7 +383,7 @@ export default function VolunteerGivingDays() {
             color={row.is_active ? 'danger' : 'success'}
             isIconOnly
             onPress={() => handleDeactivate(row)}
-            aria-label={row.is_active ? 'Deactivate' : 'Activate'}
+            aria-label={row.is_active ? t('volunteering.deactivate', 'Deactivate') : t('volunteering.activate', 'Activate')}
           >
             <XCircle size={14} />
           </Button>
@@ -426,14 +429,14 @@ export default function VolunteerGivingDays() {
                   <YAxis fontSize={12} />
                   <Tooltip />
                   <Bar
-                    dataKey="target_amount"
-                    name={t('volunteering.target_amount', 'Target Amount')}
+                    dataKey="raised_amount"
+                    name={t('volunteering.raised_amount', 'Raised Amount')}
                     fill="hsl(var(--heroui-primary))"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
-                    dataKey="target_hours"
-                    name={t('volunteering.target_hours', 'Target Hours')}
+                    dataKey="donor_count"
+                    name={t('volunteering.donor_count', 'Donors')}
                     fill="hsl(var(--heroui-success))"
                     radius={[4, 4, 0, 0]}
                   />
@@ -530,38 +533,42 @@ export default function VolunteerGivingDays() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {donors.map((donor) => (
-                      <div key={donor.id} className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-                        {donor.is_anonymous ? (
-                          <div className="w-9 h-9 rounded-full bg-default-200 flex items-center justify-center">
-                            <EyeOff size={16} className="text-default-400" />
-                          </div>
-                        ) : (
-                          <Avatar
-                            src={donor.avatar_url || undefined}
-                            name={donor.name}
-                            size="sm"
-                            className="flex-shrink-0"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {donor.is_anonymous
-                              ? t('volunteering.anonymous_donor', 'Anonymous Donor')
-                              : donor.name}
-                          </p>
-                          {!donor.is_anonymous && donor.email && (
-                            <p className="text-xs text-default-400 truncate">{donor.email}</p>
+                    {donors.map((donor) => {
+                      const donorName = donor.is_anonymous
+                        ? t('volunteering.anonymous_donor', 'Anonymous Donor')
+                        : donor.name || t('volunteering.guest_donor', 'Guest Donor');
+
+                      return (
+                        <div key={donor.id} className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
+                          {donor.is_anonymous ? (
+                            <div className="w-9 h-9 rounded-full bg-default-200 flex items-center justify-center">
+                              <EyeOff size={16} className="text-default-400" />
+                            </div>
+                          ) : (
+                            <Avatar
+                              src={donor.avatar_url || undefined}
+                              name={donorName}
+                              size="sm"
+                              className="flex-shrink-0"
+                            />
                           )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {donorName}
+                            </p>
+                            {!donor.is_anonymous && donor.email && (
+                              <p className="text-xs text-default-400 truncate">{donor.email}</p>
+                            )}
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-semibold text-success">{donor.amount.toLocaleString()}</p>
+                            <p className="text-xs text-default-400">
+                              {donor.donated_at ? new Date(donor.donated_at).toLocaleDateString() : ''}
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="text-sm font-semibold text-success">{donor.amount.toLocaleString()}</p>
-                          <p className="text-xs text-default-400">
-                            {donor.donated_at ? new Date(donor.donated_at).toLocaleDateString() : ''}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {donorHasMore && (
                       <Button
                         variant="flat"

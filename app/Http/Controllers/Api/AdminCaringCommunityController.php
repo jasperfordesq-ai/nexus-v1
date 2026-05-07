@@ -35,6 +35,7 @@ use App\Services\CaringInviteCodeService;
 use App\Services\CaringLoyaltyService;
 use App\Services\CaringSupportRelationshipService;
 use App\Services\CaringTandemMatchingService;
+use App\Support\CsvExportSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -1756,7 +1757,7 @@ class AdminCaringCommunityController extends BaseApiController
             // UTF-8 BOM so Excel renders Swiss German umlauts correctly.
             fwrite($out, "\xEF\xBB\xBF");
             foreach ($rows as $row) {
-                fputcsv($out, $row);
+                fputcsv($out, CsvExportSanitizer::row($row));
             }
             fclose($out);
         }, 200, [

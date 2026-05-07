@@ -8,7 +8,7 @@
  * Admin page to review and manage community-proposed volunteer projects.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Button,
   Chip,
@@ -48,6 +48,14 @@ interface CommunityProject {
   created_at: string;
 }
 
+interface ProjectStats {
+  total: number;
+  approved: number;
+  active: number;
+  completed: number;
+  total_supporters: number;
+}
+
 const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default' | 'primary' | 'secondary'> = {
   proposed: 'default',
   under_review: 'warning',
@@ -58,11 +66,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
   cancelled: 'danger',
 };
 
-const reviewStatuses = [
-  { key: 'approved', label: 'Approved' },
-  { key: 'rejected', label: 'Rejected' },
-  { key: 'under_review', label: 'Request Changes' },
-];
+const reviewStatuses = ['approved', 'rejected', 'under_review'] as const;
 
 export default function VolunteerProjects() {
   const { t } = useTranslation('admin');
@@ -72,6 +76,16 @@ export default function VolunteerProjects() {
 
   const [projects, setProjects] = useState<CommunityProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [stats, setStats] = useState<ProjectStats>({
+    total: 0,
+    approved: 0,
+    active: 0,
+    completed: 0,
+    total_supporters: 0,
+  });
   const [saving, setSaving] = useState(false);
   const [reviewingProject, setReviewingProject] = useState<CommunityProject | null>(null);
   const [reviewStatus, setReviewStatus] = useState('');
@@ -79,24 +93,41 @@ export default function VolunteerProjects() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (append = false, nextCursor: string | null = null) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     try {
-      const res = await adminVolunteering.getCommunityProjects();
+      const res = await adminVolunteering.getCommunityProjects({
+        cursor: append && nextCursor ? nextCursor : undefined,
+        per_page: 20,
+      });
       if (res.success && res.data) {
         const payload = res.data as unknown;
+        let loadedProjects: CommunityProject[] = [];
         if (Array.isArray(payload)) {
-          setProjects(payload);
+          loadedProjects = payload;
         } else if (payload && typeof payload === 'object' && 'data' in payload) {
-          setProjects((payload as { data: CommunityProject[] }).data || []);
+          loadedProjects = (payload as { data: CommunityProject[] }).data || [];
         }
+        setProjects((prev) => append ? [...prev, ...loadedProjects] : loadedProjects);
+
+        const meta = res.meta as { cursor?: string; has_more?: boolean; stats?: ProjectStats } | undefined;
+        setCursor(meta?.cursor ?? null);
+        setHasMore(Boolean(meta?.has_more));
+        if (meta?.stats) setStats(meta.stats);
+      } else {
+        throw new Error('community_projects_load_failed');
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_projects', 'Failed to load community projects'));
-      setProjects([]);
+      if (!append) setProjects([]);
     }
     setLoading(false);
-  }, [toast]);
+    setLoadingMore(false);
+  }, [t, toast]);
 
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -115,10 +146,13 @@ export default function VolunteerProjects() {
     }
     setSaving(true);
     try {
-      await adminVolunteering.reviewCommunityProject(reviewingProject.id, {
+      const res = await adminVolunteering.reviewCommunityProject(reviewingProject.id, {
         status: reviewStatus,
         review_notes: reviewNotes.trim() || undefined,
       });
+      if (!res.success) {
+        throw new Error((res as { message?: string; error?: string }).message || 'community_project_review_failed');
+      }
       toast.success(t('volunteering.project_reviewed', 'Project review submitted'));
       onClose();
       loadData();
@@ -127,15 +161,6 @@ export default function VolunteerProjects() {
     }
     setSaving(false);
   };
-
-  const stats = useMemo(() => {
-    const total = projects.length;
-    const approved = projects.filter((p) => p.status === 'approved').length;
-    const active = projects.filter((p) => p.status === 'active').length;
-    const completed = projects.filter((p) => p.status === 'completed').length;
-    const totalSupporters = projects.reduce((sum, p) => sum + (p.supporters_count || 0), 0);
-    return { total, approved, active, completed, totalSupporters };
-  }, [projects]);
 
   const handleCreateOpportunity = (project: CommunityProject) => {
     const params = new URLSearchParams({
@@ -225,14 +250,14 @@ export default function VolunteerProjects() {
         title={t('volunteering.projects_title', 'Community Projects')}
         description={t('volunteering.projects_desc', 'Review and manage community-proposed volunteer projects')}
         actions={
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
             {t('common.refresh', 'Refresh')}
           </Button>
         }
       />
 
       {/* Project Analytics Stats */}
-      {projects.length > 0 && (
+      {stats.total > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
           <StatCard
             label={t('volunteering.total_projects', 'Total Projects')}
@@ -264,7 +289,7 @@ export default function VolunteerProjects() {
           />
           <StatCard
             label={t('volunteering.total_supporters', 'Total Supporters')}
-            value={stats.totalSupporters}
+            value={stats.total_supporters}
             icon={Users}
             color="warning"
             loading={loading}
@@ -279,7 +304,16 @@ export default function VolunteerProjects() {
           description={t('volunteering.no_projects_desc', 'No community projects have been proposed yet.')}
         />
       ) : (
-        <DataTable columns={columns} data={projects} isLoading={loading} />
+        <>
+          <DataTable columns={columns} data={projects} isLoading={loading} />
+          {hasMore && (
+            <div className="mt-4 flex justify-center">
+              <Button variant="flat" onPress={() => loadData(true, cursor)} isLoading={loadingMore}>
+                {t('common.load_more', 'Load More')}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Review Modal */}
@@ -300,9 +334,9 @@ export default function VolunteerProjects() {
                 variant="bordered"
                 isRequired
               >
-                {reviewStatuses.map((s) => (
-                  <SelectItem key={s.key}>
-                    {t(`volunteering.review_status_${s.key}`, s.label)}
+                {reviewStatuses.map((status) => (
+                  <SelectItem key={status}>
+                    {t(`volunteering.review_status_${status}`)}
                   </SelectItem>
                 ))}
               </Select>

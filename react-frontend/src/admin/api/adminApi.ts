@@ -1302,7 +1302,8 @@ export const adminVolunteering = {
   getGuardianConsents: () => api.get('/v2/admin/volunteering/guardian-consents'),
 
   // Community Projects
-  getCommunityProjects: () => api.get('/v2/admin/volunteering/community-projects'),
+  getCommunityProjects: (params?: { status?: string; cursor?: string; per_page?: number }) =>
+    api.get(`/v2/admin/volunteering/community-projects${buildQuery(params || {})}`),
   reviewCommunityProject: (id: number, data: { status: string; review_notes?: string }) =>
     api.put(`/v2/admin/volunteering/community-projects/${id}/review`, data),
 

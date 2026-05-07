@@ -14,6 +14,7 @@ use App\Services\VolunteerWellbeingService;
 use App\Services\VolunteerEmergencyAlertService;
 use App\Services\SafeguardingService;
 use App\Core\TenantContext;
+use Carbon\Carbon;
 
 /**
  * VolunteerWellbeingController -- Wellbeing dashboard, emergency alerts, safeguarding, training, and incidents.
@@ -118,28 +119,28 @@ class VolunteerWellbeingController extends BaseApiController
         $warnings = [];
         $indicators = $assessment['indicators'] ?? [];
         if (($indicators['shift_frequency']['trend'] ?? '') === 'declining') {
-            $warnings[] = 'Your volunteering frequency has decreased compared to last month.';
+            $warnings[] = __('api.vol_wellbeing_warning_frequency_declining');
         }
         if (($indicators['cancellation_rate']['rate_percent'] ?? 0) > 30) {
-            $warnings[] = 'Your cancellation rate is higher than usual. Consider taking on fewer commitments.';
+            $warnings[] = __('api.vol_wellbeing_warning_cancellation_rate');
         }
         if (($indicators['hours_trend']['trend'] ?? '') === 'declining_significantly') {
-            $warnings[] = 'Your logged hours have dropped significantly. Remember to take breaks when needed.';
+            $warnings[] = __('api.vol_wellbeing_warning_hours_declining');
         }
         if (($indicators['engagement_gap']['days_since_last_activity'] ?? 0) > 30) {
-            $warnings[] = 'It has been a while since your last volunteer activity. We miss you!';
+            $warnings[] = __('api.vol_wellbeing_warning_engagement_gap');
         }
 
         // Suggested rest days (next 7 days without scheduled shifts)
         $suggestedRest = [];
         try {
             $busyRows = DB::select(
-                "SELECT DISTINCT DATE(s.start_time) as shift_date FROM vol_applications a JOIN vol_shifts s ON a.shift_id = s.id WHERE a.user_id = ? AND a.tenant_id = ? AND a.status = 'approved' AND s.start_time >= NOW() AND s.start_time <= DATE_ADD(NOW(), INTERVAL 7 DAY)",
+                "SELECT DISTINCT DATE(s.start_time) as shift_date FROM vol_applications a JOIN vol_shifts s ON a.shift_id = s.id AND s.tenant_id = a.tenant_id WHERE a.user_id = ? AND a.tenant_id = ? AND a.status = 'approved' AND s.start_time >= NOW() AND s.start_time <= DATE_ADD(NOW(), INTERVAL 7 DAY)",
                 [$userId, $tenantId]
             );
             $busyDays = array_map(fn($r) => $r->shift_date, $busyRows);
             for ($i = 0; $i < 7; $i++) {
-                $day = (new \DateTime())->modify("+{$i} days")->format('Y-m-d');
+                $day = Carbon::now()->addDays($i)->toDateString();
                 if (!in_array($day, $busyDays)) {
                     $suggestedRest[] = $day;
                     if (count($suggestedRest) >= 3) break;

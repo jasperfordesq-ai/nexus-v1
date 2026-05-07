@@ -533,7 +533,8 @@ class VolunteerCommunityController extends BaseApiController
         $this->rateLimit('vol_public_read', 60, 30);
 
         $filters = [
-            'status' => $this->query('status') ?: 'proposed',
+            'status' => $this->query('status') ?: 'approved',
+            'public' => true,
             'category' => $this->query('category'),
             'search' => $this->query('search'),
             'sort' => $this->query('sort') ?: 'newest',
@@ -561,7 +562,15 @@ class VolunteerCommunityController extends BaseApiController
         ];
 
         $result = $this->communityProjectService->getProposals($filters);
-        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+        $stats = $this->communityProjectService->getProposalStats($filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more'],
+            ['stats' => $stats]
+        );
     }
 
     public function proposeCommunityProject(): JsonResponse
@@ -586,7 +595,7 @@ class VolunteerCommunityController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_public_read', 60, 30);
 
-        $project = $this->communityProjectService->getProposal((int) $id);
+        $project = $this->communityProjectService->getProposal((int) $id, true);
         if (!$project) {
             return $this->respondWithError('NOT_FOUND', __('api.vol_project_not_found'), null, 404);
         }
@@ -597,6 +606,7 @@ class VolunteerCommunityController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
+        $this->rateLimit('vol_project_update', 10, 60);
 
         $data = $this->getAllInput();
         $result = $this->communityProjectService->updateProposal((int) $id, $userId, $data);
@@ -623,6 +633,7 @@ class VolunteerCommunityController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
+        $this->rateLimit('vol_project_unsupport', 30, 60);
 
         $tenantId = TenantContext::getId();
         $result = $this->communityProjectService->unsupport((int) $id, $userId, $tenantId);
@@ -743,7 +754,20 @@ class VolunteerCommunityController extends BaseApiController
         $this->requireAdmin();
 
         $result = $this->volunteerDonationService->adminGetGivingDays();
-        return $this->respondWithData($result);
+        $stats = DB::selectOne(
+            "SELECT COUNT(*) as total_donations, COALESCE(SUM(amount), 0) as total_amount
+             FROM vol_donations
+             WHERE tenant_id = ? AND status = 'completed'",
+            [TenantContext::getId()]
+        );
+
+        return $this->respondWithData([
+            'giving_days' => $result,
+            'donation_stats' => [
+                'total_donations' => (int) ($stats->total_donations ?? 0),
+                'total_amount' => (float) ($stats->total_amount ?? 0),
+            ],
+        ]);
     }
 
     public function createGivingDay(): JsonResponse
@@ -909,6 +933,7 @@ class VolunteerCommunityController extends BaseApiController
     /** Public endpoint -- no auth required */
     public function verifyGuardianConsent($token): JsonResponse
     {
+        $this->ensureFeature();
         $this->rateLimit('guardian_consent_verify', 10, 300);
 
         $ip = request()->ip() ?? '0.0.0.0';

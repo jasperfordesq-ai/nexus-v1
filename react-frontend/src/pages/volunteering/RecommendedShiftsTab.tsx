@@ -313,7 +313,7 @@ export function RecommendedShiftsTab() {
                           track: 'bg-theme-hover',
                         }}
                         size="md"
-                        aria-label={`${item.match_score}% match`}
+                        aria-label={t('recommendations.match_aria', { score: item.match_score })}
                       />
                     </div>
                     <Button

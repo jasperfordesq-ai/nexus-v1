@@ -114,6 +114,7 @@ const defaultProps = {
   onComposeOpen: vi.fn(),
   onLoadMore: vi.fn(),
   onToggleLike: vi.fn(),
+  onReact: vi.fn(),
   onHidePost: vi.fn(),
   onMuteUser: vi.fn(),
   onReportPost: vi.fn(),

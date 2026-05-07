@@ -114,6 +114,22 @@ describe('useSocialInteractions', () => {
       expect(result.current.likesCount).toBe(5);
     });
 
+    it('reverts optimistic update when API returns success false', async () => {
+      mockApi.post.mockResolvedValue({
+        success: false,
+        error: 'Target not found',
+      });
+
+      const { result } = renderHook(() => useSocialInteractions(defaultOptions));
+      act(() => {
+        void result.current.toggleLike();
+      });
+
+      await waitFor(() => expect(result.current.isLiking).toBe(false));
+      expect(result.current.isLiked).toBe(false);
+      expect(result.current.likesCount).toBe(5);
+    });
+
     it('does not allow double-like while liking in progress', async () => {
       let resolvePost: (v: unknown) => void;
       mockApi.post.mockReturnValue(new Promise((r) => { resolvePost = r; }));
@@ -264,6 +280,59 @@ describe('useSocialInteractions', () => {
       expect(result.current.comments).toHaveLength(0);
       expect(result.current.commentsCount).toBe(0);
     });
+
+    it('uses deleted_count from the server when removing a thread', async () => {
+      mockApi.get.mockResolvedValue({
+        success: true,
+        data: {
+          comments: [
+            {
+              id: 1,
+              content: 'Parent',
+              replies: [{ id: 2, content: 'Reply', replies: [] }],
+            },
+          ],
+          count: 2,
+        },
+      });
+      mockApi.delete.mockResolvedValue({ success: true, data: { deleted_count: 2 } });
+
+      const { result } = renderHook(() => useSocialInteractions(defaultOptions));
+      await act(async () => { await result.current.loadComments(); });
+
+      await act(async () => { await result.current.deleteComment(1); });
+
+      expect(result.current.comments).toHaveLength(0);
+      expect(result.current.commentsCount).toBe(0);
+    });
+  });
+
+  describe('toggleReaction', () => {
+    it('normalizes canonical comment reaction response shape', async () => {
+      mockApi.get.mockResolvedValue({
+        success: true,
+        data: { comments: [{ id: 1, content: 'Reactable', reactions: {}, user_reactions: [], replies: [] }], count: 1 },
+      });
+      mockApi.post.mockResolvedValue({
+        success: true,
+        data: {
+          action: 'added',
+          reaction_type: 'love',
+          reactions: {
+            counts: { love: 1 },
+            total: 1,
+            user_reaction: 'love',
+          },
+        },
+      });
+
+      const { result } = renderHook(() => useSocialInteractions(defaultOptions));
+      await act(async () => { await result.current.loadComments(); });
+      await act(async () => { await result.current.toggleReaction(1, 'love'); });
+
+      expect(result.current.comments[0].reactions).toEqual({ love: 1 });
+      expect(result.current.comments[0].user_reactions).toEqual(['love']);
+    });
   });
 
   describe('shareToFeed', () => {
@@ -277,9 +346,9 @@ describe('useSocialInteractions', () => {
       });
 
       expect(success!).toBe(true);
-      expect(mockApi.post).toHaveBeenCalledWith('/social/share', {
-        parent_type: 'post',
-        parent_id: 42,
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/shares', {
+        type: 'post',
+        id: 42,
         content: 'Check this out',
       });
     });

@@ -16,7 +16,7 @@
  * API: POST/DELETE /api/v2/feed/posts/{id}/share
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -86,6 +86,14 @@ export function ShareButton({
   const [showExternalShareModal, setShowExternalShareModal] = useState(false);
   const [showDMModal, setShowDMModal] = useState(false);
 
+  useEffect(() => {
+    setLocalCount(shareCount);
+  }, [shareCount]);
+
+  useEffect(() => {
+    setLocalIsShared(isShared);
+  }, [isShared]);
+
   // Resolve the polymorphic identity with a safe fallback to the legacy postId path.
   const resolvedType: FeedItem['type'] = type ?? 'post';
   const resolvedId: number = id ?? postId ?? 0;
@@ -151,14 +159,13 @@ export function ShareButton({
       if (response.data) {
         setLocalIsShared(response.data.shared);
         setLocalCount(response.data.count);
+        onShareChange?.(response.data.count, response.data.shared);
       }
       if (newIsShared) {
         toast.success(t('toast.post_shared'));
       } else {
         toast.info(t('toast.share_removed'));
       }
-
-      onShareChange?.(Math.max(0, newCount), newIsShared);
     } catch (err) {
       logError('Failed to toggle share', err);
       setLocalIsShared(isShared);

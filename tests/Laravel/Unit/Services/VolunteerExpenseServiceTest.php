@@ -14,7 +14,7 @@ class VolunteerExpenseServiceTest extends TestCase
     public function test_submitExpense_throws_for_missing_required_fields(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("'organization_id' is required");
+        $this->expectExceptionMessage('Missing required field: organization_id');
 
         VolunteerExpenseService::submitExpense(1, []);
     }
@@ -22,7 +22,7 @@ class VolunteerExpenseServiceTest extends TestCase
     public function test_submitExpense_throws_for_invalid_expense_type(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid expense_type');
+        $this->expectExceptionMessage('Invalid expense type');
 
         VolunteerExpenseService::submitExpense(1, [
             'organization_id' => 1,

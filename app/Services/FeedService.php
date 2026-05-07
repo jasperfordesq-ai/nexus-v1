@@ -989,7 +989,7 @@ class FeedService
             'event'     => 'events',
             'poll'      => 'polls',
             'job'       => 'job_vacancies',
-            'blog'      => 'blog_posts',
+            'blog'      => 'posts',
             'goal'      => 'goals',
             'challenge' => 'ideation_challenges',
             'volunteer' => 'vol_opportunities',
@@ -1171,6 +1171,9 @@ class FeedService
     public function createPost(int $userId, array $data): FeedPost|array
     {
         $tenantId = TenantContext::getId();
+        if (!isset($data['content']) && isset($data['body'])) {
+            $data['content'] = $data['body'];
+        }
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content'] ?? ''));
         $image = $data['image_url'] ?? $data['image'] ?? null;
@@ -1371,6 +1374,10 @@ class FeedService
             return ['success' => false, 'error' => __('api_controllers_2.feed.post_not_found_or_not_owned')];
         }
 
+        if (!isset($data['content']) && isset($data['body'])) {
+            $data['content'] = $data['body'];
+        }
+
         $content = isset($data['content'])
             ? \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']))
             : $post->content;
@@ -1535,11 +1542,11 @@ class FeedService
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id{$commentDeleteClause}) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id AND tenant_id = ?{$commentDeleteClause}) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND u.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
-                    [$id, $tenantId, $tenantId]
+                    [$tenantId, $id, $tenantId, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);
                 break;
@@ -1550,11 +1557,11 @@ class FeedService
                            0 as likes_count, p.author_id as user_id, 'blog' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id{$commentDeleteClause}) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id AND tenant_id = ?{$commentDeleteClause}) as comments_count
                     FROM posts p
                     JOIN users u ON p.author_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND p.status = 'published'",
-                    [$id, $tenantId]
+                    [$tenantId, $id, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);
                 break;
@@ -1594,7 +1601,12 @@ class FeedService
             $isLiked = (bool) $liked;
         }
 
-        return [
+        $reactions = null;
+        if (in_array($type, ReactionService::VALID_TARGET_TYPES, true)) {
+            $reactions = app(ReactionService::class)->getReactions($id, $type, $userId);
+        }
+
+        $response = [
             'id' => (int) $item['id'],
             'type' => $item['type'],
             'title' => $item['title'] ?? null,
@@ -1611,6 +1623,12 @@ class FeedService
             'is_liked' => $isLiked,
             'created_at' => $item['created_at'],
         ];
+
+        if ($reactions !== null) {
+            $response['reactions'] = $reactions;
+        }
+
+        return $response;
     }
 
     /**

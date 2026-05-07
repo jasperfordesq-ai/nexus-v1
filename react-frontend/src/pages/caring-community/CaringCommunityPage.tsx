@@ -123,19 +123,22 @@ function applyChoiceFilter(
 
 export function CaringCommunityPage() {
   const { t } = useTranslation('common');
-  const { branding, hasFeature, hasModule, tenantPath } = useTenant();
+  const { branding, hasFeature, hasModule, tenant, tenantPath, tenantSlug } = useTenant();
   usePageTitle(t('caring_community.meta.title'));
 
-  const [choice, setChoice] = useState<OnboardingChoice | null>(() => readStoredOnboardingChoice());
+  const onboardingTenantScope = tenant?.slug ?? tenantSlug ?? (tenant?.id ? String(tenant.id) : null);
+  const [choice, setChoice] = useState<OnboardingChoice | null>(() => readStoredOnboardingChoice(onboardingTenantScope));
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [showAll, setShowAll] = useState<boolean>(false);
 
   // Open the modal once on first mount when no stored choice exists.
   useEffect(() => {
-    if (readStoredOnboardingChoice() === null) {
+    const storedChoice = readStoredOnboardingChoice(onboardingTenantScope);
+    setChoice(storedChoice);
+    if (storedChoice === null) {
       setModalOpen(true);
     }
-  }, []);
+  }, [onboardingTenantScope]);
 
   const handleChoice = useCallback((picked: OnboardingChoice) => {
     setChoice(picked);
@@ -144,11 +147,11 @@ export function CaringCommunityPage() {
   }, []);
 
   const handleRefine = useCallback(() => {
-    clearStoredOnboardingChoice();
+    clearStoredOnboardingChoice(onboardingTenantScope);
     setChoice(null);
     setShowAll(false);
     setModalOpen(true);
-  }, []);
+  }, [onboardingTenantScope]);
 
   const handleToggleShowAll = useCallback(() => {
     setShowAll((v) => !v);
@@ -178,6 +181,7 @@ export function CaringCommunityPage() {
         isOpen={modalOpen}
         onChoice={handleChoice}
         onClose={() => setModalOpen(false)}
+        tenantScope={onboardingTenantScope}
       />
 
       <div className="space-y-6">

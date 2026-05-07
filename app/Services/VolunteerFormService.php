@@ -210,11 +210,30 @@ class VolunteerFormService
         $tenantId = TenantContext::getId();
 
         try {
+            $fieldIds = array_map('intval', array_keys($values));
+            if (empty($fieldIds)) {
+                return;
+            }
+
+            $allowedFieldIds = VolCustomField::where('tenant_id', $tenantId)
+                ->whereIn('id', $fieldIds)
+                ->where('applies_to', $entityType)
+                ->where('is_active', true)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+            $allowedFieldIds = array_flip($allowedFieldIds);
+
             foreach ($values as $fieldId => $value) {
+                $fieldId = (int) $fieldId;
+                if (!isset($allowedFieldIds[$fieldId])) {
+                    continue;
+                }
+
                 VolCustomFieldValue::updateOrCreate(
                     [
                         'tenant_id' => $tenantId,
-                        'custom_field_id' => (int) $fieldId,
+                        'custom_field_id' => $fieldId,
                         'entity_type' => $entityType,
                         'entity_id' => $entityId,
                     ],

@@ -117,6 +117,7 @@
     "greeting": "Hi {{name}},",
     "button_fallback": "If the button above doesn't work, copy and paste this link into your browser:",
     "button_fallback_short": "If the button doesn't work, copy this link:",
+    "platform_name": "Project NEXUS",
     "fallback_name": "there",
     "fallback_member_name": "A member",
     "fallback_someone": "Someone",
