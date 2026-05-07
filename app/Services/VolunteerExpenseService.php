@@ -45,18 +45,18 @@ class VolunteerExpenseService
         $required = ['organization_id', 'expense_type', 'amount', 'description'];
         foreach ($required as $field) {
             if (!array_key_exists($field, $data) || (empty($data[$field]) && $data[$field] !== 0)) {
-                throw new \InvalidArgumentException("Field '{$field}' is required.");
+                throw new \InvalidArgumentException(__('api.missing_required_field', ['field' => $field]));
             }
         }
 
         $validTypes = ['travel', 'meals', 'supplies', 'equipment', 'parking', 'other'];
         if (!in_array($data['expense_type'], $validTypes, true)) {
-            throw new \InvalidArgumentException("Invalid expense_type. Must be one of: " . implode(', ', $validTypes));
+            throw new \InvalidArgumentException(__('api.vol_expense_type_invalid', ['types' => implode(', ', $validTypes)]));
         }
 
         $amount = (float) $data['amount'];
         if ($amount <= 0) {
-            throw new \InvalidArgumentException("Amount must be greater than zero.");
+            throw new \InvalidArgumentException(__('api.vol_expense_amount_positive'));
         }
 
         $organizationId = (int) $data['organization_id'];
@@ -124,7 +124,7 @@ class VolunteerExpenseService
         if ($policy) {
             if (!empty($policy->max_amount) && $amount > (float) $policy->max_amount) {
                 throw new \InvalidArgumentException(
-                    "Amount exceeds the maximum allowed per expense ({$policy->max_amount})."
+                    __('api.vol_expense_amount_exceeds_policy', ['amount' => $policy->max_amount])
                 );
             }
 
@@ -141,7 +141,10 @@ class VolunteerExpenseService
 
                 if (($monthlyTotal + $amount) > (float) $policy->max_monthly) {
                     throw new \InvalidArgumentException(
-                        "This expense would exceed your monthly limit ({$policy->max_monthly}). Current month total: {$monthlyTotal}."
+                        __('api.vol_expense_monthly_limit_exceeded', [
+                            'limit' => $policy->max_monthly,
+                            'total' => $monthlyTotal,
+                        ])
                     );
                 }
             }
@@ -151,7 +154,7 @@ class VolunteerExpenseService
                 && empty($data['receipt_path'])
             ) {
                 throw new \InvalidArgumentException(
-                    "A receipt is required for expenses above {$policy->requires_receipt_above}."
+                    __('api.vol_expense_receipt_required_above', ['amount' => $policy->requires_receipt_above])
                 );
             }
         }
@@ -280,13 +283,13 @@ class VolunteerExpenseService
     public static function reviewExpense(int $id, int $reviewerId, string $status, ?string $notes = null): bool
     {
         if (!in_array($status, ['approved', 'rejected'], true)) {
-            throw new \InvalidArgumentException("Review status must be 'approved' or 'rejected'.");
+            throw new \InvalidArgumentException(__('api.vol_expense_review_status_invalid'));
         }
 
         // Prevent admins from approving their own expenses
         $expense = VolExpense::where('tenant_id', TenantContext::getId())->find($id);
         if ($expense && (int) $expense->user_id === $reviewerId) {
-            throw new \InvalidArgumentException("You cannot review your own expense.");
+            throw new \InvalidArgumentException(__('api.vol_expense_review_own_forbidden'));
         }
 
         $affected = VolExpense::where('id', $id)

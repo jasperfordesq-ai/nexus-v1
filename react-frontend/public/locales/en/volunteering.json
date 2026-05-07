@@ -1,5 +1,6 @@
 {
   "dashboard": "Dashboard",
+  "wallet": "Wallet",
   "org_dashboard": {
     "title": "Organization Dashboard",
     "stats_unavailable": "Unable to load organization stats.",
@@ -194,6 +195,11 @@
   "action_failed": "Action failed. Please try again.",
   "no_pending_hours": "No hours pending review.",
   "all_hours_reviewed": "You're all caught up — every submission has been reviewed.",
+  "org_hours_approved_paid": "Hours approved. Time credits paid to volunteer.",
+  "org_hours_approved": "Hours approved.",
+  "org_hours_declined": "Hours declined.",
+  "org_all_hours_reviewed": "All volunteer hours have been reviewed.",
+  "org_balance_low_warning": "Balance may be insufficient for {{count}} pending hours.",
   "hour": "hour",
   "hours": "hours",
   "hours_review": {
@@ -295,6 +301,7 @@
     "donors_count": "{{count}} donors",
     "my_donations": "My Donations",
     "anonymous": "Anonymous",
+    "progress_aria": "Donation progress: {{percent}}%",
     "modal_title": "Record an Offline Pledge",
     "form": {
       "amount": "Amount",
@@ -564,6 +571,7 @@
     "your_opportunity": "Your opportunity",
     "apply_now": "Apply Now",
     "you_have_applied": "You have applied",
+    "applied_on": "Applied {{date}}",
     "application_status": "Status: {{status}}",
     "upcoming_shifts": "Upcoming Shifts",
     "shift_open": "Open",
@@ -661,6 +669,7 @@
     "error_load": "Failed to load recommendations",
     "error_load_generic": "Unable to load recommendations. Please try again.",
     "match_score": "{{score}}% match",
+    "match_aria": "{{score}}% match",
     "view_opportunity": "View"
   },
   "certificates": {
@@ -728,6 +737,7 @@
     "risk_moderate": "Moderate Risk",
     "risk_high": "High Risk",
     "mood_unknown": "Unknown",
+    "mood_aria": "Mood: {{mood}}",
     "load_error": "Unable to load wellbeing data. Please try again.",
     "checkin_success": "Mood check-in recorded.",
     "checkin_failed": "Failed to submit check-in. Please try again.",

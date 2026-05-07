@@ -35,7 +35,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
@@ -99,6 +99,13 @@ export function VolunteerOrganizations() {
   const { t } = useTranslation('admin');
   usePageTitle(t('volunteering.volunteer_organizations_title', 'Volunteer Organizations'));
   const toast = useToast();
+  const { user } = useAuth();
+  const canManageOrgWallet = Boolean(
+    user?.is_super_admin ||
+    user?.is_god ||
+    user?.is_tenant_super_admin ||
+    user?.role === 'super_admin',
+  );
 
   // Data state
   const [items, setItems] = useState<VolOrg[]>([]);
@@ -231,6 +238,9 @@ export function VolunteerOrganizations() {
           setTxHasMore(p.meta?.has_more || false);
         }
       }
+      if (!res.success) {
+        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions', 'Failed to load transactions'));
+      }
     } catch {
       toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
     }
@@ -255,6 +265,9 @@ export function VolunteerOrganizations() {
           setTxCursor(p.meta?.next_cursor || null);
           setTxHasMore(p.meta?.has_more || false);
         }
+      }
+      if (!res.success) {
+        toast.error((res as { message?: string; error?: string }).message || t('volunteering.failed_load_transactions', 'Failed to load transactions'));
       }
     } catch {
       toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
@@ -464,24 +477,28 @@ export function VolunteerOrganizations() {
           >
             {t('volunteering.members', 'Members')}
           </Button>
-          <Button
-            size="sm"
-            variant="flat"
-            color="primary"
-            startContent={<Wallet size={14} />}
-            onPress={() => openAdjustModal(item)}
-          >
-            {t('volunteering.adjust_balance', 'Adjust')}
-          </Button>
-          <Button
-            size="sm"
-            variant="flat"
-            color="secondary"
-            startContent={<ArrowLeftRight size={14} />}
-            onPress={() => openTxModal(item)}
-          >
-            {t('volunteering.transactions', 'Txns')}
-          </Button>
+          {canManageOrgWallet && (
+            <>
+              <Button
+                size="sm"
+                variant="flat"
+                color="primary"
+                startContent={<Wallet size={14} />}
+                onPress={() => openAdjustModal(item)}
+              >
+                {t('volunteering.adjust_balance', 'Adjust')}
+              </Button>
+              <Button
+                size="sm"
+                variant="flat"
+                color="secondary"
+                startContent={<ArrowLeftRight size={14} />}
+                onPress={() => openTxModal(item)}
+              >
+                {t('volunteering.transactions', 'Txns')}
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             variant="flat"
@@ -646,7 +663,7 @@ export function VolunteerOrganizations() {
                           <p className="text-sm font-medium">{tx.description || tx.type}</p>
                           <p className="text-xs text-default-400">
                             {tx.created_at ? new Date(tx.created_at).toLocaleString() : '--'}
-                            {tx.admin_name && ` — by ${tx.admin_name}`}
+                            {tx.admin_name && t('volunteering.transaction_by_admin', ' by {{name}}', { name: tx.admin_name })}
                           </p>
                         </div>
                         <span

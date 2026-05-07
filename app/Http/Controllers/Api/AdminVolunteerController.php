@@ -1203,7 +1203,7 @@ class AdminVolunteerController extends BaseApiController
         try {
             // Stats
             $stats = DB::selectOne("
-                SELECT COUNT(*) as total_donors,
+                SELECT COUNT(DISTINCT COALESCE(user_id, id)) as total_donors,
                        SUM(CASE WHEN is_anonymous = 1 THEN 1 ELSE 0 END) as anonymous_count,
                        COALESCE(SUM(amount), 0) as total_raised
                 FROM vol_donations

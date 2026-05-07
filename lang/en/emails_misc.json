@@ -193,6 +193,7 @@
     "new_vol_opp_title": "New Volunteer Opportunity",
     "new_vol_opp_preview": "A new volunteer opportunity has been posted on {{community}}",
     "new_vol_opp_bell": "New volunteer opportunity: {{title}}",
+    "new_vol_opp_fallback_title": "Untitled opportunity",
     "new_vol_opp_body": "A new volunteer opportunity has been posted on <strong>{{community}}</strong>.",
     "new_vol_opp_by_label": "Posted by",
     "new_vol_opp_cta": "View Opportunity"

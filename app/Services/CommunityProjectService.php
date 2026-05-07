@@ -49,12 +49,12 @@ class CommunityProjectService
         $description = trim($data['description'] ?? '');
 
         if ($title === '') {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_title_required'), 'field' => 'title'];
             return [];
         }
 
         if ($description === '') {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_description_required'), 'field' => 'description'];
             return [];
         }
 
@@ -73,7 +73,7 @@ class CommunityProjectService
         if ($proposedDate !== null && $proposedDate !== '') {
             $parsed = \DateTime::createFromFormat('Y-m-d', $proposedDate);
             if (! $parsed || $parsed->format('Y-m-d') !== $proposedDate) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'proposed_date must be a valid date (YYYY-MM-DD)', 'field' => 'proposed_date'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_proposed_date_invalid'), 'field' => 'proposed_date'];
                 return [];
             }
         } else {
@@ -133,7 +133,14 @@ class CommunityProjectService
             );
 
         // Status filter
-        if (! empty($filters['status']) && in_array($filters['status'], self::VALID_STATUSES, true)) {
+        $public = !empty($filters['public']);
+        if ($public) {
+            $publicStatuses = ['approved', 'active', 'completed'];
+            $status = !empty($filters['status']) && in_array($filters['status'], $publicStatuses, true)
+                ? $filters['status']
+                : 'approved';
+            $query->where('p.status', $status);
+        } elseif (! empty($filters['status']) && in_array($filters['status'], self::VALID_STATUSES, true)) {
             $query->where('p.status', $filters['status']);
         }
 
@@ -178,7 +185,7 @@ class CommunityProjectService
             $items->pop();
         }
 
-        $formatted = $items->map(fn ($row) => $this->formatProject($row))->all();
+        $formatted = $items->map(fn ($row) => $this->formatProject($row, $public))->all();
 
         return [
             'items'    => $formatted,
@@ -188,9 +195,49 @@ class CommunityProjectService
     }
 
     /**
+     * Get tenant-scoped proposal totals for admin dashboards.
+     */
+    public function getProposalStats(array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $query = DB::table('vol_community_projects')
+            ->where('tenant_id', $tenantId);
+
+        if (! empty($filters['category'])) {
+            $query->where('category', $filters['category']);
+        }
+
+        if (! empty($filters['search'])) {
+            $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $filters['search']);
+            $term    = '%' . $escaped . '%';
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'LIKE', $term)
+                  ->orWhere('description', 'LIKE', $term);
+            });
+        }
+
+        $rows = $query
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved")
+            ->selectRaw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active")
+            ->selectRaw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed")
+            ->selectRaw('COALESCE(SUM(supporter_count), 0) as total_supporters')
+            ->first();
+
+        return [
+            'total'            => (int) ($rows->total ?? 0),
+            'approved'         => (int) ($rows->approved ?? 0),
+            'active'           => (int) ($rows->active ?? 0),
+            'completed'        => (int) ($rows->completed ?? 0),
+            'total_supporters' => (int) ($rows->total_supporters ?? 0),
+        ];
+    }
+
+    /**
      * Get a single proposal with supporter count and proposer info.
      */
-    public function getProposal(int $id): ?array
+    public function getProposal(int $id, bool $public = false): ?array
     {
         $tenantId = TenantContext::getId();
 
@@ -213,7 +260,11 @@ class CommunityProjectService
             return null;
         }
 
-        return $this->formatProject($row);
+        if ($public && !in_array((string) $row->status, ['approved', 'active', 'completed'], true)) {
+            return null;
+        }
+
+        return $this->formatProject($row, $public);
     }
 
     /**
@@ -230,7 +281,7 @@ class CommunityProjectService
             ->first();
 
         if (! $existing) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Project not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_project_not_found')];
             return false;
         }
 
@@ -241,7 +292,7 @@ class CommunityProjectService
                 ->where('tenant_id', $tenantId)
                 ->value('role');
             if (! in_array($userRole, ['admin', 'super_admin'], true)) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to update this project'];
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.vol_project_update_forbidden')];
                 return false;
             }
         }
@@ -281,7 +332,7 @@ class CommunityProjectService
                     if ($value !== null && $value !== '') {
                         $parsed = \DateTime::createFromFormat('Y-m-d', trim($value));
                         if (! $parsed || $parsed->format('Y-m-d') !== trim($value)) {
-                            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "{$field} must be a valid date (YYYY-MM-DD)", 'field' => $field];
+                            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_field_date_invalid', ['field' => $field]), 'field' => $field];
                             return false;
                         }
                         $value = trim($value);
@@ -300,11 +351,11 @@ class CommunityProjectService
 
         // Validate required fields are not blanked
         if (array_key_exists('title', $data) && trim((string) $data['title']) === '') {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title cannot be empty', 'field' => 'title'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_title_required'), 'field' => 'title'];
             return false;
         }
         if (array_key_exists('description', $data) && trim((string) $data['description']) === '') {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description cannot be empty', 'field' => 'description'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_project_description_required'), 'field' => 'description'];
             return false;
         }
 
@@ -448,9 +499,9 @@ class CommunityProjectService
     /**
      * Format a raw project row for API response.
      */
-    private function formatProject(object $row): array
+    private function formatProject(object $row, bool $public = false): array
     {
-        return [
+        $project = [
             'id'                => (int) $row->id,
             'tenant_id'         => (int) $row->tenant_id,
             'proposed_by'       => (int) $row->proposed_by,
@@ -465,9 +516,6 @@ class CommunityProjectService
             'skills_needed'     => $row->skills_needed ?? null,
             'estimated_hours'   => isset($row->estimated_hours) && $row->estimated_hours !== null ? (float) $row->estimated_hours : null,
             'status'            => $row->status,
-            'reviewed_by'       => isset($row->reviewed_by) && $row->reviewed_by !== null ? (int) $row->reviewed_by : null,
-            'reviewed_at'       => $row->reviewed_at ?? null,
-            'review_notes'      => $row->review_notes ?? null,
             'opportunity_id'    => isset($row->opportunity_id) && $row->opportunity_id !== null ? (int) $row->opportunity_id : null,
             'upvotes'           => (int) ($row->supporter_count ?? 0),
             'supporter_count'   => (int) ($row->supporter_count ?? 0),
@@ -481,5 +529,13 @@ class CommunityProjectService
                 'avatar_url' => $row->proposer_avatar ?? null,
             ],
         ];
+
+        if (!$public) {
+            $project['reviewed_by'] = isset($row->reviewed_by) && $row->reviewed_by !== null ? (int) $row->reviewed_by : null;
+            $project['reviewed_at'] = $row->reviewed_at ?? null;
+            $project['review_notes'] = $row->review_notes ?? null;
+        }
+
+        return $project;
     }
 }

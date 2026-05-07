@@ -531,7 +531,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                         return next;
                       });
                     }}
-                    aria-label={`Select application from ${app.user.name}`}
+                    aria-label={t('applications.aria_select_application', { name: app.user.name })}
                     className="flex-shrink-0 self-center"
                   />
                 )}

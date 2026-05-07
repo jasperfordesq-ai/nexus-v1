@@ -215,16 +215,23 @@ class VolunteerCertificateController extends BaseApiController
             $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($uploadedFile['tmp_name']);
         }
 
-        if ($mimeType === 'application/pdf') {
-            $storagePath = 'volunteer-credentials/' . $tenantId . '/' . bin2hex(random_bytes(16)) . '.pdf';
-            \Illuminate\Support\Facades\Storage::disk('local')->put(
-                $storagePath,
-                file_get_contents($uploadedFile['tmp_name'])
-            );
-            $fileUrl = 'private:' . $storagePath;
-        } else {
-            $fileUrl = \App\Core\ImageUploader::upload($uploadedFile, 'credentials');
+        $extensions = [
+            'application/pdf' => 'pdf',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
+        $extension = $extensions[$mimeType] ?? null;
+        if ($extension === null) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.credential_file_types'), 'file');
         }
+
+        $storagePath = 'volunteer-credentials/' . $tenantId . '/' . bin2hex(random_bytes(16)) . '.' . $extension;
+        \Illuminate\Support\Facades\Storage::disk('local')->put(
+            $storagePath,
+            file_get_contents($uploadedFile['tmp_name'])
+        );
+        $fileUrl = 'private:' . $storagePath;
 
         DB::insert(
             "INSERT INTO vol_credentials (tenant_id, user_id, credential_type, file_url, file_name, status, expires_at, created_at, updated_at)

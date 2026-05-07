@@ -373,7 +373,7 @@ export function DonationsTab() {
                           value={pct}
                           color="success"
                           className="mb-2"
-                          aria-label={`Progress: ${Math.round(pct)}%`}
+                          aria-label={t('donations.progress_aria', { percent: Math.round(pct) })}
                         />
                         <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle">
                           <span className="flex items-center gap-1">

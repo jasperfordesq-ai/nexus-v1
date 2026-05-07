@@ -51,10 +51,14 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Search from 'lucide-react/icons/search';
 import Clock from 'lucide-react/icons/clock';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+
+function apiErrorMessage(res: { error?: string; message?: string } | null | undefined): string | undefined {
+  return res?.error || res?.message;
+}
 
 // ─── Custom Fields types ───────────────────────────────────────────────────────
 
@@ -429,10 +433,12 @@ function CustomFieldsTab() {
           : null,
       };
       if (editingId) {
-        await adminVolunteering.updateCustomField(editingId, payload);
+        const res = await adminVolunteering.updateCustomField(editingId, payload);
+        if (!res.success) throw new Error(apiErrorMessage(res) || 'update_failed');
         toast.success(t('volunteering.field_updated', 'Custom field updated'));
       } else {
-        await adminVolunteering.createCustomField(payload);
+        const res = await adminVolunteering.createCustomField(payload);
+        if (!res.success) throw new Error(apiErrorMessage(res) || 'create_failed');
         toast.success(t('volunteering.field_created', 'Custom field created'));
       }
       onClose();
@@ -446,7 +452,8 @@ function CustomFieldsTab() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminVolunteering.deleteCustomField(deleteId);
+      const res = await adminVolunteering.deleteCustomField(deleteId);
+      if (!res.success) throw new Error(apiErrorMessage(res) || 'delete_failed');
       toast.success(t('volunteering.field_deleted', 'Custom field deleted'));
       onDeleteClose();
       loadData();
@@ -496,7 +503,7 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx <= 0}
               onPress={() => moveField(idx, 'up')}
-              aria-label={"Move up"}
+              aria-label={t('volunteering.move_up', 'Move up')}
             >
               <ArrowUp size={14} />
             </Button>
@@ -506,14 +513,14 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx >= sortedFields.length - 1}
               onPress={() => moveField(idx, 'down')}
-              aria-label={"Move Down"}
+              aria-label={t('volunteering.move_down', 'Move down')}
             >
               <ArrowDown size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={"Preview"}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.preview', 'Preview')}>
               <Eye size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={"Edit"}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
               <Edit2 size={14} />
             </Button>
             <Button
@@ -522,7 +529,7 @@ function CustomFieldsTab() {
               color="danger"
               isIconOnly
               onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-              aria-label={"Delete"}
+              aria-label={t('common.delete', 'Delete')}
             >
               <Trash2 size={14} />
             </Button>
@@ -715,6 +722,13 @@ function toReminderRequest(reminder: ReminderSetting): Record<string, unknown> {
 function RemindersTab() {
   const { t } = useTranslation('admin');
   const toast = useToast();
+  const { user } = useAuth();
+  const canRunReminderJobs = Boolean(
+    user?.is_super_admin ||
+    user?.is_god ||
+    user?.is_tenant_super_admin ||
+    user?.role === 'super_admin',
+  );
 
   const [reminders, setReminders] = useState<ReminderSetting[]>(defaultReminders);
   const [loading, setLoading] = useState(true);
@@ -834,9 +848,11 @@ function RemindersTab() {
           <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('common.refresh', 'Refresh')}
           </Button>
-          <Button variant="flat" color="primary" startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
-            {t('volunteering.run_due_reminders', 'Run Due Reminders')}
-          </Button>
+          {canRunReminderJobs && (
+            <Button variant="flat" color="primary" startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
+              {t('volunteering.run_due_reminders', 'Run Due Reminders')}
+            </Button>
+          )}
           <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>
             {t('common.save', 'Save')}
           </Button>
@@ -949,12 +965,12 @@ function RemindersTab() {
               loadDeliveryLogs(val, deliveryFilterChannel);
             }}
           >
-            <SelectItem key="">{"All"}</SelectItem>
-            <SelectItem key="pre_shift">{"Pre Shift"}</SelectItem>
-            <SelectItem key="post_shift_feedback">{"Post Shift Feedback"}</SelectItem>
-            <SelectItem key="lapsed_volunteer">{"Lapsed Volunteer"}</SelectItem>
-            <SelectItem key="credential_expiry">{"Credential Expiry"}</SelectItem>
-            <SelectItem key="training_expiry">{"Training Expiry"}</SelectItem>
+            <SelectItem key="">{t('common.all', 'All')}</SelectItem>
+            <SelectItem key="pre_shift">{t('volunteering.reminder_pre_shift', 'Pre-shift Reminder')}</SelectItem>
+            <SelectItem key="post_shift_feedback">{t('volunteering.reminder_post_shift_feedback', 'Post-shift Feedback')}</SelectItem>
+            <SelectItem key="lapsed_volunteer">{t('volunteering.reminder_lapsed_volunteer', 'Lapsed Volunteer')}</SelectItem>
+            <SelectItem key="credential_expiry">{t('volunteering.reminder_credential_expiry', 'Credential Expiry')}</SelectItem>
+            <SelectItem key="training_expiry">{t('volunteering.reminder_training_expiry', 'Training Expiry')}</SelectItem>
           </Select>
           <Select
             label={t('volunteering.filter_channel', 'Channel')}
@@ -968,10 +984,10 @@ function RemindersTab() {
               loadDeliveryLogs(deliveryFilterType, val);
             }}
           >
-            <SelectItem key="">{"All"}</SelectItem>
-            <SelectItem key="email">{"Email"}</SelectItem>
-            <SelectItem key="push">{"Push"}</SelectItem>
-            <SelectItem key="sms">{"SMS"}</SelectItem>
+            <SelectItem key="">{t('common.all', 'All')}</SelectItem>
+            <SelectItem key="email">{t('volunteering.channel_email', 'Email')}</SelectItem>
+            <SelectItem key="push">{t('volunteering.channel_push', 'Push')}</SelectItem>
+            <SelectItem key="sms">{t('volunteering.channel_sms', 'SMS')}</SelectItem>
           </Select>
         </div>
 
@@ -1025,25 +1041,27 @@ function RemindersTab() {
       </div>
 
       {/* Reminder Job Confirmation Modal */}
-      <Modal isOpen={isTestOpen} onClose={onTestClose} size="sm">
-        <ModalContent>
-          <ModalHeader>{t('volunteering.run_reminder_job_title', 'Run Due Shift Reminders')}</ModalHeader>
-          <ModalBody>
-            <p className="text-default-600">
-              {t(
-                'volunteering.run_reminder_job_confirm',
-                'Send due shift reminders for active opportunities in this community?',
-              )}
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="flat" onPress={onTestClose}>{t('common.cancel', 'Cancel')}</Button>
-            <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
-              {t('volunteering.confirm_run_reminders', 'Run Reminders')}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {canRunReminderJobs && (
+        <Modal isOpen={isTestOpen} onClose={onTestClose} size="sm">
+          <ModalContent>
+            <ModalHeader>{t('volunteering.run_reminder_job_title', 'Run Due Shift Reminders')}</ModalHeader>
+            <ModalBody>
+              <p className="text-default-600">
+                {t(
+                  'volunteering.run_reminder_job_confirm',
+                  'Send due shift reminders for active opportunities in this community?',
+                )}
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={onTestClose}>{t('common.cancel', 'Cancel')}</Button>
+              <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
+                {t('volunteering.confirm_run_reminders', 'Run Reminders')}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -1125,10 +1143,12 @@ function WebhooksTab() {
         is_active: form.is_active,
       };
       if (editingId) {
-        await adminVolunteering.updateWebhook(editingId, payload);
+        const res = await adminVolunteering.updateWebhook(editingId, payload);
+        if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_update_failed');
         toast.success(t('volunteering.webhook_updated', 'Webhook updated'));
       } else {
-        await adminVolunteering.createWebhook(payload);
+        const res = await adminVolunteering.createWebhook(payload);
+        if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_create_failed');
         toast.success(t('volunteering.webhook_created', 'Webhook created'));
       }
       onClose();
@@ -1142,7 +1162,8 @@ function WebhooksTab() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminVolunteering.deleteWebhook(deleteId);
+      const res = await adminVolunteering.deleteWebhook(deleteId);
+      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_delete_failed');
       toast.success(t('volunteering.webhook_deleted', 'Webhook deleted'));
       onDeleteClose();
       loadData();
@@ -1154,7 +1175,8 @@ function WebhooksTab() {
   const handleTest = async (id: number) => {
     setTestingId(id);
     try {
-      await adminVolunteering.testWebhook(id);
+      const res = await adminVolunteering.testWebhook(id);
+      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_test_failed');
       toast.success(t('volunteering.webhook_test_sent', 'Test webhook dispatched'));
     } catch {
       toast.error(t('volunteering.webhook_test_failed', 'Webhook test failed'));
@@ -1165,7 +1187,8 @@ function WebhooksTab() {
   const handleRetry = async (id: number) => {
     setRetryingId(id);
     try {
-      await adminVolunteering.testWebhook(id);
+      const res = await adminVolunteering.testWebhook(id);
+      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_retry_failed');
       toast.success(t('volunteering.webhook_retry_sent', 'Retrying webhook...'));
       loadData();
     } catch {
@@ -1245,7 +1268,7 @@ function WebhooksTab() {
       label: t('common.actions', 'Actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={"Edit"}>
+          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('common.edit', 'Edit')}>
             <Edit2 size={14} />
           </Button>
           <Button
@@ -1255,7 +1278,7 @@ function WebhooksTab() {
             isIconOnly
             isLoading={testingId === row.id}
             onPress={() => handleTest(row.id)}
-            aria-label={"Test"}
+            aria-label={t('volunteering.test_webhook', 'Test webhook')}
           >
             <Play size={14} />
           </Button>
@@ -1267,7 +1290,7 @@ function WebhooksTab() {
               isIconOnly
               isLoading={retryingId === row.id}
               onPress={() => handleRetry(row.id)}
-              aria-label={"Retry"}
+              aria-label={t('volunteering.retry_webhook', 'Retry webhook')}
             >
               <RotateCcw size={14} />
             </Button>
@@ -1277,7 +1300,7 @@ function WebhooksTab() {
             variant="flat"
             isIconOnly
             onPress={() => handleViewLogs(row.id)}
-            aria-label={"View Logs"}
+            aria-label={t('volunteering.view_logs', 'View logs')}
           >
             <FileText size={14} />
           </Button>
@@ -1287,7 +1310,7 @@ function WebhooksTab() {
             color="danger"
             isIconOnly
             onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-            aria-label={"Delete"}
+            aria-label={t('common.delete', 'Delete')}
           >
             <Trash2 size={14} />
           </Button>
