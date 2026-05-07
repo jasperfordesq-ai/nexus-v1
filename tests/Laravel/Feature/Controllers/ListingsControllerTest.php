@@ -157,6 +157,38 @@ class ListingsControllerTest extends TestCase
         $this->assertNotContains('Unrelated haystack listing', $titles);
     }
 
+    public function test_index_can_filter_to_coordinate_backed_results_for_map_view(): void
+    {
+        $user = $this->authenticatedUser();
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Dublin listing without map coordinates',
+            'description' => 'A Dublin text-location listing that cannot be placed on a map.',
+            'location' => 'Dublin',
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Dublin listing with map coordinates',
+            'description' => 'A Dublin listing that can be placed on the map.',
+            'location' => 'Dublin',
+            'latitude' => 53.3498,
+            'longitude' => -6.2603,
+        ]);
+
+        $response = $this->apiGet('/v2/listings?q=Dublin&with_coordinates=1&per_page=100&personalised=false');
+
+        $response->assertStatus(200);
+        $titles = collect($response->json('data'))->pluck('title')->all();
+        $this->assertContains('Dublin listing with map coordinates', $titles);
+        $this->assertNotContains('Dublin listing without map coordinates', $titles);
+        collect($response->json('data'))->each(function (array $listing): void {
+            $this->assertNotNull($listing['latitude'] ?? null);
+            $this->assertNotNull($listing['longitude'] ?? null);
+        });
+    }
+
     public function test_index_returns_empty_for_unknown_category_slug(): void
     {
         $user = $this->authenticatedUser();

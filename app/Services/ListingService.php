@@ -70,6 +70,7 @@ class ListingService
      *   search?: string,
      *   skills?: string|string[],
      *   featured_first?: bool,
+     *   with_coordinates?: bool,
      *   include_deleted?: bool,
      *   current_user_id?: int|null,
      *   limit?: int,
@@ -93,7 +94,8 @@ class ListingService
         // post-search in SQL which breaks pagination (IDs filtered out → fewer
         // items than limit). The SQL path handles all filters correctly.
         $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
-            || !empty($filters['service_type']) || !empty($filters['posted_within']);
+            || !empty($filters['service_type']) || !empty($filters['posted_within'])
+            || !empty($filters['with_coordinates']);
         if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId = \App\Core\TenantContext::getId();
 
@@ -306,6 +308,10 @@ class ListingService
         if (!empty($filters['posted_within'])) {
             $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
         }
+        if (!empty($filters['with_coordinates'])) {
+            $query->whereNotNull('latitude')
+                ->whereNotNull('longitude');
+        }
 
         // Cursor pagination (ID-based, descending)
         if ($cursor !== null) {
@@ -435,7 +441,8 @@ class ListingService
         // posted_within) since Meilisearch can't apply those — its total
         // would be inaccurate.
         $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
-            || !empty($filters['service_type']) || !empty($filters['posted_within']);
+            || !empty($filters['service_type']) || !empty($filters['posted_within'])
+            || !empty($filters['with_coordinates']);
         if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId     = \App\Core\TenantContext::getId();
             $meiliFilters = [];
@@ -545,6 +552,10 @@ class ListingService
         // Faceted filters: posted within N days
         if (!empty($filters['posted_within'])) {
             $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
+        }
+        if (!empty($filters['with_coordinates'])) {
+            $query->whereNotNull('latitude')
+                ->whereNotNull('longitude');
         }
 
         return $query->count();

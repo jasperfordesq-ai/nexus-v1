@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -59,8 +59,9 @@ vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
+let mapsEnabled = false;
 vi.mock('@/lib/map-config', () => ({
-  MAPS_ENABLED: false,
+  get MAPS_ENABLED() { return mapsEnabled; },
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -83,10 +84,12 @@ vi.mock('@/components/feedback', () => ({
 vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 import { ListingsPage } from './ListingsPage';
+import { api } from '@/lib/api';
 
 describe('ListingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mapsEnabled = false;
   });
 
   it('renders without crashing', () => {
@@ -114,5 +117,21 @@ describe('ListingsPage', () => {
     render(<ListingsPage />);
     expect(screen.getByLabelText('Grid view')).toBeInTheDocument();
     expect(screen.getByLabelText('List view')).toBeInTheDocument();
+  });
+
+  it('requests only coordinate-backed listings in map view', async () => {
+    mapsEnabled = true;
+    render(<ListingsPage />);
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(expect.stringMatching(/^\/v2\/listings\?/));
+    });
+
+    fireEvent.click(screen.getByLabelText('Map view'));
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(expect.stringContaining('with_coordinates=1'));
+      expect(api.get).toHaveBeenCalledWith(expect.stringContaining('per_page=100'));
+    });
   });
 });

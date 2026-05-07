@@ -110,6 +110,9 @@ class ListingsController extends BaseApiController
         if ($this->query('posted_within')) {
             $filters['posted_within'] = max(1, min(365, (int) $this->query('posted_within')));
         }
+        if ($this->queryBool('with_coordinates')) {
+            $filters['with_coordinates'] = true;
+        }
 
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');

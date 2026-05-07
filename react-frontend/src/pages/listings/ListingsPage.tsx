@@ -37,6 +37,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Monitor from 'lucide-react/icons/monitor';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import Star from 'lucide-react/icons/star';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import X from 'lucide-react/icons/x';
@@ -165,7 +166,11 @@ export function ListingsPage() {
       if (selectedType !== 'all') params.set('type', selectedType);
       if (selectedCategory) params.set('category', selectedCategory);
       if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
-      params.set('per_page', '20');
+      const isMapView = viewMode === 'map';
+      params.set('per_page', isMapView ? '100' : '20');
+      if (isMapView) {
+        params.set('with_coordinates', '1');
+      }
 
       // Faceted filters
       if (hoursRange !== 'any') {
@@ -236,7 +241,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -275,7 +280,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode]);
 
   // Restore scroll position on back-navigation; save on unmount
   useEffect(() => {
@@ -719,6 +724,16 @@ export function ListingsPage() {
                   <h4 className="font-semibold text-sm text-theme-primary">{l.title}</h4>
                   <p className="text-xs text-theme-secondary line-clamp-2 mt-0.5">{l.description}</p>
                   {l.location && <p className="text-xs text-theme-muted mt-1">{l.location}</p>}
+                  <Link to={tenantPath(`/listings/${l.id}`)} className="mt-2 inline-flex">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      className="h-8 min-w-0 bg-theme-elevated px-3 text-xs font-medium text-theme-primary hover:bg-theme-hover"
+                      endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
+                    >
+                      {t('map_view_listing')}
+                    </Button>
+                  </Link>
                 </div>
               )}
               isLoading={isLoading}
