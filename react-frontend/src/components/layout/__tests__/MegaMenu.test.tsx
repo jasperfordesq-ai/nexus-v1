@@ -8,8 +8,8 @@
  * Covers rendering, keyboard navigation, focus management, and accessibility.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
@@ -31,6 +31,33 @@ vi.mock('react-i18next', () => ({
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
+
+type MockMotionProps = { children?: React.ReactNode; [key: string]: unknown };
+
+vi.mock('framer-motion', async () => {
+  const react = await import('react');
+  const passthrough = (tag: string) => ({ children, ...props }: MockMotionProps) =>
+    react.createElement(tag, props, children);
+
+  return {
+    AnimatePresence: ({ children }: MockMotionProps) => react.createElement(react.Fragment, null, children),
+    LazyMotion: ({ children }: MockMotionProps) => react.createElement(react.Fragment, null, children),
+    MotionConfig: ({ children }: MockMotionProps) => react.createElement(react.Fragment, null, children),
+    domAnimation: {},
+    m: {
+      button: passthrough('button'),
+      div: passthrough('div'),
+      nav: passthrough('nav'),
+      span: passthrough('span'),
+    },
+    motion: {
+      button: passthrough('button'),
+      div: passthrough('div'),
+      nav: passthrough('nav'),
+      span: passthrough('span'),
+    },
+  };
+});
 
 // Stub icon component
 const StubIcon: LucideIcon = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<SVGSVGElement>) =>
@@ -106,6 +133,10 @@ function renderMegaMenu(overrides: Partial<React.ComponentProps<typeof MegaMenu>
 describe('MegaMenu', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   describe('Rendering', () => {
