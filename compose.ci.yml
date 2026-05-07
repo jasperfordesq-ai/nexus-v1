@@ -76,7 +76,10 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - nexus-ci-internal
+      nexus-ci-internal:
+        aliases:
+          # react-frontend/nginx.conf proxies uploads to this production name.
+          - nexus-php-app
     # No ports — tests reach the app via Docker network or docker exec
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]

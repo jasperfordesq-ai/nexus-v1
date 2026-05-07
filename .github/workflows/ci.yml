@@ -646,6 +646,9 @@ jobs:
             echo "::group::App container logs"
             docker compose -f compose.ci.yml logs --no-color app || true
             echo "::endgroup::"
+            echo "::group::Frontend container logs"
+            docker compose -f compose.ci.yml logs --no-color frontend || true
+            echo "::endgroup::"
             exit 1
           }
           echo "CI stack is healthy — all services passed their healthchecks."
