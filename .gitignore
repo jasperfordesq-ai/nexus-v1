@@ -140,7 +140,8 @@ _deprecated/
 
 /coverage/
 **/coverage/
-/bootstrap/cache/
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
 # ─── Logs ─────────────────────────────────────────────────────────────────────
 /logs
 *.log
