@@ -546,6 +546,7 @@ class GovukAlphaFrontendTest extends TestCase
         $index->assertOk();
         $index->assertSee('class="govuk-fieldset"', false);
         $index->assertSee('class="govuk-checkboxes ', false);
+        $index->assertSee('class="govuk-tabs ', false);
         $index->assertSee('Alpha volunteering opportunity');
         $index->assertSee('Alpha Volunteer Organisation');
         $index->assertSee(route('govuk-alpha.volunteering.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId]), false);
@@ -571,6 +572,19 @@ class GovukAlphaFrontendTest extends TestCase
             'shift_id' => $shiftId,
             'status' => 'pending',
         ]);
+
+        $applications = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=applications");
+        $applications->assertOk();
+        $applications->assertSee(__('govuk_alpha.volunteering.applications_title'));
+        $applications->assertSee('Alpha volunteering opportunity');
+        $applications->assertSee(__('govuk_alpha.volunteering.status_values.pending'));
+        $applications->assertSee(__('govuk_alpha.volunteering.applied_on'));
+
+        $organisations = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
+        $organisations->assertOk();
+        $organisations->assertSee(__('govuk_alpha.volunteering.organisations_title'));
+        $organisations->assertSee('Alpha Volunteer Organisation');
+        $organisations->assertSee(__('govuk_alpha.volunteering.roles.owner'));
     }
 
     public function test_volunteering_hours_page_renders_member_hour_logging_form(): void

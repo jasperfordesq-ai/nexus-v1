@@ -355,10 +355,12 @@ class AlphaController extends Controller
                 'hoursSummary' => null,
                 'applications' => [],
                 'organizations' => [],
+                'selectedTab' => 'opportunities',
             ], 403);
         }
 
         $filters = $this->volunteeringFilters($request);
+        $selectedTab = $this->allowed($request->query('tab', 'opportunities'), ['opportunities', 'applications', 'organisations'], 'opportunities');
         $query = ['limit' => 12];
         foreach (['category_id', 'search', 'cursor', 'is_remote'] as $key) {
             if ($filters[$key] !== null && $filters[$key] !== '') {
@@ -397,6 +399,7 @@ class AlphaController extends Controller
             'hoursSummary' => $userId ? VolunteerService::getHoursSummary($userId) : null,
             'applications' => $userId ? (VolunteerService::getMyApplications($userId, ['limit' => 5])['items'] ?? []) : [],
             'organizations' => $userId ? (VolunteerService::getMyOrganizations($userId, ['limit' => 5])['items'] ?? []) : [],
+            'selectedTab' => $selectedTab,
         ]);
     }
 

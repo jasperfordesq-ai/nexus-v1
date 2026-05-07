@@ -9,6 +9,8 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasFilters = !empty($filters['search']) || !empty($filters['category_id']) || !empty($filters['is_remote']);
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
+        $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
+        $selectedTab = $selectedTab ?? 'opportunities';
     @endphp
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.volunteering.caption', ['community' => $communityName]) }}</span>
@@ -57,8 +59,130 @@
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.log_hours_title') }}</a>
             </p>
+
+            <div class="govuk-tabs govuk-!-margin-top-6">
+                <h2 class="govuk-tabs__title">{{ __('govuk_alpha.volunteering.tabs_title') }}</h2>
+                <ul class="govuk-tabs__list">
+                    <li class="govuk-tabs__list-item{{ $selectedTab === 'opportunities' ? ' govuk-tabs__list-item--selected' : '' }}">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.opportunities') }}</a>
+                    </li>
+                    <li class="govuk-tabs__list-item{{ $selectedTab === 'applications' ? ' govuk-tabs__list-item--selected' : '' }}">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}">{{ __('govuk_alpha.volunteering.tabs.applications') }}</a>
+                    </li>
+                    <li class="govuk-tabs__list-item">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
+                    </li>
+                    <li class="govuk-tabs__list-item{{ $selectedTab === 'organisations' ? ' govuk-tabs__list-item--selected' : '' }}">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'organisations']) }}">{{ __('govuk_alpha.volunteering.tabs.organisations') }}</a>
+                    </li>
+                </ul>
+            </div>
         @endif
 
+        @if (!$requiresAuth && $selectedTab === 'applications')
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.applications_title') }}</h2>
+            @if (empty($applications))
+                <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_applications') }}</div>
+            @else
+                <div class="nexus-alpha-card-list">
+                    @foreach ($applications as $application)
+                        @php
+                            $opportunity = $application['opportunity'] ?? [];
+                            $organization = $application['organization'] ?? [];
+                            $statusValue = (string) ($application['status'] ?? 'pending');
+                            $shift = $application['shift'] ?? null;
+                        @endphp
+                        <article class="nexus-alpha-card">
+                            <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
+                                @if (!empty($opportunity['id']))
+                                    <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $opportunity['id']]) }}">{{ $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title') }}</a>
+                                @else
+                                    {{ $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title') }}
+                                @endif
+                            </h3>
+                            <strong class="govuk-tag">{{ __('govuk_alpha.volunteering.status_values.' . $statusValue) }}</strong>
+                            <dl class="govuk-summary-list govuk-!-margin-top-4 govuk-!-margin-bottom-0">
+                                @if (!empty($organization['name']))
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.organization') }}</dt>
+                                        <dd class="govuk-summary-list__value">{{ $organization['name'] }}</dd>
+                                    </div>
+                                @endif
+                                @if (!empty($opportunity['location']))
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.location') }}</dt>
+                                        <dd class="govuk-summary-list__value">{{ $opportunity['location'] }}</dd>
+                                    </div>
+                                @endif
+                                @if (is_array($shift) && !empty($shift['start_time']))
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.shift_label') }}</dt>
+                                        <dd class="govuk-summary-list__value">{{ $formatDateTime($shift['start_time']) }}</dd>
+                                    </div>
+                                @endif
+                                @if (!empty($application['created_at']))
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.applied_on') }}</dt>
+                                        <dd class="govuk-summary-list__value">{{ $formatDate($application['created_at']) }}</dd>
+                                    </div>
+                                @endif
+                            </dl>
+                        </article>
+                    @endforeach
+                </div>
+            @endif
+        @elseif (!$requiresAuth && $selectedTab === 'organisations')
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.organisations_title') }}</h2>
+            @if (empty($organizations))
+                <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_organisations') }}</div>
+            @else
+                <div class="nexus-alpha-card-list">
+                    @foreach ($organizations as $organization)
+                        @php
+                            $statusValue = (string) ($organization['status'] ?? 'pending');
+                            $roleValue = (string) ($organization['member_role'] ?? 'member');
+                            $website = (string) ($organization['website'] ?? '');
+                            $websiteScheme = $website !== '' ? parse_url($website, PHP_URL_SCHEME) : null;
+                            $websiteHref = in_array($websiteScheme, ['http', 'https'], true) ? $website : null;
+                        @endphp
+                        <article class="nexus-alpha-card">
+                            <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ $organization['name'] }}</h3>
+                            <dl class="govuk-summary-list govuk-!-margin-bottom-0">
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.status') }}</dt>
+                                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.volunteering.status_values.' . $statusValue) }}</dd>
+                                </div>
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.role_label') }}</dt>
+                                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.volunteering.roles.' . $roleValue) }}</dd>
+                                </div>
+                                @if (!empty($organization['contact_email']))
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.contact_email') }}</dt>
+                                        <dd class="govuk-summary-list__value">{{ $organization['contact_email'] }}</dd>
+                                    </div>
+                                @endif
+                                @if ($website !== '')
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.website') }}</dt>
+                                        <dd class="govuk-summary-list__value">
+                                            @if ($websiteHref)
+                                                <a class="govuk-link" href="{{ $websiteHref }}">{{ $website }}</a>
+                                            @else
+                                                {{ $website }}
+                                            @endif
+                                        </dd>
+                                    </div>
+                                @endif
+                            </dl>
+                            @if (!empty($organization['description']))
+                                <p class="govuk-body govuk-!-margin-top-3">{{ \Illuminate\Support\Str::limit(strip_tags((string) $organization['description']), 220) }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            @endif
+        @else
         <form method="get" action="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-7 govuk-!-margin-top-7">
             <fieldset class="govuk-fieldset" aria-describedby="volunteering-filter-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -192,6 +316,7 @@
                     </div>
                 </nav>
             @endif
+        @endif
         @endif
     @endif
 @endsection
