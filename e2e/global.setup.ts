@@ -37,6 +37,8 @@ const TEST_USERS = {
 
 const BASE_URL = process.env.E2E_BASE_URL || 'http://staging.timebank.local';
 const TENANT_SLUG = process.env.E2E_TENANT || 'hour-timebank';
+const HAS_USER_CREDENTIALS = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
+const HAS_ADMIN_CREDENTIALS = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 
@@ -301,10 +303,18 @@ async function globalSetup(config: FullConfig) {
 
     await context.close();
 
-    // Only attempt authentication if server is accessible
+    const configuredUsers = Object.entries(TEST_USERS).filter(([userType]) => (
+      userType === 'admin' ? HAS_ADMIN_CREDENTIALS : HAS_USER_CREDENTIALS
+    ));
+
+    if (configuredUsers.length === 0) {
+      console.log('No E2E auth credentials configured; using empty auth state files.');
+    }
+
+    // Only attempt authentication if server is accessible and credentials exist.
     if (serverAccessible) {
       // Create authenticated sessions for each user type
-      for (const [userType, credentials] of Object.entries(TEST_USERS)) {
+      for (const [userType, credentials] of configuredUsers) {
         console.log(`🔐 Creating auth session for ${userType} user...`);
 
         const authContext = await browser.newContext();

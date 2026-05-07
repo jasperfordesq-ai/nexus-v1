@@ -68,6 +68,11 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Prepare Laravel Runtime Directories
+        run: |
+          mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
+          chmod -R ug+rw bootstrap/cache storage
+
       - name: Setup Test Database Schema
         run: |
           echo "Loading schema into nexus_test database..."
@@ -252,6 +257,7 @@ jobs:
         run: npm run build
         env:
           VITE_API_BASE: /api
+          NEXUS_SKIP_PRERENDER: "1"
 
       - name: Upload React Build Artifact
         uses: actions/upload-artifact@v4

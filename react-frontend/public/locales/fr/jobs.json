@@ -116,7 +116,10 @@
     "delete": "Supprimer",
     "action_move_stage": "Changer d’étape",
     "action_auto_reject": "Rejet automatique",
-    "action_notify_me": "Me notifier"
+    "action_notify_me": "Me notifier",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Profil de l'employeur",
@@ -312,7 +315,8 @@
     "salary_monthly": "Mensuel",
     "personal_message": "Message personnel",
     "personal_message_placeholder": "Une note pour le candidat...",
-    "select_applicant": "Sélectionner {{name}}"
+    "select_applicant": "Sélectionner {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Postuler maintenant",
@@ -336,7 +340,8 @@
     "cv_too_large": "Le fichier CV doit être inférieur à 5 Mo",
     "cv_invalid_type": "Seuls les fichiers PDF, DOC ou DOCX sont pris en charge",
     "message_employer": "Contacter l'employeur",
-    "cv_parse_error": "Échec de l'analyse du CV. Vous pouvez toujours soumettre votre candidature manuellement."
+    "cv_parse_error": "Échec de l'analyse du CV. Vous pouvez toujours soumettre votre candidature manuellement.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Chargement de l'offre...",
@@ -404,7 +409,12 @@
     "declined": "Entretien refusé",
     "accept": "Accepter",
     "decline": "Refuser",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Vous avez reçu une offre !",
@@ -451,12 +461,15 @@
     "technical": "Compétences techniques",
     "cultural_fit": "Adéquation culturelle",
     "experience": "Expérience",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Profil de candidature sauvegardé trouvé",
     "use": "Utiliser le profil sauvegardé",
-    "start_fresh": "Recommencer"
+    "start_fresh": "Recommencer",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Équipe de recrutement",
@@ -567,7 +580,9 @@
       "deadline_past": "La date limite doit être une date future",
       "salary_required": "Plage salariale requise. Vous pouvez cocher « Salaire négociable » pour l'omettre.",
       "salary_range_invalid": "Le salaire minimum ne peut pas dépasser le salaire maximum"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "Générer avec l'IA",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Détection de spam",
@@ -736,7 +755,10 @@
     "loading": "Génération du rapport...",
     "no_data": "Aucune donnée de candidature disponible pour la période sélectionnée",
     "load_error": "Échec du chargement du rapport d'audit des biais",
-    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée."
+    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Créneaux d'entretien",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Marque employeur"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

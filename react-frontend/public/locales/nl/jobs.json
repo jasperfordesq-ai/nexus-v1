@@ -116,7 +116,10 @@
     "delete": "Delete",
     "action_move_stage": "Fase verplaatsen",
     "action_auto_reject": "Automatisch afwijzen",
-    "action_notify_me": "Stuur mij een melding"
+    "action_notify_me": "Stuur mij een melding",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Werkgeversprofiel",
@@ -312,7 +315,8 @@
     "salary_monthly": "Monthly",
     "personal_message": "Persoonlijk bericht",
     "personal_message_placeholder": "Een notitie voor de kandidaat...",
-    "select_applicant": "Selecteer {{name}}"
+    "select_applicant": "Selecteer {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Nu solliciteren",
@@ -336,7 +340,8 @@
     "cv_too_large": "CV-bestand moet kleiner zijn dan 5MB",
     "cv_invalid_type": "Alleen PDF-, DOC- of DOCX-bestanden worden ondersteund",
     "message_employer": "Bericht Werkgever",
-    "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen."
+    "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Vacature laden...",
@@ -404,7 +409,12 @@
     "declined": "Interview Geweigerd",
     "accept": "Accept",
     "decline": "Decline",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Je hebt een aanbod ontvangen!",
@@ -451,12 +461,15 @@
     "technical": "Technische Vaardigheden",
     "cultural_fit": "Culturele Geschiktheid",
     "experience": "Experience",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Opgeslagen aanvraagprofiel gevonden",
     "use": "Gebruik Opgeslagen Profiel",
-    "start_fresh": "Begin Nieuw"
+    "start_fresh": "Begin Nieuw",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Wervings Team",
@@ -567,7 +580,9 @@
       "deadline_past": "Deadline moet een toekomstige datum zijn",
       "salary_required": "Salarisrange vereist. Je kunt 'Salaris bespreekbaar' aanvinken om dit over te slaan.",
       "salary_range_invalid": "Minimum salaris mag niet hoger zijn dan maximum salaris"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "AI Genereren",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Spam Detectie",
@@ -736,7 +755,10 @@
     "loading": "Rapport aan het genereren...",
     "no_data": "Geen aanvraaggegevens beschikbaar voor de geselecteerde periode",
     "load_error": "Kon het bias audit rapport niet laden",
-    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt."
+    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Interviewslots",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Werkgever Merk"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

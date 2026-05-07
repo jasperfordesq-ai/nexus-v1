@@ -116,7 +116,10 @@
     "delete": "Scrios",
     "action_move_stage": "Bog céim",
     "action_auto_reject": "Uathdhiúltú",
-    "action_notify_me": "Cuir ar an eolas mé"
+    "action_notify_me": "Cuir ar an eolas mé",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Próifíl Fostóra",
@@ -312,7 +315,8 @@
     "salary_monthly": "Míosúil",
     "personal_message": "Teachtaireacht Phearsanta",
     "personal_message_placeholder": "Nóta don iarrthóir...",
-    "select_applicant": "Roghnaigh {{name}}"
+    "select_applicant": "Roghnaigh {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Cuir Isteach Anois",
@@ -336,7 +340,8 @@
     "cv_too_large": "Ní mór don chomhad CV a bheith faoi bhun 5MB",
     "cv_invalid_type": "Ní thacaítear ach le comhaid PDF, DOC, nó DOCX",
     "message_employer": "Cuir Teachtaireacht chuig Fostóir",
-    "cv_parse_error": "Theip ar CV a pharsáil. Is féidir leat d'iarratas a chur isteach de láimh fós."
+    "cv_parse_error": "Theip ar CV a pharsáil. Is féidir leat d'iarratas a chur isteach de láimh fós.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Folúntas á luchtú...",
@@ -404,7 +409,12 @@
     "declined": "Agallamh Diúltaithe",
     "accept": "Glac",
     "decline": "Diúltaigh",
-    "minutes": "nóim"
+    "minutes": "nóim",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Fuair tú tairiscint!",
@@ -451,12 +461,15 @@
     "technical": "Scileanna Teicniúla",
     "cultural_fit": "Oiriúnacht Chultúrtha",
     "experience": "Taithí",
-    "motivation": "Spreagadh"
+    "motivation": "Spreagadh",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Próifíl iarratais sábháilte aimsithe",
     "use": "Úsáid Próifíl Shábháilte",
-    "start_fresh": "Tosaigh Arís"
+    "start_fresh": "Tosaigh Arís",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Foireann Fostaithe",
@@ -567,7 +580,9 @@
       "deadline_past": "Ní mór don spriocdháta a bheith sa todhchaí",
       "salary_required": "Raon tuarastail riachtanach. Is féidir leat 'Tuarastal insocraithe' a sheiceáil le fágáil as.",
       "salary_range_invalid": "Ní féidir leis an íostuarastal an t-uastuarastal a shárú"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "Gin le IS",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Braiteacht Turscair",
@@ -736,7 +755,10 @@
     "loading": "Tuairisc á giniúint...",
     "no_data": "Níl sonraí iarratais ar fáil don tréimhse roghnaithe",
     "load_error": "Theip ar thuairisc iniúchta laofachta a lódáil",
-    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha."
+    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Sliotáin Agallaimh",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Employer Brand"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

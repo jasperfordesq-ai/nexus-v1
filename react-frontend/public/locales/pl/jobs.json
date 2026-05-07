@@ -116,7 +116,10 @@
     "delete": "Delete",
     "action_move_stage": "Przenieś etap",
     "action_auto_reject": "Automatyczne odrzucenie",
-    "action_notify_me": "Powiadom mnie"
+    "action_notify_me": "Powiadom mnie",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Profil pracodawcy",
@@ -312,7 +315,8 @@
     "salary_monthly": "Monthly",
     "personal_message": "Wiadomość osobista",
     "personal_message_placeholder": "Notatka do kandydata...",
-    "select_applicant": "Wybierz {{name}}"
+    "select_applicant": "Wybierz {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Aplikuj teraz",
@@ -336,7 +340,8 @@
     "cv_too_large": "Plik CV musi mieć mniej niż 5MB",
     "cv_invalid_type": "Obsługiwane są tylko pliki PDF, DOC lub DOCX",
     "message_employer": "Wyślij wiadomość do pracodawcy",
-    "cv_parse_error": "Nie udało się przetworzyć CV. Możesz nadal złożyć swoją aplikację ręcznie."
+    "cv_parse_error": "Nie udało się przetworzyć CV. Możesz nadal złożyć swoją aplikację ręcznie.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Ładowanie oferty pracy...",
@@ -404,7 +409,12 @@
     "declined": "Rozmowa Kwalifikacyjna Odrzucona",
     "accept": "Accept",
     "decline": "Decline",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Otrzymałeś ofertę!",
@@ -451,12 +461,15 @@
     "technical": "Umiejętności techniczne",
     "cultural_fit": "Dopasowanie kulturowe",
     "experience": "Experience",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Znaleziono zapisany profil aplikacji",
     "use": "Użyj zapisanego profilu",
-    "start_fresh": "Zacznij od nowa"
+    "start_fresh": "Zacznij od nowa",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Zespół rekrutacyjny",
@@ -567,7 +580,9 @@
       "deadline_past": "Termin musi być datą w przyszłości",
       "salary_required": "Zakres wynagrodzenia jest wymagany. Możesz zaznaczyć 'Wynagrodzenie do negocjacji', aby pominąć.",
       "salary_range_invalid": "Minimalne wynagrodzenie nie może przekraczać maksymalnego wynagrodzenia"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "Generowanie AI",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Wykrywanie spamu",
@@ -736,7 +755,10 @@
     "loading": "Generowanie raportu...",
     "no_data": "Brak danych aplikacyjnych dostępnych za wybrany okres",
     "load_error": "Nie udało się załadować raportu audytu stronniczości",
-    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane."
+    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Sloty Rozmów Kwalifikacyjnych",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Marka pracodawcy"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

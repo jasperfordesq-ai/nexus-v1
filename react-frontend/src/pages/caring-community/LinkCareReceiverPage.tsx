@@ -167,7 +167,7 @@ export function LinkCareReceiverPage() {
                   ) : searchResults && searchResults.length > 0 ? (
                     <ul className="divide-y divide-theme-default" role="listbox" aria-label={t('caregiver.search_results_aria')}>
                       {searchResults.slice(0, 8).map((user) => (
-                        <li key={user.id} role="option" aria-selected={selectedUser?.id === user.id}>
+                        <li key={user.id} role="option" aria-selected={false}>
                           <Button
                             type="button"
                             variant="light"

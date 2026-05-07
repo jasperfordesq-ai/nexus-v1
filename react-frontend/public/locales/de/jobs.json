@@ -116,7 +116,10 @@
     "delete": "Löschen",
     "action_move_stage": "Phase verschieben",
     "action_auto_reject": "Automatisch ablehnen",
-    "action_notify_me": "Benachrichtigen"
+    "action_notify_me": "Benachrichtigen",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Arbeitgeberprofil",
@@ -312,7 +315,8 @@
     "salary_monthly": "Monatlich",
     "personal_message": "Persönliche Nachricht",
     "personal_message_placeholder": "Eine Notiz an den Kandidaten...",
-    "select_applicant": "{{name}} auswählen"
+    "select_applicant": "{{name}} auswählen",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Jetzt bewerben",
@@ -336,7 +340,8 @@
     "cv_too_large": "Lebenslauf-Datei muss unter 5MB sein",
     "cv_invalid_type": "Nur PDF-, DOC- oder DOCX-Dateien werden unterstützt",
     "message_employer": "Arbeitgeber kontaktieren",
-    "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen."
+    "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Stelle wird geladen...",
@@ -404,7 +409,12 @@
     "declined": "Vorstellungsgespräch abgelehnt",
     "accept": "Akzeptieren",
     "decline": "Ablehnen",
-    "minutes": "Min"
+    "minutes": "Min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Sie haben ein Angebot erhalten!",
@@ -451,12 +461,15 @@
     "technical": "Technische Fähigkeiten",
     "cultural_fit": "Kulturelle Passung",
     "experience": "Erfahrung",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Gespeichertes Bewerbungsprofil gefunden",
     "use": "Gespeichertes Profil verwenden",
-    "start_fresh": "Neu beginnen"
+    "start_fresh": "Neu beginnen",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Einstellungsteam",
@@ -567,7 +580,9 @@
       "deadline_past": "Frist muss in der Zukunft liegen",
       "salary_required": "Gehaltsbereich erforderlich. Sie können 'Gehalt verhandelbar' ankreuzen, um ihn wegzulassen.",
       "salary_range_invalid": "Das Mindestgehalt darf das Maximalgehalt nicht überschreiten"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "KI-Generierung",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Spam-Erkennung",
@@ -736,7 +755,10 @@
     "loading": "Bericht wird erstellt...",
     "no_data": "Keine Bewerbungsdaten für den ausgewählten Zeitraum verfügbar",
     "load_error": "Vorurteils-Audit-Bericht konnte nicht geladen werden",
-    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet."
+    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Gesprächszeitfenster",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Arbeitgebermarke"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

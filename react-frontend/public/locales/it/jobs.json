@@ -116,7 +116,10 @@
     "delete": "Elimina",
     "action_move_stage": "Sposta fase",
     "action_auto_reject": "Rifiuto automatico",
-    "action_notify_me": "Avvisami"
+    "action_notify_me": "Avvisami",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "Profilo Datore di Lavoro",
@@ -312,7 +315,8 @@
     "salary_monthly": "Mensile",
     "personal_message": "Messaggio Personale",
     "personal_message_placeholder": "Una nota per il candidato...",
-    "select_applicant": "Seleziona {{name}}"
+    "select_applicant": "Seleziona {{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "Candidati Ora",
@@ -336,7 +340,8 @@
     "cv_too_large": "Il file del CV deve essere inferiore a 5MB",
     "cv_invalid_type": "Sono supportati solo file PDF, DOC o DOCX",
     "message_employer": "Messaggio al Datore",
-    "cv_parse_error": "Impossibile analizzare il CV. Puoi comunque inviare la candidatura manualmente."
+    "cv_parse_error": "Impossibile analizzare il CV. Puoi comunque inviare la candidatura manualmente.",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "Caricamento offerta...",
@@ -404,7 +409,12 @@
     "declined": "Colloquio Rifiutato",
     "accept": "Accetta",
     "decline": "Rifiuta",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "Hai ricevuto un'offerta!",
@@ -451,12 +461,15 @@
     "technical": "Competenze Tecniche",
     "cultural_fit": "Adattamento Culturale",
     "experience": "Esperienza",
-    "motivation": "Motivazione"
+    "motivation": "Motivazione",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "Profilo di candidatura salvato trovato",
     "use": "Usa Profilo Salvato",
-    "start_fresh": "Inizia da Zero"
+    "start_fresh": "Inizia da Zero",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "Team di Selezione",
@@ -567,7 +580,9 @@
       "deadline_past": "La scadenza deve essere una data futura",
       "salary_required": "Fascia salariale obbligatoria. Puoi selezionare \"Stipendio negoziabile\" per ometterla.",
       "salary_range_invalid": "Lo stipendio minimo non può superare il massimo"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "Genera con IA",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "Rilevamento Spam",
@@ -736,7 +755,10 @@
     "loading": "Generazione report...",
     "no_data": "Nessun dato di candidatura disponibile per il periodo selezionato",
     "load_error": "Impossibile caricare il report dell'audit sui pregiudizi",
-    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato."
+    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato.",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "Slot per Colloqui",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "Brand del datore di lavoro"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }

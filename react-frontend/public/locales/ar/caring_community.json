@@ -62,7 +62,10 @@
     "upcoming_care": "Upcoming care",
     "recent_care": "Recent care",
     "no_upcoming_care": "No scheduled support yet",
-    "no_recent_care": "No recent care logs yet"
+    "no_recent_care": "No recent care logs yet",
+    "search_results_aria": "Matching members",
+    "search_error": "We couldn't search members. Please try again.",
+    "select_member_error": "Choose a member before linking a care receiver."
   },
   "cover": {
     "title": "Cover Care",
@@ -125,7 +128,11 @@
     "website_aria": "Visit provider website {{url}}",
     "opening_hours": "Opening Hours",
     "no_providers": "No care providers found",
-    "no_providers_hint": "Try adjusting your filters or search"
+    "no_providers_hint": "Try adjusting your filters or search",
+    "unavailable": "The care provider directory is not available for this community.",
+    "error_title": "Care providers could not be loaded",
+    "error_body": "Please try again. If this keeps happening, contact your community coordinator.",
+    "retry": "Try again"
   },
   "emergency_alert": {
     "region_label": "Emergency alerts",
@@ -487,6 +494,142 @@
       "errors": {
         "save_failed": "فشل حفظ التكوين.",
         "recompute_failed": "فشل في إعادة حساب الطبقات."
+      }
+    },
+    "common": {
+      "refresh": "Refresh",
+      "cancel": "Cancel",
+      "empty_dash": "-"
+    },
+    "loyalty": {
+      "title": "Loyalty Programme",
+      "description": "Time-credit to marketplace bridge. Members earn hours, merchants opt in to accept them as a CHF discount on their listings.",
+      "refresh": "Refresh",
+      "about": {
+        "title": "About this page",
+        "body": "The Loyalty programme rewards members for sustained participation beyond direct care exchanges, including events, training, surveys, and milestones. Rewards are funded by time credits redeemed at participating marketplace sellers. Configure per-seller settings and review redemption history here. The programme is optional and can be disabled without affecting core timebank functionality.",
+        "rate_label": "Per-seller exchange rate:",
+        "rate_body": "How many CHF a member saves for each hour they apply.",
+        "discount_label": "Max discount per order (%):",
+        "discount_body": "Cap on how much of the order total can be paid in time credits."
+      },
+      "stats": {
+        "total_redemptions": "Total Redemptions",
+        "hours_redeemed": "Hours Redeemed",
+        "total_chf_discount": "Total CHF Discount"
+      },
+      "settings": {
+        "title": "Per-Seller Loyalty Settings",
+        "description": "Pick a seller to configure whether they accept time credits as a discount on their listings, the exchange rate, and the max discount per order.",
+        "seller_label": "Seller (member)",
+        "seller_placeholder": "Search by name or email",
+        "no_matching_members": "No matching members",
+        "clear": "Clear",
+        "accept_time_credits": "Accept time credits",
+        "accept_time_credits_hint": "When enabled, this seller's listings show a time-credit option to members at checkout.",
+        "exchange_rate": "Exchange rate (CHF per hour)",
+        "exchange_rate_description": "How many CHF a member saves for each hour they apply.",
+        "maximum_discount": "Maximum discount per order (%)",
+        "maximum_discount_description": "Cap on how much of the order total can be paid in time credits.",
+        "save": "Save settings",
+        "view_only": "View-only users cannot change loyalty settings."
+      },
+      "ledger": {
+        "title": "Recent Redemptions",
+        "empty": "No redemptions yet. Once a merchant opts in and a member redeems credits, the ledger will appear here.",
+        "date": "Date",
+        "member": "Member",
+        "merchant": "Merchant",
+        "item": "Item",
+        "hours": "Hours",
+        "rate": "Rate",
+        "discount": "Discount",
+        "status": "Status",
+        "actions": "Actions",
+        "reverse": "Reverse",
+        "empty_value": "-"
+      },
+      "reverse_modal": {
+        "title": "Reverse redemption",
+        "body": "This will restore {{hours}} hours to {{member}}'s wallet and mark the redemption as reversed. This cannot be undone.",
+        "member_fallback": "the member",
+        "merchant": "Merchant: {{merchant}}",
+        "discount": "Discount: CHF {{discount}} on order of CHF {{total}}",
+        "redeemed": "Redeemed: {{date}}",
+        "reason": "Reason (optional)",
+        "reason_placeholder": "e.g. Refunded order, member request, error correction",
+        "cancel": "Cancel",
+        "confirm": "Confirm reversal"
+      },
+      "messages": {
+        "settings_saved": "Loyalty settings saved",
+        "reversed": "Reversed: {{hours}} hours restored to member."
+      },
+      "errors": {
+        "load_redemptions": "Failed to load redemptions",
+        "load_settings": "Failed to load seller settings",
+        "rate_positive": "CHF per hour must be greater than 0",
+        "discount_range": "Max discount percent must be between 0 and 100",
+        "save_settings": "Failed to save settings",
+        "reverse": "Failed to reverse redemption"
+      }
+    },
+    "hour_transfers": {
+      "title": "Cooperative Hour Transfers",
+      "subtitle": "When a member moves to another cooperative running NEXUS, they can transfer banked hours with them. Review outbound requests and approve only after confirming the member has registered at the destination cooperative.",
+      "tabs": {
+        "aria": "Hour transfer tabs",
+        "pending": "Pending Outbound",
+        "inbound": "Recent Inbound"
+      },
+      "pending": {
+        "title": "Awaiting your approval",
+        "empty": "No pending transfers."
+      },
+      "inbound": {
+        "title": "Received from other cooperatives (last 90 days)",
+        "empty": "No transfers received in the last 90 days."
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "reject_modal": {
+        "title": "Reject transfer",
+        "reason_label": "Reason for rejection (optional)",
+        "reason_placeholder": "Add context for the audit log"
+      },
+      "messages": {
+        "approved": "Transfer approved and delivered.",
+        "rejected": "Transfer rejected."
+      },
+      "errors": {
+        "load_pending": "Failed to load pending transfers",
+        "load_inbound": "Failed to load inbound transfers",
+        "approve": "Approval failed",
+        "reject": "Rejection failed"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "Failed to export survey responses."
+      }
+    },
+    "feedback": {
+      "title": "Municipality Feedback Inbox",
+      "subtitle": "Receive, triage, and resolve resident feedback: questions, ideas, issues, and complaints routed to the municipality or community team.",
+      "messages": {
+        "triage_saved": "Triage saved",
+        "resolved": "Marked as resolved",
+        "closed": "Closed"
+      },
+      "errors": {
+        "load": "Failed to load feedback",
+        "save_triage": "Failed to save triage",
+        "resolution_required": "Resolution notes are required",
+        "resolve": "Failed to resolve",
+        "close": "Failed to close",
+        "export": "Failed to export"
       }
     }
   }

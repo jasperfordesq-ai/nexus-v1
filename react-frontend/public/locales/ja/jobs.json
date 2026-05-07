@@ -116,7 +116,10 @@
     "delete": "Delete",
     "action_move_stage": "ステージを移動",
     "action_auto_reject": "自動拒否",
-    "action_notify_me": "通知を受け取る"
+    "action_notify_me": "通知を受け取る",
+    "generated_name": "{{stage}} to {{target}} after {{count}}d",
+    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}"
   },
   "employer": {
     "page_title": "雇用者プロフィール",
@@ -312,7 +315,8 @@
     "salary_monthly": "Monthly",
     "personal_message": "個人的なメッセージ",
     "personal_message_placeholder": "候補者へのメモ...",
-    "select_applicant": "選択{{name}}"
+    "select_applicant": "選択{{name}}",
+    "ai_score": "AI: {{score}}/100"
   },
   "apply": {
     "button": "今すぐ応募",
@@ -336,7 +340,8 @@
     "cv_too_large": "CVファイルは5MB未満でなければなりません",
     "cv_invalid_type": "PDF、DOC、またはDOCXファイルのみがサポートされています",
     "message_employer": "雇用主にメッセージを送る",
-    "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。"
+    "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。",
+    "cv_size_kb": "({{count}} KB)"
   },
   "detail": {
     "loading": "求人情報を読み込んでいます...",
@@ -404,7 +409,12 @@
     "declined": "面接が辞退されました",
     "accept": "Accept",
     "decline": "Decline",
-    "minutes": "min"
+    "minutes": "min",
+    "join_call": "Join Video Call",
+    "add_to_calendar": "Add to Calendar",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics"
   },
   "offer": {
     "title": "オファーを受け取りました！",
@@ -451,12 +461,15 @@
     "technical": "技術スキル",
     "cultural_fit": "文化的適合",
     "experience": "Experience",
-    "motivation": "Motivation"
+    "motivation": "Motivation",
+    "max_score_suffix": "/ 10"
   },
   "saved_profile": {
     "found": "保存された応募プロフィールが見つかりました",
     "use": "保存されたプロフィールを使用",
-    "start_fresh": "新たに始める"
+    "start_fresh": "新たに始める",
+    "inline_cv": "- CV: {{filename}}",
+    "cv_label": "Saved CV: {{filename}}"
   },
   "team": {
     "section": "採用チーム",
@@ -567,7 +580,9 @@
       "deadline_past": "締切は未来の日付でなければなりません",
       "salary_required": "給与範囲が必要です。「給与交渉可」をチェックして省略できます。",
       "salary_range_invalid": "最低給与は最高給与を超えることはできません"
-    }
+    },
+    "save_draft": "Save as Draft",
+    "draft_saved": "Draft saved"
   },
   "ai_generate": {
     "button": "AI生成",
@@ -627,7 +642,11 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "no_description": "No description",
-    "no_flags": "No flags"
+    "no_flags": "No flags",
+    "load_error": "Failed to load moderation queue",
+    "flags_tooltip": "Flags: {{flags}}",
+    "user_fallback": "User #{{id}}",
+    "pagination_label": "Moderation queue pages"
   },
   "spam": {
     "title": "スパム検出",
@@ -736,7 +755,10 @@
     "loading": "レポートを生成しています...",
     "no_data": "選択した期間の応募データは利用できません",
     "load_error": "バイアス監査レポートの読み込みに失敗しました",
-    "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。"
+    "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。",
+    "stages": "stages",
+    "not_available": "N/A",
+    "access_denied": "Access denied"
   },
   "self_scheduling": {
     "title": "面接スロット",
@@ -931,5 +953,7 @@
     "employer_brand": {
       "title": "雇用主ブランド"
     }
-  }
+  },
+  "page_title": "Job Vacancies",
+  "page_description": "Find job opportunities, volunteering positions, and timebank roles."
 }
