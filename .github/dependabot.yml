@@ -1,8 +1,12 @@
 version: 2
 
-# Quiet mode: keep dependency visibility without letting Dependabot flood the repo.
-# Security update PRs use GitHub's separate security-update limit; this file
-# controls routine version-update PRs only.
+# Quiet mode: routine PRs are restricted to PATCH and MINOR updates only.
+# Major-version bumps are intentionally excluded — they require dedicated
+# upgrade projects (React 19, PHP 8.5, TypeScript 6, etc.) and should never
+# arrive as routine maintenance PRs.
+#
+# Security updates use GitHub's separate security-update flow and are NOT
+# affected by these filters.
 updates:
   - package-ecosystem: composer
     directory: /
@@ -13,6 +17,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       composer-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -25,6 +32,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       root-npm-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -37,6 +47,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       react-frontend-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -49,6 +62,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       e2e-npm-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -61,6 +77,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       root-docker-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -73,6 +92,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       react-frontend-docker-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -85,6 +107,9 @@ updates:
     open-pull-requests-limit: 1
     groups:
       sales-site-docker-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
 
@@ -97,5 +122,8 @@ updates:
     open-pull-requests-limit: 1
     groups:
       github-actions-routine:
+        update-types:
+          - patch
+          - minor
         patterns:
           - "*"
