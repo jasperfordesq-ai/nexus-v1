@@ -1110,7 +1110,7 @@ class FeedService
                 $totalVotes += $count;
                 $formattedOptions[] = [
                     'id' => (int) $opt->id,
-                    'text' => $opt->option_text ?? $opt->text ?? '',
+                    'text' => $opt->label ?? $opt->option_text ?? $opt->text ?? '',
                     'vote_count' => $count,
                 ];
             }
