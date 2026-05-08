@@ -9,6 +9,15 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $moduleRows = [
             [
+                'key' => 'dashboard',
+                'title' => __('govuk_alpha.dashboard.title'),
+                'description' => __('govuk_alpha.dashboard.description'),
+                'href' => ($isAuthenticated ?? false)
+                    ? route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
+                    : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
+                'available' => $isAuthenticated ?? false,
+            ],
+            [
                 'key' => 'feed',
                 'title' => __('govuk_alpha.feed.title'),
                 'description' => __('govuk_alpha.feed.description'),
@@ -28,6 +37,47 @@
                 'description' => __('govuk_alpha.members.description'),
                 'href' => route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]),
                 'available' => $modules['members'] ?? true,
+            ],
+            [
+                'key' => 'events',
+                'title' => __('govuk_alpha.events.title'),
+                'description' => __('govuk_alpha.events.description'),
+                'href' => route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]),
+                'available' => \App\Core\TenantContext::hasFeature('events'),
+            ],
+            [
+                'key' => 'volunteering',
+                'title' => __('govuk_alpha.volunteering.title'),
+                'description' => __('govuk_alpha.volunteering.description'),
+                'href' => route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]),
+                'available' => \App\Core\TenantContext::hasFeature('volunteering'),
+            ],
+            [
+                'key' => 'messages',
+                'title' => __('govuk_alpha.messages.title'),
+                'description' => __('govuk_alpha.messages.description'),
+                'href' => ($isAuthenticated ?? false)
+                    ? route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug])
+                    : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
+                'available' => ($isAuthenticated ?? false) && \App\Services\BrokerControlConfigService::isDirectMessagingEnabled(),
+            ],
+            [
+                'key' => 'exchanges',
+                'title' => __('govuk_alpha.exchanges.title'),
+                'description' => __('govuk_alpha.exchanges.description'),
+                'href' => ($isAuthenticated ?? false)
+                    ? route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug])
+                    : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
+                'available' => ($isAuthenticated ?? false) && \App\Core\TenantContext::hasModule('listings') && \App\Services\BrokerControlConfigService::isExchangeWorkflowEnabled(),
+            ],
+            [
+                'key' => 'profile',
+                'title' => __('govuk_alpha.nav.profile'),
+                'description' => __('govuk_alpha.profile_settings.description'),
+                'href' => ($isAuthenticated ?? false)
+                    ? route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug])
+                    : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
+                'available' => $isAuthenticated ?? false,
             ],
         ];
     @endphp
