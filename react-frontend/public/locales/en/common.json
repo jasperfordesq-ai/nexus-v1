@@ -63,7 +63,8 @@
     "explore": "Explore",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "Offers & requests",
     "messages": "Your messages",
     "marketplace": "Buy & sell in your community",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "My Profile",
@@ -213,6 +215,7 @@
     "switch_to_light": "Switch to light mode",
     "switch_to_dark": "Switch to dark mode",
     "skip_to_content": "Skip to main content",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab",
     "menu_opened": "Navigation menu opened",
     "close": "Close",
     "scroll_to_top": "Scroll to top",

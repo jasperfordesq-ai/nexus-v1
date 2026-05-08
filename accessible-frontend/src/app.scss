@@ -56,6 +56,8 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 .nexus-alpha-header__container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: govuk-spacing(3);
   padding-top: govuk-spacing(3);
   padding-bottom: govuk-spacing(3);
 }
@@ -73,6 +75,38 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 .nexus-alpha-header__service {
   color: govuk-colour("white");
+}
+
+.nexus-alpha-header__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(3);
+  justify-content: flex-end;
+}
+
+.nexus-alpha-header__link,
+.nexus-alpha-header__link:visited {
+  color: govuk-colour("white");
+  font-weight: 700;
+}
+
+.nexus-alpha-header__link:hover {
+  color: govuk-colour("black", $variant: "tint-95");
+}
+
+.nexus-alpha-header__link:focus {
+  color: govuk-colour("black");
+}
+
+@include govuk-media-query($until: tablet) {
+  .nexus-alpha-header__container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nexus-alpha-header__links {
+    justify-content: flex-start;
+  }
 }
 
 .nexus-alpha-card-list {
@@ -161,6 +195,21 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 .nexus-alpha-inline-list dt::after {
   content: ": ";
+}
+
+.nexus-alpha-comments-list {
+  margin-bottom: govuk-spacing(4);
+}
+
+.nexus-alpha-comments-list--nested {
+  margin-top: govuk-spacing(2);
+  margin-left: govuk-spacing(4);
+  padding-left: govuk-spacing(3);
+  border-left: 4px solid $govuk-border-colour;
+}
+
+.nexus-alpha-comment {
+  margin-bottom: govuk-spacing(3);
 }
 
 @include govuk-media-query($until: tablet) {

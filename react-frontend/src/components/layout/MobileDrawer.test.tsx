@@ -61,6 +61,7 @@ const i18nMap: Record<string, string> = {
   'nav.partner_with_us': 'Partner With Us', 'nav.impact_report': 'Impact Report',
   'nav.organisations': 'Organisations', 'nav.partner_communities': 'Partner Communities',
   'nav.group_exchanges': 'Group Exchanges',
+  'nav.accessibility_alpha': 'Accessibility (alpha)',
   'nav.federation_hub': 'Federation Hub', 'nav.federated_members': 'Federated Members',
   'nav.federated_listings': 'Federated Listings', 'nav.federated_messages': 'Federated Messages',
   'nav.federated_events': 'Federated Events',
@@ -76,6 +77,7 @@ const i18nMap: Record<string, string> = {
   'sections.federation': 'Federation', 'sections.partner_communities': 'Partner Communities',
   'sections.account': 'Account',
   'accessibility.close_menu': 'Close menu',
+  'accessibility.accessibility_alpha_new_tab': 'Open Accessibility (alpha) in a new tab',
   'aria.open_search': 'Open search',
   'aria.mobile_navigation': 'Mobile navigation',
   'aria.main_navigation': 'Main navigation',
@@ -235,6 +237,20 @@ describe('MobileDrawer', () => {
       // Help Center is shown only for authenticated users
       render(<MobileDrawer {...defaultProps} />);
       expect(screen.getByText('Contact')).toBeInTheDocument();
+    });
+
+    it('renders a tenant-aware accessible frontend link in the mobile utility row', () => {
+      setupDefaultMocks({
+        tenant: {
+          tenant: { id: 2, name: 'hOUR Timebank', slug: 'hour-timebank' },
+        },
+      });
+      render(<MobileDrawer {...defaultProps} />);
+      const link = screen.getByRole('link', { name: 'Open Accessibility (alpha) in a new tab' });
+      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/alpha');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(screen.getByText('Accessibility (alpha)')).toBeInTheDocument();
     });
 
     it('renders Legal section', () => {

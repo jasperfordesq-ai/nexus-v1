@@ -21,6 +21,18 @@
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
                 {{ !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name') }}
             </a>
+            @if (!empty($tenantSlug))
+                <nav class="nexus-alpha-header__links" aria-label="{{ __('govuk_alpha.header.links_label') }}">
+                    @if ($isAuthenticated ?? false)
+                        <a class="nexus-alpha-header__link" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'profile') aria-current="page" @endif>
+                            {{ __('govuk_alpha.nav.profile') }}
+                        </a>
+                    @endif
+                    <a class="nexus-alpha-header__link" href="{{ $mainSiteUrl ?? '/' }}">
+                        {{ __('govuk_alpha.header.back_to_main_site') }}
+                    </a>
+                </nav>
+            @endif
         </div>
     </header>
 
@@ -44,17 +56,7 @@
                                     </a>
                                 </li>
                             @endforeach
-                            @if ($isAuthenticated ?? false)
-                                <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'profile' ? 'govuk-service-navigation__item--active' : '' }}">
-                                    <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'profile') aria-current="page" @endif>
-                                        @if (($activeNav ?? '') === 'profile')
-                                            <strong class="govuk-service-navigation__active-fallback">{{ __('govuk_alpha.nav.profile') }}</strong>
-                                        @else
-                                            {{ __('govuk_alpha.nav.profile') }}
-                                        @endif
-                                    </a>
-                                </li>
-                            @else
+                            @if (!($isAuthenticated ?? false))
                                 <li class="govuk-service-navigation__item {{ ($activeNav ?? '') === 'login' ? 'govuk-service-navigation__item--active' : '' }}">
                                     <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'login') aria-current="page" @endif>
                                         @if (($activeNav ?? '') === 'login')
@@ -86,7 +88,7 @@
             <p class="govuk-phase-banner__content">
                 <strong class="govuk-tag govuk-phase-banner__content__tag">{{ __('govuk_alpha.phase') }}</strong>
                 <span class="govuk-phase-banner__text">
-                    <a class="govuk-link" href="{{ __('govuk_alpha.feedback_url') }}">{{ __('govuk_alpha.feedback') }}</a>
+                    <a class="govuk-link" href="{{ $feedbackUrl ?? __('govuk_alpha.feedback_url') }}">{{ __('govuk_alpha.feedback') }}</a>
                 </span>
             </p>
         </div>
@@ -97,6 +99,18 @@
 
     <footer class="nexus-alpha-footer" role="contentinfo">
         <div class="govuk-width-container govuk-!-padding-top-6 govuk-!-padding-bottom-6">
+            @if (!empty($alphaFooterLinks))
+                <nav class="nexus-alpha-footer__links" aria-label="{{ __('govuk_alpha.footer.links_label') }}">
+                    <h2 class="govuk-heading-s">{{ __('govuk_alpha.footer.links_heading') }}</h2>
+                    <ul class="govuk-list">
+                        @foreach ($alphaFooterLinks as $key => $href)
+                            <li>
+                                <a class="govuk-link" href="{{ $href }}">{{ __('govuk_alpha.footer.links.' . $key) }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </nav>
+            @endif
             <p class="govuk-body-s">{{ __('govuk_alpha.footer.licence') }}</p>
             <p class="govuk-body-s">{{ __('govuk_alpha.footer.attribution') }}</p>
             <p class="govuk-body-s">

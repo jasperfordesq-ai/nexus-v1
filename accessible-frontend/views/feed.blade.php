@@ -9,9 +9,12 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
+        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created'];
+        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed'];
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
+        $commentableTypes = ['post', 'listing', 'event', 'goal', 'poll', 'review', 'volunteer', 'challenge', 'job', 'blog', 'discussion', 'resource'];
         $feedItemType = fn (?string $type): string => match ($type) {
             'listing' => 'govuk-tag--blue',
             'event' => 'govuk-tag--green',
@@ -22,6 +25,13 @@
         $feedItemTypeLabel = fn (?string $type): string => \Illuminate\Support\Facades\Lang::has('govuk_alpha.feed.item_types.' . ($type ?: 'post'))
             ? __('govuk_alpha.feed.item_types.' . ($type ?: 'post'))
             : __('govuk_alpha.feed.item_types.activity');
+        $preservedFeedInputs = array_filter([
+            'type' => $selectedType,
+            'mode' => $selectedMode,
+            'subtype' => $selectedSubtype,
+            'per_page' => $meta['per_page'] ?? null,
+            'cursor' => request()->query('cursor'),
+        ], fn ($value) => $value !== null && $value !== '');
         $nextFeedUrl = !empty($meta['cursor'])
             ? route('govuk-alpha.feed', array_filter([
                 'tenantSlug' => $tenantSlug,
@@ -54,13 +64,13 @@
         </div>
     @endif
 
-    @if ($status === 'post-created')
+    @if (in_array($status, $successStatuses, true))
         <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="post-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="post-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.post_created') }}</p>
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
             </div>
         </div>
     @elseif ($status === 'post-empty')
@@ -91,6 +101,15 @@
                         <li><a href="#content">{{ __('govuk_alpha.states.post_failed') }}</a></li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    @elseif (in_array($status, $errorStatuses, true))
+        <div class="govuk-notification-banner" role="region" aria-labelledby="feed-action-error-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="feed-action-error-title">{{ __('govuk_alpha.states.error_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
             </div>
         </div>
     @endif
@@ -183,14 +202,20 @@
             @foreach ($items as $item)
                 @php
                     $itemType = $item['type'] ?? 'post';
+                    $itemId = (int) ($item['id'] ?? 0);
                     $itemTitle = $item['title'] ?? $feedItemTypeLabel($itemType);
                     $authorName = $item['author']['name'] ?? $item['author_name'] ?? __('govuk_alpha.feed.unknown_author');
                     $createdAt = !empty($item['created_at']) ? \Illuminate\Support\Carbon::parse($item['created_at']) : null;
+                    $comments = $commentsByTarget[$itemType][$itemId] ?? [];
+                    $commentCount = (int) ($item['comments_count'] ?? 0);
+                    $likeCount = (int) ($item['likes_count'] ?? 0);
+                    $isLiked = (bool) ($item['is_liked'] ?? false);
+                    $isCommentable = in_array($itemType, $commentableTypes, true);
                     $detailUrl = ($itemType === 'listing' && !empty($item['id']))
                         ? route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $item['id']])
                         : null;
                 @endphp
-                <article class="nexus-alpha-card">
+                <article class="nexus-alpha-card" id="feed-item-{{ preg_replace('/[^a-z0-9_-]/i', '-', $itemType) }}-{{ $itemId }}">
                     <div class="nexus-alpha-feed-row">
                         <div>
                             <strong class="govuk-tag {{ $feedItemType($itemType) }}">{{ $feedItemTypeLabel($itemType) }}</strong>
@@ -217,10 +242,51 @@
                         <p class="govuk-body">{{ $item['content'] }}</p>
                     @endif
                     <p class="govuk-body-s nexus-alpha-meta">
-                        {{ trans_choice('govuk_alpha.feed.likes', (int) ($item['likes_count'] ?? 0), ['count' => (int) ($item['likes_count'] ?? 0)]) }}
+                        {{ trans_choice('govuk_alpha.feed.likes', $likeCount, ['count' => $likeCount]) }}
                         ·
-                        {{ trans_choice('govuk_alpha.feed.comments', (int) ($item['comments_count'] ?? 0), ['count' => (int) ($item['comments_count'] ?? 0)]) }}
+                        {{ trans_choice('govuk_alpha.feed.comments', $commentCount, ['count' => $commentCount]) }}
                     </p>
+                    @if (!$requiresAuth)
+                        <div class="nexus-alpha-actions govuk-!-margin-bottom-3">
+                            <form method="post" action="{{ route('govuk-alpha.feed.items.like', ['tenantSlug' => $tenantSlug, 'type' => $itemType, 'id' => $itemId]) }}">
+                                @csrf
+                                @foreach ($preservedFeedInputs as $name => $value)
+                                    <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                                @endforeach
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                                    {{ $isLiked ? __('govuk_alpha.actions.unlike') : __('govuk_alpha.actions.like') }}
+                                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.feed.action_for', ['title' => $itemTitle]) }}</span>
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                    @if ($isCommentable)
+                        <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details" @if (($status ?? '') === 'comment-created') open @endif>
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">{{ __('govuk_alpha.feed.comments_summary') }}</span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                @if (!empty($comments))
+                                    @include('accessible-frontend::partials.feed-comments', ['comments' => $comments, 'depth' => 0])
+                                @else
+                                    <p class="govuk-body">{{ __('govuk_alpha.feed.no_comments') }}</p>
+                                @endif
+                                @if (!$requiresAuth)
+                                    <form method="post" action="{{ route('govuk-alpha.feed.items.comments.store', ['tenantSlug' => $tenantSlug, 'type' => $itemType, 'id' => $itemId]) }}">
+                                        @csrf
+                                        @foreach ($preservedFeedInputs as $name => $value)
+                                            <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                                        @endforeach
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="comment-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.comment_label') }}</label>
+                                            <textarea class="govuk-textarea" id="comment-{{ $itemType }}-{{ $itemId }}" name="content" rows="3"></textarea>
+                                        </div>
+                                        <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.comment') }}</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </details>
+                    @endif
                 </article>
             @endforeach
         </div>

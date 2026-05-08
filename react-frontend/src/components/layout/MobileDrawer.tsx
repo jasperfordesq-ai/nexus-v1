@@ -66,6 +66,8 @@ import Moon from 'lucide-react/icons/moon';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
+import Accessibility from 'lucide-react/icons/accessibility';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -73,6 +75,7 @@ import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import type { TenantFeatures, TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
@@ -150,6 +153,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { resolvedTheme, toggleTheme } = useTheme();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
   const year = new Date().getFullYear();
+  const accessibleFrontendUrl = buildAccessibleFrontendUrl(tenant?.slug);
 
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
@@ -554,6 +558,20 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     <FlaskConical className="w-4 h-4" aria-hidden="true" />
                     {t('dev_banner.dev_notice', 'Dev Notice')}
                   </Button>
+                  {accessibleFrontendUrl && (
+                    <a
+                      href={accessibleFrontendUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center rounded-small text-theme-muted hover:text-theme-primary hover:bg-default/40 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                      aria-label={t('accessibility.accessibility_alpha_new_tab')}
+                      onClick={onClose}
+                    >
+                      <Accessibility className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{t('nav.accessibility_alpha')}</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    </a>
+                  )}
                   {!isAuthenticated && (
                     <Button
                       variant="light"

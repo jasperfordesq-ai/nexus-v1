@@ -16,7 +16,16 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_events') }}</a>
 
-    @if ($status === 'rsvp-updated')
+    @if ($status === 'event-created')
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="event-created-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="event-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.created') }}</p>
+            </div>
+        </div>
+    @elseif ($status === 'rsvp-updated')
         <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="rsvp-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="rsvp-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>

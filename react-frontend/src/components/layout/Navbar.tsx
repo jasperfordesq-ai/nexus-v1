@@ -66,9 +66,12 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Crown from 'lucide-react/icons/crown';
+import Accessibility from 'lucide-react/icons/accessibility';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
@@ -394,6 +397,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     ...leftSections.flatMap(s => s.items.map(i => i.href)),
     ...rightSections.flatMap(s => s.items.map(i => i.href)),
   ], [leftSections, rightSections]);
+  const accessibleFrontendUrl = useMemo(
+    () => buildAccessibleFrontendUrl(tenant?.slug),
+    [tenant?.slug],
+  );
 
   return (
     <>
@@ -489,6 +496,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </>
               )}
               {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}
+              {accessibleFrontendUrl && (
+                <a
+                  href={accessibleFrontendUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-small text-theme-muted hover:text-theme-primary hover:bg-default/40 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                  aria-label={t('accessibility.accessibility_alpha_new_tab')}
+                >
+                  <Accessibility className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <span className="hidden md:inline">{t('nav.accessibility_alpha')}</span>
+                  <ExternalLink className="hidden lg:block w-3 h-3 shrink-0" aria-hidden="true" />
+                </a>
+              )}
               <LanguageSwitcher />
               <Button
                 isIconOnly

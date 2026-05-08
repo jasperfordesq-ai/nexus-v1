@@ -31,11 +31,14 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.tenant_chooser.title'));
         $response->assertSee($this->testTenantSlug);
         $response->assertSee("/{$this->testTenantSlug}/alpha", false);
+        $response->assertSee('href="' . __('govuk_alpha.feedback_url') . '"', false);
         $response->assertSee('AGPL-3.0-or-later');
     }
 
     public function test_home_login_and_register_pages_render_for_tenant(): void
     {
+        $feedbackUrl = route('govuk-alpha.contact', ['tenantSlug' => $this->testTenantSlug]);
+
         foreach (['/alpha', '/alpha/login', '/alpha/register'] as $path) {
             $response = $this->get("/{$this->testTenantSlug}{$path}");
 
@@ -44,8 +47,122 @@ class GovukAlphaFrontendTest extends TestCase
             $response->assertSee('Project NEXUS Accessible');
             $response->assertSee('class="govuk-skip-link"', false);
             $response->assertSee('class="govuk-phase-banner"', false);
+            $response->assertSee('href="' . $feedbackUrl . '"', false);
             $response->assertSee('AGPL-3.0-or-later');
         }
+    }
+
+    public function test_contact_page_renders_govuk_alpha_form_and_feedback_link_targets_it(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/contact");
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/html; charset=UTF-8');
+        $response->assertSee(__('govuk_alpha.contact.title'));
+        $response->assertSee('class="govuk-fieldset"', false);
+        $response->assertSee('name="name"', false);
+        $response->assertSee('name="email"', false);
+        $response->assertSee('name="subject"', false);
+        $response->assertSee('name="message"', false);
+        $response->assertSee('href="' . route('govuk-alpha.contact', ['tenantSlug' => $this->testTenantSlug]) . '"', false);
+        $response->assertSee('AGPL-3.0-or-later');
+    }
+
+    public function test_contact_link_is_in_accessible_footer_links_not_service_navigation(): void
+    {
+        $contactUrl = route('govuk-alpha.contact', ['tenantSlug' => $this->testTenantSlug]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha");
+
+        $response->assertOk();
+        $response->assertSee('<nav class="nexus-alpha-footer__links"', false);
+        $response->assertSee('<a class="govuk-link" href="' . $contactUrl . '">' . __('govuk_alpha.footer.links.contact') . '</a>', false);
+        $response->assertDontSee(__('govuk_alpha.footer.links.logout'));
+        $response->assertDontSee('<a class="govuk-service-navigation__link" href="' . $contactUrl . '"', false);
+    }
+
+    public function test_accessible_header_hides_home_navigation_link_for_signed_in_users(): void
+    {
+        $homeUrl = route('govuk-alpha.home', ['tenantSlug' => $this->testTenantSlug]);
+
+        $guest = $this->get("/{$this->testTenantSlug}/alpha");
+
+        $guest->assertOk();
+        $guest->assertSee('<a class="govuk-service-navigation__link" href="' . $homeUrl . '"', false);
+
+        $this->authenticatedUser();
+
+        $signedIn = $this->get("/{$this->testTenantSlug}/alpha/feed");
+
+        $signedIn->assertOk();
+        $signedIn->assertDontSee('<a class="govuk-service-navigation__link" href="' . $homeUrl . '"', false);
+        $signedIn->assertSee(__('govuk_alpha.nav.dashboard'));
+    }
+
+    public function test_logout_link_is_in_accessible_footer_for_signed_in_users(): void
+    {
+        $this->authenticatedUser();
+
+        $logoutUrl = route('govuk-alpha.logout', ['tenantSlug' => $this->testTenantSlug]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha");
+
+        $response->assertOk();
+        $response->assertSee('<nav class="nexus-alpha-footer__links"', false);
+        $response->assertSee('<a class="govuk-link" href="' . $logoutUrl . '">' . __('govuk_alpha.footer.links.logout') . '</a>', false);
+
+        $logout = $this->get("/{$this->testTenantSlug}/alpha/logout");
+
+        $logout->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=signed-out");
+    }
+
+    public function test_contact_page_preserves_react_contact_validation_contract(): void
+    {
+        $redirect = $this->post("/{$this->testTenantSlug}/alpha/contact", [
+            'name' => '',
+            'email' => 'not-an-email',
+            'subject' => '',
+            'message' => '',
+        ]);
+
+        $redirect->assertRedirect("/{$this->testTenantSlug}/alpha/contact?status=contact-validation");
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/contact?status=contact-validation");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.error_title'));
+        $response->assertSee('class="govuk-error-summary"', false);
+        $response->assertSee('href="#name"', false);
+        $response->assertSee('href="#email"', false);
+        $response->assertSee('href="#message"', false);
+    }
+
+    public function test_contact_page_submits_to_same_v2_contact_contract_as_react_page(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['contact_email' => 'support@example.test']);
+        TenantContext::setById($this->testTenantId);
+
+        $redirect = $this->post("/{$this->testTenantSlug}/alpha/contact", [
+            'name' => 'Accessible Contact User',
+            'email' => 'accessible-contact@example.test',
+            'subject' => '',
+            'message' => 'This came from the accessible frontend contact page.',
+        ]);
+
+        $redirect->assertRedirect("/{$this->testTenantSlug}/alpha/contact?status=contact-sent");
+        $this->assertDatabaseHas('contact_submissions', [
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Accessible Contact User',
+            'email' => 'accessible-contact@example.test',
+            'subject' => 'General Inquiry',
+            'message' => 'This came from the accessible frontend contact page.',
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/contact?status=contact-sent");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.contact.success_title'));
+        $response->assertSee(__('govuk_alpha.contact.success_message'));
     }
 
     public function test_accessible_login_persists_token_cookie_for_server_rendered_pages(): void
@@ -165,6 +282,90 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.states.post_created'));
         $response->assertSee('govuk-notification-banner--success', false);
+    }
+
+    public function test_accessible_feed_likes_sync_with_v2_social_feed(): void
+    {
+        $user = $this->authenticatedUser();
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'content' => 'Accessible like sync post',
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'post',
+            'source_id' => $post->id,
+            'user_id' => $user->id,
+            'content' => 'Accessible like sync post',
+        ]);
+
+        $like = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/like", [
+            'type' => 'posts',
+            'mode' => 'ranking',
+        ]);
+
+        $like->assertRedirectContains("status=like-added");
+        $this->assertDatabaseHas('likes', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $post->id,
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/feed?type=posts");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.actions.unlike'));
+        $page->assertSee(trans_choice('govuk_alpha.feed.likes', 1, ['count' => 1]));
+
+        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false');
+        $api->assertOk();
+        $apiItems = $api->json('data');
+        $apiPost = collect($apiItems)->firstWhere('id', $post->id);
+        $this->assertSame(1, (int) ($apiPost['likes_count'] ?? 0));
+        $this->assertTrue((bool) ($apiPost['is_liked'] ?? false));
+    }
+
+    public function test_accessible_feed_comments_sync_with_v2_social_feed(): void
+    {
+        $user = $this->authenticatedUser();
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'content' => 'Accessible comment sync post',
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'post',
+            'source_id' => $post->id,
+            'user_id' => $user->id,
+            'content' => 'Accessible comment sync post',
+        ]);
+
+        $comment = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/comments", [
+            'type' => 'posts',
+            'mode' => 'ranking',
+            'content' => 'Accessible frontend comment synced to social module.',
+        ]);
+
+        $comment->assertRedirectContains("status=comment-created");
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $post->id,
+            'content' => 'Accessible frontend comment synced to social module.',
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/feed?type=posts");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.feed.comments_summary'));
+        $page->assertSee('Accessible frontend comment synced to social module.');
+        $page->assertSee(trans_choice('govuk_alpha.feed.comments', 1, ['count' => 1]));
+
+        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false');
+        $api->assertOk();
+        $apiItems = $api->json('data');
+        $apiPost = collect($apiItems)->firstWhere('id', $post->id);
+        $this->assertSame(1, (int) ($apiPost['comments_count'] ?? 0));
     }
 
     public function test_feed_page_keeps_tenant_items_isolated(): void
@@ -478,8 +679,49 @@ class GovukAlphaFrontendTest extends TestCase
         $index->assertSee('class="govuk-fieldset"', false);
         $index->assertSee('type="search"', false);
         $index->assertSee('class="govuk-select"', false);
+        $index->assertSee(__('govuk_alpha.actions.create_event'));
+        $index->assertSee(route('govuk-alpha.events.create', ['tenantSlug' => $this->testTenantSlug]), false);
         $index->assertSee('Alpha event verification');
         $index->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+
+        $createForm = $this->get("/{$this->testTenantSlug}/alpha/events/new");
+
+        $createForm->assertOk();
+        $createForm->assertSee(__('govuk_alpha.events.create_title'));
+        $createForm->assertSee('name="title"', false);
+        $createForm->assertSee('type="datetime-local"', false);
+        $createForm->assertSee('name="max_attendees"', false);
+
+        $create = $this->post("/{$this->testTenantSlug}/alpha/events/new", [
+            'title' => 'Alpha created event',
+            'description' => 'Created through the accessible alpha event form.',
+            'start_time' => now()->addDays(10)->format('Y-m-d\TH:i'),
+            'end_time' => now()->addDays(10)->addHours(2)->format('Y-m-d\TH:i'),
+            'location' => 'Accessible Hall',
+            'max_attendees' => 20,
+        ]);
+
+        $createdEventId = DB::table('events')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('title', 'Alpha created event')
+            ->value('id');
+
+        $this->assertNotNull($createdEventId);
+        $create->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$createdEventId}?status=event-created");
+        $this->assertDatabaseHas('events', [
+            'id' => $createdEventId,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Alpha created event',
+            'location' => 'Accessible Hall',
+            'max_attendees' => 20,
+        ]);
+
+        $createdDetail = $this->get("/{$this->testTenantSlug}/alpha/events/{$createdEventId}?status=event-created");
+
+        $createdDetail->assertOk();
+        $createdDetail->assertSee(__('govuk_alpha.events.created'));
+        $createdDetail->assertSee('Alpha created event');
 
         $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
 
@@ -721,9 +963,13 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
 
         $profile = $this->get("/{$this->testTenantSlug}/alpha/profile");
+        $profileUrl = route('govuk-alpha.profile.me', ['tenantSlug' => $this->testTenantSlug]);
 
         $profile->assertOk();
         $profile->assertSee(__('govuk_alpha.nav.profile'));
+        $profile->assertSee('class="nexus-alpha-header__link" href="' . $profileUrl . '"', false);
+        $profile->assertDontSee('class="govuk-service-navigation__link" href="' . $profileUrl . '"', false);
+        $profile->assertSee(__('govuk_alpha.header.back_to_main_site'));
         $profile->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
 
         $dashboard = $this->get("/{$this->testTenantSlug}/alpha/dashboard");

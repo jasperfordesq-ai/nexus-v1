@@ -8,8 +8,10 @@ namespace App\Http\Controllers\GovukAlpha;
 
 use App\Core\TenantContext;
 use App\Core\Validator;
+use App\Http\Controllers\Api\CoreController;
 use App\Models\Category;
 use App\Services\BrokerControlConfigService;
+use App\Services\CommentService;
 use App\Services\EventService;
 use App\Services\ExchangeService;
 use App\Services\ExchangeWorkflowService;
@@ -19,19 +21,30 @@ use App\Services\MessageService;
 use App\Services\OnboardingConfigService;
 use App\Services\RegistrationService;
 use App\Services\SearchService;
+use App\Services\SocialNotificationService;
 use App\Services\TokenService;
 use App\Services\UserService;
 use App\Services\VolunteerService;
+use App\Support\FeedItemTables;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AlphaController extends Controller
 {
+    private const VALID_FEED_LIKE_TARGETS = [
+        'post', 'listing', 'event', 'poll', 'goal',
+        'resource', 'volunteer', 'volunteering', 'review', 'challenge', 'comment',
+        'job', 'blog', 'discussion',
+    ];
+
     public function __construct(
         private readonly FeedService $feedService,
         private readonly ListingService $listingService,
@@ -75,6 +88,11 @@ class AlphaController extends Controller
     public function hostRegister(): RedirectResponse
     {
         return $this->redirectHostTenantRoute('govuk-alpha.register');
+    }
+
+    public function hostContact(): RedirectResponse
+    {
+        return $this->redirectHostTenantRoute('govuk-alpha.contact');
     }
 
     public function home(Request $request, string $tenantSlug): Response
@@ -154,6 +172,24 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+    }
+
+    public function logout(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            unset($_SESSION['user_id']);
+        }
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'signed-out'])
+            ->withCookie(cookie()->forget('auth_token', '/'));
     }
 
     public function register(Request $request, string $tenantSlug): Response
@@ -237,6 +273,87 @@ class AlphaController extends Controller
         ]);
     }
 
+    public function contact(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $user = null;
+        $userId = $this->currentUserId();
+        if ($userId !== null) {
+            $user = DB::table('users')
+                ->select('name', 'first_name', 'last_name', 'email')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->first();
+        }
+
+        return $this->view('accessible-frontend::contact', [
+            'title' => __('govuk_alpha.contact.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'contact',
+            'status' => $request->query('status'),
+            'contactUser' => $user ? (array) $user : null,
+        ]);
+    }
+
+    public function storeContact(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $name = trim((string) $request->input('name', ''));
+        $email = trim((string) $request->input('email', ''));
+        $message = trim((string) $request->input('message', ''));
+
+        $errors = [];
+        if ($name === '') {
+            $errors['name'] = __('govuk_alpha.contact.errors.name_required');
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = __('govuk_alpha.contact.errors.email_required');
+        }
+        if ($message === '') {
+            $errors['message'] = __('govuk_alpha.contact.errors.message_required');
+        }
+
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-validation'])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        $request->merge([
+            'name' => $name,
+            'email' => $email,
+            'subject' => trim((string) $request->input('subject', '')) ?: 'General Inquiry',
+            'message' => $message,
+        ]);
+
+        try {
+            $response = app(CoreController::class)->apiSubmit();
+        } catch (HttpResponseException $e) {
+            $status = $e->getResponse()->getStatusCode() === 429 ? 'contact-rate-limited' : 'contact-failed';
+
+            return redirect()
+                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => $status])
+                ->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-failed'])
+                ->withInput();
+        }
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            return redirect()->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-sent']);
+        }
+
+        return redirect()
+            ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-failed'])
+            ->withInput();
+    }
+
     public function events(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);
@@ -311,6 +428,75 @@ class AlphaController extends Controller
             'requiresAuth' => $this->currentUserId() === null,
             'status' => request()->query('status'),
         ]);
+    }
+
+    public function createEvent(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::event-create', [
+            'title' => __('govuk_alpha.events.create_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'categories' => $this->categoriesForTypes(['events', 'event']),
+            'status' => $request->query('status') ?: session('status'),
+        ]);
+    }
+
+    public function storeEvent(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            $event = EventService::create($userId, $this->eventInput($request));
+            $eventId = (int) $event->id;
+
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_event'], 'create_event', __('govuk_alpha.events.gamification_reason'));
+            } catch (\Throwable $e) {
+                Log::warning('Accessible event XP award failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
+
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    TenantContext::getId(),
+                    $userId,
+                    'event',
+                    $eventId,
+                    [
+                        'title' => $event->title,
+                        'content' => $event->description,
+                        'image_url' => $event->image_url,
+                        'group_id' => $event->group_id,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Accessible event feed activity failed', ['event_id' => $eventId, 'error' => $e->getMessage()]);
+            }
+        } catch (ValidationException) {
+            return redirect()
+                ->route('govuk-alpha.events.create', ['tenantSlug' => $tenantSlug, 'status' => 'event-create-failed'])
+                ->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.events.create', ['tenantSlug' => $tenantSlug, 'status' => 'event-create-failed'])
+                ->withInput();
+        }
+
+        return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $eventId, 'status' => 'event-created']);
     }
 
     public function storeEventRsvp(Request $request, string $tenantSlug, int $id): RedirectResponse
@@ -540,6 +726,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'feed',
             'items' => $items,
+            'commentsByTarget' => $this->commentsForFeedItems($items, $userId),
             'meta' => $meta,
             'selectedType' => $type,
             'selectedMode' => $mode,
@@ -577,6 +764,192 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-created']);
+    }
+
+    public function storeFeedLike(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', $type, $id);
+        }
+
+        $targetType = $this->normalizeFeedTargetType($type);
+        if (!in_array($targetType, self::VALID_FEED_LIKE_TARGETS, true) || !FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'like-failed', $targetType, $id);
+        }
+
+        try {
+            $result = $this->toggleFeedItemLike($targetType, $id, $userId);
+            return $this->redirectToFeed($request, $tenantSlug, $result['liked'] ? 'like-added' : 'like-removed', $targetType, $id);
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->redirectToFeed($request, $tenantSlug, 'like-failed', $targetType, $id);
+        }
+    }
+
+    public function storeFeedComment(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', $type, $id);
+        }
+
+        $targetType = $this->normalizeFeedTargetType($type);
+        $content = trim((string) $request->input('content', ''));
+
+        if ($content === '') {
+            return $this->redirectToFeed($request, $tenantSlug, 'comment-empty', $targetType, $id);
+        }
+
+        if (mb_strlen($content) > 10000) {
+            return $this->redirectToFeed($request, $tenantSlug, 'comment-too-long', $targetType, $id);
+        }
+
+        if (!FeedItemTables::isCommentable($targetType) || !FeedItemTables::canView($targetType, $id, $userId)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'comment-failed', $targetType, $id);
+        }
+
+        try {
+            CommentService::create($targetType, $id, $userId, TenantContext::getId(), [
+                'content' => $content,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->redirectToFeed($request, $tenantSlug, 'comment-failed', $targetType, $id);
+        }
+
+        return $this->redirectToFeed($request, $tenantSlug, 'comment-created', $targetType, $id);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $items
+     * @return array<string, array<int, array<int, array<string, mixed>>>>
+     */
+    private function commentsForFeedItems(array $items, ?int $userId): array
+    {
+        if ($userId === null) {
+            return [];
+        }
+
+        $commentsByTarget = [];
+        foreach ($items as $item) {
+            $targetType = $this->normalizeFeedTargetType((string) ($item['type'] ?? ''));
+            $targetId = (int) ($item['id'] ?? 0);
+            if ($targetId <= 0 || !FeedItemTables::isCommentable($targetType)) {
+                continue;
+            }
+
+            try {
+                $commentsByTarget[$targetType][$targetId] = CommentService::getForEntity($targetType, $targetId, $userId);
+            } catch (\Throwable $e) {
+                report($e);
+                $commentsByTarget[$targetType][$targetId] = [];
+            }
+        }
+
+        return $commentsByTarget;
+    }
+
+    /**
+     * @return array{liked: bool, likes_count: int}
+     */
+    private function toggleFeedItemLike(string $targetType, int $targetId, int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $existing = DB::table('likes')
+            ->where('user_id', $userId)
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if ($existing) {
+            DB::table('likes')
+                ->where('id', $existing->id)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            if ($targetType === 'post') {
+                DB::table('feed_posts')
+                    ->where('id', $targetId)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['likes_count' => DB::raw('GREATEST(likes_count - 1, 0)')]);
+            }
+
+            $liked = false;
+        } else {
+            $affected = DB::affectingStatement(
+                'INSERT IGNORE INTO likes (user_id, target_type, target_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                [$userId, $targetType, $targetId, $tenantId]
+            );
+
+            if ($affected > 0 && $targetType === 'post') {
+                $updated = DB::table('feed_posts')
+                    ->where('id', $targetId)
+                    ->where('tenant_id', $tenantId)
+                    ->increment('likes_count');
+
+                if ($updated === 0) {
+                    DB::table('likes')
+                        ->where('user_id', $userId)
+                        ->where('target_type', $targetType)
+                        ->where('target_id', $targetId)
+                        ->where('tenant_id', $tenantId)
+                        ->delete();
+                }
+            }
+
+            $liked = true;
+
+            try {
+                $contentOwnerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+                if ($contentOwnerId && $contentOwnerId !== $userId) {
+                    SocialNotificationService::notifyLike(
+                        $contentOwnerId,
+                        $userId,
+                        $targetType,
+                        $targetId,
+                        SocialNotificationService::getContentPreview($targetType, $targetId)
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('AlphaController::toggleFeedItemLike notification failed', ['error' => $e->getMessage()]);
+            }
+        }
+
+        $count = (int) DB::table('likes')
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        return ['liked' => $liked, 'likes_count' => $count];
+    }
+
+    private function normalizeFeedTargetType(string $targetType): string
+    {
+        return $targetType === 'volunteering' ? 'volunteer' : $targetType;
+    }
+
+    private function redirectToFeed(Request $request, string $tenantSlug, string $status, ?string $targetType = null, ?int $targetId = null): RedirectResponse
+    {
+        $query = ['tenantSlug' => $tenantSlug, 'status' => $status];
+        foreach (['type', 'mode', 'subtype', 'per_page', 'cursor'] as $key) {
+            $value = $request->input($key, $request->query($key));
+            if ($value !== null && $value !== '') {
+                $query[$key] = $value;
+            }
+        }
+
+        $url = route('govuk-alpha.feed', $query);
+        if ($targetType !== null && $targetId !== null) {
+            $url .= '#feed-item-' . preg_replace('/[^a-z0-9_-]/i', '-', $targetType) . '-' . $targetId;
+        }
+
+        return redirect()->to($url);
     }
 
     public function listings(Request $request, string $tenantSlug): Response
@@ -1113,7 +1486,41 @@ class AlphaController extends Controller
             'tenant' => TenantContext::get(),
             'isAuthenticated' => $this->currentUserId() !== null,
             'alphaNavItems' => $this->alphaNavItems(),
+            'alphaFooterLinks' => $this->alphaFooterLinks(),
+            'feedbackUrl' => $this->feedbackUrl(),
+            'mainSiteUrl' => $this->mainSiteUrl(),
         ];
+    }
+
+    private function mainSiteUrl(): string
+    {
+        $tenant = TenantContext::get();
+        $tenantSlug = (string) ($tenant['slug'] ?? '');
+        $frontendUrl = rtrim(TenantContext::getFrontendUrl(), '/');
+
+        if ($tenantSlug === '') {
+            return $frontendUrl;
+        }
+
+        $host = strtolower((string) parse_url($frontendUrl, PHP_URL_HOST));
+        $sharedHosts = ['app.project-nexus.ie', 'localhost', '127.0.0.1'];
+
+        if (in_array($host, $sharedHosts, true)) {
+            return $frontendUrl . '/' . rawurlencode($tenantSlug);
+        }
+
+        return $frontendUrl;
+    }
+
+    private function feedbackUrl(): string
+    {
+        $tenant = TenantContext::get();
+        $tenantSlug = (string) ($tenant['slug'] ?? '');
+        if ($tenantSlug === '') {
+            return (string) __('govuk_alpha.feedback_url');
+        }
+
+        return route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug]);
     }
 
     private function alphaNavItems(): array
@@ -1124,11 +1531,12 @@ class AlphaController extends Controller
             return [];
         }
 
-        $items = [
-            'home' => route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]),
-        ];
+        $userId = $this->currentUserId();
+        $items = [];
 
-        if ($this->currentUserId() !== null) {
+        if ($userId === null) {
+            $items['home'] = route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]);
+        } else {
             $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
             $items['messages'] = route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]);
         }
@@ -1139,7 +1547,7 @@ class AlphaController extends Controller
 
         if (TenantContext::hasModule('listings')) {
             $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
-            if ($this->currentUserId() !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+            if ($userId !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
                 $items['exchanges'] = route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]);
             }
         }
@@ -1154,6 +1562,25 @@ class AlphaController extends Controller
 
         if (TenantContext::hasFeature('volunteering')) {
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        return $items;
+    }
+
+    private function alphaFooterLinks(): array
+    {
+        $tenant = TenantContext::get();
+        $tenantSlug = (string) ($tenant['slug'] ?? '');
+        if ($tenantSlug === '') {
+            return [];
+        }
+
+        $items = [
+            'contact' => route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug]),
+        ];
+
+        if ($this->currentUserId() !== null) {
+            $items['logout'] = route('govuk-alpha.logout', ['tenantSlug' => $tenantSlug]);
         }
 
         return $items;
@@ -1465,6 +1892,27 @@ class AlphaController extends Controller
             'when' => $this->allowed($request->query('when', 'upcoming'), ['upcoming', 'past', 'all'], 'upcoming'),
             'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
             'cursor' => $request->query('cursor'),
+        ];
+    }
+
+    private function eventInput(Request $request): array
+    {
+        $maxAttendees = trim((string) $request->input('max_attendees', ''));
+        $location = trim((string) $request->input('location', ''));
+        $onlineLink = trim((string) $request->input('online_link', ''));
+        $endTime = trim((string) $request->input('end_time', ''));
+        $categoryId = $request->input('category_id');
+
+        return [
+            'title' => trim((string) $request->input('title', '')),
+            'description' => trim((string) $request->input('description', '')),
+            'start_time' => $request->input('start_time'),
+            'end_time' => $endTime !== '' ? $endTime : null,
+            'location' => $location !== '' ? $location : null,
+            'category_id' => $categoryId !== null && $categoryId !== '' ? (int) $categoryId : null,
+            'max_attendees' => $maxAttendees !== '' ? max(1, (int) $maxAttendees) : null,
+            'is_online' => $request->boolean('is_online'),
+            'online_link' => $onlineLink !== '' ? $onlineLink : null,
         ];
     }
 

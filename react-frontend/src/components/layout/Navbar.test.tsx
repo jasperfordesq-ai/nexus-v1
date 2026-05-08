@@ -87,11 +87,13 @@ const i18nMap: Record<string, string> = {
   'nav.messages': 'Messages',
   'nav.community': 'Community',
   'nav.more': 'More',
+  'nav.accessibility_alpha': 'Accessibility (alpha)',
   'accessibility.create_new': 'Create new',
   'accessibility.open_menu': 'Open menu',
   'accessibility.search': 'Search',
   'accessibility.search_ctrl_k': 'Search (Ctrl+K)',
   'accessibility.skip_to_content': 'Skip to main content',
+  'accessibility.accessibility_alpha_new_tab': 'Open Accessibility (alpha) in a new tab',
   'aria.main_navigation': 'Main navigation',
   'aria.timebanking_navigation': 'Timebanking navigation',
   'aria.community_navigation': 'Community navigation',
@@ -299,6 +301,30 @@ describe('Navbar', () => {
   });
 
   describe('Navigation links', () => {
+    it('renders a tenant-aware accessible frontend link that opens in a new tab', () => {
+      setupDefaultMocks({
+        tenant: {
+          tenant: { id: 2, name: 'hOUR Timebank', slug: 'hour-timebank' },
+        },
+      });
+      render(<Navbar />);
+      const link = screen.getByRole('link', { name: 'Open Accessibility (alpha) in a new tab' });
+      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/alpha');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(screen.getByText('Accessibility (alpha)')).toBeInTheDocument();
+    });
+
+    it('does not render the accessible frontend link without a tenant slug', () => {
+      setupDefaultMocks({
+        tenant: {
+          tenant: { id: 2, name: 'Unknown Tenant', slug: '' },
+        },
+      });
+      render(<Navbar />);
+      expect(screen.queryByRole('link', { name: 'Open Accessibility (alpha) in a new tab' })).not.toBeInTheDocument();
+    });
+
     it('renders Dashboard link when module is enabled', () => {
       setupDefaultMocks({
         auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
