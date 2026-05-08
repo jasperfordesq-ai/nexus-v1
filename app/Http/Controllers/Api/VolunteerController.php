@@ -206,7 +206,7 @@ class VolunteerController extends BaseApiController
 
         // Notify the opportunity organizer about the new application
         try {
-            $opportunity = VolOpportunity::find($id);
+            $opportunity = VolOpportunity::where('tenant_id', TenantContext::getId())->find($id);
             if (!$opportunity || (int) $opportunity->tenant_id !== TenantContext::getId()) {
                 throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
@@ -297,13 +297,14 @@ class VolunteerController extends BaseApiController
 
         // Notify the volunteer about the application decision (bell + email + push)
         try {
-            $application = VolApplication::find($id);
-            if (!$application || (int) $application->tenant_id !== TenantContext::getId()) {
+            $tenantId = TenantContext::getId();
+            $application = VolApplication::where('tenant_id', $tenantId)->find($id);
+            if (!$application || (int) $application->tenant_id !== $tenantId) {
                 throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
             if ($application && $application->user_id) {
                 $opportunityId = $application->opportunity_id;
-                $opportunity = VolOpportunity::find($opportunityId);
+                $opportunity = VolOpportunity::where('tenant_id', $tenantId)->find($opportunityId);
                 $applicant = User::find((int) $application->user_id);
                 LocaleContext::withLocale($applicant, function () use ($application, $opportunity, $opportunityId, $action) {
                     $oppTitle = $opportunity->title ?? __('notifications.vol_application_fallback_opportunity');

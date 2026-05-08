@@ -322,7 +322,7 @@ class AdminVolunteerController extends BaseApiController
 
         try {
             $log = DB::selectOne(
-                "SELECT id, user_id, status FROM vol_logs WHERE id = ? AND tenant_id = ?",
+                "SELECT id, user_id, organization_id, hours, status FROM vol_logs WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
 
@@ -335,10 +335,77 @@ class AdminVolunteerController extends BaseApiController
             }
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
-            DB::update(
-                "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
-                [$newStatus, $id, $tenantId]
-            );
+            $paymentOutcome = null; // null | 'paid' | 'insufficient' | 'already_paid' | 'no_org' | 'auto_pay_disabled'
+
+            DB::transaction(function () use ($id, $tenantId, $newStatus, $action, $log, &$paymentOutcome) {
+                DB::update(
+                    "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$newStatus, $id, $tenantId]
+                );
+
+                if ($action !== 'approve') {
+                    return;
+                }
+
+                $orgId = (int) ($log->organization_id ?? 0);
+                $volunteerId = (int) ($log->user_id ?? 0);
+                $hours = (float) ($log->hours ?? 0);
+
+                if ($orgId <= 0 || $volunteerId <= 0 || $hours <= 0) {
+                    $paymentOutcome = 'no_org';
+                    return;
+                }
+
+                // Idempotency: don't re-pay if a payment already exists for this vol_log
+                $existingPayment = DB::selectOne(
+                    "SELECT id FROM vol_org_transactions
+                     WHERE tenant_id = ? AND vol_organization_id = ? AND vol_log_id = ? AND type = 'volunteer_payment'
+                     LIMIT 1",
+                    [$tenantId, $orgId, $id]
+                );
+                if ($existingPayment) {
+                    $paymentOutcome = 'already_paid';
+                    return;
+                }
+
+                $org = DB::selectOne(
+                    "SELECT id, balance, auto_pay_enabled FROM vol_organizations WHERE id = ? AND tenant_id = ?",
+                    [$orgId, $tenantId]
+                );
+                if (!$org) {
+                    $paymentOutcome = 'no_org';
+                    return;
+                }
+                if (empty($org->auto_pay_enabled)) {
+                    $paymentOutcome = 'auto_pay_disabled';
+                    return;
+                }
+                if ((float) $org->balance <= 0) {
+                    $paymentOutcome = 'insufficient';
+                    return;
+                }
+
+                // Pay only the integer-floor portion (mirrors VolunteerService::verifyHours)
+                $intHours = (int) floor($hours);
+                if ($intHours <= 0) {
+                    $paymentOutcome = 'insufficient';
+                    return;
+                }
+                if ((float) $org->balance < (float) $intHours) {
+                    $paymentOutcome = 'insufficient';
+                    return;
+                }
+
+                $payResult = \App\Services\VolOrgWalletService::payVolunteer(
+                    $orgId,
+                    $volunteerId,
+                    (float) $intHours,
+                    $this->getUserId(),
+                    null,
+                    $id
+                );
+                $paymentOutcome = !empty($payResult['success']) ? 'paid' : 'insufficient';
+            });
 
             // Send hours approved/declined email notification
             try {
@@ -381,8 +448,11 @@ class AdminVolunteerController extends BaseApiController
             return $this->respondWithData([
                 'id' => $id,
                 'status' => $newStatus,
+                'paid' => $paymentOutcome === 'paid',
+                'payment_outcome' => $paymentOutcome,
             ]);
         } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::verifyHours error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'hours verification']), null, 500);
         }
     }
