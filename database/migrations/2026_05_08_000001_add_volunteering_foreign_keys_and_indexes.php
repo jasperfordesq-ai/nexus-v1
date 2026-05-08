@@ -143,6 +143,12 @@ return new class extends Migration {
         //    vol_log_id           NULL      -> vol_logs           SET NULL
         // ------------------------------------------------------------------
         if (Schema::hasTable('vol_org_transactions')) {
+            // Align FK column types with parent PK types (signed int).
+            // Prod was created with int unsigned on these columns; parents are signed.
+            $this->modifyToSignedInt('vol_org_transactions', 'vol_organization_id', false);
+            $this->modifyToSignedInt('vol_org_transactions', 'user_id', true);
+            $this->modifyToSignedInt('vol_org_transactions', 'vol_log_id', true);
+
             // vol_organization_id (CASCADE)
             if (
                 Schema::hasTable('vol_organizations')
