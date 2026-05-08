@@ -164,6 +164,10 @@ type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' |
 
 const VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates', 'alerts', 'wellbeing', 'credentials', 'waitlist', 'swaps', 'group-signups', 'hours-review', 'expenses', 'safeguarding', 'community-projects', 'donations', 'accessibility'];
 
+// Volunteering brand gradient — centralized so it can be themed later via tokens.
+const VOL_GRADIENT_BASE = 'bg-linear-to-r from-rose-500 to-pink-600';
+const VOL_GRADIENT = `${VOL_GRADIENT_BASE} text-white`;
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function VolunteeringPage() {
@@ -356,7 +360,7 @@ export function VolunteeringPage() {
                   aria-controls={`vol-panel-${key}`}
                   aria-selected={activeTab === key}
                   variant={activeTab === key ? 'solid' : 'flat'}
-                  className={activeTab === key ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                  className={activeTab === key ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
                   onPress={() => setTab(key)}
                   startContent={<Icon className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -540,7 +544,7 @@ function OpportunitiesTab() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load_opportunities')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+            className={VOL_GRADIENT}
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadOpportunities()}
           >
@@ -625,7 +629,7 @@ function OpportunitiesTab() {
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
-              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+              className={VOL_GRADIENT}
               onPress={handleApply}
               isLoading={isApplying}
             >
@@ -746,7 +750,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           {onApply && (
             <Button
               size="sm"
-              className="bg-linear-to-r from-rose-500 to-pink-600 text-white w-full sm:w-auto"
+              className={`${VOL_GRADIENT} w-full sm:w-auto`}
               onPress={onApply}
               endContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
@@ -874,7 +878,7 @@ function ApplicationsTab() {
             key={s}
             size="sm"
             variant={statusFilter === s ? 'solid' : 'flat'}
-            className={statusFilter === s ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+            className={statusFilter === s ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
             onPress={() => setStatusFilter(s)}
           >
             {s ? t('status_' + s) : t('filter_all')}
@@ -888,7 +892,7 @@ function ApplicationsTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+            className={VOL_GRADIENT}
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadApplications()}
           >
@@ -1135,7 +1139,7 @@ function HoursTab() {
       {/* Log Hours Button */}
       <div className="flex justify-end">
         <Button
-          className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+          className={VOL_GRADIENT}
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={handleOpenLogHours}
           isDisabled={isLoading || organisations.length === 0}
@@ -1156,7 +1160,7 @@ function HoursTab() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+            className={VOL_GRADIENT}
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadSummary()}
           >
@@ -1228,7 +1232,7 @@ function HoursTab() {
                   <Progress
                     value={(totalHours / (Math.ceil(totalHours / 50) * 50)) * 100}
                     classNames={{
-                      indicator: 'bg-linear-to-r from-rose-500 to-pink-600',
+                      indicator: VOL_GRADIENT_BASE,
                       track: 'bg-theme-hover',
                     }}
                     size="md"
@@ -1245,8 +1249,8 @@ function HoursTab() {
                     {t('hours_by_organization')}
                   </h3>
                   <div className="space-y-3">
-                    {(summary.by_organization ?? []).map((org, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                    {(summary.by_organization ?? []).map((org) => (
+                      <div key={org.name} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">{org.name}</span>
                         <span className="text-sm font-medium text-theme-primary">{t('hours_abbrev', { hours: org.hours })}</span>
                       </div>
@@ -1263,8 +1267,8 @@ function HoursTab() {
                     {t('hours_by_month')}
                   </h3>
                   <div className="space-y-3">
-                    {(summary.by_month ?? []).map((month, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                    {(summary.by_month ?? []).map((month) => (
+                      <div key={month.month} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">
                           {new Date(month.month + '-01').toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}
                         </span>
@@ -1282,7 +1286,7 @@ function HoursTab() {
                   description={t('no_hours_description')}
                   action={
                     <Button
-                      className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+                      className={VOL_GRADIENT}
                       onPress={handleOpenLogHours}
                       isDisabled={organisations.length === 0}
                     >
@@ -1356,7 +1360,7 @@ function HoursTab() {
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
-              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
+              className={VOL_GRADIENT}
               onPress={handleLogHours}
               isLoading={isLogging}
               isDisabled={!logForm.hours || !logForm.date || !logForm.organization_id}
