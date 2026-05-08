@@ -11,6 +11,7 @@ use App\Events\CommunityEventUpdated;
 use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
 use App\Events\FederatedGroupReceived;
+use App\Events\FederatedVolunteeringReceived;
 use App\Events\GroupCreated;
 use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
@@ -30,7 +31,10 @@ use App\Events\UserRegistered;
 use App\Events\VolLogStatusChanged;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
+use App\Listeners\AwardXpOnVolLogApproved;
 use App\Listeners\CopyMessageForBrokerReview;
+use App\Listeners\IngestFederatedVolunteerOpportunity;
+use App\Listeners\PostFeedActivityOnVolLogApproved;
 use App\Listeners\NotifyAdminOfNewCommunityEvent;
 use App\Listeners\HandleFederatedGroupReceived;
 use App\Listeners\NotifyGroupMemberJoined;
@@ -184,6 +188,12 @@ class EventServiceProvider extends ServiceProvider
 
         VolLogStatusChanged::class => [
             RevertRegionalPointsOnVolLogChange::class,
+            AwardXpOnVolLogApproved::class,
+            PostFeedActivityOnVolLogApproved::class,
+        ],
+
+        FederatedVolunteeringReceived::class => [
+            IngestFederatedVolunteerOpportunity::class,
         ],
     ];
 
