@@ -12,6 +12,7 @@ use App\Events\FederatedVolunteeringReceived;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * IngestFederatedVolunteerOpportunity — handles inbound federated volunteering
@@ -36,14 +37,14 @@ use Illuminate\Support\Facades\Log;
  *     any future persistence added here MUST upsert keyed on
  *     (federation_source = external_partner_id, external_id).
  *
- * Note on `vol_opportunities`:
- *   The local `vol_opportunities` table currently has no `is_federated` /
- *   `federation_source` / `external_id` columns, so federated opportunities
- *   live exclusively in the `federation_volunteering` shadow table (matching
- *   the established pattern used by HandleFederatedGroupReceived for
- *   federated groups). When those columns are added by a future migration,
- *   extend this listener with an idempotent upsert into `vol_opportunities`
- *   keyed on (federation_source, external_id).
+ * Mirror into vol_opportunities:
+ *   When the federation columns exist on `vol_opportunities`
+ *   (is_federated / external_partner_id / external_id, added by migration
+ *   2026_05_08_000002), the listener also mirrors the opportunity into
+ *   `vol_opportunities` so federated content surfaces in normal listing/search.
+ *   The mirror is idempotent via UNIQUE KEY (external_partner_id, external_id).
+ *   On older schemas without those columns, the listener falls back to
+ *   shadow-only persistence.
  */
 class IngestFederatedVolunteerOpportunity implements ShouldQueue
 {
@@ -77,9 +78,10 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
                 'title'               => $event->shadowRow['title'] ?? null,
             ]);
 
+            $this->mirrorIntoVolOpportunities($event);
+
             // Future extension points (all must remain idempotent on
             // federation_source = external_partner_id + external_id):
-            //   - Mirror into vol_opportunities once federation columns exist.
             //   - Push the opportunity into Meilisearch.
             //   - Notify tenant admins of new partner content.
         } catch (\Throwable $e) {
@@ -90,6 +92,55 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
                 'local_id'            => $event->localId,
                 'error'               => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Mirror the federated opportunity into vol_opportunities, idempotent on
+     * (external_partner_id, external_id) via UNIQUE KEY uk_vol_opp_partner_ext.
+     * Skips silently if the federation columns aren't present (older schema).
+     */
+    private function mirrorIntoVolOpportunities(FederatedVolunteeringReceived $event): void
+    {
+        if (! Schema::hasColumn('vol_opportunities', 'is_federated')
+            || ! Schema::hasColumn('vol_opportunities', 'external_partner_id')
+            || ! Schema::hasColumn('vol_opportunities', 'external_id')) {
+            return;
+        }
+
+        $externalId = (string) ($event->shadowRow['external_id'] ?? '');
+        $title      = (string) ($event->shadowRow['title'] ?? '');
+        if ($externalId === '' || $title === '') {
+            return;
+        }
+
+        $now = now();
+        $row = [
+            'tenant_id'           => $event->tenantId,
+            'organization_id'     => null,
+            'title'               => mb_substr($title, 0, 255),
+            'description'         => (string) ($event->shadowRow['description'] ?? ''),
+            'location'            => $event->shadowRow['location'] ?? null,
+            'start_date'          => isset($event->shadowRow['starts_at'])
+                ? substr((string) $event->shadowRow['starts_at'], 0, 10)
+                : null,
+            'is_active'           => 1,
+            'status'              => 'open',
+            'is_federated'        => 1,
+            'external_partner_id' => $event->externalPartnerId,
+            'external_id'         => $externalId,
+            'updated_at'          => $now,
+        ];
+
+        $existing = DB::table('vol_opportunities')
+            ->where('external_partner_id', $event->externalPartnerId)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('vol_opportunities')->where('id', $existing->id)->update($row);
+        } else {
+            DB::table('vol_opportunities')->insert(array_merge($row, ['created_at' => $now]));
         }
     }
 }

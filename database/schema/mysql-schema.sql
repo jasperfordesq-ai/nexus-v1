@@ -6491,7 +6491,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=231 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=232 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12701,7 +12701,7 @@ DROP TABLE IF EXISTS `vol_opportunities`;
 CREATE TABLE `vol_opportunities` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL DEFAULT 1,
-  `organization_id` int(11) NOT NULL,
+  `organization_id` int(11) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `location` varchar(255) DEFAULT NULL,
@@ -12712,6 +12712,10 @@ CREATE TABLE `vol_opportunities` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL,
+  `is_federated` tinyint(1) NOT NULL DEFAULT 0,
+  `external_partner_id` bigint(20) unsigned DEFAULT NULL,
+  `external_id` varchar(128) DEFAULT NULL,
+  `source_tenant_id` int(11) DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
   `status` varchar(20) DEFAULT 'open',
   `credits_offered` int(11) DEFAULT 0,
@@ -12719,11 +12723,13 @@ CREATE TABLE `vol_opportunities` (
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_vol_opp_partner_ext` (`external_partner_id`,`external_id`),
   KEY `idx_vol_opp_org` (`organization_id`),
   KEY `idx_vol_opp_active` (`is_active`),
   KEY `fk_vol_cat` (`category_id`),
   KEY `idx_vol_opp_tenant` (`tenant_id`),
   KEY `idx_vol_geo` (`latitude`,`longitude`),
+  KEY `idx_vol_opp_federated` (`is_federated`,`tenant_id`),
   CONSTRAINT `fk_vol_cat` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
   CONSTRAINT `vol_opportunities_organization_id_foreign` FOREIGN KEY (`organization_id`) REFERENCES `vol_organizations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=244 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -13507,7 +13513,8 @@ INSERT INTO `laravel_migrations` VALUES
 (227,'2026_05_06_080000_add_remote_delivery_outbox_to_caring_hour_transfers',100),
 (228,'2026_05_06_081000_add_dispatch_idempotency_to_caring_smart_nudges',100),
 (229,'2026_05_07_090000_reconcile_caring_dispatch_and_outbox_guards',101),
-(230,'2026_05_08_000001_add_volunteering_foreign_keys_and_indexes',101);
+(230,'2026_05_08_000001_add_volunteering_foreign_keys_and_indexes',101),
+(231,'2026_05_08_000002_add_federation_columns_to_vol_opportunities',102);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
