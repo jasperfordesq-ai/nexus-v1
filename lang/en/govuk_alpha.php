@@ -107,7 +107,7 @@ return [
     ],
     'home' => [
         'caption' => ':community',
-        'title' => 'Accessible NEXUS pages',
+        'title' => 'Accessible',
         'description' => 'Use a simpler, accessible version of :community for core community tasks.',
         'supporting_text' => 'These pages use clear structure, plain navigation, standard form controls and progressive enhancement so the core service works well with keyboards, screen readers and low-bandwidth connections.',
         'primary_guest' => 'Sign in',
