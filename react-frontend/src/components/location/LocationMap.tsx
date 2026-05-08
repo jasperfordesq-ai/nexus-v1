@@ -16,10 +16,12 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
+  useRef,
   type ReactNode,
 } from 'react';
 import {
-  Map,
+  Map as GoogleMap,
   AdvancedMarker,
   InfoWindow,
   useMap,
@@ -30,6 +32,7 @@ import {
 import {
   MarkerClusterer,
   type Renderer,
+  type Cluster,
 } from '@googlemaps/markerclusterer';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
@@ -63,6 +66,15 @@ export interface LocationMapProps {
 const DEFAULT_CENTER = { lat: 20, lng: 0 };
 const DEFAULT_ZOOM = 12;
 const CLUSTER_AUTO_THRESHOLD = 10;
+/** Stable pixel offset for InfoWindows above pin tip. */
+const INFO_PIXEL_OFFSET: [number, number] = [0, -40];
+/**
+ * If a cluster's lat/lng span (in degrees) is below this threshold, treat the
+ * markers as stacked and show a chooser InfoWindow instead of fitBounds — at
+ * SuperCluster's maxZoom, fitBounds would just zoom to max without breaking
+ * the cluster apart.
+ */
+const STACKED_CLUSTER_SPAN_DEGREES = 0.0005; // ~55m at the equator
 
 // ---------------------------------------------------------------------------
 // Custom cluster renderer — primary-colored circle with inverse text
@@ -117,10 +129,11 @@ const clusterRenderer: Renderer = {
 interface ClusteredMarkerProps {
   marker: MapMarker;
   clusterer: MarkerClusterer | null;
-  onClick: (marker: MapMarker) => void;
+  onClick: (marker: MapMarker, element: google.maps.marker.AdvancedMarkerElement | null) => void;
+  registerElement: (id: MapMarker['id'], element: google.maps.marker.AdvancedMarkerElement | null) => void;
 }
 
-function ClusteredMarkerItem({ marker, clusterer, onClick }: ClusteredMarkerProps) {
+function ClusteredMarkerItem({ marker, clusterer, onClick, registerElement }: ClusteredMarkerProps) {
   const [markerRef, advancedMarker] = useAdvancedMarkerRef();
 
   // Register / unregister with the clusterer whenever the marker element changes
@@ -132,12 +145,20 @@ function ClusteredMarkerItem({ marker, clusterer, onClick }: ClusteredMarkerProp
     };
   }, [clusterer, advancedMarker]);
 
+  // Track the AdvancedMarkerElement so the parent can use it as the
+  // InfoWindow anchor — anchor-based positioning renders content reliably
+  // (position-only InfoWindows can render blank on first open with mapId).
+  useEffect(() => {
+    registerElement(marker.id, advancedMarker);
+    return () => registerElement(marker.id, null);
+  }, [marker.id, advancedMarker, registerElement]);
+
   return (
     <AdvancedMarker
       ref={markerRef}
       position={{ lat: marker.lat, lng: marker.lng }}
       title={marker.title}
-      onClick={() => onClick(marker)}
+      onClick={() => onClick(marker, advancedMarker)}
     />
   );
 }
@@ -148,12 +169,19 @@ function ClusteredMarkerItem({ marker, clusterer, onClick }: ClusteredMarkerProp
 
 interface ClusteredMarkersProps {
   markers: MapMarker[];
-  onMarkerClick: (marker: MapMarker) => void;
+  onMarkerClick: (marker: MapMarker, element: google.maps.marker.AdvancedMarkerElement | null) => void;
+  onClusterClick: (cluster: Cluster, map: google.maps.Map) => void;
+  registerElement: (id: MapMarker['id'], element: google.maps.marker.AdvancedMarkerElement | null) => void;
 }
 
-function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
+function ClusteredMarkers({ markers, onMarkerClick, onClusterClick, registerElement }: ClusteredMarkersProps) {
   const map = useMap();
   const [clusterer, setClusterer] = useState<MarkerClusterer | null>(null);
+
+  // Keep a stable ref to the latest cluster click handler so we don't have to
+  // tear down the MarkerClusterer when the handler identity changes.
+  const onClusterClickRef = useRef(onClusterClick);
+  onClusterClickRef.current = onClusterClick;
 
   // Create/destroy the clusterer when the map instance changes
   useEffect(() => {
@@ -162,8 +190,7 @@ function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
       map,
       renderer: clusterRenderer,
       onClusterClick: (_event, cluster, clickedMap) => {
-        if (!cluster.bounds) return;
-        clickedMap.fitBounds(cluster.bounds, 60);
+        onClusterClickRef.current(cluster, clickedMap);
       },
     });
     setClusterer(instance);
@@ -181,6 +208,7 @@ function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
           marker={marker}
           clusterer={clusterer}
           onClick={onMarkerClick}
+          registerElement={registerElement}
         />
       ))}
     </>
@@ -193,18 +221,45 @@ function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
 
 interface PlainMarkersProps {
   markers: MapMarker[];
-  onMarkerClick: (marker: MapMarker) => void;
+  onMarkerClick: (marker: MapMarker, element: google.maps.marker.AdvancedMarkerElement | null) => void;
+  registerElement: (id: MapMarker['id'], element: google.maps.marker.AdvancedMarkerElement | null) => void;
 }
 
-function PlainMarkers({ markers, onMarkerClick }: PlainMarkersProps) {
+function PlainMarkerItem({
+  marker,
+  onMarkerClick,
+  registerElement,
+}: {
+  marker: MapMarker;
+  onMarkerClick: (marker: MapMarker, element: google.maps.marker.AdvancedMarkerElement | null) => void;
+  registerElement: (id: MapMarker['id'], element: google.maps.marker.AdvancedMarkerElement | null) => void;
+}) {
+  const [markerRef, advancedMarker] = useAdvancedMarkerRef();
+
+  useEffect(() => {
+    registerElement(marker.id, advancedMarker);
+    return () => registerElement(marker.id, null);
+  }, [marker.id, advancedMarker, registerElement]);
+
+  return (
+    <AdvancedMarker
+      ref={markerRef}
+      position={{ lat: marker.lat, lng: marker.lng }}
+      title={marker.title}
+      onClick={() => onMarkerClick(marker, advancedMarker)}
+    />
+  );
+}
+
+function PlainMarkers({ markers, onMarkerClick, registerElement }: PlainMarkersProps) {
   return (
     <>
       {markers.map((marker) => (
-        <AdvancedMarker
+        <PlainMarkerItem
           key={marker.id}
-          position={{ lat: marker.lat, lng: marker.lng }}
-          title={marker.title}
-          onClick={() => onMarkerClick(marker)}
+          marker={marker}
+          onMarkerClick={onMarkerClick}
+          registerElement={registerElement}
         />
       ))}
     </>
@@ -231,6 +286,28 @@ function LocationMapInner({
   const map = useMap();
   const status = useApiLoadingStatus();
   const [activeMarkerId, setActiveMarkerId] = useState<number | string | null>(null);
+  // When the user clicks a cluster of markers stacked at the same point, we
+  // open a chooser InfoWindow listing them — fitBounds can't break the
+  // cluster apart at SuperCluster's maxZoom.
+  const [stackedCluster, setStackedCluster] = useState<{
+    position: { lat: number; lng: number };
+    markers: MapMarker[];
+  } | null>(null);
+
+  // Keep a Map of marker.id → AdvancedMarkerElement so InfoWindow can use
+  // anchor-based positioning. Anchor mode is the reliable rendering path —
+  // position-only InfoWindows + mapId can render blank on first open.
+  const elementsRef = useRef(new Map<MapMarker['id'], google.maps.marker.AdvancedMarkerElement>());
+  const registerElement = useCallback(
+    (id: MapMarker['id'], element: google.maps.marker.AdvancedMarkerElement | null) => {
+      if (element) {
+        elementsRef.current.set(id, element);
+      } else {
+        elementsRef.current.delete(id);
+      }
+    },
+    [],
+  );
 
   // Resolve whether clustering should be active
   const clusteringEnabled =
@@ -263,10 +340,67 @@ function LocationMapInner({
 
   const handleMarkerClick = useCallback(
     (marker: MapMarker) => {
+      setStackedCluster(null);
       setActiveMarkerId((prev) => (prev === marker.id ? null : marker.id));
       onMarkerClick?.(marker);
     },
-    [onMarkerClick]
+    [onMarkerClick],
+  );
+
+  const handleClusterClick = useCallback(
+    (cluster: Cluster, clickedMap: google.maps.Map) => {
+      const bounds = cluster.bounds;
+      if (!bounds) return;
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const latSpan = Math.abs(ne.lat() - sw.lat());
+      const lngSpan = Math.abs(ne.lng() - sw.lng());
+
+      // Find the underlying MapMarker entries that belong to this cluster.
+      // markerclusterer holds google.maps.marker.AdvancedMarkerElement
+      // references; we map each back to its MapMarker via lat/lng equality
+      // (within a tiny epsilon to absorb FP rounding).
+      const eps = 1e-9;
+      const memberIds = new Set<MapMarker['id']>();
+      cluster.markers?.forEach((m) => {
+        const pos = (m as google.maps.marker.AdvancedMarkerElement).position;
+        if (!pos) return;
+        const lat = typeof pos.lat === 'function' ? pos.lat() : (pos as google.maps.LatLngLiteral).lat;
+        const lng = typeof pos.lng === 'function' ? pos.lng() : (pos as google.maps.LatLngLiteral).lng;
+        markers.forEach((mm) => {
+          if (Math.abs(mm.lat - lat) < eps && Math.abs(mm.lng - lng) < eps) {
+            memberIds.add(mm.id);
+          }
+        });
+      });
+      const memberMarkers = markers.filter((mm) => memberIds.has(mm.id));
+
+      const isStacked =
+        latSpan < STACKED_CLUSTER_SPAN_DEGREES &&
+        lngSpan < STACKED_CLUSTER_SPAN_DEGREES &&
+        memberMarkers.length > 1;
+
+      if (isStacked) {
+        const anchor = memberMarkers[0];
+        if (!anchor) return;
+        // Close any single-marker InfoWindow first
+        setActiveMarkerId(null);
+        setStackedCluster({
+          position: { lat: anchor.lat, lng: anchor.lng },
+          markers: memberMarkers,
+        });
+        return;
+      }
+
+      setStackedCluster(null);
+      clickedMap.fitBounds(bounds, 60);
+    },
+    [markers],
+  );
+
+  const activeMarker = useMemo(
+    () => markers.find((m) => m.id === activeMarkerId) ?? null,
+    [markers, activeMarkerId],
   );
 
   // Gracefully degrade if API auth fails (billing not enabled, key restricted, etc.)
@@ -280,11 +414,14 @@ function LocationMapInner({
       ? { lat: markers[0].lat, lng: markers[0].lng }
       : DEFAULT_CENTER);
 
-  const activeMarker = markers.find((m) => m.id === activeMarkerId);
+  const activeAnchor = activeMarker ? elementsRef.current.get(activeMarker.id) ?? null : null;
+  const stackedAnchor = stackedCluster && stackedCluster.markers[0]
+    ? elementsRef.current.get(stackedCluster.markers[0].id) ?? null
+    : null;
 
   return (
     <div className={`rounded-xl overflow-hidden ${className}`} style={{ height }}>
-      <Map
+      <GoogleMap
         defaultCenter={mapCenter}
         defaultZoom={zoom}
         gestureHandling="cooperative"
@@ -301,24 +438,83 @@ function LocationMapInner({
           <ClusteredMarkers
             markers={markers}
             onMarkerClick={handleMarkerClick}
+            onClusterClick={handleClusterClick}
+            registerElement={registerElement}
           />
         ) : (
           <PlainMarkers
             markers={markers}
             onMarkerClick={handleMarkerClick}
+            registerElement={registerElement}
           />
         )}
 
         {activeMarker?.infoContent && (
           <InfoWindow
-            position={{ lat: activeMarker.lat, lng: activeMarker.lng }}
+            // Force remount per-marker so children portal in before open()
+            key={`marker-${activeMarker.id}`}
+            anchor={activeAnchor}
+            position={activeAnchor ? undefined : { lat: activeMarker.lat, lng: activeMarker.lng }}
             onCloseClick={() => setActiveMarkerId(null)}
-            pixelOffset={[0, -40]}
+            pixelOffset={INFO_PIXEL_OFFSET}
           >
             {activeMarker.infoContent}
           </InfoWindow>
         )}
-      </Map>
+
+        {stackedCluster && (
+          <InfoWindow
+            key={`cluster-${stackedCluster.position.lat}-${stackedCluster.position.lng}-${stackedCluster.markers.length}`}
+            anchor={stackedAnchor}
+            position={stackedAnchor ? undefined : stackedCluster.position}
+            onCloseClick={() => setStackedCluster(null)}
+            pixelOffset={INFO_PIXEL_OFFSET}
+          >
+            <ClusterChooser
+              markers={stackedCluster.markers}
+              onPick={(m) => {
+                setStackedCluster(null);
+                setActiveMarkerId(m.id);
+                onMarkerClick?.(m);
+              }}
+            />
+          </InfoWindow>
+        )}
+      </GoogleMap>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ClusterChooser — list of marker titles when many markers share a coord.
+// Plain HTML (no HeroUI) so it renders cleanly inside Google's portal node.
+// ---------------------------------------------------------------------------
+
+function ClusterChooser({
+  markers,
+  onPick,
+}: {
+  markers: MapMarker[];
+  onPick: (marker: MapMarker) => void;
+}) {
+  return (
+    <div className="max-w-[260px] max-h-[280px] overflow-y-auto">
+      <div className="font-semibold text-[13px] mb-1.5 text-gray-900">
+        {markers.length} listings here
+      </div>
+      <ul className="list-none p-0 m-0">
+        {markers.map((m) => (
+          <li key={m.id} className="border-t border-gray-200 first:border-t-0">
+            <button
+              type="button"
+              onClick={() => onPick(m)}
+              className="block w-full text-left px-1 py-2 bg-transparent border-0 cursor-pointer text-[13px] text-gray-800 hover:bg-gray-50"
+            >
+              {m.title}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
