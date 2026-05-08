@@ -63,7 +63,8 @@
     "explore": "Explorar",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "Ofertas e pedidos",
     "messages": "Suas mensagens",
     "marketplace": "Compre e venda na sua comunidade",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "O Meu Perfil",
@@ -216,7 +218,8 @@
     "menu_opened": "Menu de navegação aberto",
     "close": "Fechar",
     "scroll_to_top": "Voltar ao topo",
-    "breadcrumb": "Navegação estrutural"
+    "breadcrumb": "Navegação estrutural",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab"
   },
   "cookie_consent": {
     "banner_label": "Consentimento de cookies",

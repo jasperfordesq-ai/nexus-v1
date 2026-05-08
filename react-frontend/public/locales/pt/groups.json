@@ -162,7 +162,8 @@
     "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Notification preferences",
     "image_alt_group": "Group",
-    "image_alt_cover": "Cover"
+    "image_alt_cover": "Cover",
+    "you": "You"
   },
   "form": {
     "create_title": "Criar Novo Grupo",
@@ -328,7 +329,9 @@
     "provide_reason": "Por favor, forneça um motivo",
     "reported": "Publicação denunciada",
     "report_failed": "Falha ao denunciar publicação",
-    "vote_failed": "Falha ao votar"
+    "vote_failed": "Falha ao votar",
+    "post_deleted": "Post deleted",
+    "post_delete_failed": "Failed to delete post"
   },
   "loading_aria": "A carregar grupos",
   "load_error": "Falha ao carregar grupos.",

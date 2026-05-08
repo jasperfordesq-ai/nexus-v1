@@ -283,5 +283,6 @@
   "user_fallback": "ユーザー",
   "listing_image_alt": "出品画像",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km"
+  "distance_kilometers": "{{distance}} km",
+  "map_view_listing": "View listing"
 }

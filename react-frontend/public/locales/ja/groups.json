@@ -162,7 +162,8 @@
     "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Notification preferences",
     "image_alt_group": "Group",
-    "image_alt_cover": "Cover"
+    "image_alt_cover": "Cover",
+    "you": "You"
   },
   "form": {
     "create_title": "Create New Group",
@@ -328,7 +329,9 @@
     "provide_reason": "Please provide a reason",
     "reported": "Post reported",
     "report_failed": "Failed to report post",
-    "vote_failed": "Failed to vote"
+    "vote_failed": "Failed to vote",
+    "post_deleted": "Post deleted",
+    "post_delete_failed": "Failed to delete post"
   },
   "loading_aria": "Loading groups",
   "load_error": "Failed to load groups. Please try again.",

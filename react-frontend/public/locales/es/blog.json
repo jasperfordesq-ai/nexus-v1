@@ -49,6 +49,11 @@
     "reaction_thumbs_down": "No me gusta",
     "reaction_laugh": "Jaja",
     "reaction_angry": "Enojado",
-    "unknown_author": "Unknown author"
+    "unknown_author": "Unknown author",
+    "reaction_love": "Love",
+    "reaction_like": "Like",
+    "reaction_wow": "Wow",
+    "reaction_sad": "Sad",
+    "reaction_celebrate": "Celebrate"
   }
 }

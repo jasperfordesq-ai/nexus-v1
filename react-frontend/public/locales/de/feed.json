@@ -211,7 +211,11 @@
     "sdg_selected_other": "{{count}} Ziele ausgewählt",
     "content_required": "Der Beitragsinhalt darf nicht leer sein.",
     "content_too_long": "Der Beitrag ist zu lang (max. {{max}} Zeichen).",
-    "groups_load_error": "Gruppen konnten nicht geladen werden."
+    "groups_load_error": "Gruppen konnten nicht geladen werden.",
+    "upload_preview_alt": "Upload preview {{number}}",
+    "image_remove_number_aria": "Remove image {{number}}",
+    "alt_text_add": "Add alt text",
+    "alt_text_edit": "Edit alt text"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -321,7 +325,8 @@
     "milestone": {
       "badge_unlocked": "Abzeichen freigeschaltet",
       "level_reached": "Stufe erreicht"
-    }
+    },
+    "type_resource": "Resource"
   },
   "poll": {
     "load_failed": "Umfragedaten konnten nicht geladen werden.",

@@ -63,7 +63,8 @@
     "explore": "Ontdekken",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "Aanbiedingen & verzoeken",
     "messages": "Jouw berichten",
     "marketplace": "Koop & verkoop in je gemeenschap",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "Mijn profiel",
@@ -216,7 +218,8 @@
     "menu_opened": "Navigatiemenu geopend",
     "close": "Sluiten",
     "scroll_to_top": "Naar boven scrollen",
-    "breadcrumb": "Kruimelpad"
+    "breadcrumb": "Kruimelpad",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab"
   },
   "cookie_consent": {
     "banner_label": "Cookie toestemming",

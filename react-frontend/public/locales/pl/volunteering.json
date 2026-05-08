@@ -215,7 +215,8 @@
       "type": "Expense Type",
       "amount": "Amount",
       "currency": "Currency",
-      "description": "Description"
+      "description": "Description",
+      "organisation": "Organisation"
     },
     "cancel": "Cancel",
     "submit_button": "Submit Expense",
@@ -235,7 +236,8 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "paid": "Paid"
-    }
+    },
+    "no_organisation": "No approved volunteer organisations are available for expenses yet."
   },
   "community_projects": {
     "heading": "Community Projects",
@@ -355,7 +357,8 @@
     "receipt_method": "Payment Method",
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
-    "receipt_not_found": "Receipt not found."
+    "receipt_not_found": "Receipt not found.",
+    "progress_aria": "Donation progress: {{percent}}%"
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -566,7 +569,8 @@
     "apply_message_placeholder": "Powiedz organizatorowi, dlaczego chcesz zostać wolontariuszem...",
     "select_shift": "Wybierz zmianę (opcjonalnie)",
     "cancel": "Anulować",
-    "submit_application": "Prześlij wniosek"
+    "submit_application": "Prześlij wniosek",
+    "applied_on": "Applied {{date}}"
   },
   "org_settings": {
     "heading": "Ustawienia organizacji",
@@ -654,7 +658,8 @@
     "error_load": "Failed to load recommendations",
     "error_load_generic": "Unable to load recommendations. Please try again.",
     "match_score": "{{score}}% match",
-    "view_opportunity": "View"
+    "view_opportunity": "View",
+    "match_aria": "{{score}}% match"
   },
   "certificates": {
     "title": "Impact Certificates",
@@ -719,7 +724,32 @@
     "day_streak": "Day Streak",
     "suggested_rest_days": "Suggested Rest Days",
     "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
-    "recent_checkins": "Recent Mood Check-ins"
+    "recent_checkins": "Recent Mood Check-ins",
+    "score_good": "Good",
+    "score_fair": "Fair",
+    "score_needs_attention": "Needs Attention",
+    "score_critical": "Critical",
+    "risk_moderate": "Moderate Risk",
+    "risk_high": "High Risk",
+    "mood_unknown": "Unknown",
+    "mood_aria": "Mood: {{mood}}",
+    "load_error": "Unable to load wellbeing data. Please try again.",
+    "checkin_success": "Mood check-in recorded.",
+    "checkin_failed": "Failed to submit check-in. Please try again.",
+    "try_again": "Try Again",
+    "no_data_title": "No wellbeing data yet",
+    "no_data_desc": "Start logging your mood and tracking your volunteer wellbeing.",
+    "log_mood": "Log How I'm Feeling",
+    "burnout_warning": "Burnout Warning",
+    "needs_attention_title": "Your wellbeing needs attention",
+    "needs_attention_desc": "Your wellbeing score is below the healthy threshold. Consider taking some time off and reaching out to your community coordinator if you need support.",
+    "hide_tips": "Hide self-care tips",
+    "view_tips": "View self-care tips",
+    "tip_breaks": "Take regular breaks between volunteer shifts",
+    "tip_boundaries": "Set boundaries on your availability",
+    "tip_connect": "Connect with fellow volunteers for support",
+    "tip_celebrate": "Celebrate your impact. Every hour counts.",
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
   },
   "page_meta": {
     "create_opportunity": {
@@ -785,5 +815,11 @@
     "checked_in_at": "Checked in: {{time}}",
     "checked_out_at": "Checked out: {{time}}",
     "some_unavailable": "Check-in QR codes are not yet available for some shifts."
-  }
+  },
+  "wallet": "Wallet",
+  "org_hours_approved_paid": "Hours approved. Time credits paid to volunteer.",
+  "org_hours_approved": "Hours approved.",
+  "org_hours_declined": "Hours declined.",
+  "org_all_hours_reviewed": "All volunteer hours have been reviewed.",
+  "org_balance_low_warning": "Balance may be insufficient for {{count}} pending hours."
 }

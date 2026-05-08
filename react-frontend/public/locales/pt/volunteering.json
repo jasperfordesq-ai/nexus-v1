@@ -215,7 +215,8 @@
       "type": "Tipo de Despesa",
       "amount": "Montante",
       "currency": "Moeda",
-      "description": "Descrição"
+      "description": "Descrição",
+      "organisation": "Organisation"
     },
     "cancel": "Cancelar",
     "submit_button": "Submeter",
@@ -235,7 +236,8 @@
       "approved": "Aprovado",
       "rejected": "Rejeitado",
       "paid": "Pago"
-    }
+    },
+    "no_organisation": "No approved volunteer organisations are available for expenses yet."
   },
   "community_projects": {
     "heading": "Projetos Comunitários",
@@ -355,7 +357,8 @@
     "receipt_method": "Método de pagamento",
     "receipt_message": "Mensagem",
     "receipt_error": "Falha ao carregar recibo.",
-    "receipt_not_found": "Recibo não encontrado."
+    "receipt_not_found": "Recibo não encontrado.",
+    "progress_aria": "Donation progress: {{percent}}%"
   },
   "safeguarding": {
     "heading": "Salvaguarda",
@@ -566,7 +569,8 @@
     "apply_message_placeholder": "Diga ao organizador por que você gostaria de ser voluntário...",
     "select_shift": "Selecione um turno (opcional)",
     "cancel": "Cancelar",
-    "submit_application": "Enviar inscrição"
+    "submit_application": "Enviar inscrição",
+    "applied_on": "Applied {{date}}"
   },
   "org_settings": {
     "heading": "Configurações da organização",
@@ -654,7 +658,8 @@
     "error_load": "Falha ao carregar recomendações",
     "error_load_generic": "Não foi possível carregar recomendações. Tente novamente.",
     "match_score": "{{score}}% de correspondência",
-    "view_opportunity": "Ver"
+    "view_opportunity": "Ver",
+    "match_aria": "{{score}}% match"
   },
   "certificates": {
     "title": "Certificados de Impacto",
@@ -719,7 +724,32 @@
     "day_streak": "Série de Dias",
     "suggested_rest_days": "Dias de Descanso Sugeridos",
     "rest_days_desc": "Com base na sua atividade recente, recomendamos que descanse nestes dias:",
-    "recent_checkins": "Check-ins de Humor Recentes"
+    "recent_checkins": "Check-ins de Humor Recentes",
+    "score_good": "Good",
+    "score_fair": "Fair",
+    "score_needs_attention": "Needs Attention",
+    "score_critical": "Critical",
+    "risk_moderate": "Moderate Risk",
+    "risk_high": "High Risk",
+    "mood_unknown": "Unknown",
+    "mood_aria": "Mood: {{mood}}",
+    "load_error": "Unable to load wellbeing data. Please try again.",
+    "checkin_success": "Mood check-in recorded.",
+    "checkin_failed": "Failed to submit check-in. Please try again.",
+    "try_again": "Try Again",
+    "no_data_title": "No wellbeing data yet",
+    "no_data_desc": "Start logging your mood and tracking your volunteer wellbeing.",
+    "log_mood": "Log How I'm Feeling",
+    "burnout_warning": "Burnout Warning",
+    "needs_attention_title": "Your wellbeing needs attention",
+    "needs_attention_desc": "Your wellbeing score is below the healthy threshold. Consider taking some time off and reaching out to your community coordinator if you need support.",
+    "hide_tips": "Hide self-care tips",
+    "view_tips": "View self-care tips",
+    "tip_breaks": "Take regular breaks between volunteer shifts",
+    "tip_boundaries": "Set boundaries on your availability",
+    "tip_connect": "Connect with fellow volunteers for support",
+    "tip_celebrate": "Celebrate your impact. Every hour counts.",
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
   },
   "page_meta": {
     "create_opportunity": {
@@ -785,5 +815,11 @@
     "checked_in_at": "Checked in: {{time}}",
     "checked_out_at": "Checked out: {{time}}",
     "some_unavailable": "Check-in QR codes are not yet available for some shifts."
-  }
+  },
+  "wallet": "Wallet",
+  "org_hours_approved_paid": "Hours approved. Time credits paid to volunteer.",
+  "org_hours_approved": "Hours approved.",
+  "org_hours_declined": "Hours declined.",
+  "org_all_hours_reviewed": "All volunteer hours have been reviewed.",
+  "org_balance_low_warning": "Balance may be insufficient for {{count}} pending hours."
 }

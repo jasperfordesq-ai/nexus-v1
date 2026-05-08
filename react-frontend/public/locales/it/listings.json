@@ -283,5 +283,6 @@
   "user_fallback": "Utente",
   "listing_image_alt": "Immagine dell'elenco",
   "distance_meters": "NEXUSPLACEholder0TOKEN m",
-  "distance_kilometers": "NEXUSPLACEholder0TOKEN km"
+  "distance_kilometers": "NEXUSPLACEholder0TOKEN km",
+  "map_view_listing": "View listing"
 }

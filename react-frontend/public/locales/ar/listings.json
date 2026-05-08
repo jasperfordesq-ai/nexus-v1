@@ -283,5 +283,6 @@
   "user_fallback": "مستخدم",
   "listing_image_alt": "صورة القائمة",
   "distance_meters": "{{distance}} م",
-  "distance_kilometers": "{{distance}} كم"
+  "distance_kilometers": "{{distance}} كم",
+  "map_view_listing": "View listing"
 }

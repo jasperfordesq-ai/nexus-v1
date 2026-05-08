@@ -63,7 +63,8 @@
     "explore": "探索",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "オファーとリクエスト",
     "messages": "あなたのメッセージ",
     "marketplace": "コミュニティで売買する",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -216,7 +218,8 @@
     "menu_opened": "ナビゲーションメニューが開きました",
     "close": "閉じる",
     "scroll_to_top": "トップへスクロール",
-    "breadcrumb": "パンくずリスト"
+    "breadcrumb": "パンくずリスト",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab"
   },
   "cookie_consent": {
     "banner_label": "Cookie同意",

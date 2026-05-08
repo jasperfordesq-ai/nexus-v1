@@ -283,5 +283,6 @@
   "user_fallback": "Benutzer",
   "listing_image_alt": "Auflistungsbild",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km"
+  "distance_kilometers": "{{distance}} km",
+  "map_view_listing": "View listing"
 }

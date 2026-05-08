@@ -211,7 +211,11 @@
     "sdg_selected_other": "{{count}} أهداف محددة",
     "content_required": "Post content cannot be empty.",
     "content_too_long": "Post is too long (max {{max}} characters).",
-    "groups_load_error": "Failed to load groups."
+    "groups_load_error": "Failed to load groups.",
+    "upload_preview_alt": "Upload preview {{number}}",
+    "image_remove_number_aria": "Remove image {{number}}",
+    "alt_text_add": "Add alt text",
+    "alt_text_edit": "Edit alt text"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."
@@ -321,7 +325,8 @@
     "milestone": {
       "badge_unlocked": "Badge unlocked",
       "level_reached": "Level reached"
-    }
+    },
+    "type_resource": "Resource"
   },
   "poll": {
     "load_failed": "Failed to load poll data.",

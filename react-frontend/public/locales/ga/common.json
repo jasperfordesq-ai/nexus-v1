@@ -63,7 +63,8 @@
     "explore": "Féach Thart",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "Tairiscintí agus iarratais",
     "messages": "Do theachtaireachtaí",
     "marketplace": "Buy & sell in your community",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -216,7 +218,8 @@
     "menu_opened": "Roghchlár nascleanúna oscailte",
     "close": "Dún",
     "scroll_to_top": "Scrollaigh go barr",
-    "breadcrumb": "Lorg Aráin"
+    "breadcrumb": "Lorg Aráin",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",

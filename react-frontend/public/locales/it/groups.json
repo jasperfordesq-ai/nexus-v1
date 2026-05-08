@@ -162,7 +162,8 @@
     "invite": "Invite",
     "copy": "Copy",
     "image_alt_group": "Group",
-    "image_alt_cover": "Cover"
+    "image_alt_cover": "Cover",
+    "you": "You"
   },
   "form": {
     "create_title": "Crea nuovo gruppo",
@@ -328,7 +329,9 @@
     "provide_reason": "Fornisci un motivo",
     "reported": "Post segnalato",
     "report_failed": "Impossibile segnalare il post",
-    "vote_failed": "Impossibile votare"
+    "vote_failed": "Impossibile votare",
+    "post_deleted": "Post deleted",
+    "post_delete_failed": "Failed to delete post"
   },
   "loading_aria": "Caricamento gruppi",
   "load_error": "Impossibile caricare i gruppi.",

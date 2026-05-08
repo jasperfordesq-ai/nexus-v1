@@ -162,7 +162,8 @@
     "invite": "Invite",
     "copy": "Copy",
     "image_alt_group": "Group",
-    "image_alt_cover": "Cover"
+    "image_alt_cover": "Cover",
+    "you": "You"
   },
   "form": {
     "create_title": "Nieuwe groep aanmaken",
@@ -328,7 +329,9 @@
     "provide_reason": "Geef alstublieft een reden op",
     "reported": "Bericht gerapporteerd",
     "report_failed": "Kon bericht niet rapporteren",
-    "vote_failed": "Kon niet stemmen"
+    "vote_failed": "Kon niet stemmen",
+    "post_deleted": "Post deleted",
+    "post_delete_failed": "Failed to delete post"
   },
   "loading_aria": "Groepen laden",
   "load_error": "Kon groepen niet laden. Probeer het opnieuw.",

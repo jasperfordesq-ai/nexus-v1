@@ -283,5 +283,6 @@
   "user_fallback": "Úsáideoir",
   "listing_image_alt": "Íomhá liostú",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km"
+  "distance_kilometers": "{{distance}} km",
+  "map_view_listing": "View listing"
 }

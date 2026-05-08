@@ -63,7 +63,8 @@
     "explore": "استكشاف",
     "marketplace": "Marketplace",
     "premium": "Premium",
-    "verify_identity": "Verify Your Identity"
+    "verify_identity": "Verify Your Identity",
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -118,7 +119,8 @@
     "timebanking_listings": "العروض والطلبات",
     "messages": "رسائلك",
     "marketplace": "اشترِ وبيع في مجتمعك",
-    "premium": "Premium membership tiers"
+    "premium": "Premium membership tiers",
+    "accessibility_alpha": "Open the accessibility-first alpha frontend"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",
@@ -216,7 +218,8 @@
     "menu_opened": "تم فتح قائمة التنقل",
     "close": "إغلاق",
     "scroll_to_top": "التمرير إلى الأعلى",
-    "breadcrumb": "مسار التنقل"
+    "breadcrumb": "مسار التنقل",
+    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab"
   },
   "cookie_consent": {
     "banner_label": "موافقة ملفات تعريف الارتباط",
