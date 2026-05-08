@@ -18,6 +18,8 @@ class Poll extends Model
 
     protected $table = 'polls';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'user_id', 'event_id', 'question', 'description',
         'end_date', 'is_active', 'category', 'poll_type',
