@@ -34,8 +34,7 @@ import { NotificationsProvider } from '@/contexts/NotificationsContext';
 import { PusherProvider } from '@/contexts/PusherContext';
 import { MenuProvider } from '@/contexts/MenuContext';
 import { PresenceProvider } from '@/contexts/PresenceContext';
-import { detectTenantFromUrl, RESERVED_PATHS } from '@/lib/tenant-routing';
-import { tokenManager } from '@/lib/api';
+import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { Spinner } from '@heroui/react';
@@ -69,42 +68,14 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   const { slug: detectedSlug } = detectTenantFromUrl();
   const effectiveSlug = detectedSlug ?? undefined;
 
-  // ── SLUG RECOVERY REDIRECT — SYNCHRONOUS, BEFORE ANY CHILDREN MOUNT ────
-  // On shared hosts (localhost, app.project-nexus.ie) the URL path MUST include
-  // the tenant slug prefix. If the slug is missing but we know which tenant the
-  // user is on (from localStorage), redirect IMMEDIATELY via window.location.
-  //
-  // GUARD: Only recover the slug when the user has active auth tokens. Without
-  // this guard, a stale slug in localStorage (from visiting another tenant in a
-  // different tab, or from a previous session) causes cross-tenant redirects —
-  // e.g. user on hour-timebank gets sent to park-goodman's login page. When
-  // tokens are cleared (logout / session expiry), the slug fallback is skipped
-  // and the user sees the login page's tenant chooser instead.
-  //
-  // SAFE for custom domains: hostname check ensures this NEVER fires on custom
-  // domains or subdomains — only on localhost, 127.0.0.1, app.project-nexus.ie.
-  if (!effectiveSlug && typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    const isSharedHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
-
-    if (isSharedHost) {
-      const storedSlug = tokenManager.getTenantSlug();
-      const hasAuthTokens = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
-      if (storedSlug && hasAuthTokens) {
-        const firstSegment = window.location.pathname.split('/').filter(Boolean)[0]?.toLowerCase();
-        const isReservedOrEmpty = !firstSegment || RESERVED_PATHS.has(firstSegment);
-
-        // Guard: if the storedSlug is itself a reserved word (e.g. tenant slug "admin"),
-        // prepending it would just produce another reserved-looking path → infinite loop.
-        const slugIsReserved = RESERVED_PATHS.has(storedSlug.toLowerCase());
-        if (isReservedOrEmpty && !slugIsReserved) {
-          const path = window.location.pathname === '/' ? '' : window.location.pathname;
-          window.location.replace(`${window.location.origin}/${storedSlug}${path}${window.location.search}${window.location.hash}`);
-          return null;
-        }
-      }
-    }
-  }
+  // Cross-tenant slug-recovery redirect REMOVED (2026-05-08). The previous
+  // logic re-prepended a stored slug from localStorage when a user hit a
+  // slug-less URL on app.project-nexus.ie. That mechanism caused a persistent
+  // bug: visiting app.project-nexus.ie/ (the master/platform landing page)
+  // bounced authenticated users straight into whichever tenant they had last
+  // visited (e.g. /agoris). The URL is now respected as-typed: the master
+  // tenant landing renders at /, and tenant-scoped pages require the slug
+  // to be present in the URL.
 
   return (
     <TenantProvider tenantSlug={effectiveSlug}>
