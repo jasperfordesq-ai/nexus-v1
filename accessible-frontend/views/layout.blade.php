@@ -19,7 +19,7 @@
     <header class="nexus-alpha-header" role="banner">
         <div class="govuk-width-container nexus-alpha-header__container">
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
-                {{ !empty($tenantSlug) ? __('govuk_alpha.header.community', ['name' => $tenant['name'] ?? $tenantSlug]) : __('govuk_alpha.service_name') }}
+                {{ !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name') }}
             </a>
         </div>
     </header>
@@ -28,11 +28,6 @@
         <section class="govuk-service-navigation" data-module="govuk-service-navigation" aria-label="{{ __('govuk_alpha.service_information_label') }}">
             <div class="govuk-width-container">
                 <div class="govuk-service-navigation__container">
-                    <span class="govuk-service-navigation__service-name">
-                        <a class="govuk-service-navigation__link" href="{{ route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) }}">
-                            {{ $tenant['name'] ?? $tenantSlug }}
-                        </a>
-                    </span>
                     <nav class="govuk-service-navigation__wrapper" aria-label="{{ __('govuk_alpha.navigation_label') }}">
                         <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="alpha-navigation" hidden aria-hidden="true">
                             {{ __('govuk_alpha.nav.menu') }}
