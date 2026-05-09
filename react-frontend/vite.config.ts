@@ -88,7 +88,13 @@ export default defineConfig(({ command, mode }) => {
           },
         ],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
+        // /clear-site-data and /api/sw-reset are emergency recovery URLs
+        // (defined in nginx.bluegreen.conf). They MUST bypass the SW so the
+        // browser sees the actual response (with the Clear-Site-Data header
+        // and the inline unregister script). Without them in the denylist,
+        // workbox would substitute the precached /index.html and the trap
+        // would re-form on the next deploy.
+        navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/, /^\/clear-site-data$/, /^\/api\/sw-reset$/],
       },
     }),
     // Image optimizer only runs during build — skip in dev for faster startup.

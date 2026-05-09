@@ -663,10 +663,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </div>
             )}
 
-            {/* Update / cache reset — full-page navigation to nginx route that returns Clear-Site-Data */}
+            {/* Update / cache reset — full-page navigation to nginx route that
+                bypasses the service worker (matches /^\/api\// on the OLD SW's
+                navigateFallbackDenylist) and unregisters the SW + clears caches
+                via inline JS. See nginx.bluegreen.conf for the recovery flow. */}
             <div className="px-4 py-3 border-t border-[var(--border-default)]">
               <a
-                href="/clear-site-data"
+                href="/api/sw-reset"
                 onClick={onClose}
                 className="flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all w-full no-underline"
               >
