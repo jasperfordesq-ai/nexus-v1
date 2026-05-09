@@ -7,8 +7,10 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobVacancy;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -116,14 +118,17 @@ class JobModerationService
                 'job_id' => $jobId,
             ]);
 
-            // Notify the job poster
+            // Notify the job poster — render in poster's preferred_language, not admin's locale
             try {
-                Notification::createNotification(
-                    (int) $job->user_id,
-                    __('emails_misc.jobs.posting_approved'),
-                    "/jobs/{$jobId}",
-                    'job_moderation'
-                );
+                $poster = User::select('id', 'preferred_language')->find($job->user_id);
+                LocaleContext::withLocale($poster, function () use ($job, $jobId) {
+                    Notification::createNotification(
+                        (int) $job->user_id,
+                        __('emails_misc.jobs.posting_approved'),
+                        "/jobs/{$jobId}",
+                        'job_moderation'
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::approveJob notification failed', [
                     'job_id' => $jobId,
@@ -168,14 +173,17 @@ class JobModerationService
                 'job_id' => $jobId,
             ]);
 
-            // Notify the job poster
+            // Notify the job poster — render in poster's preferred_language, not admin's locale
             try {
-                Notification::createNotification(
-                    (int) $job->user_id,
-                    __('emails_misc.jobs.posting_not_approved'),
-                    "/jobs/{$jobId}",
-                    'job_moderation'
-                );
+                $poster = User::select('id', 'preferred_language')->find($job->user_id);
+                LocaleContext::withLocale($poster, function () use ($job, $jobId) {
+                    Notification::createNotification(
+                        (int) $job->user_id,
+                        __('emails_misc.jobs.posting_not_approved'),
+                        "/jobs/{$jobId}",
+                        'job_moderation'
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::rejectJob notification failed', [
                     'job_id' => $jobId,

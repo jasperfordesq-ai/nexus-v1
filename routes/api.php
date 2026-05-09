@@ -37,6 +37,7 @@ Route::get('/laravel/health', function () {
         'status' => 'ok',
     ]);
 });
+Route::get('/v2/health', fn () => response()->json(['status' => 'ok']));
 
 // ============================================
 // MIGRATED ROUTES — Tenant Bootstrap
