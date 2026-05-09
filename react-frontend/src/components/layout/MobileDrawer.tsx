@@ -68,6 +68,7 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -661,6 +662,18 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </Button>
               </div>
             )}
+
+            {/* Update / cache reset — full-page navigation to nginx route that returns Clear-Site-Data */}
+            <div className="px-4 py-3 border-t border-[var(--border-default)]">
+              <a
+                href="/clear-site-data"
+                onClick={onClose}
+                className="flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all w-full no-underline"
+              >
+                <RefreshCw className="w-5 h-5" aria-hidden="true" />
+                <span>{t('nav.update_app', 'Update to the latest version')}</span>
+              </a>
+            </div>
 
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
             <div className="pt-4 pb-4 px-4">
