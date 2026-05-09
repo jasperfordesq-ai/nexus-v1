@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Sentry\Laravel\Integration;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
@@ -346,12 +347,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ], 429, ['API-Version' => '2.0']);
         });
 
-        // Sentry integration — report to Sentry in production
-        $exceptions->reportable(function (\Throwable $e) {
-            if (app()->bound('sentry')) {
-                app('sentry')->captureException($e);
-            }
-        });
+        // Sentry — captures unhandled exceptions and wires tracing context.
+        // Driven by config/sentry.php (which reads SENTRY_DSN_PHP from .env).
+        Integration::handles($exceptions);
     })
     ->create();
 
