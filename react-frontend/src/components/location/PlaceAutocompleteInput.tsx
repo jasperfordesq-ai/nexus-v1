@@ -32,6 +32,8 @@ import { useTranslation } from 'react-i18next';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
 import { GoogleMapsProvider } from './GoogleMapsProvider';
+import { NominatimAutocomplete } from './NominatimAutocomplete';
+import { useTenant } from '@/contexts/TenantContext';
 
 /** Debounce delay for autocomplete requests (ms). */
 const DEBOUNCE_MS = 300;
@@ -351,11 +353,25 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
 /**
  * PlaceAutocompleteInput — the public API.
  *
- * Renders the Google-powered autocomplete when APIProvider is available.
- * The component wraps its Google-powered branch in GoogleMapsProvider only
- * when rendered, so public pages do not load Maps globally.
+ * Dispatches on the tenant's `geocodingProvider` setting:
+ *   - 'google'    → Google Places Autocomplete (paid; loaded lazily via
+ *                   GoogleMapsProvider). Falls back to plain text input if
+ *                   the Maps API is unavailable (kill switch engaged or
+ *                   network failure).
+ *   - 'nominatim' → OpenStreetMap Nominatim (free, no API key, rate-limited
+ *                   to 1 req/sec via internal debounce).
+ *
+ * Autocomplete is always rendered — the choice is *which* provider, never
+ * whether to offer it. The cost-bearing Google branch never mounts when the
+ * tenant has selected Nominatim, so no Maps script is loaded on those pages.
  */
 export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
+  const { geocodingProvider } = useTenant();
+
+  if (geocodingProvider === 'nominatim') {
+    return <NominatimAutocomplete {...props} />;
+  }
+
   return (
     <GoogleMapsProvider fallback={<PlaceAutocompleteFallback {...props} />}>
       <PlaceAutocompleteWithGoogle {...props} />

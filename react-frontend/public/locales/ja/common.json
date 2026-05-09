@@ -71,7 +71,10 @@
     "aria_label": "Explore community sections"
   },
   "location": {
-    "powered_by_google": "Powered by Google"
+    "powered_by_google": "Powered by Google",
+    "powered_by_osm": "© OpenStreetMap contributors",
+    "osm_placeholder": "Map view via OpenStreetMap is not available yet. Address details are still searchable.",
+    "osm_placeholder_aria": "Map placeholder — OpenStreetMap rendering not yet available"
   },
   "nav_desc": {
     "feed": "コミュニティフィード",

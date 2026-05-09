@@ -44,6 +44,7 @@ class TenantFeatureConfig
         'partner_api' => false,
         'regional_analytics' => false,
         'newsletter' => true,
+        'maps' => true,
     ];
 
     /**

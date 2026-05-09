@@ -37,6 +37,8 @@ import {
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
+import { useTenant } from '@/contexts/TenantContext';
+import { useTranslation } from 'react-i18next';
 
 export interface MapMarker {
   id: number | string;
@@ -520,10 +522,45 @@ function ClusterChooser({
 }
 
 // ---------------------------------------------------------------------------
-// Public export — guards against missing API key
+// OpenStreetMap branch — placeholder.
+//
+// When the tenant selects `map_provider = openstreetmap`, an OSM-backed map
+// renderer would go here (e.g. react-leaflet + OSM tiles). Building it
+// requires adding `leaflet` + `react-leaflet` deps and porting marker logic.
+// For now, we render an accessible placeholder so map cards degrade
+// predictably; address autocomplete continues to work via Nominatim.
+// ---------------------------------------------------------------------------
+
+function OpenStreetMapPlaceholder({ className, height }: Pick<LocationMapProps, 'className' | 'height'>) {
+  const { t } = useTranslation('common');
+  return (
+    <div
+      role="img"
+      aria-label={t('location.osm_placeholder_aria')}
+      className={`flex items-center justify-center rounded-xl border border-glass-border bg-default-50 dark:bg-default-100/10 text-theme-muted text-sm ${className ?? ''}`}
+      style={{ height: height ?? '400px' }}
+    >
+      <span className="px-4 text-center">{t('location.osm_placeholder')}</span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Public export — dispatches on tenant's map provider
 // ---------------------------------------------------------------------------
 
 export function LocationMap(props: LocationMapProps) {
+  const { mapProvider, hasFeature } = useTenant();
+
+  // Maps kill switch: when off, render nothing (existing behavior).
+  if (!hasFeature('maps')) {
+    return null;
+  }
+
+  if (mapProvider === 'openstreetmap') {
+    return <OpenStreetMapPlaceholder className={props.className} height={props.height} />;
+  }
+
   return (
     <GoogleMapsProvider>
       <LocationMapInner {...props} />

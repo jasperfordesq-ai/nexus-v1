@@ -62,6 +62,7 @@ class AdminConfigController extends BaseApiController
         'time_format', 'items_per_page', 'max_upload_size_mb',
         'email_verification', 'admin_approval', 'welcome_credits',
         'footer_text',
+        'map_provider', 'geocoding_provider',
     ];
 
     private const FEED_ALGO_DEFAULTS = [

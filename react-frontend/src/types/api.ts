@@ -1144,6 +1144,7 @@ export interface TenantFeatures {
   newsletter: boolean;
   merchant_coupons: boolean;
   regional_analytics: boolean;
+  maps: boolean;
 }
 
 export interface TenantModules {

@@ -358,6 +358,7 @@ class TenantBootstrapController extends BaseApiController
         'timezone', 'default_currency', 'date_format', 'time_format',
         'items_per_page', 'welcome_credits', 'footer_text', 'welcome_message',
         'seo_google_verification', 'seo_bing_verification',
+        'map_provider', 'geocoding_provider',
     ];
 
     private function buildGeneralSettings(int $tenantId): array

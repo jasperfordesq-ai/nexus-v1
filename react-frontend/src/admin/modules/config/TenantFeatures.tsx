@@ -22,9 +22,10 @@ import Database from 'lucide-react/icons/database';
 import Timer from 'lucide-react/icons/timer';
 import Play from 'lucide-react/icons/play';
 import Globe from 'lucide-react/icons/globe';
+import MapPin from 'lucide-react/icons/map-pin';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
-import { adminConfig } from '../../api/adminApi';
+import { adminConfig, adminSettings } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { TenantConfig, CacheStats, BackgroundJob } from '../../api/types';
 
@@ -61,6 +62,11 @@ export function TenantFeatures() {
   const [langSupported, setLangSupported] = useState<string[]>(supportedLanguages);
   const [savingLang, setSavingLang] = useState(false);
 
+  // Maps & Location config state
+  const [mapProvider, setMapProvider] = useState<'google' | 'openstreetmap'>('google');
+  const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim'>('google');
+  const [savingProviders, setSavingProviders] = useState(false);
+
   // Sync language state when TenantContext data arrives
   useEffect(() => {
     setLangDefault(defaultLanguage);
@@ -69,10 +75,11 @@ export function TenantFeatures() {
 
   const loadConfig = useCallback(async () => {
     setLoading(true);
-    const [configRes, cacheRes, jobsRes] = await Promise.all([
+    const [configRes, cacheRes, jobsRes, settingsRes] = await Promise.all([
       adminConfig.get(),
       adminConfig.getCacheStats(),
       adminConfig.getJobs(),
+      adminSettings.get(),
     ]);
 
     if (configRes.success && configRes.data) {
@@ -83,6 +90,13 @@ export function TenantFeatures() {
     }
     if (jobsRes.success && jobsRes.data) {
       setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
+    }
+    if (settingsRes.success && settingsRes.data) {
+      const s = (settingsRes.data as { settings?: Record<string, unknown> }).settings ?? {};
+      const mp = s.map_provider;
+      const gp = s.geocoding_provider;
+      if (mp === 'google' || mp === 'openstreetmap') setMapProvider(mp);
+      if (gp === 'google' || gp === 'nominatim') setGeocodingProvider(gp);
     }
     setLoading(false);
   }, []);
@@ -157,6 +171,27 @@ export function TenantFeatures() {
       setLangDefault('en');
     }
   };
+
+  const handleSaveProviders = async () => {
+    setSavingProviders(true);
+    const res = await adminSettings.update({
+      map_provider: mapProvider,
+      geocoding_provider: geocodingProvider,
+    });
+    if (res.success) {
+      toast.success(t('tenant_features.maps_providers_saved', { defaultValue: 'Map & location providers saved' }));
+      refreshTenant();
+    } else {
+      toast.error(res.error || t('tenant_features.maps_providers_save_failed', { defaultValue: 'Failed to save providers' }));
+    }
+    setSavingProviders(false);
+  };
+
+  const handleMapsKillSwitch = async (enabled: boolean) => {
+    await handleFeatureToggle('maps', enabled);
+  };
+
+  const mapsEnabled = config?.features?.maps ?? true;
 
   const handleSaveLanguages = async () => {
     setSavingLang(true);
@@ -265,6 +300,106 @@ export function TenantFeatures() {
                   onPress={handleSaveLanguages}
                 >
                   {"Save changes"}
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Maps & Location Providers */}
+          <Card shadow="sm">
+            <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+              <MapPin size={18} className="text-warning" />
+              <h3 className="font-semibold">{t('tenant_features.maps_card_title', { defaultValue: 'Maps & location' })}</h3>
+              <span className="text-sm text-default-400">
+                {t('tenant_features.maps_card_subtitle', { defaultValue: 'Cost & provider controls' })}
+              </span>
+            </CardHeader>
+            <CardBody className="px-4 pb-4 space-y-4">
+              {/* Kill switch */}
+              <div className="flex items-center justify-between rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-3">
+                <div className="pr-4">
+                  <p className="font-medium text-sm">
+                    {t('tenant_features.maps_kill_switch_label', { defaultValue: 'Map display (kill switch)' })}
+                  </p>
+                  <p className="text-xs text-default-500 mt-0.5">
+                    {t('tenant_features.maps_kill_switch_desc', { defaultValue: 'When off: no map components render, no Google API key is delivered to browsers. Address autocomplete continues to work via the chosen geocoding provider.' })}
+                  </p>
+                </div>
+                <Switch
+                  isSelected={mapsEnabled}
+                  onValueChange={handleMapsKillSwitch}
+                  isDisabled={toggling === 'maps'}
+                  size="sm"
+                  aria-label={t('tenant_features.maps_kill_switch_label', { defaultValue: 'Map display kill switch' })}
+                />
+              </div>
+
+              <Divider />
+
+              {/* Map provider */}
+              <div>
+                <p className="text-sm font-medium mb-1">
+                  {t('tenant_features.map_provider_label', { defaultValue: 'Map display provider' })}
+                </p>
+                <p className="text-xs text-default-400 mb-2">
+                  {t('tenant_features.map_provider_desc', { defaultValue: 'Which service renders interactive maps. Google = paid, Places-quality. OpenStreetMap = free, community-maintained.' })}
+                </p>
+                <Select
+                  aria-label={t('tenant_features.map_provider_label', { defaultValue: 'Map provider' })}
+                  selectedKeys={[mapProvider]}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as string;
+                    if (val === 'google' || val === 'openstreetmap') setMapProvider(val);
+                  }}
+                  className="max-w-xs"
+                  size="sm"
+                  isDisabled={!mapsEnabled}
+                >
+                  <SelectItem key="google">
+                    {t('tenant_features.provider_google', { defaultValue: 'Google Maps (paid)' })}
+                  </SelectItem>
+                  <SelectItem key="openstreetmap">
+                    {t('tenant_features.provider_osm', { defaultValue: 'OpenStreetMap (free)' })}
+                  </SelectItem>
+                </Select>
+              </div>
+
+              {/* Geocoding / autocomplete provider */}
+              <div>
+                <p className="text-sm font-medium mb-1">
+                  {t('tenant_features.geocoding_provider_label', { defaultValue: 'Address autocomplete provider' })}
+                </p>
+                <p className="text-xs text-default-400 mb-2">
+                  {t('tenant_features.geocoding_provider_desc', { defaultValue: 'Powers location search across registration, listings, events, groups, and volunteering. Always on — only the provider is configurable. Google Places is paid; Nominatim is free, slightly slower, and rate-limited.' })}
+                </p>
+                <Select
+                  aria-label={t('tenant_features.geocoding_provider_label', { defaultValue: 'Autocomplete provider' })}
+                  selectedKeys={[geocodingProvider]}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as string;
+                    if (val === 'google' || val === 'nominatim') setGeocodingProvider(val);
+                  }}
+                  className="max-w-xs"
+                  size="sm"
+                >
+                  <SelectItem key="google">
+                    {t('tenant_features.provider_google_places', { defaultValue: 'Google Places (paid)' })}
+                  </SelectItem>
+                  <SelectItem key="nominatim">
+                    {t('tenant_features.provider_nominatim', { defaultValue: 'Nominatim / OpenStreetMap (free)' })}
+                  </SelectItem>
+                </Select>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  color="primary"
+                  size="sm"
+                  isLoading={savingProviders}
+                  isDisabled={savingProviders}
+                  onPress={handleSaveProviders}
+                >
+                  {t('tenant_features.save_changes', { defaultValue: 'Save changes' })}
                 </Button>
               </div>
             </CardBody>

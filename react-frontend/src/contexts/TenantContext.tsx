@@ -69,7 +69,17 @@ interface TenantContextValue extends TenantState {
   supportedLanguages: string[];
   /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
   defaultLanguage: string;
+  /** Tenant-selected map display provider. Default: 'google'. */
+  mapProvider: MapProvider;
+  /** Tenant-selected location autocomplete / geocoding provider. Default: 'google'. */
+  geocodingProvider: GeocodingProvider;
 }
+
+export type MapProvider = 'google' | 'openstreetmap';
+export type GeocodingProvider = 'google' | 'nominatim';
+
+const ALLOWED_MAP_PROVIDERS: readonly MapProvider[] = ['google', 'openstreetmap'];
+const ALLOWED_GEOCODING_PROVIDERS: readonly GeocodingProvider[] = ['google', 'nominatim'];
 
 // Default features — synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS
 const defaultFeatures: TenantFeatures = {
@@ -103,6 +113,7 @@ const defaultFeatures: TenantFeatures = {
   newsletter: true,
   merchant_coupons: false,
   regional_analytics: false,
+  maps: true,
 };
 
 // Default modules (all enabled)
@@ -556,6 +567,20 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     [state.tenant]
   );
 
+  const mapProvider = useMemo<MapProvider>(() => {
+    const raw = state.tenant?.settings?.map_provider;
+    return typeof raw === 'string' && ALLOWED_MAP_PROVIDERS.includes(raw as MapProvider)
+      ? (raw as MapProvider)
+      : 'google';
+  }, [state.tenant]);
+
+  const geocodingProvider = useMemo<GeocodingProvider>(() => {
+    const raw = state.tenant?.settings?.geocoding_provider;
+    return typeof raw === 'string' && ALLOWED_GEOCODING_PROVIDERS.includes(raw as GeocodingProvider)
+      ? (raw as GeocodingProvider)
+      : 'google';
+  }, [state.tenant]);
+
   // After tenant data loads, apply tenant default language if user hasn't
   // explicitly chosen one via the language switcher.
   // Note: We check 'nexus_language_user_chosen' (set by LanguageSwitcher), NOT
@@ -597,8 +622,10 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       tenantPath,
       supportedLanguages,
       defaultLanguage,
+      mapProvider,
+      geocodingProvider,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
   );
 
   return (
