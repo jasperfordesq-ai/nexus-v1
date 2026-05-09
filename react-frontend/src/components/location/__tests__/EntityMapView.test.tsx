@@ -28,6 +28,8 @@ vi.mock('@/contexts', () => ({
     branding: { name: 'Test' },
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
+    mapProvider: 'google',
+    geocodingProvider: 'google',
     tenantPath: (p: string) => `/test${p}`,
   })),
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),

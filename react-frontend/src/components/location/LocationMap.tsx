@@ -18,6 +18,8 @@ import {
   useCallback,
   useMemo,
   useRef,
+  lazy,
+  Suspense,
   type ReactNode,
 } from 'react';
 import {
@@ -37,8 +39,14 @@ import {
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
-import { useTenant } from '@/contexts/TenantContext';
-import { OpenStreetMapView } from './OpenStreetMapView';
+import { useTenant } from '@/contexts';
+
+// Code-split: the Leaflet bundle (~150KB gz) only loads when a tenant has
+// actually selected map_provider=openstreetmap. Google-only tenants pay
+// zero bundle cost for the OSM branch.
+const OpenStreetMapView = lazy(() =>
+  import('./OpenStreetMapView').then((m) => ({ default: m.OpenStreetMapView }))
+);
 
 export interface MapMarker {
   id: number | string;
@@ -543,7 +551,19 @@ export function LocationMap(props: LocationMapProps) {
   }
 
   if (mapProvider === 'openstreetmap') {
-    return <OpenStreetMapView {...props} />;
+    return (
+      <Suspense
+        fallback={
+          <div
+            className={`rounded-xl bg-theme-surface/50 animate-pulse ${props.className ?? ''}`}
+            style={{ height: props.height ?? '400px' }}
+            aria-hidden="true"
+          />
+        }
+      >
+        <OpenStreetMapView {...props} />
+      </Suspense>
+    );
   }
 
   return (

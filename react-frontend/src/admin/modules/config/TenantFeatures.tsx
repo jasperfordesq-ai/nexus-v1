@@ -313,6 +313,34 @@ export function TenantFeatures() {
               </span>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
+              {/* Live status — shows what's actually serving right now */}
+              <div className="flex flex-wrap gap-2 items-center text-xs">
+                <span className="text-default-500">{t('tenant_features.currently_serving', { defaultValue: 'Currently serving:' })}</span>
+                <span className={`px-2 py-0.5 rounded-full font-medium ${mapsEnabled ? (mapProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300') : 'bg-default-200 text-default-600'}`}>
+                  {t('tenant_features.status_maps', { defaultValue: 'Maps' })}{': '}
+                  {!mapsEnabled
+                    ? t('tenant_features.status_off', { defaultValue: 'off' })
+                    : mapProvider === 'google'
+                      ? t('tenant_features.status_google_paid', { defaultValue: 'Google (paid)' })
+                      : t('tenant_features.status_osm_free', { defaultValue: 'OpenStreetMap (free)' })}
+                </span>
+                <span className={`px-2 py-0.5 rounded-full font-medium ${geocodingProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300'}`}>
+                  {t('tenant_features.status_autocomplete', { defaultValue: 'Autocomplete' })}{': '}
+                  {geocodingProvider === 'google'
+                    ? t('tenant_features.status_google_places_paid', { defaultValue: 'Google Places (paid)' })
+                    : t('tenant_features.status_nominatim_free', { defaultValue: 'Nominatim (free)' })}
+                </span>
+              </div>
+
+              {/* Cost guidance hint */}
+              {(geocodingProvider === 'google' || (mapsEnabled && mapProvider === 'google')) && (
+                <div className="rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-2 text-xs text-warning-700 dark:text-warning-300 border border-warning-200 dark:border-warning-800">
+                  {t('tenant_features.cost_warning', { defaultValue: 'This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver — sessions billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.' })}
+                </div>
+              )}
+
+              <Divider />
+
               {/* Kill switch */}
               <div className="flex items-center justify-between rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-3">
                 <div className="pr-4">

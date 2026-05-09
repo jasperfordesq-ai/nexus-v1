@@ -117,6 +117,29 @@ import { Button, Card, Input } from "@heroui/react";
 | `OfflineIndicator` | `src/components/feedback/OfflineIndicator.tsx` | Offline/online banner |
 | `TransferModal` | `src/components/wallet/TransferModal.tsx` | Time credit transfer dialog |
 
+## Maps & Location Providers
+
+Three independent per-tenant settings, all configurable in `/admin/tenant-features → "Maps & location"`:
+
+| Setting | Values | Default | Effect |
+| --- | --- | --- | --- |
+| `maps` (feature flag) | on / off | on | Off ⇒ no map components render anywhere; no Google API key reaches the browser. |
+| `map_provider` (general setting) | `google` / `openstreetmap` | `google` | Renderer for interactive maps. |
+| `geocoding_provider` (general setting) | `google` / `nominatim` | `google` | Address autocomplete. **Always on regardless of `maps` flag.** |
+
+**Dispatch:**
+
+- `LocationMap` checks `hasFeature('maps')` → `mapProvider` → `<OpenStreetMapView/>` (lazy-loaded Leaflet) or `<GoogleMapsProvider/>`.
+- `PlaceAutocompleteInput` checks `geocodingProvider` → `<NominatimAutocomplete/>` or Google Places. The Google branch never mounts on Nominatim tenants — zero billable traffic.
+
+**Defence in depth:** `MapsConfigController` (`/api/v2/config/google-maps`) only returns the Google API key when `maps=on` AND `map_provider=google`. `AdminConfigController::updateSettings` validates provider values against allow-lists.
+
+**Compliance:** OSM tiles via `tile.openstreetmap.org` (subject to OSMF tile policy — fine at low/moderate scale; switch to MapTiler/Stadia for high traffic). Nominatim 1 req/sec policy is honored by the 1s frontend debounce. Required attribution renders automatically.
+
+**Cost playbook:** Switch `geocoding_provider` to `nominatim` first (Places sessions are usually the biggest cost). Then `map_provider`. Kill switch is the emergency cutoff.
+
+Files: [src/components/location/LocationMap.tsx](src/components/location/LocationMap.tsx), [OpenStreetMapView.tsx](src/components/location/OpenStreetMapView.tsx), [PlaceAutocompleteInput.tsx](src/components/location/PlaceAutocompleteInput.tsx), [NominatimAutocomplete.tsx](src/components/location/NominatimAutocomplete.tsx), admin UI in [src/admin/modules/config/TenantFeatures.tsx](src/admin/modules/config/TenantFeatures.tsx).
+
 ## Feature & Module Gating
 
 Two gating mechanisms controlled per-tenant:

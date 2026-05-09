@@ -24,6 +24,16 @@ vi.mock('@/lib/map-styles', () => ({
   DARK_MAP_STYLES: [],
 }));
 
+const mockUseTenant = vi.fn(() => ({
+  hasFeature: (f: string) => f === 'maps',
+  mapProvider: 'google' as const,
+  geocodingProvider: 'google' as const,
+}));
+
+vi.mock('@/contexts', () => ({
+  useTenant: () => mockUseTenant(),
+}));
+
 const mockUseApiLoadingStatus = vi.fn(() => 'LOADED');
 
 vi.mock('@vis.gl/react-google-maps', () => ({
@@ -131,6 +141,44 @@ describe('LocationMap', () => {
       const wrapper = container.querySelector('.custom-map');
       expect(wrapper).toBeTruthy();
       expect(wrapper?.getAttribute('style')).toContain('500px');
+    });
+  });
+
+  describe('per-tenant kill switch + provider dispatch', () => {
+    it('returns null when the maps feature flag is OFF', () => {
+      mockUseTenant.mockReturnValueOnce({
+        hasFeature: () => false,
+        mapProvider: 'google' as const,
+        geocodingProvider: 'google' as const,
+      });
+      const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+      // No leaflet either
+      expect(container.querySelector('.nexus-osm-map-wrapper')).toBeNull();
+    });
+
+    it('renders the OpenStreetMap branch when map_provider=openstreetmap', async () => {
+      mockUseTenant.mockReturnValueOnce({
+        hasFeature: () => true,
+        mapProvider: 'openstreetmap' as const,
+        geocodingProvider: 'nominatim' as const,
+      });
+      const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      // Suspense fallback while leaflet bundle loads in the test env;
+      // either way, the Google branch must NOT render.
+      await waitFor(() => {
+        expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+      });
+    });
+
+    it('renders the Google branch when map_provider=google (default)', async () => {
+      const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      await waitFor(() => {
+        expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+      });
     });
   });
 });

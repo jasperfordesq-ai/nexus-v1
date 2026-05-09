@@ -33,7 +33,7 @@ import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
 import { GoogleMapsProvider } from './GoogleMapsProvider';
 import { NominatimAutocomplete } from './NominatimAutocomplete';
-import { useTenant } from '@/contexts/TenantContext';
+import { useTenant } from '@/contexts';
 
 /** Debounce delay for autocomplete requests (ms). */
 const DEBOUNCE_MS = 300;
