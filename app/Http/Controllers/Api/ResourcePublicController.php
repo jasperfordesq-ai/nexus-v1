@@ -319,6 +319,80 @@ class ResourcePublicController extends BaseApiController
     }
 
     /**
+     * PUT /api/v2/resources/{id}
+     *
+     * Update a resource's title, description, or category. Owner or admin only.
+     */
+    public function update(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $resource = DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$resource) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.resource_not_found'), null, 404);
+        }
+
+        $isOwner = (int) $resource->user_id === $userId;
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->role ?? 'member';
+        $isAdmin = in_array($role, ['admin', 'super_admin', 'tenant_admin'], true);
+
+        if (!$isOwner && !$isAdmin) {
+            return $this->respondWithError('FORBIDDEN', __('api.no_permission_edit_resource'), null, 403);
+        }
+
+        $updates = [];
+        $title = request()->input('title');
+        if ($title !== null) {
+            $title = trim((string) $title);
+            if ($title === '') {
+                return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
+            }
+            $updates['title'] = $title;
+        }
+
+        if (request()->has('description')) {
+            $updates['description'] = trim((string) request()->input('description', ''));
+        }
+
+        if (request()->has('category_id')) {
+            $categoryId = request()->input('category_id');
+            $updates['category_id'] = ($categoryId !== null && $categoryId !== '') ? (int) $categoryId : null;
+        }
+
+        if (request()->has('content_body')) {
+            $updates['content_body'] = (string) request()->input('content_body', '');
+        }
+
+        if (empty($updates)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.no_fields_to_update'), null, 400);
+        }
+
+        DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($updates);
+
+        $updated = DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        return $this->respondWithData([
+            'id'           => (int) $updated->id,
+            'title'        => $updated->title,
+            'description'  => $updated->description,
+            'category_id'  => $updated->category_id ? (int) $updated->category_id : null,
+            'content_body' => $updated->content_body ?? null,
+        ]);
+    }
+
+    /**
      * DELETE /api/v2/resources/{id}
      *
      * Delete a resource. Only the uploader or an admin can delete.

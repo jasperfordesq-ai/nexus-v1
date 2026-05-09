@@ -815,6 +815,7 @@ Route::delete('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\Resour
 Route::put('/v2/resources/reorder', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'reorder'])->middleware('admin');
 Route::post('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'store']);
 Route::get('/v2/resources/{id}/download', [\App\Http\Controllers\Api\ResourcePublicController::class, 'download']);
+Route::put('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'update']);
 Route::delete('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'destroy']);
 Route::get('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/kb/search', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'search'])->withoutMiddleware('auth:sanctum');

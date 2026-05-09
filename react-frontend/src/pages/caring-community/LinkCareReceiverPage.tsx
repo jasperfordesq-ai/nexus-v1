@@ -166,8 +166,11 @@ export function LinkCareReceiverPage() {
                     </div>
                   ) : searchResults && searchResults.length > 0 ? (
                     <ul className="divide-y divide-theme-default" role="listbox" aria-label={t('caregiver.search_results_aria')}>
-                      {searchResults.slice(0, 8).map((user) => (
-                        <li key={user.id} role="option" aria-selected={selectedUser?.id === user.id}>
+                      {(searchResults as UserSearchResult[]).slice(0, 8).map((user: UserSearchResult) => {
+                        const sel = selectedUser as UserSearchResult | null;
+                        const isSelected: boolean = sel !== null && sel.id === user.id;
+                        return (
+                        <li key={user.id} role="option" aria-selected={isSelected}>
 
                           <Button
                             type="button"
@@ -187,7 +190,8 @@ export function LinkCareReceiverPage() {
                             </span>
                           </Button>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   ) : (
                     <div className="p-3 text-sm text-theme-muted">{t('caregiver.no_search_results')}</div>

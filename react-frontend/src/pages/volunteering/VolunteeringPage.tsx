@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -383,13 +384,15 @@ export function VolunteeringPage() {
               {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
               {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
               {activeTab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
-              <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
-                {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
-                {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
-                {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
-                {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
-                {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+                  {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
+                  {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
+                  {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
+                  {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
+                  {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
+                </Suspense>
+              </ErrorBoundary>
             </div>}
           </>
         );

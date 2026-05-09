@@ -74,10 +74,14 @@ export function VerifyIdentityPage() {
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollStartRef = useRef<number>(Date.now());
+  const pollAttemptRef = useRef<number>(0);
 
   const MAX_POLL_MS = 10 * 60 * 1000;
+  // Exponential backoff: 5s, 7.5s, 11s, 17s, 25s, capped at 30s.
+  const nextPollDelayMs = (attempt: number) =>
+    Math.min(30_000, Math.round(5_000 * Math.pow(1.5, attempt)));
 
   // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -85,7 +89,7 @@ export function VerifyIdentityPage() {
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
-      clearInterval(pollRef.current);
+      clearTimeout(pollRef.current);
       pollRef.current = null;
     }
   }, []);
@@ -145,7 +149,15 @@ export function VerifyIdentityPage() {
   const startPolling = useCallback(() => {
     stopPolling();
     pollStartRef.current = Date.now();
-    pollRef.current = setInterval(fetchStatus, 5000);
+    pollAttemptRef.current = 0;
+    const tick = () => {
+      void fetchStatus().finally(() => {
+        if (pollRef.current === null && pollStartRef.current === 0) return;
+        const delay = nextPollDelayMs(pollAttemptRef.current++);
+        pollRef.current = setTimeout(tick, delay);
+      });
+    };
+    pollRef.current = setTimeout(tick, nextPollDelayMs(0));
   }, [fetchStatus, stopPolling]);
 
   // Initial fetch + polling
