@@ -1749,6 +1749,8 @@ export interface AdminSettingsResponse {
     maintenance_mode: string | null;
     footer_text: string | null;
     default_currency: string | null;
+    map_provider: string | null;
+    geocoding_provider: string | null;
   };
 }
 

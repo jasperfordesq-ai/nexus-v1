@@ -286,6 +286,8 @@ return [
     'maintenance_mode_boolean'             => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid'            => 'registration_mode must be one of: open, closed, invite_only',
     'default_currency_invalid'             => 'default_currency must be a 3-letter ISO 4217 currency code (e.g. eur, usd, gbp)',
+    'map_provider_invalid'                 => 'map_provider must be one of: google, openstreetmap',
+    'geocoding_provider_invalid'           => 'geocoding_provider must be one of: google, nominatim',
     'no_recognized_settings'               => 'No recognized settings provided. Unknown keys: :keys',
     'no_recognized_ai_settings'            => 'No recognized AI settings provided',
     'invalid_ai_provider'                  => 'Invalid AI provider. Must be one of: :providers',

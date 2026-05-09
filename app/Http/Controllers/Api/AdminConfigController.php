@@ -795,6 +795,20 @@ class AdminConfigController extends BaseApiController
             }
         }
 
+        // Validate map_provider — restricted to known frontend dispatch branches.
+        if (isset($kvUpdates['map_provider'])) {
+            if (!in_array($kvUpdates['map_provider'], ['google', 'openstreetmap'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.map_provider_invalid'), 'map_provider', 422);
+            }
+        }
+
+        // Validate geocoding_provider — restricted to known frontend dispatch branches.
+        if (isset($kvUpdates['geocoding_provider'])) {
+            if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.geocoding_provider_invalid'), 'geocoding_provider', 422);
+            }
+        }
+
         // Validate default_currency — must be a 3-letter ISO 4217 code (lowercase).
         // Stripe accepts ~135 currencies; allow any 3-letter code and normalize to lowercase.
         if (isset($kvUpdates['default_currency'])) {

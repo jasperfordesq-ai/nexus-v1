@@ -92,9 +92,7 @@ export function TenantFeatures() {
       setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
     }
     if (settingsRes.success && settingsRes.data) {
-      const s = (settingsRes.data as { settings?: Record<string, unknown> }).settings ?? {};
-      const mp = s.map_provider;
-      const gp = s.geocoding_provider;
+      const { map_provider: mp, geocoding_provider: gp } = settingsRes.data.settings;
       if (mp === 'google' || mp === 'openstreetmap') setMapProvider(mp);
       if (gp === 'google' || gp === 'nominatim') setGeocodingProvider(gp);
     }
