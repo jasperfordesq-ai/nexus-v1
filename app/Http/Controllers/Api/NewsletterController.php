@@ -9,7 +9,9 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\NewsletterAnalytics;
+use App\Models\User;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -206,21 +208,27 @@ class NewsletterController extends BaseApiController
             ]);
 
         if ($updated) {
-            // Send unsubscribe confirmation email
+            // Send unsubscribe confirmation email — render in subscriber's preferred locale
+            // (request locale may be wrong if the link is hit by an email pre-fetcher / scanner)
             try {
                 $email = $subscriber->email ?? null;
                 if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $community = DB::table('tenants')->where('id', $tenantId)->value('name') ?? config('app.name');
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails.newsletter.unsubscribed_title'))
-                        ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
-                        ->paragraph(__('emails.newsletter.unsubscribed_body_contact'))
-                        ->render();
-                    Mailer::forCurrentTenant()->send(
-                        $email,
-                        __('emails.newsletter.unsubscribed_subject', ['community' => $community]),
-                        $html
-                    );
+                    $recipient = !empty($subscriber->user_id)
+                        ? User::select('id', 'preferred_language')->find($subscriber->user_id)
+                        : null;
+                    LocaleContext::withLocale($recipient, function () use ($email, $community) {
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails.newsletter.unsubscribed_title'))
+                            ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
+                            ->paragraph(__('emails.newsletter.unsubscribed_body_contact'))
+                            ->render();
+                        Mailer::forCurrentTenant()->send(
+                            $email,
+                            __('emails.newsletter.unsubscribed_subject', ['community' => $community]),
+                            $html
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[NewsletterController] unsubscribe confirmation email failed', ['error' => $e->getMessage()]);
