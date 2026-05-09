@@ -26,6 +26,11 @@ export interface GoogleMapsConfig {
   enabled: boolean;
   apiKey: string;
   mapId: string | null;
+  /** Runtime tile URL for the OSM branch — chosen by the server (free OSM
+   *  vs MapTiler) based on whether a per-tenant MapTiler key is set. */
+  osmTileUrl?: string;
+  osmTileAttribution?: string;
+  osmTileProvider?: 'osm' | 'maptiler' | null;
 }
 
 const GoogleMapsConfigContext = createContext<GoogleMapsConfig | null>(null);
@@ -36,6 +41,10 @@ export function resetGoogleMapsConfigForTests() {
   if (import.meta.env.MODE === 'test') {
     configPromise = null;
   }
+}
+
+export async function fetchMapsRuntimeConfig(): Promise<GoogleMapsConfig> {
+  return fetchGoogleMapsConfig();
 }
 
 async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
@@ -56,6 +65,12 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           enabled: Boolean(data.enabled && data.apiKey),
           apiKey: typeof data.apiKey === 'string' ? data.apiKey : '',
           mapId: typeof data.mapId === 'string' && data.mapId !== '' ? data.mapId : null,
+          osmTileUrl: typeof data.osmTileUrl === 'string' ? data.osmTileUrl : undefined,
+          osmTileAttribution: typeof data.osmTileAttribution === 'string' ? data.osmTileAttribution : undefined,
+          osmTileProvider:
+            data.osmTileProvider === 'maptiler' || data.osmTileProvider === 'osm'
+              ? data.osmTileProvider
+              : null,
         };
       })
       .catch((error) => {
@@ -63,7 +78,14 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           console.warn('[GoogleMaps] Config fetch failed.', error);
         }
 
-        return { enabled: false, apiKey: '', mapId: null };
+        return {
+          enabled: false,
+          apiKey: '',
+          mapId: null,
+          osmTileUrl: undefined,
+          osmTileAttribution: undefined,
+          osmTileProvider: null,
+        };
       });
   }
 

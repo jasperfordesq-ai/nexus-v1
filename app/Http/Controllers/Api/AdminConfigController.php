@@ -63,6 +63,18 @@ class AdminConfigController extends BaseApiController
         'email_verification', 'admin_approval', 'welcome_credits',
         'footer_text',
         'map_provider', 'geocoding_provider',
+        'google_maps_api_key', 'google_maps_map_id', 'maptiler_api_key',
+    ];
+
+    /**
+     * Settings whose stored value contains a credential and should be
+     * returned masked from getSettings (e.g. "AIza••••••••YJ4") so the
+     * admin UI can show whether a key is configured without leaking it.
+     * The full value is sent to browsers via MapsConfigController only
+     * when the corresponding map/geocoding provider is selected.
+     */
+    private const SECRET_KEYS = [
+        'google_maps_api_key', 'maptiler_api_key',
     ];
 
     private const FEED_ALGO_DEFAULTS = [
@@ -703,7 +715,19 @@ class AdminConfigController extends BaseApiController
         $kvSettings = $this->readSettingsByPrefix($tenantId, 'general.');
         $generalSettings = [];
         foreach (self::GENERAL_SETTING_KEYS as $key) {
-            $generalSettings[$key] = $kvSettings['general.' . $key] ?? null;
+            $value = $kvSettings['general.' . $key] ?? null;
+            // Mask secret values so they can be shown in the admin UI
+            // ("set / not set" + a glance-able tail) without leaking the
+            // full credential into JSON responses or logs.
+            if ($value !== null && $value !== '' && in_array($key, self::SECRET_KEYS, true)) {
+                $generalSettings[$key] = $this->maskSecret($value);
+                $generalSettings[$key . '_set'] = true;
+            } else {
+                $generalSettings[$key] = $value;
+                if (in_array($key, self::SECRET_KEYS, true)) {
+                    $generalSettings[$key . '_set'] = false;
+                }
+            }
         }
 
         return $this->respondWithData([
@@ -711,6 +735,19 @@ class AdminConfigController extends BaseApiController
             'tenant' => $directSettings,
             'settings' => $generalSettings,
         ]);
+    }
+
+    /**
+     * Reduce a credential to "first4…last4" — enough for an admin to spot
+     * which key is configured without exposing the secret.
+     */
+    private function maskSecret(string $value): string
+    {
+        $len = strlen($value);
+        if ($len <= 8) {
+            return str_repeat('•', $len);
+        }
+        return substr($value, 0, 4) . str_repeat('•', max(4, $len - 8)) . substr($value, -4);
     }
 
     /** PUT /api/v2/admin/config/settings */
@@ -807,6 +844,33 @@ class AdminConfigController extends BaseApiController
             if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.geocoding_provider_invalid'), 'geocoding_provider', 422);
             }
+        }
+
+        // Validate API key formats. Empty string means "clear" — allowed,
+        // platform falls back to env-configured default.
+        // Google browser API keys begin "AIza" + 35 alphanumerics.
+        // MapTiler keys are alphanumeric, typically 32 chars.
+        // Map IDs are alphanumeric (with hyphens), 8–32 chars.
+        $keyShapes = [
+            'google_maps_api_key' => ['/^AIza[0-9A-Za-z_-]{35}$/', 'api.google_maps_api_key_invalid'],
+            'maptiler_api_key'    => ['/^[0-9A-Za-z]{16,64}$/',     'api.maptiler_api_key_invalid'],
+            'google_maps_map_id'  => ['/^[0-9A-Za-z_-]{4,64}$/',    'api.google_maps_map_id_invalid'],
+        ];
+        foreach ($keyShapes as $field => [$pattern, $errorKey]) {
+            if (!array_key_exists($field, $kvUpdates)) {
+                continue;
+            }
+            $val = trim((string) $kvUpdates[$field]);
+            if ($val === '') {
+                // Empty means "remove this tenant override" — replace the
+                // KV row with an empty string so getSettings sees null.
+                $kvUpdates[$field] = '';
+                continue;
+            }
+            if (!preg_match($pattern, $val)) {
+                return $this->respondWithError('VALIDATION_ERROR', __($errorKey), $field, 422);
+            }
+            $kvUpdates[$field] = $val;
         }
 
         // Validate default_currency — must be a 3-letter ISO 4217 code (lowercase).

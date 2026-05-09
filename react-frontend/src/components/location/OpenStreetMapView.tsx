@@ -20,7 +20,7 @@
  * with a dark style.
  */
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -28,14 +28,16 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { LocationMapProps, MapMarker } from './LocationMap';
+import type { LocationMapProps } from './LocationMap';
+import { fetchMapsRuntimeConfig } from './GoogleMapsProvider';
 
 const DEFAULT_CENTER: [number, number] = [20, 0];
 const DEFAULT_ZOOM = 12;
 const CLUSTER_AUTO_THRESHOLD = 10;
 
-const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const OSM_TILE_ATTRIBUTION =
+/** Fallback tile URL — used while runtime config loads or if it fails. */
+const FALLBACK_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const FALLBACK_TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 
 /**
@@ -162,6 +164,28 @@ export function OpenStreetMapView({
   fitBounds = false,
   cluster,
 }: LocationMapProps) {
+  // Runtime tile URL — chosen by the server. If the tenant has set a
+  // MapTiler key, the URL embeds it and we render production-grade tiles
+  // with proper attribution. Otherwise we fall back to free OSM tiles.
+  const [tileUrl, setTileUrl] = useState<string>(FALLBACK_TILE_URL);
+  const [tileAttribution, setTileAttribution] = useState<string>(FALLBACK_TILE_ATTRIBUTION);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchMapsRuntimeConfig()
+      .then((cfg) => {
+        if (!mounted) return;
+        if (cfg.osmTileUrl) setTileUrl(cfg.osmTileUrl);
+        if (cfg.osmTileAttribution) setTileAttribution(cfg.osmTileAttribution);
+      })
+      .catch(() => {
+        // Silent — fallback URL is already set in initial state.
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const initialCenter = useMemo<[number, number]>(() => {
     if (center) return [center.lat, center.lng];
     if (markers.length > 0 && markers[0]) return [markers[0].lat, markers[0].lng];
@@ -182,7 +206,10 @@ export function OpenStreetMapView({
         .nexus-osm-map-wrapper .leaflet-popup-content-wrapper { border-radius: 12px; }
       `}</style>
       <MapContainer center={initialCenter} zoom={zoom} scrollWheelZoom>
-        <TileLayer attribution={OSM_TILE_ATTRIBUTION} url={OSM_TILE_URL} maxZoom={19} />
+        {/* `key` forces a fresh TileLayer when the URL flips from free OSM
+            to MapTiler after runtime config arrives, so the new attribution
+            and tile pyramid replace the placeholder cleanly. */}
+        <TileLayer key={tileUrl} attribution={tileAttribution} url={tileUrl} maxZoom={19} />
         <MarkersAndBounds
           markers={markers}
           fitBounds={fitBounds}

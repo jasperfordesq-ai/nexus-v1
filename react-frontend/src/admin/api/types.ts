@@ -1751,6 +1751,13 @@ export interface AdminSettingsResponse {
     default_currency: string | null;
     map_provider: string | null;
     geocoding_provider: string | null;
+    /** Masked on read ("AIza••••••••YJ4"). Empty string on write clears the override. */
+    google_maps_api_key: string | null;
+    google_maps_api_key_set?: boolean;
+    google_maps_map_id: string | null;
+    /** Masked on read. */
+    maptiler_api_key: string | null;
+    maptiler_api_key_set?: boolean;
   };
 }
 

@@ -13,19 +13,23 @@ use Illuminate\Support\Facades\DB;
 /**
  * Public browser configuration for maps and location services.
  *
- * Two independent toggles per tenant:
- *   - `maps` feature flag — kill switch for map *display*. When off, no API
- *     key is returned and map components render their fallback.
- *   - `map_provider` setting — which provider the map components should use
- *     (`google` | `openstreetmap`). Default: `google`.
- *   - `geocoding_provider` setting — which provider drives address autocomplete
- *     (`google` | `nominatim`). Default: `google`. Autocomplete is always on
- *     regardless of the `maps` kill switch — communities still need to enter
- *     addresses; only the cost-bearing display is gated.
+ * Per-tenant settings considered (in order of precedence over env defaults):
+ *   - `maps` feature flag — kill switch for map *display*. When off, no
+ *     Google API key is returned and OSM tiles are also withheld.
+ *   - `map_provider` — `google` | `openstreetmap`. Default: `google`.
+ *   - `geocoding_provider` — `google` | `nominatim`. Default: `google`.
+ *   - `google_maps_api_key` — tenant override for Google billing. Falls
+ *     back to env `GOOGLE_MAPS_API_KEY` when not set.
+ *   - `google_maps_map_id` — tenant override for Map ID styling. Falls
+ *     back to env `GOOGLE_MAPS_MAP_ID`.
+ *   - `maptiler_api_key` — tenant override that switches OSM tiles from
+ *     the free `tile.openstreetmap.org` service to MapTiler's paid host
+ *     (proper dark mode, vector tiles, no OSMF policy concerns at scale).
  *
- * The Google API key is only returned when both the `maps` feature is enabled
- * AND `map_provider === 'google'`. This guarantees no Google Maps Platform
- * billing for tenants on OpenStreetMap or with the kill switch engaged.
+ * Browser API keys are intentionally public — they reach JS and network
+ * requests. Protect them via Console-side restrictions (HTTP referrer,
+ * IP, API). The kill switch + per-tenant key model means no Google
+ * billing can occur for opted-out tenants regardless of frontend behavior.
  */
 class MapsConfigController extends BaseApiController
 {
@@ -37,38 +41,93 @@ class MapsConfigController extends BaseApiController
     private const DEFAULT_GEOCODING_PROVIDER = 'google';
     private const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org';
 
+    /** Free OSM tile service — fine at low/moderate scale, subject to OSMF policy. */
+    private const OSM_FREE_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    private const OSM_FREE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+
+    /** MapTiler raster tiles — paid, production-grade, includes dark style. */
+    private const MAPTILER_TILE_URL = 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key=';
+    private const MAPTILER_ATTRIBUTION = '&copy; <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+
     public function show(): JsonResponse
     {
+        $tenantId = TenantContext::getId();
         $mapsEnabled = TenantContext::hasFeature('maps');
-        $mapProvider = $this->resolveProvider('map_provider', self::ALLOWED_MAP_PROVIDERS, self::DEFAULT_MAP_PROVIDER);
-        $geocodingProvider = $this->resolveProvider('geocoding_provider', self::ALLOWED_GEOCODING_PROVIDERS, self::DEFAULT_GEOCODING_PROVIDER);
+        $mapProvider = $this->resolveSetting($tenantId, 'map_provider', self::ALLOWED_MAP_PROVIDERS, self::DEFAULT_MAP_PROVIDER);
+        $geocodingProvider = $this->resolveSetting($tenantId, 'geocoding_provider', self::ALLOWED_GEOCODING_PROVIDERS, self::DEFAULT_GEOCODING_PROVIDER);
+
+        // Google API key — tenant-scoped override falling back to env.
+        $tenantGoogleKey = $this->readSetting($tenantId, 'google_maps_api_key');
+        $tenantMapId     = $this->readSetting($tenantId, 'google_maps_map_id');
+        $tenantTilerKey  = $this->readSetting($tenantId, 'maptiler_api_key');
+
+        $envGoogleKey = (string) (getenv('GOOGLE_MAPS_API_KEY') ?: '');
+        $envMapId     = (string) (getenv('GOOGLE_MAPS_MAP_ID') ?: '');
+
+        $resolvedGoogleKey = $tenantGoogleKey !== '' ? $tenantGoogleKey : $envGoogleKey;
+        $resolvedMapId     = $tenantMapId !== '' ? $tenantMapId : $envMapId;
 
         // Google API key is only delivered when (a) the maps kill switch is
-        // ON for display, AND (b) the chosen map provider is google. Either
-        // condition off means no key reaches the browser.
+        // ON AND (b) the chosen map provider is Google. Either condition off
+        // means no key reaches the browser.
         $googleEnabled = $mapsEnabled && $mapProvider === 'google';
-        $apiKey = $googleEnabled ? (string) (getenv('GOOGLE_MAPS_API_KEY') ?: '') : '';
-        $mapId = $googleEnabled ? (string) (getenv('GOOGLE_MAPS_MAP_ID') ?: '') : '';
+        $googleApiKey  = $googleEnabled ? $resolvedGoogleKey : '';
+        $googleMapId   = $googleEnabled ? $resolvedMapId : '';
+
+        // OSM tile URL — MapTiler if a tenant key is set, otherwise the
+        // free OSM service. Only delivered when maps are enabled AND the
+        // OSM map branch is selected.
+        $osmEnabled = $mapsEnabled && $mapProvider === 'openstreetmap';
+        if ($osmEnabled && $tenantTilerKey !== '') {
+            $osmTileUrl = self::MAPTILER_TILE_URL . rawurlencode($tenantTilerKey);
+            $osmTileAttribution = self::MAPTILER_ATTRIBUTION;
+        } elseif ($osmEnabled) {
+            $osmTileUrl = self::OSM_FREE_TILE_URL;
+            $osmTileAttribution = self::OSM_FREE_ATTRIBUTION;
+        } else {
+            $osmTileUrl = '';
+            $osmTileAttribution = '';
+        }
 
         return $this->respondWithData([
-            // Legacy keys (kept for backward compatibility with existing GoogleMapsProvider)
-            'enabled' => $googleEnabled && $apiKey !== '',
-            'apiKey' => $apiKey,
-            'mapId' => $mapId !== '' ? $mapId : null,
+            // Legacy keys (kept for backward compatibility)
+            'enabled' => $googleEnabled && $googleApiKey !== '',
+            'apiKey'  => $googleApiKey,
+            'mapId'   => $googleMapId !== '' ? $googleMapId : null,
 
-            // New provider-aware keys
-            'mapsEnabled' => $mapsEnabled,
-            'mapProvider' => $mapProvider,
-            'geocodingProvider' => $geocodingProvider,
-            'nominatimBaseUrl' => self::NOMINATIM_BASE_URL,
+            // Provider-aware fields
+            'mapsEnabled'        => $mapsEnabled,
+            'mapProvider'        => $mapProvider,
+            'geocodingProvider'  => $geocodingProvider,
+            'nominatimBaseUrl'   => self::NOMINATIM_BASE_URL,
+
+            // OSM tile config (MapTiler if tenant key set, else free OSM)
+            'osmTileUrl'         => $osmTileUrl,
+            'osmTileAttribution' => $osmTileAttribution,
+            'osmTileProvider'    => $osmEnabled
+                ? ($tenantTilerKey !== '' ? 'maptiler' : 'osm')
+                : null,
+
+            // Telemetry for the admin UI / tests — flags whether the
+            // tenant has overridden any platform default.
+            'tenantOverrides' => [
+                'google_maps_api_key' => $tenantGoogleKey !== '',
+                'google_maps_map_id'  => $tenantMapId !== '',
+                'maptiler_api_key'    => $tenantTilerKey !== '',
+            ],
         ]);
     }
 
-    private function resolveProvider(string $key, array $allowed, string $default): string
+    private function resolveSetting(int $tenantId, string $key, array $allowed, string $default): string
     {
-        $tenantId = TenantContext::getId();
+        $value = $this->readSetting($tenantId, $key);
+        return ($value !== '' && in_array($value, $allowed, true)) ? $value : $default;
+    }
+
+    private function readSetting(int $tenantId, string $key): string
+    {
         if ($tenantId <= 0) {
-            return $default;
+            return '';
         }
 
         try {
@@ -76,14 +135,9 @@ class MapsConfigController extends BaseApiController
                 ->where('tenant_id', $tenantId)
                 ->where('setting_key', 'general.' . $key)
                 ->value('setting_value');
-
-            if (is_string($value) && in_array($value, $allowed, true)) {
-                return $value;
-            }
-        } catch (\Throwable $e) {
-            // tenant_settings table may not exist yet
+            return is_string($value) ? $value : '';
+        } catch (\Throwable) {
+            return '';
         }
-
-        return $default;
     }
 }

@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Card, CardBody, CardHeader, Switch, Spinner, Button, Divider,
-  Select, SelectItem, Checkbox,
+  Select, SelectItem, Checkbox, Input,
 } from '@heroui/react';
 import Cog from 'lucide-react/icons/cog';
 import Zap from 'lucide-react/icons/zap';
@@ -23,6 +23,9 @@ import Timer from 'lucide-react/icons/timer';
 import Play from 'lucide-react/icons/play';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
+import KeyRound from 'lucide-react/icons/key-round';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminConfig, adminSettings } from '../../api/adminApi';
@@ -67,6 +70,19 @@ export function TenantFeatures() {
   const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim'>('google');
   const [savingProviders, setSavingProviders] = useState(false);
 
+  // Per-tenant API keys (the values shown here are MASKED on read; the
+  // empty string means "no override — use the platform default")
+  const [googleMapsKeyDisplay, setGoogleMapsKeyDisplay] = useState<string>('');
+  const [googleMapsKeyInput, setGoogleMapsKeyInput] = useState<string>('');
+  const [googleMapsKeySet, setGoogleMapsKeySet] = useState<boolean>(false);
+  const [googleMapId, setGoogleMapId] = useState<string>('');
+  const [maptilerKeyDisplay, setMaptilerKeyDisplay] = useState<string>('');
+  const [maptilerKeyInput, setMaptilerKeyInput] = useState<string>('');
+  const [maptilerKeySet, setMaptilerKeySet] = useState<boolean>(false);
+  const [savingKeys, setSavingKeys] = useState(false);
+  const [showGoogleKey, setShowGoogleKey] = useState(false);
+  const [showMaptilerKey, setShowMaptilerKey] = useState(false);
+
   // Sync language state when TenantContext data arrives
   useEffect(() => {
     setLangDefault(defaultLanguage);
@@ -92,9 +108,24 @@ export function TenantFeatures() {
       setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
     }
     if (settingsRes.success && settingsRes.data) {
-      const { map_provider: mp, geocoding_provider: gp } = settingsRes.data.settings;
+      const s = settingsRes.data.settings as Record<string, unknown>;
+      const mp = s.map_provider;
+      const gp = s.geocoding_provider;
       if (mp === 'google' || mp === 'openstreetmap') setMapProvider(mp);
       if (gp === 'google' || gp === 'nominatim') setGeocodingProvider(gp);
+
+      // API keys arrive masked when set; the *_set companion flags tell
+      // the UI whether to show "Configured" or "Using platform default".
+      const gk = s.google_maps_api_key;
+      setGoogleMapsKeyDisplay(typeof gk === 'string' ? gk : '');
+      setGoogleMapsKeySet(s.google_maps_api_key_set === true);
+
+      const gmid = s.google_maps_map_id;
+      setGoogleMapId(typeof gmid === 'string' ? gmid : '');
+
+      const mk = s.maptiler_api_key;
+      setMaptilerKeyDisplay(typeof mk === 'string' ? mk : '');
+      setMaptilerKeySet(s.maptiler_api_key_set === true);
     }
     setLoading(false);
   }, []);
@@ -168,6 +199,55 @@ export function TenantFeatures() {
     if (!checked && langDefault === code) {
       setLangDefault('en');
     }
+  };
+
+  const handleSaveApiKeys = async () => {
+    setSavingKeys(true);
+    const payload: Record<string, string> = {};
+    // Only include fields the admin actually edited. Empty string is a
+    // legitimate value: "clear my override, fall back to platform default".
+    if (googleMapsKeyInput !== '') {
+      payload.google_maps_api_key = googleMapsKeyInput.trim();
+    }
+    payload.google_maps_map_id = googleMapId.trim();
+    if (maptilerKeyInput !== '') {
+      payload.maptiler_api_key = maptilerKeyInput.trim();
+    }
+    const res = await adminSettings.update(payload);
+    if (res.success) {
+      toast.success(t('tenant_features.api_keys_saved', { defaultValue: 'API keys saved' }));
+      setGoogleMapsKeyInput('');
+      setMaptilerKeyInput('');
+      // Reload to get the new masked display + *_set flags
+      await loadConfig();
+    } else {
+      toast.error(res.error || t('tenant_features.api_keys_save_failed', { defaultValue: 'Failed to save API keys' }));
+    }
+    setSavingKeys(false);
+  };
+
+  const handleClearGoogleKey = async () => {
+    setSavingKeys(true);
+    const res = await adminSettings.update({ google_maps_api_key: '' });
+    if (res.success) {
+      toast.success(t('tenant_features.google_key_cleared', { defaultValue: 'Google key cleared — using platform default' }));
+      await loadConfig();
+    } else {
+      toast.error(res.error || 'Failed to clear');
+    }
+    setSavingKeys(false);
+  };
+
+  const handleClearMaptilerKey = async () => {
+    setSavingKeys(true);
+    const res = await adminSettings.update({ maptiler_api_key: '' });
+    if (res.success) {
+      toast.success(t('tenant_features.maptiler_key_cleared', { defaultValue: 'MapTiler key cleared — using free OSM tiles' }));
+      await loadConfig();
+    } else {
+      toast.error(res.error || 'Failed to clear');
+    }
+    setSavingKeys(false);
   };
 
   const handleSaveProviders = async () => {
@@ -426,6 +506,162 @@ export function TenantFeatures() {
                   onPress={handleSaveProviders}
                 >
                   {t('tenant_features.save_changes', { defaultValue: 'Save changes' })}
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Per-tenant API keys & billing */}
+          <Card shadow="sm">
+            <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+              <KeyRound size={18} className="text-primary" />
+              <h3 className="font-semibold">
+                {t('tenant_features.api_keys_card_title', { defaultValue: 'Per-tenant API keys & billing' })}
+              </h3>
+              <span className="text-sm text-default-400">
+                {t('tenant_features.api_keys_card_subtitle', { defaultValue: 'Override platform defaults' })}
+              </span>
+            </CardHeader>
+            <CardBody className="px-4 pb-4 space-y-5">
+              <p className="text-xs text-default-500">
+                {t('tenant_features.api_keys_intro', { defaultValue: 'Set this tenant’s own API keys here so the bill goes to the tenant’s account, not yours. Leave a field blank to fall back to the platform default. Browser API keys are necessarily public when used; protect them via Console-side restrictions (HTTP referrer, IP, allowed APIs).' })}
+              </p>
+
+              {/* Google Maps / Places API key */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium">
+                    {t('tenant_features.google_maps_api_key_label', { defaultValue: 'Google Maps / Places API key' })}
+                  </p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${googleMapsKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
+                    {googleMapsKeySet
+                      ? t('tenant_features.key_status_set', { defaultValue: 'Tenant key set' })
+                      : t('tenant_features.key_status_default', { defaultValue: 'Using platform default' })}
+                  </span>
+                </div>
+                <p className="text-xs text-default-400 mb-2">
+                  {t('tenant_features.google_maps_api_key_hint', { defaultValue: 'Used for both map display (Google branch) and Places autocomplete. One key with both APIs enabled is the typical setup. Get one at console.cloud.google.com → APIs & Services → Credentials.' })}
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    aria-label={t('tenant_features.google_maps_api_key_label', { defaultValue: 'Google Maps API key' })}
+                    placeholder={googleMapsKeySet ? googleMapsKeyDisplay : 'AIza…'}
+                    value={googleMapsKeyInput}
+                    onValueChange={setGoogleMapsKeyInput}
+                    type={showGoogleKey ? 'text' : 'password'}
+                    size="sm"
+                    autoComplete="off"
+                    isDisabled={savingKeys}
+                    endContent={
+                      <button
+                        type="button"
+                        onClick={() => setShowGoogleKey((v) => !v)}
+                        className="text-default-400 hover:text-default-600"
+                        aria-label={showGoogleKey
+                          ? t('tenant_features.hide_key', { defaultValue: 'Hide key' })
+                          : t('tenant_features.show_key', { defaultValue: 'Show key' })}
+                      >
+                        {showGoogleKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    }
+                  />
+                  {googleMapsKeySet && (
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="danger"
+                      isDisabled={savingKeys}
+                      onPress={handleClearGoogleKey}
+                    >
+                      {t('tenant_features.clear', { defaultValue: 'Clear' })}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Google Map ID (optional, controls Maps JS styling) */}
+              <div>
+                <p className="text-sm font-medium mb-1">
+                  {t('tenant_features.google_map_id_label', { defaultValue: 'Google Map ID (optional)' })}
+                </p>
+                <p className="text-xs text-default-400 mb-2">
+                  {t('tenant_features.google_map_id_hint', { defaultValue: 'A Map ID enables custom Cloud-based map styling. Leave blank for default styling.' })}
+                </p>
+                <Input
+                  aria-label={t('tenant_features.google_map_id_label', { defaultValue: 'Google Map ID' })}
+                  placeholder="map-id…"
+                  value={googleMapId}
+                  onValueChange={setGoogleMapId}
+                  size="sm"
+                  className="max-w-md"
+                  autoComplete="off"
+                  isDisabled={savingKeys}
+                />
+              </div>
+
+              <Divider />
+
+              {/* MapTiler API key */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium">
+                    {t('tenant_features.maptiler_api_key_label', { defaultValue: 'MapTiler API key (paid OSM tile host)' })}
+                  </p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${maptilerKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
+                    {maptilerKeySet
+                      ? t('tenant_features.tiles_status_maptiler', { defaultValue: 'MapTiler tiles' })
+                      : t('tenant_features.tiles_status_free_osm', { defaultValue: 'Free OSM tiles' })}
+                  </span>
+                </div>
+                <p className="text-xs text-default-400 mb-2">
+                  {t('tenant_features.maptiler_api_key_hint', { defaultValue: 'Only used when this tenant’s map_provider is OpenStreetMap. Switches from the free tile.openstreetmap.org service (subject to OSMF policy at scale) to MapTiler’s paid host with proper dark mode and high-throughput tile delivery. Free tier covers ~100k tiles/month. Get a key at maptiler.com → Cloud → API keys.' })}
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    aria-label={t('tenant_features.maptiler_api_key_label', { defaultValue: 'MapTiler API key' })}
+                    placeholder={maptilerKeySet ? maptilerKeyDisplay : '…'}
+                    value={maptilerKeyInput}
+                    onValueChange={setMaptilerKeyInput}
+                    type={showMaptilerKey ? 'text' : 'password'}
+                    size="sm"
+                    autoComplete="off"
+                    isDisabled={savingKeys}
+                    endContent={
+                      <button
+                        type="button"
+                        onClick={() => setShowMaptilerKey((v) => !v)}
+                        className="text-default-400 hover:text-default-600"
+                        aria-label={showMaptilerKey
+                          ? t('tenant_features.hide_key', { defaultValue: 'Hide key' })
+                          : t('tenant_features.show_key', { defaultValue: 'Show key' })}
+                      >
+                        {showMaptilerKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    }
+                  />
+                  {maptilerKeySet && (
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="danger"
+                      isDisabled={savingKeys}
+                      onPress={handleClearMaptilerKey}
+                    >
+                      {t('tenant_features.clear', { defaultValue: 'Clear' })}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  color="primary"
+                  size="sm"
+                  isLoading={savingKeys}
+                  isDisabled={savingKeys || (!googleMapsKeyInput && !maptilerKeyInput && googleMapId === '')}
+                  onPress={handleSaveApiKeys}
+                >
+                  {t('tenant_features.save_api_keys', { defaultValue: 'Save API keys' })}
                 </Button>
               </div>
             </CardBody>
