@@ -16,9 +16,23 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 import { initSentry, SentryErrorBoundary } from '@/lib/sentry';
 initSentry();
 
-// Register PWA service worker (production only — dev uses Vite HMR)
-// Uses "prompt" mode — new SW is installed but NOT activated until the user
-// explicitly accepts the update. This prevents mid-typing page reloads.
+// Register PWA service worker (production only — dev uses Vite HMR).
+//
+// We register manually instead of using vite-plugin-pwa's `registerSW()` so we
+// can pass `updateViaCache: 'none'`. With the default `'imports'`, mobile Chrome
+// is allowed to serve `sw-rescue.js` (loaded via importScripts) from its HTTP
+// cache — the byte-for-byte comparison then sees no change and no waiting
+// worker is ever installed. `'none'` bypasses the HTTP cache for both the
+// top-level SW script and all imported scripts. See:
+// https://developer.chrome.com/blog/fresher-sw
+//
+// The actual page reload after a successful update fires from the
+// `controllerchange` listener below — NOT from the banner's click handler.
+// `controllerchange` is the only event that mathematically guarantees the new
+// SW has assumed control. Reloading from a `finally` block in the click
+// handler used to fire while the old SW was still in control (because
+// skipWaiting() can deadlock on active fetches like Pusher's WebSocket on
+// Android Chrome), serving stale code on the next nav and looping the banner.
 if (import.meta.env.PROD) {
   navigator.serviceWorker?.addEventListener('message', (event) => {
     if (event.data?.type !== 'NEXUS_SW_RESCUE_RELOAD_REQUIRED') return;
@@ -30,16 +44,20 @@ if (import.meta.env.PROD) {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore — virtual:pwa-register is provided by vite-plugin-pwa
-  import('virtual:pwa-register').then(({ registerSW }: { registerSW: (opts?: {
-    immediate?: boolean;
-    onNeedRefresh?: () => void;
-    onOfflineReady?: () => void;
-  }) => (reloadPage?: boolean) => void }) => {
-    // Check if the user already triggered an update from this exact build.
-    // Uses localStorage (not sessionStorage) + TTL so the suppression survives
-    // mobile app kills where sessionStorage is wiped between background/foreground.
+  let _nexusRefreshing = false;
+  navigator.serviceWorker?.addEventListener('controllerchange', () => {
+    if (_nexusRefreshing) return;
+    _nexusRefreshing = true;
+    const url = new URL(window.location.href);
+    url.searchParams.set('nexus_refresh', String(Date.now()));
+    try {
+      window.location.replace(url.href);
+    } catch {
+      window.location.href = url.href;
+    }
+  });
+
+  if ('serviceWorker' in navigator) {
     const UPDATE_COMMIT_KEY = 'nexus_sw_update_from_commit';
     const UPDATE_TTL = 10 * 60 * 1000; // 10 minutes — matches UpdateAvailableBanner
     const updateAlreadyTriggered = () => {
@@ -59,55 +77,58 @@ if (import.meta.env.PROD) {
       }
     };
 
-    const updateSW = registerSW({
-      immediate: true,
-      onNeedRefresh() {
-        (window as NexusWindow).__nexus_updateSW = updateSW;
-        if (updateAlreadyTriggered()) return; // Don't re-show banner
-        (window as NexusWindow).__nexus_updatePending = true;
-        window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
-      },
-      onOfflineReady() {
-        console.info('[NEXUS] App ready for offline use');
-      },
-    });
+    const fireUpdateAvailable = () => {
+      if (updateAlreadyTriggered()) return;
+      (window as NexusWindow).__nexus_updatePending = true;
+      window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
+    };
 
-    // Store updateSW globally so the banner can call it even if onNeedRefresh
-    // never fires in this session (e.g. app was killed and reopened on mobile —
-    // the waiting SW persists but onNeedRefresh does not re-fire).
-    (window as NexusWindow).__nexus_updateSW = updateSW;
-
-    // On boot, check directly if a waiting SW already exists from a previous session.
-    // Skip if we already triggered an update from this build — avoids the
-    // "click 4-5 times" loop where the old code keeps re-showing the banner.
-    if (!updateAlreadyTriggered()) {
-      navigator.serviceWorker.getRegistration().then((reg) => {
-        if (reg?.waiting) {
-          (window as NexusWindow).__nexus_updatePending = true;
-          window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
+    navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+      updateViaCache: 'none',
+    }).then((registration) => {
+      const updateSW = async () => {
+        try {
+          await registration.update();
+        } catch {
+          // non-blocking
         }
-      }).catch(() => { /* non-blocking */ });
-    }
+      };
+      (window as NexusWindow).__nexus_updateSW = updateSW;
 
-    // Periodically check for SW updates (every 5 min) so long-lived sessions
-    // (mobile PWA kept open for hours) eventually see the update banner.
-    setInterval(() => {
-      updateSW();
-    }, 5 * 60 * 1000);
-
-    // Check for updates whenever the app comes back to the foreground.
-    // This is the primary fix for mobile: users switch apps constantly, and
-    // the 5-min interval only fires while the app is active. visibilitychange
-    // fires on every app switch, triggering registration.update() which does
-    // the actual network fetch for a new SW version.
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        updateSW();
+      // If a waiting SW already exists from a prior session (mobile "killed
+      // and reopened" case), surface the banner now.
+      if (registration.waiting && registration.active) {
+        fireUpdateAvailable();
       }
+
+      // Watch for new SWs entering the 'installed' state while there's an
+      // active controller — that's the "update available" condition.
+      registration.addEventListener('updatefound', () => {
+        const installing = registration.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed' && registration.active) {
+            fireUpdateAvailable();
+          }
+        });
+      });
+
+      // Periodically poll for SW updates so long-lived sessions eventually
+      // see the banner without needing a reload. updateViaCache:'none' on
+      // the registration guarantees this hits the network, not HTTP cache.
+      setInterval(updateSW, 5 * 60 * 1000);
+
+      // Update on every visibility change (mobile app-switch).
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          updateSW();
+        }
+      });
+    }).catch(() => {
+      // PWA registration is optional — app works without it
     });
-  }).catch(() => {
-    // PWA registration is optional � app works without it
-  });
+  }
 }
 
 createRoot(document.getElementById('root')!).render(

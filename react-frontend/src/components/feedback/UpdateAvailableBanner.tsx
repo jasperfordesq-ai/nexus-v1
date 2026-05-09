@@ -35,8 +35,8 @@ import { Button } from '@heroui/react';
 // cycles and sessionStorage is wiped even though the waiting SW persists.
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000; // 10 minutes
-const SW_ACTIVATION_TIMEOUT_MS = 5000;
 const UPDATE_SW_TIMEOUT_MS = 3000;
+const CONTROLLERCHANGE_FALLBACK_MS = 8000;
 const CACHE_BUST_QUERY_PARAM = 'nexus_refresh';
 const SW_RESCUE_QUERY_PARAM = 'nexus_sw_rescue';
 
@@ -53,52 +53,6 @@ function markUpdateTriggered(): void {
   try {
     localStorage.setItem(SW_UPDATE_FROM_COMMIT_KEY, `${__BUILD_COMMIT__}:${Date.now()}`);
   } catch { /* non-blocking */ }
-}
-
-async function refreshServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | undefined> {
-  if (!navigator.serviceWorker) return undefined;
-
-  const registration = await navigator.serviceWorker.getRegistration();
-  try {
-    await registration?.update();
-  } catch {
-    // A failed update check should not block the repair path below.
-  }
-
-  return navigator.serviceWorker.getRegistration();
-}
-
-async function waitForInstallingWorker(
-  registration: ServiceWorkerRegistration | undefined,
-): Promise<ServiceWorker | null> {
-  if (!registration) return null;
-  if (registration.waiting) return registration.waiting;
-  if (!registration.installing) return null;
-
-  const installingWorker = registration.installing;
-  if (installingWorker.state === 'installed') return installingWorker;
-
-  return new Promise((resolve) => {
-    let settled = false;
-    const settle = (worker: ServiceWorker | null) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeout);
-      installingWorker.removeEventListener('statechange', onStateChange);
-      resolve(worker);
-    };
-    const onStateChange = () => {
-      if (registration.waiting) {
-        settle(registration.waiting);
-        return;
-      }
-      if (installingWorker.state === 'installed') settle(installingWorker);
-      if (installingWorker.state === 'activated' || installingWorker.state === 'redundant') settle(null);
-    };
-    const timeout = window.setTimeout(() => settle(registration.waiting ?? null), SW_ACTIVATION_TIMEOUT_MS);
-
-    installingWorker.addEventListener('statechange', onStateChange);
-  });
 }
 
 async function runWithTimeout<T>(task: Promise<T>, timeoutMs: number): Promise<T | undefined> {
@@ -121,28 +75,6 @@ async function runWithTimeout<T>(task: Promise<T>, timeoutMs: number): Promise<T
       clearTimeout(timeout);
       resolve(undefined);
     });
-  });
-}
-
-async function activateWaitingServiceWorker(): Promise<boolean> {
-  const registration = await refreshServiceWorkerRegistration();
-  const waitingWorker = registration?.waiting ?? await waitForInstallingWorker(registration);
-  if (!waitingWorker) return false;
-
-  return new Promise((resolve) => {
-    let settled = false;
-    const settle = (activated: boolean) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeout);
-      navigator.serviceWorker?.removeEventListener('controllerchange', onControllerChange);
-      resolve(activated);
-    };
-    const onControllerChange = () => settle(true);
-    const timeout = window.setTimeout(() => settle(false), SW_ACTIVATION_TIMEOUT_MS);
-
-    navigator.serviceWorker?.addEventListener('controllerchange', onControllerChange, { once: true });
-    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
   });
 }
 
@@ -321,18 +253,43 @@ export function UpdateAvailableBanner() {
     const updateSW = (window as NexusWindow).__nexus_updateSW;
 
     void (async () => {
+      // 1. Disconnect Pusher so the long-lived WebSocket fetch doesn't keep
+      //    the old SW alive. On Android Chrome the browser refuses to
+      //    terminate the old SW while it has active fetches/streams; without
+      //    this, postMessage(SKIP_WAITING) hangs and the new SW never
+      //    activates, so `controllerchange` never fires and the banner loops.
       try {
-        if (typeof updateSW === 'function') {
-          await runWithTimeout(Promise.resolve(updateSW(false)), UPDATE_SW_TIMEOUT_MS);
-        }
+        (window as NexusWindow).__nexus_disconnectPusher?.();
+      } catch { /* non-blocking */ }
 
-        const activated = await activateWaitingServiceWorker();
-        if (!activated) {
-          await forceClearAppCaches();
-        }
-      } finally {
-        navigateToFreshAppShell();
+      // 2. Trigger an update check (in case the banner was shown by the
+      //    /build-info.json poll fallback before the SW knew about the new
+      //    version).
+      if (typeof updateSW === 'function') {
+        try {
+          await runWithTimeout(Promise.resolve(updateSW(false)), UPDATE_SW_TIMEOUT_MS);
+        } catch { /* non-blocking */ }
       }
+
+      // 3. Tell the waiting SW to skip its waiting state. The actual page
+      //    reload happens in the `controllerchange` listener installed in
+      //    main.tsx — that's the only event that proves the new SW is in
+      //    control. Reloading from a try/finally here used to fire while
+      //    the old SW was still active, serving stale code on the next nav.
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        reg?.waiting?.postMessage({ type: 'SKIP_WAITING' });
+      } catch { /* non-blocking */ }
+
+      // 4. Hard fallback: if `controllerchange` does not fire within
+      //    CONTROLLERCHANGE_FALLBACK_MS, the SW activation is wedged. Nuke
+      //    caches, unregister the SW, and force a navigation to a clean URL.
+      //    forceClearAppCaches() handles caches.delete + registration.unregister.
+      window.setTimeout(async () => {
+        try { await forceClearAppCaches(); } catch { /* non-blocking */ }
+        try { localStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY); } catch { /* non-blocking */ }
+        navigateToFreshAppShell();
+      }, CONTROLLERCHANGE_FALLBACK_MS);
     })();
   }
 

@@ -30,4 +30,8 @@ declare const __BUILD_TIME__: string;
 interface NexusWindow extends Window {
   __nexus_updateSW?: (reloadPage?: boolean) => void | Promise<void>;
   __nexus_updatePending?: boolean;
+  // Set by PusherContext when the WebSocket is connected. Called by the
+  // update banner before postMessage(SKIP_WAITING) to prevent the new SW
+  // from deadlocking on the long-lived Pusher fetch on Android Chrome.
+  __nexus_disconnectPusher?: () => void;
 }

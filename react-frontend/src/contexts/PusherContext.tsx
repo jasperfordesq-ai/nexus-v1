@@ -222,6 +222,14 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     pusherRef.current = pusher;
 
+    // Expose a disconnect helper on window so the SW update banner can tear
+    // down the WebSocket before postMessage(SKIP_WAITING). Android Chrome
+    // refuses to terminate the old SW while it has active fetches/streams,
+    // so the long-lived Pusher connection deadlocks SW activation otherwise.
+    (window as NexusWindow).__nexus_disconnectPusher = () => {
+      try { pusher.disconnect(); } catch { /* non-blocking */ }
+    };
+
     // Subscribe to user's personal channel (must match backend PusherService::getUserChannel format)
     const tenantId = user?.tenant_id || tokenManager.getTenantId();
     if (!tenantId) {
@@ -274,6 +282,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
       feedChannelRef.current = null;
       currentConversationChannels.clear();
       setIsConnected(false);
+      try { delete (window as NexusWindow).__nexus_disconnectPusher; } catch { /* non-blocking */ }
     };
   }, [isAuthenticated, user?.id, config, user?.tenant_id]);
 

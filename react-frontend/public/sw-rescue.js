@@ -50,12 +50,24 @@
 
           url.searchParams.set(RESCUE_QUERY_PARAM, `${Date.now()}`);
 
+          // Try client.navigate() first — direct navigation is more reliable
+          // than asking the page to reload itself. But on Android Chrome
+          // navigate() can REJECT (not just be missing) when the page is in
+          // BFCache or the SW activation races the page lifecycle. In that
+          // case fall through to postMessage, which the React app handles
+          // by calling location.replace().
+          let navigated = false;
           if ('navigate' in client) {
-            await client.navigate(url.href);
-            return;
+            try {
+              await client.navigate(url.href);
+              navigated = true;
+            } catch {
+              // navigate() rejected — fall through to postMessage path.
+            }
           }
-
-          client.postMessage({ type: UPDATE_MESSAGE_TYPE, url: url.href });
+          if (!navigated) {
+            client.postMessage({ type: UPDATE_MESSAGE_TYPE, url: url.href });
+          }
         } catch {
           // Never fail activation because a browser tab could not be refreshed.
         }
