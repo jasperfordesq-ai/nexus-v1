@@ -87,6 +87,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const { user, isAuthenticated } = useAuth();
   const toast = useToast();
 
+  // Stable ref so toast methods can be called inside useCallback/useEffect
+  // without listing `toast` as a dependency — the same pattern used for
+  // refreshCountsRef below. This prevents the Pusher effect from being torn
+  // down and re-initialised every time a toast is added/removed, which was
+  // causing the "Maximum update depth exceeded" infinite loop.
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [state, setState] = useState<NotificationsState>({
     unreadCount: 0,
     counts: {
@@ -210,10 +218,12 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       unreadCount: prev.unreadCount + 1,
     }));
 
-    // Show toast notification
+    // Show toast notification — access via ref so `toast` is not a dep of
+    // this callback, preventing the Pusher useEffect from re-firing on every
+    // toast state change (which was the source of the infinite update loop).
     const toastConfig = getToastConfig(data.type);
-    toast.info(toastConfig.title, data.message || data.body || data.title);
-  }, [toast]);
+    toastRef.current.info(toastConfig.title, data.message || data.body || data.title);
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Initialize Pusher
@@ -333,13 +343,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           },
         }));
         const text = data.body || data.preview || data.message || '';
-        toast.info(i18n.t('realtime.new_message', { ns: 'notifications' }), text.substring(0, 50) || i18n.t('realtime.new_message_fallback', { ns: 'notifications' }));
+        toastRef.current.info(i18n.t('realtime.new_message', { ns: 'notifications' }), text.substring(0, 50) || i18n.t('realtime.new_message_fallback', { ns: 'notifications' }));
       });
 
       // Transaction events
       channel.bind('transaction', (data: { type: string; amount: number }) => {
         refreshCountsRef.current();
-        toast.success(
+        toastRef.current.success(
           i18n.t('realtime.transaction_complete', { ns: 'notifications' }),
           i18n.t('realtime.transaction_amount', { ns: 'notifications', sign: data.type === 'credit' ? '+' : '-', amount: data.amount })
         );
@@ -396,8 +406,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // refreshCounts is intentionally excluded from deps — it is accessed via
   // refreshCountsRef so the Pusher connection is not torn down and rebuilt
   // whenever refreshCounts identity changes (e.g., after isAuthenticated toggles).
+  // handleNewNotification and toast are also intentionally excluded: both are
+  // accessed via stable refs (handleNewNotification has empty deps; toast via
+  // toastRef) so listing them here would cause the Pusher connection to be
+  // recreated on every toast state change, triggering the infinite update loop
+  // (React error #185 — "Maximum update depth exceeded").
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.id, handleNewNotification, toast, user?.tenant_id]);
+  }, [isAuthenticated, user?.id, user?.tenant_id]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Context Value
