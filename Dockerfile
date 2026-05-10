@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libonig-dev \
     libxml2-dev \
     libcurl4-openssl-dev \
+    libgmp-dev \
     # Utilities
     curl \
     git \
@@ -47,6 +48,7 @@ RUN docker-php-ext-configure gd \
         zip \
         mbstring \
         bcmath \
+        gmp \
         opcache \
         xml \
         curl \
