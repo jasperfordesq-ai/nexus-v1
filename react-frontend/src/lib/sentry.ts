@@ -60,7 +60,11 @@ export function initSentry(): void {
   Sentry.init({
     dsn: DSN,
     environment: (import.meta.env.VITE_SENTRY_ENVIRONMENT as string) || 'production',
-    release: `nexus-react@${(import.meta.env.VITE_BUILD_COMMIT as string) || 'dev'}`,
+    // Release uses the build commit injected at compile time by vite.config.ts
+    // (__BUILD_COMMIT__ is the source of truth — VITE_BUILD_COMMIT is a soft
+    // legacy alias that's often unset). The build_commit tag below mirrors
+    // this so events are queryable by exact build SHA in Sentry's UI.
+    release: `nexus-react@${__BUILD_COMMIT__}`,
 
     // Error sampling — capture all errors
     sampleRate: 1.0,
@@ -113,6 +117,11 @@ export function initSentry(): void {
   // Set global tags
   Sentry.setTag('platform', 'react');
   Sentry.setTag('app_component', 'frontend');
+  // Tag every event with the exact build SHA so we can answer "what % of
+  // events come from build X" in Sentry's discover/issues UI. Critical for
+  // tracking how a stale-client cohort drains over time after a deploy.
+  Sentry.setTag('build_commit', __BUILD_COMMIT__);
+  Sentry.setTag('build_time', __BUILD_TIME__);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

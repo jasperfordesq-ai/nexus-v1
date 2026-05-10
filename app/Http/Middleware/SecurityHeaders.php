@@ -12,6 +12,57 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
 {
+    /**
+     * Cached build commit, resolved once per worker boot. Reading the file on
+     * every request would be wasteful; OPCache + this static keep it free.
+     */
+    private static ?string $cachedBuildCommit = null;
+
+    /**
+     * Resolve the current server build commit from httpdocs/.build-version
+     * (written by bluegreen-deploy.sh) or fall back to git HEAD in dev. Empty
+     * string means "unknown" — header is then omitted so old clients don't
+     * see a phantom mismatch.
+     */
+    private static function buildCommit(): string
+    {
+        if (self::$cachedBuildCommit !== null) {
+            return self::$cachedBuildCommit;
+        }
+
+        $commit = '';
+        $versionFile = base_path('httpdocs/.build-version');
+        if (is_file($versionFile)) {
+            $raw = @file_get_contents($versionFile);
+            if (is_string($raw) && $raw !== '') {
+                $data = json_decode($raw, true);
+                if (is_array($data) && !empty($data['commit'])) {
+                    $commit = (string) $data['commit'];
+                } else {
+                    // Some deploy scripts write a raw SHA instead of JSON.
+                    $commit = trim($raw);
+                }
+            }
+        }
+        if ($commit === '' && env('BUILD_COMMIT')) {
+            $commit = (string) env('BUILD_COMMIT');
+        }
+        if ($commit === '' && is_dir(base_path('.git'))) {
+            $head = @shell_exec('cd ' . escapeshellarg(base_path()) . ' && git rev-parse HEAD 2>/dev/null');
+            if (is_string($head)) {
+                $commit = trim($head);
+            }
+        }
+
+        // Normalise to the same 12-char short form the frontend embeds.
+        if ($commit !== '' && strlen($commit) > 12) {
+            $commit = substr($commit, 0, 12);
+        }
+
+        self::$cachedBuildCommit = $commit;
+        return self::$cachedBuildCommit;
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         // Generate a per-request nonce for CSP script-src. Blade templates can
@@ -59,6 +110,15 @@ class SecurityHeaders
 
         if ($request->secure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+        }
+
+        // X-Build: stamps every API response with the server's deployed commit
+        // so the frontend's stale-client gate (api.ts checkStaleBuild) can
+        // detect users running older code than the server is serving. Also
+        // exposed via CORS Access-Control-Expose-Headers in EnsureCorsHeaders.
+        $build = self::buildCommit();
+        if ($build !== '') {
+            $response->headers->set('X-Build', $build);
         }
 
         return $response;

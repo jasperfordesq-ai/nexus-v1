@@ -52,6 +52,79 @@ const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || null;
 export const SESSION_EXPIRED_EVENT = 'nexus:session_expired';
 export const API_ERROR_EVENT = 'nexus:api_error';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Stale-client gate
+// ─────────────────────────────────────────────────────────────────────────────
+// Every API response carries `X-Build: <sha>` (set by SecurityHeaders middleware
+// on the server). If that doesn't match this client's __BUILD_COMMIT__, the
+// client is running older code than the server. The gate gives the soft-update
+// flow (UpdateAvailableBanner / SW skipWaiting + controllerchange) a 10-minute
+// grace window to recover the client. If the mismatch persists past the
+// window, we force-redirect to /api/sw-reset — that URL bypasses every SW
+// we've ever shipped (matches the long-standing /^\/api\// denylist) and the
+// nginx response unregisters the SW + clears CacheStorage.
+
+const BUILD_HEADER = 'x-build';
+const BUILD_MISMATCH_KEY = 'nexus_build_mismatch_since';
+const BUILD_MISMATCH_GRACE_MS = 10 * 60 * 1000;
+const RECOVERY_URL = '/api/sw-reset';
+
+let staleRedirectFired = false;
+
+function checkStaleBuild(response: Response): void {
+  if (staleRedirectFired) return;
+
+  const serverBuild = response.headers.get(BUILD_HEADER);
+  if (!serverBuild) return; // server pre-dates the gate; treat as match
+
+  // __BUILD_COMMIT__ is injected as a 12-char short SHA. Server may send
+  // either short or full — compare on the prefix to stay tolerant.
+  const clientBuild = __BUILD_COMMIT__;
+  if (!clientBuild || clientBuild === 'dev') return;
+
+  const matches =
+    serverBuild === clientBuild ||
+    serverBuild.startsWith(clientBuild) ||
+    clientBuild.startsWith(serverBuild);
+
+  if (matches) {
+    // Healed (we caught up — likely after a soft-update reload). Clear tracker.
+    try { localStorage.removeItem(BUILD_MISMATCH_KEY); } catch { /* non-blocking */ }
+    return;
+  }
+
+  // First detection of this mismatch in the window — record the timestamp so
+  // we can decide later whether the soft-update path has had enough chances.
+  let firstSeen = 0;
+  try {
+    const raw = localStorage.getItem(BUILD_MISMATCH_KEY);
+    if (raw) firstSeen = parseInt(raw, 10) || 0;
+  } catch { /* non-blocking */ }
+
+  const now = Date.now();
+  if (firstSeen === 0) {
+    try { localStorage.setItem(BUILD_MISMATCH_KEY, String(now)); } catch { /* non-blocking */ }
+    // Nudge the existing soft-update path: banner + version-poll listeners
+    // already handle this event by surfacing the update prompt.
+    try { window.dispatchEvent(new CustomEvent('nexus:sw_update_available')); } catch { /* non-blocking */ }
+    return;
+  }
+
+  if (now - firstSeen >= BUILD_MISMATCH_GRACE_MS) {
+    // Soft path has had 10 minutes and the client is still running old code.
+    // Force-recover: nginx /api/sw-reset returns Clear-Site-Data + an inline
+    // script that unregisters the SW and wipes CacheStorage, then redirects
+    // to / where the browser fetches the fresh shell from network.
+    staleRedirectFired = true;
+    try { localStorage.removeItem(BUILD_MISMATCH_KEY); } catch { /* non-blocking */ }
+    try {
+      window.location.replace(RECOVERY_URL);
+    } catch {
+      window.location.href = RECOVERY_URL;
+    }
+  }
+}
+
 // Debounce SESSION_EXPIRED dispatches to prevent 401 cascade loops.
 // If multiple in-flight requests all get 401 simultaneously, only one
 // SESSION_EXPIRED event fires per 5-second window.
@@ -604,6 +677,11 @@ class ApiClient {
       const duration = performance.now() - startTime;
       captureApiCall(method, endpoint, response.status, duration);
 
+      // Stale-client gate — every response carries the server's build SHA.
+      // Triggers the soft-update path on first mismatch and force-redirects
+      // to /api/sw-reset if the mismatch persists past the grace window.
+      checkStaleBuild(response);
+
       // Handle 401 Unauthorized with token refresh
       if (response.status === 401 && retryOnUnauthorized && !options.skipAuth) {
         const refreshed = await this.handleTokenRefresh();
@@ -825,6 +903,9 @@ class ApiClient {
       credentials: 'include',
     });
 
+    // Stale-client gate — same check as request(), gates blob downloads too.
+    checkStaleBuild(response);
+
     // Handle 401 with token refresh
     if (response.status === 401 && !options.skipAuth) {
       const refreshed = await this.handleTokenRefresh();
@@ -941,6 +1022,9 @@ class ApiClient {
         signal: uploadSignal,
       });
       clearTimeout(uploadTimeoutId);
+
+      // Stale-client gate — uploads count as API calls too.
+      checkStaleBuild(response);
 
       if (response.status === 401) {
         const refreshed = await this.handleTokenRefresh();
