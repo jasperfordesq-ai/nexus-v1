@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "Your browser does not support push notifications.",
+    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
+    "subscribed": "You are subscribed on this device."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "page_title_dob": "Verify Identity — Date of Birth",

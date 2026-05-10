@@ -19,6 +19,7 @@ import Trophy from 'lucide-react/icons/trophy';
 import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
 import { GlassCard } from '@/components/ui';
+import { useWebPush } from '@/hooks/useWebPush';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -116,6 +117,34 @@ export function NotificationsTab({
   onRetry,
 }: NotificationsTabProps) {
   const { t } = useTranslation('settings');
+  const webPush = useWebPush();
+
+  // The push_enabled toggle is the source of truth for *consent*. The actual
+  // browser subscription is managed by useWebPush. When the user flips the
+  // toggle on, we request permission + create the PushSubscription before
+  // marking the preference. When they flip it off, we tear down the
+  // subscription locally + on the server. The preference itself still
+  // persists via the existing onSave flow so the user's choice is durable.
+  const handlePushToggle = async (checked: boolean) => {
+    if (checked) {
+      const ok = await webPush.subscribe();
+      if (ok) onNotificationsChange((prev) => ({ ...prev, push_enabled: true }));
+      return;
+    }
+    await webPush.unsubscribe();
+    onNotificationsChange((prev) => ({ ...prev, push_enabled: false }));
+  };
+
+  // The visible state of the toggle reflects BOTH the saved preference AND
+  // the actual browser subscription. If the preference says "on" but the
+  // subscription is gone (browser cleared, key rotated, denied permission),
+  // show as off so the user knows they need to re-enable.
+  const pushToggleChecked = notifications.push_enabled && webPush.isSubscribed;
+
+  // Why the toggle might be unavailable: unsupported browser (Safari < 16.4
+  // pre-iOS install), or explicitly denied permission (user must re-enable
+  // in browser settings — we can't re-ask).
+  const pushDisabled = !webPush.isSupported || webPush.permission === 'denied' || webPush.isPending;
 
   return (
     <GlassCard className="p-6">
@@ -310,10 +339,22 @@ export function NotificationsTab({
 
             <SettingToggle
               label={t('notification_prefs.enable_push')}
-              description={t('notification_descriptions.enable_push')}
-              checked={notifications.push_enabled}
-              onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, push_enabled: checked }))}
+              description={
+                !webPush.isSupported
+                  ? t('push_status.unsupported', 'Your browser does not support push notifications.')
+                  : webPush.permission === 'denied'
+                    ? t('push_status.denied', 'You have blocked notifications. Update your browser settings to re-enable.')
+                    : webPush.isSubscribed
+                      ? t('push_status.subscribed', 'You are subscribed on this device.')
+                      : t('notification_descriptions.enable_push')
+              }
+              checked={pushToggleChecked}
+              onChange={handlePushToggle}
+              disabled={pushDisabled}
             />
+            {webPush.error ? (
+              <p className="text-xs text-[var(--color-error)] -mt-2 px-4">{webPush.error}</p>
+            ) : null}
 
             <SettingToggle
               label={t('push_campaign_opt_in')}

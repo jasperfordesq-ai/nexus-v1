@@ -1972,5 +1972,23 @@
     "reaction_clap": "Clap",
     "reaction_star": "Star",
     "say_thanks": "Say thanks"
+  },
+  "install": {
+    "cta": "Install app",
+    "cta_sub": "Faster access, works offline",
+    "cta_ios_sub": "Add NEXUS to your home screen",
+    "banner_title": "Install NEXUS for faster access",
+    "banner_sub": "One tap install — works offline, no app store needed.",
+    "banner_sub_ios": "Add to your home screen — works offline, no app store needed.",
+    "banner_aria": "Install app banner",
+    "banner_dismiss": "Dismiss install banner",
+    "ios_title": "Install on your iPhone or iPad",
+    "ios_intro": "iOS doesn’t support automatic install prompts, but you can add NEXUS to your home screen in three taps:",
+    "ios_step_1": "Tap the",
+    "ios_step_1_after": "Share button at the bottom of Safari.",
+    "ios_step_2": "Scroll down and tap",
+    "ios_add_to_home": "Add to Home Screen",
+    "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
+    "got_it": "Got it"
   }
 }

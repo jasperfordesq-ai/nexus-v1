@@ -581,5 +581,10 @@
     "stay": "Stay"
   },
   "push_campaign_opt_in": "Recevoir des notifications push promotionnelles",
-  "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment."
+  "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment.",
+  "push_status": {
+    "unsupported": "Your browser does not support push notifications.",
+    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
+    "subscribed": "You are subscribed on this device."
+  }
 }

@@ -68,6 +68,8 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
+import Download from 'lucide-react/icons/download';
+import { InstallAppButton } from '@/components/pwa/InstallAppButton';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -342,6 +344,26 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         </DrawerHeader>
 
         <DrawerBody>
+          {/* Install app row — only renders when an install path exists */}
+          <InstallAppButton>
+            {({ onClick, label, sublabel }) => (
+              <div className="px-4 pt-3 pb-1 min-w-0">
+                <Button
+                  variant="flat"
+                  fullWidth
+                  className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 h-auto min-w-0"
+                  onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
+                >
+                  <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <div className="min-w-0 flex-1 text-start">
+                    <div className="text-base font-semibold truncate">{label}</div>
+                    <div className="text-xs text-theme-muted truncate">{sublabel}</div>
+                  </div>
+                </Button>
+              </div>
+            )}
+          </InstallAppButton>
+
           {/* Search Button */}
           {onSearchOpen && (
             <div className="px-4 pt-3 pb-1 min-w-0">

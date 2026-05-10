@@ -581,5 +581,10 @@
     "stay": "Bleiben"
   },
   "push_campaign_opt_in": "Beworbene Push-Mitteilungen erhalten",
-  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Mitteilungen zu senden. Sie können sich jederzeit abmelden."
+  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Mitteilungen zu senden. Sie können sich jederzeit abmelden.",
+  "push_status": {
+    "unsupported": "Your browser does not support push notifications.",
+    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
+    "subscribed": "You are subscribed on this device."
+  }
 }

@@ -69,6 +69,12 @@ export default defineConfig(({ command, mode }) => {
       injectRegister: null,
       manifest: false, // We use our own public/manifest.json
       workbox: {
+        // Import our custom push event handler into the generated SW. The file
+        // lives in /public, ships to the build root, and is resolvable at the
+        // SW scope (/sw-push-handler.js). Adding push/notificationclick
+        // listeners to the workbox-generated SW is otherwise impossible
+        // without switching to InjectManifest.
+        importScripts: ['/sw-push-handler.js'],
         // PRECACHE: only content-hashed, immutable build artefacts. The HTML
         // shell (index.html) is intentionally NOT included — it's served
         // NetworkFirst at runtime so every navigation hits the network for the

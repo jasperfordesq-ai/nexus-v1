@@ -68,6 +68,9 @@ import Bookmark from 'lucide-react/icons/bookmark';
 import Crown from 'lucide-react/icons/crown';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
+import Download from 'lucide-react/icons/download';
+import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
+import { IosInstallModal } from '@/components/pwa/IosInstallModal';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -122,6 +125,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { counts } = useNotifications();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { headerMenus, hasCustomMenus } = useMenuContext();
+  const installState = useInstallPrompt();
+  const canShowInstall = shouldOfferInstall(installState);
+  const [iosInstallOpen, setIosInstallOpen] = useState(false);
 
   // Scroll behavior for utility bar auto-hide + logo shrink
   const { isScrolled, isUtilityBarVisible } = useHeaderScroll(48);
@@ -192,6 +198,17 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); }
     setUserOpen(open);
   }, []);
+
+  const handleInstallClick = useCallback(() => {
+    closeAllDropdowns();
+    if (installState.canPrompt) {
+      void installState.promptInstall();
+      return;
+    }
+    if (installState.isIosSafari) {
+      setIosInstallOpen(true);
+    }
+  }, [closeAllDropdowns, installState]);
 
   // Identity verification status — shows "Verify Identity" or "Identity Verified" in utility bar
   const [isIdVerified, setIsIdVerified] = useState<boolean>(false);
@@ -817,6 +834,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       onAction={(key) => {
                         const k = String(key);
                         if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
+                        if (k === 'install') { handleInstallClick(); return; }
                         if (k === 'logout') { handleLogout(); return; }
                         if (k === 'profile-header') return;
                         dropdownNavigate(k);
@@ -877,6 +895,17 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         >
                           {resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode')}
                         </DropdownItem>
+                        {canShowInstall ? (
+                          <DropdownItem
+                            key="install"
+                            description={installState.isIosSafari
+                              ? t('install.cta_ios_sub', 'Add NEXUS to your home screen')
+                              : t('install.cta_sub', 'Faster access, works offline')}
+                            startContent={<Download className="w-4 h-4 text-indigo-500" aria-hidden="true" />}
+                          >
+                            {t('install.cta', 'Install app')}
+                          </DropdownItem>
+                        ) : null}
                       </DropdownSection>
 
                       <DropdownSection>
@@ -935,6 +964,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
           onClose={() => setIsSearchOpen(false)}
         />
       </header>
+
+      {/* iOS install instructions — only opens via the Install dropdown item */}
+      <IosInstallModal isOpen={iosInstallOpen} onClose={() => setIosInstallOpen(false)} />
     </>
   );
 }

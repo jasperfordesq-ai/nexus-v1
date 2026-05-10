@@ -16,6 +16,11 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 import { initSentry, SentryErrorBoundary, addSentryBreadcrumb } from '@/lib/sentry';
 initSentry();
 
+// Eagerly import the install prompt singleton so its `beforeinstallprompt`
+// listener attaches before Chrome fires the event. The event only fires once
+// per page load and is lost if no listener is registered in time.
+import '@/lib/installPrompt';
+
 // Register PWA service worker (production only — dev uses Vite HMR).
 //
 // We register manually instead of using vite-plugin-pwa's `registerSW()` so we

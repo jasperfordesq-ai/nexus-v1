@@ -581,5 +581,10 @@
     "stay": "Stay"
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
-  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time."
+  "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
+  "push_status": {
+    "unsupported": "Your browser does not support push notifications.",
+    "denied": "You have blocked notifications. Update your browser settings to re-enable.",
+    "subscribed": "You are subscribed on this device."
+  }
 }

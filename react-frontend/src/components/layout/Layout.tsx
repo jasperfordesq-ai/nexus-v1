@@ -18,6 +18,7 @@ import { Footer } from './Footer';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
+import { InstallBanner } from '@/components/pwa/InstallBanner';
 import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
 import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
@@ -165,6 +166,9 @@ export function Layout({
 
       {/* AG42 — Swiss FADP consent banner (fadp_compliance feature tenants only) */}
       <FadpConsentBanner />
+
+      {/* PWA install banner — one-time, dismissible, hidden when installed */}
+      <InstallBanner />
 
       {/* Navigation */}
       {showNavbar && (
