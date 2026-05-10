@@ -121,6 +121,32 @@ function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+/**
+ * High-level "user clicked Install" trigger. Routes to the right path based
+ * on browser capability:
+ *   - native prompt available → fire it
+ *   - iOS Safari → request the iOS instructions modal
+ *   - everything else → request the generic manual-instructions modal
+ *
+ * Modals are rendered by `<InstallModalHost />` at the Layout level so they
+ * survive when their trigger (drawer item, dropdown item) unmounts on close.
+ */
+export function requestInstall(state: InstallPromptState): void {
+  if (state.isInstalled) return;
+  if (state.canPrompt) {
+    void promptInstall();
+    return;
+  }
+  if (state.isIosSafari) {
+    window.dispatchEvent(new CustomEvent('nexus:install-modal', { detail: { kind: 'ios' } }));
+    return;
+  }
+  if (state.browser === 'ios-other') return;
+  window.dispatchEvent(
+    new CustomEvent('nexus:install-modal', { detail: { kind: 'manual', browser: state.browser } }),
+  );
+}
+
 export async function promptInstall(): Promise<'accepted' | 'dismissed' | 'unavailable'> {
   if (!capturedEvent) return 'unavailable';
   try {

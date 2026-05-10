@@ -19,6 +19,7 @@ import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
+import { InstallModalHost } from '@/components/pwa/InstallModalHost';
 import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
 import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
@@ -169,6 +170,9 @@ export function Layout({
 
       {/* PWA install banner — one-time, dismissible, hidden when installed */}
       <InstallBanner />
+
+      {/* Global install-instructions modal host — survives when triggers unmount */}
+      <InstallModalHost />
 
       {/* Navigation */}
       {showNavbar && (

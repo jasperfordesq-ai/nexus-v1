@@ -69,9 +69,7 @@ import Crown from 'lucide-react/icons/crown';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
-import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
-import { IosInstallModal } from '@/components/pwa/IosInstallModal';
-import { ManualInstallModal } from '@/components/pwa/ManualInstallModal';
+import { useInstallPrompt, shouldOfferInstall, requestInstall } from '@/lib/installPrompt';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -128,8 +126,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { headerMenus, hasCustomMenus } = useMenuContext();
   const installState = useInstallPrompt();
   const canShowInstall = shouldOfferInstall(installState);
-  const [iosInstallOpen, setIosInstallOpen] = useState(false);
-  const [manualInstallOpen, setManualInstallOpen] = useState(false);
 
   // Scroll behavior for utility bar auto-hide + logo shrink
   const { isScrolled, isUtilityBarVisible } = useHeaderScroll(48);
@@ -203,15 +199,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   const handleInstallClick = useCallback(() => {
     closeAllDropdowns();
-    if (installState.canPrompt) {
-      void installState.promptInstall();
-      return;
-    }
-    if (installState.isIosSafari) {
-      setIosInstallOpen(true);
-      return;
-    }
-    setManualInstallOpen(true);
+    requestInstall(installState);
   }, [closeAllDropdowns, installState]);
 
   // Identity verification status — shows "Verify Identity" or "Identity Verified" in utility bar
@@ -969,14 +957,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         />
       </header>
 
-      {/* iOS install instructions — only opens via the Install dropdown item */}
-      <IosInstallModal isOpen={iosInstallOpen} onClose={() => setIosInstallOpen(false)} />
-      {/* Generic browser install instructions — fallback when no native prompt is captured */}
-      <ManualInstallModal
-        isOpen={manualInstallOpen}
-        onClose={() => setManualInstallOpen(false)}
-        browser={installState.browser}
-      />
     </>
   );
 }

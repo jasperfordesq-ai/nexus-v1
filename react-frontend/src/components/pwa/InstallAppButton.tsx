@@ -3,11 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
-import { IosInstallModal } from './IosInstallModal';
-import { ManualInstallModal } from './ManualInstallModal';
+import { useInstallPrompt, shouldOfferInstall, requestInstall } from '@/lib/installPrompt';
 
 interface InstallAppButtonProps {
   /** Render-prop pattern — the button chrome is supplied by the parent so we
@@ -24,19 +22,9 @@ interface InstallAppButtonProps {
 export function InstallAppButton({ children }: InstallAppButtonProps) {
   const { t } = useTranslation('common');
   const state = useInstallPrompt();
-  const [iosOpen, setIosOpen] = useState(false);
-  const [manualOpen, setManualOpen] = useState(false);
 
   const onClick = useCallback(() => {
-    if (state.canPrompt) {
-      void state.promptInstall();
-      return;
-    }
-    if (state.isIosSafari) {
-      setIosOpen(true);
-      return;
-    }
-    setManualOpen(true);
+    requestInstall(state);
   }, [state]);
 
   if (!shouldOfferInstall(state)) return null;
@@ -46,13 +34,7 @@ export function InstallAppButton({ children }: InstallAppButtonProps) {
     ? t('install.cta_ios_sub', 'Add NEXUS to your home screen')
     : t('install.cta_sub', 'Faster access, works offline');
 
-  return (
-    <>
-      {children({ onClick, label, sublabel })}
-      <IosInstallModal isOpen={iosOpen} onClose={() => setIosOpen(false)} />
-      <ManualInstallModal isOpen={manualOpen} onClose={() => setManualOpen(false)} browser={state.browser} />
-    </>
-  );
+  return <>{children({ onClick, label, sublabel })}</>;
 }
 
 export default InstallAppButton;
