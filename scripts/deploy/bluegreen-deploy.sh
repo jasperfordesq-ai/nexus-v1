@@ -1030,6 +1030,17 @@ cmd_deploy() {
         exit 1
     fi
 
+    # Pre-cutover snapshot warmup: copy existing prerendered HTML from the
+    # currently-active color into the target color so bots see continuity at
+    # the moment of traffic switch instead of falling back to the SPA shell
+    # while the detached post-cutover prerender catches up. Failure here is
+    # non-fatal — bots simply get the SPA fallback during the gap.
+    if [ "$SKIP_PRERENDER" != "1" ] && [ -f "$SELF_DIR/phases/warmup-prerender-snapshots.sh" ]; then
+        phase "Pre-Cutover Snapshot Warmup" "$active" "$target" "$commit"
+        ACTIVE_COLOR="$active" TARGET_COLOR="$target" \
+            bash "$SELF_DIR/phases/warmup-prerender-snapshots.sh" || true
+    fi
+
     write_apache_routes "$target"
     if ! post_cutover_smoke; then
         log_err "Public smoke failed after cutover; reverting traffic to $active"
@@ -1051,10 +1062,42 @@ cmd_deploy() {
     # keep seeing old edge responses while the new color is active.
     purge_cloudflare_cache "Cloudflare Cache Purge"
     write_color_release "$target" "$commit" "$release_dir"
-    run_prerender_for_color "$target" "$release_dir"
-    # Purge again after prerender injection. Otherwise edge caches can keep
-    # serving the previous prerendered HTML for the full s-maxage window.
-    purge_cloudflare_cache "Cloudflare Cache Purge (Post-Prerender)"
+
+    # Detach the prerender + its post-purge from the deploy critical path.
+    # Re-rendering every public route across every active tenant takes 20-40
+    # minutes (every snapshot's asset hashes are stale after each build), and
+    # holding the deploy lock for that long means quick deploys are impossible.
+    # The phase script itself is responsible for the lock-or-cancel behavior:
+    # if a newer deploy starts before this finishes, that deploy's prerender
+    # will SIGTERM this one and take over.
+    if [ "$SKIP_PRERENDER" = "1" ]; then
+        log_info "Skipping per-tenant pre-rendering (--skip-prerender set)"
+    else
+        local prerender_log
+        prerender_log="$LOG_DIR/prerender-detached-${commit:0:12}-$(date +%Y%m%d-%H%M%S).log"
+        log_info "Launching pre-render in background; deploy lock will release shortly"
+        log_info "Prerender log: $prerender_log"
+        log_info "Tail with: sudo tail -f $prerender_log"
+
+        (
+            # Subshell inherits env + functions. Stdio fully redirected so
+            # nothing keeps the deploy script's pipes open. The deploy has
+            # already succeeded by this point — prerender failures must not
+            # propagate as a deploy failure.
+            set +e
+            local _active="${active:-}"
+            export DEPLOY_DIR LOG_DIR LAST_PRERENDER_FILE LAST_DEPLOY_FILE
+            export SKIP_PRERENDER FORCE_PRERENDER PRERENDER_TENANT PRERENDER_ROUTES
+            CURRENT_ACTIVE="$_active"
+            CURRENT_TARGET="$target"
+            CURRENT_COMMIT="$commit"
+            LOG_FILE="$prerender_log"
+            echo "[$(date -Is)] Prerender background start (target=$target commit=$commit pid=$$)"
+            run_prerender_for_color "$target" "$release_dir"
+            echo "[$(date -Is)] Prerender background end (exit=$?)"
+        ) </dev/null >>"$prerender_log" 2>&1 &
+        disown "$!" 2>/dev/null || true
+    fi
     schedule_followup_health_check
     git rev-parse origin/main > "$LAST_DEPLOY_FILE" 2>/dev/null || true
     # Prune old release worktrees — keep the 3 most recent commits (current + 2 rollback candidates)

@@ -35,6 +35,11 @@ WORK_DIR="$PRERENDER_CONFIG_DIR/.prerender-worker"
 PRERENDER_CONCURRENCY="${PRERENDER_CONCURRENCY:-4}"
 PRERENDER_FAILURE_BACKOFF_SECONDS="${PRERENDER_FAILURE_BACKOFF_SECONDS:-21600}"
 LOCK_DIR="$PRERENDER_CONFIG_DIR/.prerender-lock"
+LOCK_PID_FILE="$LOCK_DIR/pid"
+LOCK_TAKEOVER_GRACE_SECONDS="${LOCK_TAKEOVER_GRACE_SECONDS:-10}"
+# Stable container name so supersession (and crash recovery) can kill the
+# Playwright worker without having to discover its container ID.
+PRERENDER_DOCKER_NAME="${PRERENDER_DOCKER_NAME:-nexus-prerender-worker}"
 
 PUBLIC_ROUTES=(
     "/"
@@ -69,6 +74,27 @@ log_ok()   { echo -e "${GREEN}[OK]${NC}   $*"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_err()  { echo -e "${RED}[FAIL]${NC} $*"; }
 
+# Structured event log — JSONL, one line per event. Tail with:
+#   sudo tail -f /opt/nexus-php/logs/prerender-events.jsonl | jq .
+# Aggregate supersession rate, skip-on-clean rate, render durations from this.
+PRERENDER_EVENT_LOG="${PRERENDER_EVENT_LOG:-$PRERENDER_CONFIG_DIR/logs/prerender-events.jsonl}"
+emit_event() {
+    local EVENT="$1"; shift
+    local EXTRA="${1:-}"
+    local DIR
+    DIR="$(dirname "$PRERENDER_EVENT_LOG")"
+    [ -d "$DIR" ] || mkdir -p "$DIR" 2>/dev/null || return 0
+    local LINE
+    LINE="$(printf '{"ts":"%s","event":"%s","pid":%d,"host":"%s","commit":"%s"%s}' \
+        "$(date -Is)" \
+        "$(json_escape "$EVENT")" \
+        "$$" \
+        "$(json_escape "$(hostname 2>/dev/null || echo unknown)")" \
+        "$(json_escape "$(git -C "$PRERENDER_CODE_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)")" \
+        "${EXTRA:+,$EXTRA}")"
+    printf '%s\n' "$LINE" >> "$PRERENDER_EVENT_LOG" 2>/dev/null || true
+}
+
 FILTER_TENANT=""
 FILTER_ROUTES=""
 FORCE_RENDER=0
@@ -102,20 +128,74 @@ for ROUTE in "${PUBLIC_ROUTES[@]}"; do
 done
 
 cleanup() {
+    # Stop the Playwright container if it's still running (we own this name
+    # and only one prerender holds the lock at a time, so this is safe).
+    docker stop "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+    docker rm -f "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
     rm -rf "$OUTPUT_DIR" 2>/dev/null || true
     if [ "${LOCK_ACQUIRED:-0}" -eq 1 ]; then
-        rmdir "$LOCK_DIR" 2>/dev/null || true
+        rm -rf "$LOCK_DIR" 2>/dev/null || true
     fi
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 acquire_lock() {
     if mkdir "$LOCK_DIR" 2>/dev/null; then
+        echo "$$" > "$LOCK_PID_FILE" 2>/dev/null || true
         LOCK_ACQUIRED=1
         return 0
     fi
 
-    log_err "Another pre-render run is already active ($LOCK_DIR exists)"
+    # Lock-or-cancel: a fresh deploy must never be blocked by an in-flight
+    # prerender from the previous deploy. The previous run's output would also
+    # need to be re-done against the new build's assets, so superseding it is
+    # strictly better than waiting.
+    local PRIOR_PID=""
+    if [ -f "$LOCK_PID_FILE" ]; then
+        PRIOR_PID="$(cat "$LOCK_PID_FILE" 2>/dev/null || true)"
+    fi
+
+    if [ -n "$PRIOR_PID" ] && [[ "$PRIOR_PID" =~ ^[0-9]+$ ]] && kill -0 "$PRIOR_PID" 2>/dev/null; then
+        log_warn "Superseding in-flight pre-render (pid $PRIOR_PID)"
+        emit_event "supersede" "\"prior_pid\":$PRIOR_PID,\"reason\":\"newer_deploy\""
+        # `docker kill` (SIGKILL) instead of `docker stop` (SIGTERM + 10s grace):
+        # the worker has nothing to clean up, and we want the container gone
+        # immediately so the next deploy can claim the --name.
+        docker kill "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+        docker rm -f "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+        # Then SIGTERM the bash that started it (it might still be in the
+        # post-render injection step, which is cheap to interrupt).
+        kill -TERM "$PRIOR_PID" 2>/dev/null || true
+        local WAITED=0
+        while kill -0 "$PRIOR_PID" 2>/dev/null && [ "$WAITED" -lt "$LOCK_TAKEOVER_GRACE_SECONDS" ]; do
+            sleep 1
+            WAITED=$((WAITED + 1))
+        done
+        if kill -0 "$PRIOR_PID" 2>/dev/null; then
+            log_warn "Prior pre-render did not exit within ${LOCK_TAKEOVER_GRACE_SECONDS}s; sending SIGKILL"
+            kill -KILL "$PRIOR_PID" 2>/dev/null || true
+            sleep 1
+        fi
+    elif [ -n "$PRIOR_PID" ]; then
+        log_warn "Stale lock from pid $PRIOR_PID (no longer running); reclaiming"
+        emit_event "reclaim_stale_lock" "\"prior_pid\":$PRIOR_PID"
+        docker kill "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+        docker rm -f "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+    else
+        log_warn "Stale lock with no pid recorded; reclaiming"
+        emit_event "reclaim_orphan_lock"
+        docker kill "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+        docker rm -f "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+    fi
+
+    rm -rf "$LOCK_DIR" 2>/dev/null || true
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+        echo "$$" > "$LOCK_PID_FILE" 2>/dev/null || true
+        LOCK_ACQUIRED=1
+        return 0
+    fi
+
+    log_err "Could not acquire pre-render lock at $LOCK_DIR after takeover attempt"
     exit 1
 }
 
@@ -191,23 +271,12 @@ load_existing_cache_paths() {
 }
 
 load_stale_cache_paths() {
-    docker exec -e PRERENDER_DIR="$PRERENDER_DIR" "$NGINX_CONTAINER" sh -c '
-        ROOT="/usr/share/nginx/html"
-        find "$PRERENDER_DIR" -name index.html -type f 2>/dev/null | while IFS= read -r file; do
-            missing=0
-            grep -hoE "/assets/[^\"<>[:space:]]+\.(js|css)" "$file" 2>/dev/null \
-                | sed "s/[?#].*$//" \
-                | sort -u \
-                | while IFS= read -r asset; do
-                    [ -f "$ROOT$asset" ] || { echo missing > "/tmp/nexus-prerender-missing.$$"; break; }
-                done
-
-            if [ -f "/tmp/nexus-prerender-missing.$$" ]; then
-                rm -f "/tmp/nexus-prerender-missing.$$"
-                echo "${file#$PRERENDER_DIR/}"
-            fi
-        done | sort
-    ' 2>/dev/null || true
+    # No-op since the introduction of bot-only prerender serving in nginx.
+    # Snapshots are now served exclusively to crawlers, which do not execute
+    # JavaScript, so build-hashed asset URLs in stale snapshots cannot break
+    # any client. A snapshot stays valid until its content (DB-driven) changes.
+    # Use --force to rerender unconditionally.
+    return 0
 }
 
 load_recent_failure_paths() {
@@ -425,8 +494,11 @@ inject_rendered_pages() {
 }
 
 main() {
+    local START_TS
+    START_TS="$(date +%s)"
     log_info "=== Per-Tenant Server-Side Pre-Rendering ==="
     echo ""
+    emit_event "start" "\"force\":$FORCE_RENDER,\"tenant\":\"$(json_escape "${FILTER_TENANT:-}")\",\"routes\":\"$(json_escape "${FILTER_ROUTES:-}")\""
 
     if ! docker ps --format '{{.Names}}' | grep -q "^${NGINX_CONTAINER}$"; then
         log_err "Container $NGINX_CONTAINER is not running"
@@ -489,8 +561,14 @@ main() {
     mkdir -p "$WORK_DIR"
     cp "$WORKER_SCRIPT" "$WORK_DIR/worker.mjs"
 
+    # Pre-emptively remove any container left behind from a prior run (defensive
+    # — cleanup() and lock takeover both also do this, but a stale rm here lets
+    # us recover from a corrupted state without operator intervention).
+    docker rm -f "$PRERENDER_DOCKER_NAME" >/dev/null 2>&1 || true
+
     set +e
     docker run --rm -i \
+        --name "$PRERENDER_DOCKER_NAME" \
         --network host \
         -v "$WORK_DIR:/work" \
         -v "$OUTPUT_DIR:/output" \
@@ -525,16 +603,26 @@ main() {
         log_warn "No rendered pages were valid enough to inject"
     fi
 
+    local DURATION
+    DURATION=$(($(date +%s) - START_TS))
+
     if [ "$FILE_COUNT" -eq 0 ]; then
+        emit_event "fail" "\"reason\":\"no_valid_output\",\"selected\":$SELECTED_COUNT,\"duration_s\":$DURATION,\"worker_exit\":$EXIT_CODE"
         exit 1
     fi
 
     if [ $EXIT_CODE -ne 0 ] || [ "$INVALID_COUNT" -gt 0 ] || [ "$FILE_COUNT" -lt "$SELECTED_COUNT" ]; then
         log_warn "Pre-rendering completed with partial output: $FILE_COUNT/$SELECTED_COUNT page(s) refreshed"
+        emit_event "partial" "\"rendered\":$FILE_COUNT,\"selected\":$SELECTED_COUNT,\"invalid\":$INVALID_COUNT,\"duration_s\":$DURATION,\"worker_exit\":$EXIT_CODE"
         exit 2
     fi
 
     log_ok "Pre-rendering complete"
+    emit_event "success" "\"rendered\":$FILE_COUNT,\"duration_s\":$DURATION"
 }
 
-main "$@"
+# Allow this script to be sourced for testing without invoking main(). When
+# executed directly, BASH_SOURCE[0] equals $0 and main runs normally.
+if [ "${BASH_SOURCE[0]:-$0}" = "${0}" ]; then
+    main "$@"
+fi

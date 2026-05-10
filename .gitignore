@@ -50,6 +50,9 @@ CLAUDE.md
 !/scripts/train_recommendations.php
 !/scripts/batch_geocode_users.php
 !/scripts/post-deploy-algorithms.sh
+!/scripts/prerender-events-check.sh
+!/scripts/test/
+!/scripts/test/**
 !/scripts/migrate-production.sh
 !/scripts/backup-production-db.sh
 !/scripts/server-nightly-backup.sh

@@ -286,6 +286,67 @@ The 10-minute grace gives the soft-update path (banner click → SkipWaiting →
 - `sw-rescue.js`-style force-eviction shims — not needed when deploys propagate via NetworkFirst.
 - Manual "Update to latest version" buttons — users should never need one.
 
+## Prerender Pipeline (bot-only, detached)
+
+Prerendered HTML is **served only to SEO crawlers**, never to real users. This keeps snapshot freshness completely separate from user-facing correctness.
+
+### Serving rules ([nginx.bluegreen.conf](nginx.bluegreen.conf))
+
+A User-Agent regex map (`$nexus_is_seo_bot`) classifies the request. The composite key `$nexus_is_seo_bot:$arg_nexus_prerender_bypass` then routes:
+
+- **Real user (any UA not matching the bot list):** never sees a snapshot. `try_files` falls through to `/index.html` and the SPA boots normally.
+- **Bot, no bypass:** served `/prerendered/$host$uri/index.html` if it exists, otherwise the SPA.
+- **Playwright worker (`?nexus_prerender_bypass=1`):** always served the SPA, regardless of UA. Without this, the worker would render snapshots of snapshots.
+
+HTML responses are sent with `Cache-Control: no-store, no-cache, must-revalidate, max-age=0` and `Vary: User-Agent`. **CDN never caches HTML** — bots and users get different bytes for the same URL, so a per-URL CDN cache would poison across user-agents. Immutable assets (`/assets/*.js`/`.css`) remain cached at the edge as before.
+
+### Why bot-only matters
+
+Snapshots reference build-hashed asset URLs (`/assets/index-{HASH}.js`). When a deploy ships new hashes, those references go dead. Bots don't execute JS so they don't care. Users would 404 on the script tags and fail to hydrate — which is why pre-bot-only we had to invalidate every snapshot on every deploy and re-render the entire `(active tenants × 19 routes)` matrix from scratch.
+
+With bot-only serving, `load_stale_cache_paths` in [scripts/prerender-tenants.sh](../scripts/prerender-tenants.sh) is now a no-op. Snapshots survive deploys indefinitely; they only need to be re-rendered when their content (DB-driven) changes.
+
+### Snapshot persistence (shared volume)
+
+In production blue/green ([compose.bluegreen.yml](../compose.bluegreen.yml)), both colors mount the same external named volume `nexus-php-prerendered` at `/usr/share/nginx/html/prerendered`. **Snapshots are shared between colors and persist across deploys.** When the inactive color spins up, it sees the same prerender cache the active color has been using.
+
+Practical consequences:
+
+- Snapshots survive container rebuilds, deploys, and color switches automatically. No copy step is needed at cutover.
+- The pre-cutover [warmup phase](../scripts/deploy/phases/warmup-prerender-snapshots.sh) auto-detects the shared mount and skips with `event:"skip","reason":"shared_volume"`. It still works as a fallback in setups without the shared volume (legacy single-color, dev compose).
+- Concurrent writes from two prerender runs are prevented by the lock-or-cancel logic, not by isolation.
+
+### Deploy-time behavior
+
+The prerender phase runs **detached from the deploy critical path** ([bluegreen-deploy.sh](../scripts/deploy/bluegreen-deploy.sh)). After traffic switch + Cloudflare purge, the deploy script forks the prerender into a backgrounded subshell and exits. The deploy lock releases immediately; the next deploy is unblocked even if prerender is still running. Prerender logs land in `$LOG_DIR/prerender-detached-{commit}-{ts}.log`.
+
+If a newer deploy starts before the prior prerender finishes, the new deploy's prerender phase **supersedes** the old one (lock-or-cancel in `acquire_lock`):
+1. Reads the prior pid from `$LOCK_DIR/pid`.
+2. `docker stop nexus-prerender-worker` — kills the Playwright container directly. The container has a stable `--name` so we don't have to discover its ID.
+3. SIGTERM → 10s grace → SIGKILL the prior bash.
+4. Reclaims the lock and starts fresh.
+
+### Skip-on-clean
+
+[scripts/deploy/phases/prerender-tenants.sh](../scripts/deploy/phases/prerender-tenants.sh) compares HEAD against `.last-successful-prerender`. If `git diff --quiet` reports no changes under `react-frontend/` or `public/`, the prerender is skipped entirely — no Playwright container starts, no lock contention. Override with `PRERENDER_SKIP_ON_CLEAN=0` or `--force-prerender`.
+
+### Manual operations
+
+```bash
+# Re-render everything
+sudo bash scripts/prerender-tenants.sh --force
+
+# Re-render one tenant
+sudo bash scripts/prerender-tenants.sh --tenant hour-timebank
+
+# Re-render specific routes across all tenants
+sudo bash scripts/prerender-tenants.sh --routes /about,/blog
+
+# Stop a stuck worker (if cleanup trap missed)
+sudo docker stop nexus-prerender-worker
+sudo rm -rf /opt/nexus-php/.prerender-lock
+```
+
 ## Commands
 
 ```bash
