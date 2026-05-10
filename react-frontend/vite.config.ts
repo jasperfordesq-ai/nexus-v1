@@ -109,7 +109,10 @@ export default defineConfig(({ command, mode }) => {
               networkTimeoutSeconds: 3,
               expiration: { maxEntries: 16, maxAgeSeconds: 7 * 86400 },
               matchOptions: { ignoreSearch: true },
-              cacheableResponse: { statuses: [0, 200] },
+              // 200 only — status 0 (opaque cross-origin no-cors) responses
+              // shouldn't be cached as the HTML shell. Our HTML is same-origin
+              // so this would never hit, but tightening eliminates the footgun.
+              cacheableResponse: { statuses: [200] },
             },
           },
           {

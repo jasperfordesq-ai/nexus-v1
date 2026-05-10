@@ -20,7 +20,7 @@
 
 import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
-import { captureApiCall } from '@/lib/sentry';
+import { captureApiCall, addSentryBreadcrumb, captureSentryMessage } from '@/lib/sentry';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -113,6 +113,12 @@ function checkStaleBuild(response: Response): void {
     // (b) a user-initiated navigation hits NetworkFirst and pulls in the
     //     fresh shell, or (c) the timer below fires the hard recovery.
     try { localStorage.setItem(BUILD_MISMATCH_KEY, String(now)); } catch { /* non-blocking */ }
+    addSentryBreadcrumb(
+      'Stale client detected',
+      'pwa',
+      { client_build: clientBuild, server_build: serverBuild },
+      'warning',
+    );
     return;
   }
 
@@ -123,6 +129,19 @@ function checkStaleBuild(response: Response): void {
     // to / where the browser fetches the fresh shell from network.
     staleRedirectFired = true;
     try { localStorage.removeItem(BUILD_MISMATCH_KEY); } catch { /* non-blocking */ }
+    // Capture as a message (not just a breadcrumb) so we can count
+    // force-recoveries in Sentry's discover/issues UI. This event is rare
+    // by design — every occurrence means the soft-update path failed for
+    // 10+ minutes, which is worth investigating.
+    captureSentryMessage(
+      'Stale client force-recovered via /api/sw-reset',
+      'warning',
+      {
+        client_build: clientBuild,
+        server_build: serverBuild,
+        mismatch_age_ms: now - firstSeen,
+      },
+    );
     try {
       window.location.replace(RECOVERY_URL);
     } catch {
