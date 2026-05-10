@@ -69,15 +69,47 @@ export default defineConfig(({ command, mode }) => {
       injectRegister: null,
       manifest: false, // We use our own public/manifest.json
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // PRECACHE: only content-hashed, immutable build artefacts. The HTML
+        // shell (index.html) is intentionally NOT included — it's served
+        // NetworkFirst at runtime so every navigation hits the network for the
+        // current shell, falling back to the most recent cached copy only when
+        // the network is slow or offline. This is the pattern GitHub, Linear,
+        // Vercel, Notion, and most production SPAs use. Precaching the HTML
+        // is what forced this codebase into the "click Update to get fresh
+        // code" workflow that PWAs are notorious for. Removing it makes
+        // deploys propagate to users on their next navigation, with no UI.
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         importScripts: ['sw-rescue.js'],
-        // Do not register API calls with Workbox. Leaving them unhandled lets
-        // the browser perform normal fetch/CORS handling and avoids Workbox
-        // wrapping transient API/CORS failures as uncaught "no-response" errors.
         runtimeCaching: [
+          // HTML shell — NetworkFirst with a 3s timeout. Online: every nav
+          // gets the freshly deployed shell. Slow network or offline: falls
+          // back to the most recent cached HTML so the app still loads.
+          // Excludes API, admin-legacy, health, and the emergency recovery
+          // URLs — they MUST always go to the network so nginx can return
+          // the real response (Clear-Site-Data header on /api/sw-reset and
+          // /clear-site-data; live data on /api/* etc.).
+          {
+            urlPattern: ({ request, url }) => {
+              if (request.mode !== 'navigate') return false;
+              const p = url.pathname;
+              if (p.startsWith('/api/')) return false;
+              if (p.startsWith('/admin-legacy/')) return false;
+              if (p === '/health.php') return false;
+              if (p === '/clear-site-data' || p === '/api/sw-reset') return false;
+              return true;
+            },
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'nexus-html-shell',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 16, maxAgeSeconds: 7 * 86400 },
+              matchOptions: { ignoreSearch: true },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /^https?.*\/locales\//,
             handler: 'StaleWhileRevalidate',
@@ -87,14 +119,14 @@ export default defineConfig(({ command, mode }) => {
             },
           },
         ],
-        navigateFallback: '/index.html',
-        // /clear-site-data and /api/sw-reset are emergency recovery URLs
-        // (defined in nginx.bluegreen.conf). They MUST bypass the SW so the
-        // browser sees the actual response (with the Clear-Site-Data header
-        // and the inline unregister script). Without them in the denylist,
-        // workbox would substitute the precached /index.html and the trap
-        // would re-form on the next deploy.
-        navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/, /^\/clear-site-data$/, /^\/api\/sw-reset$/],
+        // Explicitly disable the default NavigationRoute. vite-plugin-pwa
+        // defaults navigateFallback to 'index.html', which registers a
+        // precache-first NavigationRoute BEFORE the runtimeCaching rules,
+        // so it would intercept every navigation and serve the stale shell
+        // before the NetworkFirst handler above could see the request.
+        // Setting navigateFallback to null disables this default and lets
+        // the urlPattern callback above own all navigation routing.
+        navigateFallback: null,
       },
     }),
     // Image optimizer only runs during build — skip in dev for faster startup.
