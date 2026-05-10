@@ -10,11 +10,11 @@
  * This hook handles the browser path:
  *   1. Notification.requestPermission()
  *   2. registration.pushManager.subscribe({ applicationServerKey: VAPID_PUB })
- *   3. POST /api/v2/push/subscribe   (persist endpoint+keys to push_subscriptions)
+ *   3. POST /api/push/subscribe   (persist endpoint+keys to push_subscriptions)
  *
  * Disable flow:
  *   1. Local subscription.unsubscribe()
- *   2. POST /api/v2/push/unsubscribe (delete row)
+ *   2. POST /api/push/unsubscribe (delete row)
  *
  * The actual notification rendering happens in /sw-push-handler.js. The send
  * path (PHP) is in app/Services/WebPushService.php.
@@ -109,7 +109,7 @@ export function useWebPush() {
         return false;
       }
 
-      const keyRes = await api.get<VapidKeyResponse>('/v2/push/vapid-key');
+      const keyRes = await api.get<VapidKeyResponse>('/push/vapid-key');
       const vapidPublicKey = keyRes?.data?.vapid_public_key;
       if (!vapidPublicKey) {
         setState((s) => ({ ...s, isPending: false, error: 'Push notifications are not configured on the server yet.' }));
@@ -132,7 +132,7 @@ export function useWebPush() {
       }
 
       const json = pushSub.toJSON();
-      const sendRes = await api.post('/v2/push/subscribe', {
+      const sendRes = await api.post('/push/subscribe', {
         endpoint: json.endpoint,
         keys: json.keys,
       });
@@ -161,7 +161,7 @@ export function useWebPush() {
         try { await pushSub.unsubscribe(); } catch { /* keep going — server cleanup still useful */ }
       }
       if (endpoint) {
-        await api.post('/v2/push/unsubscribe', { endpoint });
+        await api.post('/push/unsubscribe', { endpoint });
       }
       setState((s) => ({ ...s, isPending: false, isSubscribed: false, error: null }));
       return true;
