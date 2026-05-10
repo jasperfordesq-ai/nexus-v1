@@ -18,7 +18,6 @@ import { Footer } from './Footer';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
-import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
 import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
 import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
@@ -28,7 +27,6 @@ import { SeoHead } from '@/components/seo/SeoHead';
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
-import { useVersionCheck } from '@/hooks/useVersionCheck';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
@@ -67,10 +65,6 @@ export function Layout({
 
   // Listen for API errors and display toast notifications
   useApiErrorHandler();
-
-  // Poll build-info.json for deploy detection — SW-independent fallback that
-  // rescues users with stale/broken service workers on all browsers.
-  useVersionCheck();
 
   // Scroll state for dynamic padding — when utility bar hides, reduce top padding
   const { isUtilityBarVisible } = useHeaderScroll(48);
@@ -166,9 +160,6 @@ export function Layout({
       {/* Offline indicator */}
       <OfflineIndicator />
 
-      {/* Service worker update banner — user-controlled, never auto-reloads */}
-      <UpdateAvailableBanner />
-
       {/* AG70 — Emergency/safety alert banner (caring community tenants only) */}
       <EmergencyAlertBanner />
 
@@ -251,9 +242,6 @@ export function AuthLayout() {
         <div className="blob blob-purple" />
         <div className="blob blob-cyan" />
       </div>
-
-      {/* Service worker update banner — user-controlled, never auto-reloads */}
-      <UpdateAvailableBanner />
 
       {/* Language switcher — top-right on auth pages */}
       <div className="absolute top-[calc(var(--safe-area-top)+1rem)] right-[calc(var(--safe-area-right)+1rem)] z-20">

@@ -42,12 +42,12 @@ export default defineConfig(({ command, mode }) => {
   plugins: [
     react(),
     tailwindcss(),
-    // Emit /build-info.json into the dist root at build time.
-    // This file is NOT in the workbox precache glob patterns (*.{js,css,html,...}),
-    // so old service workers pass fetch requests for it straight to nginx.
-    // nginx serves it with no-cache (location / rule). The useVersionCheck hook
-    // polls this file to detect deploys independently of SW update mechanics,
-    // rescuing users who have a stale or broken service worker.
+    // Emit /build-info.json into the dist root at build time. Kept as a
+    // simple ops-debugging endpoint — `curl https://app.project-nexus.ie/build-info.json`
+    // reports the deployed commit. Excluded from precache (no .json in
+    // globPatterns) and served with no-cache by nginx. No frontend code
+    // consumes it anymore — the api.ts stale-client gate uses the X-Build
+    // response header instead.
     {
       name: 'nexus:build-info',
       generateBundle() {

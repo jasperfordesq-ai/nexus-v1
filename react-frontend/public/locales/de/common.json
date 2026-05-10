@@ -315,11 +315,6 @@
     "my_profile": "Mein Profil",
     "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
   },
-  "update_banner": {
-    "message": "Eine neue Version ist verfügbar.",
-    "update_now": "Jetzt aktualisieren",
-    "dismiss": "Aktualisierungsbenachrichtigung schliessen"
-  },
   "error_boundary": {
     "title": "Etwas ist schiefgelaufen",
     "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut oder gehe zurück zur Startseite.",

@@ -315,11 +315,6 @@
     "my_profile": "Mijn profiel",
     "load_more_count": "Meer laden ({{remaining}} resterend)"
   },
-  "update_banner": {
-    "message": "Er is een nieuwe versie beschikbaar.",
-    "update_now": "Nu bijwerken",
-    "dismiss": "Updatemelding negeren"
-  },
   "error_boundary": {
     "title": "Er ging iets mis",
     "description": "Er is een onverwachte fout opgetreden. Probeer het opnieuw of ga terug naar de startpagina.",

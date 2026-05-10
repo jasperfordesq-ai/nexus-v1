@@ -315,11 +315,6 @@
     "my_profile": "Meu perfil",
     "load_more_count": "Carregar mais ({{remaining}} restantes)"
   },
-  "update_banner": {
-    "message": "Uma nova versão está disponível.",
-    "update_now": "Atualizar agora",
-    "dismiss": "Ignorar notificação de atualização"
-  },
   "error_boundary": {
     "title": "Algo correu mal",
     "description": "Ocorreu um erro inesperado. Tente novamente ou volte para a página inicial.",

@@ -315,11 +315,6 @@
     "my_profile": "Il mio profilo",
     "load_more_count": "Carica altro ({{remaining}} rimanenti)"
   },
-  "update_banner": {
-    "message": "È disponibile una nuova versione.",
-    "update_now": "Aggiorna ora",
-    "dismiss": "Ignora notifica di aggiornamento"
-  },
   "error_boundary": {
     "title": "Qualcosa è andato storto",
     "description": "Si è verificato un errore imprevisto. Riprova o torna alla pagina iniziale.",

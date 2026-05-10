@@ -315,11 +315,6 @@
     "my_profile": "My Profile",
     "load_more_count": "Load more ({{remaining}} remaining)"
   },
-  "update_banner": {
-    "message": "A new version is available.",
-    "update_now": "Update now",
-    "dismiss": "Dismiss update notification"
-  },
   "error_boundary": {
     "title": "Something went wrong",
     "description": "An unexpected error occurred. Please try again or go back to the home page.",

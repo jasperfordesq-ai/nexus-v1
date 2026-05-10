@@ -52,9 +52,6 @@ vi.mock('@/components/feedback/SessionExpiredModal', () => ({
 vi.mock('@/components/feedback/AppUpdateModal', () => ({
   AppUpdateModal: () => null,
 }));
-vi.mock('@/components/feedback/UpdateAvailableBanner', () => ({
-  UpdateAvailableBanner: () => null,
-}));
 vi.mock('@/components/seo/SeoHead', () => ({
   SeoHead: () => null,
 }));

@@ -26,12 +26,16 @@ interface ImportMeta {
 declare const __BUILD_COMMIT__: string;
 declare const __BUILD_TIME__: string;
 
-// Global window extensions for PWA service worker update
+// Global window extensions kept for legacy callers. The update-banner
+// globals (__nexus_updateSW, __nexus_updatePending) were removed when the
+// banner itself was deleted in 2026-05-10 — deploys propagate via
+// NetworkFirst HTML + skipWaiting/clientsClaim + controllerchange auto-reload
+// in main.tsx, with the api.ts stale-client gate as the 10-min force-recover
+// fallback. No JS code path needs to "trigger an update" anymore.
 interface NexusWindow extends Window {
-  __nexus_updateSW?: (reloadPage?: boolean) => void | Promise<void>;
-  __nexus_updatePending?: boolean;
-  // Set by PusherContext when the WebSocket is connected. Called by the
-  // update banner before postMessage(SKIP_WAITING) to prevent the new SW
-  // from deadlocking on the long-lived Pusher fetch on Android Chrome.
+  // Set by PusherContext when the WebSocket is connected. Currently unused
+  // by app code (the banner-click handler that called it has been removed)
+  // but kept exposed for debugging and for any future flow that needs to
+  // release the Pusher fetch before SW activation.
   __nexus_disconnectPusher?: () => void;
 }

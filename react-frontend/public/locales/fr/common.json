@@ -315,11 +315,6 @@
     "my_profile": "Mon profil",
     "load_more_count": "Charger plus ({{remaining}} restants)"
   },
-  "update_banner": {
-    "message": "Une nouvelle version est disponible.",
-    "update_now": "Mettre à jour",
-    "dismiss": "Ignorer la notification de mise à jour"
-  },
   "error_boundary": {
     "title": "Une erreur est survenue",
     "description": "Une erreur inattendue s'est produite. Veuillez réessayer ou revenir à la page d'accueil.",

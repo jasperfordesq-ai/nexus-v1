@@ -281,7 +281,6 @@
 | feedback/ | LoadingScreen | LoadingScreen.test.tsx | PASS |
 | feedback/ | OfflineIndicator | OfflineIndicator.test.tsx | PASS |
 | feedback/ | SessionExpiredModal | SessionExpiredModal.test.tsx | PASS |
-| feedback/ | UpdateAvailableBanner | __tests__/UpdateAvailableBanner.test.tsx | PASS |
 | hashtags/ | HashtagRenderer | __tests__/HashtagRenderer.test.tsx | PASS |
 | hashtags/ | TrendingHashtags | __tests__/TrendingHashtags.test.tsx | PASS |
 | layout/ | DevelopmentStatusBanner | __tests__/DevelopmentStatusBanner.test.tsx | PASS |

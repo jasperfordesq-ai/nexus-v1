@@ -57,12 +57,17 @@ export const API_ERROR_EVENT = 'nexus:api_error';
 // ─────────────────────────────────────────────────────────────────────────────
 // Every API response carries `X-Build: <sha>` (set by SecurityHeaders middleware
 // on the server). If that doesn't match this client's __BUILD_COMMIT__, the
-// client is running older code than the server. The gate gives the soft-update
-// flow (UpdateAvailableBanner / SW skipWaiting + controllerchange) a 10-minute
-// grace window to recover the client. If the mismatch persists past the
-// window, we force-redirect to /api/sw-reset — that URL bypasses every SW
-// we've ever shipped (matches the long-standing /^\/api\// denylist) and the
-// nginx response unregisters the SW + clears CacheStorage.
+// client is running older code than the server. We give the silent recovery
+// paths (NetworkFirst HTML refetch on next nav, SW skipWaiting +
+// clientsClaim + controllerchange auto-reload from main.tsx) a 10-minute
+// grace window to bring the client into sync. If the mismatch persists past
+// the window, we force-redirect to /api/sw-reset — that URL bypasses every
+// SW we've ever shipped (matches the long-standing /^\/api\// denylist) and
+// the nginx response unregisters the SW + clears CacheStorage.
+//
+// No UI is fired during the grace window. The user-facing update banner has
+// been removed; the wait is silent because the natural propagation path is
+// expected to resolve >99% of mismatches without intervention.
 
 const BUILD_HEADER = 'x-build';
 const BUILD_MISMATCH_KEY = 'nexus_build_mismatch_since';
@@ -103,10 +108,11 @@ function checkStaleBuild(response: Response): void {
 
   const now = Date.now();
   if (firstSeen === 0) {
+    // Silently start the grace timer. Within the next 10 minutes either
+    // (a) the new SW activates + controllerchange auto-reloads,
+    // (b) a user-initiated navigation hits NetworkFirst and pulls in the
+    //     fresh shell, or (c) the timer below fires the hard recovery.
     try { localStorage.setItem(BUILD_MISMATCH_KEY, String(now)); } catch { /* non-blocking */ }
-    // Nudge the existing soft-update path: banner + version-poll listeners
-    // already handle this event by surfacing the update prompt.
-    try { window.dispatchEvent(new CustomEvent('nexus:sw_update_available')); } catch { /* non-blocking */ }
     return;
   }
 

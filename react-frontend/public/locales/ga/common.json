@@ -315,11 +315,6 @@
     "my_profile": "Mo Phróifíl",
     "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)"
   },
-  "update_banner": {
-    "message": "Tá leagan nua ar fáil.",
-    "update_now": "Nuashonraigh anois",
-    "dismiss": "Díbir fógra nuashonraithe"
-  },
   "error_boundary": {
     "title": "Chuaigh rud éigin mícheart",
     "description": "Tharla earráid gan choinne. Bain triail eile as nó téigh ar ais go dtí an leathanach baile.",

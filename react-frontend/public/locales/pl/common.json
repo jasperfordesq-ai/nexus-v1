@@ -315,11 +315,6 @@
     "my_profile": "Mój profil",
     "load_more_count": "Załaduj więcej ({{remaining}} pozostało)"
   },
-  "update_banner": {
-    "message": "Dostępna jest nowa wersja.",
-    "update_now": "Aktualizuj teraz",
-    "dismiss": "Odrzuć powiadomienie o aktualizacji"
-  },
   "error_boundary": {
     "title": "Coś poszło nie tak",
     "description": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub wróć na stronę główną.",

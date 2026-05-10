@@ -48,75 +48,25 @@ if (import.meta.env.PROD) {
   });
 
   if ('serviceWorker' in navigator) {
-    const UPDATE_COMMIT_KEY = 'nexus_sw_update_from_commit';
-    const UPDATE_TTL = 10 * 60 * 1000; // 10 minutes — matches UpdateAvailableBanner
-    const updateAlreadyTriggered = () => {
-      try {
-        const raw = localStorage.getItem(UPDATE_COMMIT_KEY);
-        if (!raw) return false;
-        const colonIdx = raw.lastIndexOf(':');
-        const commit = raw.slice(0, colonIdx);
-        const ts = parseInt(raw.slice(colonIdx + 1), 10);
-        if (commit !== __BUILD_COMMIT__) {
-          localStorage.removeItem(UPDATE_COMMIT_KEY);
-          return false;
-        }
-        return Date.now() - ts < UPDATE_TTL;
-      } catch {
-        return false;
-      }
-    };
-
-    const fireUpdateAvailable = () => {
-      if (updateAlreadyTriggered()) return;
-      (window as NexusWindow).__nexus_updatePending = true;
-      window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
-    };
-
     navigator.serviceWorker.register('/sw.js', {
       scope: '/',
       updateViaCache: 'none',
     }).then((registration) => {
       const updateSW = async () => {
-        try {
-          await registration.update();
-        } catch {
-          // non-blocking
-        }
+        try { await registration.update(); } catch { /* non-blocking */ }
       };
-      (window as NexusWindow).__nexus_updateSW = updateSW;
-
-      // If a waiting SW already exists from a prior session (mobile "killed
-      // and reopened" case), surface the banner now.
-      if (registration.waiting && registration.active) {
-        fireUpdateAvailable();
-      }
-
-      // Watch for new SWs entering the 'installed' state while there's an
-      // active controller — that's the "update available" condition.
-      registration.addEventListener('updatefound', () => {
-        const installing = registration.installing;
-        if (!installing) return;
-        installing.addEventListener('statechange', () => {
-          if (installing.state === 'installed' && registration.active) {
-            fireUpdateAvailable();
-          }
-        });
-      });
 
       // Periodically poll for SW updates so long-lived sessions eventually
-      // see the banner without needing a reload. updateViaCache:'none' on
-      // the registration guarantees this hits the network, not HTTP cache.
+      // pick up new builds. updateViaCache:'none' on the registration
+      // guarantees this hits the network, not HTTP cache. When a new SW
+      // installs, skipWaiting + clientsClaim activate it immediately and
+      // the controllerchange listener above auto-reloads the page.
       setInterval(updateSW, 5 * 60 * 1000);
-
-      // Update on every visibility change (mobile app-switch).
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          updateSW();
-        }
+        if (document.visibilityState === 'visible') updateSW();
       });
     }).catch(() => {
-      // PWA registration is optional — app works without it
+      // PWA registration is optional — app works without it.
     });
   }
 }
