@@ -65,6 +65,29 @@ function isSafari(): boolean {
   return /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|EdgiOS/.test(ua);
 }
 
+export type BrowserKind =
+  | 'chrome-android'
+  | 'chrome-desktop'
+  | 'edge-desktop'
+  | 'samsung'
+  | 'firefox-android'
+  | 'firefox-desktop'
+  | 'ios-safari'
+  | 'ios-other'
+  | 'other';
+
+function detectBrowser(): BrowserKind {
+  if (typeof window === 'undefined') return 'other';
+  const ua = window.navigator.userAgent;
+  if (isIos()) return isSafari() ? 'ios-safari' : 'ios-other';
+  const isAndroid = /Android/.test(ua);
+  if (/SamsungBrowser/.test(ua)) return 'samsung';
+  if (/EdgA?\//.test(ua)) return 'edge-desktop';
+  if (/FxiOS|Firefox/.test(ua)) return isAndroid ? 'firefox-android' : 'firefox-desktop';
+  if (/Chrome|CriOS/.test(ua)) return isAndroid ? 'chrome-android' : 'chrome-desktop';
+  return 'other';
+}
+
 export interface InstallPromptState {
   /** Native prompt is available — call promptInstall() to show it. */
   canPrompt: boolean;
@@ -74,6 +97,8 @@ export interface InstallPromptState {
   isInstalled: boolean;
   /** Browser is iOS Safari specifically (the only iOS browser that can install). */
   isIosSafari: boolean;
+  /** Coarse browser identification for tailored install instructions. */
+  browser: BrowserKind;
 }
 
 function getSnapshot(): InstallPromptState {
@@ -86,6 +111,7 @@ function getSnapshot(): InstallPromptState {
     isIos: isIos(),
     isInstalled: installed || isStandalone(),
     isIosSafari: isIos() && isSafari(),
+    browser: detectBrowser(),
   };
   return cachedSnapshot;
 }
@@ -115,12 +141,18 @@ export function useInstallPrompt(): InstallPromptState & { promptInstall: typeof
 }
 
 /**
- * True when ANY install affordance is available — native Chrome prompt OR
- * iOS Safari manual install. Used to decide whether to render install UI.
+ * True whenever the app isn't already installed. We always offer the entry so
+ * users on Chrome (which only fires `beforeinstallprompt` opportunistically),
+ * iOS Safari, and other browsers all see a discoverable install affordance.
+ * The click handler degrades to a manual-instructions modal when no native
+ * prompt is captured.
+ *
+ * We hide the entry on `ios-other` (Chrome/Firefox on iOS) because iOS only
+ * lets Safari add to home screen — pointing those users at instructions they
+ * can't follow is worse than hiding it.
  */
 export function shouldOfferInstall(state: InstallPromptState): boolean {
   if (state.isInstalled) return false;
-  if (state.canPrompt) return true;
-  if (state.isIosSafari) return true;
-  return false;
+  if (state.browser === 'ios-other') return false;
+  return true;
 }

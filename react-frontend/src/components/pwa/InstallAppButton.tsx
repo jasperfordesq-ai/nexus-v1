@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
 import { IosInstallModal } from './IosInstallModal';
+import { ManualInstallModal } from './ManualInstallModal';
 
 interface InstallAppButtonProps {
   /** Render-prop pattern — the button chrome is supplied by the parent so we
@@ -24,6 +25,7 @@ export function InstallAppButton({ children }: InstallAppButtonProps) {
   const { t } = useTranslation('common');
   const state = useInstallPrompt();
   const [iosOpen, setIosOpen] = useState(false);
+  const [manualOpen, setManualOpen] = useState(false);
 
   const onClick = useCallback(() => {
     if (state.canPrompt) {
@@ -32,7 +34,9 @@ export function InstallAppButton({ children }: InstallAppButtonProps) {
     }
     if (state.isIosSafari) {
       setIosOpen(true);
+      return;
     }
+    setManualOpen(true);
   }, [state]);
 
   if (!shouldOfferInstall(state)) return null;
@@ -46,6 +50,7 @@ export function InstallAppButton({ children }: InstallAppButtonProps) {
     <>
       {children({ onClick, label, sublabel })}
       <IosInstallModal isOpen={iosOpen} onClose={() => setIosOpen(false)} />
+      <ManualInstallModal isOpen={manualOpen} onClose={() => setManualOpen(false)} browser={state.browser} />
     </>
   );
 }
