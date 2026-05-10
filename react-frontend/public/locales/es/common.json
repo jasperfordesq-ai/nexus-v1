@@ -64,8 +64,7 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)",
-    "update_app": "Update to the latest version"
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",

@@ -64,8 +64,7 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)",
-    "update_app": "Update to the latest version"
+    "accessibility_alpha": "Accessibility (alpha)"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -800,22 +799,22 @@
     "offers": "Offers",
     "wants": "Wants",
     "no_members": "No members found with this skill.",
-      "proficiency": {
-        "beginner": "Beginner",
-        "intermediate": "Intermediate",
-        "advanced": "Advanced",
-        "expert": "Expert"
-      },
-      "proficiency_aria": "Proficiency: {{level}}",
-      "remove_skill_aria": "Remove {{skill}}",
-      "no_user_skills": "No skills added yet. Add your first skill below.",
-      "add_skill": "Add Skill",
-      "add_a_skill": "Add a Skill",
-      "search_result_category": "in {{category}}",
-      "no_matching_custom": "No matching skill found. You can add \"{{query}}\" as a custom skill.",
-      "use_custom": "Use \"{{query}}\"",
-      "skill_to_add": "Skill to add:",
-      "aria_clear_search": "Clear search",
+    "proficiency": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "proficiency_aria": "Proficiency: {{level}}",
+    "remove_skill_aria": "Remove {{skill}}",
+    "no_user_skills": "No skills added yet. Add your first skill below.",
+    "add_skill": "Add Skill",
+    "add_a_skill": "Add a Skill",
+    "search_result_category": "in {{category}}",
+    "no_matching_custom": "No matching skill found. You can add \"{{query}}\" as a custom skill.",
+    "use_custom": "Use \"{{query}}\"",
+    "skill_to_add": "Skill to add:",
+    "aria_clear_search": "Clear search",
     "aria_close_members_list": "Close members list",
     "category_optional": "Category (optional)",
     "proficiency_level": "Proficiency Level"

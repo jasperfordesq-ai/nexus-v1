@@ -68,7 +68,6 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -84,87 +83,6 @@ import { MobileMenuItems } from '@/components/navigation';
 
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
-}
-
-/**
- * Soft "Update to the latest version" — the user-initiated counterpart of the
- * UpdateAvailableBanner click handler. Mirrors that flow so behaviour is
- * consistent: disconnect Pusher (the long-lived fetch deadlocks SW activation
- * on Android Chrome), trigger a SW update check, postMessage SKIP_WAITING if
- * one is waiting, and let the `controllerchange` listener in main.tsx do the
- * reload. Hard-fallback to a cache-busted location.replace if controllerchange
- * never fires (or there's no SW at all). Never unregisters the SW, never wipes
- * CacheStorage — that's the job of the /api/sw-reset emergency URL only.
- */
-function triggerSoftAppUpdate(): void {
-  // Suppress the update banner from re-firing while this attempt is in flight.
-  // Same key UpdateAvailableBanner reads — if the build commit is still the
-  // same after reload, the banner stays hidden for up to 10 minutes.
-  try {
-    localStorage.setItem(
-      'nexus_sw_update_from_commit',
-      `${__BUILD_COMMIT__}:${Date.now()}`,
-    );
-  } catch { /* non-blocking */ }
-
-  // Release the Pusher WebSocket so the new SW can activate. Without this,
-  // postMessage(SKIP_WAITING) hangs and controllerchange never fires.
-  try {
-    (window as NexusWindow).__nexus_disconnectPusher?.();
-  } catch { /* non-blocking */ }
-
-  // Compute the cache-busted reload URL up front so the fallback can fire
-  // even if the SW path throws.
-  const reloadUrl = (() => {
-    try {
-      const u = new URL(window.location.href);
-      u.searchParams.set('nexus_refresh', String(Date.now()));
-      return u.href;
-    } catch {
-      return '/';
-    }
-  })();
-  const hardReload = () => {
-    try {
-      window.location.replace(reloadUrl);
-    } catch {
-      window.location.href = reloadUrl;
-    }
-  };
-
-  // Hard ceiling: 6 seconds. controllerchange reloads earlier when a new SW
-  // takes control; if not, this guarantees the user always escapes.
-  const fallbackTimer = window.setTimeout(hardReload, 6000);
-
-  // Try the SW path. Any failure falls through to the timer above.
-  void (async () => {
-    try {
-      if (!('serviceWorker' in navigator)) {
-        window.clearTimeout(fallbackTimer);
-        hardReload();
-        return;
-      }
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (!reg) {
-        window.clearTimeout(fallbackTimer);
-        hardReload();
-        return;
-      }
-      try { await reg.update(); } catch { /* non-blocking */ }
-      if (reg.waiting) {
-        // SKIP_WAITING → new SW activates → main.tsx controllerchange reloads.
-        // Leave fallbackTimer running as a safety net.
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-        return;
-      }
-      // No waiting SW means there's nothing new to install. Just refresh.
-      window.clearTimeout(fallbackTimer);
-      hardReload();
-    } catch {
-      window.clearTimeout(fallbackTimer);
-      hardReload();
-    }
-  })();
 }
 
 // Per-tab cache so opening/closing the drawer doesn't refetch on every cycle.
@@ -743,24 +661,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </Button>
               </div>
             )}
-
-            {/* Update — soft refresh that uses the existing SW update path
-                (skipWaiting + controllerchange reload from main.tsx), with a
-                cache-busted location.replace as the fallback so even with no
-                waiting SW the page still ends up on a fresh fetch. NOT the
-                destructive /api/sw-reset recovery URL — that one wipes the SW
-                + CacheStorage every click and on Android Chrome / Capacitor
-                can leave the user stuck on the recovery shell. */}
-            <div className="px-4 py-3 border-t border-[var(--border-default)]">
-              <Button
-                variant="light"
-                onPress={() => { onClose(); triggerSoftAppUpdate(); }}
-                className="flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all w-full h-auto"
-              >
-                <RefreshCw className="w-5 h-5" aria-hidden="true" />
-                <span>{t('nav.update_app', 'Update to the latest version')}</span>
-              </Button>
-            </div>
 
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
             <div className="pt-4 pb-4 px-4">

@@ -9,7 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **PWA update flow rewritten (2026-05-10).** Replaced precache-shell + click-to-update workflow with NetworkFirst HTML + API stale-client gate. The HTML shell is no longer precached by the service worker; navigations are served NetworkFirst with a 3s timeout. Every API response carries `X-Build: <sha>`; the frontend interceptor force-redirects to `/api/sw-reset` if a build mismatch persists past a 10-minute grace window. Sentry events are now tagged with `build_commit` and `build_time`. Deploys propagate to users on their next navigation, with no UI prompt. See `react-frontend/CLAUDE.md#pwa-update-architecture` and the `feedback_pwa_android_update.md` memory file for the full architecture.
+
+### Removed
+
+- `react-frontend/public/sw-rescue.js` — service worker rescue shim that force-navigated clients via `client.navigate()`. Made redundant by NetworkFirst.
+- `/clear-site-data` nginx route. Older SWs intercepted it and served the precached SPA shell, making it useless for actually-stuck users. `/api/sw-reset` does the same job and bypasses every SW we've ever shipped via the universal `/^\/api\//` denylist.
+- "Update to the latest version" link in the mobile drawer (and the `nav.update_app` translation key in all 11 languages, the `triggerSoftAppUpdate` helper). With NetworkFirst + the API gate, no user will ever need a manual force-update button.
+
 ### Added
+
 - Public `SECURITY.md` vulnerability disclosure policy.
 - Public `CODE_OF_CONDUCT.md` community participation expectations.
 - Dependabot coverage for Composer, npm, Docker, and GitHub Actions.

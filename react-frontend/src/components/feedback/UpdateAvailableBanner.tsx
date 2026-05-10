@@ -38,7 +38,6 @@ const SW_UPDATE_SUPPRESSION_TTL = 10 * 60 * 1000; // 10 minutes
 const UPDATE_SW_TIMEOUT_MS = 3000;
 const CONTROLLERCHANGE_FALLBACK_MS = 8000;
 const CACHE_BUST_QUERY_PARAM = 'nexus_refresh';
-const SW_RESCUE_QUERY_PARAM = 'nexus_sw_rescue';
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -127,11 +126,8 @@ function navigateToFreshAppShell(): void {
 function removeCacheBustQueryParam(): void {
   try {
     const url = new URL(window.location.href);
-    const hasCacheBustParam = url.searchParams.has(CACHE_BUST_QUERY_PARAM);
-    const hasRescueParam = url.searchParams.has(SW_RESCUE_QUERY_PARAM);
-    if (!hasCacheBustParam && !hasRescueParam) return;
+    if (!url.searchParams.has(CACHE_BUST_QUERY_PARAM)) return;
     url.searchParams.delete(CACHE_BUST_QUERY_PARAM);
-    url.searchParams.delete(SW_RESCUE_QUERY_PARAM);
     const nextUrl = `${url.pathname}${url.search}${url.hash}`;
     window.history.replaceState(window.history.state, document.title, nextUrl);
   } catch {

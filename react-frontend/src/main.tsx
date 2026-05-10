@@ -34,16 +34,6 @@ initSentry();
 // skipWaiting() can deadlock on active fetches like Pusher's WebSocket on
 // Android Chrome), serving stale code on the next nav and looping the banner.
 if (import.meta.env.PROD) {
-  navigator.serviceWorker?.addEventListener('message', (event) => {
-    if (event.data?.type !== 'NEXUS_SW_RESCUE_RELOAD_REQUIRED') return;
-    const url = typeof event.data.url === 'string' ? event.data.url : window.location.href;
-    try {
-      window.location.replace(url);
-    } catch {
-      window.location.href = url;
-    }
-  });
-
   let _nexusRefreshing = false;
   navigator.serviceWorker?.addEventListener('controllerchange', () => {
     if (_nexusRefreshing) return;

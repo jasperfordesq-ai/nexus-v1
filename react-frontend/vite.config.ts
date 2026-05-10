@@ -82,7 +82,6 @@ export default defineConfig(({ command, mode }) => {
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        importScripts: ['sw-rescue.js'],
         runtimeCaching: [
           // HTML shell — NetworkFirst with a 3s timeout. Online: every nav
           // gets the freshly deployed shell. Slow network or offline: falls
@@ -98,7 +97,10 @@ export default defineConfig(({ command, mode }) => {
               if (p.startsWith('/api/')) return false;
               if (p.startsWith('/admin-legacy/')) return false;
               if (p === '/health.php') return false;
-              if (p === '/clear-site-data' || p === '/api/sw-reset') return false;
+              // /api/sw-reset is the emergency recovery URL — must always
+              // hit the network so nginx can return Clear-Site-Data + the
+              // inline unregister script.
+              if (p === '/api/sw-reset') return false;
               return true;
             },
             handler: 'NetworkFirst',

@@ -232,6 +232,60 @@ API responses validated against Zod schemas in development mode:
 - Dev mode: `console.warn` on schema mismatch (never throws)
 - Production: validation code tree-shaken out (zero overhead)
 
+## PWA Update Architecture
+
+**TL;DR:** deploys propagate to users on their next navigation, with no UI prompt. The "Update available" banner exists but is defence-in-depth, not the primary mechanism.
+
+Three layers, in priority order:
+
+### 1. NetworkFirst HTML shell (primary, 99% of cases)
+
+In [vite.config.ts](vite.config.ts) the workbox config does **not** precache `index.html`. Only content-hashed JS/CSS/icons are in `globPatterns`. `navigateFallback: null` disables vite-plugin-pwa's default precache-first NavigationRoute (which would otherwise shadow everything below). A `runtimeCaching` rule with a function `urlPattern` catches all navigation requests and serves them `NetworkFirst` with a 3s timeout. Online → fresh shell on every navigation. Offline → cached fallback.
+
+```ts
+runtimeCaching: [{
+  urlPattern: ({ request, url }) => {
+    if (request.mode !== 'navigate') return false;
+    const p = url.pathname;
+    if (p.startsWith('/api/')) return false;       // bypass to network
+    if (p.startsWith('/admin-legacy/')) return false;
+    if (p === '/health.php') return false;
+    if (p === '/api/sw-reset') return false;       // recovery URL
+    return true;
+  },
+  handler: 'NetworkFirst',
+  options: { cacheName: 'nexus-html-shell', networkTimeoutSeconds: 3, ... },
+}]
+```
+
+### 2. API stale-client gate (secondary safety net)
+
+Every API response carries `X-Build: <commit-sha>` set by `app/Http/Middleware/SecurityHeaders.php` (sourced from `httpdocs/.build-version` baked by `bluegreen-deploy.sh`). The header is exposed via CORS (`Access-Control-Expose-Headers` in both `EnsureCorsHeaders.php` and `config/cors.php`).
+
+In [src/lib/api.ts](src/lib/api.ts), `checkStaleBuild()` runs on every response from `request()`, `download()`, and `upload()`:
+
+- **Match** → clear the mismatch tracker.
+- **First mismatch** → record timestamp in `localStorage` (`nexus_build_mismatch_since`), dispatch the existing `nexus:sw_update_available` event so `UpdateAvailableBanner` fires.
+- **Mismatch persists ≥ 10 minutes** → `window.location.replace('/api/sw-reset')`. Forces nuclear recovery via the nginx route that returns `Clear-Site-Data` plus an inline SW unregister + cache wipe script.
+
+The 10-minute grace gives the soft-update path (banner click → SkipWaiting → controllerchange reload) a chance to recover the user gracefully. Only when that path has clearly failed do we eject them.
+
+### 3. Soft update banner (defence-in-depth, rarely seen)
+
+[`UpdateAvailableBanner.tsx`](src/components/feedback/UpdateAvailableBanner.tsx) shows when either the API gate or `useVersionCheck` (`/build-info.json` poll, every 5 min) detects a mismatch. Click handler still does the Android-Chrome dance (disconnect Pusher → postMessage SKIP_WAITING → 8s `controllerchange`-fallback that calls `forceClearAppCaches` + cache-busted reload). With layers 1 and 2 above, the user almost never sees this banner — but if they do, it works.
+
+### Sentry visibility
+
+[src/lib/sentry.ts](src/lib/sentry.ts) tags every event with `build_commit` and `build_time` from `__BUILD_COMMIT__` / `__BUILD_TIME__`. Use Sentry Discover with `tag:build_commit:<sha>` to measure how a stale cohort drains over time after a deploy. `release` is `nexus-react@<commit>`.
+
+### Things to never reintroduce
+
+- HTML in `globPatterns` — every PWA tutorial copies `'**/*.{js,css,html,ico,png,svg,woff2}'` from the vite-plugin-pwa README; that single `'html'` is the original sin that caused six months of staleness incidents.
+- `navigateFallback: 'index.html'` — vite-plugin-pwa's default. Silently registers a precache-first NavigationRoute *before* any runtimeCaching rules. Always set to `null` when using NetworkFirst navigation.
+- `/clear-site-data` nginx route — older SWs intercepted it and served the precached SPA shell. Useless for actually-stuck users. Use `/api/sw-reset` only (the universal `/^\/api\//` denylist guarantees every SW we've ever shipped passes it through).
+- `sw-rescue.js`-style force-eviction shims — not needed when deploys propagate via NetworkFirst.
+- Manual "Update to latest version" buttons — users should never need one.
+
 ## Commands
 
 ```bash
