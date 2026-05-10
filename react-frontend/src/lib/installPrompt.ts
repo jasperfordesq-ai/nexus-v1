@@ -22,9 +22,11 @@ interface BeforeInstallPromptEvent extends Event {
 
 let capturedEvent: BeforeInstallPromptEvent | null = null;
 let installed = false;
+let cachedSnapshot: InstallPromptState | null = null;
 const listeners = new Set<() => void>();
 
 function emit(): void {
+  cachedSnapshot = null;
   for (const fn of listeners) fn();
 }
 
@@ -75,12 +77,17 @@ export interface InstallPromptState {
 }
 
 function getSnapshot(): InstallPromptState {
-  return {
+  // useSyncExternalStore compares snapshots by Object.is — must return a stable
+  // reference until emit() invalidates the cache, otherwise React re-renders
+  // every tick and trips the max-update-depth guard.
+  if (cachedSnapshot) return cachedSnapshot;
+  cachedSnapshot = {
     canPrompt: capturedEvent !== null && !installed,
     isIos: isIos(),
     isInstalled: installed || isStandalone(),
     isIosSafari: isIos() && isSafari(),
   };
+  return cachedSnapshot;
 }
 
 function subscribe(listener: () => void): () => void {
