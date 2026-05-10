@@ -316,6 +316,11 @@ jobs:
   docker-verify:
     name: Docker Build Verify
     runs-on: ubuntu-latest
+    # Only on push to main + manual dispatch — skipped on PRs.
+    # Rebuilding 4 Docker images with --no-cache is ~15–25 min and almost
+    # always passes; running it post-merge gives the same safety with no
+    # PR-time tax. Trigger manually with `gh workflow run ci.yml` if needed.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [php-checks, react-build, api-contract]
 
     steps:
@@ -417,8 +422,36 @@ jobs:
   # ─────────────────────────────────────────────────────────────────
   # Stage 6: Translation Drift Detection
   # ─────────────────────────────────────────────────────────────────
+  # Detect whether this push/PR actually touches files that could affect i18n.
+  # Job-level paths filtering avoids running the (relatively slow) i18n-drift
+  # job on backend-only or infra-only changes.
+  i18n-changed:
+    name: i18n changed-files filter
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.filter.outputs.i18n }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            i18n:
+              - 'react-frontend/public/locales/**'
+              - 'react-frontend/src/**/*.ts'
+              - 'react-frontend/src/**/*.tsx'
+              - 'lang/**'
+              - 'app/**/*.php'
+              - 'src/**/*.php'
+              - 'scripts/check-i18n*.mjs'
+              - 'scripts/check-i18n.sh'
+              - 'scripts/check-php-i18n-coverage.mjs'
+              - '.github/i18n-gap-baseline.json'
+
   i18n-drift:
     name: Translation Drift Detection
+    needs: i18n-changed
+    if: needs.i18n-changed.outputs.run == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -445,8 +478,14 @@ jobs:
       # Hardcoded English in admin code is intentional, not a violation.
       # See memory/feedback_admin_english_only.md.
 
-      - name: "BLOCKING: Prevent non-admin translation-gap regressions"
+      # Floating-baseline gate — surfaces drift but does not block merge.
+      # Counts strings where translation == English (i.e. English fallback in
+      # use). Unrelated PRs frequently trip this when other commits add new
+      # English keys. Refresh the baseline on `main` with:
+      #   node scripts/check-i18n-gap-regression.mjs --write-baseline
+      - name: "WARNING: Prevent non-admin translation-gap regressions"
         run: npm run check:i18n:baseline
+        continue-on-error: true
 
       - name: "BLOCKING: Prevent stub placeholder translation values"
         run: node scripts/check-i18n-stubs.mjs
@@ -454,14 +493,20 @@ jobs:
       # check-admin-breadcrumbs REMOVED 2026-04-22 — admin is English-only by design.
       # See memory/feedback_admin_english_only.md.
 
-      - name: "BLOCKING: Exhaustive t() key coverage (ratchets down via baseline)"
+      # Floating-baseline gate — surfaces missing t() keys but does not block.
+      # Ratchets down on every commit; unrelated PRs frequently trip the
+      # baseline when other commits add new t() calls.
+      - name: "WARNING: Exhaustive t() key coverage (ratchets down via baseline)"
         run: node scripts/check-i18n-coverage.mjs
+        continue-on-error: true
 
       - name: "BLOCKING: Variable-name mismatches between t() args and {{placeholders}}"
         run: node scripts/check-i18n-vars.mjs
 
-      - name: "BLOCKING: PHP __() key coverage (emails, notifications, services)"
+      # Floating-baseline gate — surfaces missing __() keys but does not block.
+      - name: "WARNING: PHP __() key coverage (emails, notifications, services)"
         run: node scripts/check-php-i18n-coverage.mjs
+        continue-on-error: true
 
       - name: "INFO: Audit non-admin English fallback gaps"
         run: npm run check:i18n:gaps
@@ -598,8 +643,27 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Get Playwright version
+        id: playwright-version
+        run: |
+          VERSION=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test']?.version || require('./package-lock.json').packages['node_modules/playwright']?.version || 'unknown'")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright Browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            # Browsers cached — only install OS deps.
+            npx playwright install-deps chromium
+          else
+            npx playwright install chromium --with-deps
+          fi
 
       - name: Create .env.ci
         run: |

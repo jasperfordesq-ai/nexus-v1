@@ -6,8 +6,12 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  # PR trigger removed 2026-05-10 — heavy scans (OWASP, Semgrep, npm audit on
+  # transitive deps) constantly tripped on pre-existing issues unrelated to
+  # the PR, blocking nothing (no required checks) but creating noise. PR-time
+  # dependency risk is now covered by `dependency-review.yml`, which only
+  # runs when package files change. Full security scan still runs nightly
+  # and on every merge to main, so coverage is unchanged.
 
 permissions:
   contents: read
