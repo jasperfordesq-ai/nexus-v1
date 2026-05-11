@@ -129,6 +129,7 @@ class ToolRegistry
             new SearchJobsTool(),
             new SearchMarketplaceTool(),
             new GetMyWalletBalanceTool(),
+            new SemanticSearchTool(),
         ];
     }
 }

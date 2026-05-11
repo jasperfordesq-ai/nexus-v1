@@ -8,6 +8,7 @@ namespace App\Observers;
 
 use App\Jobs\SyncUserSearchIndexJob;
 use App\Models\User;
+use App\Observers\Concerns\IndexesEmbeddings;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Log;
  */
 class UserObserver
 {
+    use IndexesEmbeddings;
+
     /**
      * Fields that, when changed, require a re-index.
      * MUST stay in sync with the document shape built in SearchService::indexUser
@@ -42,6 +45,7 @@ class UserObserver
     public function created(User $user): void
     {
         $this->dispatchIndex($user->id, 'created');
+        $this->reindexEmbedding($user, 'user');
     }
 
     public function updated(User $user): void
@@ -51,6 +55,7 @@ class UserObserver
             return;
         }
         $this->dispatchIndex($user->id, 'updated');
+        $this->reindexEmbedding($user, 'user');
     }
 
     public function deleted(User $user): void
@@ -63,6 +68,7 @@ class UserObserver
                 'error'   => $e->getMessage(),
             ]);
         }
+        $this->deleteEmbedding($user, 'user');
     }
 
     private function dispatchIndex(int $userId, string $reason): void

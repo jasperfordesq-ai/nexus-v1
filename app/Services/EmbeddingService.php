@@ -53,6 +53,159 @@ class EmbeddingService
         $this->store((int) $user['tenant_id'], 'user', (int) $user['id'], $text);
     }
 
+    public function generateForEvent(array $event): void
+    {
+        $text = implode('. ', array_filter([
+            $event['title'] ?? '', $event['description'] ?? '', $event['location'] ?? '',
+        ]));
+        $this->store((int) $event['tenant_id'], 'event', (int) $event['id'], $text);
+    }
+
+    public function generateForGroup(array $group): void
+    {
+        $text = implode('. ', array_filter([
+            $group['name'] ?? '', $group['description'] ?? '',
+        ]));
+        $this->store((int) $group['tenant_id'], 'group', (int) $group['id'], $text);
+    }
+
+    public function generateForJob(array $job): void
+    {
+        $text = implode('. ', array_filter([
+            $job['title'] ?? '', $job['tagline'] ?? '', $job['description'] ?? '',
+            $job['location'] ?? '', $job['skills_required'] ?? '',
+        ]));
+        $this->store((int) $job['tenant_id'], 'job', (int) $job['id'], $text);
+    }
+
+    public function generateForMarketplace(array $item): void
+    {
+        $text = implode('. ', array_filter([
+            $item['title'] ?? '', $item['tagline'] ?? '', $item['description'] ?? '',
+            $item['condition'] ?? '', $item['location'] ?? '',
+        ]));
+        $this->store((int) $item['tenant_id'], 'marketplace', (int) $item['id'], $text);
+    }
+
+    public function generateForKbArticle(array $article): void
+    {
+        $body = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) ($article['content'] ?? '')))) ?? '');
+        $text = trim(($article['title'] ?? '') . '. ' . mb_substr($body, 0, 6000));
+        $this->store((int) $article['tenant_id'], 'kb_article', (int) $article['id'], $text);
+    }
+
+    /**
+     * Dispatcher used by the queued ReindexEmbeddingJob — picks the right
+     * type-specific generator based on a string type key.
+     */
+    public function generateFor(string $contentType, array $row): void
+    {
+        match ($contentType) {
+            'listing' => $this->generateForListing($row),
+            'user' => $this->generateForUser($row),
+            'event' => $this->generateForEvent($row),
+            'group' => $this->generateForGroup($row),
+            'job' => $this->generateForJob($row),
+            'marketplace' => $this->generateForMarketplace($row),
+            'kb_article' => $this->generateForKbArticle($row),
+            default => null,
+        };
+    }
+
+    /**
+     * Delete the stored embedding for a piece of content (call on model delete).
+     */
+    public function delete(int $tenantId, string $contentType, int $contentId): void
+    {
+        try {
+            DB::table('content_embeddings')
+                ->where('tenant_id', $tenantId)
+                ->where('content_type', $contentType)
+                ->where('content_id', $contentId)
+                ->delete();
+        } catch (\Throwable $e) {
+            Log::info("EmbeddingService::delete failed: " . $e->getMessage());
+        }
+    }
+
+    // =========================================================================
+    // SEMANTIC QUERY
+    // =========================================================================
+
+    /**
+     * Semantic search: embed the query, then rank stored embeddings by cosine
+     * similarity. Tenant-scoped. Returns the top-K rows with content_type,
+     * content_id, and a score in [0,1].
+     *
+     * Cost guard: caller can pass a candidate cap (default 2000) to bound the
+     * in-memory cosine pass. For very large tenants we'd want a real vector
+     * index, but cap + index on (tenant_id, content_type) keeps this O(N) PHP
+     * loop tolerable up to ~5k embeddings per tenant.
+     *
+     * @param string[] $contentTypes restrict to these types; empty = all
+     * @return array<int, array{content_type:string, content_id:int, score:float}>
+     */
+    public function semanticSearch(
+        string $query,
+        int $tenantId,
+        array $contentTypes = [],
+        int $limit = 10,
+        int $candidateCap = 2000
+    ): array {
+        $query = trim($query);
+        if ($query === '') {
+            return [];
+        }
+
+        try {
+            $apiKey = DB::table('ai_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'openai_api_key')
+                ->value('setting_value');
+            if (empty($apiKey)) {
+                return [];
+            }
+
+            $queryVec = $this->callOpenAiEmbedding($apiKey, $query);
+            if (!is_array($queryVec) || $queryVec === []) {
+                return [];
+            }
+
+            $rowsQuery = DB::table('content_embeddings')
+                ->where('tenant_id', $tenantId);
+            if ($contentTypes !== []) {
+                $rowsQuery->whereIn('content_type', $contentTypes);
+            }
+            $rows = $rowsQuery
+                ->orderByDesc('updated_at')
+                ->limit($candidateCap)
+                ->get(['content_type', 'content_id', 'embedding']);
+
+            $scored = [];
+            foreach ($rows as $row) {
+                $vec = json_decode($row->embedding, true);
+                if (!is_array($vec) || $vec === []) {
+                    continue;
+                }
+                $sim = $this->cosineSimilarity($queryVec, $vec);
+                if ($sim <= 0.15) {
+                    continue;
+                }
+                $scored[] = [
+                    'content_type' => (string) $row->content_type,
+                    'content_id' => (int) $row->content_id,
+                    'score' => (float) $sim,
+                ];
+            }
+
+            usort($scored, fn ($a, $b) => $b['score'] <=> $a['score']);
+            return array_slice($scored, 0, $limit);
+        } catch (\Throwable $e) {
+            Log::warning('EmbeddingService::semanticSearch failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     // =========================================================================
     // FIND SIMILAR
     // =========================================================================

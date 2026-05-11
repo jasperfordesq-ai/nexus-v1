@@ -7,6 +7,7 @@
 namespace App\Observers;
 
 use App\Models\Event;
+use App\Observers\Concerns\IndexesEmbeddings;
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Log;
 
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Log;
  */
 class EventObserver
 {
+    use IndexesEmbeddings;
+
     public function created(Event $event): void
     {
         try {
@@ -29,6 +32,7 @@ class EventObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->reindexEmbedding($event, 'event');
     }
 
     public function updated(Event $event): void
@@ -48,6 +52,7 @@ class EventObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->reindexEmbedding($event, 'event');
     }
 
     public function deleted(Event $event): void
@@ -60,5 +65,6 @@ class EventObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->deleteEmbedding($event, 'event');
     }
 }

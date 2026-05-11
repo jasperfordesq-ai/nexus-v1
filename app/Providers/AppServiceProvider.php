@@ -16,7 +16,9 @@ use App\Models\FeedPost;
 use App\Models\Goal;
 use App\Models\GoalTemplate;
 use App\Models\Group;
+use App\Models\JobVacancy;
 use App\Models\Listing;
+use App\Models\MarketplaceListing;
 use App\Models\Message;
 use App\Models\Newsletter;
 use App\Models\Notification;
@@ -239,7 +241,9 @@ use App\Observers\CommentObserver;
 use App\Observers\EventObserver;
 use App\Observers\FeedPostObserver;
 use App\Observers\GroupObserver;
+use App\Observers\JobVacancyObserver;
 use App\Observers\ListingObserver;
+use App\Observers\MarketplaceListingObserver;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -1041,6 +1045,8 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Event::observe(EventObserver::class);
         Group::observe(GroupObserver::class);
+        JobVacancy::observe(JobVacancyObserver::class);
+        MarketplaceListing::observe(MarketplaceListingObserver::class);
         FeedPost::observe(FeedPostObserver::class);
         \App\Models\Comment::observe(CommentObserver::class);
 

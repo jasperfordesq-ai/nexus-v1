@@ -7,6 +7,7 @@
 namespace App\Observers;
 
 use App\Models\Listing;
+use App\Observers\Concerns\IndexesEmbeddings;
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Log;
 
@@ -21,6 +22,13 @@ use Illuminate\Support\Facades\Log;
  */
 class ListingObserver
 {
+    use IndexesEmbeddings;
+
+    public function created(Listing $listing): void
+    {
+        $this->reindexEmbedding($listing, 'listing');
+    }
+
     public function updated(Listing $listing): void
     {
         try {
@@ -31,6 +39,7 @@ class ListingObserver
                 'error'      => $e->getMessage(),
             ]);
         }
+        $this->reindexEmbedding($listing, 'listing');
     }
 
     public function deleted(Listing $listing): void
@@ -43,5 +52,6 @@ class ListingObserver
                 'error'      => $e->getMessage(),
             ]);
         }
+        $this->deleteEmbedding($listing, 'listing');
     }
 }

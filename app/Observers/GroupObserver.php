@@ -7,6 +7,7 @@
 namespace App\Observers;
 
 use App\Models\Group;
+use App\Observers\Concerns\IndexesEmbeddings;
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Log;
 
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Log;
  */
 class GroupObserver
 {
+    use IndexesEmbeddings;
+
     public function created(Group $group): void
     {
         try {
@@ -29,6 +32,7 @@ class GroupObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->reindexEmbedding($group, 'group');
     }
 
     public function updated(Group $group): void
@@ -48,6 +52,7 @@ class GroupObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->reindexEmbedding($group, 'group');
     }
 
     public function deleted(Group $group): void
@@ -60,5 +65,6 @@ class GroupObserver
                 'error'    => $e->getMessage(),
             ]);
         }
+        $this->deleteEmbedding($group, 'group');
     }
 }
