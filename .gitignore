@@ -258,3 +258,7 @@ DPO_Confidentiality_Agreement_*.docx
 # Local secrets — never committed (per CLAUDE.md, repo is PUBLIC)
 /.secrets.local
 /.secrets.local/
+
+# ─── Blue-green deploy local artefacts ───────────────────────────────────────
+.bluegreen-status
+.bluegreen-latest-log

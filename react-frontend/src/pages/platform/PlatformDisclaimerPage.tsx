@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+/* eslint-disable i18next/no-literal-string --
+ * Platform-level legal documents are canonically English. Localized versions,
+ * if produced, must be authored by lawyers (not machine-translated) and
+ * served from a separate per-locale source. Disabling the i18n literal rule
+ * here is intentional — see audit 2026-05-10.
+ */
+
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';

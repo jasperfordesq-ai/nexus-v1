@@ -50,12 +50,6 @@ export function GroupGeocode() {
             </p>
           </div>
           <Code className="text-xs">php artisan groups:geocode</Code>
-          <p className="text-xs text-default-400">
-            {t(
-              'groups.geocode_not_migrated_note',
-              'TODO: rebuild this screen with progress reporting, retry controls and per-group status.',
-            )}
-          </p>
         </CardBody>
       </Card>
     </div>
