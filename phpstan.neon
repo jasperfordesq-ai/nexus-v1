@@ -1,13 +1,9 @@
 # PHPStan configuration.
 #
-# Baseline as of 2026-05-10: 22 real errors at level 1 against app/ + src/.
-# See docs/STATIC_ANALYSIS_BASELINE.md for what each remaining error is and
-# how to fix. The ignoreErrors block below silences Laravel/Eloquent magic
-# methods and facade aliases that PHPStan can't resolve without larastan.
-#
-# Earlier note about "~123 errors" was wrong: PHPStan was scanning src/
-# only, which became near-empty after the Laravel migration. Real baseline
-# captured 2026-05-10 from full app/ + src/ scan.
+# Scans app/ at level 1. The ignoreErrors block silences Laravel/Eloquent
+# magic methods and facade aliases that PHPStan can't resolve without larastan.
+# Legacy src/ path-scoped ignores below are no-ops (src/ was removed post-migration)
+# but kept harmless via reportUnmatchedIgnoredErrors: false.
 #
 # PHPStan 1.12's --generate-baseline emits invalid NEON (escaped colons
 # like "\:" that the parser rejects). Do NOT use --generate-baseline.
@@ -15,10 +11,8 @@
 parameters:
     level: 1
     paths:
-        - src
         - app
     excludePaths:
-        - src/Views
         - vendor
     parallel:
         processTimeout: 1200.0

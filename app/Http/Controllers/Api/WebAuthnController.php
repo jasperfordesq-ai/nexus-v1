@@ -25,9 +25,6 @@ use lbuchs\WebAuthn\WebAuthnException;
 
 /**
  * WebAuthnController -- WebAuthn/Passkey authentication.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/WebAuthnApiController.php
  */
 class WebAuthnController extends BaseApiController
 {

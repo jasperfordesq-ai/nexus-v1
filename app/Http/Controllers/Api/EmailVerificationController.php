@@ -20,9 +20,6 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * EmailVerificationController -- Email verification endpoints.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/EmailVerificationApiController.php
  */
 class EmailVerificationController extends BaseApiController
 {
