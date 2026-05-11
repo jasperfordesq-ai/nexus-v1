@@ -17,6 +17,7 @@ use App\Models\Event;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\AI\AIServiceFactory;
+use App\Services\AI\Tools\ToolRegistry;
 use App\Services\AiSupportContextService;
 
 /**
@@ -31,9 +32,13 @@ class AiChatController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /** Max round-trips the model can take through tool calls before we cut it off. */
+    private const MAX_TOOL_HOPS = 5;
+
     public function __construct(
         private readonly AIServiceFactory $aiServiceFactory,
         private readonly AiSupportContextService $supportContextService,
+        private readonly ToolRegistry $toolRegistry,
     ) {}
 
     // =====================================================================
@@ -79,29 +84,93 @@ class AiChatController extends BaseApiController
 
         // Build a bounded conversation history for context.
         $history = $this->supportContextService->recentConversationHistory((int) $conversationId);
+        $toolGuidance = <<<TXT
+You have retrieval tools available (search_listings, search_members, search_kb, search_events, search_jobs, search_marketplace, get_my_wallet_balance). Call them whenever the user's question would benefit from live, tenant-scoped data — for example, "find me a gardener", "what events are on this weekend", "who can teach me Spanish", "what is my balance". Prefer tool calls over guessing from training data. Only call get_my_wallet_balance when the user is clearly asking about their own balance. After a tool returns, summarise the results conversationally and reference items by title; the UI will render structured cards beside your message, so do not paste raw URLs or repeat every field — keep your reply readable and concise.
+TXT;
         $chatMessages = [
             ['role' => 'system', 'content' => AIServiceFactory::getSystemPrompt() ?: 'You are a helpful community assistant for a timebanking platform.'],
+            ['role' => 'system', 'content' => $toolGuidance],
             ['role' => 'system', 'content' => $supportContext['content']],
         ];
         foreach ($history as $row) {
             $chatMessages[] = ['role' => $row->role, 'content' => $row->content];
         }
 
-        // Call AI provider with fallback
+        // Tool-augmented chat: model may call retrieval tools (search_listings,
+        // search_members, etc.) to ground its answer in live tenant data. Each
+        // hop replays the full message history plus tool results, up to
+        // MAX_TOOL_HOPS, after which we force a final text answer.
+        $tools = $this->toolRegistry->openAiSchemasFor((int) $userId);
+        $toolInvocations = [];
         $content = null;
-        $tokensUsed = null;
+        $tokensUsed = 0;
         $model = null;
         $provider = null;
 
         try {
-            $response = AIServiceFactory::chatWithFallback($chatMessages, [
-                'temperature' => 0.2,
-                'max_tokens' => 1200,
-            ]);
-            $content = $response['content'] ?? '';
-            $tokensUsed = $response['tokens_used'] ?? null;
-            $model = $response['model'] ?? null;
-            $provider = $response['provider'] ?? null;
+            $hop = 0;
+            while ($hop < self::MAX_TOOL_HOPS) {
+                $response = AIServiceFactory::chatWithFallback($chatMessages, [
+                    'temperature' => 0.2,
+                    'max_tokens' => 1200,
+                    'tools' => $tools,
+                    'tool_choice' => 'auto',
+                ]);
+
+                $tokensUsed += (int) ($response['tokens_used'] ?? 0);
+                $model = $response['model'] ?? $model;
+                $provider = $response['provider'] ?? $provider;
+
+                $toolCalls = $response['tool_calls'] ?? [];
+                if ($toolCalls === []) {
+                    $content = $response['content'] ?? '';
+                    break;
+                }
+
+                $chatMessages[] = [
+                    'role' => 'assistant',
+                    'content' => $response['content'] ?? '',
+                    'tool_calls' => $toolCalls,
+                ];
+
+                foreach ($toolCalls as $call) {
+                    $result = $this->toolRegistry->execute(
+                        (string) $call['name'],
+                        is_array($call['arguments'] ?? null) ? $call['arguments'] : [],
+                        (int) $userId
+                    );
+                    $toolInvocations[] = [
+                        'name' => $call['name'] ?? '',
+                        'arguments' => $call['arguments'] ?? [],
+                        'ok' => (bool) ($result['ok'] ?? false),
+                        'summary' => (string) ($result['summary'] ?? ''),
+                        'card_type' => (string) ($result['card_type'] ?? 'generic'),
+                        'results' => $result['results'] ?? [],
+                    ];
+                    $chatMessages[] = [
+                        'role' => 'tool',
+                        'tool_call_id' => $call['id'] ?? '',
+                        'content' => json_encode([
+                            'ok' => $result['ok'] ?? false,
+                            'summary' => $result['summary'] ?? '',
+                            'results' => $result['results'] ?? [],
+                            'error' => $result['error'] ?? null,
+                        ]),
+                    ];
+                }
+                $hop++;
+            }
+            if ($content === null) {
+                // Hit hop limit — make one final call with no tools to force a text answer.
+                $response = AIServiceFactory::chatWithFallback($chatMessages, [
+                    'temperature' => 0.2,
+                    'max_tokens' => 1200,
+                ]);
+                $content = $response['content'] ?? '';
+                $tokensUsed += (int) ($response['tokens_used'] ?? 0);
+                $model = $response['model'] ?? $model;
+                $provider = $response['provider'] ?? $provider;
+            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('AI chat provider failed', [
                 'error' => $e->getMessage(),
@@ -133,6 +202,7 @@ class AiChatController extends BaseApiController
             'provider' => $provider,
             'sources' => $supportContext['sources'],
             'source_count' => $supportContext['source_count'],
+            'tool_invocations' => $toolInvocations,
         ]);
     }
 

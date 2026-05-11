@@ -35,6 +35,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
+import { ToolResultCards, type ToolInvocation } from './ToolResultCards';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -47,6 +48,7 @@ interface ChatMessage {
   timestamp: Date;
   isError?: boolean;
   sources?: ChatSource[];
+  toolInvocations?: ToolInvocation[];
 }
 
 interface ChatSource {
@@ -73,6 +75,7 @@ interface AiChatResponse {
   provider?: string;
   sources?: ChatSource[];
   source_count?: number;
+  tool_invocations?: ToolInvocation[];
   limits?: {
     daily_remaining: number;
     monthly_remaining: number;
@@ -145,6 +148,7 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const sources = !isUser && message.sources?.length ? message.sources.slice(0, 4) : [];
+  const toolInvocations = !isUser && message.toolInvocations?.length ? message.toolInvocations : [];
 
   return (
     <motion.div
@@ -193,6 +197,7 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
           {message.content}
         </div>
         <span className="text-xs text-[var(--color-text-muted)] px-1">{time}</span>
+        {toolInvocations.length > 0 && <ToolResultCards invocations={toolInvocations} />}
         {sources.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 px-1" aria-label={t('sources_label')}>
             {sources.map((source) => {
@@ -379,6 +384,7 @@ export default function AiChatPage() {
           content: data.message.content,
           timestamp: new Date(),
           sources: data.sources ?? [],
+          toolInvocations: data.tool_invocations ?? [],
         };
         setMessages(prev => [...prev, assistantMsg]);
 
