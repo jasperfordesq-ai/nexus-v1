@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type ReactNode, type HTMLAttributes } from 'react';
+import { forwardRef, type ReactNode, type HTMLAttributes, type MouseEvent } from 'react';
 import { Card } from '@heroui/react';
 import { motion, type Variants } from 'framer-motion';
 
@@ -38,6 +38,8 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       glow = 'none',
       animated = false,
       className = '',
+      onClick,
+      onKeyDown,
       ...rest
     },
     ref
@@ -45,6 +47,18 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
     const baseClass = hoverable ? 'glass-card-hover' : 'glass-card';
     const glowClass = glow !== 'none' ? `glow-${glow}` : '';
     const combinedClassName = ['backdrop-blur-lg', baseClass, glowClass, className].filter(Boolean).join(' ');
+
+    // When the consumer wires up onClick, forward it to HeroUI Card as onPress
+    // and mark the card pressable so clicks/keyboard reliably activate it.
+    // (HeroUI Card ignores native onClick unless isPressable is set.)
+    const isInteractive = typeof onClick === 'function';
+    const pressableProps = isInteractive
+      ? {
+          isPressable: true as const,
+          onPress: () => onClick!({} as MouseEvent<HTMLDivElement>),
+          onKeyDown,
+        }
+      : { onKeyDown };
 
     if (animated) {
       return (
@@ -61,6 +75,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
             classNames={{ base: combinedClassName }}
             shadow="none"
             radius="none"
+            {...pressableProps}
           >
             {children}
           </Card>
@@ -75,6 +90,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         shadow="none"
         radius="none"
         {...(rest as object)}
+        {...pressableProps}
       >
         {children}
       </Card>
