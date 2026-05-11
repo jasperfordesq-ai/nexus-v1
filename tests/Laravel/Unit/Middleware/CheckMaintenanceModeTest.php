@@ -25,6 +25,13 @@ class CheckMaintenanceModeTest extends TestCase
     {
         parent::setUp();
         $this->middleware = new CheckMaintenanceMode();
+        CheckMaintenanceMode::$forceCheckInTesting = true;
+    }
+
+    protected function tearDown(): void
+    {
+        CheckMaintenanceMode::$forceCheckInTesting = false;
+        parent::tearDown();
     }
 
     private function makeNext(): \Closure
@@ -194,11 +201,15 @@ class CheckMaintenanceModeTest extends TestCase
     {
         $this->enableMaintenanceMode();
 
-        // Force tenant context to id=0 via reflection (setById(0) fails silently, leaving previous tenant)
+        // Force tenant context to id=0 via reflection (setById(0) fails silently, leaving previous tenant).
+        // Must also clear $cachedId — getId() short-circuits on it before reading $tenant.
         $ref = new \ReflectionClass(TenantContext::class);
-        $prop = $ref->getProperty('tenant');
-        $prop->setAccessible(true);
-        $prop->setValue(null, ['id' => 0, 'name' => '', 'features' => '{}']);
+        $tenantProp = $ref->getProperty('tenant');
+        $tenantProp->setAccessible(true);
+        $tenantProp->setValue(null, ['id' => 0, 'name' => '', 'features' => '{}']);
+        $cachedIdProp = $ref->getProperty('cachedId');
+        $cachedIdProp->setAccessible(true);
+        $cachedIdProp->setValue(null, null);
 
         $request = Request::create('/api/v2/feed', 'GET');
         $response = $this->middleware->handle($request, $this->makeNext());
