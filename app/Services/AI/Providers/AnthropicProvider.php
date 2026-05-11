@@ -36,8 +36,14 @@ class AnthropicProvider extends BaseProvider
     }
 
     /**
-     * Send a chat completion request to Anthropic API
-     * CRITICAL FIX: API key is strictly sanitized before every request
+     * Send a chat completion request to Anthropic API.
+     *
+     * Supports OpenAI-style provider-neutral tool calling: the caller passes
+     * options.tools as a list of {type:function, function:{name, description,
+     * parameters}} schemas and may pass role:tool messages with tool_call_id
+     * + content. We translate to/from Anthropic's tool_use / tool_result
+     * content-block shape transparently so the caller doesn't care which
+     * provider answered.
      */
     public function chat(array $messages, array $options = []): array
     {
@@ -45,47 +51,43 @@ class AnthropicProvider extends BaseProvider
             throw new \Exception('Anthropic API key not configured');
         }
 
-        // CRITICAL: Strictly sanitize the API key to remove any whitespace/newlines
-        // This prevents 401 errors from hidden characters
         $apiKey = trim($this->apiKey);
-
-        // SECURITY: Only log key presence, never expose key content
         if (empty($apiKey)) {
             \Illuminate\Support\Facades\Log::warning("Anthropic Request: API key is empty or not configured");
         }
 
         $model = $this->getModel($options);
 
-        // Extract system message if present
-        $systemPrompt = '';
-        $chatMessages = [];
-
-        foreach ($messages as $message) {
-            if ($message['role'] === 'system') {
-                $systemPrompt .= $message['content'] . "\n";
-            } else {
-                $chatMessages[] = [
-                    'role' => $message['role'],
-                    'content' => $message['content'],
-                ];
-            }
-        }
+        [$systemPrompt, $chatMessages] = $this->translateMessagesForAnthropic($messages);
 
         $data = [
             'model' => $model,
             'messages' => $chatMessages,
             'max_tokens' => $options['max_tokens'] ?? 2048,
         ];
-
-        if ($systemPrompt) {
-            $data['system'] = trim($systemPrompt);
+        if ($systemPrompt !== '') {
+            $data['system'] = $systemPrompt;
         }
-
         if (isset($options['temperature'])) {
             $data['temperature'] = $options['temperature'];
         }
+        if (!empty($options['tools']) && is_array($options['tools'])) {
+            $data['tools'] = array_map(function ($t) {
+                $fn = $t['function'] ?? $t;
+                return [
+                    'name' => $fn['name'] ?? '',
+                    'description' => $fn['description'] ?? '',
+                    'input_schema' => $fn['parameters'] ?? ['type' => 'object', 'properties' => (object) []],
+                ];
+            }, $options['tools']);
+            if (!empty($options['tool_choice'])) {
+                $tc = $options['tool_choice'];
+                $data['tool_choice'] = is_string($tc)
+                    ? ($tc === 'required' ? ['type' => 'any'] : ['type' => 'auto'])
+                    : ['type' => 'auto'];
+            }
+        }
 
-        // CRITICAL: Use sanitized $apiKey, NOT $this->apiKey
         $headers = [
             'x-api-key: ' . $apiKey,
             'anthropic-version: ' . $this->apiVersion,
@@ -94,12 +96,20 @@ class AnthropicProvider extends BaseProvider
 
         $response = $this->request('messages', $data, $headers);
 
-        // Parse response
         $content = '';
+        $toolCalls = [];
         if (isset($response['content']) && is_array($response['content'])) {
             foreach ($response['content'] as $block) {
-                if ($block['type'] === 'text') {
-                    $content .= $block['text'];
+                $type = $block['type'] ?? '';
+                if ($type === 'text') {
+                    $content .= (string) ($block['text'] ?? '');
+                } elseif ($type === 'tool_use') {
+                    $toolCalls[] = [
+                        'id' => (string) ($block['id'] ?? ''),
+                        'name' => (string) ($block['name'] ?? ''),
+                        'arguments' => is_array($block['input'] ?? null) ? $block['input'] : [],
+                        'arguments_raw' => json_encode($block['input'] ?? new \stdClass()),
+                    ];
                 }
             }
         }
@@ -108,6 +118,7 @@ class AnthropicProvider extends BaseProvider
 
         return [
             'content' => $content,
+            'tool_calls' => $toolCalls,
             'tokens_used' => ($usage['input_tokens'] ?? 0) + ($usage['output_tokens'] ?? 0),
             'tokens_input' => ($usage['input_tokens'] ?? 0),
             'tokens_output' => ($usage['output_tokens'] ?? 0),
@@ -115,6 +126,78 @@ class AnthropicProvider extends BaseProvider
             'finish_reason' => $response['stop_reason'] ?? 'stop',
             'provider' => 'anthropic',
         ];
+    }
+
+    /**
+     * Convert our provider-neutral messages into Anthropic's wire format.
+     *
+     * - All `role: system` messages collapse into a single `system` string.
+     * - `role: tool` (tool result) messages become user messages with a
+     *   `tool_result` content block (batched into the previous user message
+     *   when adjacent).
+     * - `role: assistant` messages carrying `tool_calls` become assistant
+     *   messages with `text` + `tool_use` content blocks.
+     *
+     * @return array{0: string, 1: array<int, array<string, mixed>>}
+     */
+    private function translateMessagesForAnthropic(array $messages): array
+    {
+        $systemPrompt = '';
+        $out = [];
+
+        foreach ($messages as $m) {
+            $role = $m['role'] ?? 'user';
+
+            if ($role === 'system') {
+                $systemPrompt .= ($m['content'] ?? '') . "\n";
+                continue;
+            }
+
+            if ($role === 'tool') {
+                $block = [
+                    'type' => 'tool_result',
+                    'tool_use_id' => (string) ($m['tool_call_id'] ?? ''),
+                    'content' => is_string($m['content'] ?? null)
+                        ? $m['content']
+                        : json_encode($m['content']),
+                ];
+                $last = end($out);
+                if ($last !== false && $last['role'] === 'user' && is_array($last['content'] ?? null)) {
+                    $out[count($out) - 1]['content'][] = $block;
+                } else {
+                    $out[] = ['role' => 'user', 'content' => [$block]];
+                }
+                continue;
+            }
+
+            if ($role === 'assistant' && !empty($m['tool_calls'])) {
+                $blocks = [];
+                if (!empty($m['content']) && is_string($m['content'])) {
+                    $blocks[] = ['type' => 'text', 'text' => $m['content']];
+                }
+                foreach ($m['tool_calls'] as $call) {
+                    $args = $call['arguments'] ?? [];
+                    if (is_string($args)) {
+                        $args = json_decode($args, true) ?: [];
+                    }
+                    $blocks[] = [
+                        'type' => 'tool_use',
+                        'id' => (string) ($call['id'] ?? ''),
+                        'name' => (string) ($call['name'] ?? ''),
+                        'input' => $args ?: new \stdClass(),
+                    ];
+                }
+                $out[] = ['role' => 'assistant', 'content' => $blocks];
+                continue;
+            }
+
+            $out[] = [
+                'role' => $role,
+                'content' => is_string($m['content'] ?? null) ? $m['content'] : json_encode($m['content']),
+            ];
+        }
+
+        return [trim($systemPrompt), $out];
     }
 
     /**
