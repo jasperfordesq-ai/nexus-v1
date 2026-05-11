@@ -2450,6 +2450,7 @@ Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnControlle
 Route::get('/webauthn/credentials', [\App\Http\Controllers\Api\WebAuthnController::class, 'credentials']);
 Route::get('/webauthn/status', [\App\Http\Controllers\Api\WebAuthnController::class, 'status']);
 Route::post('/ai/chat', [\App\Http\Controllers\Api\AiChatController::class, 'chat']);
+Route::post('/ai/chat/feedback', [\App\Http\Controllers\Api\AiChatController::class, 'feedback']);
 Route::post('/ai/chat/stream', [\App\Http\Controllers\Api\AiChatController::class, 'streamChat']);
 Route::get('/ai/conversations', [\App\Http\Controllers\Api\AiChatController::class, 'listConversations']);
 Route::get('/ai/conversations/{id}', [\App\Http\Controllers\Api\AiChatController::class, 'getConversation']);
@@ -2960,6 +2961,9 @@ Route::post('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModul
 Route::put('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'update']);
 Route::delete('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'destroy']);
 Route::post('/v2/admin/ai-module-docs/seed-defaults', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'seedDefaults']);
+
+// AI chat trace metrics (cost, latency, tool usage, downvoted "unanswered" turns)
+Route::get('/v2/admin/ai-traces/metrics', [\App\Http\Controllers\Api\Admin\AiTraceMetricsController::class, 'metrics']);
 
 // AG59 — Regional Analytics Product
 Route::get('/v2/admin/regional-analytics/overview', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'overview']);

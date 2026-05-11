@@ -18,6 +18,7 @@ use App\Models\Listing;
 use App\Models\User;
 use App\Services\AI\AIServiceFactory;
 use App\Services\AI\AiModuleDocsService;
+use App\Services\AI\AiTurnTraceService;
 use App\Services\AI\Tools\ToolRegistry;
 use App\Services\AiSupportContextService;
 
@@ -41,6 +42,7 @@ class AiChatController extends BaseApiController
         private readonly AiSupportContextService $supportContextService,
         private readonly ToolRegistry $toolRegistry,
         private readonly AiModuleDocsService $moduleDocs,
+        private readonly AiTurnTraceService $traces,
     ) {}
 
     // =====================================================================
@@ -111,8 +113,12 @@ TXT;
         $toolInvocations = [];
         $content = null;
         $tokensUsed = 0;
+        $tokensIn = 0;
+        $tokensOut = 0;
         $model = null;
         $provider = null;
+        $traceError = null;
+        $startedAt = microtime(true);
 
         try {
             $hop = 0;
@@ -125,6 +131,8 @@ TXT;
                 ]);
 
                 $tokensUsed += (int) ($response['tokens_used'] ?? 0);
+                $tokensIn += (int) ($response['tokens_input'] ?? 0);
+                $tokensOut += (int) ($response['tokens_output'] ?? 0);
                 $model = $response['model'] ?? $model;
                 $provider = $response['provider'] ?? $provider;
 
@@ -175,6 +183,8 @@ TXT;
                 ]);
                 $content = $response['content'] ?? '';
                 $tokensUsed += (int) ($response['tokens_used'] ?? 0);
+                $tokensIn += (int) ($response['tokens_input'] ?? 0);
+                $tokensOut += (int) ($response['tokens_output'] ?? 0);
                 $model = $response['model'] ?? $model;
                 $provider = $response['provider'] ?? $provider;
             }
@@ -184,7 +194,10 @@ TXT;
                 'tenant_id' => $tenantId,
             ]);
             $content = __('api_controllers_1.ai_chat.not_available');
+            $traceError = $e->getMessage();
         }
+
+        $latencyMs = (int) round((microtime(true) - $startedAt) * 1000);
 
         // Save assistant reply
         DB::insert(
@@ -195,6 +208,23 @@ TXT;
 
         // Update conversation timestamp
         DB::update('UPDATE ai_conversations SET updated_at = NOW() WHERE id = ?', [$conversationId]);
+
+        $traceId = $this->traces->record([
+            'tenant_id' => (int) $tenantId,
+            'user_id' => (int) $userId,
+            'conversation_id' => (int) $conversationId,
+            'message_id' => $messageId,
+            'user_text' => $message,
+            'assistant_text' => (string) $content,
+            'provider' => $provider,
+            'model' => $model,
+            'tokens_input' => $tokensIn,
+            'tokens_output' => $tokensOut,
+            'tokens_total' => $tokensUsed,
+            'latency_ms' => $latencyMs,
+            'tool_calls' => $toolInvocations,
+            'error' => $traceError,
+        ]);
 
         return $this->respondWithData([
             'success' => true,
@@ -207,10 +237,40 @@ TXT;
             'tokens_used' => $tokensUsed,
             'model' => $model,
             'provider' => $provider,
+            'trace_id' => $traceId ?: null,
             'sources' => $supportContext['sources'],
             'source_count' => $supportContext['source_count'],
             'tool_invocations' => $toolInvocations,
         ]);
+    }
+
+    /** POST /api/v2/ai/chat/feedback — thumbs up/down on the assistant turn */
+    public function feedback(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+        $this->rateLimit('ai_chat_feedback', 60, 60);
+
+        $vote = (string) $this->requireInput('feedback');
+        if (!in_array($vote, ['up', 'down'], true)) {
+            return $this->respondWithError('VALIDATION', 'feedback must be "up" or "down"', null, 422);
+        }
+        $note = $this->input('note');
+        $messageId = $this->inputInt('message_id');
+        $traceId = $this->inputInt('trace_id');
+
+        if ($traceId) {
+            $ok = $this->traces->recordFeedback($traceId, (int) $tenantId, $vote, is_string($note) ? $note : null);
+        } elseif ($messageId) {
+            $ok = $this->traces->recordFeedbackByMessage($messageId, (int) $tenantId, $vote, is_string($note) ? $note : null);
+        } else {
+            return $this->respondWithError('VALIDATION', 'Either trace_id or message_id is required', null, 422);
+        }
+
+        if (!$ok) {
+            return $this->respondWithError('NOT_FOUND', 'No matching trace to update', null, 404);
+        }
+        return $this->respondWithData(['recorded' => true, 'feedback' => $vote, 'user_id' => $userId]);
     }
 
     /** POST /api/v2/ai/chat/stream — SSE streaming, kept as delegation */

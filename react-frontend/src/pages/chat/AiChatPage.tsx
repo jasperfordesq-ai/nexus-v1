@@ -31,6 +31,8 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Sparkles from 'lucide-react/icons/sparkles';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Zap from 'lucide-react/icons/zap';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
@@ -49,6 +51,9 @@ interface ChatMessage {
   isError?: boolean;
   sources?: ChatSource[];
   toolInvocations?: ToolInvocation[];
+  traceId?: number | null;
+  messageId?: number | null;
+  feedback?: 'up' | 'down' | null;
 }
 
 interface ChatSource {
@@ -76,6 +81,7 @@ interface AiChatResponse {
   sources?: ChatSource[];
   source_count?: number;
   tool_invocations?: ToolInvocation[];
+  trace_id?: number | null;
   limits?: {
     daily_remaining: number;
     monthly_remaining: number;
@@ -141,9 +147,10 @@ interface MessageBubbleProps {
   message: ChatMessage;
   userName?: string;
   userAvatar?: string;
+  onFeedback?: (messageClientId: string, vote: 'up' | 'down') => void;
 }
 
-function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
+function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBubbleProps) {
   const { t } = useTranslation('chat');
   const isUser = message.role === 'user';
   const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -196,7 +203,37 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
           )}
           {message.content}
         </div>
-        <span className="text-xs text-[var(--color-text-muted)] px-1">{time}</span>
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-xs text-[var(--color-text-muted)]">{time}</span>
+          {!isUser && !message.isError && onFeedback && (message.traceId || message.messageId) && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="Thumbs up"
+                onClick={() => onFeedback(message.id, 'up')}
+                className={`p-0.5 rounded transition-colors ${
+                  message.feedback === 'up'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-[var(--color-text-muted)] hover:text-green-600 dark:hover:text-green-400'
+                }`}
+              >
+                <ThumbsUp className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                aria-label="Thumbs down"
+                onClick={() => onFeedback(message.id, 'down')}
+                className={`p-0.5 rounded transition-colors ${
+                  message.feedback === 'down'
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400'
+                }`}
+              >
+                <ThumbsDown className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
         {toolInvocations.length > 0 && <ToolResultCards invocations={toolInvocations} />}
         {sources.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 px-1" aria-label={t('sources_label')}>
@@ -385,6 +422,9 @@ export default function AiChatPage() {
           timestamp: new Date(),
           sources: data.sources ?? [],
           toolInvocations: data.tool_invocations ?? [],
+          traceId: data.trace_id ?? null,
+          messageId: data.message.id,
+          feedback: null,
         };
         setMessages(prev => [...prev, assistantMsg]);
 
@@ -427,6 +467,25 @@ export default function AiChatPage() {
       setIsLoading(false);
     }
   }, [isLoading, conversationId, warning, toastError, t]);
+
+  const handleFeedback = useCallback(async (messageClientId: string, vote: 'up' | 'down') => {
+    const msg = messages.find((m) => m.id === messageClientId);
+    if (!msg || (!msg.traceId && !msg.messageId)) return;
+    // Optimistically toggle: clicking the same vote a second time clears it.
+    const next = msg.feedback === vote ? null : vote;
+    setMessages((prev) => prev.map((m) => (m.id === messageClientId ? { ...m, feedback: next } : m)));
+    if (next === null) return; // we don't support clearing on the server yet — just keep the UI in sync
+    try {
+      await api.post('/ai/chat/feedback', {
+        feedback: vote,
+        trace_id: msg.traceId ?? undefined,
+        message_id: msg.messageId ?? undefined,
+      });
+    } catch {
+      // Revert on failure
+      setMessages((prev) => prev.map((m) => (m.id === messageClientId ? { ...m, feedback: msg.feedback ?? null } : m)));
+    }
+  }, [messages]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -519,6 +578,7 @@ export default function AiChatPage() {
                     message={msg}
                     userName={user ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() : undefined}
                     userAvatar={userAvatarUrl}
+                    onFeedback={handleFeedback}
                   />
                 ))}
               </AnimatePresence>
