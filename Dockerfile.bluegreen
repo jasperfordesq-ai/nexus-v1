@@ -165,7 +165,6 @@ COPY httpdocs ./httpdocs
 COPY lang ./lang
 COPY resources ./resources
 COPY routes ./routes
-COPY src ./src
 COPY views ./views
 COPY artisan ./artisan
 
