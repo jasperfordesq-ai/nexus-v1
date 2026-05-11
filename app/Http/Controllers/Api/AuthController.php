@@ -19,9 +19,6 @@ use App\Core\TenantContext;
 
 /**
  * AuthController — Authentication: login, logout, token refresh, session management.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/AuthController.php
  */
 class AuthController extends BaseApiController
 {

@@ -657,7 +657,7 @@ class AdminContentController extends BaseApiController
         $this->requireAdmin();
 
         $plans = array_map(fn($r) => (array)$r, DB::select(
-            "SELECT pp.id, pp.name, pp.slug, pp.description, pp.tier_level, pp.features, pp.allowed_layouts,
+            "SELECT pp.id, pp.name, pp.slug, pp.description, pp.tier_level, pp.features,
                     pp.max_menus, pp.max_menu_items, pp.max_users, pp.price_monthly, pp.price_yearly,
                     pp.is_active, pp.stripe_product_id, pp.stripe_price_id_monthly, pp.stripe_price_id_yearly,
                     pp.created_at, pp.updated_at,
@@ -667,7 +667,6 @@ class AdminContentController extends BaseApiController
 
         foreach ($plans as &$plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
-            if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
             $plan['stripe_synced'] = !empty($plan['stripe_product_id']);
             $plan['tenant_count'] = (int) $plan['tenant_count'];
         }
@@ -709,7 +708,7 @@ class AdminContentController extends BaseApiController
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
 
         $result = DB::selectOne(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
+            "SELECT id, name, slug, description, tier_level, features,
                     max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
         );
@@ -718,7 +717,6 @@ class AdminContentController extends BaseApiController
 
         $plan = (array)$result;
         if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
-        if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
 
         return $this->respondWithData($plan);
     }
@@ -740,11 +738,10 @@ class AdminContentController extends BaseApiController
         }
 
         DB::insert(
-            "INSERT INTO pay_plans (name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            "INSERT INTO pay_plans (name, slug, description, tier_level, features, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$name, $slug, $input['description'] ?? '', (int)($input['tier_level'] ?? 0),
              isset($input['features']) ? json_encode($input['features']) : '[]',
-             isset($input['allowed_layouts']) ? json_encode($input['allowed_layouts']) : '[]',
              isset($input['max_menus']) ? (int)$input['max_menus'] : null,
              isset($input['max_menu_items']) ? (int)$input['max_menu_items'] : null,
              isset($input['max_users']) && $input['max_users'] !== '' ? (int)$input['max_users'] : null,
@@ -766,14 +763,13 @@ class AdminContentController extends BaseApiController
         }
 
         $result = DB::selectOne(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
+            "SELECT id, name, slug, description, tier_level, features, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$newPlanId]
         );
 
         $plan = $result ? (array)$result : null;
         if ($plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
-            if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
         }
 
         return $this->respondWithData($plan, null, 201);
@@ -803,7 +799,6 @@ class AdminContentController extends BaseApiController
         if (array_key_exists('description', $input)) { $updates[] = 'description = ?'; $params[] = $input['description']; }
         if (isset($input['tier_level'])) { $updates[] = 'tier_level = ?'; $params[] = (int)$input['tier_level']; }
         if (array_key_exists('features', $input)) { $updates[] = 'features = ?'; $params[] = json_encode($input['features'] ?? []); }
-        if (array_key_exists('allowed_layouts', $input)) { $updates[] = 'allowed_layouts = ?'; $params[] = json_encode($input['allowed_layouts'] ?? []); }
         if (isset($input['max_menus'])) { $updates[] = 'max_menus = ?'; $params[] = (int)$input['max_menus']; }
         if (isset($input['max_menu_items'])) { $updates[] = 'max_menu_items = ?'; $params[] = (int)$input['max_menu_items']; }
         if (array_key_exists('max_users', $input)) { $updates[] = 'max_users = ?'; $params[] = ($input['max_users'] !== '' && $input['max_users'] !== null) ? (int)$input['max_users'] : null; }
@@ -829,14 +824,13 @@ class AdminContentController extends BaseApiController
         }
 
         $result = DB::selectOne(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
+            "SELECT id, name, slug, description, tier_level, features, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
         );
 
         $plan = $result ? (array)$result : null;
         if ($plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
-            if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
         }
 
         return $this->respondWithData($plan);

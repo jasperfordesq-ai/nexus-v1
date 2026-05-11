@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Core\MenuManager;
-use App\Models\PayPlan;
 
 /**
  * MenuController — Navigation menu management.
@@ -100,7 +99,7 @@ class MenuController extends BaseApiController
     /**
      * GET /api/menus/config
      *
-     * Get menu configuration and plan info.
+     * Get menu configuration.
      * Auth is optional — config is available to guests too.
      */
     public function config(): JsonResponse
@@ -110,29 +109,16 @@ class MenuController extends BaseApiController
             return $this->respondWithError('TENANT_NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
 
-        try {
-            $plan = PayPlan::getCurrentPlanForTenant($tenantId);
-            $allowedLayouts = PayPlan::getAllowedLayouts($tenantId);
-
-            return $this->respondWithData([
-                'tenant_id'           => $tenantId,
-                'allowed_layouts'     => $allowedLayouts,
-                'current_plan'        => $plan ? [
-                    'name'       => $plan['name'],
-                    'slug'       => $plan['slug'],
-                    'tier_level' => $plan['tier_level'],
-                ] : null,
-                'available_locations' => [
-                    'header-main'      => 'Header - Main Navigation',
-                    'header-secondary' => 'Header - Secondary Navigation',
-                    'footer'           => 'Footer',
-                    'sidebar'          => 'Sidebar',
-                    'mobile'           => 'Mobile Menu',
-                ],
-            ]);
-        } catch (\Throwable $e) {
-            return $this->respondWithError('CONFIG_LOAD_FAILED', __('api.fetch_failed', ['resource' => 'config']), null, 500);
-        }
+        return $this->respondWithData([
+            'tenant_id'           => $tenantId,
+            'available_locations' => [
+                'header-main'      => 'Header - Main Navigation',
+                'header-secondary' => 'Header - Secondary Navigation',
+                'footer'           => 'Footer',
+                'sidebar'          => 'Sidebar',
+                'mobile'           => 'Mobile Menu',
+            ],
+        ]);
     }
 
     /**

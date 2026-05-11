@@ -30,40 +30,6 @@ views/modern/components/
 views/modern/auth/
 views/modern/errors/
 
-# ── Legacy PHP frontend controllers ────────────────────────────────────────
-# These controllers served the old PHP frontend. The React app uses only the
-# API controllers (src/Controllers/Api/). These legacy controllers are still
-# routed but are being phased out. Excluding from blocking scan to reduce
-# noise; they remain visible in non-blocking scans.
-src/Controllers/AuthController.php
-src/Controllers/ComposeController.php
-src/Controllers/EventController.php
-src/Controllers/FederatedEventController.php
-src/Controllers/FederatedGroupController.php
-src/Controllers/FederatedListingController.php
-src/Controllers/FederatedMemberController.php
-src/Controllers/FederationHubController.php
-src/Controllers/FederationStreamController.php
-src/Controllers/GroupController.php
-src/Controllers/InsightsController.php
-src/Controllers/LeaderboardController.php
-src/Controllers/ListingController.php
-src/Controllers/MatchController.php
-src/Controllers/MemberController.php
-src/Controllers/MessageController.php
-src/Controllers/NotificationController.php
-src/Controllers/NexusScoreController.php
-src/Controllers/OrganizationController.php
-src/Controllers/PageController.php
-src/Controllers/PollController.php
-src/Controllers/ProfileController.php
-src/Controllers/ResourceController.php
-src/Controllers/ReviewController.php
-src/Controllers/SearchController.php
-src/Controllers/SettingsController.php
-src/Controllers/VolunteeringController.php
-src/Controllers/WalletController.php
-
 # ── Deprecated controllers (moved to _deprecated/) ────────────────────────
 # These are fully deprecated and no longer routed. Code is kept for reference
 # only. All alerts in these files are known and accepted.

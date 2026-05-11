@@ -18,9 +18,6 @@ use App\Core\TenantContext;
 
 /**
  * TotpController -- TOTP two-factor authentication verify + status.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/TotpApiController.php
  */
 class TotpController extends BaseApiController
 {

@@ -22,9 +22,6 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * PasswordResetController -- Password reset flow.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/PasswordResetApiController.php
  */
 class PasswordResetController extends BaseApiController
 {

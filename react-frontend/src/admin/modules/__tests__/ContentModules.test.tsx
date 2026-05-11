@@ -96,7 +96,7 @@ vi.mock('../../api/adminApi', () => ({
   },
   adminPlans: {
     list: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    get: vi.fn().mockResolvedValue({ success: true, data: { id: 1, name: 'Basic', description: '', price_monthly: '0', price_yearly: '0', tier_level: '1', max_menus: '5', max_menu_items: '20', features: '', allowed_layouts: '', is_active: true } }),
+    get: vi.fn().mockResolvedValue({ success: true, data: { id: 1, name: 'Basic', description: '', price_monthly: '0', price_yearly: '0', tier_level: '1', max_menus: '5', max_menu_items: '20', features: '', is_active: true } }),
     create: vi.fn().mockResolvedValue({ success: true }),
     update: vi.fn().mockResolvedValue({ success: true }),
     delete: vi.fn().mockResolvedValue({ success: true }),

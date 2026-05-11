@@ -216,6 +216,7 @@ class HelpController extends BaseApiController
         }
 
         $article = DB::table('help_articles')
+            ->where('tenant_id', $this->getTenantId())
             ->where('slug', $articleSlug)
             ->where('is_public', 1)
             ->first();

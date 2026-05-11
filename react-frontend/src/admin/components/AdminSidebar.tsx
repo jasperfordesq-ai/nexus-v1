@@ -100,7 +100,7 @@ import BellRing from 'lucide-react/icons/bell-ring';
 import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Navigation config — mirrors PHP admin-navigation-config.php
+// Navigation config
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface NavItem {

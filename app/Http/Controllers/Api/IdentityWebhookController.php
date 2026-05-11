@@ -17,9 +17,6 @@ use App\Services\RateLimitService;
 
 /**
  * IdentityWebhookController -- Identity provider webhook handler.
- *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/IdentityWebhookController.php
  */
 class IdentityWebhookController extends BaseApiController
 {
