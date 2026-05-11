@@ -49,6 +49,7 @@ RUN docker-php-ext-configure gd \
         mbstring \
         bcmath \
         gmp \
+        pcntl \
         opcache \
         xml \
         curl \
