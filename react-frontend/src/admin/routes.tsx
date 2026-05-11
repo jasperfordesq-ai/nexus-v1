@@ -167,6 +167,7 @@ const PushCampaignAdminPage = lazy(() => import('./modules/advertising/PushCampa
 
 // AI / KI-Agents module
 const KiAgentAdminPage = lazy(() => import('./modules/ai/KiAgentAdminPage'));
+const AiModuleDocsAdminPage = lazy(() => import('./modules/ai/AiModuleDocsAdminPage'));
 
 // AG61 — KI-Agenten new framework (definitions, proposals, runs)
 const AgentsAdminPage = lazy(() => import('./modules/agents/AgentsAdminPage'));
@@ -657,6 +658,9 @@ export function AdminRoutes() {
 
       {/* AG61 — KI-Agenten autonomous framework */}
       <Route path="ai/ki-agents" element={<Lazy><KiAgentAdminPage /></Lazy>} />
+
+      {/* AI chat — admin-editable "how each module works" prompt docs */}
+      <Route path="ai/module-docs" element={<Lazy><AiModuleDocsAdminPage /></Lazy>} />
 
       {/* AG61 — new KI-Agenten admin (definitions, proposals, runs) */}
       <Route path="agents" element={<Lazy><AgentsAdminPage /></Lazy>} />

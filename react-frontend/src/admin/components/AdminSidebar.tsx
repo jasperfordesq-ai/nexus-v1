@@ -343,6 +343,7 @@ function useAdminNav(): NavSection[] {
     const advancedItems = [
       ...(hasFeature('ai_chat') ? [
         { label: "AI Settings", href: '/admin/ai-settings', icon: Brain },
+        { label: "AI Module Docs", href: '/admin/ai/module-docs', icon: Brain },
       ] : []),
       ...(hasFeature('ai_agents') ? [
         { label: "AI Agents", href: '/admin/agents', icon: Bot },

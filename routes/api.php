@@ -2954,6 +2954,13 @@ Route::post('/v2/admin/ki-agents/proposals/{id}/reject', [\App\Http\Controllers\
 Route::post('/v2/admin/ki-agents/proposals/approve-eligible', [\App\Http\Controllers\Api\KiAgentController::class, 'approveAllEligible']);
 Route::get('/v2/admin/ki-agents/stats', [\App\Http\Controllers\Api\KiAgentController::class, 'getStats']);
 
+// AI Module Docs — per-tenant, admin-editable "how each module works" prompts
+Route::get('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'index']);
+Route::post('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'store']);
+Route::put('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'update']);
+Route::delete('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'destroy']);
+Route::post('/v2/admin/ai-module-docs/seed-defaults', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'seedDefaults']);
+
 // AG59 — Regional Analytics Product
 Route::get('/v2/admin/regional-analytics/overview', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'overview']);
 Route::get('/v2/admin/regional-analytics/heatmap', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'heatmap']);

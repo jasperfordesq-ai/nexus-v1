@@ -17,6 +17,7 @@ use App\Models\Event;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\AI\AIServiceFactory;
+use App\Services\AI\AiModuleDocsService;
 use App\Services\AI\Tools\ToolRegistry;
 use App\Services\AiSupportContextService;
 
@@ -39,6 +40,7 @@ class AiChatController extends BaseApiController
         private readonly AIServiceFactory $aiServiceFactory,
         private readonly AiSupportContextService $supportContextService,
         private readonly ToolRegistry $toolRegistry,
+        private readonly AiModuleDocsService $moduleDocs,
     ) {}
 
     // =====================================================================
@@ -87,11 +89,16 @@ class AiChatController extends BaseApiController
         $toolGuidance = <<<TXT
 You have retrieval tools available (search_listings, search_members, search_kb, search_events, search_jobs, search_marketplace, get_my_wallet_balance, semantic_search). Call them whenever the user's question would benefit from live, tenant-scoped data — for example, "find me a gardener", "what events are on this weekend", "who can teach me Spanish", "what is my balance". Prefer the specific keyword search_* tools first; fall back to semantic_search only when the question is vague, uses synonyms, or a keyword search returned nothing. Only call get_my_wallet_balance when the user is clearly asking about their own balance. After a tool returns, summarise the results conversationally and reference items by title; the UI will render structured cards beside your message, so do not paste raw URLs or repeat every field — keep your reply readable and concise.
 TXT;
+        $moduleDocsPrompt = $this->moduleDocs->renderForPrompt((int) $tenantId, $message);
+
         $chatMessages = [
             ['role' => 'system', 'content' => AIServiceFactory::getSystemPrompt() ?: 'You are a helpful community assistant for a timebanking platform.'],
             ['role' => 'system', 'content' => $toolGuidance],
             ['role' => 'system', 'content' => $supportContext['content']],
         ];
+        if ($moduleDocsPrompt !== '') {
+            $chatMessages[] = ['role' => 'system', 'content' => $moduleDocsPrompt];
+        }
         foreach ($history as $row) {
             $chatMessages[] = ['role' => $row->role, 'content' => $row->content];
         }
