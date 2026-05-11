@@ -189,7 +189,7 @@ class PollService
         $data['poll_type'] = $data['poll_type'] ?? 'standard';
 
         // Compute status for frontend
-        $endDate = $poll->end_date ?? $poll->expires_at ?? null;
+        $endDate = $poll->end_date ?? null;
         $data['status'] = ($poll->is_active && (! $endDate || now()->lt($endDate))) ? 'open' : 'closed';
         $data['expires_at'] = $endDate ? (string) $endDate : null;
 
@@ -233,7 +233,7 @@ class PollService
             if (! empty($data['options'])) {
                 foreach ($data['options'] as $text) {
                     // C6: Only insert columns that exist in poll_options schema
-                    // (id, poll_id, tenant_id, label, expires_at, votes — no created_at)
+                    // (id, poll_id, tenant_id, label, votes — no created_at)
                     DB::table('poll_options')->insert([
                         'poll_id'   => $poll->id,
                         'tenant_id' => TenantContext::getId(),

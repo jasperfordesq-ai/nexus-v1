@@ -1164,6 +1164,7 @@ return [
     'private_group_members_only' => 'You must be a member to view members of a private group',
     'not_review_author' => 'You did not author this review',
     'no_permission_delete_resource' => 'You do not have permission to delete this resource',
+    'no_permission_edit_resource'          => 'You do not have permission to edit this resource',
     'no_permission_org_transfer' => 'You do not have permission to transfer from this organization',
     'no_permission_verify_checkin' => 'You do not have permission to verify check-ins for this shift',
     'no_permission_checkout' => 'You do not have permission to check out volunteers for this shift',

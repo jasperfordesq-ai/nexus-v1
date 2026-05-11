@@ -96,7 +96,10 @@ class AgentAdminController extends BaseApiController
                 'updated_at' => now(),
             ]);
 
-        $row = DB::table('agent_definitions')->where('id', $id)->first();
+        $row = DB::table('agent_definitions')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
         return $this->respondWithData($this->formatDefinition($row));
     }
 
@@ -137,9 +140,15 @@ class AgentAdminController extends BaseApiController
             $update['config'] = json_encode((array) $cfg);
         }
 
-        DB::table('agent_definitions')->where('id', $id)->update($update);
+        DB::table('agent_definitions')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($update);
 
-        $row = DB::table('agent_definitions')->where('id', $id)->first();
+        $row = DB::table('agent_definitions')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
         return $this->respondWithData($this->formatDefinition($row));
     }
 
