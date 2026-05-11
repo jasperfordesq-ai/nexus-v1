@@ -152,7 +152,10 @@ class ApiPartnerAdminController extends BaseApiController
             $update['is_sandbox'] = (bool) $request->input('is_sandbox');
         }
 
-        DB::table('api_partners')->where('id', $id)->update($update);
+        DB::table('api_partners')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->update($update);
 
         return $this->respondWithData(['partner_id' => $id]);
     }
