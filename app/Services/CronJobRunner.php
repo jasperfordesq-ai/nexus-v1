@@ -1668,6 +1668,28 @@ class CronJobRunner
                     );
 
                     if ($matchResult['score'] >= 85) {
+                        // Deduplication gate: skip if we already notified this user about this
+                        // listing in the last 30 days. The hot-match cron runs hourly and
+                        // re-scans recent listings — without this gate the same recipient
+                        // would be re-emailed each tick. The dedup table also has a UNIQUE
+                        // index on (tenant_id, listing_id, matched_user_id) as a second line
+                        // of defence.
+                        $tenantId = (int) ($listing['tenant_id'] ?? \App\Core\TenantContext::getId() ?? 0);
+                        try {
+                            $alreadySent = DB::selectOne(
+                                "SELECT 1 FROM match_notification_sent
+                                 WHERE tenant_id = ? AND listing_id = ? AND matched_user_id = ?
+                                   AND sent_at > NOW() - INTERVAL 30 DAY
+                                 LIMIT 1",
+                                [$tenantId, $listing['id'], $user['user_id']]
+                            );
+                            if ($alreadySent) {
+                                continue;
+                            }
+                        } catch (\Throwable $e) {
+                            // Table may not exist on legacy installs — fall through to dispatch.
+                        }
+
                         // This is a hot match! Notify the user
                         $matchData = array_merge($listing, [
                             'match_score' => $matchResult['score'],
@@ -1678,14 +1700,16 @@ class CronJobRunner
                         NotificationDispatcher::dispatchHotMatch($user['user_id'], $matchData);
                         $notificationsSent++;
 
-                        // Record that we notified about this listing
+                        // Record dedup marker. INSERT IGNORE swallows race-condition duplicates
+                        // (two cron runners hitting the same (tenant,listing,user) tuple via
+                        // the UNIQUE (tenant_id, listing_id, matched_user_id) index).
                         try {
                             DB::insert(
-                                "INSERT INTO match_history (user_id, listing_id, action, match_score, created_at) VALUES (?, ?, 'notified', ?, NOW())",
-                                [$user['user_id'], $listing['id'], $matchResult['score']]
+                                "INSERT IGNORE INTO match_notification_sent (tenant_id, listing_id, matched_user_id, match_score, sent_at) VALUES (?, ?, ?, ?, NOW())",
+                                [$tenantId, $listing['id'], $user['user_id'], $matchResult['score']]
                             );
-                        } catch (\Exception $e) {
-                            // Table may not exist
+                        } catch (\Throwable $e) {
+                            // Table may not exist on legacy installs — non-fatal.
                         }
                     }
                 }

@@ -38,7 +38,6 @@ interface PlanFormData {
   max_menu_items: string;
   /** One feature per line */
   features: string;
-  allowed_layouts: string;
   is_active: boolean;
 }
 
@@ -67,7 +66,6 @@ export function PlanForm() {
     max_menus: '',
     max_menu_items: '',
     features: '',
-    allowed_layouts: '',
     is_active: true,
   });
   const [stripeStatus, setStripeStatus] = useState<StripeStatus>({});
@@ -92,7 +90,6 @@ export function PlanForm() {
             max_menu_items: plan.max_menu_items != null ? String(plan.max_menu_items) : '',
             // One feature per line
             features: Array.isArray(plan.features) ? plan.features.join('\n') : '',
-            allowed_layouts: Array.isArray(plan.allowed_layouts) ? plan.allowed_layouts.join('\n') : '',
             is_active: plan.is_active !== false,
           });
           setStripeStatus({
@@ -115,9 +112,6 @@ export function PlanForm() {
     const featuresArr = formData.features.trim()
       ? formData.features.split('\n').map((s) => s.trim()).filter(Boolean)
       : [];
-    const layoutsArr = formData.allowed_layouts.trim()
-      ? formData.allowed_layouts.split('\n').map((s) => s.trim()).filter(Boolean)
-      : [];
 
     return {
       name: formData.name,
@@ -129,7 +123,6 @@ export function PlanForm() {
       max_menus: formData.max_menus ? Number(formData.max_menus) : undefined,
       max_menu_items: formData.max_menu_items ? Number(formData.max_menu_items) : undefined,
       features: featuresArr,
-      allowed_layouts: layoutsArr,
       is_active: formData.is_active,
     };
   };
@@ -308,15 +301,6 @@ export function PlanForm() {
                 description="One feature per line. These are displayed as bullet points on the pricing page."
                 value={formData.features}
                 onValueChange={(v) => handleChange('features', v)}
-              />
-              <Textarea
-                label={t('content.allowed_layouts', 'Allowed Layouts')}
-                placeholder={'modern\ncivicone'}
-                variant="bordered"
-                minRows={3}
-                description="One layout slug per line. Leave blank to allow all layouts."
-                value={formData.allowed_layouts}
-                onValueChange={(v) => handleChange('allowed_layouts', v)}
               />
             </CardBody>
           </Card>

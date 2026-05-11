@@ -10,20 +10,6 @@
  * This file contains global helper functions used throughout the application.
  */
 
-if (!function_exists('layout')) {
-    /**
-     * Get the current active layout
-     *
-     * Legacy CivicOne theme has been removed. Always returns 'modern'.
-     *
-     * @return string Always 'modern'
-     */
-    function layout(): string
-    {
-        return 'modern';
-    }
-}
-
 if (!function_exists('webp_image')) {
     /**
      * Generate optimized image HTML with WebP support

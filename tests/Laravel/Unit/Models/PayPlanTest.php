@@ -31,7 +31,6 @@ class PayPlanTest extends TestCase
         $this->assertEquals('decimal:2', $casts['price_monthly']);
         $this->assertEquals('decimal:2', $casts['price_yearly']);
         $this->assertEquals('array', $casts['features']);
-        $this->assertEquals('array', $casts['allowed_layouts']);
         $this->assertEquals('integer', $casts['max_menus']);
         $this->assertEquals('integer', $casts['max_menu_items']);
         $this->assertEquals('boolean', $casts['is_active']);

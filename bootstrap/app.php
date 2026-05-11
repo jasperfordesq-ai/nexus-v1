@@ -246,6 +246,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->runInBackground()
             ->name('nexus-prune-logs');
 
+        // Prune match-notification dedup markers older than 30 days.
+        // The hot-match cron writes to match_notification_sent to avoid re-emailing
+        // the same user about the same listing; rows are dropped after the 30-day TTL.
+        $schedule->command('nexus:prune-match-notifications')
+            ->dailyAt('03:15')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->name('nexus-prune-match-notifications');
+
         // Onboarding nurture sequence — Day 2, Day 5, Day 7 emails to new users
         $schedule->call(function () {
             \App\Services\OnboardingNurtureService::sendDueNurtureEmails();

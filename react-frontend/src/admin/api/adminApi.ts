@@ -1602,13 +1602,12 @@ export interface PlanDetail extends PlanListItem {
   max_menus?: number;
   max_menu_items?: number;
   features?: string[];
-  allowed_layouts?: string[];
 }
 
 export const adminPlans = {
   list: () => api.get<PlanListItem[]>('/v2/admin/plans'),
   get: (id: number) => api.get<PlanDetail>(`/v2/admin/plans/${id}`),
-  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_users?: number | null; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active?: boolean }) =>
+  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_users?: number | null; max_menus?: number; max_menu_items?: number; features?: string[]; is_active?: boolean }) =>
     api.post<{ id: number }>('/v2/admin/plans', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put<{ success: boolean }>(`/v2/admin/plans/${id}`, data),
