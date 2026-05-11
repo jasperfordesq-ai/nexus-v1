@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Services\AI\AIServiceFactory;
 use App\Services\AI\AiModuleDocsService;
 use App\Services\AI\AiTurnTraceService;
+use App\Services\AI\AiUserMemoryService;
 use App\Services\AI\Tools\ToolRegistry;
 use App\Services\AiSupportContextService;
 
@@ -43,6 +44,7 @@ class AiChatController extends BaseApiController
         private readonly ToolRegistry $toolRegistry,
         private readonly AiModuleDocsService $moduleDocs,
         private readonly AiTurnTraceService $traces,
+        private readonly AiUserMemoryService $userMemory,
     ) {}
 
     // =====================================================================
@@ -92,16 +94,26 @@ class AiChatController extends BaseApiController
 You have retrieval tools available (search_listings, search_members, search_kb, search_events, search_jobs, search_marketplace, get_my_wallet_balance, semantic_search). Call them whenever the user's question would benefit from live, tenant-scoped data — for example, "find me a gardener", "what events are on this weekend", "who can teach me Spanish", "what is my balance". Prefer the specific keyword search_* tools first; fall back to semantic_search only when the question is vague, uses synonyms, or a keyword search returned nothing. Only call get_my_wallet_balance when the user is clearly asking about their own balance. After a tool returns, summarise the results conversationally and reference items by title; the UI will render structured cards beside your message, so do not paste raw URLs or repeat every field — keep your reply readable and concise.
 TXT;
         $moduleDocsPrompt = $this->moduleDocs->renderForPrompt((int) $tenantId, $message);
+        $userMemoryPrompt = $this->userMemory->buildPrompt((int) $tenantId, (int) $userId);
 
         $chatMessages = [
             ['role' => 'system', 'content' => AIServiceFactory::getSystemPrompt() ?: 'You are a helpful community assistant for a timebanking platform.'],
             ['role' => 'system', 'content' => $toolGuidance],
             ['role' => 'system', 'content' => $supportContext['content']],
         ];
+        if ($userMemoryPrompt !== '') {
+            $chatMessages[] = ['role' => 'system', 'content' => $userMemoryPrompt];
+        }
         if ($moduleDocsPrompt !== '') {
             $chatMessages[] = ['role' => 'system', 'content' => $moduleDocsPrompt];
         }
-        foreach ($history as $row) {
+        // Summarise long history to keep tokens bounded: if more than 20 prior
+        // messages exist, condense everything older than the last 12 into a
+        // short summary block produced by the model itself on a previous turn.
+        // For now we just trim to the last 12 turns — summarisation is a
+        // future enhancement.
+        $bounded = count($history) > 12 ? array_slice($history, -12) : $history;
+        foreach ($bounded as $row) {
             $chatMessages[] = ['role' => $row->role, 'content' => $row->content];
         }
 
@@ -242,6 +254,14 @@ TXT;
             'source_count' => $supportContext['source_count'],
             'tool_invocations' => $toolInvocations,
         ]);
+    }
+
+    /** GET /api/v2/ai/chat/starters — tenant-tailored empty-state prompts */
+    public function starters(): JsonResponse
+    {
+        $this->requireAuth();
+        $service = app(\App\Services\AI\AiSuggestedPromptsService::class);
+        return $this->respondWithData(['starters' => $service->pick(5)]);
     }
 
     /** POST /api/v2/ai/chat/feedback — thumbs up/down on the assistant turn */

@@ -2451,6 +2451,7 @@ Route::get('/webauthn/credentials', [\App\Http\Controllers\Api\WebAuthnControlle
 Route::get('/webauthn/status', [\App\Http\Controllers\Api\WebAuthnController::class, 'status']);
 Route::post('/ai/chat', [\App\Http\Controllers\Api\AiChatController::class, 'chat']);
 Route::post('/ai/chat/feedback', [\App\Http\Controllers\Api\AiChatController::class, 'feedback']);
+Route::get('/ai/chat/starters', [\App\Http\Controllers\Api\AiChatController::class, 'starters']);
 Route::post('/ai/chat/stream', [\App\Http\Controllers\Api\AiChatController::class, 'streamChat']);
 Route::get('/ai/conversations', [\App\Http\Controllers\Api\AiChatController::class, 'listConversations']);
 Route::get('/ai/conversations/{id}', [\App\Http\Controllers\Api\AiChatController::class, 'getConversation']);

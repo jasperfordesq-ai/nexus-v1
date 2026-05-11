@@ -295,10 +295,14 @@ function FeatureNotAvailable() {
 
 interface EmptyStateProps {
   onQuestionClick: (q: string) => void;
+  starters: string[];
 }
 
-function EmptyState({ onQuestionClick }: EmptyStateProps) {
+function EmptyState({ onQuestionClick, starters }: EmptyStateProps) {
   const { t } = useTranslation('chat');
+  // Fall back to the static i18n questions if the server hasn't returned
+  // dynamic starters yet (initial render before the /starters call resolves).
+  const questions = starters.length > 0 ? starters : STARTER_QUESTION_KEYS.map((k) => t(k));
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-8">
@@ -333,15 +337,13 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
           {t('try_asking')}
         </p>
         <div className="flex flex-col gap-2">
-          {STARTER_QUESTION_KEYS.map((key, i) => {
-            const question = t(key);
-            return (
-              <motion.div
-                key={key}
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.25 + i * 0.06, duration: 0.25 }}
-              >
+          {questions.map((question, i) => (
+            <motion.div
+              key={`${i}-${question}`}
+              initial={{ x: -10, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.25 + i * 0.06, duration: 0.25 }}
+            >
               <Button
                 variant="flat"
                 onPress={() => onQuestionClick(question)}
@@ -350,8 +352,7 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
                 {question}
               </Button>
             </motion.div>
-            );
-          })}
+          ))}
         </div>
       </motion.div>
     </div>
@@ -376,6 +377,7 @@ export default function AiChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [limits, setLimits] = useState<{ daily_remaining: number; monthly_remaining: number } | null>(null);
+  const [starters, setStarters] = useState<string[]>([]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -388,6 +390,21 @@ export default function AiChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Fetch tenant-tailored starter prompts once on mount
+  useEffect(() => {
+    if (!isEnabled) return;
+    void (async () => {
+      try {
+        const res = await api.get<{ starters: string[] }>('/ai/chat/starters');
+        if (res.data?.starters?.length) {
+          setStarters(res.data.starters);
+        }
+      } catch {
+        // Non-critical — fall back to i18n defaults
+      }
+    })();
+  }, [isEnabled]);
 
   const sendMessage = useCallback(async (text: string) => {
     const trimmed = text.trim();
@@ -568,7 +585,7 @@ export default function AiChatPage() {
           hideScrollBar={false}
         >
           {!hasMessages ? (
-            <EmptyState onQuestionClick={(q) => void sendMessage(q)} />
+            <EmptyState onQuestionClick={(q) => void sendMessage(q)} starters={starters} />
           ) : (
             <div className="max-w-2xl mx-auto">
               <AnimatePresence initial={false}>
