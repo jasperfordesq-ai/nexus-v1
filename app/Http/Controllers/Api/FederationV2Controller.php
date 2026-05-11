@@ -2460,7 +2460,7 @@ class FederationV2Controller extends BaseApiController
     }
 
     /** GET /api/v2/federation/connections/status/{userId}/{tenantId} */
-    public function connectionStatus($userId, $tenantId): JsonResponse
+    public function connectionStatus(int $userId, int $tenantId): JsonResponse
     {
         if ($blocked = $this->requireFederationOperation('profiles')) {
             return $blocked;

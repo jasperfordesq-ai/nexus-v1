@@ -832,11 +832,13 @@ export function FeedPage() {
     ...(hasFeature('groups') ? [{ key: 'discussions' as FeedFilter, label: t('filter.discussions') }] : []),
   ], [hasFeature, hasModule, t, user]);
 
+  const filterOptionsKey = filterOptions.map((option) => option.key).join(',');
   useEffect(() => {
-    if (!filterOptions.some((option) => option.key === filter)) {
+    const validKeys = filterOptionsKey.split(',');
+    if (!validKeys.includes(filter)) {
       handleFilterChange('all');
     }
-  }, [filter, filterOptions, handleFilterChange]);
+  }, [filter, filterOptionsKey, handleFilterChange]);
 
   const mobilePrimaryFilters = new Set<FeedFilter>(['all', 'following', 'saved', 'posts']);
   const mobilePrimaryFilterOptions = filterOptions.filter((opt) => mobilePrimaryFilters.has(opt.key));
