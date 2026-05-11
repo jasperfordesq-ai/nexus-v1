@@ -29,5 +29,11 @@
   "starter_q5": "Come posso creare un annuncio per offrire le mie competenze?",
   "page_meta": {
     "title": "Chat AI"
-  }
+  },
+  "thumbs_up_aria": "Helpful answer",
+  "thumbs_down_aria": "Unhelpful answer",
+  "card_online": "Online",
+  "card_remote": "Remote",
+  "card_wallet_title": "Your wallet",
+  "card_wallet_transactions": "{{count}} transactions in last 30 days"
 }

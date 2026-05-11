@@ -29,5 +29,11 @@
   "starter_q5": "Hoe maak ik een aanbieding om mijn vaardigheden aan te bieden?",
   "page_meta": {
     "title": "AI Chat"
-  }
+  },
+  "thumbs_up_aria": "Helpful answer",
+  "thumbs_down_aria": "Unhelpful answer",
+  "card_online": "Online",
+  "card_remote": "Remote",
+  "card_wallet_title": "Your wallet",
+  "card_wallet_transactions": "{{count}} transactions in last 30 days"
 }

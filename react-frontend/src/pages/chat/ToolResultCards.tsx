@@ -12,6 +12,7 @@
  * user a direct way to navigate to the underlying entity.
  */
 
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, Chip } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Tag from 'lucide-react/icons/tag';
@@ -150,6 +151,7 @@ function MemberCard({ item }: { item: Record<string, unknown> }) {
 }
 
 function EventCard({ item }: { item: Record<string, unknown> }) {
+  const { t } = useTranslation('chat');
   const start = item.start_time ? new Date(String(item.start_time)).toLocaleString([], {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : null;
@@ -161,7 +163,7 @@ function EventCard({ item }: { item: Record<string, unknown> }) {
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
         {start ? <span>{start}</span> : null}
-        {item.is_online ? <Chip size="sm" variant="flat" color="primary">Online</Chip> : null}
+        {item.is_online ? <Chip size="sm" variant="flat" color="primary">{t('card_online')}</Chip> : null}
         {item.location ? <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{String(item.location)}</span> : null}
       </div>
     </>
@@ -169,6 +171,7 @@ function EventCard({ item }: { item: Record<string, unknown> }) {
 }
 
 function JobCard({ item }: { item: Record<string, unknown> }) {
+  const { t } = useTranslation('chat');
   return (
     <>
       <div className="flex items-start gap-2">
@@ -177,7 +180,7 @@ function JobCard({ item }: { item: Record<string, unknown> }) {
       </div>
       {item.tagline ? <p className="text-xs text-[var(--color-text-muted)] line-clamp-1">{String(item.tagline)}</p> : null}
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
-        {item.is_remote ? <Chip size="sm" variant="flat" color="primary">Remote</Chip> : null}
+        {item.is_remote ? <Chip size="sm" variant="flat" color="primary">{t('card_remote')}</Chip> : null}
         {item.location ? <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{String(item.location)}</span> : null}
         {item.salary ? <span>{String(item.salary)}</span> : null}
       </div>
@@ -214,14 +217,15 @@ function KbCard({ item }: { item: Record<string, unknown> }) {
 }
 
 function WalletCard({ item }: { item: Record<string, unknown> }) {
+  const { t } = useTranslation('chat');
   return (
     <>
       <div className="flex items-start gap-2">
         <Wallet className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
-        <p className="text-sm font-semibold text-[var(--color-text)]">Your wallet</p>
+        <p className="text-sm font-semibold text-[var(--color-text)]">{t('card_wallet_title')}</p>
       </div>
       <p className="text-2xl font-bold text-[var(--color-text)]">{Number(item.balance ?? 0).toFixed(2)}h</p>
-      <p className="text-xs text-[var(--color-text-muted)]">{String(item.recent_transactions_30d ?? 0)} transactions in last 30 days</p>
+      <p className="text-xs text-[var(--color-text-muted)]">{t('card_wallet_transactions', { count: Number(item.recent_transactions_30d ?? 0) })}</p>
     </>
   );
 }

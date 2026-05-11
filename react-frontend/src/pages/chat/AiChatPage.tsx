@@ -209,7 +209,7 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                aria-label="Thumbs up"
+                aria-label={t('thumbs_up_aria')}
                 onClick={() => onFeedback(message.id, 'up')}
                 className={`p-0.5 rounded transition-colors ${
                   message.feedback === 'up'
@@ -221,7 +221,7 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
               </button>
               <button
                 type="button"
-                aria-label="Thumbs down"
+                aria-label={t('thumbs_down_aria')}
                 onClick={() => onFeedback(message.id, 'down')}
                 className={`p-0.5 rounded transition-colors ${
                   message.feedback === 'down'

@@ -29,5 +29,11 @@
   "starter_q5": "¿Cómo creo un anuncio para ofrecer mis habilidades?",
   "page_meta": {
     "title": "Chat de IA"
-  }
+  },
+  "thumbs_up_aria": "Helpful answer",
+  "thumbs_down_aria": "Unhelpful answer",
+  "card_online": "Online",
+  "card_remote": "Remote",
+  "card_wallet_title": "Your wallet",
+  "card_wallet_transactions": "{{count}} transactions in last 30 days"
 }

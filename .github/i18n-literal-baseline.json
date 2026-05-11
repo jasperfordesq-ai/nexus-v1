@@ -1,6 +1,6 @@
 {
-  "count": 410,
-  "updated": "2026-05-06T09:27:50.527Z",
+  "count": 408,
+  "updated": "2026-05-11T16:06:53.237Z",
   "source": "scripts/check-i18n-literals.mjs",
   "scope": "react-frontend/src excluding src/admin",
   "topFiles": [
@@ -15,10 +15,6 @@
     {
       "file": "src/pages/platform/PlatformDisclaimerPage.tsx",
       "count": 105
-    },
-    {
-      "file": "src/components/jobs/JobPipelineRules.tsx",
-      "count": 3
     },
     {
       "file": "src/components/compose/shared/ComposeEditor.tsx",
@@ -49,7 +45,7 @@
       "count": 1
     },
     {
-      "file": "src/components/jobs/JobModals.tsx",
+      "file": "src/components/location/LocationMap.tsx",
       "count": 1
     },
     {
@@ -62,6 +58,10 @@
     },
     {
       "file": "src/components/ui/LevelProgress.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/pages/chat/ToolResultCards.tsx",
       "count": 1
     },
     {
