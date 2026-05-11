@@ -35,15 +35,12 @@
     "test:e2e:firefox": "npx playwright test --project=firefox-modern",
     "test:e2e:mobile": "npx playwright test --project=mobile-chrome",
     "test:e2e:report": "npx playwright show-report e2e/reports/html",
-    "test:e2e:codegen": "npx playwright codegen http://staging.timebank.local/hour-timebank",
-    "prepare": "husky"
+    "test:e2e:codegen": "npx playwright codegen http://staging.timebank.local/hour-timebank"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "dotenv": "^17.4.2",
     "govuk-frontend": "^6.1.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
     "pa11y": "^9.1.1",
     "picocolors": "^1.1.1",
     "prisma": "^5.22.0",
@@ -51,15 +48,6 @@
     "sharp": "^0.34.5",
     "typescript": "^5.9.3",
     "vite": "^7.3.2"
-  },
-  "lint-staged": {
-    "react-frontend/src/**/*.{ts,tsx}": [
-      "bash -c 'cd react-frontend && npx eslint --max-warnings 1000 \"$@\" 2>&1 || exit 1' _",
-      "bash -c 'cd react-frontend && npx tsc --noEmit'"
-    ],
-    "src/**/*.php": [
-      "bash -c 'for f in \"$@\"; do rel=$(echo \"$f\" | sed \"s|.*/src/|src/|\"); docker exec nexus-php-app php -l \"$rel\" || exit 1; done' _"
-    ]
   },
   "dependencies": {
     "@capacitor/cli": "^8.3.2",

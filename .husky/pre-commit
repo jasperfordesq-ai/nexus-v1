@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-
-# Admin i18n guardrail REMOVED 2026-04-22.
-# Admin panel is English-only by design — hardcoded English is intentional.
-# See memory/feedback_admin_english_only.md.
-exit 0
