@@ -37,11 +37,18 @@ class AiModuleDocsService
     {
         $haystack = mb_strtolower($message);
 
-        $docs = DB::table('ai_module_docs')
-            ->where('tenant_id', $tenantId)
-            ->where('is_active', true)
-            ->orderBy('module_slug')
-            ->get(['id', 'module_slug', 'title', 'body', 'keywords']);
+        try {
+            $docs = DB::table('ai_module_docs')
+                ->where('tenant_id', $tenantId)
+                ->where('is_active', true)
+                ->orderBy('module_slug')
+                ->get(['id', 'module_slug', 'title', 'body', 'keywords']);
+        } catch (\Throwable $e) {
+            // Table may not exist yet (migration not run). Fail soft — the
+            // chat still works without injected module docs.
+            \Illuminate\Support\Facades\Log::info('AiModuleDocsService: table query failed (migration pending?): ' . $e->getMessage());
+            return [];
+        }
 
         $matched = [];
         foreach ($docs as $doc) {
