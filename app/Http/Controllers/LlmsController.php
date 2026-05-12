@@ -31,7 +31,11 @@ class LlmsController
     public function index(Request $request): Response
     {
         $tenant = $this->resolveTenant($request);
-        $host = $request->getHost();
+        // nginx proxies /llms.txt to api.project-nexus.ie with the original
+        // tenant host carried in X-Sitemap-Host (same pattern as the sitemap
+        // proxy). Without this fallback, link URLs in the body resolve to
+        // api.project-nexus.ie instead of the tenant domain.
+        $host = $request->header('X-Sitemap-Host', $request->getHost());
         $key = "llms:short:{$host}:" . ($tenant->id ?? 0);
 
         $body = Cache::remember($key, self::CACHE_TTL, fn () => $this->renderShort($tenant, $host));
@@ -42,7 +46,11 @@ class LlmsController
     public function full(Request $request): Response
     {
         $tenant = $this->resolveTenant($request);
-        $host = $request->getHost();
+        // nginx proxies /llms.txt to api.project-nexus.ie with the original
+        // tenant host carried in X-Sitemap-Host (same pattern as the sitemap
+        // proxy). Without this fallback, link URLs in the body resolve to
+        // api.project-nexus.ie instead of the tenant domain.
+        $host = $request->header('X-Sitemap-Host', $request->getHost());
         $key = "llms:full:{$host}:" . ($tenant->id ?? 0);
 
         $body = Cache::remember($key, self::CACHE_TTL, fn () => $this->renderFull($tenant, $host));
