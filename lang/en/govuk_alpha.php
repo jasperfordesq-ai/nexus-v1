@@ -192,7 +192,7 @@ return [
         'register_description' => 'Create an account for :community.',
         'email_label' => 'Email address',
         'password_label' => 'Password',
-        'password_hint' => 'Use at least 8 characters, with uppercase and lowercase letters and a number.',
+        'password_hint' => 'Use at least 12 characters, with uppercase and lowercase letters, a number and a special character.',
         'first_name_label' => 'First name',
         'last_name_label' => 'Last name',
         'phone_label' => 'Phone number',
