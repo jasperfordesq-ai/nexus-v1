@@ -12,8 +12,7 @@
         <link rel="stylesheet" href="{{ $stylesheet }}">
     @endforeach
 </head>
-<body class="govuk-template__body">
-    <script>document.body.className = document.body.className ? document.body.className + ' js-enabled' : 'js-enabled';</script>
+<body class="govuk-template__body js-enabled govuk-frontend-supported">
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">{{ __('govuk_alpha.skip_to_content') }}</a>
 
     <header class="nexus-alpha-header" role="banner">

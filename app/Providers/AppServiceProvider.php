@@ -1027,6 +1027,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Cloudflare terminates TLS and proxies to origin as HTTP. Without this,
+        // route()/url() emit http:// URLs that the browser blocks via CSP
+        // (form-action 'self') because the page is loaded over https://.
+        if (str_starts_with((string) config('app.url'), 'https://') || $this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Initialise the custom JSON translator so __() resolves lang/{locale}/*.json
         // for ALL contexts (HTTP requests and artisan/cron jobs). Without this,
         // $langDir stays '' and every __() call returns the raw key as fallback.
