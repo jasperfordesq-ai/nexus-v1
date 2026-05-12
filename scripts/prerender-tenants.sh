@@ -61,6 +61,16 @@ PUBLIC_ROUTES=(
     "/platform/terms"
     "/platform/privacy"
     "/platform/disclaimer"
+    "/resources"
+    "/development-status"
+    # Tenant-gated routes (TenantSlugGate). For tenants that don't match the
+    # gate, React Router renders a fallback — that fallback is what gets
+    # prerendered. Either way, bots no longer hit an empty SPA shell.
+    "/partner"
+    "/social-prescribing"
+    "/impact-report"
+    "/impact-summary"
+    "/strategic-plan"
 )
 
 RED='\033[0;31m'

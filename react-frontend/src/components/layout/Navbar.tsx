@@ -413,14 +413,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   return (
     <>
-      {/* Skip to content link — accessible to keyboard/screen reader users */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[500] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium"
-      >
-        {t('accessibility.skip_to_content', 'Skip to main content')}
-      </a>
-
+      {/* Skip-to-content link lives in Layout.tsx (single source). Rendering
+          another one here produced two consecutive "Skip to main content"
+          links in the DOM — flagged by accessibility audits. */}
       <header className={`fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip transition-transform duration-200 ${isMobileMenuOpen ? '-translate-y-full md:translate-y-0' : ''}`} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         {/* Utility Bar — slim top strip, auto-hides on scroll down */}
         <div

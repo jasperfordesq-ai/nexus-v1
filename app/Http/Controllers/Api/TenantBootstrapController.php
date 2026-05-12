@@ -209,40 +209,79 @@ class TenantBootstrapController extends BaseApiController
     /**
      * GET /api/v2/platform/stats
      *
-     * Returns platform-wide statistics (across all tenants).
-     * Public endpoint for the landing page.
+     * Returns landing-page statistics. Scoped to the requesting host:
+     *   - Tenant custom domain (e.g. hour-timebank.ie) → stats for that
+     *     tenant only. Visitors to a custom-domain site expect to see that
+     *     community's numbers, not a network-wide aggregate.
+     *   - Anything else (app.project-nexus.ie, project-nexus.ie, direct
+     *     API hits) → platform-wide aggregate across all tenants.
+     *
+     * Resolves the previous inconsistency where hour-timebank.ie's homepage
+     * showed network-wide members (331) while Discover on the same domain
+     * showed tenant-only members (237).
      */
     public function platformStats(): JsonResponse
     {
-        $cacheKey = 'platform_stats_public';
+        // Resolve tenant from Host first (TenantContext, already set by index.php),
+        // falling back to Origin when Host is master (the React app on a custom
+        // domain hits api.project-nexus.ie, so Origin carries the user's domain).
+        // Mirrors the resolution chain used by bootstrap() above.
+        $resolvedTenantId = TenantContext::getId();
+        if ($resolvedTenantId <= 1) {
+            $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+            if ($origin) {
+                $originHost = parse_url($origin, PHP_URL_HOST) ?: '';
+                $originHost = preg_replace('/^www\./', '', $originHost);
+                if ($originHost) {
+                    $originTenant = DB::table('tenants')
+                        ->where('domain', $originHost)
+                        ->where('is_active', 1)
+                        ->first();
+                    if ($originTenant && (int) $originTenant->id !== 1) {
+                        $resolvedTenantId = (int) $originTenant->id;
+                    }
+                }
+            }
+        }
+        $scopedTenantId = $resolvedTenantId > 1 ? $resolvedTenantId : null;
+
+        $cacheKey = $scopedTenantId !== null
+            ? "platform_stats_public:tenant:{$scopedTenantId}"
+            : 'platform_stats_public';
         $cached = $this->redisCache->get($cacheKey);
 
         if ($cached !== null) {
             return $this->respondWithData($cached);
         }
 
-        $activeMembers = (int) DB::table('users')
+        $membersQuery = DB::table('users')->where('status', 'active');
+        $hoursQuery = DB::table('transactions')->where('status', 'completed');
+        $listingsQuery = DB::table('listings')->where('status', 'active');
+
+        if ($scopedTenantId !== null) {
+            $membersQuery->where('tenant_id', $scopedTenantId);
+            $hoursQuery->where('tenant_id', $scopedTenantId);
+            $listingsQuery->where('tenant_id', $scopedTenantId);
+        }
+
+        $activeMembers = (int) $membersQuery->count();
+        $hoursExchanged = (int) $hoursQuery->sum('amount');
+        $activeListings = (int) $listingsQuery->count();
+
+        $skillsQuery = DB::table('listings')
             ->where('status', 'active')
-            ->count();
+            ->whereNotNull('category_id');
+        if ($scopedTenantId !== null) {
+            $skillsQuery->where('tenant_id', $scopedTenantId);
+        }
+        $skillsListed = (int) $skillsQuery->distinct('category_id')->count('category_id');
 
-        $hoursExchanged = (int) DB::table('transactions')
-            ->where('status', 'completed')
-            ->sum('amount');
-
-        $activeListings = (int) DB::table('listings')
-            ->where('status', 'active')
-            ->count();
-
-        $skillsListed = (int) DB::table('listings')
-            ->where('status', 'active')
-            ->whereNotNull('category_id')
-            ->distinct('category_id')
-            ->count('category_id');
-
-        $communities = (int) DB::table('tenants')
-            ->where('is_active', 1)
-            ->where('id', '>', 1)
-            ->count();
+        // "Communities" — for a tenant-scoped view this is always 1 (you're
+        // looking at that community). For the platform view it's all
+        // non-master tenants.
+        $communities = $scopedTenantId !== null
+            ? 1
+            : (int) DB::table('tenants')->where('is_active', 1)->where('id', '>', 1)->count();
 
         $data = [
             'members' => $activeMembers,
@@ -250,6 +289,7 @@ class TenantBootstrapController extends BaseApiController
             'listings' => $activeListings,
             'skills' => $skillsListed,
             'communities' => $communities,
+            'scope' => $scopedTenantId !== null ? 'tenant' : 'platform',
         ];
 
         $this->redisCache->set($cacheKey, $data, 300);
