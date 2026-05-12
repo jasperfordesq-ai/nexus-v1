@@ -14,6 +14,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -21,6 +22,15 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyMessageReceived implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting Redis re-deliver this job. With retry_after=90s
+     * on the redis queue, a slow run (HTML build + inline WebPush) could be released
+     * back to another worker mid-flight, producing duplicate emails. Killing at 60s
+     * and not retrying keeps a single message → single email.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -34,6 +44,21 @@ class NotifyMessageReceived implements ShouldQueue
      */
     public function handle(MessageSent $event): void
     {
+        // Idempotency guard. The in-app bell has its own 60s dedup in
+        // NotificationDispatcher, but the notification_queue insert does not —
+        // a re-delivered job would queue a second email. Cache::add() is atomic.
+        $messageId = $event->message->id ?? null;
+        if ($messageId) {
+            $lockKey = 'notify_message_received:' . (int) $messageId;
+            if (!Cache::add($lockKey, 1, now()->addHour())) {
+                Log::info('NotifyMessageReceived: duplicate delivery suppressed', [
+                    'message_id' => $messageId,
+                    'tenant_id'  => $event->tenantId ?? null,
+                ]);
+                return;
+            }
+        }
+
         try {
             // Ensure tenant context is set (required when running via async queue).
             // setById returns false if the tenant no longer exists (e.g. deleted
