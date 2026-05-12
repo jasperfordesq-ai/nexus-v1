@@ -1095,6 +1095,16 @@ cmd_deploy() {
             echo "[$(date -Is)] Prerender background start (target=$target commit=$commit pid=$$)"
             run_prerender_for_color "$target" "$release_dir"
             echo "[$(date -Is)] Prerender background end (exit=$?)"
+
+            # IndexNow ping — submits the freshly-prerendered URLs to Bing /
+            # Yandex / Seznam / Yep. Runs after prerender so the URLs we ping
+            # are the ones bots will actually find rendered. Failure here is
+            # never a deploy blocker.
+            if [ -f "$release_dir/scripts/seo-ping.sh" ]; then
+                echo "[$(date -Is)] SEO ping (IndexNow) start"
+                bash "$release_dir/scripts/seo-ping.sh" || echo "[$(date -Is)] SEO ping had errors (non-blocking)"
+                echo "[$(date -Is)] SEO ping end"
+            fi
         ) </dev/null >>"$prerender_log" 2>&1 &
         disown "$!" 2>/dev/null || true
     fi

@@ -101,6 +101,11 @@ class RouteServiceProvider extends ServiceProvider
             Route::get('/sitemap-{slug}.xml', [\App\Http\Controllers\SitemapController::class, 'tenant'])
                 ->where('slug', '[a-zA-Z0-9_-]+');
 
+            // AI-readable site summaries (https://llmstxt.org/).
+            // Each tenant domain gets its own llms.txt and llms-full.txt.
+            Route::get('/llms.txt', [\App\Http\Controllers\LlmsController::class, 'index']);
+            Route::get('/llms-full.txt', [\App\Http\Controllers\LlmsController::class, 'full']);
+
             // Channel authorization routes for broadcasting
             if (file_exists(base_path('routes/channels.php'))) {
                 require base_path('routes/channels.php');

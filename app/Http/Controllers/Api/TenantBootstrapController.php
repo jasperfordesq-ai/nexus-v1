@@ -612,6 +612,10 @@ class TenantBootstrapController extends BaseApiController
         if (!empty($tenant['location_name'])) {
             $contact['location'] = $tenant['location_name'];
         }
+        // ISO-3166 country code — needed by SeoHead JSON-LD addressCountry.
+        if (!empty($tenant['country_code'])) {
+            $contact['country_code'] = $tenant['country_code'];
+        }
 
         return $contact;
     }

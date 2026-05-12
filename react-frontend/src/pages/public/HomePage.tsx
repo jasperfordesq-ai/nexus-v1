@@ -13,15 +13,17 @@
 
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
-import { usePageTitle } from '@/hooks';
 import { LandingPageRenderer } from '@/components/landing';
 
 export function HomePage() {
   const { t } = useTranslation('public');
-  usePageTitle(t('nav.home', { ns: 'common', defaultValue: 'Home' }));
 
   return (
     <>
+      {/* No usePageTitle here: it sets document.title via useEffect and races
+          Helmet, which left prerendered snapshots with a bare "Home" title.
+          PageMeta (Helmet) handles <title> as part of the React tree, which
+          the prerenderer captures correctly. */}
       <PageMeta
         title={t('home.meta_title', 'Community Timebanking Platform')}
         description={t('home.meta_description')}

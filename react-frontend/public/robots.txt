@@ -1,6 +1,9 @@
 # robots.txt for app.project-nexus.ie (React frontend)
-# Updated: 2026-04-04
+# Updated: 2026-05-12
 # Comprehensive: every auth-required route is blocked.
+# AI assistants and LLM crawlers are ALLOWED — community visibility through
+# AI search (ChatGPT, Claude, Perplexity, Gemini, Copilot) matters more to us
+# than opting out of training/retrieval.
 
 User-agent: *
 Allow: /
@@ -80,33 +83,13 @@ Disallow: /super-admin/
 # ── System/dev pages ──
 Disallow: /development-status
 
-# ── Block AI training bots (preserve search indexing) ──
-User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: Google-Extended
-Disallow: /
-
-User-agent: Amazonbot
-Disallow: /
-
-User-agent: ClaudeBot
-Disallow: /
-
-User-agent: Bytespider
-Disallow: /
-
-User-agent: meta-externalagent
-Disallow: /
-
-User-agent: Applebot-Extended
-Disallow: /
-
-# Sitemap — dynamically generated, covers all active tenants
+# Sitemap — dynamically generated, host-aware.
+# nginx rewrites this hostname to the requesting domain via sub_filter,
+# so each tenant domain (hour-timebank.ie, pairc-goodman.com, etc.) advertises
+# its own sitemap.
 Sitemap: https://app.project-nexus.ie/sitemap.xml
+
+# LLM-readable site summaries (emerging convention for AI crawlers).
+# Same host-aware rewriting as the sitemap line.
+# llms.txt: https://app.project-nexus.ie/llms.txt
+# llms-full.txt: https://app.project-nexus.ie/llms-full.txt

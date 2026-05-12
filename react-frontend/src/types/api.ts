@@ -1184,6 +1184,14 @@ export interface TenantConfig {
     phone?: string;
     address?: string;
     location?: string;
+    country_code?: string;
+  };
+  social?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+    youtube?: string;
   };
   config?: {
     footer_text?: string;

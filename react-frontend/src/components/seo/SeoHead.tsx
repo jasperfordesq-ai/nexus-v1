@@ -57,14 +57,59 @@ export function SeoHead() {
 
   const settings = tenant?.settings as Record<string, unknown> | undefined;
 
-  // Build Organization JSON-LD
-  const orgSchema = {
+  // Build Organization JSON-LD. Type defaults to NonprofitOrganization for
+  // community timebanks (most tenants); admins can override via the
+  // `seo_organization_type` setting if their tenant is a different entity.
+  const orgType = (typeof settings?.seo_organization_type === 'string' && settings.seo_organization_type)
+    ? (settings.seo_organization_type as string)
+    : 'NonprofitOrganization';
+
+  const contact = tenant?.contact;
+  const social = tenant?.social;
+
+  const sameAs: string[] = social
+    ? [social.facebook, social.twitter, social.instagram, social.linkedin, social.youtube]
+        .filter((v): v is string => typeof v === 'string' && v.length > 0)
+    : [];
+
+  // Optional structured PostalAddress — only emit if we have an address string.
+  const postalAddress = contact?.address
+    ? {
+        '@type': 'PostalAddress',
+        streetAddress: contact.address,
+        ...(contact.location ? { addressLocality: contact.location } : {}),
+        ...(contact.country_code ? { addressCountry: contact.country_code } : {}),
+      }
+    : undefined;
+
+  const orgSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': orgType,
     name: siteName,
     url: siteUrl,
     ...(branding.logo ? { logo: branding.logo } : {}),
     ...(branding.tagline ? { description: branding.tagline } : {}),
+    ...(contact?.email ? { email: contact.email } : {}),
+    ...(contact?.phone ? { telephone: contact.phone } : {}),
+    ...(postalAddress ? { address: postalAddress } : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+  };
+
+  // WebSite JSON-LD with SearchAction — lets search engines wire up a
+  // sitelinks searchbox to /listings (the primary public search surface).
+  const webSiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/listings?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   };
 
   const googleVerification = typeof settings?.seo_google_verification === 'string'
@@ -86,9 +131,17 @@ export function SeoHead() {
         <meta name="msvalidate.01" content={bingVerification} />
       )}
 
-      {/* Organization JSON-LD */}
+      {/* Organization JSON-LD (NonprofitOrganization by default).
+          Contains address, contact, sameAs links — used by Google Knowledge
+          Graph, Bing, and AI assistants to identify and describe the org. */}
       <script type="application/ld+json">
         {JSON.stringify(orgSchema)}
+      </script>
+
+      {/* WebSite JSON-LD with SearchAction — enables sitelinks searchbox
+          in Google results. */}
+      <script type="application/ld+json">
+        {JSON.stringify(webSiteSchema)}
       </script>
 
       {/* x-default hreflang — clean canonical URL, no ?lng= variants.

@@ -80,6 +80,7 @@ CLAUDE.md
 !/scripts/translate-i18n-gaps.mjs
 !/scripts/prerender-tenants.sh
 !/scripts/prerender-worker.mjs
+!/scripts/seo-ping.sh
 !/scripts/audit-static-services.php
 !/scripts/audit-fk-cascade.php
 !/scripts/check-container-health.sh
