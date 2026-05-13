@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "منصة تبادل الوقت المجتمعية",
-    "meta_description": "تبادل المهارات والخدمات باستخدام أرصدة الوقت. انضم إلى منصتنا المجتمعية المدفوعة بالوقت.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "تبادل الوقت، تبادل المهارات، المجتمع، التطوع، أرصدة الوقت",
     "badge": "مستقبل تبادل الوقت",
     "headline_1": "تبادل المهارات،",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "حول {{name}}",
-    "meta_description": "تعرف على {{name}} — منصة مصرفية زمنية حيث تتبادل المجتمعات المهارات باستخدام الوقت كعملة.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "حول {{name}}",
     "hero_description": "{{name}} هي منصة مصرفية زمنية حديثة حيث يتم تقييم كل ساعة من الخدمة بشكل متساوٍ. نحن نساعد المجتمعات على تبادل المهارات، وبناء الثقة، وخلق اقتصاد محلي أكثر عدلاً — ساعة واحدة في كل مرة.",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "تواصل مع فريق دعم المجتمع لدينا. نحن هنا للمساعدة.",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "اتصل بنا",
     "subtitle": "هل لديك سؤال حول {{name}}؟ نود أن نسمع منك.",
     "success_title": "تم إرسال الرسالة!",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "الأسئلة الشائعة",
     "subtitle_before_link": "لا تستطيع العثور على ما تبحث عنه؟ قم بزيارة",
     "help_center_link": "مركز المساعدة",

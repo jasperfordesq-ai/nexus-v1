@@ -1,6 +1,6 @@
 {
   "home": {
-    "meta_description": "Malartaigh scileanna agus seirbhísí ag baint úsáide as creidmheasanna ama. Bí páirteach inár n-ardán baincéireachta ama pobail.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "baincéireacht ama, malartú scileanna, pobal, obair dheonach, creidmheasanna ama",
     "badge": "Todhchaí na Baincéireachta Ama",
     "headline_1": "Malartaigh Scileanna,",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "Maidir le {{name}}",
-    "meta_description": "Foghlaim faoi {{name}} — ardán baincéireachta ama ina malartaíonn pobail scileanna ag baint úsáide as am mar airgeadra.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "Maidir le {{name}}",
     "hero_description": "Is ardán nua-aimseartha baincéireachta ama é {{name}} ina bhfuil gach uair an chloig seirbhíse ar comhluach. Cabhraímid le pobail scileanna a mhalartú, muinín a thógáil, agus geilleagar áitiúil níos cothroime a chruthú — uair amháin san am.",
     "how_it_works": {
@@ -184,7 +184,7 @@
       "login_link": "Logáil isteach",
       "login_prompt_after": "le haghaidh tacaíocht níos tapúla."
     },
-    "meta_description": "Get in touch with our community support team. We're here to help."
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help."
   },
   "faq": {
     "title": "Ceisteanna Coitianta",
@@ -380,7 +380,7 @@
       }
     },
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started."
   },
   "maintenance": {
     "title": "Beimid ar ais go luath!",

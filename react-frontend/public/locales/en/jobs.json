@@ -1,7 +1,7 @@
 {
   "title": "Job Vacancies",
   "page_title": "Job Vacancies",
-  "page_description": "Find job opportunities, volunteering positions, and timebank roles.",
+  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "subtitle": "Find opportunities in your community",
   "create_vacancy": "Post Vacancy",
   "edit_vacancy": "Edit Vacancy",
@@ -318,8 +318,7 @@
     "duration_90": "1.5 hours",
     "salary_monthly": "Monthly",
     "personal_message": "Personal Message",
-    "personal_message_placeholder": "A note to the candidate...",
-    "select_applicant": "Select {{name}}"
+    "personal_message_placeholder": "A note to the candidate..."
   },
   "apply": {
     "button": "Apply Now",

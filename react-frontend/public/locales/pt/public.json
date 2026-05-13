@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "Community Timebanking Platform",
-    "meta_description": "Troque competências e serviços usando créditos de tempo. Junte-se à nossa plataforma comunitária de timebanking.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "timebanking, troca de competências, comunidade, voluntariado, créditos de tempo",
     "badge": "O Futuro do Timebanking",
     "headline_1": "Troque Competências,",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "Sobre {{name}}",
-    "meta_description": "Saiba sobre {{name}} — uma plataforma de timebanking onde as comunidades trocam competências usando o tempo como moeda.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "Sobre {{name}}",
     "hero_description": "{{name}} é uma plataforma moderna de timebanking onde cada hora de serviço é valorizada igualmente. Ajudamos as comunidades a trocar competências, construir confiança e criar uma economia local mais justa — uma hora de cada vez.",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Get in touch with our community support team. We're here to help.",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "Contacte-nos",
     "subtitle": "Tem uma pergunta sobre {{name}}? Adoraríamos ouvir de si.",
     "success_title": "Mensagem Enviada!",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "Perguntas Frequentes",
     "subtitle_before_link": "Não encontra o que procura? Visite o nosso",
     "help_center_link": "Centro de Ajuda",

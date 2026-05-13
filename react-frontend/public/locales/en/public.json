@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "Community Timebanking Platform",
-    "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
     "badge": "The Future of Time Banking",
     "headline_1": "Exchange Skills,",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "About {{name}}",
-    "meta_description": "Learn about {{name}} — a time banking platform where communities exchange skills using time as currency.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "About {{name}}",
     "hero_description": "{{name}} is a modern time banking platform where every hour of service is valued equally. We help communities exchange skills, build trust, and create a fairer local economy — one hour at a time.",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Get in touch with our community support team. We're here to help.",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "Contact Us",
     "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
     "success_title": "Message Sent!",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "Frequently Asked Questions",
     "subtitle_before_link": "Can't find what you're looking for? Visit our",
     "help_center_link": "Help Center",

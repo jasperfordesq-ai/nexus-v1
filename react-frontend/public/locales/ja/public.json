@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "コミュニティタイムバンキングプラットフォーム",
-    "meta_description": "時間クレジットを使ってスキルやサービスを交換しましょう。私たちのコミュニティ主導のタイムバンキングプラットフォームに参加してください。",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "タイムバンキング、スキル交換、コミュニティ、ボランティア、時間クレジット",
     "badge": "タイムバンキングの未来",
     "headline_1": "スキルを交換する、",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "{{name}}について",
-    "meta_description": "{{name}}について学びましょう — コミュニティが時間を通貨としてスキルを交換するタイムバンキングプラットフォームです。",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "{{name}}について",
     "hero_description": "{{name}}は、すべてのサービスの時間が等しく評価される現代のタイムバンキングプラットフォームです。私たちはコミュニティがスキルを交換し、信頼を築き、より公正な地域経済を創造する手助けをします — 一時間ずつ。",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "私たちのコミュニティサポートチームにご連絡ください。お手伝いします。",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "お問い合わせ",
     "subtitle": "{{name}}について質問がありますか？ぜひお聞かせください。",
     "success_title": "メッセージが送信されました！",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "よくある質問",
     "subtitle_before_link": "探しているものが見つかりませんか？私たちの",
     "help_center_link": "ヘルプセンター",

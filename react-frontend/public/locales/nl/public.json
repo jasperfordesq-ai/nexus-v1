@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "Gemeenschaps Timebanking Platform",
-    "meta_description": "Ruil vaardigheden en diensten met tijdcredits. Sluit je aan bij ons door de gemeenschap aangedreven time banking platform.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "time banking, vaardigheidsuitwisseling, gemeenschap, vrijwilligerswerk, tijdcredits",
     "badge": "De Toekomst van Time Banking",
     "headline_1": "Ruil Vaardigheden,",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "Over {{name}}",
-    "meta_description": "Leer over {{name}} — een tijdbankplatform waar gemeenschappen vaardigheden uitwisselen met tijd als valuta.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "Over {{name}}",
     "hero_description": "{{name}} is een modern tijdbankplatform waar elk uur van dienstverlening gelijk wordt gewaardeerd. We helpen gemeenschappen vaardigheden uit te wisselen, vertrouwen op te bouwen en een eerlijkere lokale economie te creëren — uur voor uur.",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Neem contact op met ons community-ondersteuningsteam. We zijn hier om te helpen.",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "Neem Contact met Ons Op",
     "subtitle": "Heb je een vraag over {{name}}? We horen graag van je.",
     "success_title": "Bericht Verzonden!",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "Veelgestelde Vragen",
     "subtitle_before_link": "Kun je niet vinden wat je zoekt? Bezoek ons",
     "help_center_link": "Helpcentrum",

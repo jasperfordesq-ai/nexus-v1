@@ -1,7 +1,7 @@
 {
   "home": {
     "meta_title": "Platforma Czasowego Bankowania Społecznościowego",
-    "meta_description": "Wymieniaj umiejętności i usługi za pomocą kredytów czasowych. Dołącz do naszej platformy bankowania czasu prowadzonej przez społeczność.",
+    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
     "meta_keywords": "bankowanie czasu, wymiana umiejętności, społeczność, wolontariat, kredyty czasowe",
     "badge": "Przyszłość Bankowania Czasu",
     "headline_1": "Wymiana Umiejętności,",
@@ -80,7 +80,7 @@
   },
   "about": {
     "meta_title": "O {{name}}",
-    "meta_description": "Dowiedz się o {{name}} — platformie bankowości czasowej, na której społeczności wymieniają umiejętności, używając czasu jako waluty.",
+    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
     "hero_title": "O {{name}}",
     "hero_description": "{{name}} to nowoczesna platforma bankowości czasowej, na której każda godzina usługi jest wyceniana równo. Pomagamy społecznościom wymieniać umiejętności, budować zaufanie i tworzyć sprawiedliwszą lokalną gospodarkę — godzinę po godzinie.",
     "how_it_works": {
@@ -157,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Skontaktuj się z naszym zespołem wsparcia społeczności. Jesteśmy tutaj, aby pomóc.",
+    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
     "title": "Skontaktuj się z nami",
     "subtitle": "Masz pytanie dotyczące {{name}}? Chętnie usłyszymy od Ciebie.",
     "success_title": "Wiadomość wysłana!",
@@ -188,7 +188,7 @@
   },
   "faq": {
     "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
     "title": "Najczęściej Zadawane Pytania",
     "subtitle_before_link": "Nie możesz znaleźć tego, czego szukasz? Odwiedź nasze",
     "help_center_link": "Centrum Pomocy",
