@@ -9,7 +9,7 @@
  * Replaces the legacy flat key-value editor.
  */
 
-import { useState, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Card,
