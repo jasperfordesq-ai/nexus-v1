@@ -139,6 +139,9 @@ export function DataTable<T extends Record<string, any>>({
           {searchable && (
             <Input
               className="w-full sm:max-w-xs"
+              type="search"
+              name="datatable-search"
+              autoComplete="off"
               placeholder={searchPlaceholder}
               aria-label={searchPlaceholder || "Search"}
               startContent={<Search size={16} className="text-default-400" />}

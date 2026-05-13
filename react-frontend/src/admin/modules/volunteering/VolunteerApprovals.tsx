@@ -316,7 +316,7 @@ export function VolunteerApprovals() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           {/* Search */}
-          <Input
+          <Input type="search" name="admin-search" autoComplete="off"
             className="max-w-xs"
             placeholder={t('volunteering.search_applicants', 'Search applicants...')}
             startContent={<Search size={16} className="text-default-400" />}

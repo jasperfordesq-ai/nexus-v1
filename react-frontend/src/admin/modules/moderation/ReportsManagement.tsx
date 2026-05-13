@@ -338,7 +338,7 @@ export default function ReportsManagement() {
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={"Search Reports..."}
           aria-label={"Search Reports"}
           value={search}

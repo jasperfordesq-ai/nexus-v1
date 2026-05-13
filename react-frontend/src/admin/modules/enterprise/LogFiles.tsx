@@ -141,7 +141,7 @@ export function LogFiles() {
 
       {/* Search & Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={"Enter search..."}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}

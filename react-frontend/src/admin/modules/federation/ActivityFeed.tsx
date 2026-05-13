@@ -531,7 +531,7 @@ export function ActivityFeed() {
       <Card shadow="sm" className="mb-6">
         <CardBody>
           <div className="flex flex-wrap gap-3 items-end">
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               label={t('federation.label_search', 'Search')}
               placeholder={t('federation.search_placeholder', 'User name, description...')}
               size="sm"

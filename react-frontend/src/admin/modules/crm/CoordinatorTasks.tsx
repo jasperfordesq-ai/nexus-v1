@@ -339,7 +339,7 @@ export default function CoordinatorTasks() {
         </Select>
 
         {/* Search */}
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           size="sm"
           label={"Search"}
           placeholder={"Search Tasks..."}

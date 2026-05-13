@@ -503,7 +503,7 @@ export function SafeguardingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">{t('safeguarding.flagged_messages')}</h3>
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               placeholder={t('safeguarding.placeholder_search_messages')}
               aria-label={t('safeguarding.label_search_safeguarding_messages')}
               size="sm"

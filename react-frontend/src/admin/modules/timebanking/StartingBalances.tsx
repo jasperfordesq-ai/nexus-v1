@@ -126,7 +126,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         {/* Member search */}
         {!selectedUser ? (
           <div>
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               label={"Search Member"}
               placeholder={"Search by Name or Email..."}
               startContent={<Search size={16} className="text-default-400" />}

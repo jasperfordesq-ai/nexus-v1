@@ -94,7 +94,7 @@ export default function AdminHelpCenterPage() {
 
       {/* Search bar */}
       <div className="max-w-lg">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={`Search ${totalArticles} help articles…`}
           value={query}
           onValueChange={setQuery}

@@ -948,6 +948,9 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           <Input
             size="sm"
             variant="flat"
+            type="search"
+            name="admin-sidebar-search"
+            autoComplete="off"
             placeholder={"Search admin..."}
             value={searchQuery}
             onValueChange={setSearchQuery}

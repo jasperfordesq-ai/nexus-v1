@@ -174,7 +174,7 @@ export function SystemRequirements() {
                   {`${loadedCount} of ${data.extensions.length} loaded (${requiredCount} required)`}
                 </Chip>
               </div>
-              <Input
+              <Input type="search" name="admin-search" autoComplete="off"
                 placeholder={"Search extensions..."}
                 startContent={<Search size={14} className="text-default-400" />}
                 value={extSearch}

@@ -348,7 +348,7 @@ export default function SubRegionsAdminPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           aria-label="Search sub-regions"
           placeholder="Search by name, description or slug..."
           value={search}

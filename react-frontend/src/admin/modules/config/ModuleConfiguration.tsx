@@ -156,6 +156,9 @@ export default function ModuleConfiguration() {
         <Input
           size="sm"
           variant="bordered"
+          type="search"
+          name="module-config-search"
+          autoComplete="off"
           placeholder={"Search modules"}
           startContent={<Search size={16} className="text-default-400" />}
           value={searchQuery}

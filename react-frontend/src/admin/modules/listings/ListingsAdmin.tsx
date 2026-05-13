@@ -218,7 +218,7 @@ function FeaturedListingsPanel() {
             <Plus size={16} />
             {"Feature Listing"}
           </h3>
-          <Input
+          <Input type="search" name="admin-search" autoComplete="off"
             placeholder={"Search Active Listings to Feature..."}
             aria-label={"Search Listings"}
             startContent={<Search size={16} className="text-default-400" />}

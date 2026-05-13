@@ -281,7 +281,7 @@ export function MemberNotes() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           label={"Search"}
           placeholder={"Search Notes..."}
           className="w-56"

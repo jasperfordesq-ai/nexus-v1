@@ -310,7 +310,7 @@ export function NewsletterBounces() {
           </Tabs>
 
           <div className="flex gap-2 w-full">
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               placeholder={"Search by Email..."}
               aria-label={"Search bounced emails..."}
               value={searchQuery}

@@ -237,7 +237,7 @@ export function MatchDebugPanel() {
         </CardHeader>
         <CardBody>
           <div className="relative max-w-md">
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               value={searchQuery}
               onValueChange={handleSearchChange}
               placeholder={"Search Users by Name or Email..."}

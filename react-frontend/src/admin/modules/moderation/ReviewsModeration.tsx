@@ -298,7 +298,7 @@ export default function ReviewsModeration() {
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={"Search Reviews or Users..."}
           aria-label={"Search Reviews"}
           value={search}

@@ -272,7 +272,7 @@ export default function FeedModeration() {
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={"Search Posts or Users..."}
           aria-label={"Search Posts"}
           value={search}

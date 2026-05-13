@@ -501,7 +501,7 @@ export function Subscribers() {
           ))}
         </div>
         <div className="ml-auto w-full max-w-xs">
-          <Input
+          <Input type="search" name="admin-search" autoComplete="off"
             size="sm"
             placeholder={t('newsletters.placeholder_search_by_name_or_email')}
             aria-label={t('newsletters.label_search_subscribers')}

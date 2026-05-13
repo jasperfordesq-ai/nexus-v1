@@ -233,7 +233,7 @@ export function PartnerDirectory() {
       <Card className="mb-6">
         <CardBody className="gap-4">
           <div className="flex flex-col md:flex-row gap-3">
-            <Input
+            <Input type="search" name="admin-search" autoComplete="off"
               className="flex-1"
               placeholder={"Search communities..."}
               aria-label={"Search Partner Communities"}

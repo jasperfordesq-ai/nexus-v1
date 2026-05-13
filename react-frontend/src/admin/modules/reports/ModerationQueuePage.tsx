@@ -468,7 +468,7 @@ export function ModerationQueuePage() {
             <SelectItem key={opt.key}>{t(opt.i18nKey)}</SelectItem>
           ))}
         </Select>
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           size="sm"
           placeholder={"Search Content..."}
           aria-label={"Search Moderation Queue"}

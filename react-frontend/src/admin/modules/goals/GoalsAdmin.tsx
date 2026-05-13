@@ -230,7 +230,7 @@ export function GoalsAdmin() {
 
       {/* Search bar */}
       <div className="mb-4 flex items-center gap-2">
-        <Input
+        <Input type="search" name="admin-search" autoComplete="off"
           placeholder={"Search Goals by Title or Member..."}
           aria-label={"Search Goals"}
           value={searchInput}
