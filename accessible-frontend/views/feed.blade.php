@@ -239,7 +239,20 @@
                         @endif
                     </div>
                     @if (!empty($item['content']))
-                        <p class="govuk-body">{{ $item['content'] }}</p>
+                        @php
+                            $plainContent = trim(html_entity_decode(strip_tags((string) $item['content']), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                            $contentParagraphs = preg_split('/\R{2,}/u', $plainContent) ?: [];
+                        @endphp
+                        @foreach ($contentParagraphs as $paragraph)
+                            @if (trim($paragraph) !== '')
+                                <p class="govuk-body">{!! nl2br(e(trim($paragraph))) !!}</p>
+                            @endif
+                        @endforeach
+                    @endif
+                    @if (!empty($item['image_url']))
+                        <p class="govuk-body">
+                            <img src="{{ $item['image_url'] }}" alt="{{ __('govuk_alpha.feed.image_alt', ['title' => $itemTitle]) }}" class="nexus-alpha-feed-image" loading="lazy">
+                        </p>
                     @endif
                     <p class="govuk-body-s nexus-alpha-meta">
                         {{ trans_choice('govuk_alpha.feed.likes', $likeCount, ['count' => $likeCount]) }}

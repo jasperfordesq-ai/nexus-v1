@@ -274,6 +274,7 @@ return [
         'posted_by' => 'Posted by :name',
         'posted_on_prefix' => 'Posted on',
         'unknown_author' => 'Community member',
+        'image_alt' => 'Image for :title',
         'detail_for' => ' for :title',
         'action_for' => ' for :title',
         'pagination_label' => 'Feed pages',

@@ -163,6 +163,13 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   text-align: right;
 }
 
+.nexus-alpha-feed-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
 .nexus-alpha-listing-row__action {
   min-width: 120px;
   text-align: right;
