@@ -45,8 +45,8 @@ ON DUPLICATE KEY UPDATE
 -- ── 4. Footer text — legal entity credit + AGPL software credit ─────────
 -- footer_text is read by Footer.tsx and replaces the default "© {year} {name}".
 UPDATE tenants
-SET config = JSON_SET(
-    COALESCE(config, JSON_OBJECT()),
+SET configuration = JSON_SET(
+    COALESCE(configuration, JSON_OBJECT()),
     '$.footer_text',
     CONCAT('© ', YEAR(NOW()), ' Timebank Ireland · operated by hOUR Timebank CLG · RCN 20162023 · CRO 608327')
 )
@@ -54,7 +54,7 @@ WHERE slug = 'hour-timebank';
 
 -- ── 5. Sanity check ─────────────────────────────────────────────────────
 -- After running, verify with:
---   SELECT slug, name, meta_title, JSON_EXTRACT(config, '$.footer_text') FROM tenants WHERE slug = 'hour-timebank';
+--   SELECT slug, name, meta_title, JSON_EXTRACT(configuration, '$.footer_text') FROM tenants WHERE slug = 'hour-timebank';
 --   SELECT setting_key, setting_value FROM tenant_settings
 --     WHERE tenant_id = (SELECT id FROM tenants WHERE slug = 'hour-timebank')
 --     AND setting_key IN ('seo_title_suffix', 'seo_meta_description');
