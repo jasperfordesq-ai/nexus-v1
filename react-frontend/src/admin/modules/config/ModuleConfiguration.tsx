@@ -22,6 +22,7 @@ import { PageHeader } from '../../components';
 import type { TenantConfig } from '../../api/types';
 import ModuleCard from './ModuleCard';
 import ModuleConfigModal from './ModuleConfigModal';
+import PlatformInfrastructure from './PlatformInfrastructure';
 import {
   getCoreModules,
   getFeatureModules,
@@ -237,6 +238,17 @@ export default function ModuleConfiguration() {
             {"Clear filters"}
           </Button>
         </div>
+      )}
+
+      {/* Platform Infrastructure — tenant-wide settings that aren't tied to a module */}
+      {!searchQuery && (
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold mb-1">{"Platform Infrastructure"}</h2>
+          <p className="text-sm text-default-500 mb-4">
+            {"Tenant-wide settings: languages, maps, and API keys."}
+          </p>
+          <PlatformInfrastructure config={config} onConfigChange={setConfig} />
+        </section>
       )}
 
       {/* Config modal */}

@@ -55,8 +55,8 @@ function FeatureGatedElement({
 // Lazy-loaded admin pages
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
 const UserList = lazy(() => import('./modules/users/UserList'));
-const TenantFeatures = lazy(() => import('./modules/config/TenantFeatures'));
 const ModuleConfiguration = lazy(() => import('./modules/config/ModuleConfiguration'));
+const Operations = lazy(() => import('./modules/system/Operations'));
 const UserCreate = lazy(() => import('./modules/users/UserCreate'));
 const UserEdit = lazy(() => import('./modules/users/UserEdit'));
 const UserPermissions = lazy(() => import('./modules/users/UserPermissions'));
@@ -558,8 +558,10 @@ export function AdminRoutes() {
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
       <Route path="settings/registration-policy" element={<Lazy><RegistrationPolicySettings /></Lazy>} />
       <Route path="onboarding-settings" element={<Lazy><OnboardingSettings /></Lazy>} />
-      <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
+      {/* /admin/tenant-features retired — unified into module-configuration */}
+      <Route path="tenant-features" element={<TenantRedirect to="/admin/module-configuration" />} />
       <Route path="module-configuration" element={<Lazy><ModuleConfiguration /></Lazy>} />
+      <Route path="operations" element={<Lazy><Operations /></Lazy>} />
       <Route path="translation-config" element={<Lazy><TranslationConfig /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />

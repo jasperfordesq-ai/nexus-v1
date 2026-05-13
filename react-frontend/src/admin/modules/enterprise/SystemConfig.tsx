@@ -239,16 +239,16 @@ const RELATED_ADMIN_PAGES: RelatedAdminPage[] = [
     destLabel: "Onboarding",
   },
   {
-    label: "Tenant features",
-    description: "Toggle optional modules (events, groups, gamification, blog, etc.) on or off.",
-    href: '/admin/tenant-features',
-    destLabel: "Tenant Features",
-  },
-  {
     label: "Module configuration",
-    description: "Tune which platform modules are enabled and how they behave (beta).",
+    description: "Toggle features on/off and tune how each module behaves — the single home for tenant feature configuration.",
     href: '/admin/module-configuration',
     destLabel: "Module Configuration",
+  },
+  {
+    label: "Operations",
+    description: "Cache stats and background job controls.",
+    href: '/admin/operations',
+    destLabel: "Operations",
   },
   {
     label: "Translation settings",

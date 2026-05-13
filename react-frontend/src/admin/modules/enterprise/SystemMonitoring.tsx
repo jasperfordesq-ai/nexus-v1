@@ -144,12 +144,12 @@ export function SystemMonitoring() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/tenant-features')}
+              to={tenantPath('/admin/module-configuration')}
               variant="flat"
               size="sm"
               endContent={<ToggleLeft size={14} />}
             >
-              {"Tenant Features"}
+              {"Module Configuration"}
             </Button>
             <Button
               variant="flat"
@@ -285,12 +285,12 @@ export function SystemMonitoring() {
                 </div>
               </CardBody>
             </Card>
-            <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/tenant-features')}>
+            <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/module-configuration')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <ToggleLeft size={20} className="text-success" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{"Tenant Features"}</p>
-                  <p className="text-xs text-default-500">{"Toggle Features Modules"}</p>
+                  <p className="text-sm font-semibold text-foreground">{"Module Configuration"}</p>
+                  <p className="text-xs text-default-500">{"Toggle and configure modules"}</p>
                 </div>
               </CardBody>
             </Card>

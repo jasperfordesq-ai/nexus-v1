@@ -271,16 +271,9 @@ describe('ListingsAdmin', () => {
   });
 });
 
-// ─── TenantFeatures ──────────────────────────────────────────────────────────
-
-import { TenantFeatures } from '../config/TenantFeatures';
-
-describe('TenantFeatures', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<W><TenantFeatures /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
+// ─── TenantFeatures retired — unified into ModuleConfiguration ─────────────
+// The /admin/tenant-features page was removed and now redirects to
+// /admin/module-configuration. See ModuleConfiguration tests below.
 
 // ─── MatchingConfig ──────────────────────────────────────────────────────────
 

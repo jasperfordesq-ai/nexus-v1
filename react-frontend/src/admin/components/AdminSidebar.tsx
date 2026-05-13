@@ -533,8 +533,8 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: "Settings", href: '/admin/settings', icon: Settings },
           { label: "Onboarding Settings", href: '/admin/onboarding-settings', icon: Sparkles },
-          { label: "Tenant Features", href: '/admin/tenant-features', icon: Cog },
-          { label: "Module Configuration", href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
+          { label: "Module Configuration", href: '/admin/module-configuration', icon: Puzzle },
+          { label: "Operations", href: '/admin/operations', icon: Activity },
           { label: "Translation Settings", href: '/admin/translation-config', icon: Languages },
           { label: "Activity Log", href: '/admin/activity-log', icon: Activity },
           { label: "Cron Jobs", href: '/admin/cron-jobs', icon: Timer },
@@ -1040,26 +1040,29 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
               )}
             </li>
 
-            {/* Caring Community panel — pinned below Broker Panel for setup and daily operations */}
-            <li>
-              {collapsed ? (
-                <Link
-                  to={tenantPath('/caring')}
-                  className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
-                  title={caringPanelLabel}
-                >
-                  <Heart size={18} />
-                </Link>
-              ) : (
-                <Link
-                  to={tenantPath('/caring')}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Heart size={18} className="shrink-0" />
-                  <span>{caringPanelLabel}</span>
-                </Link>
-              )}
-            </li>
+            {/* Caring Community panel — gated on the feature flag so it disappears
+                when the tenant has Caring Community disabled. */}
+            {hasFeature('caring_community') && (
+              <li>
+                {collapsed ? (
+                  <Link
+                    to={tenantPath('/caring')}
+                    className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
+                    title={caringPanelLabel}
+                  >
+                    <Heart size={18} />
+                  </Link>
+                ) : (
+                  <Link
+                    to={tenantPath('/caring')}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    <Heart size={18} className="shrink-0" />
+                    <span>{caringPanelLabel}</span>
+                  </Link>
+                )}
+              </li>
+            )}
 
             {/* Recent pages — shown if 2+ visits and sidebar is expanded */}
             {showRecent && (

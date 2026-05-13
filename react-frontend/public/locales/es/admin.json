@@ -723,7 +723,8 @@
     "national": "National",
     "kiss": "KISS",
     "regional_analytics": "Regional Analytics",
-    "help": "Help"
+    "help": "Help",
+    "operations": "Operations"
   },
   "broker": {
     "a_reason_is_required": "A reason is required",
@@ -7640,7 +7641,21 @@
     "api_keys_saved": "Claves de API guardadas",
     "api_keys_save_failed": "No se pudieron guardar las claves de API",
     "google_key_cleared": "Clave de Google borrada — usando el valor predeterminado de la plataforma",
-    "maptiler_key_cleared": "Clave de MapTiler borrada — usando teselas OSM gratuitas"
+    "maptiler_key_cleared": "Clave de MapTiler borrada — usando teselas OSM gratuitas",
+    "label_ai_agents": "AI Agents",
+    "label_member_premium": "Member Premium",
+    "label_merchant_coupons": "Merchant Coupons",
+    "label_message_translation": "Message Translation",
+    "label_newsletter": "Newsletter",
+    "label_partner_api": "Partner API",
+    "label_regional_analytics": "Regional Analytics",
+    "desc_ai_agents": "Autonomous AI agents that propose actions and assist with platform operations",
+    "desc_member_premium": "Paid premium subscription tier for members with upgraded features and perks",
+    "desc_merchant_coupons": "Discount coupons issued by marketplace merchants (requires Marketplace)",
+    "desc_message_translation": "Auto-translate direct messages between members who speak different languages",
+    "desc_newsletter": "Email newsletter campaigns, subscribers, segments, and analytics",
+    "desc_partner_api": "Allow external partners to integrate with this tenant via the Partner API",
+    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
