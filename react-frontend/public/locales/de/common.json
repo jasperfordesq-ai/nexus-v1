@@ -64,7 +64,8 @@
     "marketplace": "Marktplatz",
     "premium": "Premium",
     "verify_identity": "Identität verifizieren",
-    "accessibility_alpha": "Accessibility (alpha)"
+    "accessibility_alpha": "Accessibility (alpha)",
+    "features": "Funktionen"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -121,7 +122,8 @@
     "messages": "Ihre Nachrichten",
     "marketplace": "Kaufen & Verkaufen in Ihrer Gemeinschaft",
     "premium": "Premium membership tiers",
-    "accessibility_alpha": "Open the accessibility-first alpha frontend"
+    "accessibility_alpha": "Open the accessibility-first alpha frontend",
+    "features": "Alle Funktionen von Project NEXUS mit ehrlichen Reifegradkennzeichnungen"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -717,13 +719,6 @@
   "go_back": "Zurück",
   "feature_error": {
     "load_failed": "{{feature}} konnte nicht geladen werden. Dieser Bereich ist möglicherweise vorübergehend nicht verfügbar."
-  },
-  "dev_banner": {
-    "aria_label": "Entwicklungsstatus",
-    "dev_notice": "Entwicklerhinweis",
-    "status": "{{stage}}",
-    "summary": "Neu und sich schnell verbessernd.",
-    "read_more": "Mehr lesen"
   },
   "aria": {
     "view_mode": "Ansichtsmodus",

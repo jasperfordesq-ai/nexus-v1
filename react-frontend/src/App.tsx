@@ -279,7 +279,8 @@ const SellerPickupScanPage = lazyWithRetry(() => import('./pages/marketplace/sel
 const MyPickupsPage = lazyWithRetry(() => import('./pages/marketplace/MyPickupsPage'));
 
 // Static Pages
-const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
+const FeaturesPage = lazyWithRetry(() => import('@/pages/public/FeaturesPage'));
+const ChangelogPage = lazyWithRetry(() => import('@/pages/public/ChangelogPage'));
 const AboutPage = lazyWithRetry(() => import('@/pages/public/AboutPage'));
 const ContactPage = lazyWithRetry(() => import('@/pages/public/ContactPage'));
 const TermsPage = lazyWithRetry(() => import('@/pages/public/TermsPage'));
@@ -354,7 +355,9 @@ function AppRoutes() {
       <Route element={<Layout />}>
         {/* Public Routes */}
         <Route index element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
-        <Route path="development-status" element={<ErrorBoundary><DevelopmentStatusPage /></ErrorBoundary>} />
+        <Route path="features" element={<ErrorBoundary><FeaturesPage /></ErrorBoundary>} />
+        <Route path="changelog" element={<ErrorBoundary><ChangelogPage /></ErrorBoundary>} />
+        <Route path="development-status" element={<Navigate to="../features" replace />} />
         <Route path="about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
         <Route path="faq" element={<ErrorBoundary><FaqPage /></ErrorBoundary>} />
         <Route path="contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />

@@ -64,7 +64,8 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)"
+    "accessibility_alpha": "Accessibility (alpha)",
+    "features": "Features"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -121,7 +122,8 @@
     "messages": "Your messages",
     "marketplace": "Buy & sell in your community",
     "premium": "Premium membership tiers",
-    "accessibility_alpha": "Open the accessibility-first alpha frontend"
+    "accessibility_alpha": "Open the accessibility-first alpha frontend",
+    "features": "Everything Project NEXUS does, with honest maturity labels"
   },
   "user_menu": {
     "my_profile": "My Profile",
@@ -717,13 +719,6 @@
   "go_back": "Go back",
   "feature_error": {
     "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
-  },
-  "dev_banner": {
-    "aria_label": "Development status",
-    "dev_notice": "Dev Notice",
-    "status": "{{stage}}",
-    "summary": "New and improving fast.",
-    "read_more": "Read more"
   },
   "aria": {
     "view_mode": "View mode",

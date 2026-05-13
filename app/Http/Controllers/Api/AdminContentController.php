@@ -918,7 +918,7 @@ class AdminContentController extends BaseApiController
         'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
         'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
         'help', 'contact', 'about', 'faq', 'legal', 'terms',
-        'privacy', 'accessibility', 'cookies', 'development-status',
+        'privacy', 'accessibility', 'cookies', 'development-status', 'features', 'changelog',
         'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
         'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
         'uploads', 'classic', 'health', 'page',

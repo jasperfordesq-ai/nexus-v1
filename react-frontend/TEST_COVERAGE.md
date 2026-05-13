@@ -242,7 +242,7 @@
 | public/ | AcceptableUsePage | Low | Static legal page |
 | public/ | CommunityGuidelinesPage | Low | Static legal page |
 | public/ | CustomPage | Medium | Dynamic CMS page renderer |
-| public/ | DevelopmentStatusPage | Low | Dev-only status page |
+| public/ | FeaturesPage | Low | Public features inventory page |
 | public/ | LegalVersionHistoryPage | Low | Legal version history |
 | skills/ | SkillsBrowsePage | Medium | Skills discovery |
 | volunteering/ | AccessibilityTab | Medium | Volunteering tab |
@@ -283,7 +283,6 @@
 | feedback/ | SessionExpiredModal | SessionExpiredModal.test.tsx | PASS |
 | hashtags/ | HashtagRenderer | __tests__/HashtagRenderer.test.tsx | PASS |
 | hashtags/ | TrendingHashtags | __tests__/TrendingHashtags.test.tsx | PASS |
-| layout/ | DevelopmentStatusBanner | __tests__/DevelopmentStatusBanner.test.tsx | PASS |
 | layout/ | Footer | Footer.test.tsx | PASS |
 | layout/ | Layout | Layout.test.tsx | PASS |
 | layout/ | MegaMenu | __tests__/MegaMenu.test.tsx | PASS |
@@ -604,7 +603,7 @@ Files currently having tests written (this session):
 - [ ] AcceptableUsePage
 - [ ] CommunityGuidelinesPage
 - [ ] CustomPage
-- [ ] DevelopmentStatusPage
+- [ ] FeaturesPage
 - [ ] LegalVersionHistoryPage
 - [ ] PlatformDisclaimerPage
 - [ ] PlatformPrivacyPage

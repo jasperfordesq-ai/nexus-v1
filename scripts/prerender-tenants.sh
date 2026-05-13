@@ -63,7 +63,8 @@ PUBLIC_ROUTES=(
     "/platform/privacy"
     "/platform/disclaimer"
     "/resources"
-    "/development-status"
+    "/features"
+    "/changelog"
     # Feature-gated public discovery routes. These were missing from the
     # prerender list, so unauthenticated crawlers were getting an empty SPA
     # shell on important discovery pages (2026-05-13 audit).

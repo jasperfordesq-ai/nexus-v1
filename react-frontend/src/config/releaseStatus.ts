@@ -6,18 +6,15 @@
 /**
  * Platform release status configuration.
  *
- * To change the stage:
- * - Update `stageKey`, `stageLabel`, and `stageSummary` here.
- * - The banner and status page update automatically.
- * - Set stageKey to 'ga' (General Availability) to indicate the platform is
- *   no longer in pre-release. You can then remove the banner from Layout.tsx
- *   if desired.
+ * The platform reached General Availability (v1.5) on 2026-05-13. Individual
+ * newer modules may still ship with their own maturity label (alpha / beta /
+ * preview) via per-module chips — this constant tracks the platform as a whole.
  */
 export const RELEASE_STATUS = {
-  stageKey: 'rc' as const,
-  stageLabel: 'Release Candidate (RC)',
-  stageSummary: 'New and improving fast.',
-  readMorePath: '/development-status',
+  stageKey: 'ga' as const,
+  stageLabel: 'Generally Available (v1.5)',
+  stageSummary: 'Live and supported.',
+  readMorePath: '/features',
 } as const;
 
 export type ReleaseStageKey = typeof RELEASE_STATUS.stageKey;

@@ -42,7 +42,7 @@ export const RESERVED_PATHS = new Set([
   'caring', 'caring-community',
   // Public/info pages
   'help', 'contact', 'about', 'faq', 'legal', 'terms', 'platform',
-  'privacy', 'accessibility', 'cookies', 'development-status',
+  'privacy', 'accessibility', 'cookies', 'development-status', 'features', 'changelog',
   'community-guidelines', 'acceptable-use',
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
   'communities', 'local-groups', 'services',

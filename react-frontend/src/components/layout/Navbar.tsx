@@ -49,6 +49,7 @@ import Heart from 'lucide-react/icons/heart';
 import Building2 from 'lucide-react/icons/building-2';
 import Globe from 'lucide-react/icons/globe';
 import Info from 'lucide-react/icons/info';
+import Sparkles from 'lucide-react/icons/sparkles';
 import FileText from 'lucide-react/icons/file-text';
 import Shield from 'lucide-react/icons/shield';
 import Handshake from 'lucide-react/icons/handshake';
@@ -359,6 +360,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       title: t('sections.about'),
       items: [
         { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
+        { label: t('nav.features'), desc: t('nav_desc.features'), href: tenantPath('/features'), icon: Sparkles },
         { label: t('nav.blog'), desc: t('nav_desc.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' },
         { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
         { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },

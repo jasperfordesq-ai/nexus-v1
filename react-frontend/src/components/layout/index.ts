@@ -8,5 +8,4 @@ export { Footer, FooterLink, type FooterProps, type FooterLinkProps } from './Fo
 export { Layout, AuthLayout } from './Layout';
 export { Navbar } from './Navbar';
 export { MobileDrawer } from './MobileDrawer';
-export { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 export { SourceRepositoryLink, PROJECT_NEXUS_REPO_URL } from './SourceRepositoryLink';

@@ -61,9 +61,6 @@ vi.mock('@/components/caring-community/EmergencyAlertBanner', () => ({
 vi.mock('@/components/legal/FadpConsentBanner', () => ({
   FadpConsentBanner: () => null,
 }));
-vi.mock('./DevelopmentStatusBanner', () => ({
-  DevelopmentStatusBanner: () => null,
-}));
 vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => null,
 }));

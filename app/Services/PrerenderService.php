@@ -47,7 +47,7 @@ class PrerenderService
         '/blog', '/terms', '/privacy', '/accessibility', '/cookies',
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
         '/legal', '/timebanking-guide', '/platform/terms', '/platform/privacy',
-        '/platform/disclaimer', '/resources', '/development-status',
+        '/platform/disclaimer', '/resources', '/features', '/changelog',
         '/events', '/groups', '/jobs', '/marketplace', '/volunteering',
         '/pilot-inquiry', '/pilot-apply', '/developers',
         '/partner', '/social-prescribing', '/impact-report',

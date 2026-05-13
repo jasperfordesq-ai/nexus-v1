@@ -9,8 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **In-app `/changelog` page** rendering this file via `react-markdown`. The markdown source is copied from the repo root into `react-frontend/public/changelog.md` at prebuild/predev time by `scripts/copy-changelog.mjs`, so the in-app changelog is always in sync with the file in git. Footer Changelog link is now internal.
+- **`Features` link in the public Navbar and Mobile drawer** (About section, alongside About / Blog / FAQ).
+- `nav.features` and `nav_desc.features` translation keys in all 11 languages.
+
+### Removed
+
+- **Dead `dev_banner.*` and `dev_status.*` translation keys** swept from all 11 locale files (22 key blocks total). All code references were already gone when the platform moved to GA.
+- **"Dev Notice" amber button** in the MobileDrawer bottom bar — redundant post-GA; Features is now reachable via the About accordion. `FlaskConical` icon import removed.
+
+---
+
+## [1.5.0] - 2026-05-13
+
+**Project NEXUS is now Generally Available.** After running as a release candidate since 2026-03-27, the v1.5 line — covering the full Laravel 12 migration, the React SPA frontend, federation, multi-tenant scoping hardening, the SEO overhaul, the email system rewrite, and the PWA update architecture — is promoted to GA. The platform as a whole is live and supported; newer modules may still ship with their own per-module maturity label.
+
 ### Changed
 
+- **Release marker promoted from RC → GA.** `RELEASE_STATUS.stageKey` is now `'ga'` with label "Generally Available (v1.5)". The amber "Release Candidate" footer strip is replaced with a calm GA strip linking to the new Features page and the public Changelog (this file, on GitHub).
+- **Footer Changelog link** now points to `CHANGELOG.md` in the source repository — the canonical, public-facing version history.
+- **`/development-status` page replaced with `/features`** — a public marketing-grade features inventory with honest per-module maturity chips (GA / Beta / Preview). The old `/development-status` URL 301s to `/features` so existing bookmarks survive. Federation is explicitly labelled **Beta — Live with external partners, protocols still hardening** to reflect reality: real partnerships exchange data daily while the wire protocols are still being hardened against edge cases.
 - **PWA update flow rewritten (2026-05-10).** Replaced precache-shell + click-to-update workflow with NetworkFirst HTML + API stale-client gate. The HTML shell is no longer precached by the service worker; navigations are served NetworkFirst with a 3s timeout. Every API response carries `X-Build: <sha>`; the frontend interceptor force-redirects to `/api/sw-reset` if a build mismatch persists past a 10-minute grace window. Sentry events are now tagged with `build_commit` and `build_time`. Deploys propagate to users on their next navigation, with no UI prompt. See `react-frontend/CLAUDE.md#pwa-update-architecture` and the `feedback_pwa_android_update.md` memory file for the full architecture.
 
 ### Removed

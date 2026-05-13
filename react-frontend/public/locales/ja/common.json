@@ -64,7 +64,8 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)"
+    "accessibility_alpha": "Accessibility (alpha)",
+    "features": "機能"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -121,7 +122,8 @@
     "messages": "あなたのメッセージ",
     "marketplace": "コミュニティで売買する",
     "premium": "Premium membership tiers",
-    "accessibility_alpha": "Open the accessibility-first alpha frontend"
+    "accessibility_alpha": "Open the accessibility-first alpha frontend",
+    "features": "Project NEXUSのすべての機能と正直な成熟度ラベル"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -717,13 +719,6 @@
   "go_back": "Go back",
   "feature_error": {
     "load_failed": "{{feature}}を読み込めませんでした。このセクションは一時的に利用できない可能性があります。"
-  },
-  "dev_banner": {
-    "aria_label": "開発ステータス",
-    "dev_notice": "開発通知",
-    "status": "{{stage}}",
-    "summary": "New and improving fast.",
-    "read_more": "もっと読む"
   },
   "aria": {
     "view_mode": "表示モード",

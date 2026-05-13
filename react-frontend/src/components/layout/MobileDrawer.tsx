@@ -48,6 +48,7 @@ import Search from 'lucide-react/icons/search';
 import Shield from 'lucide-react/icons/shield';
 import Globe from 'lucide-react/icons/globe';
 import Info from 'lucide-react/icons/info';
+import Sparkles from 'lucide-react/icons/sparkles';
 import FileText from 'lucide-react/icons/file-text';
 import Handshake from 'lucide-react/icons/handshake';
 import Stethoscope from 'lucide-react/icons/stethoscope';
@@ -63,14 +64,12 @@ import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Activity from 'lucide-react/icons/activity';
 import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
-import FlaskConical from 'lucide-react/icons/flask-conical';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
 import { InstallAppButton } from '@/components/pwa/InstallAppButton';
-import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
@@ -230,6 +229,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
   const aboutNavItems = [
     { label: t('nav.about'), href: '/about', icon: Info },
+    { label: t('nav.features'), href: '/features', icon: Sparkles },
     { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
     { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
     { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
@@ -571,15 +571,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       {t('user_menu.help_center')}
                     </Button>
                   )}
-                  <Button
-                    variant="light"
-                    size="sm"
-                    className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
-                    onPress={() => navigateAndClose(RELEASE_STATUS.readMorePath)}
-                  >
-                    <FlaskConical className="w-4 h-4" aria-hidden="true" />
-                    {t('dev_banner.dev_notice', 'Dev Notice')}
-                  </Button>
                   {accessibleFrontendUrl && (
                     <a
                       href={accessibleFrontendUrl}

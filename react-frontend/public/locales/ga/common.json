@@ -64,7 +64,8 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)"
+    "accessibility_alpha": "Accessibility (alpha)",
+    "features": "Gnéithe"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -121,7 +122,8 @@
     "messages": "Do theachtaireachtaí",
     "marketplace": "Buy & sell in your community",
     "premium": "Premium membership tiers",
-    "accessibility_alpha": "Open the accessibility-first alpha frontend"
+    "accessibility_alpha": "Open the accessibility-first alpha frontend",
+    "features": "Gach rud a dhéanann Project NEXUS, le lipéid aibíochta macánta"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -717,13 +719,6 @@
   "go_back": "Go back",
   "feature_error": {
     "load_failed": "Ní rabhamar in ann {{feature}} a lódáil. D'fhéadfadh an chuid seo a bheith neamh-infhaighte go sealadach."
-  },
-  "dev_banner": {
-    "aria_label": "Stádas forbartha",
-    "dev_notice": "Fógra Forbartha",
-    "status": "{{stage}}",
-    "summary": "New and improving fast.",
-    "read_more": "Léigh tuilleadh"
   },
   "aria": {
     "view_mode": "Mód amhairc",

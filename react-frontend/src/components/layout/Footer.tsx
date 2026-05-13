@@ -14,7 +14,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Cookie from 'lucide-react/icons/cookie';
 import Bug from 'lucide-react/icons/bug';
 import { TenantLogo } from '@/components/branding';
-import FlaskConical from 'lucide-react/icons/flask-conical';
+import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 
@@ -174,19 +174,27 @@ export function Footer({ children, copyright }: FooterProps) {
               </div>
             ) : null}
 
-            {/* RC dev notice */}
-            <div className="border-t border-theme-default pt-4 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-center text-xs text-amber-700 dark:text-amber-400">
-              <FlaskConical className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+            {/* Release status — GA strip with Features + Changelog links */}
+            <div className="border-t border-theme-default pt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-theme-subtle">
+              <Sparkles className="w-3.5 h-3.5 shrink-0 text-success" aria-hidden="true" />
               <span>
-                <span className="font-semibold">{RELEASE_STATUS.stageLabel}</span>
+                <span className="font-semibold text-theme-primary">{RELEASE_STATUS.stageLabel}</span>
                 {' — '}
-                {t('dev_banner.summary', { defaultValue: RELEASE_STATUS.stageSummary })}
+                {t('release_status.summary', { defaultValue: RELEASE_STATUS.stageSummary })}
               </span>
+              <span aria-hidden="true">&middot;</span>
               <Link
                 to={RELEASE_STATUS.readMorePath}
-                className="underline font-medium ms-1 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-amber-500 rounded whitespace-nowrap"
+                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
               >
-                {t('dev_banner.read_more', 'Read more')}
+                {t('release_status.features_link', { defaultValue: 'Features' })}
+              </Link>
+              <span aria-hidden="true">&middot;</span>
+              <Link
+                to={tenantPath('/changelog')}
+                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
+              >
+                {t('release_status.changelog_link', { defaultValue: 'Changelog' })}
               </Link>
             </div>
 
