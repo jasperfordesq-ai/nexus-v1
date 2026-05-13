@@ -20,6 +20,21 @@ import { useToast, useTenant } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
+import SystemConfig from '../enterprise/SystemConfig';
+
+// Keys handled directly by the cards above — excluded from the embedded
+// SystemConfig editor below to avoid duplicate controls.
+const DUPLICATE_KEYS = [
+  'site_name',
+  'site_description',
+  'contact_email',
+  'contact_phone',
+  'footer_text',
+  'registration_enabled',
+  'require_approval',
+  'require_email_verification',
+  'maintenance_mode',
+];
 
 // Field names match the backend's TENANT_DIRECT_COLUMNS and GENERAL_SETTING_KEYS exactly
 interface SettingsForm {
@@ -297,6 +312,25 @@ export function AdminSettings() {
           >
             {"Save settings"}
           </Button>
+        </div>
+
+        {/* Additional platform configuration ported from the legacy
+            /admin/enterprise/config page. Persists via the enterprise
+            config endpoint; duplicate keys handled by the cards above are
+            hidden via excludeKeys. Rendered without an outer Card to avoid
+            double card nesting — SystemConfig provides its own per-group Cards. */}
+        <div className="pt-6 mt-2 border-t border-default-200">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-foreground">{"Additional configuration"}</h2>
+            <p className="text-sm text-default-500 mt-1">
+              {"Localization, wallet, content moderation, notifications, and limits. These settings save independently from the form above."}
+            </p>
+          </div>
+          <SystemConfig
+            embedded
+            excludeKeys={DUPLICATE_KEYS}
+            onAfterChange={fetchSettings}
+          />
         </div>
       </div>
     </div>

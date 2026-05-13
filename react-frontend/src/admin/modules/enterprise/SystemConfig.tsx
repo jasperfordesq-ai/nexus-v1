@@ -9,7 +9,8 @@
  * Replaces the legacy flat key-value editor.
  */
 
-import { useEffect, useState, useCallback, type ReactNode } from 'react';
+import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -28,6 +29,9 @@ import {
   ModalFooter,
   Tooltip,
 } from '@heroui/react';
+import AlertTriangle from 'lucide-react/icons/alert-triangle';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import { useTenant } from '@/contexts';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
@@ -38,7 +42,6 @@ import Shield from 'lucide-react/icons/shield';
 import Bell from 'lucide-react/icons/bell';
 import Gauge from 'lucide-react/icons/gauge';
 import Info from 'lucide-react/icons/info';
-import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
@@ -78,80 +81,80 @@ interface ConfigGroup {
 // Supported platform language codes — names resolved via i18n inside the component
 const SUPPORTED_LOCALE_CODES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
 
-/** Build the config schema with translated labels/descriptions. Called inside the component so t() is available. */
-function buildConfigSchema(t: (key: string) => string): ConfigGroup[] {
+/** Build the config schema. Labels and descriptions are English-only (admin panel is not translated). */
+function buildConfigSchema(): ConfigGroup[] {
   return [
     {
       key: 'general',
       label: "General",
-      description: "General.",
+      description: "Site identity, localization, and footer text.",
       icon: <Settings2 size={18} />,
       settings: [
-        { key: 'site_name', label: "Setting Site Name", description: "Setting Site Name.", type: 'text', default: '' },
-        { key: 'site_description', label: "Setting Site Description", description: "Setting Site Description.", type: 'textarea', default: '' },
-        { key: 'contact_email', label: "Setting Contact Email", description: "Setting Contact Email.", type: 'email', default: '' },
-        { key: 'contact_phone', label: "Setting Contact Phone", description: "Setting Contact Phone.", type: 'text', default: '' },
-        { key: 'timezone', label: "Setting Timezone", description: "Setting Timezone.", type: 'text', default: 'UTC' },
-        { key: 'footer_text', label: "Setting Footer Text", description: "Setting Footer Text.", type: 'textarea', default: '' },
+        { key: 'site_name', label: "Site name", description: "Public name shown in the header, browser tab, and emails.", type: 'text', default: '' },
+        { key: 'site_description', label: "Site description", description: "Short tagline used in metadata and shared links.", type: 'textarea', default: '' },
+        { key: 'contact_email', label: "Contact email", description: "Address members use to reach support.", type: 'email', default: '' },
+        { key: 'contact_phone', label: "Contact phone", description: "Public phone number for support enquiries.", type: 'text', default: '' },
+        { key: 'timezone', label: "Timezone", description: "IANA timezone identifier (e.g. Europe/Dublin) used for scheduling and timestamps.", type: 'text', default: 'UTC' },
+        { key: 'footer_text', label: "Footer legal text", description: "Charity number, company registration, or other legal text displayed in the footer.", type: 'textarea', default: '' },
         {
-          key: 'locale', label: "Setting Locale", description: "Setting Locale.", type: 'select', default: 'en',
+          key: 'locale', label: "Default locale", description: "Language used for new members until they pick their own.", type: 'select', default: 'en',
           options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
         },
       ],
     },
     {
       key: 'registration',
-      label: "Registration",
-      description: "Registration.",
+      label: "Registration & onboarding",
+      description: "Who can sign up, what they verify, and how they're welcomed.",
       icon: <UserPlus size={18} />,
       settings: [
-        { key: 'registration_enabled', label: "Setting Registration Enabled", description: "Setting Registration Enabled.", type: 'boolean', default: true },
-        { key: 'require_approval', label: "Setting Require Approval", description: "Setting Require Approval.", type: 'boolean', default: false },
-        { key: 'require_email_verification', label: "Setting Require Email Verification", description: "Setting Require Email Verification.", type: 'boolean', default: true },
-        { key: 'maintenance_mode', label: "Setting Maintenance Mode", description: "Setting Maintenance Mode.", type: 'boolean', default: false },
-        { key: 'onboarding_enabled', label: "Setting Onboarding Enabled", description: "Setting Onboarding Enabled.", type: 'boolean', default: true },
-        { key: 'welcome_message', label: "Setting Welcome Message", description: "Setting Welcome Message.", type: 'textarea', default: '' },
+        { key: 'registration_enabled', label: "Registration enabled", description: "Turn off to close sign-ups entirely.", type: 'boolean', default: true },
+        { key: 'require_approval', label: "Admin approval required", description: "New accounts must be approved by an admin before they can sign in.", type: 'boolean', default: false },
+        { key: 'require_email_verification', label: "Require email verification", description: "Members must verify their email address before accessing the platform.", type: 'boolean', default: true },
+        { key: 'maintenance_mode', label: "Maintenance mode", description: "Read-only. Toggle via scripts/maintenance.sh on the server.", type: 'boolean', default: false },
+        { key: 'onboarding_enabled', label: "Show onboarding flow", description: "Walk new members through profile and skills setup after sign-up.", type: 'boolean', default: true },
+        { key: 'welcome_message', label: "Welcome message", description: "Shown to new members on their first sign-in.", type: 'textarea', default: '' },
       ],
     },
     {
       key: 'wallet',
-      label: "Wallet",
-      description: "Wallet.",
+      label: "Wallet & credits",
+      description: "Time-credit balance, transfer caps, and how the currency is named.",
       icon: <Wallet size={18} />,
       settings: [
-        { key: 'starting_balance', label: "Setting Starting Balance", description: "Setting Starting Balance.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_transaction', label: "Setting Max Transaction", description: "Setting Max Transaction.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'currency_name', label: "Setting Currency Name", description: "Setting Currency Name.", type: 'text', default: 'Hours' },
-        { key: 'currency_symbol', label: "Setting Currency Symbol", description: "Setting Currency Symbol.", type: 'text', default: 'h' },
+        { key: 'starting_balance', label: "Starting balance", description: "Time credits granted to new members on sign-up. Set to 0 to disable.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_transaction', label: "Maximum transfer", description: "Largest single transfer between members. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'currency_name', label: "Currency name", description: "Display name for the time-bank currency (e.g. Hours, Credits, TimeBucks).", type: 'text', default: 'Hours' },
+        { key: 'currency_symbol', label: "Currency symbol", description: "Short symbol shown next to balances (e.g. h, ⌛, TC).", type: 'text', default: 'h' },
       ],
     },
     {
       key: 'content',
-      label: "Content",
-      description: "Content.",
+      label: "Content & moderation",
+      description: "Approval rules and content filters for listings and posts.",
       icon: <Shield size={18} />,
       settings: [
-        { key: 'auto_approve_listings', label: "Setting Auto Approve Listings", description: "Setting Auto Approve Listings.", type: 'boolean', default: true },
-        { key: 'auto_approve_blog', label: "Setting Auto Approve Blog", description: "Setting Auto Approve Blog.", type: 'boolean', default: false },
-        { key: 'max_listing_images', label: "Setting Max Listing Images", description: "Setting Max Listing Images.", type: 'number', default: 5, validation: { min: 1, max: 20 } },
-        { key: 'profanity_filter', label: "Setting Profanity Filter", description: "Setting Profanity Filter.", type: 'boolean', default: false },
+        { key: 'auto_approve_listings', label: "Auto-approve listings", description: "Publish new listings immediately instead of holding them for moderator review.", type: 'boolean', default: true },
+        { key: 'auto_approve_blog', label: "Auto-approve blog posts", description: "Publish new blog posts immediately instead of holding them for moderator review.", type: 'boolean', default: false },
+        { key: 'max_listing_images', label: "Max images per listing", description: "Upper limit on photos attached to a single listing.", type: 'number', default: 5, validation: { min: 1, max: 20 } },
+        { key: 'profanity_filter', label: "Profanity filter", description: "Block submissions containing words on the platform's profanity list.", type: 'boolean', default: false },
       ],
     },
     {
       key: 'notifications',
       label: "Notifications",
-      description: "Notifications.",
+      description: "Default delivery channels for new accounts and digest cadence.",
       icon: <Bell size={18} />,
       settings: [
-        { key: 'email_notifications_enabled', label: "Setting Email Notifications Enabled", description: "Setting Email Notifications Enabled.", type: 'boolean', default: true },
-        { key: 'push_notifications_enabled', label: "Setting Push Notifications Enabled", description: "Setting Push Notifications Enabled.", type: 'boolean', default: true },
+        { key: 'email_notifications_enabled', label: "Email notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
+        { key: 'push_notifications_enabled', label: "Push notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
         {
-          key: 'digest_frequency', label: "Setting Digest Frequency", description: "Setting Digest Frequency.", type: 'select', default: 'weekly',
+          key: 'digest_frequency', label: "Digest frequency", description: "How often the activity digest email is sent.", type: 'select', default: 'weekly',
           options: [
-            { label: "Digest Daily", value: 'daily' },
-            { label: "Digest Weekly", value: 'weekly' },
-            { label: "Digest Monthly", value: 'monthly' },
-            { label: "Digest Never", value: 'never' },
+            { label: "Daily", value: 'daily' },
+            { label: "Weekly", value: 'weekly' },
+            { label: "Monthly", value: 'monthly' },
+            { label: "Never", value: 'never' },
           ],
         },
       ],
@@ -159,12 +162,12 @@ function buildConfigSchema(t: (key: string) => string): ConfigGroup[] {
     {
       key: 'limits',
       label: "Limits",
-      description: "Limits.",
+      description: "Per-member caps and upload size.",
       icon: <Gauge size={18} />,
       settings: [
-        { key: 'max_listings_per_user', label: "Setting Max Listings Per User", description: "Setting Max Listings Per User.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_groups_per_user', label: "Setting Max Groups Per User", description: "Setting Max Groups Per User.", type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_file_upload_mb', label: "Setting Max File Upload Mb", description: "Setting Max File Upload Mb.", type: 'number', default: 10, validation: { min: 1, max: 100 } },
+        { key: 'max_listings_per_user', label: "Max listings per member", description: "Most listings a single member can have active at once. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_groups_per_user', label: "Max groups per member", description: "Most groups a single member can join. Set to 0 for no limit.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_file_upload_mb', label: "Max upload size (MB)", description: "Per-file upload size limit. Larger files are rejected at the server.", type: 'number', default: 10, validation: { min: 1, max: 100 } },
       ],
     },
   ];
@@ -205,6 +208,53 @@ const STATIC_SETTINGS: StaticSettingDef[] = [
 
 /** All known schema keys — static list for normalization/validation (independent of translations) */
 const SCHEMA_KEYS = new Set(STATIC_SETTINGS.map((s) => s.key));
+
+/**
+ * Registry of well-known configuration keys that are stored at the platform level
+ * but managed by dedicated admin pages. Used to render a "Manage" button instead
+ * of a raw JSON dump in the "managed elsewhere" section.
+ */
+interface ManagedElsewhereEntry {
+  label: string;
+  description: string;
+  /** Path relative to the tenant root (e.g. "/admin/federation"). Pass through tenantPath() at render. */
+  href: string;
+  /** Label for the destination, e.g. "Federation". Used in the button as "Manage in {destLabel}". */
+  destLabel: string;
+}
+
+const MANAGED_ELSEWHERE: Record<string, ManagedElsewhereEntry> = {
+  broker_controls: {
+    label: "Broker controls",
+    description: "Exchange workflow, messaging, and risk tagging.",
+    href: '/broker',
+    destLabel: "Broker Panel",
+  },
+  federation: {
+    label: "Federation",
+    description: "Inbound partnerships, auto-approval, shared categories, and partnership limits.",
+    href: '/admin/federation',
+    destLabel: "Federation",
+  },
+  modules: {
+    label: "Modules",
+    description: "Which platform modules are enabled (listings, wallet, messages, feed, etc.).",
+    href: '/admin/tenant-features',
+    destLabel: "Tenant Features",
+  },
+  default_language: {
+    label: "Default language",
+    description: "Primary language for new members on this tenant.",
+    href: '/admin/tenant-features',
+    destLabel: "Tenant Features",
+  },
+  supported_languages: {
+    label: "Supported languages",
+    description: "Languages members can choose from.",
+    href: '/admin/tenant-features',
+    destLabel: "Tenant Features",
+  },
+};
 
 /** Schema definitions keyed by setting key for fast lookup */
 const SCHEMA_MAP = new Map<string, StaticSettingDef>(STATIC_SETTINGS.map((s) => [s.key, s]));
@@ -259,35 +309,35 @@ function normalizeConfig(data: Record<string, unknown>): Record<string, unknown>
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const URL_RE = /^https?:\/\/.+/;
 
-function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string, opts?: Record<string, unknown>) => string): string | null {
+function validateSetting(def: ConfigSettingDef, value: unknown): string | null {
   const str = String(value ?? '');
 
   if (def.validation?.required && str.trim() === '') {
-    return `Validation Required`;
+    return "Required";
   }
 
   if (def.type === 'email' && str.trim() !== '' && !EMAIL_RE.test(str)) {
-    return "Validation Invalid Email";
+    return "Enter a valid email address";
   }
 
   if (def.type === 'url' && str.trim() !== '' && !URL_RE.test(str)) {
-    return "Validation Invalid URL";
+    return "Enter a valid URL (must start with http:// or https://)";
   }
 
   if (def.type === 'number' && str.trim() !== '') {
     const num = Number(str);
-    if (isNaN(num)) return "Validation Must Be Number";
+    if (isNaN(num)) return "Must be a number";
     if (def.validation?.min !== undefined && num < def.validation.min) {
-      return `Validation Min Value`;
+      return `Must be ${def.validation.min} or greater`;
     }
     if (def.validation?.max !== undefined && num > def.validation.max) {
-      return `Validation Max Value`;
+      return `Must be ${def.validation.max} or less`;
     }
   }
 
   if (def.validation?.pattern && str.trim() !== '') {
     const re = new RegExp(def.validation.pattern);
-    if (!re.test(str)) return "Validation Invalid Format";
+    if (!re.test(str)) return "Invalid format";
   }
 
   return null;
@@ -297,10 +347,38 @@ function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string,
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function SystemConfig() {
+interface SystemConfigProps {
+  /** When true, hides the PageHeader and deprecation banner — used when embedded inside another page. */
+  embedded?: boolean;
+  /** Setting keys to hide from the editor (used to suppress duplicates when embedded). */
+  excludeKeys?: string[];
+  /** Group keys to keep. When omitted, all groups are shown. */
+  includeGroups?: string[];
+  /**
+   * Called after a successful save or reset. The parent should refetch its own
+   * data — Reset in particular clears keys that may be owned by the parent.
+   */
+  onAfterChange?: () => void;
+}
+
+export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onAfterChange }: SystemConfigProps = {}) {
   const { t } = useTranslation('admin');
-  usePageTitle("Enterprise");
+  const { tenantPath } = useTenant();
+  // Only manage the document title when this component owns the whole page.
+  // When embedded inside another page, the parent's usePageTitle wins.
+  useEffect(() => {
+    if (embedded) return;
+    const prev = document.title;
+    document.title = "Enterprise";
+    return () => { document.title = prev; };
+  }, [embedded]);
   const toast = useToast();
+
+  const excludeSet = useMemo(() => new Set(excludeKeys ?? []), [excludeKeys]);
+  const includeGroupSet = useMemo(
+    () => (includeGroups && includeGroups.length > 0 ? new Set(includeGroups) : null),
+    [includeGroups],
+  );
 
   const [config, setConfig] = useState<Record<string, unknown>>({});
   const [edited, setEdited] = useState<Record<string, unknown>>({});
@@ -320,8 +398,12 @@ export function SystemConfig() {
     value: code,
   }));
 
-  // Config schema with translated strings — rebuilt on each render (translations change with locale)
-  const configSchema = buildConfigSchema((key) => t(key));
+  // Config schema (English-only — admin panel is not translated)
+  const fullConfigSchema = buildConfigSchema();
+  const configSchema = fullConfigSchema
+    .filter((g) => !includeGroupSet || includeGroupSet.has(g.key))
+    .map((g) => ({ ...g, settings: g.settings.filter((s) => !excludeSet.has(s.key)) }))
+    .filter((g) => g.settings.length > 0);
 
   // ── Data loading ──────────────────────────────────────────────────────
 
@@ -331,7 +413,7 @@ export function SystemConfig() {
     try {
       const res = await adminEnterprise.getConfig();
       if (!res.success || !res.data) {
-        toast.error(res.error || "Failed to load configuration");
+        toast.error(res.error || "Failed to load settings");
         setLoadError(true);
         return;
       }
@@ -341,7 +423,7 @@ export function SystemConfig() {
       setEdited({ ...data });
       setErrors({});
     } catch {
-      toast.error("Failed to load configuration");
+      toast.error("Failed to load settings");
       setLoadError(true);
     } finally {
       setLoading(false);
@@ -359,8 +441,15 @@ export function SystemConfig() {
     return edited[key] ?? defaultVal ?? '';
   }
 
-  function getUnknownKeys(): string[] {
-    return Object.keys(edited).filter((k) => !SCHEMA_KEYS.has(k)).sort();
+  /**
+   * Returns the subset of stored keys that aren't part of the SystemConfig schema
+   * AND are recognised in the MANAGED_ELSEWHERE registry. Truly unknown keys are
+   * hidden — admins can't act on them and they'd just be noise.
+   */
+  function getManagedElsewhereKeys(): string[] {
+    return Object.keys(edited)
+      .filter((k) => !SCHEMA_KEYS.has(k) && k in MANAGED_ELSEWHERE)
+      .sort();
   }
 
   // ── Change handler ────────────────────────────────────────────────────
@@ -369,7 +458,7 @@ export function SystemConfig() {
     setEdited((prev) => ({ ...prev, [key]: value }));
 
     if (def) {
-      const error = validateSetting(def, value, (key, opts) => t(key, opts));
+      const error = validateSetting(def, value);
       setErrors((prev) => {
         const next = { ...prev };
         if (error) {
@@ -386,20 +475,20 @@ export function SystemConfig() {
 
   async function handleSave() {
     if (loadError) {
-      toast.error("Cannot Save Config Not Loaded");
+      toast.error("Settings haven't loaded yet — reload before saving.");
       return;
     }
     // Validate all schema fields
     const newErrors: Record<string, string> = {};
     for (const group of configSchema) {
       for (const def of group.settings) {
-        const error = validateSetting(def, getSettingValue(def.key, def.default), (key, opts) => t(key, opts));
+        const error = validateSetting(def, getSettingValue(def.key, def.default));
         if (error) newErrors[def.key] = error;
       }
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast.error("Fix Validation Errors");
+      toast.error("Fix the highlighted errors before saving.");
       return;
     }
 
@@ -416,15 +505,16 @@ export function SystemConfig() {
         }
       }
       if (Object.keys(payload).length === 0) {
-        toast.error("No changes to save found");
+        toast.error("No changes to save.");
         setSaving(false);
         return;
       }
       await adminEnterprise.updateConfig(payload);
-      toast.success("Configuration Saved");
+      toast.success("Settings saved.");
       await loadData();
+      onAfterChange?.();
     } catch {
-      toast.error("Failed to save configuration");
+      toast.error("Failed to save settings.");
     } finally {
       setSaving(false);
     }
@@ -436,11 +526,12 @@ export function SystemConfig() {
     setResetting(true);
     try {
       await adminEnterprise.resetConfig();
-      toast.success("Configuration Reset to Defaults");
+      toast.success("Configuration reset to defaults.");
       setShowResetModal(false);
       await loadData();
+      onAfterChange?.();
     } catch {
-      toast.error("Failed to reset configuration");
+      toast.error("Failed to reset configuration.");
     } finally {
       setResetting(false);
     }
@@ -589,10 +680,33 @@ export function SystemConfig() {
 
   // ── Loading state ─────────────────────────────────────────────────────
 
+  const deprecationBanner = !embedded ? (
+    <Card shadow="sm" className="mb-4 border border-warning-300 bg-warning-50">
+      <CardBody className="flex flex-row items-start gap-3 py-3">
+        <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
+        <div className="text-sm">
+          <p className="font-semibold text-warning-700">This page is being retired.</p>
+          <p className="text-default-700 mt-1">
+            All settings here have been moved to{' '}
+            <Link to={tenantPath('/admin/settings')} className="font-medium text-primary underline">
+              Admin Settings
+            </Link>
+            . Please use that page going forward — this one will be removed shortly.
+          </p>
+        </div>
+      </CardBody>
+    </Card>
+  ) : null;
+
+  const headerNode = embedded ? null : (
+    <PageHeader title={"System Configuration"} description={"Edit platform-wide configuration values"} />
+  );
+
   if (loading) {
     return (
       <div>
-        <PageHeader title={"System Config"} description={"View and manage system configuration keys"} />
+        {deprecationBanner}
+        {headerNode}
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -603,11 +717,12 @@ export function SystemConfig() {
   if (loadError) {
     return (
       <div>
-        <PageHeader title={"System Config"} description={"View and manage system configuration keys"} />
+        {deprecationBanner}
+        {headerNode}
         <Card shadow="sm" className="border-danger-200 bg-danger-50">
           <CardBody className="text-center py-12">
-            <p className="text-danger font-medium mb-3">{"Failed to load configuration"}</p>
-            <p className="text-sm text-default-500 mb-4">{"Server Error Config Warning"}</p>
+            <p className="text-danger font-medium mb-3">{"Failed to load settings"}</p>
+            <p className="text-sm text-default-500 mb-4">{"We couldn't reach the configuration service. Check your connection and try again."}</p>
             <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
               {"Retry"}
             </Button>
@@ -617,47 +732,54 @@ export function SystemConfig() {
     );
   }
 
-  const unknownKeys = getUnknownKeys();
+  const managedElsewhereKeys = getManagedElsewhereKeys();
 
   // ── Render ────────────────────────────────────────────────────────────
 
+  const actionsNode = (
+    <div className="flex gap-2 flex-wrap">
+      <Button
+        variant="flat"
+        startContent={<RefreshCw size={16} />}
+        onPress={loadData}
+        size="sm"
+      >
+        {"Reload"}
+      </Button>
+      <Button
+        variant="flat"
+        color="danger"
+        startContent={<RotateCcw size={16} />}
+        onPress={() => setShowResetModal(true)}
+        size="sm"
+      >
+        {"Reset to Defaults"}
+      </Button>
+      <Button
+        color="primary"
+        startContent={<Save size={16} />}
+        onPress={handleSave}
+        isLoading={saving}
+        isDisabled={!hasChanges || Object.keys(errors).length > 0}
+        size="sm"
+      >
+        {"Save Changes"}
+      </Button>
+    </div>
+  );
+
   return (
     <div>
-      <PageHeader
-        title={"System Config"}
-        description={"View and manage system configuration keys"}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              variant="flat"
-              startContent={<RefreshCw size={16} />}
-              onPress={loadData}
-              size="sm"
-            >
-              {"Reload"}
-            </Button>
-            <Button
-              variant="flat"
-              color="danger"
-              startContent={<RotateCcw size={16} />}
-              onPress={() => setShowResetModal(true)}
-              size="sm"
-            >
-              {"Reset to Defaults"}
-            </Button>
-            <Button
-              color="primary"
-              startContent={<Save size={16} />}
-              onPress={handleSave}
-              isLoading={saving}
-              isDisabled={!hasChanges || Object.keys(errors).length > 0}
-              size="sm"
-            >
-              {"Save Changes"}
-            </Button>
-          </div>
-        }
-      />
+      {deprecationBanner}
+      {embedded ? (
+        <div className="flex justify-end mb-3">{actionsNode}</div>
+      ) : (
+        <PageHeader
+          title={"System Configuration"}
+          description={"Edit platform-wide configuration values"}
+          actions={actionsNode}
+        />
+      )}
 
       <div className="space-y-6">
         {configSchema.map((group) => (
@@ -679,59 +801,72 @@ export function SystemConfig() {
           </Card>
         ))}
 
-        {/* Unknown / custom keys not in schema */}
-        {unknownKeys.length > 0 && (
+        {/* Other settings managed by dedicated admin pages.
+            Renders a row per known stored key with a "Manage" button routing
+            to the page that owns that key. Unknown/unmapped keys are hidden
+            (admins can't act on them from here). */}
+        {managedElsewhereKeys.length > 0 && (
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-3 pb-1">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-warning/10 text-warning">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
                 <Settings2 size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-foreground">{"Advanced Custom Settings"}</h3>
+                <h3 className="text-base font-semibold text-foreground">{"Other platform settings"}</h3>
                 <p className="text-xs text-default-400">
-                  {"Custom Settings."}
+                  {"These are configured on their own dedicated admin pages."}
                 </p>
               </div>
             </CardHeader>
-            <CardBody className="px-5 pb-4 pt-2 space-y-3">
-              {unknownKeys.map((key) => {
-                const rawValue = edited[key];
-                const displayValue = typeof rawValue === 'object' && rawValue !== null
-                  ? JSON.stringify(rawValue, null, 2)
-                  : String(rawValue ?? '');
-                return (
-                  <div key={key} className="flex items-start gap-3">
-                    <div className="w-48 shrink-0 pt-2">
-                      <span className="text-sm font-mono font-medium text-default-600">{key}</span>
+            <CardBody className="px-5 pb-4 pt-2">
+              <div className="divide-y divide-default-100">
+                {managedElsewhereKeys.map((key) => {
+                  const entry = MANAGED_ELSEWHERE[key];
+                  return (
+                    <div key={key} className="flex items-center justify-between gap-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{entry.label}</p>
+                        <p className="text-xs text-default-500 mt-0.5">{entry.description}</p>
+                      </div>
+                      <Button
+                        as={Link}
+                        to={tenantPath(entry.href)}
+                        size="sm"
+                        variant="flat"
+                        color="primary"
+                        endContent={<ArrowRight size={14} />}
+                      >
+                        {`Manage in ${entry.destLabel}`}
+                      </Button>
                     </div>
-                    <Input
-                      value={displayValue}
-                      isReadOnly
-                      aria-label={key}
-                      variant="bordered"
-                      size="sm"
-                      className="flex-1"
-                      description={"Managed by Other Pages"}
-                    />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </CardBody>
           </Card>
         )}
       </div>
 
       {/* Reset confirmation modal */}
-      <Modal isOpen={showResetModal} onOpenChange={setShowResetModal} size="sm">
+      <Modal isOpen={showResetModal} onOpenChange={setShowResetModal} size="md">
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {"Reset Configuration"}
+                {"Reset configuration to defaults?"}
               </ModalHeader>
               <ModalBody>
+                <p className="text-sm text-default-700">
+                  {"This restores all platform configuration to its default values."}
+                </p>
                 <p className="text-sm text-default-600">
-                  {"Reset Config Confirm"}
+                  {"Will be cleared: registration mode, email verification, admin approval, footer text, default locale, timezone, welcome message, wallet, content, notifications, and limits settings."}
+                </p>
+                <p className="text-sm text-default-600">
+                  {"Will be preserved: site name, description, contact details, default currency, and maintenance mode (CLI-managed)."}
+                </p>
+                <p className="text-sm font-medium text-danger">
+                  {"This action cannot be undone."}
                 </p>
               </ModalBody>
               <ModalFooter>
