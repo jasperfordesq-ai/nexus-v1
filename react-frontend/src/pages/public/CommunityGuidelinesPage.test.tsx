@@ -118,16 +118,17 @@ describe('CommunityGuidelinesPage', () => {
     expect(screen.getByText('Community Guidelines')).toBeInTheDocument();
   });
 
-  it('renders not-available message when no custom document', () => {
+  it('renders default v1.0 sections when no custom document', () => {
     mockUseLegalDocument.mockReturnValue({ document: null, loading: false });
     render(<CommunityGuidelinesPage />);
-    expect(screen.getByText(/community guidelines have not been published yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/Be kind and respectful/i)).toBeInTheDocument();
+    expect(screen.getByText(/Report concerns/i)).toBeInTheDocument();
+    expect(screen.getByText(/What happens when guidelines are broken/i)).toBeInTheDocument();
   });
 
-  it('renders Contact Us and All Legal Documents links', () => {
+  it('includes the version label on the default fallback', () => {
     mockUseLegalDocument.mockReturnValue({ document: null, loading: false });
     render(<CommunityGuidelinesPage />);
-    expect(screen.getByText('Contact Us')).toBeInTheDocument();
-    expect(screen.getByText('All Legal Documents')).toBeInTheDocument();
+    expect(screen.getByText(/Version 1\.0/i)).toBeInTheDocument();
   });
 });

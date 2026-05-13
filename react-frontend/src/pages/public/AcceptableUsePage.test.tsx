@@ -118,16 +118,17 @@ describe('AcceptableUsePage', () => {
     expect(screen.getByText('Acceptable Use Policy')).toBeInTheDocument();
   });
 
-  it('renders not-available message when no custom document', () => {
+  it('renders default v1.0 sections when no custom document', () => {
     mockUseLegalDocument.mockReturnValue({ document: null, loading: false });
     render(<AcceptableUsePage />);
-    expect(screen.getByText(/acceptable use policy has not been published yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/No illegal activity/i)).toBeInTheDocument();
+    expect(screen.getByText(/No fraud or impersonation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Enforcement/i)).toBeInTheDocument();
   });
 
-  it('renders Contact Us and All Legal Documents links', () => {
+  it('includes the version label on the default fallback', () => {
     mockUseLegalDocument.mockReturnValue({ document: null, loading: false });
     render(<AcceptableUsePage />);
-    expect(screen.getByText('Contact Us')).toBeInTheDocument();
-    expect(screen.getByText('All Legal Documents')).toBeInTheDocument();
+    expect(screen.getByText(/Version 1\.0/i)).toBeInTheDocument();
   });
 });
