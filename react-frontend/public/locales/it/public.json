@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Comunità",
-        "description": "Si connetta con fornitori di servizi locali"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Istantaneo",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Costruire fiducia",
-          "description": "Recensioni e valutazioni La aiutano a trovare fornitori di servizi affidabili e a costruire la Sua reputazione nella comunità."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Restare locali",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Pronto per iniziare?",
-      "description": "Si unisca a migliaia di membri della comunità che stanno già scambiando competenze e costruendo connessioni significative.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Crei il Suo account gratuito"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Sicurezza enterprise — CSRF, rate limiting, TOTP 2FA e autenticazione passwordless WebAuthn",
       "platform_item2": "Conformità GDPR — richieste dati, gestione consenso, tracciamento violazioni e registro audit",
       "platform_item3": "Rilevamento frodi e abusi — avvisi automatici di attività sospette e moderazione contenuti",
-      "platform_item4": "Conformità accessibilità WCAG 2.1 AA",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 lingue — inglese, irlandese, tedesco, francese, italiano, portoghese e spagnolo",
       "platform_item6": "Pannello di amministrazione — configurazione tenant, gestione utenti, analisi e moderazione",
       "platform_item7": "Controlli algoritmici — dashboard di salute in tempo reale e tuning di tutti i sistemi di ranking",

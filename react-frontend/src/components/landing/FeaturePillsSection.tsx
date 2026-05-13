@@ -43,7 +43,7 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
           {
             Icon: Users,
             title: t('home.features.1.title', 'Community'),
-            description: t('home.features.1.description', 'Connect with local service providers'),
+            description: t('home.features.1.description', 'Connect with neighbours offering help'),
           },
           {
             Icon: Zap,

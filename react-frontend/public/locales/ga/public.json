@@ -17,7 +17,7 @@
       },
       "1": {
         "title": "Pobal",
-        "description": "Ceangail le soláthraithe seirbhíse áitiúla"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Láithreach",
@@ -63,7 +63,7 @@
         },
         "1": {
           "title": "Tóg Muinín",
-          "description": "Cabhraíonn athbhreithnithe agus rátálacha leat soláthraithe seirbhíse iontaofa a aimsiú agus do chlú sa phobal a thógáil."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Fan Áitiúil",
@@ -73,7 +73,7 @@
     },
     "cta_section": {
       "title": "Réidh le tosú?",
-      "description": "Bí páirteach leis na mílte ball pobail atá cheana féin ag malartú scileanna agus ag tógáil naisc fhiúntacha.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Cruthaigh Do Chuntas Saor in Aisce"
     },
     "meta_title": "Community Timebanking Platform"
@@ -442,7 +442,7 @@
       "platform_item1": "Slándáil fiontraíochta — CSRF, teorannú ráta, TOTP 2FA, agus fíordheimhniú gan pasfhocal WebAuthn",
       "platform_item2": "Comhlíonadh GDPR — iarratais sonraí, bainistíocht toiliú, rianú sáruithe, agus loga iniúchóireachta",
       "platform_item3": "Braite calaoise agus mí-úsáide — foláirimh ghníomhaíochta amhrasacha uathoibríocha agus modhnóireacht ábhair",
-      "platform_item4": "Comhlíonadh inrochtaineachta WCAG 2.1 AA",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 teanga — Béarla, Gaeilge, Gearmáinis, Fraincis, Iodáilis, Portaingéilis, agus Spáinnis",
       "platform_item6": "Painéal riaracháin — cumraíocht tionónta, bainistíocht úsáideoirí, anailísíocht agus modhnóireacht",
       "platform_item7": "Rialuithe algartaim — deais sláinte beo agus tiúnadh do gach córas rangaithe",

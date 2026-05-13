@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Community",
-        "description": "Connect with local service providers"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Instant",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Build Trust",
-          "description": "Reviews and ratings help you find reliable service providers and build your reputation in the community."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Stay Local",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Ready to get started?",
-      "description": "Join thousands of community members who are already exchanging skills and building meaningful connections.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Create Your Free Account"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, CORS allowlist, and Form Request validation",
       "platform_item2": "GDPR compliance — data requests, consent management, breach tracking, and audit log",
       "platform_item3": "Fraud and abuse detection — automated suspicious activity alerts and content moderation",
-      "platform_item4": "WCAG 2.1 AA accessibility compliance",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "11 languages — English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and Arabic (with full RTL support)",
       "platform_item6": "Admin panel — tenant configuration, user management, analytics, and moderation",
       "platform_item7": "Algorithm controls — live health dashboard and tuning for all ranking systems",

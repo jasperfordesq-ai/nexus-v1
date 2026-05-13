@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Community",
-        "description": "Verbind met lokale dienstverleners"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Instant",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Bouw Vertrouwen",
-          "description": "Beoordelingen en waarderingen helpen je betrouwbare dienstverleners te vinden en je reputatie in de gemeenschap op te bouwen."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Blijf Lokaal",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Klaar om te beginnen?",
-      "description": "Sluit je aan bij duizenden gemeenschapsleden die al vaardigheden uitwisselen en betekenisvolle verbindingen opbouwen.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Maak Je Gratis Account Aan"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
       "platform_item2": "GDPR-naleving — gegevensverzoeken, toestemmingsbeheer, inbreuktracking en auditlog",
       "platform_item3": "Fraude- en misbruikdetectie — geautomatiseerde waarschuwingen voor verdachte activiteiten en inhoudsmoderatie",
-      "platform_item4": "WCAG 2.1 AA toegankelijkheidsnaleving",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
       "platform_item6": "Beheerderspaneel — configuratie voor huurders, gebruikersbeheer, analytics en moderatie",
       "platform_item7": "Algoritmecontroles — live gezondheidsdashboard en afstemming voor alle rangschikkingssystemen",

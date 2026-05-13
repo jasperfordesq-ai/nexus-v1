@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Community",
-        "description": "Połącz się z lokalnymi dostawcami usług"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Instant",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Buduj Zaufanie",
-          "description": "Opinie i oceny pomagają znaleźć wiarygodnych dostawców usług i budować swoją reputację w społeczności."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Zostań Lokalny",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Gotowy, aby zacząć?",
-      "description": "Dołącz do tysięcy członków społeczności, którzy już wymieniają umiejętności i budują znaczące połączenia.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Utwórz swoje darmowe konto"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
       "platform_item2": "Zgodność z RODO — żądania danych, zarządzanie zgodą, śledzenie naruszeń i dziennik audytu",
       "platform_item3": "Wykrywanie oszustw i nadużyć — zautomatyzowane powiadomienia o podejrzanej aktywności i moderacja treści",
-      "platform_item4": "Zgodność z WCAG 2.1 AA",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
       "platform_item6": "Panel administracyjny — konfiguracja najemcy, zarządzanie użytkownikami, analityka i moderacja",
       "platform_item7": "Kontrola algorytmu — pulpit zdrowia na żywo i dostosowywanie dla wszystkich systemów rankingowych",

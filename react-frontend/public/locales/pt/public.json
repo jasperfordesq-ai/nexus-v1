@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Comunidade",
-        "description": "Conecte-se com prestadores de serviços locais"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Instantâneo",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Construir Confiança",
-          "description": "Avaliações e classificações ajudam a encontrar prestadores de serviço fiáveis e a construir a sua reputação na comunidade."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Ficar Local",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Pronto para começar?",
-      "description": "Junte-se a milhares de membros da comunidade que já estão a trocar competências e a construir conexões significativas.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Criar a Sua Conta Gratuita"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Segurança empresarial — CSRF, limitação de taxa, TOTP 2FA e autenticação sem senha WebAuthn",
       "platform_item2": "Conformidade RGPD — pedidos de dados, gestão de consentimento, rastreio de violações e registo de auditoria",
       "platform_item3": "Deteção de fraude e abuso — alertas automáticos de atividade suspeita e moderação de conteúdo",
-      "platform_item4": "Conformidade de acessibilidade WCAG 2.1 AA",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 idiomas — inglês, irlandês, alemão, francês, italiano, português e espanhol",
       "platform_item6": "Painel de administração — configuração de tenant, gestão de utilizadores, análises e moderação",
       "platform_item7": "Controlos algorítmicos — dashboard de saúde em direto e ajuste de todos os sistemas de classificação",

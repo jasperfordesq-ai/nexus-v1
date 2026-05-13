@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Community",
-        "description": "تواصل مع مقدمي الخدمات المحليين"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Instant",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "بناء الثقة",
-          "description": "المراجعات والتقييمات تساعدك في العثور على مقدمي خدمات موثوقين وبناء سمعتك في المجتمع."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "ابق محليًا",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "هل أنت مستعد للبدء؟",
-      "description": "انضم إلى آلاف الأعضاء في المجتمع الذين يتبادلون المهارات ويبنون علاقات ذات مغزى.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "أنشئ حسابك المجاني"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
       "platform_item2": "امتثال GDPR - طلبات البيانات، إدارة الموافقة، تتبع الانتهاكات، وسجل التدقيق",
       "platform_item3": "كشف الاحتيال وسوء الاستخدام - تنبيهات تلقائية للنشاط المشبوه وإدارة المحتوى",
-      "platform_item4": "امتثال WCAG 2.1 AA للوصول",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
       "platform_item6": "لوحة الإدارة - تكوين المستأجر، إدارة المستخدمين، التحليلات، والإشراف",
       "platform_item7": "تحكمات الخوارزمية - لوحة معلومات صحية حية وضبط لجميع أنظمة الترتيب",

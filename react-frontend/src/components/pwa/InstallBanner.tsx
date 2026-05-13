@@ -80,6 +80,7 @@ export function InstallBanner() {
         role="region"
         aria-label={t('install.banner_aria', 'Install app banner')}
         className="relative z-20 mx-3 mt-3 sm:mx-6 sm:mt-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 py-3 flex items-center gap-3"
+        data-nosnippet
       >
         <div className="shrink-0 w-9 h-9 rounded-lg bg-indigo-500/20 inline-flex items-center justify-center">
           <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />

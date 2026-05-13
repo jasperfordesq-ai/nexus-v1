@@ -64,6 +64,7 @@ export function CookieConsentBanner() {
         role="dialog"
         aria-label={t('cookie_consent.banner_label', 'Cookie consent')}
         aria-modal="false"
+        data-nosnippet
       >
         <div
           className="max-w-3xl mx-auto rounded-2xl border border-[var(--glass-border)] shadow-lg"

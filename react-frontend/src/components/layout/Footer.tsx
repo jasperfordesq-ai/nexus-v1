@@ -47,7 +47,7 @@ export function Footer({ children, copyright }: FooterProps) {
   const contact = tenant?.contact;
 
   return (
-    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm">
+    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
       <div className="md:hidden px-4 py-4 pb-[calc(var(--safe-area-bottom)+5rem)] text-center">
         <div className="flex flex-col items-center gap-2">
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />

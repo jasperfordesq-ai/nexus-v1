@@ -50,7 +50,7 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
             title: t('home.why_timebanking.values.1.title', 'Build Trust'),
             description: t(
               'home.why_timebanking.values.1.description',
-              'Reviews and ratings help you find reliable service providers and build your reputation in the community.',
+              'Reviews and ratings help you find reliable community members and build your reputation in the community.',
             ),
             gradient: 'from-purple-500 to-pink-500',
           },

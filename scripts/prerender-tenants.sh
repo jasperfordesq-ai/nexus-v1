@@ -63,6 +63,17 @@ PUBLIC_ROUTES=(
     "/platform/disclaimer"
     "/resources"
     "/development-status"
+    # Feature-gated public discovery routes. These were missing from the
+    # prerender list, so unauthenticated crawlers were getting an empty SPA
+    # shell on important discovery pages (2026-05-13 audit).
+    "/events"
+    "/groups"
+    "/jobs"
+    "/marketplace"
+    "/volunteering"
+    "/pilot-inquiry"
+    "/pilot-apply"
+    "/developers"
     # Tenant-gated routes (TenantSlugGate). For tenants that don't match the
     # gate, React Router renders a fallback — that fallback is what gets
     # prerendered. Either way, bots no longer hit an empty SPA shell.

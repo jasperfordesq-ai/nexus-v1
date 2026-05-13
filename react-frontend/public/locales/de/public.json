@@ -18,7 +18,7 @@
       },
       "1": {
         "title": "Gemeinschaft",
-        "description": "Verbinden Sie sich mit lokalen Dienstleistern"
+        "description": "Connect with neighbours offering help"
       },
       "2": {
         "title": "Sofort",
@@ -64,7 +64,7 @@
         },
         "1": {
           "title": "Vertrauen aufbauen",
-          "description": "Bewertungen und Beurteilungen helfen Ihnen, zuverlässige Dienstleister zu finden und Ihren Ruf in der Gemeinschaft aufzubauen."
+          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
         },
         "2": {
           "title": "Lokal bleiben",
@@ -74,7 +74,7 @@
     },
     "cta_section": {
       "title": "Bereit loszulegen?",
-      "description": "Treten Sie Tausenden von Gemeinschaftsmitgliedern bei, die bereits Fähigkeiten austauschen und bedeutungsvolle Verbindungen aufbauen.",
+      "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Erstellen Sie Ihr kostenloses Konto"
     }
   },
@@ -446,7 +446,7 @@
       "platform_item1": "Unternehmenssicherheit — CSRF, Ratenbegrenzung, TOTP 2FA und WebAuthn-Passwortlose-Authentifizierung",
       "platform_item2": "DSGVO-Compliance — Datenanfragen, Einwilligungsverwaltung, Datenpannenverfolgung und Prüfprotokoll",
       "platform_item3": "Betrugs- und Missbrauchserkennung — automatische Verdachtsbenachrichtigungen und Content-Moderation",
-      "platform_item4": "WCAG 2.1 AA Barrierefreiheits-Compliance",
+      "platform_item4": "WCAG 2.1 AA accessibility — targeted standard; the platform is currently partially conformant while audits continue",
       "platform_item5": "7 Sprachen — Englisch, Irisch, Deutsch, Französisch, Italienisch, Portugiesisch und Spanisch",
       "platform_item6": "Admin-Panel — Mandantenkonfiguration, Benutzerverwaltung, Analytik und Moderation",
       "platform_item7": "Algorithmus-Steuerung — Live-Health-Dashboard und Tuning aller Ranking-Systeme",
