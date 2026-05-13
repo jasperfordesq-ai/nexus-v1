@@ -249,10 +249,28 @@
                             @endif
                         @endforeach
                     @endif
-                    @if (!empty($item['image_url']))
-                        <p class="govuk-body">
-                            <img src="{{ $item['image_url'] }}" alt="{{ __('govuk_alpha.feed.image_alt', ['title' => $itemTitle]) }}" class="nexus-alpha-feed-image" loading="lazy">
-                        </p>
+                    @php
+                        $itemMedia = $item['media'] ?? [];
+                        if (empty($itemMedia) && !empty($item['image_url'])) {
+                            $itemMedia = [['file_url' => $item['image_url'], 'thumbnail_url' => null, 'alt_text' => null]];
+                        }
+                    @endphp
+                    @if (!empty($itemMedia))
+                        <ul class="nexus-alpha-feed-media govuk-list">
+                            @foreach ($itemMedia as $media)
+                                @php
+                                    $mediaUrl = $media['file_url'] ?? null;
+                                    $altText = !empty($media['alt_text'])
+                                        ? $media['alt_text']
+                                        : __('govuk_alpha.feed.image_alt', ['title' => $itemTitle]);
+                                @endphp
+                                @if ($mediaUrl)
+                                    <li>
+                                        <img src="{{ $mediaUrl }}" alt="{{ $altText }}" class="nexus-alpha-feed-image" loading="lazy">
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
                     @endif
                     <p class="govuk-body-s nexus-alpha-meta">
                         {{ trans_choice('govuk_alpha.feed.likes', $likeCount, ['count' => $likeCount]) }}

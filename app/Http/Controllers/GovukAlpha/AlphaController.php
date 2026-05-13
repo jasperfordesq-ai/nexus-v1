@@ -709,7 +709,7 @@ class AlphaController extends Controller
                     'subtype' => $subtype,
                     'cursor' => $request->query('cursor'),
                 ]);
-                $items = $result['items'] ?? [];
+                $items = $this->attachPostMedia($result['items'] ?? []);
                 $meta = [
                     'has_more' => (bool) ($result['has_more'] ?? false),
                     'cursor' => $result['cursor'] ?? null,
@@ -821,6 +821,53 @@ class AlphaController extends Controller
         }
 
         return $this->redirectToFeed($request, $tenantSlug, 'comment-created', $targetType, $id);
+    }
+
+    /**
+     * Enrich feed post items with their attached images from post_media.
+     * FeedService leaves top-level posts without media; the accessible
+     * frontend has no API client, so we load it here.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, array<string, mixed>>
+     */
+    private function attachPostMedia(array $items): array
+    {
+        $postIds = [];
+        foreach ($items as $item) {
+            if (($item['type'] ?? null) === 'post' && !empty($item['id'])) {
+                $postIds[] = (int) $item['id'];
+            }
+        }
+        if ($postIds === []) {
+            return $items;
+        }
+
+        $rows = DB::table('post_media')
+            ->whereIn('post_id', $postIds)
+            ->where('media_type', 'image')
+            ->orderBy('post_id')
+            ->orderBy('display_order')
+            ->orderBy('id')
+            ->get(['post_id', 'file_url', 'thumbnail_url', 'alt_text']);
+
+        $mediaByPost = [];
+        foreach ($rows as $row) {
+            $mediaByPost[(int) $row->post_id][] = [
+                'file_url' => $row->file_url,
+                'thumbnail_url' => $row->thumbnail_url,
+                'alt_text' => $row->alt_text,
+            ];
+        }
+
+        foreach ($items as &$item) {
+            if (($item['type'] ?? null) === 'post' && !empty($item['id'])) {
+                $item['media'] = $mediaByPost[(int) $item['id']] ?? [];
+            }
+        }
+        unset($item);
+
+        return $items;
     }
 
     /**

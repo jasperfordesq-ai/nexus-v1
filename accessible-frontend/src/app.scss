@@ -170,6 +170,25 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   border-radius: 4px;
 }
 
+.nexus-alpha-feed-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  padding: 0;
+  margin: 0 0 govuk-spacing(3) 0;
+  list-style: none;
+
+  li {
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
+  img {
+    max-height: 480px;
+    width: auto;
+  }
+}
+
 .nexus-alpha-listing-row__action {
   min-width: 120px;
   text-align: right;
