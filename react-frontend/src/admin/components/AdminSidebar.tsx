@@ -631,7 +631,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
   const sections = useAdminNav();
   const location = useLocation();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const brokerPanelLabel = t('broker_panel');
   const caringPanelLabel = t('caring_community');
 
