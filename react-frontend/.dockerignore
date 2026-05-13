@@ -51,6 +51,9 @@ Dockerfile.prod
 
 # Misc
 *.md
+# Exception: CHANGELOG.md is staged into the build context by bluegreen-deploy.sh
+# (and read at build time by scripts/copy-changelog.mjs) for the /changelog page.
+!CHANGELOG.md
 LICENSE
 .eslintcache
 .prettierrc
