@@ -362,7 +362,9 @@
     "cta_title": "Questions sur nos politiques ?",
     "cta_body": "Si vous avez des questions sur nos documents juridiques, nos pratiques en matiere de donnees, ou si vous souhaitez exercer vos droits RGPD, veuillez nous contacter.",
     "contact_team": "Contacter notre equipe",
-    "privacy_policy_link": "Politique de confidentialite"
+    "privacy_policy_link": "Politique de confidentialite",
+    "doc_trust_safety_title": "Trust & Safety",
+    "doc_trust_safety_desc": "Plain-English guide to how exchanges work, what we do to keep the community safe, what we don’t, and how to report a safeguarding concern."
   },
   "version_history": {
     "page_title": "Historique des versions",
@@ -475,6 +477,92 @@
     "legal_version_history": {
       "title": "Historique des versions légales",
       "description": "Historique des versions de nos documents et politiques légales."
+    },
+    "trust_safety": {
+      "title": "Trust & Safety",
+      "description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding."
     }
+  },
+  "trust_safety": {
+    "page_title": "Trust & Safety",
+    "meta_description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding.",
+    "heading": "Trust & Safety",
+    "subtitle": "{{name}} connects neighbours so they can share skills using time credits. This page explains how that works in practice — what the platform does, what it doesn’t, and how you can stay safe.",
+    "safeguarding_title": "Report a safeguarding concern",
+    "safeguarding_body": "If you’re worried about a member, an exchange, or something you’ve seen on the platform, please tell us. We respond to safeguarding reports within one working day.",
+    "safeguarding_step_1": "Use the Report button on the relevant listing, message, or profile.",
+    "safeguarding_step_2": "Or email us via the Contact page — mark the subject as “Safeguarding”.",
+    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
+    "how_exchanges_title": "How an exchange works",
+    "how_exchanges_intro": "Every exchange follows the same simple flow. There is no money involved — just time credits.",
+    "how_exchanges_steps": {
+      "0": "Find a member offering what you need, or post a request describing what you’re looking for.",
+      "1": "Message them through the platform to agree the details — time, place, and what’s involved.",
+      "2": "Complete the exchange. You only meet in person if you both want to.",
+      "3": "Log the hours. Both members confirm — that’s the receipt.",
+      "4": "Time credits transfer automatically. One hour of help = one time credit, no matter what skill was shared."
+    },
+    "what_we_do_title": "What the platform does",
+    "what_we_do_items": {
+      "0": "Verifies every member’s email address at registration; offers optional photo-ID verification with a Verified Member badge for those who want extra trust signals.",
+      "1": "Shows reviews and ratings on member profiles so the community can see who’s been a reliable exchange partner.",
+      "2": "Asks every member to accept our Community Guidelines and Acceptable Use Policy at signup, and to keep to them while they’re here.",
+      "3": "Gives every listing, message, and profile a Report button that goes straight to coordinators.",
+      "4": "Has human coordinators who can mediate, support, and step in when something goes wrong.",
+      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
+    },
+    "what_we_dont_title": "What the platform doesn’t do",
+    "what_we_dont_intro": "Timebanking is built on neighbours helping neighbours, not on us standing between you. That’s a feature, not a bug — but it does mean we need to be clear about our limits.",
+    "what_we_dont_items": {
+      "0": "We don’t vet, train, or certify members for specific services. We’re not a recruitment agency.",
+      "1": "We don’t provide insurance coverage for the work members do for each other.",
+      "2": "We don’t supervise exchanges or act as anyone’s employer or service provider.",
+      "3": "We don’t guarantee any specific outcome, level of skill, or punctuality. Reviews are how the community keeps itself accountable."
+    },
+    "precautions_title": "Sensible precautions for a first exchange",
+    "precautions_intro": "You’d apply the same common sense here as you would meeting anyone new through a community group.",
+    "precautions_items": {
+      "0": "Meet in a public place the first time, or bring a friend if you’re inviting someone to your home.",
+      "1": "Read the other member’s reviews and check how long they’ve been on the platform.",
+      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
+      "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
+    },
+    "vetting_title": "Garda vetting",
+    "vetting_body": "Some exchanges — childcare, elderly care, support for vulnerable adults — legally require Garda vetting in Ireland. Members offering these services are responsible for holding current vetting, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf.",
+    "insurance_title": "Insurance and liability",
+    "insurance_items": {
+      "0": "{{name}} carries platform liability insurance for the running of the website and coordinator activity.",
+      "1": "Members are NOT covered by our insurance for the work they do for each other. Exchanges are between members.",
+      "2": "If you offer professional services (plumbing, electrical, healthcare, legal, financial advice), you’re responsible for your own professional indemnity and any regulatory obligations that apply.",
+      "3": "Time credits have no monetary value. They can’t be exchanged for cash, sold, or used outside the timebanking community."
+    },
+    "disputes_title": "When something goes wrong",
+    "disputes_intro": "Most disagreements can be sorted out between members. If they can’t, we’ll help.",
+    "disputes_steps": {
+      "0": "Try first to resolve it directly through messages — most misunderstandings are just that.",
+      "1": "If that doesn’t work, contact a coordinator via the Contact page. Coordinators can mediate.",
+      "2": "If a member breaches our Community Guidelines, we take action — warnings, mediation, suspension, or removal, depending on severity.",
+      "3": "Time-credit disputes (hours logged in error, etc.) are reviewed by an admin who can adjust balances on either side."
+    },
+    "responsibilities_title": "Your responsibilities as a member",
+    "responsibilities_intro": "By using {{name}} you agree to:",
+    "responsibilities_items": {
+      "0": "Treat other members with respect (Community Guidelines).",
+      "1": "Be honest about your skills, qualifications, and limitations.",
+      "2": "Show up when you commit, or cancel with reasonable notice.",
+      "3": "Log hours fairly — for the time actually given.",
+      "4": "Use the platform only for community time exchanges, not paid work, sales solicitation, or anything illegal (Acceptable Use Policy)."
+    },
+    "rights_title": "Your rights",
+    "rights_items": {
+      "0": "Leave at any time and request your data be deleted (GDPR).",
+      "1": "Block other members so they can’t contact you.",
+      "2": "Make your profile invisible to search or browsing.",
+      "3": "Opt out of all optional cookies, analytics, and email notifications."
+    },
+    "contact_cta_title": "Have a question we haven’t answered?",
+    "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
+    "contact_cta_button": "Contact us",
+    "community_guidelines_link": "Read the Community Guidelines"
   }
 }

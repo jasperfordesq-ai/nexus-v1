@@ -55,6 +55,7 @@ PUBLIC_ROUTES=(
     "/accessibility"
     "/cookies"
     "/community-guidelines"
+    "/trust-and-safety"
     "/acceptable-use"
     "/legal"
     "/timebanking-guide"

@@ -128,6 +128,7 @@ export function Footer({ children, copyright }: FooterProps) {
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/help')}>{t('footer.help_center')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/kb')}>{t('nav.knowledge_base', 'Knowledge Base')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/trust-and-safety')}>{t('footer.trust_safety', 'Trust & Safety')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/contact')}>{t('footer.contact_us')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>{t('footer.about')}</FooterLink></li>
                   <li>

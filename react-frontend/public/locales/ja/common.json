@@ -259,7 +259,8 @@
     "built_on_nexus": "Project NEXUS上に構築 — オープンソースコミュニティプラットフォーム",
     "agpl_notice": "AGPL-3.0 — 著作権 © 2024–{{year}} ジャスパー・フォード",
     "terms": "利用規約",
-    "privacy": "プライバシー"
+    "privacy": "プライバシー",
+    "trust_safety": "Trust & Safety"
   },
   "mobile_tab": {
     "create": "作成",

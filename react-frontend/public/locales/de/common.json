@@ -259,7 +259,8 @@
     "built_on_nexus": "Erstellt auf Project NEXUS — Open-Source-Gemeinschaftsplattform",
     "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
     "terms": "AGB",
-    "privacy": "Datenschutz"
+    "privacy": "Datenschutz",
+    "trust_safety": "Trust & Safety"
   },
   "mobile_tab": {
     "create": "Erstellen",

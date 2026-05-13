@@ -11,6 +11,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -27,9 +28,27 @@ import { logError } from '@/lib/logger';
 
 export function ContactPage() {
   const { t } = useTranslation('public');
-  const { branding, tenantPath } = useTenant();
+  const { branding, tenantPath, tenant } = useTenant();
   const { user, isAuthenticated } = useAuth();
   usePageTitle(t('contact.title'));
+
+  // ContactPoint structured data — helps Google Knowledge Graph and Bing
+  // surface the right way to reach the organisation. Only emits a contact
+  // point if the tenant has actually configured an email or phone.
+  const contactInfo = tenant?.contact;
+  const contactPointSchema = (contactInfo?.email || contactInfo?.phone) ? {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: branding.name || 'NEXUS',
+    url: typeof window !== 'undefined' ? window.location.origin : '',
+    contactPoint: [{
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      ...(contactInfo.email ? { email: contactInfo.email } : {}),
+      ...(contactInfo.phone ? { telephone: contactInfo.phone } : {}),
+      availableLanguage: ['en', 'ga'],
+    }],
+  } : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +88,13 @@ export function ContactPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <PageMeta title={t('contact.title', { defaultValue: 'Contact Us' })} description={t('contact.meta_description', { defaultValue: 'Get in touch with our community support team.' })} />
+      {contactPointSchema && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(contactPointSchema)}
+          </script>
+        </Helmet>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

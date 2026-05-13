@@ -259,7 +259,8 @@
     "built_on_nexus": "مبني على Project NEXUS — منصة مجتمعية مفتوحة المصدر",
     "agpl_notice": "AGPL-3.0 — حقوق النشر © 2024–{{year}} Jasper Ford",
     "terms": "الشروط",
-    "privacy": "الخصوصية"
+    "privacy": "الخصوصية",
+    "trust_safety": "Trust & Safety"
   },
   "mobile_tab": {
     "create": "إنشاء",

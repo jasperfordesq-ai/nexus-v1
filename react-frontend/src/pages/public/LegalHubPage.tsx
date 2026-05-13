@@ -108,6 +108,16 @@ const legalDocumentDefs = [
     gradient: 'from-teal-500/20 to-cyan-500/20',
     updatedKey: 'hub.doc_updated_feb_2026',
   },
+  {
+    titleKey: 'hub.doc_trust_safety_title',
+    descKey: 'hub.doc_trust_safety_desc',
+    icon: ShieldCheck,
+    path: '/trust-and-safety',
+    color: 'text-emerald-500',
+    bg: 'bg-emerald-500/20',
+    gradient: 'from-emerald-500/20 to-indigo-500/20',
+    updatedKey: 'hub.doc_updated_feb_2026',
+  },
 ];
 
 export function LegalHubPage() {
