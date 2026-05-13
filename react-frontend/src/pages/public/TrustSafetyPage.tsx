@@ -79,7 +79,7 @@ export function TrustSafetyPage() {
     >
       <PageMeta
         title={t('trust_safety.page_title')}
-        description={t('trust_safety.meta_description')}
+        description={t('trust_safety.meta_description', { name: branding.name })}
       />
 
       {/* Hero */}
