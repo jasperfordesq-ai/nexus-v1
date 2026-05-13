@@ -70,6 +70,7 @@ Disallow: /exchanges
 Disallow: /group-exchanges
 
 # ── Protected federation pages ──
+Disallow: /federation
 Disallow: /federation/
 
 # ── Newsletter utility ──
@@ -83,9 +84,13 @@ Disallow: /super-admin/
 # ── System/dev pages ──
 Disallow: /development-status
 
-# ── Test/legacy routes (nginx returns 410, but prevent fresh discovery) ──
+# ── Test/legacy routes (nginx returns 410 or 301, but prevent fresh discovery) ──
 Disallow: /login-test
 Disallow: /testing
+Disallow: /account/
+Disallow: /directory/
+Disallow: /how-timebanking-works
+Disallow: /community-directory
 
 # ── API (served from same hostname on some tenant setups) ──
 Disallow: /api/
