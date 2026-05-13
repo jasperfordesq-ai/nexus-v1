@@ -892,6 +892,9 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
             type="search"
             name="admin-sidebar-search"
             autoComplete="off"
+            data-1p-ignore="true"
+            data-lpignore="true"
+            data-form-type="other"
             placeholder={t('search_nav')}
             value={searchQuery}
             onValueChange={setSearchQuery}
