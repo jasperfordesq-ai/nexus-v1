@@ -133,7 +133,7 @@ export default function EmergencyAlertBanner() {
   };
 
   return (
-    <div className="w-full flex flex-col gap-0" role="region" aria-label={t('emergency_alert.region_label')}>
+    <div className="w-full flex flex-col gap-0" role="region" aria-label={t('emergency_alert.region_label')} data-nosnippet>
       {visible.map((alert) => (
         <div
           key={alert.id}

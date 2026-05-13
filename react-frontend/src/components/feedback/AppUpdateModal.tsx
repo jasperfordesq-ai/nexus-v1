@@ -36,7 +36,7 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
       hideCloseButton={updateInfo.forceUpdate}
       size="md"
     >
-      <ModalContent>
+      <ModalContent data-nosnippet>
         <ModalHeader className="flex items-center gap-2">
           <Sparkles size={20} className="text-primary" />
           {t('update_available')}

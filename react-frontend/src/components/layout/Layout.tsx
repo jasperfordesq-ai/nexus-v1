@@ -262,7 +262,7 @@ export function AuthLayout() {
       </main>
 
       {/* Attribution (AGPL Section 7(b) — required on all pages) */}
-      <footer className="relative z-10 px-4 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center">
+      <footer className="relative z-10 px-4 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center" data-nosnippet>
         <div className="flex flex-col items-center justify-center gap-2">
           <SourceRepositoryLink inverse compact className="max-w-[18rem] justify-center" />
           <p className="text-xs text-white/55">

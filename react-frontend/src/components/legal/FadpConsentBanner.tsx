@@ -62,6 +62,7 @@ export function FadpConsentBanner() {
       className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pt-2 pointer-events-none"
       role="region"
       aria-label={t('fadp.fadp_banner_title')}
+      data-nosnippet
     >
       <div className="max-w-3xl mx-auto pointer-events-auto">
         <Card
