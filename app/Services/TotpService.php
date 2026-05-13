@@ -385,6 +385,13 @@ class TotpService
             [$userId, $tenantId, $encryptedSecret]
         );
 
+        // Keep users.totp_enabled in sync — without this, abandoning a re-setup
+        // leaves the user locked out (login requires 2FA, verify rejects it).
+        DB::update(
+            "UPDATE users SET totp_enabled = 0 WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
         $provisioningUri = self::getProvisioningUri($secret, $user->email);
         $qrCode = self::generateQrCode($provisioningUri);
 

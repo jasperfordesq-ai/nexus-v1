@@ -166,7 +166,11 @@ class AuthController extends BaseApiController
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
             // 2FA CHECK — ENFORCED FOR ALL USERS WHO HAVE IT ENABLED
-            $has2faEnabled = !empty($user['totp_enabled']) || $this->totpService->isEnabled((int)$user['id']);
+            // user_totp_settings.is_enabled is the single source of truth.
+            // The users.totp_enabled column can drift (e.g. initializeSetup resets
+            // the settings row to is_enabled=0 but leaves users.totp_enabled=1),
+            // which would gate login on 2FA the verify endpoint can't satisfy.
+            $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
             $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
 
             if ($has2faEnabled && !$isTrustedDevice) {
