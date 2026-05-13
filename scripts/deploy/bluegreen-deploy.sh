@@ -181,6 +181,19 @@ detach_if_requested() {
         return 0
     fi
 
+    # Synchronous pre-flight lock check: if another deploy is running we
+    # want the caller to see [FAIL] on stderr immediately, not buried in a
+    # detached log file after we falsely report "started in background".
+    check_lock
+    if [ -d "$LOCK_DIR" ]; then
+        local recorded_pid age
+        recorded_pid="$(cat "$LOCK_DIR/pid" 2>/dev/null || echo unknown)"
+        age=$(( $(date +%s) - $(stat -c %Y "$LOCK_DIR" 2>/dev/null || echo 0) ))
+        log_err "Another deployment is already running (PID: $recorded_pid, age: $((age / 60))m). Refusing to detach a new one."
+        log_info "Tail the active deploy: sudo bash scripts/deploy/bluegreen-deploy.sh logs -f"
+        exit 2
+    fi
+
     local child_args=("$mode")
     [ "$LARAVEL_MIGRATE" = "1" ] && child_args+=("--migrate")
     [ "$SKIP_PRERENDER" = "1" ] && child_args+=("--skip-prerender")
