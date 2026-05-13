@@ -311,7 +311,7 @@ export function MembersPage() {
 
   return (
     <div className="space-y-5">
-      <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} />
+      <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} noIndex />
       {/* Hero Banner */}
       <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
