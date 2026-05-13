@@ -21,7 +21,27 @@
 
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
+
+// Map our short language codes to OG locale codes (BCP 47 with region).
+// Google and Facebook expect e.g. en_GB / fr_FR, not the bare lang code.
+// Picked plausible defaults for each tenant region; if a tenant later
+// needs a different region (e.g. pt_BR vs pt_PT), this can be moved into
+// tenant settings.
+const OG_LOCALES: Record<string, string> = {
+  en: 'en_GB',
+  ga: 'ga_IE',
+  de: 'de_DE',
+  fr: 'fr_FR',
+  it: 'it_IT',
+  pt: 'pt_PT',
+  es: 'es_ES',
+  nl: 'nl_NL',
+  pl: 'pl_PL',
+  ja: 'ja_JP',
+  ar: 'ar_001', // Modern Standard Arabic, no region
+};
 
 interface PageMetaProps {
   /** Page title (appears before the site name suffix). */
@@ -85,6 +105,14 @@ export function PageMeta({
   const { branding: tenantBranding, tenant } = useTenant();
   const branding = tenantBranding ?? { name: 'NEXUS', tagline: '', og_image_url: '', logo: '' };
   const location = useLocation();
+  const { i18n } = useTranslation();
+
+  // Active language → OG locale (BCP 47). Falls back to en_GB if unknown.
+  const activeLang = (i18n.language || 'en').split('-')[0];
+  const ogLocale = OG_LOCALES[activeLang] || OG_LOCALES.en;
+  const ogLocaleAlternates = Object.entries(OG_LOCALES)
+    .filter(([code]) => code !== activeLang)
+    .map(([, locale]) => locale);
 
   const settings = tenant?.settings as Record<string, unknown> | undefined;
 
@@ -150,6 +178,10 @@ export function PageMeta({
           <meta property="og:image" content={ogImage} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
+          <meta property="og:locale" content={ogLocale} />
+          {ogLocaleAlternates.map((locale) => (
+            <meta key={locale} property="og:locale:alternate" content={locale} />
+          ))}
         </>
       )}
 

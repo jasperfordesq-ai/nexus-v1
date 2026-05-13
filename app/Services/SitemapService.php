@@ -310,6 +310,9 @@ class SitemapService
         foreach (['terms', 'privacy', 'cookies', 'accessibility', 'acceptable-use', 'community-guidelines'] as $page) {
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'yearly', '0.2');
         }
+        // Trust & Safety — higher priority than the legal documents because
+        // it's the prospective-member-facing safety page, not boilerplate.
+        $urls[] = $this->url($baseUrl, '/trust-and-safety', $now, 'monthly', '0.6');
         // Legal hub & version history
         $urls[] = $this->url($baseUrl, '/legal', $now, 'monthly', '0.3');
         $urls[] = $this->url($baseUrl, '/legal/history', $now, 'monthly', '0.2');

@@ -36,6 +36,16 @@ const imgClassMap = {
   lg: 'h-9 w-auto object-contain max-w-[128px] sm:max-w-[160px]',
 } as const;
 
+// Explicit intrinsic dimensions to let the browser reserve layout space
+// before the logo loads (reduces Cumulative Layout Shift). CSS still
+// controls the rendered size via the imgClassMap classes; these values
+// are the upper bounds so we never under-reserve.
+const imgDimMap = {
+  sm: { width: 140, height: 28 },
+  md: { width: 160, height: 36 },
+  lg: { width: 160, height: 36 },
+} as const;
+
 const nameClassMap = {
   sm: 'text-lg',
   md: 'text-lg sm:text-xl',
@@ -80,6 +90,8 @@ export function TenantLogo({
       alt={branding.name}
       className={`${imgClassMap[effectiveSize]} transition-all duration-200`}
       loading={size === 'sm' ? 'lazy' : 'eager'}
+      width={imgDimMap[effectiveSize].width}
+      height={imgDimMap[effectiveSize].height}
     />
   ) : (
     <Avatar

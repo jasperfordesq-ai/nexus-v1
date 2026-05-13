@@ -83,6 +83,13 @@ Disallow: /super-admin/
 # ── System/dev pages ──
 Disallow: /development-status
 
+# ── Test/legacy routes (nginx returns 410, but prevent fresh discovery) ──
+Disallow: /login-test
+Disallow: /testing
+
+# ── API (served from same hostname on some tenant setups) ──
+Disallow: /api/
+
 # Sitemap — dynamically generated, host-aware.
 # nginx rewrites this hostname to the requesting domain via sub_filter,
 # so each tenant domain (hour-timebank.ie, pairc-goodman.com, etc.) advertises
