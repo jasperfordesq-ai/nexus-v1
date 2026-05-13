@@ -6,32 +6,63 @@
 /**
  * copy-changelog.mjs
  *
- * Copies the root CHANGELOG.md into react-frontend/public/changelog.md so the
- * Vite build serves it as a static asset that the SPA can fetch and render
- * on the in-app /changelog route.
+ * Copies CHANGELOG.md into react-frontend/public/changelog.md so the Vite
+ * build serves it as a static asset for the in-app /changelog route.
  *
- * Runs as part of `prebuild` and `predev` (see package.json). Failing to find
- * the source file is a hard error — we never want the in-app changelog page
- * to silently fall back to a stale copy.
+ * Runs as part of `prebuild` and `predev`. Looks for the source in two
+ * places, in order of preference:
+ *
+ *   1. ../CHANGELOG.md  (repo root — works in local dev)
+ *   2. ./CHANGELOG.md   (frontend root — works in Docker builds when the
+ *                        deploy pipeline pre-copies it into the build ctx)
+ *
+ * If neither exists (e.g. Docker build with a narrow build context and no
+ * pre-copy step), we write a stub pointing users to the GitHub copy. We
+ * never fail the build over a missing changelog — the /changelog page
+ * already has a "View on GitHub" link as its fallback.
  */
 
-import { copyFile, mkdir, access } from 'node:fs/promises';
+import { copyFile, mkdir, writeFile, access } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '..', '..');
-const source = path.join(repoRoot, 'CHANGELOG.md');
-const target = path.resolve(__dirname, '..', 'public', 'changelog.md');
-
-try {
-  await access(source, constants.R_OK);
-} catch {
-  console.error(`copy-changelog: source not found at ${source}`);
-  process.exit(1);
-}
+const frontendRoot = path.resolve(__dirname, '..');
+const candidates = [
+  path.resolve(frontendRoot, '..', 'CHANGELOG.md'),
+  path.resolve(frontendRoot, 'CHANGELOG.md'),
+];
+const target = path.resolve(frontendRoot, 'public', 'changelog.md');
 
 await mkdir(path.dirname(target), { recursive: true });
-await copyFile(source, target);
-console.log(`copy-changelog: ${path.relative(repoRoot, source)} → ${path.relative(repoRoot, target)}`);
+
+let copied = null;
+for (const candidate of candidates) {
+  try {
+    await access(candidate, constants.R_OK);
+    await copyFile(candidate, target);
+    copied = candidate;
+    break;
+  } catch {
+    /* try next candidate */
+  }
+}
+
+if (copied) {
+  console.log(`copy-changelog: ${copied} → ${target}`);
+} else {
+  const stub = [
+    '# Changelog',
+    '',
+    'The full changelog could not be bundled into this build.',
+    '',
+    'You can read the complete, up-to-date version on GitHub:',
+    '',
+    '[CHANGELOG.md on GitHub](https://github.com/jasperfordesq-ai/nexus-v1/blob/main/CHANGELOG.md)',
+    '',
+  ].join('\n');
+  await writeFile(target, stub, 'utf8');
+  console.warn('copy-changelog: source not found in any candidate location, wrote GitHub-link stub');
+  console.warn(`copy-changelog: tried: ${candidates.join(', ')}`);
+}

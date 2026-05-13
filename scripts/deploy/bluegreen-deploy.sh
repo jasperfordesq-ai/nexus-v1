@@ -581,6 +581,16 @@ deploy_candidate() {
     export BUILD_COMMIT="${commit:0:12}"
 
     free_target_color_ports "$color" "$release_dir"
+
+    # Stage CHANGELOG.md into react-frontend/ so it's inside the Docker build
+    # context (compose.bluegreen.yml uses `context: ./react-frontend`, which
+    # excludes the repo-root CHANGELOG.md by default). The in-app /changelog
+    # page renders this file at runtime; copy-changelog.mjs picks it up here.
+    if [ -f "$release_dir/CHANGELOG.md" ]; then
+        cp "$release_dir/CHANGELOG.md" "$release_dir/react-frontend/CHANGELOG.md"
+        log_info "Staged CHANGELOG.md into react-frontend/ for in-app /changelog"
+    fi
+
     compose_for_release "$release_dir" build --no-cache app frontend sales
     compose_for_release "$release_dir" up -d --no-build app frontend sales
     wait_for_color "$color"
