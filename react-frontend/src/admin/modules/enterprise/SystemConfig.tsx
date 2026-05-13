@@ -64,6 +64,11 @@ interface ConfigSettingDef {
     max?: number;
     pattern?: string;
   };
+  /**
+   * Optional inline "Configure" link rendered next to the control. Use for
+   * master-switch settings whose full configuration lives on another page.
+   */
+  manage?: { href: string; label: string };
 }
 
 interface ConfigGroup {
@@ -112,7 +117,14 @@ function buildConfigSchema(): ConfigGroup[] {
         { key: 'require_approval', label: "Admin approval required", description: "New accounts must be approved by an admin before they can sign in.", type: 'boolean', default: false },
         { key: 'require_email_verification', label: "Require email verification", description: "Members must verify their email address before accessing the platform.", type: 'boolean', default: true },
         { key: 'maintenance_mode', label: "Maintenance mode", description: "Read-only. Toggle via scripts/maintenance.sh on the server.", type: 'boolean', default: false },
-        { key: 'onboarding_enabled', label: "Show onboarding flow", description: "Walk new members through profile and skills setup after sign-up.", type: 'boolean', default: true },
+        {
+          key: 'onboarding_enabled',
+          label: "Show onboarding flow",
+          description: "Walk new members through profile and skills setup after sign-up.",
+          type: 'boolean',
+          default: true,
+          manage: { href: '/admin/onboarding-settings', label: "Configure steps" },
+        },
         { key: 'welcome_message', label: "Welcome message", description: "Shown to new members on their first sign-in.", type: 'textarea', default: '' },
       ],
     },
@@ -210,51 +222,73 @@ const STATIC_SETTINGS: StaticSettingDef[] = [
 const SCHEMA_KEYS = new Set(STATIC_SETTINGS.map((s) => s.key));
 
 /**
- * Registry of well-known configuration keys that are stored at the platform level
- * but managed by dedicated admin pages. Used to render a "Manage" button instead
- * of a raw JSON dump in the "managed elsewhere" section.
+ * Curated list of related admin pages. Always visible — these are peer
+ * configuration pages that admins commonly reach for from the Settings page.
  */
-interface ManagedElsewhereEntry {
+interface RelatedAdminPage {
   label: string;
   description: string;
   /** Path relative to the tenant root (e.g. "/admin/federation"). Pass through tenantPath() at render. */
   href: string;
-  /** Label for the destination, e.g. "Federation". Used in the button as "Manage in {destLabel}". */
   destLabel: string;
 }
 
-const MANAGED_ELSEWHERE: Record<string, ManagedElsewhereEntry> = {
-  broker_controls: {
-    label: "Broker controls",
-    description: "Exchange workflow, messaging, and risk tagging.",
-    href: '/broker',
-    destLabel: "Broker Panel",
+const RELATED_ADMIN_PAGES: RelatedAdminPage[] = [
+  {
+    label: "Onboarding settings",
+    description: "Welcome steps, required profile fields, and skills setup for new members.",
+    href: '/admin/onboarding-settings',
+    destLabel: "Onboarding",
   },
-  federation: {
+  {
+    label: "Tenant features",
+    description: "Toggle optional modules (events, groups, gamification, blog, etc.) on or off.",
+    href: '/admin/tenant-features',
+    destLabel: "Tenant Features",
+  },
+  {
+    label: "Module configuration",
+    description: "Tune which platform modules are enabled and how they behave (beta).",
+    href: '/admin/module-configuration',
+    destLabel: "Module Configuration",
+  },
+  {
+    label: "Translation settings",
+    description: "Default language and the languages members can choose from.",
+    href: '/admin/translation-config',
+    destLabel: "Translation Settings",
+  },
+  {
+    label: "Image settings",
+    description: "Default formats, sizes, and WebP conversion behaviour.",
+    href: '/admin/image-settings',
+    destLabel: "Image Settings",
+  },
+  {
+    label: "Registration policy",
+    description: "Granular sign-up rules — invite codes, allowlisted domains, captcha.",
+    href: '/admin/settings/registration-policy',
+    destLabel: "Registration Policy",
+  },
+  {
     label: "Federation",
     description: "Inbound partnerships, auto-approval, shared categories, and partnership limits.",
     href: '/admin/federation',
     destLabel: "Federation",
   },
-  modules: {
-    label: "Modules",
-    description: "Which platform modules are enabled (listings, wallet, messages, feed, etc.).",
-    href: '/admin/tenant-features',
-    destLabel: "Tenant Features",
+  {
+    label: "Broker controls",
+    description: "Exchange workflow, messaging review, and risk tagging.",
+    href: '/broker',
+    destLabel: "Broker Panel",
   },
-  default_language: {
-    label: "Default language",
-    description: "Primary language for new members on this tenant.",
-    href: '/admin/tenant-features',
-    destLabel: "Tenant Features",
+  {
+    label: "Safeguarding options",
+    description: "Reporting flows, escalation paths, and safeguarding policies.",
+    href: '/admin/safeguarding-options',
+    destLabel: "Safeguarding",
   },
-  supported_languages: {
-    label: "Supported languages",
-    description: "Languages members can choose from.",
-    href: '/admin/tenant-features',
-    destLabel: "Tenant Features",
-  },
-};
+];
 
 /** Schema definitions keyed by setting key for fast lookup */
 const SCHEMA_MAP = new Map<string, StaticSettingDef>(STATIC_SETTINGS.map((s) => [s.key, s]));
@@ -441,16 +475,6 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
     return edited[key] ?? defaultVal ?? '';
   }
 
-  /**
-   * Returns the subset of stored keys that aren't part of the SystemConfig schema
-   * AND are recognised in the MANAGED_ELSEWHERE registry. Truly unknown keys are
-   * hidden — admins can't act on them and they'd just be noise.
-   */
-  function getManagedElsewhereKeys(): string[] {
-    return Object.keys(edited)
-      .filter((k) => !SCHEMA_KEYS.has(k) && k in MANAGED_ELSEWHERE)
-      .sort();
-  }
 
   // ── Change handler ────────────────────────────────────────────────────
 
@@ -559,13 +583,27 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
               </div>
               <p className="text-xs text-default-400 mt-0.5">{def.description}</p>
             </div>
-            <Switch
-              isSelected={value === true}
-              onValueChange={isReadOnly ? undefined : (v) => handleChange(def.key, v, def)}
-              isDisabled={isReadOnly}
-              aria-label={def.label}
-              size="sm"
-            />
+            <div className="flex items-center gap-2 shrink-0">
+              {def.manage && (
+                <Button
+                  as={Link}
+                  to={tenantPath(def.manage.href)}
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  endContent={<ArrowRight size={14} />}
+                >
+                  {def.manage.label}
+                </Button>
+              )}
+              <Switch
+                isSelected={value === true}
+                onValueChange={isReadOnly ? undefined : (v) => handleChange(def.key, v, def)}
+                isDisabled={isReadOnly}
+                aria-label={def.label}
+                size="sm"
+              />
+            </div>
           </div>
         );
       }
@@ -732,7 +770,6 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
     );
   }
 
-  const managedElsewhereKeys = getManagedElsewhereKeys();
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -801,50 +838,44 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
           </Card>
         ))}
 
-        {/* Other settings managed by dedicated admin pages.
-            Renders a row per known stored key with a "Manage" button routing
-            to the page that owns that key. Unknown/unmapped keys are hidden
-            (admins can't act on them from here). */}
-        {managedElsewhereKeys.length > 0 && (
-          <Card shadow="sm">
-            <CardHeader className="flex items-center gap-3 pb-1">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                <Settings2 size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-foreground">{"Other platform settings"}</h3>
-                <p className="text-xs text-default-400">
-                  {"These are configured on their own dedicated admin pages."}
-                </p>
-              </div>
-            </CardHeader>
-            <CardBody className="px-5 pb-4 pt-2">
-              <div className="divide-y divide-default-100">
-                {managedElsewhereKeys.map((key) => {
-                  const entry = MANAGED_ELSEWHERE[key];
-                  return (
-                    <div key={key} className="flex items-center justify-between gap-4 py-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{entry.label}</p>
-                        <p className="text-xs text-default-500 mt-0.5">{entry.description}</p>
-                      </div>
-                      <Button
-                        as={Link}
-                        to={tenantPath(entry.href)}
-                        size="sm"
-                        variant="flat"
-                        color="primary"
-                        endContent={<ArrowRight size={14} />}
-                      >
-                        {`Manage in ${entry.destLabel}`}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardBody>
-          </Card>
-        )}
+        {/* Related admin pages — peer configuration surfaces that don't fit
+            the schema above. Always visible since these admin pages always
+            exist on the platform. */}
+        <Card shadow="sm">
+          <CardHeader className="flex items-center gap-3 pb-1">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+              <Settings2 size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-foreground">{"Related admin pages"}</h3>
+              <p className="text-xs text-default-400">
+                {"Configuration that lives on its own dedicated page."}
+              </p>
+            </div>
+          </CardHeader>
+          <CardBody className="px-5 pb-4 pt-2">
+            <div className="divide-y divide-default-100">
+              {RELATED_ADMIN_PAGES.map((entry) => (
+                <div key={entry.href} className="flex items-center justify-between gap-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">{entry.label}</p>
+                    <p className="text-xs text-default-500 mt-0.5">{entry.description}</p>
+                  </div>
+                  <Button
+                    as={Link}
+                    to={tenantPath(entry.href)}
+                    size="sm"
+                    variant="flat"
+                    color="primary"
+                    endContent={<ArrowRight size={14} />}
+                  >
+                    {`Open ${entry.destLabel}`}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       </div>
 
       {/* Reset confirmation modal */}
