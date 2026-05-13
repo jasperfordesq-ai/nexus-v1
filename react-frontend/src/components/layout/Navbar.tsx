@@ -351,7 +351,22 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
       ].filter(gateFilter),
     },
-  ], [t, tenantPath, overflowNavItems, gateFilter]);
+    ...(hasFeature('federation') ? [{
+      key: 'federation',
+      title: t('sections.partner_communities'),
+      collapsible: true,
+      defaultExpanded: false,
+      items: [
+        { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
+        { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
+        { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
+        { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
+        { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
+        { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
+        { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
+      ],
+    }] : []),
+  ], [t, tenantPath, overflowNavItems, gateFilter, hasFeature]);
 
   // ─── Right column sections ───────────────────────────────────────────────
   const rightSections = useMemo(() => [
@@ -385,22 +400,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         { label: t('nav.strategic_plan'), desc: t('nav_desc.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
       ],
     }] : []),
-    ...(hasFeature('federation') ? [{
-      key: 'federation',
-      title: t('sections.partner_communities'),
-      collapsible: true,
-      defaultExpanded: false,
-      items: [
-        { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
-        { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
-        { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
-        { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
-        { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
-        { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
-        { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
-      ],
-    }] : []),
-  ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about, gateFilter]);
+  ], [t, tenantPath, isHourTimebank, tenant?.menu_pages?.about, gateFilter]);
 
   const timebankingPaths = useMemo(() => timebankingItems.map(i => i.href), [timebankingItems]);
   const communityPaths = useMemo(() => visibleCommunityItems.map(i => i.href), [visibleCommunityItems]);

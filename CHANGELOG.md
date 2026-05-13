@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Partner Communities moved to the left column of the "More" mega menu**, sitting directly under the Tools section. Previously placed beneath Impact in the right column, the federation submenu is now more discoverable to reflect its importance.
+
 ### Added
 
 - **In-app `/changelog` page** rendering this file via `react-markdown`. The markdown source is copied from the repo root into `react-frontend/public/changelog.md` at prebuild/predev time by `scripts/copy-changelog.mjs`, so the in-app changelog is always in sync with the file in git. Footer Changelog link is now internal.
