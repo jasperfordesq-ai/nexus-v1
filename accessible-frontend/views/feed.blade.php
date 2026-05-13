@@ -254,19 +254,31 @@
                         if (empty($itemMedia) && !empty($item['image_url'])) {
                             $itemMedia = [['file_url' => $item['image_url'], 'thumbnail_url' => null, 'alt_text' => null]];
                         }
+                        $totalMedia = count($itemMedia);
+                        $visibleMedia = array_slice($itemMedia, 0, 4);
+                        $extraMedia = max(0, $totalMedia - 4);
+                        $gridCount = min($totalMedia, 4);
                     @endphp
-                    @if (!empty($itemMedia))
-                        <ul class="nexus-alpha-feed-media govuk-list">
-                            @foreach ($itemMedia as $media)
+                    @if (!empty($visibleMedia))
+                        <ul class="nexus-alpha-feed-media" data-count="{{ $gridCount }}">
+                            @foreach ($visibleMedia as $mediaIndex => $media)
                                 @php
-                                    $mediaUrl = $media['file_url'] ?? null;
+                                    $fullUrl = $media['file_url'] ?? null;
+                                    $thumbUrl = $media['thumbnail_url'] ?? $fullUrl;
                                     $altText = !empty($media['alt_text'])
                                         ? $media['alt_text']
                                         : __('govuk_alpha.feed.image_alt', ['title' => $itemTitle]);
+                                    $isLast = $mediaIndex === count($visibleMedia) - 1;
                                 @endphp
-                                @if ($mediaUrl)
+                                @if ($fullUrl)
                                     <li>
-                                        <img src="{{ $mediaUrl }}" alt="{{ $altText }}" class="nexus-alpha-feed-image" loading="lazy">
+                                        <a href="{{ $fullUrl }}" target="_blank" rel="noopener noreferrer">
+                                            <img src="{{ $thumbUrl }}" alt="{{ $altText }}" class="nexus-alpha-feed-image" loading="lazy">
+                                            @if ($isLast && $extraMedia > 0)
+                                                <span class="nexus-alpha-feed-media__more" aria-hidden="true">+{{ $extraMedia }}</span>
+                                                <span class="govuk-visually-hidden">{{ __('govuk_alpha.feed.media_more', ['count' => $extraMedia]) }}</span>
+                                            @endif
+                                        </a>
                                     </li>
                                 @endif
                             @endforeach
