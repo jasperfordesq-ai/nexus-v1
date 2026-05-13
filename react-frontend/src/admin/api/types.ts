@@ -788,12 +788,6 @@ export interface EnterpriseDashboardStats {
   }>;
 }
 
-export interface SecretEntry {
-  key: string;
-  is_set: boolean;
-  masked_value: string;
-}
-
 export interface ErrorLogEntry {
   id: number;
   user_id?: number;
@@ -943,16 +937,6 @@ export interface HealthCheckHistoryEntry {
   checks: HealthCheckResult['checks'];
   latency_ms: number | null;
   created_at: string;
-}
-
-export interface FeatureFlags {
-  features: Record<string, boolean>;
-  modules: Record<string, boolean>;
-}
-
-export interface SecretEntryExtended extends SecretEntry {
-  category: string;
-  masked_value: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

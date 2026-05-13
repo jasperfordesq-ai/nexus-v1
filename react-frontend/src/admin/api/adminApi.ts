@@ -81,11 +81,9 @@ import type {
   HealthCheckResult,
   HealthCheckHistoryEntry,
   ErrorLogEntry,
-  SecretEntry,
   LogFile,
   LogFileContent,
   SystemRequirements,
-  FeatureFlags,
   LegalDocument,
   LegalDocumentVersion,
   VersionComparison,
@@ -913,9 +911,6 @@ export const adminEnterprise = {
   resetConfig: (keys?: string[]) =>
     api.post<{ success: boolean }>('/v2/admin/enterprise/config/reset', keys ? { keys } : {}),
 
-  getSecrets: () =>
-    api.get<SecretEntry[]>('/v2/admin/enterprise/config/secrets'),
-
   // GDPR Request Detail & Management
   getGdprRequest: (id: number) =>
     api.get<GdprRequestDetail>(`/v2/admin/enterprise/gdpr/requests/${id}`),
@@ -986,22 +981,6 @@ export const adminEnterprise = {
   getHealthHistory: () =>
     api.get<HealthCheckHistoryEntry[]>('/v2/admin/enterprise/monitoring/health-history'),
 
-  // Config — Feature Flags
-  getFeatureFlags: () =>
-    api.get<FeatureFlags>('/v2/admin/enterprise/config/features'),
-
-  updateFeatureFlag: (data: { key: string; value: boolean; type: 'feature' | 'module' }) =>
-    api.patch<{ success: boolean }>('/v2/admin/enterprise/config/features', data),
-
-  // Config — Secrets Management
-  rotateSecret: (key: string) =>
-    api.post<{ success: boolean; manual_required?: boolean; message?: string }>(`/v2/admin/enterprise/config/secrets/${key}/rotate`),
-
-  deleteSecret: (key: string) =>
-    api.delete<{ success: boolean; manual_required?: boolean; message?: string }>(`/v2/admin/enterprise/config/secrets/${key}`),
-
-  testVaultConnection: () =>
-    api.post<{ success: boolean; services: Record<string, boolean> }>('/v2/admin/enterprise/config/secrets/test-vault'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

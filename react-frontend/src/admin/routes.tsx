@@ -114,8 +114,6 @@ const GdprAuditLog = lazy(() => import('./modules/enterprise/GdprAuditLog'));
 const SystemMonitoring = lazy(() => import('./modules/enterprise/SystemMonitoring'));
 const HealthCheck = lazy(() => import('./modules/enterprise/HealthCheck'));
 const ErrorLogs = lazy(() => import('./modules/enterprise/ErrorLogs'));
-const SystemConfig = lazy(() => import('./modules/enterprise/SystemConfig'));
-const SecretsVault = lazy(() => import('./modules/enterprise/SecretsVault'));
 const LegalDocList = lazy(() => import('./modules/enterprise/LegalDocList'));
 const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
 const LegalDocVersionList = lazy(() => import('./modules/enterprise/LegalDocVersionList'));
@@ -127,7 +125,6 @@ const GdprBreachDetail = lazy(() => import('./modules/enterprise/GdprBreachDetai
 const LogFiles = lazy(() => import('./modules/enterprise/LogFiles'));
 const LogFileViewer = lazy(() => import('./modules/enterprise/LogFileViewer'));
 const SystemRequirements = lazy(() => import('./modules/enterprise/SystemRequirements'));
-const FeatureFlags = lazy(() => import('./modules/enterprise/FeatureFlags'));
 
 // Performance module
 const PerformanceDashboard = lazy(() => import('./modules/performance/PerformanceDashboard'));
@@ -519,9 +516,6 @@ export function AdminRoutes() {
       <Route path="enterprise/monitoring/log-files" element={<Lazy><LogFiles /></Lazy>} />
       <Route path="enterprise/monitoring/log-files/:filename" element={<Lazy><LogFileViewer /></Lazy>} />
       <Route path="enterprise/monitoring/requirements" element={<Lazy><SystemRequirements /></Lazy>} />
-      <Route path="enterprise/config" element={<Lazy><SystemConfig /></Lazy>} />
-      <Route path="enterprise/config/secrets" element={<Lazy><SecretsVault /></Lazy>} />
-      <Route path="enterprise/config/features" element={<Lazy><FeatureFlags /></Lazy>} />
 
       {/* ─── PERFORMANCE ─── */}
       <Route path="performance" element={<Lazy><PerformanceDashboard /></Lazy>} />

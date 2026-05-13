@@ -7,8 +7,8 @@
  * Batch render tests for Enterprise admin modules:
  * - EnterpriseDashboard, ErrorLogs, GdprDashboard, GdprRequests,
  *   GdprConsents, GdprAuditLog, GdprBreaches, HealthCheck,
- *   PermissionBrowser, RoleList, RoleForm, SecretsVault,
- *   SystemConfig, SystemMonitoring, LegalDocList, LegalDocForm,
+ *   PermissionBrowser, RoleList, RoleForm,
+ *   SystemMonitoring, LegalDocList, LegalDocForm,
  *   LegalDocComplianceDashboard, LegalDocVersionComparison
  *
  * Smoke tests only — verify each component renders without crashing.
@@ -367,28 +367,6 @@ describe('RoleForm', () => {
         <RoleForm />
       </WRoute>
     );
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
-// ─── SecretsVault ────────────────────────────────────────────────────────────
-
-import { SecretsVault } from '../enterprise/SecretsVault';
-
-describe('SecretsVault', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<W><SecretsVault /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
-// ─── SystemConfig ────────────────────────────────────────────────────────────
-
-import { SystemConfig } from '../enterprise/SystemConfig';
-
-describe('SystemConfig', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<W><SystemConfig /></W>);
     expect(container.querySelector('div')).toBeTruthy();
   });
 });

@@ -524,9 +524,6 @@ function useAdminNav(): NavSection[] {
           { label: "Legal Documents", href: '/admin/legal-documents', icon: FileText },
           { label: "Compliance Dashboard", href: '/admin/legal-documents/compliance', icon: ShieldCheck },
           { label: "Monitoring", href: '/admin/enterprise/monitoring', icon: Heart },
-          { label: "System Configuration", href: '/admin/enterprise/config', icon: Cog },
-          { label: "Feature Flags", href: '/admin/enterprise/config/features', icon: Settings },
-          { label: "Secrets Vault", href: '/admin/enterprise/config/secrets', icon: Key },
         ],
       },
       {

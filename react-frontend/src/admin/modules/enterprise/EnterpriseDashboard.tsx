@@ -56,7 +56,6 @@ export function EnterpriseDashboard() {
     { label: "Roles & Permissions", href: tenantPath('/admin/enterprise/roles'), icon: Shield },
     { label: "GDPR Dashboard", href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
     { label: "System Monitoring", href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
-    { label: "System Configuration", href: tenantPath('/admin/enterprise/config'), icon: Shield },
     { label: "Legal Documents", href: tenantPath('/admin/legal-documents'), icon: FileWarning },
   ];
 

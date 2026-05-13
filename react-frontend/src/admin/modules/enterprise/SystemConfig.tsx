@@ -9,7 +9,7 @@
  * Replaces the legacy flat key-value editor.
  */
 
-import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -29,7 +29,6 @@ import {
   ModalFooter,
   Tooltip,
 } from '@heroui/react';
-import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTenant } from '@/contexts';
 import Save from 'lucide-react/icons/save';
@@ -44,7 +43,6 @@ import Gauge from 'lucide-react/icons/gauge';
 import Info from 'lucide-react/icons/info';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -382,12 +380,8 @@ function validateSetting(def: ConfigSettingDef, value: unknown): string | null {
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface SystemConfigProps {
-  /** When true, hides the PageHeader and deprecation banner — used when embedded inside another page. */
-  embedded?: boolean;
-  /** Setting keys to hide from the editor (used to suppress duplicates when embedded). */
+  /** Setting keys to hide from the editor (used to suppress duplicates with the parent's own form). */
   excludeKeys?: string[];
-  /** Group keys to keep. When omitted, all groups are shown. */
-  includeGroups?: string[];
   /**
    * Called after a successful save or reset. The parent should refetch its own
    * data — Reset in particular clears keys that may be owned by the parent.
@@ -395,24 +389,17 @@ interface SystemConfigProps {
   onAfterChange?: () => void;
 }
 
-export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onAfterChange }: SystemConfigProps = {}) {
+/**
+ * Embedded-only editor for platform configuration. Rendered inside the Admin
+ * Settings page; never routed standalone (the legacy /admin/enterprise/config
+ * route was retired and its sidebar entries removed).
+ */
+export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps = {}) {
   const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
-  // Only manage the document title when this component owns the whole page.
-  // When embedded inside another page, the parent's usePageTitle wins.
-  useEffect(() => {
-    if (embedded) return;
-    const prev = document.title;
-    document.title = "Enterprise";
-    return () => { document.title = prev; };
-  }, [embedded]);
   const toast = useToast();
 
   const excludeSet = useMemo(() => new Set(excludeKeys ?? []), [excludeKeys]);
-  const includeGroupSet = useMemo(
-    () => (includeGroups && includeGroups.length > 0 ? new Set(includeGroups) : null),
-    [includeGroups],
-  );
 
   const [config, setConfig] = useState<Record<string, unknown>>({});
   const [edited, setEdited] = useState<Record<string, unknown>>({});
@@ -433,9 +420,7 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
   }));
 
   // Config schema (English-only — admin panel is not translated)
-  const fullConfigSchema = buildConfigSchema();
-  const configSchema = fullConfigSchema
-    .filter((g) => !includeGroupSet || includeGroupSet.has(g.key))
+  const configSchema = buildConfigSchema()
     .map((g) => ({ ...g, settings: g.settings.filter((s) => !excludeSet.has(s.key)) }))
     .filter((g) => g.settings.length > 0);
 
@@ -718,105 +703,63 @@ export function SystemConfig({ embedded = false, excludeKeys, includeGroups, onA
 
   // ── Loading state ─────────────────────────────────────────────────────
 
-  const deprecationBanner = !embedded ? (
-    <Card shadow="sm" className="mb-4 border border-warning-300 bg-warning-50">
-      <CardBody className="flex flex-row items-start gap-3 py-3">
-        <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
-        <div className="text-sm">
-          <p className="font-semibold text-warning-700">This page is being retired.</p>
-          <p className="text-default-700 mt-1">
-            All settings here have been moved to{' '}
-            <Link to={tenantPath('/admin/settings')} className="font-medium text-primary underline">
-              Admin Settings
-            </Link>
-            . Please use that page going forward — this one will be removed shortly.
-          </p>
-        </div>
-      </CardBody>
-    </Card>
-  ) : null;
-
-  const headerNode = embedded ? null : (
-    <PageHeader title={"System Configuration"} description={"Edit platform-wide configuration values"} />
-  );
-
   if (loading) {
     return (
-      <div>
-        {deprecationBanner}
-        {headerNode}
-        <div className="flex justify-center py-16">
-          <Spinner size="lg" />
-        </div>
+      <div className="flex justify-center py-16">
+        <Spinner size="lg" />
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div>
-        {deprecationBanner}
-        {headerNode}
-        <Card shadow="sm" className="border-danger-200 bg-danger-50">
-          <CardBody className="text-center py-12">
-            <p className="text-danger font-medium mb-3">{"Failed to load settings"}</p>
-            <p className="text-sm text-default-500 mb-4">{"We couldn't reach the configuration service. Check your connection and try again."}</p>
-            <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
-              {"Retry"}
-            </Button>
-          </CardBody>
-        </Card>
-      </div>
+      <Card shadow="sm" className="border-danger-200 bg-danger-50">
+        <CardBody className="text-center py-12">
+          <p className="text-danger font-medium mb-3">{"Failed to load settings"}</p>
+          <p className="text-sm text-default-500 mb-4">{"We couldn't reach the configuration service. Check your connection and try again."}</p>
+          <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
+            {"Retry"}
+          </Button>
+        </CardBody>
+      </Card>
     );
   }
 
-
   // ── Render ────────────────────────────────────────────────────────────
-
-  const actionsNode = (
-    <div className="flex gap-2 flex-wrap">
-      <Button
-        variant="flat"
-        startContent={<RefreshCw size={16} />}
-        onPress={loadData}
-        size="sm"
-      >
-        {"Reload"}
-      </Button>
-      <Button
-        variant="flat"
-        color="danger"
-        startContent={<RotateCcw size={16} />}
-        onPress={() => setShowResetModal(true)}
-        size="sm"
-      >
-        {"Reset to Defaults"}
-      </Button>
-      <Button
-        color="primary"
-        startContent={<Save size={16} />}
-        onPress={handleSave}
-        isLoading={saving}
-        isDisabled={!hasChanges || Object.keys(errors).length > 0}
-        size="sm"
-      >
-        {"Save Changes"}
-      </Button>
-    </div>
-  );
 
   return (
     <div>
-      {deprecationBanner}
-      {embedded ? (
-        <div className="flex justify-end mb-3">{actionsNode}</div>
-      ) : (
-        <PageHeader
-          title={"System Configuration"}
-          description={"Edit platform-wide configuration values"}
-          actions={actionsNode}
-        />
-      )}
+      <div className="flex justify-end mb-3">
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="flat"
+            startContent={<RefreshCw size={16} />}
+            onPress={loadData}
+            size="sm"
+          >
+            {"Reload"}
+          </Button>
+          <Button
+            variant="flat"
+            color="danger"
+            startContent={<RotateCcw size={16} />}
+            onPress={() => setShowResetModal(true)}
+            size="sm"
+          >
+            {"Reset to Defaults"}
+          </Button>
+          <Button
+            color="primary"
+            startContent={<Save size={16} />}
+            onPress={handleSave}
+            isLoading={saving}
+            isDisabled={!hasChanges || Object.keys(errors).length > 0}
+            size="sm"
+          >
+            {"Save Changes"}
+          </Button>
+        </div>
+      </div>
 
       <div className="space-y-6">
         {configSchema.map((group) => (

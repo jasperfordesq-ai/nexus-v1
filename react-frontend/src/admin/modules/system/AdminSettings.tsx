@@ -314,8 +314,7 @@ export function AdminSettings() {
           </Button>
         </div>
 
-        {/* Additional platform configuration ported from the legacy
-            /admin/enterprise/config page. Persists via the enterprise
+        {/* Additional platform configuration. Persists via the enterprise
             config endpoint; duplicate keys handled by the cards above are
             hidden via excludeKeys. Rendered without an outer Card to avoid
             double card nesting — SystemConfig provides its own per-group Cards. */}
@@ -327,7 +326,6 @@ export function AdminSettings() {
             </p>
           </div>
           <SystemConfig
-            embedded
             excludeKeys={DUPLICATE_KEYS}
             onAfterChange={fetchSettings}
           />
