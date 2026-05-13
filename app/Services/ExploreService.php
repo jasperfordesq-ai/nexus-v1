@@ -261,6 +261,14 @@ class ExploreService
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
                     AND l.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                    -- Quality floor for public discovery: skip thin listings
+                    -- (no real description) and titles that are just the
+                    -- category name. Keeps them out of /explore's Popular
+                    -- widget, where they appeared as low-quality content in
+                    -- the 2026-05-13 SEO audit. They still show in
+                    -- /listings, search, and inside the platform.
+                    AND CHAR_LENGTH(COALESCE(l.description, '')) >= 30
+                    AND (cat.name IS NULL OR LOWER(TRIM(l.title)) <> LOWER(TRIM(cat.name)))
                 ORDER BY (COALESCE(l.view_count, 0) + COALESCE(l.save_count, 0)) DESC
                 LIMIT 8
             ", [$tenantId, $tenantId]);

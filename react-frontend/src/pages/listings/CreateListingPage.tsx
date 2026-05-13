@@ -160,6 +160,23 @@ export function CreateListingPage() {
     return () => { editAbortRef.current?.abort(); };
   }, [id, isEditing, t, toast]);
 
+  // True when the title is just the selected category name, or a generic
+  // "I can help with X" / "Help with X" template. Drives a non-blocking
+  // nudge under the title input.
+  const isGenericTitle = (() => {
+    const title = formData.title.trim().toLowerCase();
+    if (!title || title.length < 3) return false;
+    const stripped = title
+      .replace(/^(i can help with|help with|looking for help with|need help with)\s+/i, '')
+      .trim();
+    const categoryName = categories
+      .find((c) => c.id.toString() === formData.category_id)?.name?.toLowerCase()
+      .trim() || '';
+    if (categoryName && (title === categoryName || stripped === categoryName)) return true;
+    // Bare category-style titles with no qualifier beyond a couple of words.
+    return stripped.length > 0 && stripped !== title && stripped.split(/\s+/).length <= 2;
+  })();
+
   function validateForm(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
     const minTitle = listingConfig['listing.min_title_length'] || 5;
@@ -403,6 +420,16 @@ export function CreateListingPage() {
                 label: 'text-theme-muted',
               }}
             />
+            {/* Soft nudge when the title is just the category name or a generic
+                "I can help with X" template. Not blocking — listing still
+                submits. Aimed at the SERP/discovery quality regression where
+                titles like "I can help with Events" indexed as thin content. */}
+            {isGenericTitle && (
+              <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400 flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+                <span>{t('form.title_too_generic_hint')}</span>
+              </p>
+            )}
           </div>
 
           {/* Description */}
