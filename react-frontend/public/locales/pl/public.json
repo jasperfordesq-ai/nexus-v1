@@ -76,6 +76,9 @@
       "title": "Gotowy, aby zacząć?",
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Utwórz swoje darmowe konto"
+    },
+    "audience_cards": {
+      "title": "Where would you like to start?"
     }
   },
   "about": {

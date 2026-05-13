@@ -76,7 +76,10 @@
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Cruthaigh Do Chuntas Saor in Aisce"
     },
-    "meta_title": "Community Timebanking Platform"
+    "meta_title": "Community Timebanking Platform",
+    "audience_cards": {
+      "title": "Where would you like to start?"
+    }
   },
   "about": {
     "meta_title": "Maidir le {{name}}",

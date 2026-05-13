@@ -42,6 +42,8 @@ import type {
   LandingSectionType,
   LandingIconId,
   HeroContent,
+  AudienceCardsContent,
+  AudienceCard,
   FeaturePillsContent,
   FeaturePillItem,
   StatsContent,
@@ -51,7 +53,7 @@ import type {
   CoreValue,
   CtaContent,
 } from '@/types/landing-page';
-import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types/landing-page';
+import { DEFAULT_LANDING_PAGE_CONFIG, DEFAULT_AUDIENCE_CARDS } from '@/types/landing-page';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -59,6 +61,7 @@ import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types/landing-page';
 
 const SECTION_LABEL_KEYS: Record<LandingSectionType, string> = {
   hero: 'content.landing_section_hero',
+  audience_cards: 'content.landing_section_audience_cards',
   feature_pills: 'content.landing_section_feature_pills',
   stats: 'content.landing_section_stats',
   how_it_works: 'content.landing_section_how_it_works',
@@ -262,6 +265,193 @@ function HeroEditor({
           variant="bordered"
           size="sm"
         />
+      </div>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+    </div>
+  );
+}
+
+function AudienceCardsEditor({
+  content,
+  onChange,
+}: {
+  content: AudienceCardsContent;
+  onChange: (c: AudienceCardsContent) => void;
+}) {
+  const { t } = useTranslation('admin');
+  const cards = content.cards || [];
+
+  const updateCard = (index: number, field: keyof AudienceCard, value: string) => {
+    const updated: AudienceCard[] = [...cards];
+    updated[index] = { ...updated[index], [field]: value } as AudienceCard;
+    onChange({ ...content, cards: updated });
+  };
+
+  const updateCardIcon = (index: number, value: LandingIconId | undefined) => {
+    const updated: AudienceCard[] = [...cards];
+    updated[index] = { ...updated[index], icon: value } as AudienceCard;
+    onChange({ ...content, cards: updated });
+  };
+
+  const moveCard = (index: number, direction: 'up' | 'down') => {
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= cards.length) return;
+    const updated: AudienceCard[] = [...cards];
+    const current = updated[index];
+    const swap = updated[swapIndex];
+    if (!current || !swap) return;
+    updated[index] = swap;
+    updated[swapIndex] = current;
+    onChange({ ...content, cards: updated });
+  };
+
+  const addCard = () => {
+    if (cards.length >= 4) return;
+    onChange({
+      ...content,
+      cards: [
+        ...cards,
+        { title: '', description: '', cta_label: 'Learn more', target_url: '/' },
+      ],
+    });
+  };
+
+  const removeCard = (index: number) => {
+    onChange({ ...content, cards: cards.filter((_, i) => i !== index) });
+  };
+
+  const resetToDefaults = () => {
+    onChange({ ...content, cards: JSON.parse(JSON.stringify(DEFAULT_AUDIENCE_CARDS)) });
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Input
+          label={"Section title (optional)"}
+          placeholder={"Where would you like to start?"}
+          value={content.title || ''}
+          onValueChange={(v) => onChange({ ...content, title: v })}
+          variant="bordered"
+          size="sm"
+        />
+        <Input
+          label={"Section subtitle (optional)"}
+          placeholder={"Pick the path that fits you"}
+          value={content.subtitle || ''}
+          onValueChange={(v) => onChange({ ...content, subtitle: v })}
+          variant="bordered"
+          size="sm"
+        />
+      </div>
+      <Divider />
+      <p className="text-xs text-default-500">
+        {"Up to 4 cards. Each card is a doorway into your community for a specific kind of visitor."}
+      </p>
+      {cards.map((card, i) => (
+        <Card key={i} shadow="none" className="border border-default-200">
+          <CardBody className="flex flex-col gap-3 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-default-600">
+                {`Card ${i + 1}`}
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  isDisabled={i === 0}
+                  onPress={() => moveCard(i, 'up')}
+                  aria-label={`Move card ${i + 1} up`}
+                >
+                  <ChevronUp size={14} />
+                </Button>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  isDisabled={i === cards.length - 1}
+                  onPress={() => moveCard(i, 'down')}
+                  aria-label={`Move card ${i + 1} down`}
+                >
+                  <ChevronDown size={14} />
+                </Button>
+                <Button
+                  size="sm"
+                  color="danger"
+                  variant="light"
+                  startContent={<Trash2 size={14} />}
+                  onPress={() => removeCard(i)}
+                >
+                  {"Remove"}
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <IconSelect
+                value={card.icon}
+                onChange={(val) => updateCardIcon(i, val)}
+                label={"Icon"}
+                placeholder={"Select an icon"}
+              />
+              <Input
+                label={"Title"}
+                placeholder={"New here?"}
+                value={card.title}
+                onValueChange={(v) => updateCard(i, 'title', v)}
+                variant="bordered"
+                size="sm"
+              />
+            </div>
+            <Textarea
+              label={"Description"}
+              placeholder={"One short sentence explaining who this card is for."}
+              value={card.description}
+              onValueChange={(v) => updateCard(i, 'description', v)}
+              variant="bordered"
+              size="sm"
+              minRows={2}
+            />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Input
+                label={"Button label"}
+                placeholder={"Get started"}
+                value={card.cta_label}
+                onValueChange={(v) => updateCard(i, 'cta_label', v)}
+                variant="bordered"
+                size="sm"
+              />
+              <Input
+                label={"Link"}
+                placeholder={"/about"}
+                value={card.target_url}
+                onValueChange={(v) => updateCard(i, 'target_url', v)}
+                variant="bordered"
+                size="sm"
+              />
+            </div>
+          </CardBody>
+        </Card>
+      ))}
+      <div className="flex flex-wrap gap-2">
+        {cards.length < 4 && (
+          <Button
+            size="sm"
+            variant="flat"
+            startContent={<Plus size={14} />}
+            onPress={addCard}
+          >
+            {"Add card"}
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant="flat"
+          startContent={<RotateCcw size={14} />}
+          onPress={resetToDefaults}
+        >
+          {"Reset cards to defaults"}
+        </Button>
       </div>
       <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
@@ -683,6 +873,13 @@ function SectionCard({
         return (
           <HeroEditor
             content={(section.content as HeroContent) || {}}
+            onChange={(c) => onContentChange(c)}
+          />
+        );
+      case 'audience_cards':
+        return (
+          <AudienceCardsEditor
+            content={(section.content as AudienceCardsContent) || {}}
             onChange={(c) => onContentChange(c)}
           />
         );

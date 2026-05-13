@@ -76,6 +76,9 @@
       "title": "始める準備はできましたか？",
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "無料アカウントを作成する"
+    },
+    "audience_cards": {
+      "title": "Where would you like to start?"
     }
   },
   "about": {

@@ -23,6 +23,7 @@ import { useTenant } from '@/contexts';
 import type {
   LandingSection,
   HeroContent,
+  AudienceCardsContent,
   FeaturePillsContent,
   StatsContent,
   HowItWorksContent,
@@ -30,6 +31,7 @@ import type {
   CtaContent,
 } from '@/types';
 import { HeroSection } from './HeroSection';
+import { AudienceCardsSection } from './AudienceCardsSection';
 import { FeaturePillsSection } from './FeaturePillsSection';
 import { StatsSection } from './StatsSection';
 import { HowItWorksSection } from './HowItWorksSection';
@@ -43,6 +45,8 @@ function RenderSection({ section }: { section: LandingSection }) {
   switch (section.type) {
     case 'hero':
       return <HeroSection content={section.content as HeroContent | undefined} />;
+    case 'audience_cards':
+      return <AudienceCardsSection content={section.content as AudienceCardsContent | undefined} />;
     case 'feature_pills':
       return <FeaturePillsSection content={section.content as FeaturePillsContent | undefined} />;
     case 'stats':

@@ -19,6 +19,7 @@
 
 export type LandingSectionType =
   | 'hero'
+  | 'audience_cards'
   | 'feature_pills'
   | 'stats'
   | 'how_it_works'
@@ -57,6 +58,20 @@ export interface HeroContent {
   cta_primary_link?: string;
   cta_secondary_text?: string;
   cta_secondary_link?: string;
+}
+
+export interface AudienceCard {
+  icon?: LandingIconId;
+  title: string;
+  description: string;
+  cta_label: string;
+  target_url: string;
+}
+
+export interface AudienceCardsContent {
+  title?: string;
+  subtitle?: string;
+  cards?: AudienceCard[];
 }
 
 export interface FeaturePillItem {
@@ -111,6 +126,7 @@ export interface CtaContent {
 /** Map section types to their content shapes */
 export interface SectionContentMap {
   hero: HeroContent;
+  audience_cards: AudienceCardsContent;
   feature_pills: FeaturePillsContent;
   stats: StatsContent;
   how_it_works: HowItWorksContent;
@@ -138,6 +154,30 @@ export interface LandingPageConfig {
 // Defaults
 // ───────────────────────────────────────────────────���─────────────────────────
 
+export const DEFAULT_AUDIENCE_CARDS: AudienceCard[] = [
+  {
+    icon: 'user-plus',
+    title: 'New here?',
+    description: 'Learn how our community works and how to get involved.',
+    cta_label: 'Get started',
+    target_url: '/about',
+  },
+  {
+    icon: 'handshake',
+    title: 'Offer or find help',
+    description: 'Browse what people are offering, or post your own request.',
+    cta_label: 'Browse listings',
+    target_url: '/listings',
+  },
+  {
+    icon: 'shield',
+    title: 'Partner or refer',
+    description: 'For organisations, funders, and professionals supporting our members.',
+    cta_label: 'Learn more',
+    target_url: '/contact',
+  },
+];
+
 export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
   sections: [
     {
@@ -147,34 +187,41 @@ export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
       order: 0,
     },
     {
+      id: 'audience_cards',
+      type: 'audience_cards',
+      enabled: true,
+      order: 1,
+      content: { cards: DEFAULT_AUDIENCE_CARDS },
+    },
+    {
       id: 'feature_pills',
       type: 'feature_pills',
       enabled: true,
-      order: 1,
+      order: 2,
     },
     {
       id: 'stats',
       type: 'stats',
       enabled: true,
-      order: 2,
+      order: 3,
     },
     {
       id: 'how_it_works',
       type: 'how_it_works',
       enabled: true,
-      order: 3,
+      order: 4,
     },
     {
       id: 'core_values',
       type: 'core_values',
       enabled: true,
-      order: 4,
+      order: 5,
     },
     {
       id: 'cta',
       type: 'cta',
       enabled: true,
-      order: 5,
+      order: 6,
     },
   ],
 };

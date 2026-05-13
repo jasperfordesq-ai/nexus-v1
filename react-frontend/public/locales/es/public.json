@@ -76,6 +76,9 @@
       "title": "¿Listo para empezar?",
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Crea Tu Cuenta Gratis"
+    },
+    "audience_cards": {
+      "title": "Where would you like to start?"
     }
   },
   "about": {

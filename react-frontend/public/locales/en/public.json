@@ -32,6 +32,9 @@
       "communities": "Communities"
     },
     "scroll_down": "Scroll down",
+    "audience_cards": {
+      "title": "Where would you like to start?"
+    },
     "how_it_works": {
       "title": "How It Works",
       "subtitle": "Get started in four simple steps",

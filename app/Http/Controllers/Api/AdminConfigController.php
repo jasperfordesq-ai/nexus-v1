@@ -2300,13 +2300,46 @@ class AdminConfigController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'Config must have a sections array', null, 422);
             }
 
-            $validTypes = ['hero', 'feature_pills', 'stats', 'how_it_works', 'core_values', 'cta'];
+            $validTypes = ['hero', 'audience_cards', 'feature_pills', 'stats', 'how_it_works', 'core_values', 'cta'];
             foreach ($config['sections'] as $i => $section) {
                 if (!isset($section['id'], $section['type'], $section['enabled'], $section['order'])) {
                     return $this->respondWithError('VALIDATION_ERROR', "Section $i missing required fields (id, type, enabled, order)", null, 422);
                 }
                 if (!in_array($section['type'], $validTypes, true)) {
                     return $this->respondWithError('VALIDATION_ERROR', "Section $i has invalid type: {$section['type']}", null, 422);
+                }
+                if ($section['type'] === 'audience_cards' && isset($section['content']) && is_array($section['content'])) {
+                    $cards = $section['content']['cards'] ?? null;
+                    if ($cards !== null) {
+                        if (!is_array($cards)) {
+                            return $this->respondWithError('VALIDATION_ERROR', "Section $i: audience_cards.cards must be an array", null, 422);
+                        }
+                        if (count($cards) > 4) {
+                            return $this->respondWithError('VALIDATION_ERROR', "Section $i: audience_cards allows at most 4 cards", null, 422);
+                        }
+                        foreach ($cards as $ci => $card) {
+                            if (!is_array($card)) {
+                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci must be an object", null, 422);
+                            }
+                            $url = $card['target_url'] ?? '';
+                            if (!is_string($url) || $url === '') {
+                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci is missing target_url", null, 422);
+                            }
+                            $isRelative = str_starts_with($url, '/') && !str_starts_with($url, '//');
+                            $isHttp = preg_match('#^https?://#i', $url) === 1;
+                            if (!$isRelative && !$isHttp) {
+                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci target_url must be a relative path or http(s) URL", null, 422);
+                            }
+                            foreach (['title', 'description', 'cta_label'] as $field) {
+                                if (!isset($card[$field]) || !is_string($card[$field])) {
+                                    return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci is missing $field", null, 422);
+                                }
+                                if (mb_strlen($card[$field]) > 500) {
+                                    return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci $field exceeds 500 chars", null, 422);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

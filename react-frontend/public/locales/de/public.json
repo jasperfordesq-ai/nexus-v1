@@ -76,6 +76,9 @@
       "title": "Bereit loszulegen?",
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "Erstellen Sie Ihr kostenloses Konto"
+    },
+    "audience_cards": {
+      "title": "Where would you like to start?"
     }
   },
   "about": {

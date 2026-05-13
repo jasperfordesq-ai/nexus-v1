@@ -499,10 +499,54 @@ class TenantBootstrapController extends BaseApiController
             }
 
             $config = json_decode($row, true);
-            return is_array($config) ? $config : null;
+            if (!is_array($config)) {
+                return null;
+            }
+
+            return $this->mergeMissingDefaultSections($config);
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Append any default sections that the saved config lacks. The admin UI
+     * does not allow deleting sections — only enable/disable — so a section ID
+     * missing from a saved config means the tenant saved their config before
+     * that section type existed. Rolling out new sections then reaches every
+     * tenant without overwriting their existing customisations.
+     */
+    private function mergeMissingDefaultSections(array $config): array
+    {
+        if (!isset($config['sections']) || !is_array($config['sections'])) {
+            return $config;
+        }
+
+        $existingIds = [];
+        $maxOrder = -1;
+        foreach ($config['sections'] as $s) {
+            if (isset($s['id'])) {
+                $existingIds[] = $s['id'];
+            }
+            if (isset($s['order']) && is_numeric($s['order']) && (int) $s['order'] > $maxOrder) {
+                $maxOrder = (int) $s['order'];
+            }
+        }
+
+        $defaultIds = ['hero', 'audience_cards', 'feature_pills', 'stats', 'how_it_works', 'core_values', 'cta'];
+        foreach ($defaultIds as $defId) {
+            if (!in_array($defId, $existingIds, true)) {
+                $maxOrder++;
+                $config['sections'][] = [
+                    'id' => $defId,
+                    'type' => $defId,
+                    'enabled' => true,
+                    'order' => $maxOrder,
+                ];
+            }
+        }
+
+        return $config;
     }
 
     private function buildBrandingData(array $tenant, ?array $config): array

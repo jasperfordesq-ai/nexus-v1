@@ -76,6 +76,9 @@
       "title": "هل أنت مستعد للبدء؟",
       "description": "Join a growing community already exchanging skills and building meaningful connections.",
       "button": "أنشئ حسابك المجاني"
+    },
+    "audience_cards": {
+      "title": "Where would you like to start?"
     }
   },
   "about": {
