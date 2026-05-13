@@ -152,6 +152,8 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/legal')}>{t('legal.legal_hub')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/terms')}>{t('legal.terms_of_service')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/privacy')}>{t('legal.privacy_policy')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/community-guidelines')}>{t('legal.type_community_guidelines', 'Community Guidelines')}</FooterLink></li>
+                  <li><FooterLink href={tenantPath('/acceptable-use')}>{t('legal.type_acceptable_use', 'Acceptable Use')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/cookies')}>{t('legal.cookie_policy')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>{t('legal.accessibility')}</FooterLink></li>
                 </ul>
