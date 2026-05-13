@@ -2118,6 +2118,22 @@ Route::get('/v2/admin/tools/blog-backups', [\App\Http\Controllers\Api\AdminTools
 Route::post('/v2/admin/tools/blog-backups/{id}/restore', [\App\Http\Controllers\Api\AdminToolsController::class, 'restoreBlogBackup']);
 Route::get('/v2/admin/tools/seo-audit', [\App\Http\Controllers\Api\AdminToolsController::class, 'getSeoAudit']);
 Route::post('/v2/admin/tools/seo-audit', [\App\Http\Controllers\Api\AdminToolsController::class, 'runSeoAudit']);
+
+// Prerender engine admin (SEO module).
+// Read endpoints accept tenant_admin+; mutating endpoints (enqueue/cancel)
+// require super_admin and are gated inside the controller.
+Route::get('/v2/admin/prerender/summary',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'summary']);
+Route::get('/v2/admin/prerender/inventory',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'inventory']);
+Route::get('/v2/admin/prerender/inspect',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'inspect']);
+Route::get('/v2/admin/prerender/coverage',         [\App\Http\Controllers\Api\AdminPrerenderController::class, 'coverage']);
+Route::get('/v2/admin/prerender/events',           [\App\Http\Controllers\Api\AdminPrerenderController::class, 'events']);
+Route::get('/v2/admin/prerender/failures',         [\App\Http\Controllers\Api\AdminPrerenderController::class, 'failures']);
+Route::get('/v2/admin/prerender/jobs',             [\App\Http\Controllers\Api\AdminPrerenderController::class, 'jobs']);
+Route::get('/v2/admin/prerender/jobs/{id}',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'showJob'])->whereNumber('id');
+Route::post('/v2/admin/prerender/jobs',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'enqueue']);
+Route::post('/v2/admin/prerender/jobs/{id}/cancel',[\App\Http\Controllers\Api\AdminPrerenderController::class, 'cancelJob'])->whereNumber('id');
+Route::get('/v2/admin/prerender/metrics',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'metrics']);
+Route::get('/v2/admin/prerender/realtime-channel', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'realtimeChannel']);
 Route::get('/v2/admin/deliverability/dashboard', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDashboard']);
 Route::get('/v2/admin/deliverability/analytics', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getAnalytics']);
 Route::get('/v2/admin/deliverability', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDeliverables']);

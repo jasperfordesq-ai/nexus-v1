@@ -1702,6 +1702,183 @@ export const adminTools = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Prerender Engine (SEO module)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface PrerenderSummary {
+  cache_readable: boolean;
+  cache_path: string;
+  total_snapshots: number;
+  total_size_bytes: number;
+  oldest_age_s: number | null;
+  newest_age_s: number | null;
+  stale_count: number;
+  warn_count: number;
+  missing_count: number;
+  expected_count: number;
+  coverage_pct: number;
+  last_run: Record<string, unknown> | null;
+  recent_failures: number;
+  active_jobs: number;
+  queued_jobs: number;
+  last_event_at: string | null;
+  build_commit: string | null;
+  expected_routes: string[];
+  tenant_count: number;
+  content_stale_count: number;
+  asset_invalid_count: number;
+  realtime_channel: string;
+  realtime_event: string;
+}
+
+export interface PrerenderInventoryItem {
+  host: string;
+  route: string;
+  cache_path: string;
+  size_bytes: number;
+  mtime: number;
+  age_s: number;
+  staleness: 'fresh' | 'warn' | 'stale';
+  age_staleness: 'fresh' | 'warn' | 'stale';
+  asset_refs: string[];
+  asset_issues: string[];
+  content_stale: boolean;
+  content_stale_reason: string | null;
+}
+
+export interface PrerenderCoverageRow {
+  tenant_id: number;
+  slug: string;
+  host: string;
+  expected: number;
+  rendered: number;
+  missing: number;
+  missing_routes: string[];
+  stale_routes: string[];
+  asset_invalid_routes: string[];
+}
+
+export interface PrerenderInspect {
+  cache_path: string;
+  size_bytes: number;
+  mtime: number;
+  age_s: number;
+  title: string;
+  meta_description: string | null;
+  canonical: string | null;
+  og_tags: Record<string, string>;
+  h1_texts: string[];
+  json_ld: {
+    blocks_count: number;
+    all_valid: boolean;
+    blocks: Array<{ valid: boolean; size: number; types: string[] }>;
+  };
+  asset_refs: string[];
+  asset_issues: string[];
+  flags: {
+    parses: boolean;
+    has_h1: boolean;
+    multiple_h1: boolean;
+    has_meta_desc: boolean;
+    has_og: boolean;
+    has_canonical: boolean;
+    has_jsonld: boolean;
+    jsonld_valid: boolean;
+    has_noscript: boolean;
+  };
+  parse_warnings: string[];
+  preview: string;
+}
+
+export interface PrerenderJob {
+  id: number;
+  status: 'queued' | 'claimed' | 'running' | 'succeeded' | 'failed' | 'partial' | 'cancelled';
+  tenant_id: number | null;
+  tenant_slug: string | null;
+  routes: string | null;
+  force: boolean;
+  dry_run: boolean;
+  planned_count: number | null;
+  rendered_count: number | null;
+  invalid_count: number | null;
+  duration_s: number | null;
+  exit_code: number | null;
+  log_excerpt: string | null;
+  error_message: string | null;
+  claimed_by: string | null;
+  queued_at: string | null;
+  claimed_at: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  requested_by: { id: number; name: string; email: string | null } | null;
+}
+
+export interface PrerenderEvent {
+  ts?: string;
+  event?: string;
+  pid?: number;
+  host?: string;
+  commit?: string;
+  [k: string]: unknown;
+}
+
+export interface PrerenderFailure {
+  cache_path: string;
+  failed_at: number;
+  age_s: number;
+}
+
+export const adminPrerender = {
+  getSummary: () =>
+    api.get<PrerenderSummary>('/v2/admin/prerender/summary'),
+
+  getInventory: (tenant?: string) =>
+    api.get<{ cache_readable: boolean; cache_path: string; items: PrerenderInventoryItem[] }>(
+      `/v2/admin/prerender/inventory${tenant ? `?tenant=${encodeURIComponent(tenant)}` : ''}`,
+    ),
+
+  inspect: (cachePath: string) =>
+    api.get<PrerenderInspect>(`/v2/admin/prerender/inspect?path=${encodeURIComponent(cachePath)}`),
+
+  getCoverage: () =>
+    api.get<{ expected_routes: string[]; rows: PrerenderCoverageRow[] }>('/v2/admin/prerender/coverage'),
+
+  getEvents: (limit = 200) =>
+    api.get<{ events: PrerenderEvent[] }>(`/v2/admin/prerender/events?limit=${limit}`),
+
+  getFailures: () =>
+    api.get<{ items: PrerenderFailure[] }>('/v2/admin/prerender/failures'),
+
+  listJobs: (params: { status?: string; limit?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.limit) qs.set('limit', String(params.limit));
+    const q = qs.toString();
+    return api.get<{ items: PrerenderJob[] }>(`/v2/admin/prerender/jobs${q ? `?${q}` : ''}`);
+  },
+
+  getJob: (id: number) =>
+    api.get<PrerenderJob>(`/v2/admin/prerender/jobs/${id}`),
+
+  enqueueJob: (payload: {
+    tenant_slug?: string;
+    routes?: string;
+    force?: boolean;
+    dry_run?: boolean;
+  }) =>
+    api.post<{ job_id: number; job: PrerenderJob }>('/v2/admin/prerender/jobs', payload),
+
+  cancelJob: (id: number) =>
+    api.post<{ cancelled: boolean; id: number }>(`/v2/admin/prerender/jobs/${id}/cancel`, {}),
+
+  realtimeChannel: () =>
+    api.get<{ channel: string; event: string }>('/v2/admin/prerender/realtime-channel'),
+
+  /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
+  metricsUrl: '/api/v2/admin/prerender/metrics',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Super Admin (Tenant CRUD, Cross-Tenant Users, Bulk, Audit, Federation Controls)
 // ─────────────────────────────────────────────────────────────────────────────
 

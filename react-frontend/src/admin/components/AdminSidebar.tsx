@@ -354,6 +354,7 @@ function useAdminNav(): NavSection[] {
       { label: "Email Settings", href: '/admin/email-settings', icon: Mail },
       { label: "Algorithm Settings", href: '/admin/algorithm-settings', icon: Cpu },
       { label: "SEO Overview", href: '/admin/seo', icon: Search },
+      { label: "Prerender Engine", href: '/admin/seo/prerender', icon: Zap },
       { label: "404 Error Tracking", href: '/admin/404-errors', icon: AlertTriangle },
       { label: "Diagnostics", href: '/admin/matching-diagnostic', icon: Stethoscope },
       { label: "Match Debug Panel", href: '/admin/match-debug', icon: Target },

@@ -245,6 +245,7 @@ const EmailSettings = lazy(() => import('./modules/advanced/EmailSettings'));
 const AlgorithmSettings = lazy(() => import('./modules/advanced/AlgorithmSettings'));
 const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
 const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
+const PrerenderAdmin = lazy(() => import('./modules/advanced/prerender/PrerenderAdmin'));
 const Redirects = lazy(() => import('./modules/advanced/Redirects'));
 const Error404Tracking = lazy(() => import('./modules/advanced/Error404Tracking'));
 const MatchDebugPanel = lazy(() => import('./modules/advanced/MatchDebugPanel'));
@@ -457,6 +458,7 @@ export function AdminRoutes() {
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />
       <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />
       <Route path="seo/redirects" element={<Lazy><Redirects /></Lazy>} />
+      <Route path="seo/prerender" element={<Lazy><PrerenderAdmin /></Lazy>} />
       <Route path="404-errors" element={<Lazy><Error404Tracking /></Lazy>} />
       <Route path="match-debug" element={<Lazy><MatchDebugPanel /></Lazy>} />
 

@@ -27,6 +27,13 @@ services:
       - nexus-php-uploads:/var/www/html/httpdocs/uploads
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
+      # RO mount of the prerender snapshot cache so the admin Prerender module
+      # can inspect rendered HTML, sizes, mtimes, asset references. The
+      # Playwright worker writes from the host; PHP only reads.
+      - nexus-php-prerendered:/var/www/html/storage/prerendered:ro
+      # JSONL event log written by scripts/prerender-tenants.sh + deploy phase.
+      # Bind-mounted so the admin Events page can tail it.
+      - ${DEPLOY_DIR:-/opt/nexus-php}/logs:/var/www/html/storage/logs/host-logs:ro
     env_file:
       - ${NEXUS_ENV_FILE:-.env}
     environment:
@@ -39,6 +46,9 @@ services:
       - REDIS_PORT=6379
       - MEILISEARCH_HOST=http://nexus-meilisearch:7700
       - MEILISEARCH_KEY=${MEILISEARCH_KEY}
+      # Prerender admin module reads these paths inside the container.
+      - PRERENDER_CACHE_PATH=/var/www/html/storage/prerendered
+      - PRERENDER_EVENT_LOG=/var/www/html/storage/logs/host-logs/prerender-events.jsonl
     networks:
       - nexus-php-internal
     healthcheck:
