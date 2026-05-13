@@ -765,6 +765,14 @@ class ApiClient {
         }
 
         if (typeof data === 'object' && data !== null && 'success' in data && data.success === false) {
+          // 2FA-required is a partial success: HTTP 200 with success:false but
+          // requires_2fa:true. Pass the payload through as data so the caller
+          // (AuthContext) can branch on requires_2fa instead of treating it as
+          // a login error.
+          if (data.requires_2fa === true) {
+            return { success: true, data: data as T, message: data.message, meta: data.meta };
+          }
+
           const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
           const result: ApiResponse<T> = {
             success: false,
