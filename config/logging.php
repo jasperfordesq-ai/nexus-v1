@@ -49,7 +49,10 @@ return [
             'level' => env('LOG_LEVEL', 'warning'),
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
-            'permission' => 0664,
+            // No explicit 'permission' — setting it makes Monolog chmod() the
+            // file on every write, which throws "Operation not permitted" when
+            // the existing log file is owned by a different user (e.g. left
+            // behind on a mounted volume from a prior container run).
         ],
 
         'stderr' => [
