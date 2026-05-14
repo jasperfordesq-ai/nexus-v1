@@ -56,6 +56,8 @@ import {
   type PrerenderFailure,
   type PrerenderInspect,
   type PrerenderAnalytics,
+  type PrerenderHealth,
+  type PrerenderAuditEntry,
 } from '../../../api/adminApi';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
@@ -192,6 +194,8 @@ export function PrerenderAdmin() {
         </div>
       )}
 
+      <HealthBanner isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} />
+
       <div className="flex justify-end mb-2">
         <Chip
           size="sm"
@@ -255,6 +259,12 @@ export function PrerenderAdmin() {
           title={<span className="flex items-center gap-2"><AlertOctagon size={16} />Failures</span>}
         >
           <FailuresTab />
+        </Tab>
+        <Tab
+          key="history"
+          title={<span className="flex items-center gap-2"><Clock size={16} />History</span>}
+        >
+          <AuditTab />
         </Tab>
       </Tabs>
     </div>
@@ -1661,6 +1671,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
           <TableHeader>
             <TableColumn>#</TableColumn>
             <TableColumn>STATUS</TableColumn>
+            <TableColumn>PRIORITY</TableColumn>
             <TableColumn>SCOPE</TableColumn>
             <TableColumn>FLAGS</TableColumn>
             <TableColumn>RESULT</TableColumn>
@@ -1676,6 +1687,19 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                   <Chip color={jobStatusColor(j.status)} variant="flat" size="sm">
                     {j.status}
                   </Chip>
+                </TableCell>
+                <TableCell>
+                  {(() => {
+                    const p = j.priority ?? 5;
+                    // Match service constants: 3=HIGH, 5=NORMAL, 7=LOW.
+                    const label = p <= 3 ? 'HIGH' : p >= 7 ? 'LOW' : 'NORMAL';
+                    const color: 'danger' | 'primary' | 'default' = p <= 3 ? 'danger' : p >= 7 ? 'default' : 'primary';
+                    return (
+                      <Tooltip content={`priority=${p} (lower wins)`}>
+                        <Chip size="sm" variant="flat" color={color}>{label}</Chip>
+                      </Tooltip>
+                    );
+                  })()}
                 </TableCell>
                 <TableCell className="text-xs">
                   {j.tenant_slug ? <Chip size="sm" variant="flat">{j.tenant_slug}</Chip> : <span className="text-default-400">all tenants</span>}
@@ -1902,6 +1926,227 @@ function FailuresTab() {
                 <TableCell className="text-xs">{formatTs(it.failed_at)}</TableCell>
                 <TableCell className="text-xs flex items-center gap-1">
                   <Clock size={12} />{formatAge(it.age_s)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+}
+
+// ─── Health banner ─────────────────────────────────────────────────────────
+
+function statusToColor(s: 'green' | 'yellow' | 'red'): 'success' | 'warning' | 'danger' {
+  return s === 'green' ? 'success' : s === 'yellow' ? 'warning' : 'danger';
+}
+
+function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
+  const [health, setHealth] = useState<PrerenderHealth | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const load = useCallback(() => {
+    adminPrerender.getHealth()
+      .then((res) => { if (res.data) setHealth(res.data as PrerenderHealth); })
+      .catch(() => { /* silent — banner just disappears */ });
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => { if (lastUpdate > 0) load(); }, [lastUpdate, load]);
+  useEffect(() => {
+    const id = setInterval(load, 60_000);
+    return () => clearInterval(id);
+  }, [load]);
+
+  const resetBreaker = async () => {
+    setBusy(true);
+    try {
+      await adminPrerender.resetBreaker();
+      toast.success('Circuit breaker reset');
+      load();
+    } catch { toast.error('Reset failed'); }
+    finally { setBusy(false); }
+  };
+
+  const resetQueue = async () => {
+    setBusy(true);
+    try {
+      const res = await adminPrerender.resetQueue();
+      if (res.data) toast.success(`Reset ${res.data.rows_reset} stuck row(s); breaker cleared`);
+      load();
+      onClose();
+    } catch { toast.error('Queue reset failed'); }
+    finally { setBusy(false); }
+  };
+
+  if (!health) return null;
+  // Hide the banner entirely when everything is green and nothing's actionable.
+  if (health.status === 'green') {
+    return (
+      <div className="mb-3 flex items-center gap-2 text-sm text-default-500">
+        <CheckCircle size={14} className="text-success" />
+        Engine healthy
+        <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
+          {expanded ? 'Hide details' : 'Details'}
+        </button>
+      </div>
+    );
+  }
+
+  const tone = statusToColor(health.status);
+  const failing = health.checks.filter((c) => c.status !== 'green');
+
+  return (
+    <div className={`mb-3 rounded-md border px-3 py-2 text-sm border-${tone}-200 bg-${tone}-50 text-${tone}-800`}>
+      <div className="flex items-center gap-2">
+        <Chip size="sm" color={tone} variant="flat">{health.status.toUpperCase()}</Chip>
+        <span className="font-medium">{failing.length} issue{failing.length === 1 ? '' : 's'}</span>
+        <button type="button" className="ml-auto text-xs hover:underline" onClick={() => setExpanded((v) => !v)}>
+          {expanded ? 'Hide' : 'Details'}
+        </button>
+        {isSuperAdmin && (
+          <Button
+            size="sm"
+            color="danger"
+            variant="flat"
+            isDisabled={busy}
+            startContent={<StopCircle size={14} />}
+            onPress={onOpen}
+          >
+            Emergency reset
+          </Button>
+        )}
+      </div>
+      {expanded && (
+        <ul className="mt-2 ml-2 space-y-1 list-disc list-inside">
+          {health.checks.map((c) => (
+            <li key={c.name}>
+              <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle bg-${statusToColor(c.status)}`} />
+              <strong>{c.name}:</strong> {c.detail}
+              {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
+            </li>
+          ))}
+          {health.breaker_until && isSuperAdmin && (
+            <li className="pt-1">
+              <Button size="sm" variant="flat" onPress={resetBreaker} isDisabled={busy}>
+                Close breaker now
+              </Button>
+            </li>
+          )}
+        </ul>
+      )}
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>Emergency: reset stuck queue</ModalHeader>
+          <ModalBody>
+            <p>
+              This will requeue every <code>claimed</code> or <code>running</code> row whose
+              worker has been silent for &gt;30 min, and clear the circuit breaker.
+            </p>
+            <p className="text-warning-700 text-sm">
+              Only use this if you&apos;ve confirmed the queue is stuck. If a healthy
+              worker is still running, this will create duplicate work.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onClose} isDisabled={busy}>Cancel</Button>
+            <Button color="danger" onPress={resetQueue} isDisabled={busy}>
+              Reset queue
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+}
+
+// ─── Audit history tab ─────────────────────────────────────────────────────
+
+function AuditTab() {
+  const [items, setItems] = useState<PrerenderAuditEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('');
+
+  const load = useCallback(() => {
+    setLoading(true);
+    adminPrerender.getAudit(filter || undefined, 200)
+      .then((res) => { if (res.data) setItems(res.data.items); })
+      .finally(() => setLoading(false));
+  }, [filter]);
+
+  useEffect(() => { load(); }, [load]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Select
+          size="sm"
+          label="Action filter"
+          className="max-w-xs"
+          selectedKeys={filter ? [filter] : []}
+          onChange={(e) => setFilter(e.target.value || '')}
+        >
+          <SelectItem key="">All</SelectItem>
+          <SelectItem key="enqueue">enqueue</SelectItem>
+          <SelectItem key="cancel">cancel</SelectItem>
+          <SelectItem key="purge">purge</SelectItem>
+          <SelectItem key="purge_unexpected">purge_unexpected</SelectItem>
+          <SelectItem key="invalidate">invalidate</SelectItem>
+          <SelectItem key="auto_recache">auto_recache</SelectItem>
+          <SelectItem key="detect_drift">detect_drift</SelectItem>
+          <SelectItem key="reset_breaker">reset_breaker</SelectItem>
+          <SelectItem key="reset_queue">reset_queue</SelectItem>
+        </Select>
+        <Button size="sm" variant="flat" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
+          Refresh
+        </Button>
+      </div>
+      {loading && items.length === 0 ? (
+        <div className="flex justify-center py-8"><Spinner /></div>
+      ) : items.length === 0 ? (
+        <p className="text-default-500">No audit entries.</p>
+      ) : (
+        <Table aria-label="Audit history" removeWrapper>
+          <TableHeader>
+            <TableColumn>When</TableColumn>
+            <TableColumn>Actor</TableColumn>
+            <TableColumn>Action</TableColumn>
+            <TableColumn>Outcome</TableColumn>
+            <TableColumn>Tenant</TableColumn>
+            <TableColumn>Job</TableColumn>
+            <TableColumn>Details</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {items.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{formatTs(row.created_at)}</TableCell>
+                <TableCell>
+                  {row.actor_email
+                    ? <Tooltip content={`#${row.actor_user_id ?? '?'}`}><span>{row.actor_first} {row.actor_last}</span></Tooltip>
+                    : <span className="text-default-400">system</span>}
+                </TableCell>
+                <TableCell><Code size="sm">{row.action}</Code></TableCell>
+                <TableCell>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={row.outcome === 'ok' ? 'success' : row.outcome === 'denied' ? 'warning' : 'danger'}
+                  >
+                    {row.outcome}
+                  </Chip>
+                </TableCell>
+                <TableCell>{row.tenant_slug ?? <span className="text-default-400">all</span>}</TableCell>
+                <TableCell>{row.job_id ?? '—'}</TableCell>
+                <TableCell className="max-w-md">
+                  {row.details ? (
+                    <Code size="sm" className="text-xs whitespace-pre-wrap block max-h-20 overflow-auto">
+                      {JSON.stringify(row.details)}
+                    </Code>
+                  ) : '—'}
                 </TableCell>
               </TableRow>
             ))}

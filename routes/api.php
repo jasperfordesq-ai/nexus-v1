@@ -2140,6 +2140,11 @@ Route::post('/v2/admin/prerender/auto-recache',    [\App\Http\Controllers\Api\Ad
 Route::post('/v2/admin/prerender/detect-drift',    [\App\Http\Controllers\Api\AdminPrerenderController::class, 'detectDrift']);
 Route::get('/v2/admin/prerender/metrics',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'metrics']);
 Route::get('/v2/admin/prerender/realtime-channel', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'realtimeChannel']);
+// Round 2 — health, audit, breaker reset, emergency queue reset.
+Route::get('/v2/admin/prerender/health',           [\App\Http\Controllers\Api\AdminPrerenderController::class, 'health']);
+Route::get('/v2/admin/prerender/audit',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'auditLog']);
+Route::post('/v2/admin/prerender/reset-breaker',   [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetBreaker']);
+Route::post('/v2/admin/prerender/reset-queue',     [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetQueue']);
 Route::get('/v2/admin/deliverability/dashboard', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDashboard']);
 Route::get('/v2/admin/deliverability/analytics', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getAnalytics']);
 Route::get('/v2/admin/deliverability', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDeliverables']);

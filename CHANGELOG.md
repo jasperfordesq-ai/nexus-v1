@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Prerender engine — Round 2: self-healing, audit, observability artefacts.** Building on the P0/P1/P2 audit, the engine now self-recovers from worker outages and ships first-class ops artefacts.
+  - **Per-tenant concurrency cap.** `claimNextJob` now skips rows whose tenant already has a job in flight. Stops a single slow tenant homepage from starving the queue.
+  - **Circuit breaker.** Five failed jobs inside a 10-minute window auto-pauses the queue for 15 minutes. Saves CPU on a wedged host and gives operators time to investigate. Closes automatically on cooldown; can be reset manually via `POST /api/v2/admin/prerender/reset-breaker` or the new admin UI button.
+  - **Health endpoint.** `GET /api/v2/admin/prerender/health` returns a traffic-light JSON (`green`/`yellow`/`red`) with per-check details (cache filesystem, breaker, queue age, failure rate, stuck rows) and an actionable `action` string on every failing check. Rendered into a banner at the top of the admin module.
+  - **Emergency "Reset stuck queue" button** in the health banner. Requeues every `claimed`/`running` row older than 30 min AND clears the breaker — one click. Rate-limited (2/5min per user) and audited.
+  - **Audit log.** New `prerender_audit_log` table persists every mutating action (enqueue, cancel, purge, invalidate, auto_recache, detect_drift, purge_unexpected, reset_breaker, reset_queue) with actor, IP, UA, outcome, sanitised details. New **History** tab in the admin UI surfaces it with an action filter. Secrets are scrubbed before persistence (`password`/`token`/`secret`/`api_key` keys redacted).
+  - **Per-user per-action rate limiting** on every mutating endpoint. Denied attempts are themselves audited so abuse leaves a trail.
+  - **New Prometheus metrics**: `nexus_prerender_breaker_tripped`, `nexus_prerender_breaker_until_seconds`, `nexus_prerender_queue_oldest_age_seconds`, `nexus_prerender_health_status` (0/1/2 enum).
+  - **Grafana dashboard** committed at `docs-public/observability/prerender-grafana-dashboard.json` — health + breaker + coverage + queue age + outcomes + per-tenant missing-route bargauge.
+  - **Prometheus alerting rules** committed at `docs-public/observability/prerender-alerts.yml` — 7 alerts (4 critical, 3 warning) covering RED health, breaker, cache, queue jam, coverage, recent failures, asset invalidation.
+  - **Operator runbook** at `docs-public/observability/prerender-runbook.md` — alert-by-alert response steps + emergency procedures + forensics index.
+  - **Jobs tab gains a PRIORITY column** showing HIGH/NORMAL/LOW with a tooltip explaining the numeric value. The lifecycle was already priority-aware (claim order is `priority ASC, queued_at ASC`); now you can see it at a glance.
+
 ### Fixed
 
 - **Prerender engine — admin module audit, full P0→P2 sweep.** Following the new admin panel's introduction, prerender jobs were piling up in `queued` state forever and tenant admins reported all action buttons greyed out. Full audit + 13 fixes:

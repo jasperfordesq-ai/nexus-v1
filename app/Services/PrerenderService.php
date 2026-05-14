@@ -977,20 +977,86 @@ class PrerenderService
         return $this->normaliseJob((array) $r);
     }
 
+    // -------------------------------------------------------------------------
+    // Circuit breaker
+    // -------------------------------------------------------------------------
+    //
+    // If the worker fails N times in a row inside a short window, something is
+    // wrong on the host (build broken, disk full, Playwright wedged) and
+    // running more jobs just adds noise + uses CPU. We pause the queue for a
+    // cooldown — claimNextJob returns null even when rows exist — and let
+    // operators investigate. Auto-resumes when the cooldown elapses.
+
+    public const BREAKER_FAILURE_THRESHOLD = 5;   // consecutive failures
+    public const BREAKER_WINDOW_SECONDS    = 600; // within 10 minutes
+    public const BREAKER_COOLDOWN_SECONDS  = 900; // pause queue 15 minutes
+    public const BREAKER_CACHE_KEY         = 'prerender:breaker:tripped_until';
+
+    public function breakerTrippedUntil(): ?int
+    {
+        $ts = (int) (\Illuminate\Support\Facades\Cache::get(self::BREAKER_CACHE_KEY) ?? 0);
+        return $ts > time() ? $ts : null;
+    }
+
+    public function tripBreaker(?int $cooldownSeconds = null): int
+    {
+        $until = time() + ($cooldownSeconds ?? self::BREAKER_COOLDOWN_SECONDS);
+        \Illuminate\Support\Facades\Cache::put(self::BREAKER_CACHE_KEY, $until, $until - time() + 60);
+        Log::warning('Prerender breaker tripped', ['until' => date('c', $until)]);
+        return $until;
+    }
+
+    public function resetBreaker(): void
+    {
+        \Illuminate\Support\Facades\Cache::forget(self::BREAKER_CACHE_KEY);
+    }
+
     /**
-     * Atomically claim the oldest queued job. Used by PrerenderProcessQueue.
-     * Returns the claimed job or null if the queue is empty.
+     * Max concurrent running jobs per tenant. Keeps a single misbehaving
+     * tenant (one with a slow homepage, say) from starving every other one.
+     * Global concurrency is bounded by the host cron (1 tick = 1 job).
+     */
+    public const PER_TENANT_RUNNING_CAP = 1;
+
+    /**
+     * Atomically claim the next eligible queued job. Honours:
+     *   - circuit breaker (returns null if tripped)
+     *   - per-tenant concurrency cap (skips rows whose tenant already has
+     *     a running/claimed sibling)
+     *   - priority + FIFO order
      */
     public function claimNextJob(string $claimedBy): ?array
     {
+        if ($this->breakerTrippedUntil() !== null) {
+            return null;
+        }
+
         return DB::transaction(function () use ($claimedBy): ?array {
-            $row = DB::table('prerender_jobs')
+            // Tenants that already have a job in flight. Concurrency cap.
+            $busy = DB::table('prerender_jobs')
+                ->whereIn('status', ['claimed', 'running'])
+                ->whereNotNull('tenant_id')
+                ->groupBy('tenant_id')
+                ->havingRaw('COUNT(*) >= ?', [self::PER_TENANT_RUNNING_CAP])
+                ->pluck('tenant_id')
+                ->all();
+
+            $q = DB::table('prerender_jobs')
                 ->where('status', 'queued')
                 ->orderBy('priority')
                 ->orderBy('queued_at')
                 ->orderBy('id')
-                ->lockForUpdate()
-                ->first();
+                ->lockForUpdate();
+
+            if (!empty($busy)) {
+                // Skip rows whose tenant is over the cap. NULL tenant_id
+                // (all-tenants jobs) still claimable — those serialise via
+                // the host worker lock.
+                $q->where(function ($w) use ($busy) {
+                    $w->whereNull('tenant_id')->orWhereNotIn('tenant_id', $busy);
+                });
+            }
+            $row = $q->first();
             if (!$row) return null;
 
             DB::table('prerender_jobs')
@@ -1047,6 +1113,18 @@ class PrerenderService
             'finished_at'    => date('Y-m-d H:i:s'),
         ]);
         $this->broadcastJob($id);
+
+        // Circuit breaker. Count recent failures inside the window; trip if
+        // we cross the threshold. A succeeded/partial job resets the streak.
+        if ($status === 'failed') {
+            $recentFails = DB::table('prerender_jobs')
+                ->where('status', 'failed')
+                ->where('finished_at', '>=', date('Y-m-d H:i:s', time() - self::BREAKER_WINDOW_SECONDS))
+                ->count();
+            if ($recentFails >= self::BREAKER_FAILURE_THRESHOLD) {
+                $this->tripBreaker();
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -1123,6 +1201,21 @@ class PrerenderService
             $lines[] = '# TYPE nexus_prerender_last_run_duration_seconds gauge';
             $lines[] = sprintf('nexus_prerender_last_run_duration_seconds %d', (int) $lastRun['duration_s']);
         }
+
+        // Round 2 metrics — circuit breaker + queue age + health rollup.
+        $breakerUntil = $this->breakerTrippedUntil();
+        $g('nexus_prerender_breaker_tripped', $breakerUntil !== null ? 1 : 0, 'Circuit breaker tripped (1) or closed (0)');
+        $g('nexus_prerender_breaker_until_seconds', $breakerUntil ?? 0, 'Unix ts when breaker auto-resumes (0 = closed)');
+
+        // Oldest queued job age in seconds — the most useful queue-health number.
+        $oldestQueuedRaw = DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at');
+        $oldestQueuedAge = $oldestQueuedRaw ? max(0, time() - strtotime($oldestQueuedRaw)) : 0;
+        $g('nexus_prerender_queue_oldest_age_seconds', $oldestQueuedAge, 'Age of the oldest queued job (0 if queue empty)');
+
+        // Health rollup as a numeric so Grafana/alertmanager can use thresholds.
+        $h = $this->health();
+        $hVal = $h['status'] === 'green' ? 0 : ($h['status'] === 'yellow' ? 1 : 2);
+        $g('nexus_prerender_health_status', $hVal, 'Engine health: 0=green, 1=yellow, 2=red');
 
         return implode("\n", $lines) . "\n";
     }
@@ -1831,5 +1924,235 @@ class PrerenderService
     private function escapePromLabel(string $s): string
     {
         return str_replace(['\\', '"', "\n"], ['\\\\', '\\"', '\\n'], $s);
+    }
+
+    // -------------------------------------------------------------------------
+    // Audit log
+    // -------------------------------------------------------------------------
+
+    /**
+     * Persist a single audit entry. Keep details to 8 KiB — anything more
+     * goes in log_excerpt on the job row instead.
+     */
+    public function audit(
+        string $action,
+        ?int $actorUserId,
+        ?int $tenantId = null,
+        ?int $jobId = null,
+        string $outcome = 'ok',
+        ?array $details = null,
+        ?string $ip = null,
+        ?string $userAgent = null
+    ): void {
+        try {
+            $detailsJson = $details === null ? null : json_encode(
+                $this->sanitiseAuditDetails($details),
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            );
+            if (is_string($detailsJson) && strlen($detailsJson) > 8192) {
+                $detailsJson = substr($detailsJson, 0, 8192);
+            }
+            DB::table('prerender_audit_log')->insert([
+                'actor_user_id' => $actorUserId,
+                'action'        => substr($action, 0, 64),
+                'tenant_id'     => $tenantId,
+                'job_id'        => $jobId,
+                'outcome'       => in_array($outcome, ['ok', 'denied', 'error'], true) ? $outcome : 'ok',
+                'details'       => $detailsJson,
+                'ip'            => $ip !== null ? substr($ip, 0, 64) : null,
+                'user_agent'    => $userAgent !== null ? substr($userAgent, 0, 255) : null,
+                'created_at'    => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            // Auditing failures must NEVER block the underlying operation.
+            Log::warning('Prerender audit insert failed', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Drop any obvious secrets from the audit body. Belt-and-braces — the
+     * controller already validates payloads but a future endpoint could
+     * forward sensitive fields.
+     */
+    private function sanitiseAuditDetails(array $details): array
+    {
+        $forbidden = ['password', 'token', 'secret', 'api_key', 'authorization', 'bearer'];
+        foreach ($details as $k => $v) {
+            $lower = strtolower((string) $k);
+            foreach ($forbidden as $needle) {
+                if (str_contains($lower, $needle)) {
+                    $details[$k] = '[REDACTED]';
+                    continue 2;
+                }
+            }
+            if (is_array($v)) {
+                $details[$k] = $this->sanitiseAuditDetails($v);
+            }
+        }
+        return $details;
+    }
+
+    /**
+     * Recent audit entries for the admin UI.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function recentAudit(int $limit = 100, ?string $action = null): array
+    {
+        $q = DB::table('prerender_audit_log as a')
+            ->leftJoin('users as u', 'u.id', '=', 'a.actor_user_id')
+            ->leftJoin('tenants as t', 't.id', '=', 'a.tenant_id')
+            ->select(
+                'a.*',
+                'u.first_name as actor_first',
+                'u.last_name as actor_last',
+                'u.email as actor_email',
+                't.slug as tenant_slug'
+            )
+            ->orderByDesc('a.id')
+            ->limit(max(1, min(500, $limit)));
+        if (is_string($action) && $action !== '') $q->where('a.action', $action);
+        return $q->get()->map(function ($r) {
+            $r = (array) $r;
+            if (!empty($r['details']) && is_string($r['details'])) {
+                $decoded = json_decode($r['details'], true);
+                if (is_array($decoded)) $r['details'] = $decoded;
+            }
+            return $r;
+        })->all();
+    }
+
+    // -------------------------------------------------------------------------
+    // Health endpoint
+    // -------------------------------------------------------------------------
+
+    /**
+     * Traffic-light health for the prerender engine.
+     *
+     * Status:
+     *   green  — queue draining, no breaker, all checks pass
+     *   yellow — degraded (stale queue, recent failures, missing dirs)
+     *   red    — broken (cache unreachable, breaker tripped, queue jammed)
+     *
+     * Each component lists exactly what's wrong + an actionable suggestion
+     * so operators don't have to dig through metrics to decide what to do.
+     *
+     * @return array{status:string, checks: list<array<string,mixed>>}
+     */
+    public function health(): array
+    {
+        $checks = [];
+        $worst = 'green';
+        $bump = function (string $s) use (&$worst) {
+            $rank = ['green' => 0, 'yellow' => 1, 'red' => 2];
+            if ($rank[$s] > $rank[$worst]) $worst = $s;
+        };
+
+        // 1. Cache filesystem.
+        if ($this->cacheReadable()) {
+            $checks[] = ['name' => 'cache_filesystem', 'status' => 'green', 'detail' => $this->cachePath];
+        } else {
+            $checks[] = [
+                'name'   => 'cache_filesystem',
+                'status' => 'red',
+                'detail' => 'Snapshot cache directory not readable',
+                'action' => "ls -la {$this->cachePath} on the host; check the nexus-php-prerendered volume mount",
+            ];
+            $bump('red');
+        }
+
+        // 2. Circuit breaker.
+        $breakerUntil = $this->breakerTrippedUntil();
+        if ($breakerUntil !== null) {
+            $checks[] = [
+                'name'   => 'circuit_breaker',
+                'status' => 'red',
+                'detail' => 'Breaker tripped until ' . date('c', $breakerUntil),
+                'action' => 'POST /api/v2/admin/prerender/reset-breaker after fixing the root cause (check the latest failed jobs)',
+            ];
+            $bump('red');
+        } else {
+            $checks[] = ['name' => 'circuit_breaker', 'status' => 'green', 'detail' => 'Closed (normal)'];
+        }
+
+        // 3. Queue draining. Oldest queued row should be < 5 minutes old.
+        $oldestQueued = DB::table('prerender_jobs')
+            ->where('status', 'queued')
+            ->min('queued_at');
+        if ($oldestQueued !== null) {
+            $ageS = max(0, time() - strtotime($oldestQueued));
+            if ($ageS > 600) {
+                $checks[] = [
+                    'name'   => 'queue_age',
+                    'status' => 'red',
+                    'detail' => "Oldest queued job is {$ageS}s old (>10m)",
+                    'action' => 'Check the host cron is running: sudo systemctl status cron && cat /etc/cron.d/nexus-prerender-processor',
+                ];
+                $bump('red');
+            } elseif ($ageS > 120) {
+                $checks[] = [
+                    'name'   => 'queue_age',
+                    'status' => 'yellow',
+                    'detail' => "Oldest queued job is {$ageS}s old (>2m)",
+                    'action' => 'Investigate if this persists; the worker may be slow or backed up',
+                ];
+                $bump('yellow');
+            } else {
+                $checks[] = ['name' => 'queue_age', 'status' => 'green', 'detail' => "Oldest queued: {$ageS}s"];
+            }
+        } else {
+            $checks[] = ['name' => 'queue_age', 'status' => 'green', 'detail' => 'Queue empty'];
+        }
+
+        // 4. Recent failure rate.
+        $cutoff = date('Y-m-d H:i:s', time() - self::BREAKER_WINDOW_SECONDS);
+        $recentFails = DB::table('prerender_jobs')
+            ->where('status', 'failed')
+            ->where('finished_at', '>=', $cutoff)
+            ->count();
+        if ($recentFails >= self::BREAKER_FAILURE_THRESHOLD) {
+            $checks[] = [
+                'name'   => 'recent_failures',
+                'status' => 'red',
+                'detail' => "{$recentFails} failed jobs in last 10m",
+                'action' => 'Inspect the latest failed job for root cause',
+            ];
+            $bump('red');
+        } elseif ($recentFails > 0) {
+            $checks[] = [
+                'name'   => 'recent_failures',
+                'status' => 'yellow',
+                'detail' => "{$recentFails} failed jobs in last 10m",
+                'action' => 'One-off or transient; tolerate up to ' . self::BREAKER_FAILURE_THRESHOLD,
+            ];
+            $bump('yellow');
+        } else {
+            $checks[] = ['name' => 'recent_failures', 'status' => 'green', 'detail' => 'No recent failures'];
+        }
+
+        // 5. Stuck claimed/running rows.
+        $stuckCutoff = date('Y-m-d H:i:s', time() - 1800);
+        $stuck = DB::table('prerender_jobs')
+            ->whereIn('status', ['claimed', 'running'])
+            ->where('claimed_at', '<', $stuckCutoff)
+            ->count();
+        if ($stuck > 0) {
+            $checks[] = [
+                'name'   => 'stuck_jobs',
+                'status' => 'yellow',
+                'detail' => "{$stuck} jobs claimed >30m without finishing",
+                'action' => 'Run: docker exec nexus-php-app php artisan prerender:reap-stale',
+            ];
+            $bump('yellow');
+        } else {
+            $checks[] = ['name' => 'stuck_jobs', 'status' => 'green', 'detail' => 'No stuck jobs'];
+        }
+
+        return [
+            'status'       => $worst,
+            'checked_at'   => date('c'),
+            'breaker_until'=> $breakerUntil,
+            'checks'       => $checks,
+        ];
     }
 }

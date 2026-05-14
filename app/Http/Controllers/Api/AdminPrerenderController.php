@@ -140,6 +140,9 @@ class AdminPrerenderController extends BaseApiController
     public function enqueue(Request $r): JsonResponse
     {
         $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'enqueue', 30, 60)) {
+            return $this->error('Too many enqueue requests — slow down', 429, 'RATE_LIMITED');
+        }
 
         $payload = $r->json()->all();
         $tenantSlug = $payload['tenant_slug'] ?? null;
@@ -185,6 +188,12 @@ class AdminPrerenderController extends BaseApiController
             $priority
         );
 
+        $this->service->audit(
+            'enqueue', $userId, $tenantId, $jobId, 'ok',
+            ['routes' => $routesValue, 'force' => $force, 'dry_run' => $dryRun, 'priority' => $priority],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+
         return $this->respondWithData([
             'job_id' => $jobId,
             'job'    => $this->service->getJob($jobId),
@@ -206,6 +215,9 @@ class AdminPrerenderController extends BaseApiController
     public function purge(Request $r): JsonResponse
     {
         $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'purge', 10, 60)) {
+            return $this->error('Too many purge requests', 429, 'RATE_LIMITED');
+        }
 
         $payload = $r->json()->all();
         $pattern = trim((string) ($payload['pattern'] ?? ''));
@@ -254,6 +266,12 @@ class AdminPrerenderController extends BaseApiController
             );
         }
 
+        $this->service->audit(
+            'purge', $userId, $tenantId, $jobId, 'ok',
+            ['pattern' => $pattern, 'dry_run' => $dryRun, 'deleted_count' => count($result['deleted']), 'recache' => $recache],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+
         return $this->respondWithData([
             'pattern'      => $pattern,
             'tenant_slug'  => $tenantSlug,
@@ -265,13 +283,17 @@ class AdminPrerenderController extends BaseApiController
     }
 
     /** POST /api/v2/admin/prerender/jobs/{id}/cancel */
-    public function cancelJob(int $id): JsonResponse
+    public function cancelJob(Request $r, int $id): JsonResponse
     {
-        $this->requirePlatformSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
         $ok = $this->service->cancelJob($id);
         if (!$ok) {
             return $this->error('Job is not cancellable (already claimed or finished)', 409, 'CONFLICT');
         }
+        $this->service->audit(
+            'cancel', $userId, null, $id, 'ok',
+            null, $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
         return $this->respondWithData(['cancelled' => true, 'id' => $id]);
     }
 
@@ -363,6 +385,12 @@ class AdminPrerenderController extends BaseApiController
             $jobId = $row ? (int) $row->id : null;
         }
 
+        $this->service->audit(
+            'invalidate', null, $tenantId, $jobId, 'ok',
+            ['routes' => $routes, 'invalidated' => $count, 'recache' => $recache],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+
         return $this->respondWithData([
             'invalidated' => $count,
             'tenant_id'   => $tenantId,
@@ -397,9 +425,13 @@ class AdminPrerenderController extends BaseApiController
      */
     public function autoRecache(Request $r): JsonResponse
     {
-        $this->requirePlatformSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'auto_recache', 5, 60)) {
+            return $this->error('Too many requests', 429, 'RATE_LIMITED');
+        }
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:auto-recache', $apply ? [] : ['--dry-run' => true]);
+        $this->service->audit('auto_recache', $userId, null, null, 'ok', ['applied' => $apply, 'exit_code' => $exit]);
         return $this->respondWithData([
             'exit_code' => $exit,
             'output'    => \Artisan::output(),
@@ -416,9 +448,13 @@ class AdminPrerenderController extends BaseApiController
      */
     public function detectDrift(Request $r): JsonResponse
     {
-        $this->requirePlatformSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'detect_drift', 5, 60)) {
+            return $this->error('Too many requests', 429, 'RATE_LIMITED');
+        }
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:detect-drift', $apply ? [] : ['--dry-run' => true]);
+        $this->service->audit('detect_drift', $userId, null, null, 'ok', ['applied' => $apply, 'exit_code' => $exit]);
         return $this->respondWithData([
             'exit_code' => $exit,
             'output'    => \Artisan::output(),
@@ -441,9 +477,18 @@ class AdminPrerenderController extends BaseApiController
      */
     public function purgeUnexpected(Request $r): JsonResponse
     {
-        $this->requirePlatformSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'purge_unexpected', 5, 60)) {
+            return $this->error('Too many requests', 429, 'RATE_LIMITED');
+        }
         $apply = (bool) $r->json('apply', false);
-        return $this->respondWithData($this->service->purgeUnexpectedSnapshots(!$apply));
+        $result = $this->service->purgeUnexpectedSnapshots(!$apply);
+        $this->service->audit(
+            'purge_unexpected', $userId, null, null, 'ok',
+            ['applied' => $apply, 'deleted_total' => $result['deleted_total'] ?? 0],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+        return $this->respondWithData($result);
     }
 
     /**
@@ -477,5 +522,133 @@ class AdminPrerenderController extends BaseApiController
             'channel' => \App\Services\PrerenderService::REALTIME_CHANNEL,
             'event'   => \App\Services\PrerenderService::REALTIME_EVENT,
         ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Round 2 — health, audit, breaker, emergency reset
+    // -------------------------------------------------------------------------
+
+    /**
+     * GET /api/v2/admin/prerender/health
+     *
+     * Traffic-light JSON: status (green|yellow|red) plus a list of per-check
+     * details with actionable suggestions. Designed to be scraped by uptime
+     * monitors or rendered in the admin UI banner.
+     */
+    public function health(): JsonResponse
+    {
+        $this->requireAdmin();
+        $data = $this->service->health();
+        // HTTP 200 even on red — uptime monitors decide what to alert on by
+        // reading the body's status field. A 5xx would mask the engine being
+        // up but the queue being jammed.
+        return $this->respondWithData($data);
+    }
+
+    /**
+     * GET /api/v2/admin/prerender/audit?action=&limit=
+     *
+     * Recent audit log entries. Read-only for any admin.
+     */
+    public function auditLog(Request $r): JsonResponse
+    {
+        $this->requireAdmin();
+        $action = $r->query('action');
+        $limit  = (int) $r->query('limit', 100);
+        return $this->respondWithData([
+            'items' => $this->service->recentAudit($limit, is_string($action) ? $action : null),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/reset-breaker
+     *
+     * Manually close the circuit breaker. The audit row records who did it
+     * and when; the operator should have investigated the failure trigger
+     * before resetting.
+     */
+    public function resetBreaker(Request $r): JsonResponse
+    {
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'reset_breaker', 5, 60)) {
+            return $this->error('Too many requests', 429, 'RATE_LIMITED');
+        }
+        $wasTripped = $this->service->breakerTrippedUntil();
+        $this->service->resetBreaker();
+        $this->service->audit(
+            'reset_breaker', $userId, null, null, 'ok',
+            ['was_tripped_until' => $wasTripped],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+        return $this->respondWithData(['ok' => true, 'was_tripped_until' => $wasTripped]);
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/reset-queue
+     *
+     * Emergency: requeue every claimed/running row whose worker likely died,
+     * AND clear the breaker. Equivalent to running reap-stale --requeue and
+     * reset-breaker in one click. Rate-limited because it's destructive
+     * if used while a healthy worker is actually working.
+     */
+    public function resetQueue(Request $r): JsonResponse
+    {
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'reset_queue', 2, 300)) {
+            return $this->error('Too many requests — wait a few minutes', 429, 'RATE_LIMITED');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        // Anything older than 30 min in claimed/running is fair game.
+        $cutoff = date('Y-m-d H:i:s', time() - 1800);
+        $reset = \DB::table('prerender_jobs')
+            ->whereIn('status', ['claimed', 'running'])
+            ->where(function ($q) use ($cutoff) {
+                $q->whereNull('claimed_at')->orWhere('claimed_at', '<', $cutoff);
+            })
+            ->update([
+                'status'        => 'queued',
+                'claimed_at'    => null,
+                'claimed_by'    => null,
+                'started_at'    => null,
+                'error_message' => 'reset by admin via /reset-queue',
+                'updated_at'    => $now,
+            ]);
+
+        $this->service->resetBreaker();
+
+        $this->service->audit(
+            'reset_queue', $userId, null, null, 'ok',
+            ['rows_reset' => $reset],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+
+        return $this->respondWithData([
+            'rows_reset'      => $reset,
+            'breaker_cleared' => true,
+        ]);
+    }
+
+    /**
+     * Per-user per-action rate limit using the cache. Returns true if the
+     * action is allowed, false if the caller has exceeded $limit attempts
+     * in $windowSeconds. Hard-coded keys; no need for the cluster-wide
+     * RateLimiter facade abstraction.
+     */
+    private function checkActionRate(int $userId, string $action, int $limit, int $windowSeconds): bool
+    {
+        $key = "prerender:rate:{$action}:{$userId}";
+        $count = (int) \Illuminate\Support\Facades\Cache::increment($key);
+        if ($count === 1) {
+            \Illuminate\Support\Facades\Cache::put($key, 1, $windowSeconds);
+        }
+        if ($count > $limit) {
+            $this->service->audit(
+                $action, $userId, null, null, 'denied',
+                ['reason' => 'rate_limit_exceeded', 'count' => $count, 'limit' => $limit]
+            );
+            return false;
+        }
+        return true;
     }
 }

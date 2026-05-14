@@ -1951,9 +1951,59 @@ export const adminPrerender = {
       dry_run: boolean;
     }>('/v2/admin/prerender/purge-unexpected', { apply }),
 
+  // Round 2: health / audit / breaker / reset queue.
+  getHealth: () =>
+    api.get<PrerenderHealth>('/v2/admin/prerender/health'),
+
+  getAudit: (action?: string, limit = 100) => {
+    const q = new URLSearchParams();
+    if (action) q.set('action', action);
+    q.set('limit', String(limit));
+    return api.get<{ items: PrerenderAuditEntry[] }>(`/v2/admin/prerender/audit?${q.toString()}`);
+  },
+
+  resetBreaker: () =>
+    api.post<{ ok: boolean; was_tripped_until: number | null }>(
+      '/v2/admin/prerender/reset-breaker', {},
+    ),
+
+  resetQueue: () =>
+    api.post<{ rows_reset: number; breaker_cleared: boolean }>(
+      '/v2/admin/prerender/reset-queue', {},
+    ),
+
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
   metricsUrl: '/api/v2/admin/prerender/metrics',
 };
+
+export interface PrerenderHealthCheck {
+  name: string;
+  status: 'green' | 'yellow' | 'red';
+  detail: string;
+  action?: string;
+}
+export interface PrerenderHealth {
+  status: 'green' | 'yellow' | 'red';
+  checked_at: string;
+  breaker_until: number | null;
+  checks: PrerenderHealthCheck[];
+}
+export interface PrerenderAuditEntry {
+  id: number;
+  actor_user_id: number | null;
+  actor_first?: string | null;
+  actor_last?: string | null;
+  actor_email?: string | null;
+  action: string;
+  tenant_id: number | null;
+  tenant_slug?: string | null;
+  job_id: number | null;
+  outcome: 'ok' | 'denied' | 'error';
+  details: Record<string, unknown> | null;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Super Admin (Tenant CRUD, Cross-Tenant Users, Bulk, Audit, Federation Controls)
