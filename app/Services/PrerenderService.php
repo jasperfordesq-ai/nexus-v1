@@ -427,6 +427,7 @@ class PrerenderService
         $hasNoscript = (bool) ($xp && $xp->query('//noscript')->length > 0);
 
         $statusCode = $this->readStatusSidecar(dirname($abs));
+        $integrity = $this->verifyIntegrity($abs, $html);
 
         $result = [
             'cache_path'  => $safe,
@@ -434,6 +435,7 @@ class PrerenderService
             'mtime'       => $mtime,
             'age_s'       => time() - $mtime,
             'http_status' => $statusCode,
+            'integrity'   => $integrity,
             'title'       => $title,
             'meta_description' => $metaDescription,
             'canonical'   => $canonical,
@@ -1541,24 +1543,58 @@ class PrerenderService
      */
     public function ttlForRoute(string $route): int
     {
+        return $this->describeTtlForRoute($route)['ttl_seconds'];
+    }
+
+    /**
+     * Same TTL resolution as ttlForRoute but returns full diagnostics — the
+     * matched pattern, every candidate pattern that also matched, and the
+     * winning specificity score. Powers the admin TTL inspector.
+     *
+     * @return array{route:string, ttl_seconds:int, matched_pattern:?string,
+     *               source:string, all_matches:list<array{pattern:string,ttl:int,specificity:int}>}
+     */
+    public function describeTtlForRoute(string $route): array
+    {
         $patterns = config('prerender.ttl', []);
-        if (!is_array($patterns)) return 7 * 24 * 3600;
+        $defaultTtl = is_array($patterns) ? (int) ($patterns['default'] ?? 7 * 24 * 3600) : 7 * 24 * 3600;
+        if (!is_array($patterns)) {
+            return [
+                'route'          => $route,
+                'ttl_seconds'    => $defaultTtl,
+                'matched_pattern'=> null,
+                'source'         => 'default',
+                'all_matches'    => [],
+            ];
+        }
 
         $best = null;
+        $bestPat = null;
         $bestSpecificity = -1;
+        $allMatches = [];
         foreach ($patterns as $pat => $ttl) {
             if ($pat === 'default') continue;
             if (!$this->routeMatchesPattern($route, $pat)) continue;
-            // Specificity heuristic: longer literal prefix = more specific;
-            // `**` patterns are less specific than `*` at the same depth.
             $literal = strpos($pat, '*');
             $specificity = $literal === false ? strlen($pat) * 100 : $literal * 10 - substr_count($pat, '*');
+            $allMatches[] = ['pattern' => $pat, 'ttl' => (int) $ttl, 'specificity' => $specificity];
             if ($specificity > $bestSpecificity) {
                 $bestSpecificity = $specificity;
                 $best = (int) $ttl;
+                $bestPat = $pat;
             }
         }
-        return $best ?? (int) ($patterns['default'] ?? 7 * 24 * 3600);
+
+        // Stable order for the UI.
+        usort($allMatches, fn($a, $b) => $b['specificity'] <=> $a['specificity']);
+
+        return [
+            'route'          => $route,
+            'ttl_seconds'    => $best ?? $defaultTtl,
+            'matched_pattern'=> $bestPat,
+            'source'         => $bestPat !== null ? 'pattern' : 'default',
+            'all_matches'    => $allMatches,
+        ];
     }
 
     private function routeMatchesPattern(string $route, string $pattern): bool
@@ -1567,6 +1603,36 @@ class PrerenderService
         $allowDoubleStar = str_contains($pattern, '**');
         $re = $this->globToRegex($pattern, $allowDoubleStar);
         return (bool) preg_match($re, $route);
+    }
+
+    /**
+     * Verify the snapshot's content matches its `.sha256` sidecar (written by
+     * the worker at render time).
+     *
+     * @return array{status: 'ok'|'missing'|'mismatch'|'unreadable', expected:?string, actual:?string}
+     *   status = 'missing'   when no sidecar exists (older snapshots predate this feature)
+     *   status = 'unreadable' when the sidecar is malformed
+     *   status = 'mismatch'  when bytes have changed (corruption / tamper / partial write)
+     *   status = 'ok'        when bytes match the recorded sha256
+     */
+    public function verifyIntegrity(string $absHtmlPath, ?string $htmlBytes = null): array
+    {
+        $sidecar = $absHtmlPath . '.sha256';
+        if (!is_file($sidecar) || !is_readable($sidecar)) {
+            return ['status' => 'missing', 'expected' => null, 'actual' => null];
+        }
+        $raw = trim((string) @file_get_contents($sidecar));
+        // Format: "<hex>  <bytecount>". Be tolerant — accept hex alone too.
+        if (!preg_match('/^([a-f0-9]{64})/i', $raw, $m)) {
+            return ['status' => 'unreadable', 'expected' => null, 'actual' => null];
+        }
+        $expected = strtolower($m[1]);
+        $actual = strtolower(hash('sha256', $htmlBytes ?? (string) @file_get_contents($absHtmlPath)));
+        return [
+            'status'   => hash_equals($expected, $actual) ? 'ok' : 'mismatch',
+            'expected' => $expected,
+            'actual'   => $actual,
+        ];
     }
 
     /**
@@ -2146,6 +2212,52 @@ class PrerenderService
             $bump('yellow');
         } else {
             $checks[] = ['name' => 'stuck_jobs', 'status' => 'green', 'detail' => 'No stuck jobs'];
+        }
+
+        // 6. Scheduler liveness. Each prerender:* cron stamps a cache key on
+        // success; if the gap exceeds 3× the expected interval, the scheduler
+        // itself is probably wedged (Laravel queue worker / supervisord
+        // problem) and the engine is degrading silently.
+        $expectations = [
+            'prerender-detect-drift'  => 120,    // every 2 min  → alert at 6 min
+            'prerender-auto-recache'  => 1200,   // every 20 min → alert at 60 min
+            'prerender-reap-stale'    => 300,    // every 5 min  → alert at 15 min
+        ];
+        foreach ($expectations as $name => $interval) {
+            $lastOk = (int) \Illuminate\Support\Facades\Cache::get('prerender:sched:' . $name . ':last_ok_at', 0);
+            if ($lastOk === 0) {
+                $checks[] = [
+                    'name'   => 'sched_' . $name,
+                    'status' => 'yellow',
+                    'detail' => 'No successful run recorded yet',
+                    'action' => 'Normal during the first few minutes after a deploy or cache flush',
+                ];
+                $bump('yellow');
+                continue;
+            }
+            $ageS = time() - $lastOk;
+            if ($ageS > $interval * 3) {
+                $checks[] = [
+                    'name'   => 'sched_' . $name,
+                    'status' => 'red',
+                    'detail' => "Last successful run {$ageS}s ago (expected every {$interval}s)",
+                    'action' => 'Verify the Laravel scheduler is running (supervisord nexus-scheduler unit)',
+                ];
+                $bump('red');
+            } elseif ($ageS > $interval * 2) {
+                $checks[] = [
+                    'name'   => 'sched_' . $name,
+                    'status' => 'yellow',
+                    'detail' => "Last successful run {$ageS}s ago (expected every {$interval}s)",
+                ];
+                $bump('yellow');
+            } else {
+                $checks[] = [
+                    'name'   => 'sched_' . $name,
+                    'status' => 'green',
+                    'detail' => "Last successful run {$ageS}s ago",
+                ];
+            }
         }
 
         return [

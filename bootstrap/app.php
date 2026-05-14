@@ -291,10 +291,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //   snapshot mtimes and enqueues HIGH-priority recaches. Catches every
         //   code path that bypasses Eloquent observers (raw DB, migrations,
         //   queue jobs that use the query builder).
+        // After every prerender scheduled task finishes, stamp the cache so
+        // the health endpoint can detect "scheduler stopped firing" silently.
+        $stampOk = fn(string $name) => function () use ($name) {
+            \Illuminate\Support\Facades\Cache::put('prerender:sched:' . $name . ':last_ok_at', time(), 86400);
+        };
+
         $schedule->command('prerender:detect-drift')
             ->everyTwoMinutes()
             ->withoutOverlapping(5)
             ->runInBackground()
+            ->onSuccess($stampOk('prerender-detect-drift'))
             ->name('prerender-detect-drift');
 
         //   Layer 3 (hour/day floor): TTL-based recache. Bounded by config
@@ -304,6 +311,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->cron('*/20 * * * *')
             ->withoutOverlapping(15)
             ->runInBackground()
+            ->onSuccess($stampOk('prerender-auto-recache'))
             ->name('prerender-auto-recache');
 
         //   Stale-job reaper: unsticks rows whose worker died (host reboot,
@@ -314,6 +322,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->everyFiveMinutes()
             ->withoutOverlapping(5)
             ->runInBackground()
+            ->onSuccess($stampOk('prerender-reap-stale'))
             ->name('prerender-reap-stale');
     })
     ->withRouting(

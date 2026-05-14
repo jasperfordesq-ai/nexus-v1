@@ -16,6 +16,7 @@
 
 import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync, readFileSync } from 'fs';
+import { createHash } from 'crypto';
 import { dirname } from 'path';
 
 const TIMEOUT = 30000;
@@ -375,6 +376,14 @@ async function main() {
       const outputDir = dirname(entry.output);
       mkdirSync(outputDir, { recursive: true });
       writeFileSync(entry.output, html, 'utf-8');
+
+      // Integrity sidecar: SHA-256 of the bytes we just wrote. Lets the
+      // PHP side detect corruption (truncated writes, downstream filesystem
+      // tampering, bit rot) without re-hashing megabytes on every inspect.
+      // Format: "<hex>  <byte-count>" — same shape as `sha256sum` output
+      // so an operator can verify by hand.
+      const sha = createHash('sha256').update(html, 'utf-8').digest('hex');
+      writeFileSync(`${outputDir}/index.html.sha256`, `${sha}  ${Buffer.byteLength(html, 'utf-8')}`, 'utf-8');
 
       // Sidecar Markdown for AI crawlers (Phase 5). LLMs ingest Markdown
       // more efficiently than HTML — fewer tokens, less chrome noise. Only

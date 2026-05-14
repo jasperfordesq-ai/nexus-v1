@@ -2145,6 +2145,10 @@ Route::get('/v2/admin/prerender/health',           [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/prerender/audit',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'auditLog']);
 Route::post('/v2/admin/prerender/reset-breaker',   [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetBreaker']);
 Route::post('/v2/admin/prerender/reset-queue',     [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetQueue']);
+// Round 3 — CSV export + TTL inspector.
+Route::get('/v2/admin/prerender/export/{kind}.csv', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'exportCsv'])
+    ->where('kind', 'audit|inventory|jobs');
+Route::get('/v2/admin/prerender/ttl-inspector',     [\App\Http\Controllers\Api\AdminPrerenderController::class, 'ttlInspector']);
 Route::get('/v2/admin/deliverability/dashboard', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDashboard']);
 Route::get('/v2/admin/deliverability/analytics', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getAnalytics']);
 Route::get('/v2/admin/deliverability', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDeliverables']);

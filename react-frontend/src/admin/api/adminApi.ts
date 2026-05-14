@@ -1765,6 +1765,11 @@ export interface PrerenderInspect {
   mtime: number;
   age_s: number;
   http_status: number;
+  integrity: {
+    status: 'ok' | 'missing' | 'mismatch' | 'unreadable';
+    expected: string | null;
+    actual: string | null;
+  };
   title: string;
   meta_description: string | null;
   canonical: string | null;
@@ -1972,6 +1977,11 @@ export const adminPrerender = {
       '/v2/admin/prerender/reset-queue', {},
     ),
 
+  ttlInspector: (route: string) =>
+    api.get<PrerenderTtlInspect>(
+      `/v2/admin/prerender/ttl-inspector?route=${encodeURIComponent(route)}`,
+    ),
+
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
   metricsUrl: '/api/v2/admin/prerender/metrics',
 };
@@ -1987,6 +1997,13 @@ export interface PrerenderHealth {
   checked_at: string;
   breaker_until: number | null;
   checks: PrerenderHealthCheck[];
+}
+export interface PrerenderTtlInspect {
+  route: string;
+  ttl_seconds: number;
+  matched_pattern: string | null;
+  source: 'pattern' | 'default';
+  all_matches: Array<{ pattern: string; ttl: number; specificity: number }>;
 }
 export interface PrerenderAuditEntry {
   id: number;

@@ -58,6 +58,7 @@ import {
   type PrerenderAnalytics,
   type PrerenderHealth,
   type PrerenderAuditEntry,
+  type PrerenderTtlInspect,
 } from '../../../api/adminApi';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
@@ -441,6 +442,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       </Card>
 
       <FreshnessControls isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
+      <TtlInspector />
       <PurgeControls   isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
     </div>
   );
@@ -1117,6 +1119,29 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         <Chip color={httpStatusColor(inspecting.http_status)} size="sm" variant="flat">
                           HTTP {inspecting.http_status}
                         </Chip>
+                        {inspecting.integrity && (
+                          <Tooltip content={
+                            inspecting.integrity.status === 'mismatch'
+                              ? `bytes changed since render — expected sha256 ${inspecting.integrity.expected?.slice(0, 12)}…, got ${inspecting.integrity.actual?.slice(0, 12)}…`
+                              : inspecting.integrity.status === 'missing'
+                                ? 'no sha256 sidecar — snapshot predates integrity verification or was hand-edited'
+                                : inspecting.integrity.status === 'unreadable'
+                                  ? 'sha256 sidecar exists but is malformed'
+                                  : 'bytes match the sha256 written at render time'
+                          }>
+                            <Chip
+                              size="sm"
+                              variant="flat"
+                              color={
+                                inspecting.integrity.status === 'ok' ? 'success'
+                                : inspecting.integrity.status === 'mismatch' ? 'danger'
+                                : 'default'
+                              }
+                            >
+                              integrity: {inspecting.integrity.status}
+                            </Chip>
+                          </Tooltip>
+                        )}
                         <span className="text-xs text-default-400">{formatAge(inspecting.age_s)} old</span>
                       </div>
                     </div>
@@ -2104,6 +2129,15 @@ function AuditTab() {
         <Button size="sm" variant="flat" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
           Refresh
         </Button>
+        <Button
+          size="sm"
+          variant="flat"
+          as="a"
+          href={`/api/v2/admin/prerender/export/audit.csv${filter ? `?action=${encodeURIComponent(filter)}` : ''}`}
+          startContent={<ExternalLink size={14} />}
+        >
+          Export CSV
+        </Button>
       </div>
       {loading && items.length === 0 ? (
         <div className="flex justify-center py-8"><Spinner /></div>
@@ -2154,5 +2188,91 @@ function AuditTab() {
         </Table>
       )}
     </div>
+  );
+}
+
+// ─── TTL inspector (Overview tab card) ─────────────────────────────────────
+
+function TtlInspector() {
+  const [route, setRoute] = useState('/');
+  const [result, setResult] = useState<PrerenderTtlInspect | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminPrerender.ttlInspector(route);
+      if (res.data) setResult(res.data as PrerenderTtlInspect);
+    } catch {
+      setError('Lookup failed — check the route format (must start with "/")');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fmt = (s: number): string => {
+    if (s < 3600) return `${Math.round(s / 60)} min`;
+    if (s < 86400) return `${Math.round(s / 3600)} h`;
+    return `${Math.round(s / 86400)} d`;
+  };
+
+  return (
+    <Card shadow="sm">
+      <CardHeader>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Clock size={18} />TTL inspector
+        </h3>
+      </CardHeader>
+      <CardBody className="space-y-3">
+        <p className="text-sm text-default-500">
+          See which <code>config/prerender.php</code> pattern owns a route and what TTL it gets,
+          without grepping config. Used to tune the freshness policy.
+        </p>
+        <div className="flex gap-2 items-end">
+          <Input
+            label="Route"
+            placeholder="/blog/my-post"
+            variant="bordered"
+            value={route}
+            onChange={(e) => setRoute(e.target.value)}
+            className="max-w-sm"
+            description="Path only — no scheme or host"
+          />
+          <Button color="primary" onPress={submit} isLoading={loading}>
+            Inspect
+          </Button>
+        </div>
+        {error && <p className="text-danger text-sm">{error}</p>}
+        {result && (
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <Chip color="primary" variant="flat" size="sm">
+                TTL: {fmt(result.ttl_seconds)} ({result.ttl_seconds}s)
+              </Chip>
+              <Chip variant="flat" size="sm" color={result.source === 'pattern' ? 'success' : 'default'}>
+                {result.source}
+              </Chip>
+              {result.matched_pattern && (
+                <Code size="sm">match: {result.matched_pattern}</Code>
+              )}
+            </div>
+            {result.all_matches.length > 1 && (
+              <div>
+                <p className="text-xs font-medium mb-1">Other patterns that match this route:</p>
+                <ul className="text-xs space-y-1 ml-2">
+                  {result.all_matches.slice(1).map((m) => (
+                    <li key={m.pattern} className="font-mono text-default-500">
+                      {m.pattern} → {fmt(m.ttl)} (specificity {m.specificity})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </CardBody>
+    </Card>
   );
 }

@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Prerender engine — Round 3: defense in depth + operator superpowers.**
+  - **Scheduler liveness tracking.** Every prerender scheduled task (`detect-drift`, `auto-recache`, `reap-stale`) now stamps a cache key on success. The health endpoint checks the age of each stamp against 2×/3× the expected interval and surfaces a yellow/red check if the Laravel scheduler has stopped firing — catches the "supervisord nexus-scheduler died" failure mode that would otherwise be silent.
+  - **Webhook nonce one-time-use.** HMAC `/invalidate` already had a 5-min timestamp window; now each `(timestamp, signature)` pair can only be used once. The nonce is keyed by `sha256(ts:sig)` and persisted for 600s. Replay attempts are bounced AND audited with `outcome=denied, reason=webhook_replay` for forensics.
+  - **Snapshot integrity verification.** The Playwright worker now writes a `.sha256` sidecar next to every `index.html` it renders. The Inspect drawer shows an `integrity: ok|missing|mismatch|unreadable` chip — mismatch is highlighted in danger color and the tooltip shows the expected vs actual prefixes. Catches filesystem corruption, bit rot, and hand-edits that would otherwise look like a valid snapshot.
+  - **CSV export** for the three operator-facing tables: `GET /api/v2/admin/prerender/export/{audit,inventory,jobs}.csv`. Streamed, capped at 5,000 rows. "Export CSV" button on the History tab; the same URLs work for cron-scraped exports.
+  - **TTL inspector** card on the Overview tab. Type a route, see which `config/prerender.php` pattern owns it, what TTL it gets, and what other patterns also match (with their specificities). No more grepping config to understand the freshness policy.
+
 - **Prerender engine — Round 2: self-healing, audit, observability artefacts.** Building on the P0/P1/P2 audit, the engine now self-recovers from worker outages and ships first-class ops artefacts.
   - **Per-tenant concurrency cap.** `claimNextJob` now skips rows whose tenant already has a job in flight. Stops a single slow tenant homepage from starving the queue.
   - **Circuit breaker.** Five failed jobs inside a 10-minute window auto-pauses the queue for 15 minutes. Saves CPU on a wedged host and gives operators time to investigate. Closes automatically on cooldown; can be reset manually via `POST /api/v2/admin/prerender/reset-breaker` or the new admin UI button.

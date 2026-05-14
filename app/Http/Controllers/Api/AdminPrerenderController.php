@@ -338,7 +338,26 @@ class AdminPrerenderController extends BaseApiController
                         // captured (timestamp, body, signature) tuple is only
                         // usable inside the 5-minute window.
                         $expected = hash_hmac('sha256', $ts . '.' . $r->getContent(), $token);
-                        if (hash_equals($expected, $sig)) $authed = true;
+                        if (hash_equals($expected, $sig)) {
+                            // One-time-use nonce: even within the 5-minute
+                            // window, the same signature can't be replayed.
+                            // Key TTL = 2× max skew so an attacker can't
+                            // simply wait for it to expire.
+                            $nonceKey = 'prerender:webhook:nonce:' . hash('sha256', $ts . ':' . $sig);
+                            $fresh = \Illuminate\Support\Facades\Cache::add($nonceKey, 1, 600);
+                            if ($fresh) {
+                                $authed = true;
+                            } else {
+                                // Replay detected. Don't tell the caller why
+                                // — just bounce — but audit it so we have a
+                                // forensic record.
+                                $this->service->audit(
+                                    'invalidate', null, null, null, 'denied',
+                                    ['reason' => 'webhook_replay', 'ts' => $ts],
+                                    $r->ip(), substr((string) $r->userAgent(), 0, 255)
+                                );
+                            }
+                        }
                     }
                 }
             }
@@ -627,6 +646,113 @@ class AdminPrerenderController extends BaseApiController
             'rows_reset'      => $reset,
             'breaker_cleared' => true,
         ]);
+    }
+
+    /**
+     * GET /api/v2/admin/prerender/export/{kind}.csv
+     *
+     * Streamed CSV export. `kind` ∈ { audit, inventory, jobs }. No new logic —
+     * just calls the read methods and emits CSV. Big-result-set safe because
+     * we cap each kind at 5,000 rows; if you need more, use the JSON API
+     * with paging.
+     */
+    public function exportCsv(Request $r, string $kind): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->requireAdmin();
+        $kind = strtolower($kind);
+        if (!in_array($kind, ['audit', 'inventory', 'jobs'], true)) {
+            abort(404, 'Unknown export kind');
+        }
+
+        $filename = sprintf('prerender-%s-%s.csv', $kind, date('Ymd-His'));
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control'       => 'no-store',
+        ];
+
+        return response()->stream(function () use ($kind, $r) {
+            $out = fopen('php://output', 'w');
+
+            if ($kind === 'audit') {
+                fputcsv($out, ['id', 'created_at', 'action', 'outcome', 'actor_email', 'tenant_slug', 'job_id', 'ip', 'details']);
+                foreach ($this->service->recentAudit(5000, $r->query('action')) as $row) {
+                    fputcsv($out, [
+                        $row['id'] ?? '',
+                        $row['created_at'] ?? '',
+                        $row['action'] ?? '',
+                        $row['outcome'] ?? '',
+                        $row['actor_email'] ?? '',
+                        $row['tenant_slug'] ?? '',
+                        $row['job_id'] ?? '',
+                        $row['ip'] ?? '',
+                        is_array($row['details'] ?? null) ? json_encode($row['details']) : '',
+                    ]);
+                }
+            } elseif ($kind === 'inventory') {
+                fputcsv($out, ['host', 'route', 'cache_path', 'size_bytes', 'mtime', 'age_s', 'staleness', 'http_status', 'content_stale', 'asset_issues']);
+                $items = $this->service->inventory($r->query('tenant'));
+                foreach (array_slice($items, 0, 5000) as $row) {
+                    if (!empty($row['__truncated'])) continue;
+                    fputcsv($out, [
+                        $row['host'] ?? '',
+                        $row['route'] ?? '',
+                        $row['cache_path'] ?? '',
+                        $row['size_bytes'] ?? '',
+                        $row['mtime'] ?? '',
+                        $row['age_s'] ?? '',
+                        $row['staleness'] ?? '',
+                        $row['http_status'] ?? '',
+                        ($row['content_stale'] ?? false) ? '1' : '0',
+                        is_array($row['asset_issues'] ?? null) ? implode('|', $row['asset_issues']) : '',
+                    ]);
+                }
+            } else { // jobs
+                fputcsv($out, ['id', 'status', 'priority', 'tenant_slug', 'routes', 'force', 'dry_run', 'queued_at', 'started_at', 'finished_at', 'duration_s', 'exit_code', 'rendered_count', 'planned_count', 'requested_by']);
+                $rows = $this->service->listJobs(5000, $r->query('status'));
+                foreach ($rows as $row) {
+                    fputcsv($out, [
+                        $row['id'] ?? '',
+                        $row['status'] ?? '',
+                        $row['priority'] ?? '',
+                        $row['tenant_slug'] ?? '',
+                        $row['routes'] ?? '',
+                        ($row['force'] ?? false) ? '1' : '0',
+                        ($row['dry_run'] ?? false) ? '1' : '0',
+                        $row['queued_at'] ?? '',
+                        $row['started_at'] ?? '',
+                        $row['finished_at'] ?? '',
+                        $row['duration_s'] ?? '',
+                        $row['exit_code'] ?? '',
+                        $row['rendered_count'] ?? '',
+                        $row['planned_count'] ?? '',
+                        is_array($row['requested_by'] ?? null) ? ($row['requested_by']['email'] ?? '') : '',
+                    ]);
+                }
+            }
+
+            fclose($out);
+        }, 200, $headers);
+    }
+
+    /**
+     * GET /api/v2/admin/prerender/ttl-inspector?route=/blog/foo
+     *
+     * Returns which config/prerender.php pattern matches the given route and
+     * what TTL it gets. Lets operators see the freshness policy at a glance
+     * without grepping config.
+     */
+    public function ttlInspector(Request $r): JsonResponse
+    {
+        $this->requireAdmin();
+        $route = (string) $r->query('route', '');
+        if ($route === '' || $route[0] !== '/') {
+            return $this->error('route must start with "/"', 400, 'VALIDATION_INVALID');
+        }
+        if (!preg_match(\App\Services\PrerenderService::ROUTE_REGEX, $route)) {
+            return $this->error('Invalid route', 400, 'VALIDATION_INVALID');
+        }
+        return $this->respondWithData($this->service->describeTtlForRoute($route));
     }
 
     /**
