@@ -531,9 +531,9 @@
     "vetting_body": "Some exchanges — childcare, elderly care, support for vulnerable adults — legally require Garda vetting in Ireland. Members offering these services are responsible for holding current vetting, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf.",
     "insurance_title": "Insurance and liability",
     "insurance_items": {
-      "0": "{{name}} carries platform liability insurance for the running of the website and coordinator activity.",
-      "1": "Members are NOT covered by our insurance for the work they do for each other. Exchanges are between members.",
-      "2": "If you offer professional services (plumbing, electrical, healthcare, legal, financial advice), you’re responsible for your own professional indemnity and any regulatory obligations that apply.",
+      "0": "{{name}} does not provide insurance for exchanges between members. The platform is a connection service — it does not insure, indemnify, or underwrite the work members do for each other.",
+      "1": "Members are NOT covered by any platform insurance for the work they do for each other. Exchanges are entirely between members and at members’ own risk. See our Terms of Service for the full liability and indemnity position.",
+      "2": "If you offer professional services (plumbing, electrical, healthcare, legal, financial advice), you’re responsible for your own professional indemnity insurance and any regulatory obligations that apply.",
       "3": "Time credits have no monetary value. They can’t be exchanged for cash, sold, or used outside the timebanking community."
     },
     "disputes_title": "When something goes wrong",
