@@ -1203,14 +1203,31 @@ class PrerenderService
         // expected sets across tenants per host.
         $expectedByHost = [];
         $slugByHostRoute = []; // For reporting only — which tenant "owned" the missing route.
+        // List of known tenant prefixes per host. Used to strip the tenant
+        // prefix off an inventory route BEFORE the dynamic-content check —
+        // otherwise an inventory like "/partner-demo/blog/foo" looks like a
+        // static route, not a dynamic blog post.
+        $prefixesByHost = [];
         foreach ($tenants as $t) {
             $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
             $tenantRoutes = $this->routesForTenant($tObj);
             $prefix = $t['prefix']; // '' for custom-domain tenants, '/slug' for app-host
+            if ($prefix !== '') {
+                $prefixesByHost[$t['host']][] = $prefix;
+            }
             foreach ($tenantRoutes as $r) {
                 $prefixed = $prefix . $r;
-                $expectedByHost[$t['host']][$prefixed] = true;
-                $slugByHostRoute[$t['host']][$prefixed] = $t['slug'];
+                // Normalise the homepage entry: inventory drops the trailing
+                // slash from "/partner-demo/index.html" → "/partner-demo",
+                // while $prefix . '/' produces "/partner-demo/". Treat both
+                // forms as the homepage so the comparison hits.
+                if ($r === '/' && $prefix !== '') {
+                    $expectedByHost[$t['host']][$prefix] = true;
+                    $slugByHostRoute[$t['host']][$prefix] = $t['slug'];
+                } else {
+                    $expectedByHost[$t['host']][$prefixed] = true;
+                    $slugByHostRoute[$t['host']][$prefixed] = $t['slug'];
+                }
             }
         }
 
@@ -1220,22 +1237,19 @@ class PrerenderService
             $hostExpected = $expectedByHost[$row['host']] ?? null;
             if ($hostExpected === null) continue;
 
-            // Strip tenant prefix before the dynamic check — app-host routes
-            // carry it (e.g. /partner-demo/blog/foo), but isDynamicContentRoute
-            // matches the canonical /blog/ form. Use any tenant-prefix from
-            // this host's expected map to detect and strip.
+            // Strip tenant prefix before the dynamic check. Match against the
+            // KNOWN tenant prefixes for this host (collected above) — never
+            // guess from a regex, because routes like /marketplace/free would
+            // otherwise be misread as a tenant prefix.
             $tenantLocalRoute = $row['route'];
-            foreach (array_keys($slugByHostRoute[$row['host']] ?? []) as $expRoute) {
-                if (preg_match('#^/[A-Za-z0-9_-]+/#', $expRoute, $pm)) {
-                    $candidate = rtrim($pm[0], '/');
-                    if (str_starts_with($tenantLocalRoute, $candidate . '/')) {
-                        $tenantLocalRoute = substr($tenantLocalRoute, strlen($candidate));
-                        break;
-                    }
-                    if ($tenantLocalRoute === $candidate) {
-                        $tenantLocalRoute = '/';
-                        break;
-                    }
+            foreach ($prefixesByHost[$row['host']] ?? [] as $tenantPrefix) {
+                if (str_starts_with($tenantLocalRoute, $tenantPrefix . '/')) {
+                    $tenantLocalRoute = substr($tenantLocalRoute, strlen($tenantPrefix));
+                    break;
+                }
+                if ($tenantLocalRoute === $tenantPrefix) {
+                    $tenantLocalRoute = '/';
+                    break;
                 }
             }
 
