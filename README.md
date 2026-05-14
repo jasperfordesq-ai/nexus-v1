@@ -1,6 +1,6 @@
 # Project NEXUS
 
-> **Version 1.5 — Release Candidate** — Project NEXUS V1.5 is a release candidate, in active production use while undergoing final pre-release validation. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. It is currently in use by communities in **Ireland** and being tested by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Contributions and feedback are welcome.
+> **Version 1.5 — Generally Available** — Project NEXUS V1.5 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
 
 A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 18, and MariaDB.
 
@@ -103,7 +103,7 @@ A legacy schema dump is also available at [schema.sql](schema.sql) if needed for
 
 ## Project Status
 
-This is **version 1.5 — release candidate**, in active production use while undergoing final pre-release validation:
+This is **version 1.5 — generally available**, in active production use. Per-module maturity (GA / Beta / Preview) is published on the in-app `/features` page and the public Changelog:
 
 - The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
 - The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel and planned for `accessible.project-nexus.ie`

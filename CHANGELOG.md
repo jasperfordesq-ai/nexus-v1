@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Sales site (`project-nexus.ie`) — GA messaging and audit-driven fixes.**
+  - Hero badge updated from "V1.5 Now Open Source — AGPL-3.0" to "V1.5 Generally Available · Open Source · AGPL-3.0" so the public marketing site matches the actual v1.5 GA status promoted in CHANGELOG.md.
+  - **Broken Documentation link fixed.** The Get Started panel linked to `github.com/jasperfordesq-ai/nexus-v1/tree/main/docs`, which 404s — that path doesn't exist (the repo has `docs-public/`, not `docs/`). Repointed to the repo README anchor (`#readme`) with a sublabel referencing `docs-public/`.
+  - **WCAG claim softened.** "WCAG 2.1 AA — full accessibility compliance" was an unsupported blanket claim. Now reads "built to WCAG 2.1 AA targets with ongoing audit."
+  - **Prerender.io reference removed from the SEO feature card.** The platform is fully self-hosted on Playwright-rendered snapshots; the old "Prerender.io fallback" wording was stale. New copy describes the actual three-layer freshness model (observer + sitemap-drift + TTL) and HTTP status propagation.
+  - Sitemap `lastmod` bumped to 2026-05-14.
+- **README — v1.5 status promoted to Generally Available.** The top-of-file blurb and the "Project Status" section both said "Release Candidate / in active production use while undergoing final pre-release validation." Updated both to "Generally Available, in active production use" with a pointer to the in-app `/features` page and CHANGELOG for per-module maturity. Historical RC entries in CHANGELOG.md and the `v1.5.0-rc.1` release marker in `.github/RELEASE_PROCESS.md` are left untouched (historical record).
+- **Sales-site nginx — security headers hardened.** Added `Content-Security-Policy` (allowing only Google Fonts and Ahrefs analytics, which are the only third-party origins the page actually loads), `Strict-Transport-Security` (`max-age=31536000; includeSubDomains; preload`), and `Permissions-Policy` (deny accelerometer/camera/geo/gyro/mic/payment/usb). Dropped the now-deprecated `X-XSS-Protection` header — modern browsers ignore it and CSP supersedes it. Headers repeated in the static-asset and HTML `location` blocks because nginx `add_header` is replace-not-merge.
+
 ### Fixed
 
 - **Admin panel — raw translation keys no longer leak.** The Algorithm Settings and AI Settings pages (and 19 other admin pages, mostly in Caring Community) were rendering raw `t()` keys like `algo.feed_label`, `advanced.provider_openai`, `admin.providers.title` because their translation keys were never added to the locale files.
