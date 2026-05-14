@@ -26,7 +26,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { useTenant } from '@/contexts';
+import { useTenant, useFeature, useModule } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
@@ -49,6 +49,12 @@ export function HelpCenterPage() {
   const { t } = useTranslation('utility');
   const { branding, tenantPath } = useTenant();
   usePageTitle(t('help.page_title'));
+
+  // QuickLinks must respect this tenant's enabled modules/features — otherwise
+  // members hit dead links to features their tenant has turned off.
+  const hasListings = useModule('listings');
+  const hasWallet = useModule('wallet');
+  const hasEvents = useFeature('events');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [faqGroups, setFaqGroups] = useState<FaqGroup[]>([]);
@@ -136,9 +142,9 @@ export function HelpCenterPage() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-2 sm:grid-cols-4 gap-3"
       >
-        <QuickLink to={tenantPath('/listings')} icon={<BookOpen />} label={t('help.quick_browse_listings')} />
-        <QuickLink to={tenantPath('/wallet')} icon={<Wallet />} label={t('help.quick_my_wallet')} />
-        <QuickLink to={tenantPath('/events')} icon={<Calendar />} label={t('help.quick_events')} />
+        {hasListings && <QuickLink to={tenantPath('/listings')} icon={<BookOpen />} label={t('help.quick_browse_listings')} />}
+        {hasWallet && <QuickLink to={tenantPath('/wallet')} icon={<Wallet />} label={t('help.quick_my_wallet')} />}
+        {hasEvents && <QuickLink to={tenantPath('/events')} icon={<Calendar />} label={t('help.quick_events')} />}
         <QuickLink to={tenantPath('/contact')} icon={<MessageSquare />} label={t('help.quick_contact_us')} />
       </motion.div>
 
