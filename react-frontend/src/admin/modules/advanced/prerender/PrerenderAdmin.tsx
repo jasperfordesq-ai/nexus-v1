@@ -24,6 +24,7 @@ import {
   Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn,
   TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader,
   ModalBody, ModalFooter, useDisclosure, Tooltip, Divider, Code,
+  Checkbox,
 } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
@@ -37,6 +38,10 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import Activity from 'lucide-react/icons/activity';
 import AlertOctagon from 'lucide-react/icons/octagon-alert';
 import StopCircle from 'lucide-react/icons/circle-stop';
+import Trash from 'lucide-react/icons/trash-2';
+import Bot from 'lucide-react/icons/bot';
+import Gauge from 'lucide-react/icons/gauge';
+import Zap from 'lucide-react/icons/zap';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
 import { PageHeader } from '../../../components';
@@ -49,6 +54,7 @@ import {
   type PrerenderEvent,
   type PrerenderFailure,
   type PrerenderInspect,
+  type PrerenderAnalytics,
 } from '../../../api/adminApi';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
@@ -76,6 +82,24 @@ function formatTs(ts: number | string | null | undefined): string {
 
 function stalenessColor(s: 'fresh' | 'warn' | 'stale'): 'success' | 'warning' | 'danger' {
   return s === 'fresh' ? 'success' : s === 'warn' ? 'warning' : 'danger';
+}
+
+function seoGradeColor(g: 'A' | 'B' | 'C' | 'D' | 'F'): 'success' | 'primary' | 'warning' | 'danger' | 'default' {
+  switch (g) {
+    case 'A': return 'success';
+    case 'B': return 'primary';
+    case 'C': return 'warning';
+    case 'D': return 'warning';
+    case 'F': return 'danger';
+  }
+}
+
+function httpStatusColor(n: number): 'default' | 'success' | 'warning' | 'danger' {
+  if (n === 200) return 'success';
+  if (n >= 300 && n < 400) return 'default';
+  if (n >= 400 && n < 500) return 'warning';
+  if (n >= 500) return 'danger';
+  return 'default';
 }
 
 function jobStatusColor(s: PrerenderJob['status']): 'default' | 'primary' | 'success' | 'warning' | 'danger' {
@@ -185,6 +209,12 @@ export function PrerenderAdmin() {
           title={<span className="flex items-center gap-2"><Briefcase size={16} />Jobs</span>}
         >
           <JobsTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} live={live} />
+        </Tab>
+        <Tab
+          key="analytics"
+          title={<span className="flex items-center gap-2"><Bot size={16} />Analytics</span>}
+        >
+          <AnalyticsTab />
         </Tab>
         <Tab
           key="events"
@@ -369,7 +399,249 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolea
           </div>
         </CardBody>
       </Card>
+
+      <FreshnessControls isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
+      <PurgeControls   isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
     </div>
+  );
+}
+
+// ─── Overview helpers: freshness + purge action cards ──────────────────────
+
+function FreshnessControls({
+  isSuperAdmin, toast, onActed,
+}: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
+  const [autoRecLoading, setAutoRecLoading] = useState(false);
+  const [autoRecOutput, setAutoRecOutput] = useState<string>('');
+  const [driftLoading, setDriftLoading] = useState(false);
+  const [driftOutput, setDriftOutput] = useState<string>('');
+
+  const runAutoRecache = async (apply: boolean) => {
+    setAutoRecLoading(true);
+    setAutoRecOutput('');
+    try {
+      const res = await adminPrerender.triggerAutoRecache(apply);
+      if (res.data) {
+        setAutoRecOutput(res.data.output || '(no output)');
+        toast.success(apply ? 'Auto-recache applied' : 'Auto-recache dry-run complete');
+        if (apply) onActed();
+      }
+    } catch {
+      toast.error('Failed to trigger auto-recache');
+    } finally {
+      setAutoRecLoading(false);
+    }
+  };
+
+  const runDriftDetect = async (apply: boolean) => {
+    setDriftLoading(true);
+    setDriftOutput('');
+    try {
+      const res = await adminPrerender.triggerDetectDrift(apply);
+      if (res.data) {
+        setDriftOutput(res.data.output || '(no output)');
+        toast.success(apply ? 'Drift detection applied' : 'Drift dry-run complete');
+        if (apply) onActed();
+      }
+    } catch {
+      toast.error('Failed to trigger drift detection');
+    } finally {
+      setDriftLoading(false);
+    }
+  };
+
+  return (
+    <Card shadow="sm">
+      <CardHeader>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Zap size={18} />Freshness automation
+        </h3>
+      </CardHeader>
+      <CardBody className="gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <p className="font-medium flex items-center gap-2">
+              <Gauge size={16} className="text-warning" />Auto-recache (TTL + content drift)
+            </p>
+            <p className="text-sm text-default-500">
+              Scans every snapshot. Enqueues low-priority recaches for routes whose source content
+              has changed (DB updated_at &gt; snapshot mtime) or whose TTL has expired. Runs on cron
+              every 15–30 min; use this to trigger one immediately.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="flat"
+                onPress={() => runAutoRecache(false)}
+                isLoading={autoRecLoading}
+                isDisabled={!isSuperAdmin}
+                size="sm"
+              >
+                Dry run
+              </Button>
+              <Button
+                color="primary"
+                onPress={() => runAutoRecache(true)}
+                isLoading={autoRecLoading}
+                isDisabled={!isSuperAdmin}
+                size="sm"
+                startContent={<Play size={14} />}
+              >
+                Apply
+              </Button>
+            </div>
+            {autoRecOutput && (
+              <Code className="text-xs whitespace-pre-wrap block max-h-48 overflow-auto">
+                {autoRecOutput}
+              </Code>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <p className="font-medium flex items-center gap-2">
+              <Search size={16} className="text-primary" />Detect drift (sitemap vs snapshots)
+            </p>
+            <p className="text-sm text-default-500">
+              Walks each tenant&apos;s sitemap, compares &lt;lastmod&gt; against snapshot mtimes.
+              Catches stale pages from code paths that bypass Eloquent observers (raw DB writes,
+              migrations, queued jobs). Runs every 2 min. Enqueues HIGH-priority recaches.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="flat"
+                onPress={() => runDriftDetect(false)}
+                isLoading={driftLoading}
+                isDisabled={!isSuperAdmin}
+                size="sm"
+              >
+                Dry run
+              </Button>
+              <Button
+                color="primary"
+                onPress={() => runDriftDetect(true)}
+                isLoading={driftLoading}
+                isDisabled={!isSuperAdmin}
+                size="sm"
+                startContent={<Play size={14} />}
+              >
+                Apply
+              </Button>
+            </div>
+            {driftOutput && (
+              <Code className="text-xs whitespace-pre-wrap block max-h-48 overflow-auto">
+                {driftOutput}
+              </Code>
+            )}
+          </div>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function PurgeControls({
+  isSuperAdmin, toast, onActed,
+}: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
+  const [pattern, setPattern] = useState('');
+  const [tenant, setTenant] = useState('');
+  const [dryRun, setDryRun] = useState(true);
+  const [recache, setRecache] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ deleted_count: number; deleted: string[]; dry_run: boolean } | null>(null);
+
+  const submit = async () => {
+    if (!pattern.trim()) {
+      toast.error('Pattern is required (e.g. /blog/*)');
+      return;
+    }
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await adminPrerender.purge({
+        pattern: pattern.trim(),
+        tenant_slug: tenant.trim() || undefined,
+        dry_run: dryRun,
+        recache,
+      });
+      if (res.data) {
+        setResult(res.data);
+        toast.success(
+          dryRun
+            ? `Dry run: ${res.data.deleted_count} snapshots would be purged`
+            : `Purged ${res.data.deleted_count} snapshots${res.data.recache_job_id ? ` (job #${res.data.recache_job_id})` : ''}`
+        );
+        if (!dryRun) onActed();
+      }
+    } catch {
+      toast.error('Purge failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card shadow="sm">
+      <CardHeader>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Trash size={18} />Wildcard cache purge
+        </h3>
+      </CardHeader>
+      <CardBody className="gap-3">
+        <p className="text-sm text-default-500">
+          Delete snapshots matching a glob pattern. Use <code>*</code> for one path segment,
+          <code className="ml-1">**</code> for any descendant. Examples: <code>/blog/*</code>,
+          <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code> (homepage only).
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Input
+            label="Pattern"
+            placeholder="/blog/* or /listings/**"
+            variant="bordered"
+            value={pattern}
+            onValueChange={setPattern}
+            isDisabled={!isSuperAdmin}
+          />
+          <Input
+            label="Tenant slug"
+            placeholder="optional — leave blank for all"
+            variant="bordered"
+            value={tenant}
+            onValueChange={setTenant}
+            isDisabled={!isSuperAdmin}
+          />
+        </div>
+        <div className="flex items-center gap-6">
+          <Switch isSelected={dryRun} onValueChange={setDryRun} isDisabled={!isSuperAdmin}>
+            <span className="text-sm">Dry run</span>
+          </Switch>
+          <Switch isSelected={recache} onValueChange={setRecache} isDisabled={!isSuperAdmin}>
+            <span className="text-sm">Auto-recache after purge</span>
+          </Switch>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            color={dryRun ? 'primary' : 'danger'}
+            startContent={<Trash size={16} />}
+            onPress={submit}
+            isLoading={loading}
+            isDisabled={!isSuperAdmin}
+          >
+            {dryRun ? 'Preview purge' : 'Purge now'}
+          </Button>
+        </div>
+        {result && (
+          <div className="space-y-1">
+            <p className="text-sm font-medium">
+              {result.dry_run ? 'Would delete' : 'Deleted'} {result.deleted_count} snapshots
+            </p>
+            {result.deleted.length > 0 && (
+              <Code className="text-xs whitespace-pre-wrap block max-h-48 overflow-auto">
+                {result.deleted.join('\n')}
+              </Code>
+            )}
+          </div>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -403,12 +675,17 @@ function KpiCard({
 
 function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string | null; onPresetConsumed: () => void }) {
   const toast = useToast();
+  const { user } = useAuth();
+  const isSuperAdmin = Boolean(user?.is_super_admin || user?.is_god || user?.role === 'super_admin');
   const [items, setItems] = useState<PrerenderInventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [stalenessFilter, setStalenessFilter] = useState<string>('all');
   const [issueFilter, setIssueFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [tenant, setTenant] = useState('');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   // Coverage tab may have deep-linked here with a tenant preset; consume once.
   useEffect(() => {
@@ -438,6 +715,8 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
     }
     if (issueFilter === 'content_stale') out = out.filter((i) => i.content_stale);
     if (issueFilter === 'asset_invalid') out = out.filter((i) => i.asset_issues.length > 0);
+    if (statusFilter === '200')      out = out.filter((i) => i.http_status === 200);
+    else if (statusFilter === 'non-200') out = out.filter((i) => i.http_status !== 200);
     if (filter.trim()) {
       const needle = filter.trim().toLowerCase();
       out = out.filter(
@@ -445,7 +724,80 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       );
     }
     return out;
-  }, [items, filter, stalenessFilter, issueFilter]);
+  }, [items, filter, stalenessFilter, issueFilter, statusFilter]);
+
+  /**
+   * Bulk-recache the currently-selected rows. Groups by host → tenant so each
+   * tenant gets a single enqueue with a comma-joined route list at NORMAL
+   * priority (user-initiated, not background).
+   */
+  const bulkRecache = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    try {
+      // Group selected items by host (resolves to tenant via the inventory rows).
+      const byHost = new Map<string, { tenantId: number | null; routes: string[] }>();
+      const itemMap = new Map(filtered.map((i) => [i.cache_path, i] as const));
+      // We need tenant_id, but the inventory row doesn't carry it. Use the
+      // invalidate webhook which takes (tenant_id, routes[]). To resolve
+      // tenant_id from host, look up via the coverage API on first use.
+      const coverage = await adminPrerender.getCoverage();
+      const hostToTenantId = new Map(
+        (coverage.data?.rows ?? []).map((r) => [r.host, r.tenant_id] as const),
+      );
+
+      for (const cachePath of selected) {
+        const it = itemMap.get(cachePath);
+        if (!it) continue;
+        const tenantId = hostToTenantId.get(it.host) ?? null;
+        const slot = byHost.get(it.host) ?? { tenantId, routes: [] };
+        slot.routes.push(it.route);
+        byHost.set(it.host, slot);
+      }
+
+      let invalidated = 0;
+      for (const [, slot] of byHost) {
+        if (slot.tenantId == null || slot.routes.length === 0) continue;
+        const res = await adminPrerender.invalidate({
+          tenant_id: slot.tenantId,
+          routes: slot.routes,
+          recache: true,
+        });
+        invalidated += res.data?.invalidated ?? 0;
+      }
+
+      toast.success(`Invalidated ${invalidated} snapshots and queued recache`);
+      setSelected(new Set());
+      load();
+    } catch {
+      toast.error('Bulk recache failed');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const toggleSelect = (cachePath: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(cachePath)) next.delete(cachePath);
+      else next.add(cachePath);
+      return next;
+    });
+  };
+  const toggleAllVisible = () => {
+    setSelected((prev) => {
+      const visible = filtered.slice(0, 500).map((r) => r.cache_path);
+      const allSelected = visible.every((p) => prev.has(p));
+      if (allSelected) {
+        const next = new Set(prev);
+        for (const p of visible) next.delete(p);
+        return next;
+      }
+      const next = new Set(prev);
+      for (const p of visible) next.add(p);
+      return next;
+    });
+  };
 
   const openInspect = async (item: PrerenderInventoryItem) => {
     setInspectLoading(true);
@@ -496,6 +848,17 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             <SelectItem key="content_stale">Content drifted</SelectItem>
             <SelectItem key="asset_invalid">Asset broken</SelectItem>
           </Select>
+          <Select
+            label="Status"
+            variant="bordered"
+            selectedKeys={[statusFilter]}
+            onSelectionChange={(s) => setStatusFilter(Array.from(s)[0] as string)}
+            className="max-w-[150px]"
+          >
+            <SelectItem key="all">All</SelectItem>
+            <SelectItem key="200">200 only</SelectItem>
+            <SelectItem key="non-200">Non-200</SelectItem>
+          </Select>
           <Input
             label="Tenant slug"
             placeholder="optional"
@@ -509,7 +872,18 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           </Button>
           <span className="text-sm text-default-500 ml-auto self-center">
             {filtered.length} of {items.length} snapshots
+            {selected.size > 0 && <> · <span className="text-primary">{selected.size} selected</span></>}
           </span>
+          {selected.size > 0 && isSuperAdmin && (
+            <Button
+              color="primary"
+              startContent={<Play size={14} />}
+              onPress={bulkRecache}
+              isLoading={bulkLoading}
+            >
+              Recache selected ({selected.size})
+            </Button>
+          )}
         </CardBody>
       </Card>
 
@@ -518,8 +892,22 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       ) : (
         <Table aria-label="Snapshot inventory" removeWrapper isStriped>
           <TableHeader>
+            <TableColumn>
+              {isSuperAdmin ? (
+                <Checkbox
+                  size="sm"
+                  isSelected={
+                    filtered.length > 0 &&
+                    filtered.slice(0, 500).every((r) => selected.has(r.cache_path))
+                  }
+                  onValueChange={toggleAllVisible}
+                  aria-label="Select all visible"
+                />
+              ) : ''}
+            </TableColumn>
             <TableColumn>HOST</TableColumn>
             <TableColumn>ROUTE</TableColumn>
+            <TableColumn>HTTP</TableColumn>
             <TableColumn>SIZE</TableColumn>
             <TableColumn>AGE</TableColumn>
             <TableColumn>STATUS</TableColumn>
@@ -528,8 +916,23 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           <TableBody emptyContent="No snapshots match filters">
             {filtered.slice(0, 500).map((it) => (
               <TableRow key={it.cache_path}>
+                <TableCell>
+                  {isSuperAdmin ? (
+                    <Checkbox
+                      size="sm"
+                      isSelected={selected.has(it.cache_path)}
+                      onValueChange={() => toggleSelect(it.cache_path)}
+                      aria-label={`Select ${it.cache_path}`}
+                    />
+                  ) : null}
+                </TableCell>
                 <TableCell className="text-xs">{it.host}</TableCell>
                 <TableCell className="text-xs font-mono">{it.route}</TableCell>
+                <TableCell>
+                  <Chip color={httpStatusColor(it.http_status)} variant="flat" size="sm">
+                    {it.http_status}
+                  </Chip>
+                </TableCell>
                 <TableCell className="text-xs">{formatBytes(it.size_bytes)}</TableCell>
                 <TableCell className="text-xs">{formatAge(it.age_s)}</TableCell>
                 <TableCell>
@@ -587,6 +990,47 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                   <Spinner />
                 ) : (
                   <div className="space-y-3 text-sm">
+                    {/* SEO score header — at the top so it's the first thing reviewers see. */}
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 border border-default-200">
+                      <div className={`text-4xl font-bold text-${seoGradeColor(inspecting.seo.grade)}`}>
+                        {inspecting.seo.grade}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-default-500">SEO score</p>
+                        <p className="text-2xl font-semibold">{inspecting.seo.score}<span className="text-base text-default-400">/100</span></p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <Chip color={httpStatusColor(inspecting.http_status)} size="sm" variant="flat">
+                          HTTP {inspecting.http_status}
+                        </Chip>
+                        <span className="text-xs text-default-400">{formatAge(inspecting.age_s)} old</span>
+                      </div>
+                    </div>
+                    {(inspecting.seo.issues.length > 0 || inspecting.seo.tips.length > 0) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {inspecting.seo.issues.length > 0 && (
+                          <div>
+                            <p className="font-semibold mb-1 text-danger flex items-center gap-1">
+                              <AlertOctagon size={14} />Must fix ({inspecting.seo.issues.length})
+                            </p>
+                            <ul className="text-xs space-y-0.5 list-disc list-inside">
+                              {inspecting.seo.issues.map((s, i) => <li key={i}>{s}</li>)}
+                            </ul>
+                          </div>
+                        )}
+                        {inspecting.seo.tips.length > 0 && (
+                          <div>
+                            <p className="font-semibold mb-1 text-warning flex items-center gap-1">
+                              <Activity size={14} />Tips ({inspecting.seo.tips.length})
+                            </p>
+                            <ul className="text-xs space-y-0.5 list-disc list-inside">
+                              {inspecting.seo.tips.map((s, i) => <li key={i}>{s}</li>)}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <Divider />
                     <div className="grid grid-cols-2 gap-2">
                       <Info label="Path" value={inspecting.cache_path} mono />
                       <Info label="Size" value={formatBytes(inspecting.size_bytes)} />
@@ -711,6 +1155,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
   const [rows, setRows] = useState<PrerenderCoverageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [enqueuingFor, setEnqueuingFor] = useState<string | null>(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -734,9 +1179,70 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     }
   };
 
+  /**
+   * Bulk-enqueue recache for every tenant that has missing or stale routes.
+   * Targets only the affected routes (not a full force-rerender) so the cost
+   * is bounded.
+   */
+  const refreshAllStale = async () => {
+    const needsWork = rows.filter(
+      (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
+    );
+    if (needsWork.length === 0) {
+      toast.success('No stale tenants — coverage is healthy');
+      return;
+    }
+    if (!confirm(`Queue recache for ${needsWork.length} tenants?`)) return;
+    setBulkLoading(true);
+    let queued = 0;
+    try {
+      for (const r of needsWork) {
+        const allRoutes = Array.from(new Set([
+          ...r.missing_routes,
+          ...r.stale_routes,
+          ...r.asset_invalid_routes,
+        ]));
+        if (allRoutes.length === 0) continue;
+        await adminPrerender.enqueueJob({
+          tenant_slug: r.slug,
+          routes: allRoutes.join(','),
+        });
+        queued++;
+      }
+      toast.success(`Queued recache for ${queued} tenants`);
+      load();
+    } catch {
+      toast.error('Bulk enqueue failed (some tenants may have queued)');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-8"><Spinner /></div>;
 
+  const totalNeedingWork = rows.filter(
+    (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
+  ).length;
+
   return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-default-500">
+          {totalNeedingWork === 0
+            ? <>All {rows.length} tenants healthy.</>
+            : <>{totalNeedingWork} of {rows.length} tenants have missing, stale, or asset-broken routes.</>}
+        </p>
+        <Button
+          color="primary"
+          variant="flat"
+          startContent={<Zap size={14} />}
+          onPress={refreshAllStale}
+          isLoading={bulkLoading}
+          isDisabled={!isSuperAdmin || totalNeedingWork === 0}
+        >
+          Refresh all stale ({totalNeedingWork})
+        </Button>
+      </div>
     <Table aria-label="Coverage" removeWrapper isStriped>
       <TableHeader>
         <TableColumn>TENANT</TableColumn>
@@ -812,6 +1318,165 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
         })}
       </TableBody>
     </Table>
+    </div>
+  );
+}
+
+// ─── Analytics ─────────────────────────────────────────────────────────────
+
+/**
+ * Bot-only access analytics. Sourced from the nginx JSONL log written for
+ * every search engine / social / AI crawler hit. Shows the breakdown by
+ * crawler, host, status code, and which "claimed Googlebot" hits failed
+ * IP-range verification — the spoofing signal.
+ */
+function AnalyticsTab() {
+  const toast = useToast();
+  const [data, setData] = useState<PrerenderAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [windowDays, setWindowDays] = useState<string>('7');
+
+  const load = useCallback(() => {
+    setLoading(true);
+    const sinceIso = new Date(Date.now() - parseInt(windowDays, 10) * 86400_000).toISOString();
+    adminPrerender.getAnalytics({ since: sinceIso, limit: 300 })
+      .then((res) => { if (res.data) setData(res.data); })
+      .catch(() => toast.error('Failed to load analytics'))
+      .finally(() => setLoading(false));
+  }, [toast, windowDays]);
+
+  useEffect(() => { load(); }, [load]);
+
+  if (loading && !data) return <div className="flex justify-center py-8"><Spinner /></div>;
+  if (!data) return <p className="text-default-500">No analytics available. Bot access log may be empty.</p>;
+
+  const verifiedPct = data.total_hits > 0 ? Math.round((data.verified_hits / data.total_hits) * 100) : 0;
+  const totalSpoofed = Object.values(data.spoofed_by_crawler).reduce((a, b) => a + b, 0);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Select
+          label="Window"
+          variant="bordered"
+          selectedKeys={[windowDays]}
+          onSelectionChange={(s) => setWindowDays(Array.from(s)[0] as string)}
+          className="max-w-[150px]"
+        >
+          <SelectItem key="1">Last 24h</SelectItem>
+          <SelectItem key="7">Last 7 days</SelectItem>
+          <SelectItem key="30">Last 30 days</SelectItem>
+        </Select>
+        <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">Reload</Button>
+        <span className="text-sm text-default-500 ml-auto self-end">
+          Log: {formatBytes(data.log_size_bytes)} · since {formatTs(data.window_started_at)}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KpiCard label="Total bot hits" value={data.total_hits} />
+        <KpiCard
+          label="IP-verified"
+          value={`${verifiedPct}%`}
+          hint={`${data.verified_hits} of ${data.total_hits}`}
+          tone={verifiedPct >= 80 ? 'default' : 'warning'}
+        />
+        <KpiCard
+          label="Spoofed (suspicious)"
+          value={totalSpoofed}
+          hint="claimed major bot, failed IP range"
+          tone={totalSpoofed > 0 ? 'danger' : 'default'}
+        />
+        <KpiCard
+          label="Unique URIs"
+          value={data.top_uris.length}
+          hint="from top-50 cap"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card shadow="sm">
+          <CardHeader><h3 className="font-semibold">Hits by crawler</h3></CardHeader>
+          <CardBody className="text-xs space-y-1">
+            {Object.entries(data.hits_by_crawler).map(([k, n]) => (
+              <div key={k} className="flex items-center gap-2">
+                <Chip size="sm" variant="flat">{k}</Chip>
+                <span className="font-mono ml-auto">{n}</span>
+                {data.spoofed_by_crawler[k] && (
+                  <Chip size="sm" variant="flat" color="danger">{data.spoofed_by_crawler[k]} spoofed</Chip>
+                )}
+              </div>
+            ))}
+            {Object.keys(data.hits_by_crawler).length === 0 && <p className="text-default-400">No data</p>}
+          </CardBody>
+        </Card>
+
+        <Card shadow="sm">
+          <CardHeader><h3 className="font-semibold">Hits by HTTP status</h3></CardHeader>
+          <CardBody className="text-xs space-y-1">
+            {Object.entries(data.hits_by_status).map(([k, n]) => (
+              <div key={k} className="flex items-center gap-2">
+                <Chip size="sm" variant="flat" color={httpStatusColor(Number(k))}>{k}</Chip>
+                <span className="font-mono ml-auto">{n}</span>
+              </div>
+            ))}
+            {Object.keys(data.hits_by_status).length === 0 && <p className="text-default-400">No data</p>}
+          </CardBody>
+        </Card>
+      </div>
+
+      <Card shadow="sm">
+        <CardHeader><h3 className="font-semibold">Top URIs (top 50 by hit count)</h3></CardHeader>
+        <CardBody className="p-0">
+          <Table aria-label="Top URIs" removeWrapper isStriped>
+            <TableHeader>
+              <TableColumn>URL</TableColumn>
+              <TableColumn>HITS</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No bot traffic yet">
+              {data.top_uris.map((u, i) => (
+                <TableRow key={i}>
+                  <TableCell className="text-xs font-mono">{u.url}</TableCell>
+                  <TableCell className="text-xs">{u.hits}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
+
+      <Card shadow="sm">
+        <CardHeader><h3 className="font-semibold">Recent activity (newest first, last {data.recent.length})</h3></CardHeader>
+        <CardBody className="p-0">
+          <Table aria-label="Recent bot hits" removeWrapper isStriped>
+            <TableHeader>
+              <TableColumn>TIME</TableColumn>
+              <TableColumn>CRAWLER</TableColumn>
+              <TableColumn>HOST</TableColumn>
+              <TableColumn>URI</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+              <TableColumn>IP</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No recent hits">
+              {data.recent.map((r, i) => (
+                <TableRow key={i}>
+                  <TableCell className="text-xs">{formatTs(r.ts ?? null)}</TableCell>
+                  <TableCell className="text-xs">
+                    <Chip size="sm" variant="flat">{r.crawler}</Chip>
+                  </TableCell>
+                  <TableCell className="text-xs">{r.host}</TableCell>
+                  <TableCell className="text-xs font-mono">{r.uri}</TableCell>
+                  <TableCell>
+                    <Chip size="sm" variant="flat" color={httpStatusColor(r.status)}>{r.status}</Chip>
+                  </TableCell>
+                  <TableCell className="text-xs font-mono">{r.ip}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
+    </div>
   );
 }
 

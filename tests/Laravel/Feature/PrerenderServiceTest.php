@@ -218,6 +218,179 @@ HTML;
         $this->assertSame('example.com/about/index.html', $rows[0]['cache_path']);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Round 5 additions: purgePattern, ttlForRoute, seoScore, invalidateRoutes,
+    // status sidecar reading.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function test_purge_pattern_matches_glob_single_segment(): void
+    {
+        $this->writeSnapshot('example.com/blog/post-1/index.html', '<html><body>a</body></html>');
+        $this->writeSnapshot('example.com/blog/post-2/index.html', '<html><body>b</body></html>');
+        $this->writeSnapshot('example.com/about/index.html', '<html><body>c</body></html>');
+
+        $svc = new PrerenderService();
+        $result = $svc->purgePattern('/blog/*', 'example.com', dryRun: true);
+
+        $this->assertCount(2, $result['deleted']);
+        $this->assertTrue($result['dry_run']);
+        // /about should be untouched
+        $this->assertTrue(in_array('example.com/blog/post-1/index.html', $result['deleted'], true));
+        $this->assertTrue(in_array('example.com/blog/post-2/index.html', $result['deleted'], true));
+    }
+
+    public function test_purge_pattern_actually_deletes_files(): void
+    {
+        $this->writeSnapshot('example.com/blog/post-1/index.html', '<html><body>a</body></html>');
+        $svc = new PrerenderService();
+        $result = $svc->purgePattern('/blog/*', 'example.com', dryRun: false);
+        $this->assertCount(1, $result['deleted']);
+        $this->assertFileDoesNotExist($this->tmpCache . '/example.com/blog/post-1/index.html');
+    }
+
+    public function test_purge_pattern_recursive_double_star(): void
+    {
+        $this->writeSnapshot('example.com/blog/post-1/index.html', '<html><body>a</body></html>');
+        $this->writeSnapshot('example.com/blog/category/foo/index.html', '<html><body>b</body></html>');
+        $svc = new PrerenderService();
+        $result = $svc->purgePattern('/blog/**', 'example.com', dryRun: true);
+        $this->assertCount(2, $result['deleted']);
+    }
+
+    public function test_purge_pattern_scopes_to_host(): void
+    {
+        $this->writeSnapshot('a.com/blog/post/index.html', '<html><body>a</body></html>');
+        $this->writeSnapshot('b.com/blog/post/index.html', '<html><body>b</body></html>');
+        $svc = new PrerenderService();
+        $result = $svc->purgePattern('/blog/*', 'a.com', dryRun: true);
+        $this->assertCount(1, $result['deleted']);
+        $this->assertSame('a.com/blog/post/index.html', $result['deleted'][0]);
+    }
+
+    public function test_ttl_for_route_picks_most_specific_pattern(): void
+    {
+        $svc = new PrerenderService();
+        // From config/prerender.php defaults.
+        $this->assertSame(6 * 3600, $svc->ttlForRoute('/'));
+        $this->assertSame(12 * 3600, $svc->ttlForRoute('/blog'));
+        $this->assertSame(7 * 24 * 3600, $svc->ttlForRoute('/blog/foo-post'));
+        $this->assertSame(30 * 24 * 3600, $svc->ttlForRoute('/about'));
+    }
+
+    public function test_ttl_falls_back_to_default_for_unknown_route(): void
+    {
+        $svc = new PrerenderService();
+        // Default in config/prerender.php is 7 days.
+        $this->assertSame(7 * 24 * 3600, $svc->ttlForRoute('/some-route-not-in-config'));
+    }
+
+    public function test_seo_score_high_grade_for_complete_page(): void
+    {
+        $svc = new PrerenderService();
+        $insp = [
+            'title' => 'A reasonable title between ten and seventy characters',
+            'meta_description' => str_repeat('x', 100),
+            'canonical' => 'https://example.com/foo',
+            'og_tags' => [
+                'og:title' => 'Foo', 'og:description' => 'Bar', 'og:image' => 'https://example.com/og.png',
+            ],
+            'h1_texts' => ['Foo'],
+            'json_ld' => ['blocks_count' => 1, 'all_valid' => true],
+            'asset_issues' => [],
+            'flags' => ['has_noscript' => true],
+            'preview' => str_repeat('Lorem ipsum dolor sit amet. ', 60),
+        ];
+        $score = $svc->seoScore($insp);
+        $this->assertGreaterThanOrEqual(90, $score['score']);
+        $this->assertSame('A', $score['grade']);
+        $this->assertEmpty($score['issues']);
+    }
+
+    public function test_seo_score_low_grade_when_critical_tags_missing(): void
+    {
+        $svc = new PrerenderService();
+        $insp = [
+            'title' => '',
+            'meta_description' => null,
+            'canonical' => null,
+            'og_tags' => [],
+            'h1_texts' => [],
+            'json_ld' => ['blocks_count' => 0, 'all_valid' => true],
+            'asset_issues' => ['a.js', 'b.js'],
+            'flags' => ['has_noscript' => false],
+            'preview' => '',
+        ];
+        $score = $svc->seoScore($insp);
+        $this->assertLessThan(50, $score['score']);
+        $this->assertSame('F', $score['grade']);
+        $this->assertContains('Missing <title>', $score['issues']);
+    }
+
+    public function test_status_sidecar_is_surfaced_in_inspect(): void
+    {
+        $this->writeSnapshot('example.com/dead-link/index.html', '<html><body>not found</body></html>');
+        file_put_contents($this->tmpCache . '/example.com/dead-link/_status', '404');
+
+        $svc = new PrerenderService();
+        $insp = $svc->inspect('example.com/dead-link/index.html');
+        $this->assertNotNull($insp);
+        $this->assertSame(404, $insp['http_status']);
+    }
+
+    public function test_status_sidecar_defaults_to_200_when_absent(): void
+    {
+        $this->writeSnapshot('example.com/ok/index.html', '<html><body>fine</body></html>');
+        $svc = new PrerenderService();
+        $insp = $svc->inspect('example.com/ok/index.html');
+        $this->assertNotNull($insp);
+        $this->assertSame(200, $insp['http_status']);
+    }
+
+    public function test_priority_promotion_on_duplicate_enqueue(): void
+    {
+        $svc = new PrerenderService();
+        $id1 = $svc->enqueueJob(null, '/foo', false, false, null, PrerenderService::PRIORITY_LOW);
+        // Same args + higher priority → should promote the existing row.
+        $id2 = $svc->enqueueJob(null, '/foo', false, false, null, PrerenderService::PRIORITY_HIGH);
+        $this->assertSame($id1, $id2);
+        $row = DB::table('prerender_jobs')->where('id', $id1)->first();
+        $this->assertSame(PrerenderService::PRIORITY_HIGH, (int) $row->priority);
+    }
+
+    public function test_claim_next_respects_priority(): void
+    {
+        $svc = new PrerenderService();
+        // Older low-priority job comes in first.
+        $oldLow = $svc->enqueueJob(null, '/old', false, false, null, PrerenderService::PRIORITY_LOW);
+        // Newer high-priority job comes second.
+        $newHigh = $svc->enqueueJob(null, '/new', false, false, null, PrerenderService::PRIORITY_HIGH);
+
+        $claimed = $svc->claimNextJob('test-host:0');
+        $this->assertNotNull($claimed);
+        $this->assertSame($newHigh, (int) $claimed['id'], 'high-priority should win even when queued later');
+        $this->assertNotSame($oldLow, (int) $claimed['id']);
+    }
+
+    public function test_crawler_analytics_aggregates_jsonl_log(): void
+    {
+        $log = $this->tmpCache . '/.bot-access.jsonl';
+        $now = date('c');
+        $lines = [
+            json_encode(['ts' => $now, 'host' => 'a.com', 'uri' => '/foo', 'status' => 200, 'crawler' => 'googlebot', 'verified' => '1', 'ua' => 'Googlebot', 'ip' => '66.249.66.1']),
+            json_encode(['ts' => $now, 'host' => 'a.com', 'uri' => '/foo', 'status' => 200, 'crawler' => 'googlebot', 'verified' => '',  'ua' => 'Googlebot', 'ip' => '1.2.3.4']),
+            json_encode(['ts' => $now, 'host' => 'a.com', 'uri' => '/bar', 'status' => 404, 'crawler' => 'bingbot',   'verified' => '1', 'ua' => 'Bingbot',  'ip' => '40.77.0.1']),
+        ];
+        file_put_contents($log, implode("\n", $lines) . "\n");
+
+        $svc = new PrerenderService();
+        $analytics = $svc->crawlerAnalytics(date('c', time() - 3600), 100);
+
+        $this->assertSame(3, $analytics['total_hits']);
+        $this->assertSame(2, $analytics['verified_hits']);
+        $this->assertSame(['googlebot' => 1], $analytics['spoofed_by_crawler']);
+        $this->assertSame(['googlebot' => 2, 'bingbot' => 1], $analytics['hits_by_crawler']);
+    }
+
     private function writeSnapshot(string $rel, string $html): void
     {
         $path = $this->tmpCache . '/' . $rel;

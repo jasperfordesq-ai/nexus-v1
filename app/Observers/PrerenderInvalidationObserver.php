@@ -12,6 +12,16 @@ use App\Services\PrerenderService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
+/*
+ * Why content-save observers run at NORMAL priority, not LOW:
+ *
+ * The auto-recache cron (Phase 2) uses LOW to keep TTL/drift refreshes out of
+ * the way of user-initiated runs. But a content-save event IS user-initiated
+ * — someone hit "Publish" and expects the public page to reflect it within
+ * one bot crawl. Treating that as background work would let TTL sweeps starve
+ * the publish freshness, which is exactly the bug we're trying to prevent.
+ */
+
 /**
  * Generic prerender-cache invalidation observer.
  *

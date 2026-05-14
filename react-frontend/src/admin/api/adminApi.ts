@@ -1744,6 +1744,7 @@ export interface PrerenderInventoryItem {
   asset_issues: string[];
   content_stale: boolean;
   content_stale_reason: string | null;
+  http_status: number;
 }
 
 export interface PrerenderCoverageRow {
@@ -1763,6 +1764,7 @@ export interface PrerenderInspect {
   size_bytes: number;
   mtime: number;
   age_s: number;
+  http_status: number;
   title: string;
   meta_description: string | null;
   canonical: string | null;
@@ -1788,6 +1790,12 @@ export interface PrerenderInspect {
   };
   parse_warnings: string[];
   preview: string;
+  seo: {
+    score: number;
+    grade: 'A' | 'B' | 'C' | 'D' | 'F';
+    issues: string[];
+    tips: string[];
+  };
 }
 
 export interface PrerenderJob {
@@ -1798,6 +1806,7 @@ export interface PrerenderJob {
   routes: string | null;
   force: boolean;
   dry_run: boolean;
+  priority: number;
   planned_count: number | null;
   rendered_count: number | null;
   invalid_count: number | null;
@@ -1812,6 +1821,30 @@ export interface PrerenderJob {
   finished_at: string | null;
   requested_by: { id: number; name: string; email: string | null } | null;
 }
+
+export interface PrerenderAnalytics {
+  total_hits: number;
+  verified_hits: number;
+  spoofed_by_crawler: Record<string, number>;
+  window_started_at: string;
+  hits_by_status: Record<string, number>;
+  hits_by_crawler: Record<string, number>;
+  hits_by_host: Record<string, number>;
+  top_uris: Array<{ url: string; hits: number }>;
+  recent: Array<{
+    ts: string | null;
+    host: string;
+    uri: string;
+    status: number;
+    crawler: string;
+    ua: string;
+    ip: string;
+  }>;
+  log_path: string;
+  log_size_bytes: number;
+}
+
+// (PrerenderJob is now declared above with the priority field included.)
 
 export interface PrerenderEvent {
   ts?: string;
@@ -1865,6 +1898,7 @@ export const adminPrerender = {
     routes?: string;
     force?: boolean;
     dry_run?: boolean;
+    priority?: number;
   }) =>
     api.post<{ job_id: number; job: PrerenderJob }>('/v2/admin/prerender/jobs', payload),
 
@@ -1873,6 +1907,42 @@ export const adminPrerender = {
 
   realtimeChannel: () =>
     api.get<{ channel: string; event: string }>('/v2/admin/prerender/realtime-channel'),
+
+  purge: (payload: { pattern: string; tenant_slug?: string; dry_run?: boolean; recache?: boolean }) =>
+    api.post<{
+      pattern: string;
+      tenant_slug: string | null;
+      dry_run: boolean;
+      deleted_count: number;
+      deleted: string[];
+      recache_job_id: number | null;
+    }>('/v2/admin/prerender/purge', payload),
+
+  invalidate: (payload: { tenant_id: number; routes: string[]; recache?: boolean }) =>
+    api.post<{ invalidated: number; tenant_id: number; routes: string[]; job_id: number | null }>(
+      '/v2/admin/prerender/invalidate',
+      payload,
+    ),
+
+  getAnalytics: (params: { since?: string; limit?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.since) qs.set('since', params.since);
+    if (params.limit) qs.set('limit', String(params.limit));
+    const q = qs.toString();
+    return api.get<PrerenderAnalytics>(`/v2/admin/prerender/analytics${q ? `?${q}` : ''}`);
+  },
+
+  triggerAutoRecache: (apply: boolean) =>
+    api.post<{ exit_code: number; output: string; applied: boolean }>(
+      '/v2/admin/prerender/auto-recache',
+      { apply },
+    ),
+
+  triggerDetectDrift: (apply: boolean) =>
+    api.post<{ exit_code: number; output: string; applied: boolean }>(
+      '/v2/admin/prerender/detect-drift',
+      { apply },
+    ),
 
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
   metricsUrl: '/api/v2/admin/prerender/metrics',

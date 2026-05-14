@@ -648,13 +648,16 @@ class PrerenderService
         }
 
         if ($enqueueRecache && $deleted > 0) {
+            // NORMAL priority: a content save is a user-initiated event with a
+            // human waiting for the public page to update. Background sweeps
+            // run at LOW; observer-triggered work belongs ahead of them.
             $this->enqueueJob(
                 $tenantId,
                 implode(',', $routes),
                 false, // force (snapshots are gone — they'll be re-rendered)
                 false,
                 null,
-                self::PRIORITY_LOW
+                self::PRIORITY_NORMAL
             );
         }
         return $deleted;

@@ -1057,13 +1057,26 @@ class AppServiceProvider extends ServiceProvider
         FeedPost::observe(FeedPostObserver::class);
         \App\Models\Comment::observe(CommentObserver::class);
 
-        // Prerender cache invalidation hooks (Phase 2.3). On save/delete, the
-        // observers enqueue a low-priority recache for the affected route(s).
-        // Failures are logged, never thrown — model writes must never block on
-        // the prerender side-channel.
+        // Prerender cache invalidation hooks. On save/delete, the observers
+        // enqueue a NORMAL-priority recache for the affected route(s) and
+        // delete the stale snapshot immediately. Failures are logged, never
+        // thrown — model writes must never block on the prerender side-channel.
+        // The base PrerenderInvalidationObserver handles all the plumbing;
+        // subclasses just declare which routes depend on the model.
         \App\Models\Post::observe(\App\Observers\PostPrerenderObserver::class);
         Listing::observe(\App\Observers\ListingPrerenderObserver::class);
         Event::observe(\App\Observers\EventPrerenderObserver::class);
+        Group::observe(\App\Observers\GroupPrerenderObserver::class);
+        JobVacancy::observe(\App\Observers\JobVacancyPrerenderObserver::class);
+        MarketplaceListing::observe(\App\Observers\MarketplaceListingPrerenderObserver::class);
+        \App\Models\MarketplaceCategory::observe(\App\Observers\MarketplaceCategoryPrerenderObserver::class);
+        \App\Models\VolOpportunity::observe(\App\Observers\VolOpportunityPrerenderObserver::class);
+        \App\Models\IdeationChallenge::observe(\App\Observers\IdeationChallengePrerenderObserver::class);
+        \App\Models\Page::observe(\App\Observers\PagePrerenderObserver::class);
+        \App\Models\ResourceItem::observe(\App\Observers\ResourceItemPrerenderObserver::class);
+        // Organization + KnowledgeBaseArticle are sitemap-included but raw-DB
+        // (no Eloquent model). They rely on the drift detector for freshness;
+        // see prerender:detect-drift.
 
         // Dynamically merge CorsHelper's full origin list (including tenant custom
         // domains from DB) into Laravel's HandleCors config. This ensures custom

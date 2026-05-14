@@ -274,6 +274,92 @@ class AdminPrerenderController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/admin/prerender/invalidate
+     *
+     * External-system invalidation hook. Lets a headless CMS / marketing
+     * automation / ops tool flag specific routes as stale without going
+     * through the model layer.
+     *
+     * Authentication options (in order of preference):
+     *   1. Bearer token = config('prerender.webhook_token')   (preferred)
+     *   2. X-Nexus-Signature: hex-HMAC-SHA256 of the raw body with that token
+     *   3. Admin session (super_admin)                          (fallback for ops UI)
+     *
+     * Body:
+     *   tenant_id:    int       — required
+     *   routes:       string[]  — required, tenant-local paths ("/blog/foo")
+     *   recache:      bool      — also enqueue a NORMAL-priority recache job (default true)
+     *
+     * Returns: { invalidated: N, job_id: id|null }
+     */
+    public function invalidate(Request $r): JsonResponse
+    {
+        $token = (string) config('prerender.webhook_token', '');
+        $authed = false;
+
+        if ($token !== '') {
+            $bearer = (string) $r->bearerToken();
+            if ($bearer !== '' && hash_equals($token, $bearer)) {
+                $authed = true;
+            } else {
+                $sig = (string) $r->header('X-Nexus-Signature', '');
+                if ($sig !== '') {
+                    $expected = hash_hmac('sha256', $r->getContent(), $token);
+                    if (hash_equals($expected, $sig)) $authed = true;
+                }
+            }
+        }
+
+        if (!$authed) {
+            // Fall back to admin-session auth so the admin UI can call this
+            // directly without needing the shared secret.
+            try {
+                $this->requireSuperAdmin();
+                $authed = true;
+            } catch (\Throwable $e) {
+                return $this->error('Unauthorized', 401, 'UNAUTHENTICATED');
+            }
+        }
+
+        $payload = $r->json()->all();
+        $tenantId = isset($payload['tenant_id']) ? (int) $payload['tenant_id'] : 0;
+        if ($tenantId <= 0) {
+            return $this->error('tenant_id is required', 400, 'VALIDATION_REQUIRED_FIELD');
+        }
+        $routes = $payload['routes'] ?? [];
+        if (!is_array($routes) || empty($routes)) {
+            return $this->error('routes[] is required and must be non-empty', 400, 'VALIDATION_REQUIRED_FIELD');
+        }
+        // Same regex the rest of the engine uses.
+        foreach ($routes as $r2) {
+            if (!is_string($r2) || !preg_match('#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#', $r2)) {
+                return $this->error("Invalid route: " . (is_string($r2) ? $r2 : '(non-string)'), 400, 'VALIDATION_INVALID');
+            }
+        }
+        $recache = (bool) ($payload['recache'] ?? true);
+
+        $count = $this->service->invalidateRoutes($tenantId, $routes, $recache);
+        $jobId = null;
+        if ($recache && $count > 0) {
+            // invalidateRoutes already enqueues; surface the job id by reading
+            // the most recent matching queued row.
+            $row = \DB::table('prerender_jobs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'queued')
+                ->orderByDesc('id')
+                ->first();
+            $jobId = $row ? (int) $row->id : null;
+        }
+
+        return $this->respondWithData([
+            'invalidated' => $count,
+            'tenant_id'   => $tenantId,
+            'routes'      => $routes,
+            'job_id'      => $jobId,
+        ]);
+    }
+
+    /**
      * GET /api/v2/admin/prerender/analytics?since=ISO8601&limit=200
      *
      * Aggregates the bot-only JSONL access log nginx writes for every search
@@ -302,6 +388,25 @@ class AdminPrerenderController extends BaseApiController
         $this->requireSuperAdmin();
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:auto-recache', $apply ? [] : ['--dry-run' => true]);
+        return $this->respondWithData([
+            'exit_code' => $exit,
+            'output'    => \Artisan::output(),
+            'applied'   => $apply,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/detect-drift
+     *
+     * Trigger an immediate sitemap-drift detection pass. Dry-run by default;
+     * pass `apply: true` to actually enqueue recache jobs. Same logic as the
+     * 2-minute cron, exposed for operators investigating a stale-page report.
+     */
+    public function detectDrift(Request $r): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $apply = (bool) $r->json('apply', false);
+        $exit = \Artisan::call('prerender:detect-drift', $apply ? [] : ['--dry-run' => true]);
         return $this->respondWithData([
             'exit_code' => $exit,
             'output'    => \Artisan::output(),

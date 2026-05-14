@@ -629,6 +629,14 @@ inject_rendered_pages() {
             mv -f "$file" "$dest"
         done
 
+        # Move index.md sidecars (AI-friendly Markdown variant, Round 5).
+        find "$INCOMING_DIR" -name "index.md" -type f | while IFS= read -r file; do
+            rel="${file#$INCOMING_DIR/}"
+            dest="$PRERENDER_DIR/$rel"
+            mkdir -p "$(dirname "$dest")"
+            mv -f "$file" "$dest"
+        done
+
         if [ -f "$INCOMING_DIR/.prerender-results.json" ]; then
             mv -f "$INCOMING_DIR/.prerender-results.json" "$PRERENDER_DIR/.last-run.json"
         fi

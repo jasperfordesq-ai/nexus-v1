@@ -71,6 +71,12 @@ return [
         'default'       => 7 * 24 * 3600,
     ],
 
+    // Shared secret for the /invalidate webhook. External systems POST with
+    // either Bearer <token> OR an X-Nexus-Signature: <hex-HMAC-SHA256> header
+    // over the raw body. Empty string disables the external path; the admin
+    // session fallback still works for the in-app UI.
+    'webhook_token' => env('PRERENDER_WEBHOOK_TOKEN', ''),
+
     'auto_recache' => [
         // Cap the work the cron generates so a single tick can't blow up the
         // queue. The cron itself runs at a fixed interval (see deploy notes);

@@ -286,9 +286,64 @@ The 10-minute grace gives the soft-update path (banner click → SkipWaiting →
 - `sw-rescue.js`-style force-eviction shims — not needed when deploys propagate via NetworkFirst.
 - Manual "Update to latest version" buttons — users should never need one.
 
-## Prerender Pipeline (bot-only, detached)
+## Prerender Pipeline (bot-only, detached, three-layer freshness)
 
 Prerendered HTML is **served only to SEO crawlers**, never to real users. This keeps snapshot freshness completely separate from user-facing correctness.
+
+### Three-layer freshness (the "big names do this" pattern)
+
+The engine has three independent freshness mechanisms working together — defence in depth so no single failure leaves stale pages live:
+
+1. **Observer hook (millisecond layer).** Eloquent model observers (`PostPrerenderObserver`, `ListingPrerenderObserver`, `EventPrerenderObserver`, `JobVacancyPrerenderObserver`, `GroupPrerenderObserver`, `MarketplaceListingPrerenderObserver`, `MarketplaceCategoryPrerenderObserver`, `VolOpportunityPrerenderObserver`, `IdeationChallengePrerenderObserver`, `PagePrerenderObserver`, `ResourceItemPrerenderObserver`) delete the affected snapshot and enqueue a NORMAL-priority recache on every `saved`/`deleted` event. Wired in `AppServiceProvider::boot()`. To add a new content type, extend `PrerenderInvalidationObserver` and implement `routesFor()` — the base class handles the rest. Failures are swallowed and logged; the model save never blocks.
+
+2. **Sitemap drift detector (minute layer).** `prerender:detect-drift` cron (every 2 min) walks each tenant's sitemap, parses `<lastmod>` values, and compares against snapshot mtimes. Anything stale gets a HIGH-priority recache. This is the safety net for code paths that bypass Eloquent (raw DB writes, queue jobs, migrations, admin tools that use the query builder). Cap: `--max-tenants` × `--max-routes` per pass so a single tick stays bounded.
+
+3. **TTL auto-recache (hour/day floor).** `prerender:auto-recache` cron (every 15–30 min) reads `config/prerender.php`'s per-pattern TTLs (homepage 6h, content indexes 6–24h, individual items 1–7d, static pages 30d) and enqueues LOW-priority recaches for snapshots past their TTL. Backstop for the cases where both observer and drift detector miss (e.g. content that doesn't appear in the sitemap).
+
+External-system hook: `POST /api/v2/admin/prerender/invalidate` with HMAC or Bearer auth lets headless CMS / marketing automation tools invalidate routes without going through the model layer.
+
+### Priority lanes
+
+`prerender_jobs.priority` (1–9, lower wins):
+- **3 HIGH** — drift detector, user-initiated force-refresh
+- **5 NORMAL** — observer-triggered recache, manual API enqueue, bulk admin UI recache
+- **7 LOW** — TTL auto-recache, after-purge auto-recache
+
+Claim order is `(priority, queued_at, id)`. Duplicate-enqueue at a higher priority promotes the existing queued row.
+
+### HTTP status code propagation (Phase 1.2)
+
+The React app emits `<meta name="prerender-status-code" content="404|410|503">` for soft-error pages (community-not-found, deleted listings, maintenance mode). The worker extracts this and:
+
+1. Writes a `_status` sidecar next to `index.html` containing the integer status.
+2. Adds an entry to `.prerender-status-overrides.json`.
+
+The bash orchestrator aggregates the JSON into `/etc/nginx/prerender-status-overrides.list`. nginx includes this file inside a `map` block, and the server block uses `error_page` + conditional `return` to serve the snapshot body with the correct HTTP status. The list is validated by `nginx -t` before reload; the prior version is restored on validation failure.
+
+### AI-friendly Markdown variant (Round 5)
+
+After rendering the HTML snapshot, the worker also extracts a clean Markdown body (`index.md` sidecar). nginx's `$nexus_is_ai_bot` map routes GPTBot, ClaudeBot, Perplexity, ByteSpider, Common Crawl, Google-Extended, etc. to the `.md` variant first via `try_files` — falling back to the `.html` if the markdown isn't available. AI crawlers ingest Markdown more token-efficiently than HTML; this puts NEXUS ahead of every competitor that serves raw HTML to LLM bots.
+
+### Sitemap-driven route planning
+
+`prerender-tenants.sh` invokes `php artisan prerender:plan-routes` to get the full per-tenant URL list (static floor + every dynamic URL `SitemapService` publishes — blog posts, listings, events, jobs, KB articles, etc). The hardcoded `PUBLIC_ROUTES` array is the fallback when the PHP container is unavailable. `--no-sitemap` or `NEXUS_PRERENDER_NO_SITEMAP=1` forces fallback mode.
+
+### Crawler analytics (Phase 3.2)
+
+nginx writes a JSONL bot-only access log to the shared prerender volume (`.bot-access.jsonl`). The admin Analytics tab reads it via `crawlerAnalytics()`, surfacing hits by status / crawler / host, top URIs, IP-verification rate, and the spoofed-vs-verified breakdown for major crawlers. IP verification uses `/etc/nginx/prerender-trusted-bot-ips.list` (refreshed weekly by `scripts/refresh-bot-ip-ranges.sh` pulling Google / Bing / DuckDuckGo / Apple feeds).
+
+### Admin UI (`/admin/prerender`)
+
+Six tabs:
+- **Overview** — KPIs, freshness controls (auto-recache + drift trigger), wildcard purge form, force-refresh job queue
+- **Inventory** — every snapshot with HTTP status, SEO score, age, content/asset flags; bulk-select + bulk-recache; filter by host/route/staleness/status/issue
+- **Coverage** — per-tenant expected-vs-rendered matrix with "Refresh all stale" bulk action
+- **Jobs** — queued/running/completed job history with realtime updates via Pusher
+- **Analytics** — bot crawl activity, top URIs, verified vs spoofed
+- **Events** — JSONL deploy event stream
+- **Failures** — recent failed paths in the backoff window
+
+### Serving rules ([nginx.bluegreen.conf](nginx.bluegreen.conf))
 
 ### Serving rules ([nginx.bluegreen.conf](nginx.bluegreen.conf))
 
