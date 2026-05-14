@@ -26,7 +26,16 @@ set -euo pipefail
 DEPLOY_DIR="${DEPLOY_DIR:-/opt/nexus-php}"
 PRERENDER_CONFIG_DIR="${PRERENDER_CONFIG_DIR:-$DEPLOY_DIR}"
 PRERENDER_CODE_DIR="${PRERENDER_CODE_DIR:-$DEPLOY_DIR}"
-NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
+
+# Auto-detect the active react container. Blue/green deploys leave only one
+# color running at a time; legacy single-color setups use `nexus-react-prod`.
+# Override with NGINX_CONTAINER=... if you need to target a specific one
+# (e.g. warming the inactive color before a cutover).
+if [ -z "${NGINX_CONTAINER:-}" ]; then
+    NGINX_CONTAINER=$(docker ps --format '{{.Names}}' 2>/dev/null \
+        | grep -E '^nexus-(blue|green)-react$' | head -1 || true)
+    NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
+fi
 PRERENDER_DIR="/usr/share/nginx/html/prerendered"
 PLAYWRIGHT_IMAGE="${PLAYWRIGHT_IMAGE:-mcr.microsoft.com/playwright:v1.59.1-noble}"
 WORKER_SCRIPT="$PRERENDER_CODE_DIR/scripts/prerender-worker.mjs"
