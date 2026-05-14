@@ -287,27 +287,24 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     notFoundSlug: null,
   });
 
-  // Determine effective slug: route param > URL detection > stored slug (localStorage fallback)
-  // The stored slug fallback prevents losing the tenant when a redirect/error strips
-  // the slug prefix from the URL (e.g., /hour-timebank/listings → /listings).
+  // Determine effective slug: route param (from TenantShell) > URL detection.
   //
-  // GUARD: Only use stored slug when user has auth tokens. Without tokens, the stored
-  // slug may be stale from a previous session or contaminated by another browser tab
-  // visiting a different tenant. Using it would bootstrap the wrong tenant, showing
-  // the wrong branding on the login page and potentially authenticating against the
-  // wrong community. When tokens are cleared, fall through to backend Host-based
-  // resolution or the login page's tenant chooser dropdown.
+  // We deliberately do NOT fall back to a stored slug from localStorage. Doing so
+  // caused a persistent cross-tenant bug: a user who had previously logged into
+  // tenant X would visit the platform root (app.project-nexus.ie/), and the SPA
+  // would silently boot into tenant X instead of master. The login page then
+  // treated the tenant as "resolved from URL" and hid the community chooser, so
+  // the user authenticated against whichever community happened to be cached in
+  // localStorage — not the one they intended. This matches the 2026-05-08 policy
+  // already documented in TenantShell.tsx: URL is respected as typed; master
+  // tenant renders at /, and tenant-scoped pages require the slug in the URL.
   //
   // NOTE: detectTenantFromUrl() is called on every render (no useMemo) so that
   // navigation to a different tenant path is immediately reflected. The function
   // reads window.location which changes on each route transition. This is
   // intentionally not memoized — detectTenantFromUrl() is a fast synchronous read.
   const detected = detectTenantFromUrl();
-  const storedSlug = useMemo(() => {
-    const hasTokens = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
-    return hasTokens ? tokenManager.getTenantSlug() : null;
-  }, []);
-  const effectiveTenantSlug = tenantSlug || detected.slug || storedSlug;
+  const effectiveTenantSlug = tenantSlug || detected.slug;
 
   // Path-based routing: needed on shared hosts (localhost, app.project-nexus.ie) where
   // multiple tenants share the same domain and the URL path prefix is the only way to

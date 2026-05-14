@@ -374,7 +374,7 @@ describe('AuthContext', () => {
       expect(result.current.status).toBe('idle');
     });
 
-    it('calls tokenManager.clearTokens() to remove auth tokens but preserve tenant', async () => {
+    it('calls tokenManager.clearTokens() to remove auth tokens and clears tenant identity', async () => {
       mockTokenManager.hasAccessToken.mockReturnValue(true);
       mockApiGet.mockResolvedValue({ success: true, data: mockUser });
       mockApiPost.mockResolvedValue({ success: true });

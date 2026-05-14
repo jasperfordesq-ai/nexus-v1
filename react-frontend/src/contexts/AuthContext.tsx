@@ -527,12 +527,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         logWarn('Logout request failed - proceeding with local logout');
       }
 
-      // Clear auth tokens but preserve tenant context (slug + ID).
-      // Tenant is not a security credential — it's a UX preference that should
-      // survive logout so the user stays on the same community's login page.
+      // Clear auth tokens AND tenant identity. Tenant slug/id used to be
+      // preserved across logout as a UX nicety, but that caused cross-tenant
+      // login bugs: visiting app.project-nexus.ie/ after logout would still
+      // boot into the previous tenant via the storedSlug fallback, hiding the
+      // community chooser on the login page and letting users authenticate
+      // against the wrong community. Clear everything; the next visit starts
+      // from a clean platform state and the user explicitly picks a community.
       // Logout preserves trusted device token by design.
       // Call tokenManager.clearTrustedDeviceToken() for an explicit "forget this device" flow.
       tokenManager.clearTokens();
+      localStorage.removeItem('nexus_tenant_id');
+      localStorage.removeItem('nexus_tenant_slug');
 
       // Clear Sentry user context and capture logout event
       captureAuthEvent('logout', userId);

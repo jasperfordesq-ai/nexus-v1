@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Cross-tenant login bug — `app.project-nexus.ie/` no longer silently boots into a stale tenant.** Logging into one community and arriving on another is fully resolved.
+  - **Root cause.** `TenantContext` had a `storedSlug` fallback that read `nexus_tenant_slug` from `localStorage` whenever a user had auth tokens. On `app.project-nexus.ie/` (the platform root, no slug in the URL), this silently booted the SPA into whichever tenant the user had last visited — e.g. Agoris. The login page then saw a "resolved" tenant slug and hid the community chooser, letting users authenticate against the wrong community.
+  - **Fix.** `TenantContext.tsx` — removed the `storedSlug` fallback entirely. Effective tenant slug is now `tenantSlug` prop (from `TenantShell`, URL-derived) OR `detectTenantFromUrl()` only. This matches the 2026-05-08 policy already documented in `TenantShell.tsx`: URL is respected as typed; master tenant renders at `/`, tenant-scoped pages require the slug in the URL.
+  - **Defence in depth.** `AuthContext.logout()` now clears `nexus_tenant_id` and `nexus_tenant_slug` from `localStorage` (previously preserved as a UX nicety, which contributed to the leak). Cross-tab logout already did this; the same-tab logout path now matches.
+
 ### Changed
 
 - **Sales site (`project-nexus.ie`) — GA messaging and audit-driven fixes.**
