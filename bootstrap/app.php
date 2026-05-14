@@ -285,6 +285,26 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $schedule->command('horizon:snapshot')
             ->everyFiveMinutes()
             ->name('horizon-snapshot');
+
+        // Prerender freshness — three-layer model. See react-frontend/CLAUDE.md.
+        //   Layer 2 (minute): drift detector compares sitemap <lastmod> vs
+        //   snapshot mtimes and enqueues HIGH-priority recaches. Catches every
+        //   code path that bypasses Eloquent observers (raw DB, migrations,
+        //   queue jobs that use the query builder).
+        $schedule->command('prerender:detect-drift')
+            ->everyTwoMinutes()
+            ->withoutOverlapping(5)
+            ->runInBackground()
+            ->name('prerender-detect-drift');
+
+        //   Layer 3 (hour/day floor): TTL-based recache. Bounded by config
+        //   so a single tick can't flood the queue. Backstop for content
+        //   the drift detector + observers don't reach.
+        $schedule->command('prerender:auto-recache')
+            ->cron('*/20 * * * *')
+            ->withoutOverlapping(15)
+            ->runInBackground()
+            ->name('prerender-auto-recache');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
