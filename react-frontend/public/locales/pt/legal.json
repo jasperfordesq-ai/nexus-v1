@@ -527,8 +527,8 @@
       "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
       "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
     },
-    "vetting_title": "Garda vetting",
-    "vetting_body": "Some exchanges — childcare, elderly care, support for vulnerable adults — legally require Garda vetting in Ireland. Members offering these services are responsible for holding current vetting, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf.",
+    "vetting_title": "Background checks and vetting",
+    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
     "insurance_title": "Insurance and liability",
     "insurance_items": {
       "0": "{{name}} does not provide insurance for exchanges between members. The platform is a connection service — it does not insure, indemnify, or underwrite the work members do for each other.",
