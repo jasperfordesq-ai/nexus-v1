@@ -553,6 +553,12 @@ validate_output_assets() {
     local CURRENT_ASSETS="$1"
     local INVALID=0
 
+    # Bot-only serving (see react-frontend/CLAUDE.md "Prerender Pipeline") means
+    # asset-hash mismatches in snapshots don't matter to anyone: bots don't
+    # execute JS, and the read-side load_stale_cache_paths is already a no-op
+    # by the same logic. Keep the check as a STATISTIC (counted + logged) for
+    # the inventory.asset_invalid_count metric and admin visibility, but stop
+    # discarding the rendered HTML — the body content is what crawlers need.
     while IFS= read -r FILE; do
         [ -n "$FILE" ] || continue
         local BAD_ASSET=""
@@ -566,8 +572,7 @@ validate_output_assets() {
         done < <(grep -hoE '/assets/[^"<>[:space:]]+\.(js|css)' "$FILE" 2>/dev/null | sed 's/[?#].*$//' | sort -u)
 
         if [ -n "$BAD_ASSET" ]; then
-            log_warn "Discarding $(realpath --relative-to="$OUTPUT_DIR" "$FILE" 2>/dev/null || echo "$FILE") because it references missing asset $BAD_ASSET" >&2
-            rm -f "$FILE"
+            log_warn "Snapshot $(realpath --relative-to="$OUTPUT_DIR" "$FILE" 2>/dev/null || echo "$FILE") references stale asset $BAD_ASSET (keeping — bot-only serving)" >&2
             INVALID=$((INVALID + 1))
         fi
     done < <(find "$OUTPUT_DIR" -name index.html -type f 2>/dev/null)
