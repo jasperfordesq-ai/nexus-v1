@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Admin panel — raw translation keys no longer leak.** The Algorithm Settings and AI Settings pages (and 19 other admin pages, mostly in Caring Community) were rendering raw `t()` keys like `algo.feed_label`, `advanced.provider_openai`, `admin.providers.title` because their translation keys were never added to the locale files.
+  - **Algorithm Settings** and **AI Settings** — stripped `useTranslation` / `t()` entirely and inlined literal English (per the admin-is-English-only convention).
+  - **236 missing keys added** to `en/admin.json` under `admin.*`, `panel.*`, `billing.*`, `tenant_features.*`, `federation.*`, `groups.*`, `moderation.*`, `resources.*`, `super.*`, and `volunteering.*`. Covers Care Providers, Loyalty Program, Warmth Pass, Hour Transfers, Municipality Feedback, Trust Tier, and the volunteer admin tooling.
+  - All 10 non-English locale files filled with English fallbacks; `node scripts/check-i18n-drift.mjs` now passes with 0 drift.
+  - All 2,552 admin-side `t()` calls now resolve.
+
 ### Changed
 
 - **Prerender engine — Round 5 (the full polish, "better than the big names").** Closes every remaining gap from both audits and adds three things no competitor ships.

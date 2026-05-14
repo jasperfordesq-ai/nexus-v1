@@ -462,7 +462,9 @@
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
     "user_count_label": "User Count",
-    "your_plan_usage": "Your Plan Usage"
+    "your_plan_usage": "Your Plan Usage",
+    "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -3322,7 +3324,10 @@
     "jwt_federation_auth_platform_middle": "and need no platform setup. If a partner specifically requires JWT auth, the platform super-admin must set",
     "jwt_federation_auth_platform_suffix": "in the server environment. Status and setup instructions live under",
     "jwt_federation_auth_platform_title": "JWT-based federation auth is configured at platform level",
-    "label_super_admin": "Super Admin"
+    "label_super_admin": "Super Admin",
+    "analytics": {
+      "title": "Federation Analytics"
+    }
   },
   "gamification": {
     "activate": "Activate",
@@ -3765,7 +3770,9 @@
     "status_inactive": "Inactive",
     "unarchive": "Unarchive",
     "visibility_private": "Visibility Private",
-    "visibility_public": "Visibility Public"
+    "visibility_public": "Visibility Public",
+    "geocode_description": "Geocode group locations to enable map display and distance-based discovery.",
+    "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet."
   },
   "header": {
     "admin_menu": "Admin menu",
@@ -4457,7 +4464,11 @@
       "rejected_today": "Rejected today",
       "total_reviewed": "Total reviewed"
     },
-    "unauthorized": "Unauthorized"
+    "unauthorized": "Unauthorized",
+    "flags_tooltip": "Number of moderation flags on this item.",
+    "load_error": "Failed to load the moderation queue.",
+    "pagination_label": "Moderation queue pagination",
+    "user_fallback": "Unknown user"
   },
   "new": "NEW",
   "newsletters": {
@@ -5084,7 +5095,9 @@
     "sort_order": "Sort Order",
     "sort_order_desc": "Sort Order.",
     "supported_formats": "Supported Formats",
-    "video_url": "Video URL"
+    "video_url": "Video URL",
+    "excerpt_desc": "A short summary shown in article lists and search results.",
+    "video_url_desc": "Optional. A YouTube or Vimeo URL embedded at the top of the article."
   },
   "review": "Review",
   "safeguarding": {
@@ -5729,7 +5742,8 @@
     "select_tenant": "Select a tenant",
     "target_hub_tenant": "Target Hub Tenant",
     "select_hub_tenant": "Select a hub tenant",
-    "no_hub_tenants_found": "No hub tenants found"
+    "no_hub_tenants_found": "No hub tenants found",
+    "impersonate_user_warning": "Impersonation logs every action under this user's identity. Use only when necessary for support."
   },
   "system": {
     "active": "Active",
@@ -7318,7 +7332,27 @@
     "transaction_by_admin": " by {{name}}",
     "test_webhook": "Test webhook",
     "retry_webhook": "Retry webhook",
-    "view_logs": "View logs"
+    "view_logs": "View logs",
+    "move_down": "Move down",
+    "move_up": "Move up",
+    "preview": "Preview",
+    "consent_renewal_body": "This consent has expired or is about to expire. Please request renewal from the volunteer.",
+    "deactivate": "Deactivate",
+    "contact_email_required": "A contact email is required.",
+    "description_min_length": "Description must be at least 20 characters.",
+    "meeting_schedule_label": "Meeting schedule",
+    "meeting_schedule_placeholder": "e.g. Tuesdays 7pm at the community hall",
+    "org_type_club": "Club",
+    "org_type_label": "Organisation type",
+    "org_type_organisation": "Organisation",
+    "reject_training_reason_prompt": "Please provide a reason for rejecting this training submission.",
+    "time_days_ago": "{{count}} day ago",
+    "time_days_ago_plural": "{{count}} days ago",
+    "time_hours_ago": "{{count}} hour ago",
+    "time_hours_ago_plural": "{{count}} hours ago",
+    "time_just_now": "Just now",
+    "time_minutes_ago": "{{count}} minute ago",
+    "time_minutes_ago_plural": "{{count}} minutes ago"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail API is not enabled",
@@ -7646,7 +7680,16 @@
     "desc_message_translation": "Auto-translate direct messages between members who speak different languages",
     "desc_newsletter": "Email newsletter campaigns, subscribers, segments, and analytics",
     "desc_partner_api": "Allow external partners to integrate with this tenant via the Partner API",
-    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies"
+    "desc_regional_analytics": "Paid regional analytics product — monthly reports for municipalities and regional bodies",
+    "cost_warning": "This setting affects costs — review carefully before changing.",
+    "currently_serving": "Currently serving",
+    "status_autocomplete": "Autocomplete",
+    "status_google_paid": "Google (paid)",
+    "status_google_places_paid": "Google Places (paid)",
+    "status_maps": "Maps",
+    "status_nominatim_free": "Nominatim (free)",
+    "status_off": "Off",
+    "status_osm_free": "OpenStreetMap (free)"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -8991,6 +9034,297 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    }
+  },
+  "admin": {
+    "providers": {
+      "title": "Care Providers",
+      "meta_title": "Care Providers",
+      "subtitle": "Manage local care providers, their services, and verification status.",
+      "empty": "No care providers found.",
+      "verified": "Verified",
+      "yes": "Yes",
+      "no": "No",
+      "confirm_deactivate": "Deactivate this provider? It will no longer appear in member-facing lists.",
+      "confirm_delete": "Delete this provider permanently? This cannot be undone.",
+      "about": {
+        "title": "About care providers",
+        "body": "Care providers are local organisations or individuals offering services to community members.",
+        "types_label": "Types",
+        "types_body": "Providers can be home care, transport, meal delivery, companionship, or other categories.",
+        "verification_label": "Verification",
+        "verification_body": "Verified providers have been reviewed by an administrator and have passed identity and credential checks."
+      },
+      "actions": {
+        "add_provider": "Add provider",
+        "cancel": "Cancel",
+        "close": "Close",
+        "create_provider": "Create provider",
+        "deactivate_named": "Deactivate {{name}}",
+        "delete_provider": "Delete provider",
+        "edit_provider": "Edit provider",
+        "find_duplicates": "Find duplicates",
+        "save_changes": "Save changes",
+        "verify_provider": "Verify provider"
+      },
+      "duplicates": {
+        "title": "Potential duplicates",
+        "empty": "No duplicates found.",
+        "match_percent": "{{percent}}% match",
+        "scanning": "Scanning for duplicates…",
+        "summary": "Found {{count}} possible duplicate(s).",
+        "vs": "vs"
+      },
+      "errors": {
+        "deactivate": "Failed to deactivate provider.",
+        "delete": "Failed to delete provider.",
+        "duplicates": "Failed to scan for duplicates.",
+        "load": "Failed to load providers.",
+        "name_required": "Name is required.",
+        "save": "Failed to save provider.",
+        "type_required": "Type is required.",
+        "verify": "Failed to verify provider."
+      },
+      "fields": {
+        "address": "Address",
+        "description": "Description",
+        "email": "Email",
+        "name": "Name",
+        "phone": "Phone",
+        "status": "Status",
+        "type": "Type",
+        "website": "Website"
+      },
+      "messages": {
+        "created": "Provider created.",
+        "deactivated": "Provider deactivated.",
+        "removed": "Provider removed.",
+        "updated": "Provider updated.",
+        "verified": "Provider verified."
+      },
+      "modal": {
+        "create_title": "Add care provider",
+        "edit_title": "Edit care provider"
+      },
+      "pagination": {
+        "next": "Next",
+        "previous": "Previous",
+        "summary": "Showing {{from}}–{{to}} of {{total}}"
+      },
+      "placeholders": {
+        "address": "Street, city, postcode…",
+        "description": "A short description of the provider and their services…",
+        "name": "e.g. Acme Home Care"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "actions": "Actions",
+        "aria": "Care providers",
+        "name": "Name",
+        "status": "Status",
+        "type": "Type",
+        "verified": "Verified"
+      }
+    },
+    "common": {
+      "cancel": "Cancel",
+      "empty_dash": "—",
+      "refresh": "Refresh"
+    },
+    "hour_transfers": {
+      "title": "Hour Transfers",
+      "subtitle": "Review and process incoming and pending hour transfers between members.",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "errors": {
+        "approve": "Failed to approve transfer.",
+        "load_inbound": "Failed to load inbound transfers.",
+        "load_pending": "Failed to load pending transfers.",
+        "reject": "Failed to reject transfer."
+      },
+      "inbound": {
+        "empty": "No inbound transfers.",
+        "title": "Inbound"
+      },
+      "messages": {
+        "approved": "Transfer approved.",
+        "rejected": "Transfer rejected."
+      },
+      "pending": {
+        "empty": "No pending transfers.",
+        "title": "Pending"
+      },
+      "reject_modal": {
+        "reason_label": "Reason",
+        "reason_placeholder": "Explain why this transfer is being rejected…",
+        "title": "Reject transfer"
+      },
+      "tabs": {
+        "aria": "Hour transfer tabs",
+        "inbound": "Inbound",
+        "pending": "Pending"
+      }
+    },
+    "loyalty": {
+      "title": "Loyalty Program",
+      "description": "Configure how members redeem time credits for discounts at participating merchants.",
+      "refresh": "Refresh",
+      "about": {
+        "title": "About the loyalty program",
+        "body": "Members can redeem time credits at participating merchants in exchange for a discount on goods or services.",
+        "rate_label": "Exchange rate",
+        "rate_body": "Defines how much currency one time credit hour is worth at the merchant point of sale.",
+        "discount_label": "Maximum discount",
+        "discount_body": "The maximum percentage of a purchase that can be paid for with time credits."
+      },
+      "errors": {
+        "discount_range": "Discount must be between 0 and 100.",
+        "load_redemptions": "Failed to load redemptions.",
+        "load_settings": "Failed to load loyalty settings.",
+        "rate_positive": "Exchange rate must be a positive number.",
+        "reverse": "Failed to reverse redemption.",
+        "save_settings": "Failed to save loyalty settings."
+      },
+      "ledger": {
+        "actions": "Actions",
+        "date": "Date",
+        "discount": "Discount",
+        "empty": "No redemptions yet.",
+        "hours": "Hours",
+        "item": "Item",
+        "member": "Member",
+        "merchant": "Merchant",
+        "rate": "Rate",
+        "reverse": "Reverse",
+        "status": "Status",
+        "title": "Redemption ledger"
+      },
+      "messages": {
+        "reversed": "Redemption reversed.",
+        "settings_saved": "Loyalty settings saved."
+      },
+      "reverse_modal": {
+        "body": "Reversing a redemption will refund the time credits to the member.",
+        "cancel": "Cancel",
+        "confirm": "Reverse",
+        "discount": "Discount",
+        "member_fallback": "Member",
+        "merchant": "Merchant",
+        "reason": "Reason",
+        "reason_placeholder": "Why is this redemption being reversed?",
+        "redeemed": "Redeemed",
+        "title": "Reverse redemption"
+      },
+      "settings": {
+        "accept_time_credits": "Accept time credits",
+        "accept_time_credits_hint": "Allow this merchant to accept time credits as payment for a portion of each purchase.",
+        "clear": "Clear",
+        "description": "Configure the merchant-side rate and maximum-discount policy for the loyalty program.",
+        "exchange_rate": "Exchange rate",
+        "exchange_rate_description": "How much currency a single time credit hour is worth at the merchant point of sale.",
+        "maximum_discount": "Maximum discount (%)",
+        "maximum_discount_description": "The maximum percentage of a purchase that can be paid using time credits.",
+        "no_matching_members": "No matching members.",
+        "save": "Save settings",
+        "seller_label": "Merchant",
+        "seller_placeholder": "Search merchants…",
+        "title": "Loyalty settings",
+        "view_only": "You have read-only access to this setting."
+      },
+      "stats": {
+        "hours_redeemed": "Hours redeemed",
+        "total_chf_discount": "Total discount given",
+        "total_redemptions": "Total redemptions"
+      },
+      "table": {
+        "empty_value": "—"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "Failed to export survey data."
+      }
+    },
+    "feedback": {
+      "title": "Municipality Feedback",
+      "subtitle": "Review feedback submitted by community members.",
+      "errors": {
+        "close": "Failed to close feedback item.",
+        "export": "Failed to export feedback.",
+        "load": "Failed to load feedback.",
+        "resolution_required": "A resolution note is required.",
+        "resolve": "Failed to resolve feedback.",
+        "save_triage": "Failed to save triage notes."
+      },
+      "messages": {
+        "closed": "Feedback closed.",
+        "resolved": "Feedback resolved.",
+        "triage_saved": "Triage notes saved."
+      }
+    },
+    "trust_tier": {
+      "errors": {
+        "recompute_failed": "Failed to recompute trust tiers.",
+        "save_failed": "Failed to save trust tier settings."
+      },
+      "messages": {
+        "recomputed": "Trust tiers recomputed.",
+        "saved": "Trust tier settings saved."
+      },
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+    },
+    "warmth_pass": {
+      "title": "Warmth Pass",
+      "subtitle": "Look up a member to check Warmth Pass eligibility and recognised contribution history.",
+      "eligible": "Eligible",
+      "not_eligible": "Not eligible",
+      "verified": "Verified",
+      "not_verified": "Not verified",
+      "empty_date": "—",
+      "loading": "Loading…",
+      "no_categories": "No help categories recorded.",
+      "tier_chip": "Tier {{tier}}",
+      "about": {
+        "title": "About Warmth Pass",
+        "body": "Warmth Pass recognises members who have made sustained, verified contributions to their community."
+      },
+      "errors": {
+        "lookup_failed": "Member lookup failed.",
+        "no_data": "No data available for this member."
+      },
+      "fields": {
+        "help_categories": "Help categories",
+        "hours_logged": "Hours logged",
+        "identity_verified": "Identity verified",
+        "member_since": "Member since",
+        "pass_active_since": "Pass active since",
+        "reviews_received": "Reviews received",
+        "trust_tier": "Trust tier"
+      },
+      "lookup": {
+        "button": "Look up",
+        "member_id": "Member ID",
+        "placeholder": "Enter a member ID…",
+        "title": "Member lookup"
+      },
+      "not_eligible_notice": {
+        "title": "Not eligible yet",
+        "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    }
+  },
+  "panel": {
+    "sidebar": {
+      "items": {
+        "surveys": "Surveys",
+        "projects": "Projects",
+        "trust_tier": "Trust Tier"
+      }
     }
   }
 }

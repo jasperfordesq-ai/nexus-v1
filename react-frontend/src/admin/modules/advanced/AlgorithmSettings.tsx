@@ -28,7 +28,6 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AlgorithmWeights {
@@ -79,51 +78,51 @@ interface HealthStatus {
 const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
   {
     area: 'feed',
-    label: 'algo.feed_label',
-    description: 'algo.feed_desc',
+    label: 'Feed Ranking (EdgeRank)',
+    description: 'How posts are ranked in the activity feed',
     params: [
-      { key: 'affinity_weight',      label: 'algo.affinity_weight',       description: 'algo.affinity_weight_desc',   min: 0, max: 1, step: 0.05 },
-      { key: 'content_type_weight',  label: 'algo.content_type_weight',   description: 'algo.content_type_weight_desc',      min: 0, max: 1, step: 0.05 },
-      { key: 'time_decay_weight',    label: 'algo.time_decay_weight',     description: 'algo.time_decay_weight_desc',      min: 0, max: 1, step: 0.05 },
-      { key: 'engagement_weight',    label: 'algo.engagement_weight',     description: 'algo.engagement_weight_desc',        min: 0, max: 1, step: 0.05 },
-      { key: 'freshness_minimum',    label: 'algo.freshness_floor',       description: 'algo.freshness_floor_desc',       min: 0, max: 0.5, step: 0.05 },
-      { key: 'half_life_hours',      label: 'algo.half_life_hours',       description: 'algo.half_life_hours_desc',   min: 1, max: 168, step: 1 },
+      { key: 'affinity_weight',     label: 'Affinity Weight',      description: 'How strongly user-to-author relationships influence ranking',         min: 0, max: 1,    step: 0.05 },
+      { key: 'content_type_weight', label: 'Content Type Weight',  description: 'How strongly the type of content (post, photo, video) is weighted',  min: 0, max: 1,    step: 0.05 },
+      { key: 'time_decay_weight',   label: 'Time Decay Weight',    description: 'How strongly post age reduces ranking',                               min: 0, max: 1,    step: 0.05 },
+      { key: 'engagement_weight',   label: 'Engagement Weight',    description: 'How strongly likes, comments, and shares boost ranking',              min: 0, max: 1,    step: 0.05 },
+      { key: 'freshness_minimum',   label: 'Freshness Floor',      description: 'Minimum freshness score regardless of age (prevents 0 scores)',       min: 0, max: 0.5,  step: 0.05 },
+      { key: 'half_life_hours',     label: 'Half-Life (hours)',    description: 'Hours after which a post drops to half its initial freshness score', min: 1, max: 168,  step: 1    },
     ],
   },
   {
     area: 'listings',
-    label: 'algo.listings_label',
-    description: 'algo.listings_desc',
+    label: 'Listings Ranking (MatchRank)',
+    description: 'How listings are scored and ranked for each user',
     params: [
-      { key: 'skill_match_weight',   label: 'algo.skill_match_weight',    description: 'algo.skill_match_weight_desc',   min: 0, max: 1, step: 0.05 },
-      { key: 'location_weight',      label: 'algo.location_weight',       description: 'algo.location_weight_desc',               min: 0, max: 1, step: 0.05 },
-      { key: 'quality_weight',       label: 'algo.quality_weight',        description: 'algo.quality_weight_desc',     min: 0, max: 1, step: 0.05 },
-      { key: 'freshness_weight',     label: 'algo.freshness_weight',      description: 'algo.freshness_weight_desc',                            min: 0, max: 1, step: 0.05 },
-      { key: 'engagement_weight',    label: 'algo.engagement_weight',     description: 'algo.listing_engagement_desc',                min: 0, max: 1, step: 0.05 },
-      { key: 'reputation_weight',    label: 'algo.reputation_weight',     description: 'algo.reputation_weight_desc',                   min: 0, max: 1, step: 0.05 },
+      { key: 'skill_match_weight',  label: 'Skill Match Weight',   description: 'How strongly listing-to-user skill overlap influences ranking',       min: 0, max: 1, step: 0.05 },
+      { key: 'location_weight',     label: 'Location Weight',      description: 'How strongly geographic proximity influences ranking',                min: 0, max: 1, step: 0.05 },
+      { key: 'quality_weight',      label: 'Quality Weight',       description: 'How strongly listing completeness and quality signals are weighted',  min: 0, max: 1, step: 0.05 },
+      { key: 'freshness_weight',    label: 'Freshness Weight',     description: 'How strongly newer listings are favored',                             min: 0, max: 1, step: 0.05 },
+      { key: 'engagement_weight',   label: 'Engagement Weight',    description: 'How strongly listing views, saves, and inquiries boost ranking',      min: 0, max: 1, step: 0.05 },
+      { key: 'reputation_weight',   label: 'Reputation Weight',    description: 'How strongly the lister\'s reputation influences ranking',            min: 0, max: 1, step: 0.05 },
     ],
   },
   {
     area: 'members',
-    label: 'algo.members_label',
-    description: 'algo.members_desc',
+    label: 'Member Ranking (CommunityRank)',
+    description: 'How members are scored and ranked in directories and recommendations',
     params: [
-      { key: 'reputation_weight',    label: 'algo.reputation_weight',     description: 'algo.members_reputation_desc',     min: 0, max: 1, step: 0.05 },
-      { key: 'contribution_weight',  label: 'algo.contribution_weight',   description: 'algo.contribution_weight_desc',         min: 0, max: 1, step: 0.05 },
-      { key: 'activity_weight',      label: 'algo.activity_weight',       description: 'algo.activity_weight_desc',             min: 0, max: 1, step: 0.05 },
-      { key: 'connectivity_weight',  label: 'advanced.connection_weight', description: 'advanced.connection_weight_desc',         min: 0, max: 1, step: 0.05 },
-      { key: 'proximity_weight',     label: 'algo.proximity_weight',      description: 'algo.proximity_weight_desc',                 min: 0, max: 1, step: 0.05 },
+      { key: 'reputation_weight',   label: 'Reputation Weight',    description: 'How strongly member ratings and reviews are weighted',                min: 0, max: 1, step: 0.05 },
+      { key: 'contribution_weight', label: 'Contribution Weight',  description: 'How strongly the member\'s contribution history is weighted',         min: 0, max: 1, step: 0.05 },
+      { key: 'activity_weight',     label: 'Activity Weight',      description: 'How strongly recent activity boosts ranking',                         min: 0, max: 1, step: 0.05 },
+      { key: 'connectivity_weight', label: 'Connection Weight',    description: 'How strongly accepted member connections should influence CommunityRank', min: 0, max: 1, step: 0.05 },
+      { key: 'proximity_weight',    label: 'Proximity Weight',     description: 'How strongly geographic proximity influences ranking',                min: 0, max: 1, step: 0.05 },
     ],
   },
   {
     area: 'matching',
-    label: 'algo.matching_label',
-    description: 'algo.matching_desc',
+    label: 'Smart Matching',
+    description: 'How users are matched to listings for personalized recommendations',
     params: [
-      { key: 'skill_weight',         label: 'algo.skill_weight',          description: 'algo.skill_weight_desc',       min: 0, max: 1, step: 0.05 },
-      { key: 'location_weight',      label: 'algo.location_weight',       description: 'algo.matching_location_desc',                            min: 0, max: 1, step: 0.05 },
-      { key: 'rating_weight',        label: 'algo.rating_weight',         description: 'algo.rating_weight_desc',                 min: 0, max: 1, step: 0.05 },
-      { key: 'availability_weight',  label: 'algo.availability_weight',   description: 'algo.availability_weight_desc',                  min: 0, max: 1, step: 0.05 },
+      { key: 'skill_weight',        label: 'Skill Weight',         description: 'How strongly skill overlap influences match scores',                  min: 0, max: 1, step: 0.05 },
+      { key: 'location_weight',     label: 'Location Weight',      description: 'How strongly geographic proximity influences match scores',           min: 0, max: 1, step: 0.05 },
+      { key: 'rating_weight',       label: 'Rating Weight',        description: 'How strongly past ratings between users influence match scores',      min: 0, max: 1, step: 0.05 },
+      { key: 'availability_weight', label: 'Availability Weight',  description: 'How strongly overlapping availability influences match scores',       min: 0, max: 1, step: 0.05 },
     ],
   },
 ];
@@ -131,7 +130,6 @@ const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AlgorithmSettings() {
-  const { t } = useTranslation('admin');
   usePageTitle("Advanced");
   const toast = useToast();
 
@@ -269,15 +267,15 @@ export function AlgorithmSettings() {
               <div className="flex items-center gap-3">
                 <Cpu size={20} className="text-primary shrink-0" />
                 <div>
-                  <h3 className="text-base font-semibold">{t(areaData.label)}</h3>
-                  <p className="text-sm text-foreground-500">{t(areaData.description)}</p>
+                  <h3 className="text-base font-semibold">{areaData.label}</h3>
+                  <p className="text-sm text-foreground-500">{areaData.description}</p>
                 </div>
               </div>
               <Switch
                 isSelected={areaData.enabled}
                 onValueChange={v => toggleEnabled(areaData.area, v)}
                 size="sm"
-                aria-label={`Enable ${t(areaData.label)}`}
+                aria-label={`Enable ${areaData.label}`}
               >
                 {areaData.enabled ? "Enabled" : "Disabled"}
               </Switch>
@@ -288,8 +286,8 @@ export function AlgorithmSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                   {areaData.params.map(param => (
                     <div key={param.key}>
-                      <p className="text-sm font-medium mb-1">{t(param.label)}</p>
-                      <p className="text-xs text-foreground-500 mb-2">{t(param.description)}</p>
+                      <p className="text-sm font-medium mb-1">{param.label}</p>
+                      <p className="text-xs text-foreground-500 mb-2">{param.description}</p>
                       <Slider
                         minValue={param.min}
                         maxValue={param.max}
@@ -297,7 +295,7 @@ export function AlgorithmSettings() {
                         value={areaData.weights[param.key] ?? param.min}
                         onChange={v => updateWeight(areaData.area, param.key, v as number)}
                         className="max-w-sm"
-                        aria-label={t(param.label)}
+                        aria-label={param.label}
                         showTooltip
                       />
                       <span className="text-xs text-foreground-500 mt-1 block">

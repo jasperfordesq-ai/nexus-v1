@@ -29,7 +29,6 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
-import { useTranslation } from 'react-i18next';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,11 +87,11 @@ interface FormState {
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROVIDERS: { key: ProviderId; labelKey: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
-  { key: 'openai', labelKey: 'advanced.provider_openai', keyField: 'openai_api_key', modelField: 'openai_model' },
-  { key: 'anthropic', labelKey: 'advanced.provider_anthropic', keyField: 'anthropic_api_key', modelField: 'claude_model' },
-  { key: 'gemini', labelKey: 'advanced.provider_google_gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
-  { key: 'ollama', labelKey: 'advanced.provider_ollama', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
+const PROVIDERS: { key: ProviderId; label: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
+  { key: 'openai', label: 'OpenAI', keyField: 'openai_api_key', modelField: 'openai_model' },
+  { key: 'anthropic', label: 'Anthropic (Claude)', keyField: 'anthropic_api_key', modelField: 'claude_model' },
+  { key: 'gemini', label: 'Google Gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
+  { key: 'ollama', label: 'Ollama (Self-Hosted)', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
 ];
 
 const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
@@ -102,12 +101,12 @@ const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
   ollama: ['llama2', 'llama3', 'mistral', 'codellama'],
 };
 
-const FEATURE_TOGGLES: { key: keyof FormState; labelKey: string; descKey: string }[] = [
-  { key: 'ai_chat_enabled', labelKey: 'advanced.feat_ai_chat', descKey: 'advanced.feat_ai_chat_desc' },
-  { key: 'ai_content_gen_enabled', labelKey: 'advanced.feat_content_gen', descKey: 'advanced.feat_content_gen_desc' },
-  { key: 'ai_recommendations_enabled', labelKey: 'advanced.feat_recommendations', descKey: 'advanced.feat_recommendations_desc' },
-  { key: 'ai_analytics_enabled', labelKey: 'advanced.feat_ai_analytics', descKey: 'advanced.feat_ai_analytics_desc' },
-  { key: 'ai_moderation_enabled', labelKey: 'advanced.feat_moderation', descKey: 'advanced.feat_moderation_desc' },
+const FEATURE_TOGGLES: { key: keyof FormState; label: string; desc: string }[] = [
+  { key: 'ai_chat_enabled', label: 'AI Chat Assistant', desc: 'In-platform AI chat for members' },
+  { key: 'ai_content_gen_enabled', label: 'Content Generation', desc: 'AI-assisted drafting of posts, listings, and messages' },
+  { key: 'ai_recommendations_enabled', label: 'AI Recommendations', desc: 'Personalized listing, member, and content recommendations' },
+  { key: 'ai_analytics_enabled', label: 'AI Analytics', desc: 'AI-generated insights from community activity' },
+  { key: 'ai_moderation_enabled', label: 'AI Moderation', desc: 'Automated content moderation and toxicity detection' },
 ];
 
 const DEFAULT_FORM: FormState = {
@@ -135,7 +134,6 @@ const DEFAULT_FORM: FormState = {
 // ---------------------------------------------------------------------------
 
 export function AiSettings() {
-  const { t } = useTranslation('admin');
   usePageTitle("Advanced");
   const toast = useToast();
 
@@ -194,7 +192,7 @@ export function AiSettings() {
       })
       .catch(() => toast.error("Failed to load AI settings"))
       .finally(() => setLoading(false));
-  }, [toast, t, mapResponseToForm]);
+  }, [toast, mapResponseToForm]);
 
   const updateField = (key: keyof FormState, value: unknown) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -315,7 +313,7 @@ export function AiSettings() {
               description={"Select AI Provider."}
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
+                <SelectItem key={p.key}>{p.label}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -340,7 +338,7 @@ export function AiSettings() {
               return (
                 <div key={provider.key} className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{t(provider.labelKey)}</p>
+                    <p className="font-medium">{provider.label}</p>
                     {isActive && <Chip size="sm" color="primary" variant="flat">{"Active"}</Chip>}
                     {!isOllama && hasKeySet && !userTyped && (
                       <Chip size="sm" color="success" variant="flat">{"Key Configured"}</Chip>
@@ -405,14 +403,14 @@ export function AiSettings() {
             {FEATURE_TOGGLES.map(feat => (
               <div key={feat.key} className="flex items-center justify-between py-1">
                 <div>
-                  <p className="text-sm font-medium">{t(feat.labelKey)}</p>
-                  <p className="text-xs text-default-400">{t(feat.descKey)}</p>
+                  <p className="text-sm font-medium">{feat.label}</p>
+                  <p className="text-xs text-default-400">{feat.desc}</p>
                 </div>
                 <Switch
                   size="sm"
                   isSelected={!!form[feat.key]}
                   onValueChange={(v) => updateField(feat.key, v)}
-                  aria-label={t(feat.labelKey)}
+                  aria-label={feat.label}
                 />
               </div>
             ))}
