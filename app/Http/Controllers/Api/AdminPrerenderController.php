@@ -13,9 +13,11 @@ use Illuminate\Http\Request;
 /**
  * AdminPrerenderController — admin endpoints for the prerender engine.
  *
- * All routes require admin auth. Force-refresh endpoints additionally require
- * super-admin since they affect every tenant snapshot and trigger a
- * cross-tenant Playwright run on the host.
+ * Read endpoints accept any admin. Mutating endpoints (enqueue, purge,
+ * cancel, invalidate, auto-recache, detect-drift, purge-unexpected) require
+ * a PLATFORM super-admin — the engine operates cross-tenant (a job can
+ * target any tenant slug), so a tenant-scoped super-admin must not be able
+ * to enqueue work against other tenants' snapshots.
  */
 class AdminPrerenderController extends BaseApiController
 {
@@ -137,7 +139,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function enqueue(Request $r): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $payload = $r->json()->all();
         $tenantSlug = $payload['tenant_slug'] ?? null;
@@ -203,7 +205,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function purge(Request $r): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $payload = $r->json()->all();
         $pattern = trim((string) ($payload['pattern'] ?? ''));
@@ -265,7 +267,7 @@ class AdminPrerenderController extends BaseApiController
     /** POST /api/v2/admin/prerender/jobs/{id}/cancel */
     public function cancelJob(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $ok = $this->service->cancelJob($id);
         if (!$ok) {
             return $this->error('Job is not cancellable (already claimed or finished)', 409, 'CONFLICT');
@@ -282,8 +284,10 @@ class AdminPrerenderController extends BaseApiController
      *
      * Authentication options (in order of preference):
      *   1. Bearer token = config('prerender.webhook_token')   (preferred)
-     *   2. X-Nexus-Signature: hex-HMAC-SHA256 of the raw body with that token
-     *   3. Admin session (super_admin)                          (fallback for ops UI)
+     *   2. X-Nexus-Signature: hex-HMAC-SHA256 of "<timestamp>.<raw body>" with that token,
+     *      where the timestamp is the value of the X-Nexus-Timestamp header (Unix seconds).
+     *      Requests with a timestamp older than ±5 minutes are rejected (replay protection).
+     *   3. Admin session (platform super-admin)                 (fallback for ops UI)
      *
      * Body:
      *   tenant_id:    int       — required
@@ -303,9 +307,17 @@ class AdminPrerenderController extends BaseApiController
                 $authed = true;
             } else {
                 $sig = (string) $r->header('X-Nexus-Signature', '');
-                if ($sig !== '') {
-                    $expected = hash_hmac('sha256', $r->getContent(), $token);
-                    if (hash_equals($expected, $sig)) $authed = true;
+                $tsHeader = (string) $r->header('X-Nexus-Timestamp', '');
+                if ($sig !== '' && $tsHeader !== '' && ctype_digit($tsHeader)) {
+                    $ts = (int) $tsHeader;
+                    $skew = abs(time() - $ts);
+                    if ($skew <= 300) {
+                        // Signed payload is "<timestamp>.<raw body>" so a
+                        // captured (timestamp, body, signature) tuple is only
+                        // usable inside the 5-minute window.
+                        $expected = hash_hmac('sha256', $ts . '.' . $r->getContent(), $token);
+                        if (hash_equals($expected, $sig)) $authed = true;
+                    }
                 }
             }
         }
@@ -314,7 +326,7 @@ class AdminPrerenderController extends BaseApiController
             // Fall back to admin-session auth so the admin UI can call this
             // directly without needing the shared secret.
             try {
-                $this->requireSuperAdmin();
+                $this->requirePlatformSuperAdmin();
                 $authed = true;
             } catch (\Throwable $e) {
                 return $this->error('Unauthorized', 401, 'UNAUTHENTICATED');
@@ -385,7 +397,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function autoRecache(Request $r): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:auto-recache', $apply ? [] : ['--dry-run' => true]);
         return $this->respondWithData([
@@ -404,7 +416,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function detectDrift(Request $r): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:detect-drift', $apply ? [] : ['--dry-run' => true]);
         return $this->respondWithData([
@@ -429,7 +441,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function purgeUnexpected(Request $r): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $apply = (bool) $r->json('apply', false);
         return $this->respondWithData($this->service->purgeUnexpectedSnapshots(!$apply));
     }

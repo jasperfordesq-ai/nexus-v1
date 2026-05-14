@@ -227,6 +227,14 @@ class PrerenderService
      *   $deep=true:  parses each file's asset refs and validates against the
      *                live asset manifest. Adds content-staleness check.
      */
+    /**
+     * Safety cap to prevent a misbehaving Playwright run that wrote thousands
+     * of files into one directory from hanging the admin summary. When hit,
+     * `inventory()` returns a `__truncated => true` sentinel row at the front
+     * of the array; UI displays a banner.
+     */
+    public const INVENTORY_HARD_CAP = 50_000;
+
     public function inventory(?string $tenantSlug = null, bool $deep = true): array
     {
         if (!$this->cacheReadable()) return [];
@@ -242,6 +250,7 @@ class PrerenderService
         $contentUpdated = $deep ? $this->loadContentUpdatedAt() : [];
 
         $rows = [];
+        $truncated = false;
         $it = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
                 $this->cachePath,
@@ -250,6 +259,10 @@ class PrerenderService
         );
 
         foreach ($it as $file) {
+            if (count($rows) >= self::INVENTORY_HARD_CAP) {
+                $truncated = true;
+                break;
+            }
             if (!$file->isFile() || $file->getFilename() !== 'index.html') continue;
             $absPath = $file->getPathname();
             $rel = str_replace('\\', '/', ltrim(substr($absPath, strlen($this->cachePath)), '/\\'));
@@ -305,6 +318,15 @@ class PrerenderService
         }
 
         usort($rows, fn($a, $b) => $b['mtime'] <=> $a['mtime']);
+        if ($truncated) {
+            array_unshift($rows, [
+                '__truncated' => true,
+                'cap'         => self::INVENTORY_HARD_CAP,
+                'host'        => '',
+                'route'       => '',
+                'cache_path'  => '',
+            ]);
+        }
         return $rows;
     }
 
@@ -714,12 +736,26 @@ class PrerenderService
         }
 
         if ($enqueueRecache && $deleted > 0) {
+            // Backpressure: bulk imports (e.g. seeding 5,000 blog posts) would
+            // otherwise enqueue 5,000 distinct queued rows (each with a unique
+            // per-post route, so the dedup key differs and they don't coalesce).
+            // If we've fired more than the burst threshold for this tenant in
+            // the last minute, drop the per-route precision and enqueue a
+            // single tenant-wide row instead — the dedup probe in enqueueJob
+            // then collapses subsequent bursts onto that one row.
+            $burstKey   = "prerender:burst:tenant:{$tenantId}";
+            $burstCount = (int) \Illuminate\Support\Facades\Cache::increment($burstKey);
+            if ($burstCount === 1) {
+                \Illuminate\Support\Facades\Cache::put($burstKey, 1, 60);
+            }
+            $routesArg = $burstCount > 50 ? null : implode(',', $routes);
+
             // NORMAL priority: a content save is a user-initiated event with a
             // human waiting for the public page to update. Background sweeps
             // run at LOW; observer-triggered work belongs ahead of them.
             $this->enqueueJob(
                 $tenantId,
-                implode(',', $routes),
+                $routesArg,
                 false, // force (snapshots are gone — they'll be re-rendered)
                 false,
                 null,
@@ -814,6 +850,14 @@ class PrerenderService
     public const PRIORITY_NORMAL = 5;
     public const PRIORITY_LOW    = 7;
 
+    /**
+     * Route regex used everywhere (controller, webhook, observer-injected
+     * routes). Routes flow through to a bash shell `eval` in the host job
+     * processor, so input validation is a defence-in-depth requirement, not
+     * a UX nicety.
+     */
+    public const ROUTE_REGEX = '#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#';
+
     public function enqueueJob(
         ?int $tenantId,
         ?string $routes,
@@ -825,38 +869,62 @@ class PrerenderService
         $priority = max(1, min(9, $priority));
         if ($routes !== null) {
             $routes = substr(trim($routes), 0, 2000);
-            if ($routes === '') $routes = null;
-        }
-        $existing = DB::table('prerender_jobs')
-            ->where('status', 'queued')
-            ->where('tenant_id', $tenantId)
-            ->where('routes', $routes)
-            ->where('force_render', $force ? 1 : 0)
-            ->where('dry_run', $dryRun ? 1 : 0)
-            ->orderByDesc('id')
-            ->first();
-        if ($existing) {
-            // If a higher-priority caller is enqueueing a dup, promote it.
-            if ($priority < (int) ($existing->priority ?? self::PRIORITY_NORMAL)) {
-                DB::table('prerender_jobs')->where('id', $existing->id)->update(['priority' => $priority]);
-                $this->broadcastJob((int) $existing->id);
+            if ($routes === '') {
+                $routes = null;
+            } else {
+                // Defence in depth: every route token must match ROUTE_REGEX.
+                // Observer-injected routes already go through routesFor() and
+                // are static strings, but a future contributor adding a
+                // dynamic routesFor() could land unsafe characters in a shell
+                // eval. Reject those here.
+                $tokens = array_filter(array_map('trim', explode(',', $routes)));
+                foreach ($tokens as $tok) {
+                    if (!preg_match(self::ROUTE_REGEX, $tok)) {
+                        throw new \InvalidArgumentException("Invalid route in enqueueJob: {$tok}");
+                    }
+                }
+                $routes = implode(',', $tokens);
+                if ($routes === '') $routes = null;
             }
-            return (int) $existing->id;
         }
 
-        $id = (int) DB::table('prerender_jobs')->insertGetId([
-            'requested_by'  => $requestedBy,
-            'tenant_id'     => $tenantId,
-            'routes'        => $routes,
-            'force_render'  => $force ? 1 : 0,
-            'dry_run'       => $dryRun ? 1 : 0,
-            'priority'      => $priority,
-            'status'        => 'queued',
-            'queued_at'     => date('Y-m-d H:i:s'),
-        ]);
+        // Transactional dedup. Two concurrent observers firing on the same
+        // model save can both see "no queued row" and both insert; wrapping
+        // the probe+insert in a transaction with lockForUpdate serialises
+        // them through MariaDB row locks.
+        return DB::transaction(function () use ($tenantId, $routes, $force, $dryRun, $requestedBy, $priority): int {
+            $existing = DB::table('prerender_jobs')
+                ->where('status', 'queued')
+                ->where('tenant_id', $tenantId)
+                ->where('routes', $routes)
+                ->where('force_render', $force ? 1 : 0)
+                ->where('dry_run', $dryRun ? 1 : 0)
+                ->orderByDesc('id')
+                ->lockForUpdate()
+                ->first();
+            if ($existing) {
+                // If a higher-priority caller is enqueueing a dup, promote it.
+                if ($priority < (int) ($existing->priority ?? self::PRIORITY_NORMAL)) {
+                    DB::table('prerender_jobs')->where('id', $existing->id)->update(['priority' => $priority]);
+                    $this->broadcastJob((int) $existing->id);
+                }
+                return (int) $existing->id;
+            }
 
-        $this->broadcastJob($id);
-        return $id;
+            $id = (int) DB::table('prerender_jobs')->insertGetId([
+                'requested_by'  => $requestedBy,
+                'tenant_id'     => $tenantId,
+                'routes'        => $routes,
+                'force_render'  => $force ? 1 : 0,
+                'dry_run'       => $dryRun ? 1 : 0,
+                'priority'      => $priority,
+                'status'        => 'queued',
+                'queued_at'     => date('Y-m-d H:i:s'),
+            ]);
+
+            $this->broadcastJob($id);
+            return $id;
+        });
     }
 
     public function cancelJob(int $id): bool
@@ -1362,8 +1430,10 @@ class PrerenderService
     {
         $rel = ltrim(str_replace('\\', '/', $rel), '/');
         if ($rel === '' || str_contains($rel, '..')) return null;
-        if (!preg_match('#^[A-Za-z0-9._/%\-]+$#', $rel)) return null;
-        if (!str_ends_with($rel, '/index.html')) return null;
+        // Match the route regex used elsewhere so legitimate routes containing
+        // : @ ~ ( ) + , ; = ! $ * don't 404 the inspect drawer. The .. check
+        // above plus the /index.html suffix guarantee path safety.
+        if (!preg_match('#^[A-Za-z0-9._~/%:@!$()+,;=\-]+/index\.html$#', $rel)) return null;
         return $rel;
     }
 

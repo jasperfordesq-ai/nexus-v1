@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner,
   Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn,
@@ -149,12 +150,30 @@ export function PrerenderAdmin() {
   usePageTitle('Prerender Engine');
   const toast = useToast();
   const { user } = useAuth();
+  // PLATFORM super-admin only — the engine runs cross-tenant operations.
+  // is_tenant_super_admin is intentionally NOT accepted (matches the backend
+  // requirePlatformSuperAdmin gate and the private-admin-prerender channel auth).
   const isSuperAdmin = Boolean(
     user?.is_super_admin || user?.is_god || user?.role === 'super_admin',
   );
 
-  const [tab, setTab] = useState<string>('overview');
-  const [coverageFilter, setCoverageFilter] = useState<string | null>(null);
+  // Tell tenant admins WHY they can't use the action buttons. The greyed-out
+  // state alone was confusing — buttons just appeared broken.
+  const readOnly = !isSuperAdmin;
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState<string>(() => searchParams.get('tab') || 'overview');
+  const [coverageFilter, setCoverageFilter] = useState<string | null>(() => searchParams.get('tenant'));
+
+  // Keep tab and tenant filter in the URL so refresh and back/forward work.
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (tab && tab !== 'overview') next.set('tab', tab); else next.delete('tab');
+    if (coverageFilter) next.set('tenant', coverageFilter); else next.delete('tenant');
+    const currentStr = searchParams.toString();
+    const nextStr = next.toString();
+    if (currentStr !== nextStr) setSearchParams(next, { replace: true });
+  }, [tab, coverageFilter, searchParams, setSearchParams]);
   const { lastUpdate, live } = useJobUpdates();
 
   return (
@@ -163,6 +182,15 @@ export function PrerenderAdmin() {
         title="Prerender Engine"
         description="Bot-only server-rendered snapshots. Monitor coverage, detect staleness, force refreshes."
       />
+
+      {readOnly && (
+        <div className="mb-3 rounded-md border border-warning-200 bg-warning-50 text-warning-800 px-3 py-2 text-sm">
+          Read-only view — action buttons are disabled because the prerender
+          engine operates across every tenant. Sign in with a <strong>platform
+          super-admin</strong> account to enqueue jobs, purge snapshots, or
+          trigger drift detection.
+        </div>
+      )}
 
       <div className="flex justify-end mb-2">
         <Chip
@@ -186,7 +214,7 @@ export function PrerenderAdmin() {
           key="overview"
           title={<span className="flex items-center gap-2"><Activity size={16} />Overview</span>}
         >
-          <OverviewTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} />
+          <OverviewTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} live={live} />
         </Tab>
         <Tab
           key="inventory"
@@ -242,7 +270,7 @@ interface ToastShape {
   error: (m: string) => void;
 }
 
-function OverviewTab({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
+function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
   const [summary, setSummary] = useState<PrerenderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [enqueuing, setEnqueuing] = useState(false);
@@ -260,12 +288,14 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolea
   }, [toast]);
 
   useEffect(() => { load(); }, [load]);
-  // Reload on Pusher signal; fall back to 30s poll if realtime fails.
+  // Reload on Pusher signal; fall back to 30s poll ONLY when realtime is down,
+  // otherwise we double-fetch every Pusher event.
   useEffect(() => { if (lastUpdate > 0) load(); }, [lastUpdate, load]);
   useEffect(() => {
+    if (live) return;
     const id = setInterval(load, 30_000);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, live]);
 
   const enqueue = async () => {
     setEnqueuing(true);
@@ -304,8 +334,8 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolea
 
   return (
     <div className="space-y-4">
-      {/* KPI grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* KPI grid — 11 cards, breakpoints chosen so every row fills cleanly. */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3">
         <KpiCard label="Coverage" value={`${summary.coverage_pct}%`} hint={`${summary.total_snapshots} / ${summary.expected_count}`} />
         <KpiCard label="Missing" value={summary.missing_count} hint={`${summary.tenant_count} tenants × ${summary.expected_routes.length} routes`} tone={summary.missing_count > 0 ? 'warning' : 'default'} />
         <KpiCard label="Age stale (>14d)" value={summary.stale_count} hint={`${summary.warn_count} aging (>7d)`} tone={summary.stale_count > 0 ? 'warning' : 'default'} />

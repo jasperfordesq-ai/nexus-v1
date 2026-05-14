@@ -1151,6 +1151,22 @@ cmd_deploy() {
     purge_cloudflare_cache "Cloudflare Cache Purge"
     write_color_release "$target" "$commit" "$release_dir"
 
+    # Install/refresh the host cron for the prerender job processor. Without
+    # this, prerender_jobs rows queued by observers/scheduler sit forever
+    # because only the host can docker-exec the worker.
+    if [ -f "$SELF_DIR/phases/install-prerender-cron.sh" ]; then
+        phase "Install Prerender Cron" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+        bash "$SELF_DIR/phases/install-prerender-cron.sh" || \
+            log_warn "Prerender cron install had errors — jobs may not drain"
+    fi
+
+    # Rotate the bot-only access log so it doesn't grow unbounded (busy sites
+    # see MB/day of crawler hits). Idempotent.
+    if [ -f "$SELF_DIR/phases/install-prerender-logrotate.sh" ]; then
+        bash "$SELF_DIR/phases/install-prerender-logrotate.sh" || \
+            log_warn "Prerender logrotate install had errors"
+    fi
+
     # Detach the prerender + its post-purge from the deploy critical path.
     # Re-rendering every public route across every active tenant takes 20-40
     # minutes (every snapshot's asset hashes are stale after each build), and
