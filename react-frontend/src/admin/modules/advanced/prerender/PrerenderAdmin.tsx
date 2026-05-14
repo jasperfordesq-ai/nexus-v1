@@ -443,6 +443,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
 
       <FreshnessControls isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
       <TtlInspector />
+      <SitemapExplorer />
       <PurgeControls   isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
     </div>
   );
@@ -1659,6 +1660,16 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
     }
   };
 
+  const retryJob = async (id: number) => {
+    try {
+      const res = await adminPrerender.retryJob(id);
+      if (res.data) toast.success(`Queued retry #${res.data.job_id} (from #${id})`);
+      load();
+    } catch {
+      toast.error('Retry failed — original job may still be in flight');
+    }
+  };
+
   const openDetail = (j: PrerenderJob) => {
     setExpanded(j);
     detailModal.onOpen();
@@ -1759,6 +1770,20 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                       >
                         <StopCircle size={14} />
                       </Button>
+                    )}
+                    {(j.status === 'failed' || j.status === 'partial' || j.status === 'cancelled') && (
+                      <Tooltip content="Retry with the same parameters">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          color="primary"
+                          isIconOnly
+                          onPress={() => retryJob(j.id)}
+                          isDisabled={!isSuperAdmin}
+                        >
+                          <RefreshCw size={14} />
+                        </Button>
+                      </Tooltip>
                     )}
                   </div>
                 </TableCell>
@@ -2270,6 +2295,89 @@ function TtlInspector() {
                 </ul>
               </div>
             )}
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
+
+// ─── Sitemap explorer (Overview tab card) ──────────────────────────────────
+
+function SitemapExplorer() {
+  const [slug, setSlug] = useState('');
+  const [data, setData] = useState<{
+    tenant_slug: string;
+    tenant_id: number;
+    static_routes: string[];
+    dynamic_routes: string[];
+    total_count: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    if (!slug.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminPrerender.sitemapExplorer(slug.trim());
+      if (res.data) setData(res.data);
+    } catch {
+      setError('Lookup failed — check the tenant slug');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card shadow="sm">
+      <CardHeader>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Search size={18} />Sitemap explorer
+        </h3>
+      </CardHeader>
+      <CardBody className="space-y-3">
+        <p className="text-sm text-default-500">
+          See exactly which routes the engine plans to render for a tenant — static floor
+          (feature/module gated) plus the dynamic URLs from <code>SitemapService</code>.
+          The Playwright worker visits this list.
+        </p>
+        <div className="flex gap-2 items-end">
+          <Input
+            label="Tenant slug"
+            placeholder="hour-timebank"
+            variant="bordered"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            className="max-w-sm"
+          />
+          <Button color="primary" onPress={submit} isLoading={loading}>
+            Explore
+          </Button>
+        </div>
+        {error && <p className="text-danger text-sm">{error}</p>}
+        {data && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Chip color="primary" variant="flat" size="sm">{data.static_routes.length} static</Chip>
+              <Chip color="secondary" variant="flat" size="sm">{data.dynamic_routes.length} dynamic</Chip>
+              <Chip variant="flat" size="sm">{data.total_count} total</Chip>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs font-medium mb-1">Static routes</p>
+                <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
+                  {data.static_routes.join('\n')}
+                </Code>
+              </div>
+              <div>
+                <p className="text-xs font-medium mb-1">Dynamic routes (capped at 1,000)</p>
+                <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
+                  {data.dynamic_routes.length > 0 ? data.dynamic_routes.join('\n') : '(none)'}
+                </Code>
+              </div>
+            </div>
           </div>
         )}
       </CardBody>

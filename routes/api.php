@@ -2149,6 +2149,9 @@ Route::post('/v2/admin/prerender/reset-queue',     [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/prerender/export/{kind}.csv', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'exportCsv'])
     ->where('kind', 'audit|inventory|jobs');
 Route::get('/v2/admin/prerender/ttl-inspector',     [\App\Http\Controllers\Api\AdminPrerenderController::class, 'ttlInspector']);
+// Round 4 — retry job + sitemap explorer.
+Route::post('/v2/admin/prerender/jobs/{id}/retry',  [\App\Http\Controllers\Api\AdminPrerenderController::class, 'retryJob'])->whereNumber('id');
+Route::get('/v2/admin/prerender/sitemap-explorer',  [\App\Http\Controllers\Api\AdminPrerenderController::class, 'sitemapExplorer']);
 Route::get('/v2/admin/deliverability/dashboard', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDashboard']);
 Route::get('/v2/admin/deliverability/analytics', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getAnalytics']);
 Route::get('/v2/admin/deliverability', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDeliverables']);

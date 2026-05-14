@@ -334,14 +334,49 @@ nginx writes a JSONL bot-only access log to the shared prerender volume (`.bot-a
 
 ### Admin UI (`/admin/prerender`)
 
-Six tabs:
-- **Overview** — KPIs, freshness controls (auto-recache + drift trigger), wildcard purge form, force-refresh job queue
-- **Inventory** — every snapshot with HTTP status, SEO score, age, content/asset flags; bulk-select + bulk-recache; filter by host/route/staleness/status/issue
+**Access:** platform super-admin only. Sidebar hides the entry for tenant super-admins because the engine operates cross-tenant. Backend uses `requirePlatformSuperAdmin` on every mutating endpoint.
+
+Eight tabs:
+- **Overview** — health banner (auto-hides when green), KPIs, Freshness automation, **TTL inspector** (which `config/prerender.php` pattern owns a route + the TTL), **Sitemap explorer** (static + dynamic routes per tenant), wildcard purge, force-refresh
+- **Inventory** — every snapshot with HTTP status, SEO score, age, content/asset flags, integrity (sha256 sidecar check); bulk-select + bulk-recache; filter by host/route/staleness/status/issue
 - **Coverage** — per-tenant expected-vs-rendered matrix with "Refresh all stale" bulk action
-- **Jobs** — queued/running/completed job history with realtime updates via Pusher
+- **Jobs** — priority swimlanes (HIGH/NORMAL/LOW chips), retry-failed button, realtime updates via Pusher
 - **Analytics** — bot crawl activity, top URIs, verified vs spoofed
 - **Events** — JSONL deploy event stream
 - **Failures** — recent failed paths in the backoff window
+- **History** — every mutating action audited (actor/IP/UA/outcome/details), filterable by action, **Export CSV**
+
+### Self-healing & ops (Round 2-4)
+
+**Circuit breaker.** 5 failed jobs in 10 min trips the queue for 15 min (auto-resume). `claimNextJob` returns null while tripped. Manual reset via `POST /api/v2/admin/prerender/reset-breaker` or the UI "Close breaker now" button.
+
+**Per-tenant concurrency cap.** One in-flight job per tenant (NULL-tenant jobs serialize on the host worker lock). Stops a slow tenant from starving others.
+
+**Stale-job reaper.** `prerender:reap-stale` runs every 5 min from BOTH the in-container Laravel scheduler AND the host cron file (`/etc/cron.d/nexus-prerender-processor`). Belt-and-braces: if the scheduler dies, the host catches it.
+
+**Scheduler liveness.** Every prerender scheduled task stamps `prerender:sched:<name>:last_ok_at` on success. `health()` checks each is fresh; yellow at 2× expected interval, red at 3×. Catches the silent "supervisord died" failure mode.
+
+**Health endpoint** `GET /api/v2/admin/prerender/health` — traffic-light JSON. Always 200; status field carries `green|yellow|red`. Each check has an `action` string telling the operator exactly what to run. Rendered as a banner in the admin UI.
+
+**Emergency reset.** UI "Emergency reset" button (only visible when health ≠ green) calls `POST /api/v2/admin/prerender/reset-queue`, which requeues every `claimed`/`running` row older than 30 min AND clears the breaker. Rate-limited (2/5min/user), audited.
+
+**Audit log.** `prerender_audit_log` table persists every mutating action with actor/IP/UA/outcome/sanitised details. Secret keys (`password`/`token`/`secret`/`api_key`/`authorization`/`bearer`) auto-redacted. Replay attempts on `/invalidate` are audited with `outcome=denied, reason=webhook_replay`.
+
+**Webhook /invalidate auth** has three independent layers:
+1. Bearer token = `config('prerender.webhook_token')`
+2. HMAC-SHA256 of `"<X-Nexus-Timestamp>.<body>"` with that token, ±5 min skew, one-time-use nonce (sig replays within window are rejected)
+3. Platform-super-admin session (UI fallback)
+
+**Snapshot integrity.** Worker writes `index.html.sha256` next to every snapshot. Inspect drawer shows an `integrity` chip (`ok|missing|mismatch|unreadable`); mismatch is danger-coloured. Catches corruption, bit rot, hand-edits.
+
+**CSV exports.** `GET /api/v2/admin/prerender/export/{audit|inventory|jobs}.csv` — streamed, 5,000 row cap.
+
+**Observability artefacts** (committed):
+- `docs-public/observability/prerender-grafana-dashboard.json`
+- `docs-public/observability/prerender-alerts.yml` — 7 Prometheus rules (4 critical, 3 warning)
+- `docs-public/observability/prerender-runbook.md` — alert-by-alert response steps
+
+**Prometheus metrics worth knowing**: `nexus_prerender_health_status` (0/1/2 enum, alertable), `breaker_tripped`, `queue_oldest_age_seconds`, `failures_recent`, `coverage_ratio`, plus per-tenant `tenant_rendered{slug}` / `tenant_missing{slug}` gauges and per-status `jobs_total{status}` counters.
 
 ### Serving rules ([nginx.bluegreen.conf](nginx.bluegreen.conf))
 

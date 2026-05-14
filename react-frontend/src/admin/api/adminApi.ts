@@ -1982,6 +1982,20 @@ export const adminPrerender = {
       `/v2/admin/prerender/ttl-inspector?route=${encodeURIComponent(route)}`,
     ),
 
+  retryJob: (id: number) =>
+    api.post<{ job_id: number; retried_from_job_id: number; job: PrerenderJob }>(
+      `/v2/admin/prerender/jobs/${id}/retry`, {},
+    ),
+
+  sitemapExplorer: (tenantSlug: string) =>
+    api.get<{
+      tenant_slug: string;
+      tenant_id: number;
+      static_routes: string[];
+      dynamic_routes: string[];
+      total_count: number;
+    }>(`/v2/admin/prerender/sitemap-explorer?tenant=${encodeURIComponent(tenantSlug)}`),
+
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
   metricsUrl: '/api/v2/admin/prerender/metrics',
 };

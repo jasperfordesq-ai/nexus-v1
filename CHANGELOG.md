@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Prerender engine — Round 4: tests + retry + sitemap explorer.**
+  - **11 new tests** covering the Round 2+3 logic: circuit breaker trip + claim-suppression, per-tenant concurrency cap, route validation rejecting shell metacharacters, audit secret-redaction, health check transitions, snapshot integrity (`ok`/`mismatch`/`missing`), TTL-pattern specificity resolution, safeCachePath accepting route special characters, observer-storm coalescing to a tenant-wide row. Without these, one refactor breaks the safety net.
+  - **Job retry button.** Failed / partial / cancelled jobs now have a "Retry" button on the Jobs tab that clones their parameters into a new queued row. Original job is preserved for history. New audit row links the two via `retried_from_job_id`.
+  - **Sitemap explorer.** New Overview card lets you punch in a tenant slug and see the exact route list the engine plans to render — static floor (feature/module gated) + dynamic URLs from `SitemapService` (capped at 1,000). Answers "what does the engine think this tenant has?" without grepping logs.
+  - **`react-frontend/CLAUDE.md` updated** with the full Round 2+3+4 architecture so future contributors don't have to re-derive it from the code.
+
 - **Prerender engine — Round 3: defense in depth + operator superpowers.**
   - **Scheduler liveness tracking.** Every prerender scheduled task (`detect-drift`, `auto-recache`, `reap-stale`) now stamps a cache key on success. The health endpoint checks the age of each stamp against 2×/3× the expected interval and surfaces a yellow/red check if the Laravel scheduler has stopped firing — catches the "supervisord nexus-scheduler died" failure mode that would otherwise be silent.
   - **Webhook nonce one-time-use.** HMAC `/invalidate` already had a 5-min timestamp window; now each `(timestamp, signature)` pair can only be used once. The nonce is keyed by `sha256(ts:sig)` and persisted for 600s. Replay attempts are bounced AND audited with `outcome=denied, reason=webhook_replay` for forensics.

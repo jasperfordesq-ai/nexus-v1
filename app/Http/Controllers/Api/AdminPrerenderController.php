@@ -742,6 +742,91 @@ class AdminPrerenderController extends BaseApiController
      * what TTL it gets. Lets operators see the freshness policy at a glance
      * without grepping config.
      */
+    /**
+     * POST /api/v2/admin/prerender/jobs/{id}/retry
+     *
+     * "Try again" for a finished job: clone its parameters into a new queued
+     * row. The original is left alone (history preserved). The new row gets
+     * a fresh audit trail.
+     */
+    public function retryJob(Request $r, int $id): JsonResponse
+    {
+        $userId = $this->requirePlatformSuperAdmin();
+        if (!$this->checkActionRate($userId, 'retry', 30, 60)) {
+            return $this->error('Too many retries', 429, 'RATE_LIMITED');
+        }
+
+        $original = $this->service->getJob($id);
+        if (!$original) return $this->error('Job not found', 404, 'NOT_FOUND');
+        if (in_array($original['status'] ?? '', ['queued', 'claimed', 'running'], true)) {
+            return $this->error('Job is still in flight — cancel it before retrying', 409, 'CONFLICT');
+        }
+
+        $newId = $this->service->enqueueJob(
+            $original['tenant_id'] ?? null,
+            $original['routes'] ?? null,
+            (bool) ($original['force'] ?? false),
+            (bool) ($original['dry_run'] ?? false),
+            $userId,
+            \App\Services\PrerenderService::PRIORITY_NORMAL
+        );
+
+        $this->service->audit(
+            'retry', $userId, $original['tenant_id'] ?? null, $newId, 'ok',
+            ['retried_from_job_id' => $id, 'original_status' => $original['status'] ?? null],
+            $r->ip(), substr((string) $r->userAgent(), 0, 255)
+        );
+
+        return $this->respondWithData([
+            'job_id'             => $newId,
+            'retried_from_job_id'=> $id,
+            'job'                => $this->service->getJob($newId),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/prerender/sitemap-explorer?tenant=slug
+     *
+     * Returns the full list of routes the engine expects to render for a
+     * tenant — static floor (feature/module gated) plus dynamic routes from
+     * SitemapService. Lets operators answer "what does the engine think this
+     * tenant has?" without grepping logs or running the artisan command.
+     */
+    public function sitemapExplorer(Request $r): JsonResponse
+    {
+        $this->requireAdmin();
+        $slug = (string) $r->query('tenant', '');
+        if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
+            return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
+        }
+        $tenant = \DB::table('tenants')->where('slug', $slug)->where('is_active', 1)->first();
+        if (!$tenant) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+
+        $staticRoutes  = $this->service->routesForTenant((int) $tenant->id);
+        $dynamicRoutes = [];
+        try {
+            // Plan-routes artisan output: one route per line. Limit to 1000
+            // entries to keep the JSON response sane.
+            \Artisan::call('prerender:plan-routes', ['--tenant' => $slug]);
+            $out = trim(\Artisan::output());
+            $dynamicRoutes = array_values(array_filter(
+                array_map('trim', explode("\n", $out)),
+                fn($r) => $r !== '' && $r[0] === '/'
+            ));
+            $dynamicRoutes = array_slice($dynamicRoutes, 0, 1000);
+        } catch (\Throwable $e) {
+            // Fallback: just return the static floor.
+        }
+
+        return $this->respondWithData([
+            'tenant_slug'    => $slug,
+            'tenant_id'      => (int) $tenant->id,
+            'static_routes'  => $staticRoutes,
+            'dynamic_routes' => $dynamicRoutes,
+            'total_count'    => count($staticRoutes) + count($dynamicRoutes),
+        ]);
+    }
+
     public function ttlInspector(Request $r): JsonResponse
     {
         $this->requireAdmin();

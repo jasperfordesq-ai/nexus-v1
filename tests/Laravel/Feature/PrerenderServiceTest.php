@@ -391,6 +391,248 @@ HTML;
         $this->assertSame(['googlebot' => 2, 'bingbot' => 1], $analytics['hits_by_crawler']);
     }
 
+    // ─────── Round 2/3 tests ──────────────────────────────────────────────
+
+    public function test_circuit_breaker_trips_after_threshold(): void
+    {
+        if (! Schema::hasTable('prerender_audit_log')) {
+            $this->markTestSkipped('prerender_audit_log table not present.');
+        }
+        $service = new PrerenderService();
+        $service->resetBreaker();
+        $this->assertNull($service->breakerTrippedUntil(), 'breaker should start closed');
+
+        // Pump 5 failed finalises inside the window — trips the breaker.
+        for ($i = 0; $i < PrerenderService::BREAKER_FAILURE_THRESHOLD; $i++) {
+            $id = $service->enqueueJob(null, "/route-{$i}", false, false, 1);
+            $service->claimNextJob('w');
+            $service->markRunning($id);
+            $service->finaliseJob($id, 'failed', 0, 0, 0, 1, 5, null, 'boom');
+        }
+
+        $this->assertNotNull($service->breakerTrippedUntil(), 'breaker should trip');
+
+        // claimNextJob must return null while tripped, even with work queued.
+        $service->resetBreaker();
+        $service->tripBreaker(900);
+        $service->enqueueJob(null, '/after-trip', false, false, 1);
+        $this->assertNull(
+            $service->claimNextJob('w-after-trip'),
+            'claimNextJob must return null while breaker is tripped'
+        );
+        $service->resetBreaker();
+    }
+
+    public function test_per_tenant_concurrency_cap_blocks_second_job(): void
+    {
+        $service = new PrerenderService();
+        $service->resetBreaker();
+
+        // First job for tenant 99 gets claimed and stays running.
+        $id1 = $service->enqueueJob(99, '/route-a', false, false, 1);
+        $first = $service->claimNextJob('w');
+        $this->assertNotNull($first);
+        $service->markRunning((int) $first['id']);
+
+        // Second job for the SAME tenant: queued, but claimNextJob skips it.
+        $id2 = $service->enqueueJob(99, '/route-b', false, false, 1);
+
+        // Third job for a DIFFERENT tenant: should be claimable past the cap.
+        $id3 = $service->enqueueJob(100, '/route-c', false, false, 1);
+
+        $second = $service->claimNextJob('w');
+        $this->assertNotNull($second, 'a different tenant must still be claimable');
+        $this->assertSame($id3, (int) $second['id'], 'tenant 100 should be picked over busy tenant 99');
+
+        // After finishing tenant 99's first job, tenant 99 should be claimable again.
+        $service->finaliseJob($id1, 'succeeded', 1, 1, 0, 0, 1, null);
+        $third = $service->claimNextJob('w');
+        $this->assertNotNull($third);
+        $this->assertSame($id2, (int) $third['id']);
+    }
+
+    public function test_route_validation_rejects_shell_metacharacters(): void
+    {
+        $service = new PrerenderService();
+        $this->expectException(\InvalidArgumentException::class);
+        $service->enqueueJob(null, '/legit,/about;rm -rf /', false, false, 1);
+    }
+
+    public function test_audit_redacts_secret_keys(): void
+    {
+        if (! Schema::hasTable('prerender_audit_log')) {
+            $this->markTestSkipped('prerender_audit_log table not present.');
+        }
+        $service = new PrerenderService();
+        $service->audit(
+            'test_secret', 1, null, null, 'ok',
+            ['routes' => ['/x'], 'api_token' => 'sk-LIVE-DEADBEEF', 'nested' => ['password' => 'hunter2']]
+        );
+
+        $row = DB::table('prerender_audit_log')->orderByDesc('id')->first();
+        $this->assertNotNull($row);
+        $decoded = json_decode($row->details, true);
+        $this->assertSame('[REDACTED]', $decoded['api_token']);
+        $this->assertSame('[REDACTED]', $decoded['nested']['password']);
+        // Non-secret fields preserved.
+        $this->assertSame(['/x'], $decoded['routes']);
+    }
+
+    public function test_health_returns_red_when_breaker_tripped(): void
+    {
+        $service = new PrerenderService();
+        $service->resetBreaker();
+        $service->tripBreaker(600);
+        $h = $service->health();
+        $this->assertSame('red', $h['status']);
+        $names = array_column($h['checks'], 'name');
+        $this->assertContains('circuit_breaker', $names);
+        $service->resetBreaker();
+    }
+
+    public function test_health_reports_stuck_jobs(): void
+    {
+        $service = new PrerenderService();
+        $service->resetBreaker();
+        // Insert a row that LOOKS stuck (claimed >30min ago).
+        DB::table('prerender_jobs')->insert([
+            'tenant_id'  => null,
+            'routes'     => '/stuck',
+            'status'     => 'running',
+            'priority'   => 5,
+            'claimed_at' => date('Y-m-d H:i:s', time() - 3600),
+            'started_at' => date('Y-m-d H:i:s', time() - 3600),
+            'queued_at'  => date('Y-m-d H:i:s', time() - 3700),
+        ]);
+
+        $h = $service->health();
+        $stuck = collect($h['checks'])->firstWhere('name', 'stuck_jobs');
+        $this->assertNotNull($stuck);
+        $this->assertSame('yellow', $stuck['status']);
+    }
+
+    public function test_verify_integrity_matches_sidecar(): void
+    {
+        $service = new PrerenderService();
+        $abs = $this->tmpCache . '/example.com/foo/index.html';
+        @mkdir(dirname($abs), 0777, true);
+        $html = '<html><body>hello</body></html>';
+        file_put_contents($abs, $html);
+        file_put_contents($abs . '.sha256', hash('sha256', $html) . '  ' . strlen($html));
+
+        $r = $service->verifyIntegrity($abs);
+        $this->assertSame('ok', $r['status']);
+        $this->assertSame(hash('sha256', $html), $r['expected']);
+    }
+
+    public function test_verify_integrity_detects_mismatch(): void
+    {
+        $service = new PrerenderService();
+        $abs = $this->tmpCache . '/example.com/bar/index.html';
+        @mkdir(dirname($abs), 0777, true);
+        file_put_contents($abs, '<html>original</html>');
+        file_put_contents($abs . '.sha256', str_repeat('f', 64));
+
+        $r = $service->verifyIntegrity($abs);
+        $this->assertSame('mismatch', $r['status']);
+        $this->assertNotEquals($r['expected'], $r['actual']);
+    }
+
+    public function test_verify_integrity_missing_sidecar(): void
+    {
+        $service = new PrerenderService();
+        $abs = $this->tmpCache . '/example.com/baz/index.html';
+        @mkdir(dirname($abs), 0777, true);
+        file_put_contents($abs, '<html/>');
+        // No .sha256 sidecar.
+        $r = $service->verifyIntegrity($abs);
+        $this->assertSame('missing', $r['status']);
+    }
+
+    public function test_ttl_inspector_picks_most_specific_pattern(): void
+    {
+        // Stub config.
+        config(['prerender.ttl' => [
+            'default'  => 7 * 86400,
+            '/blog'    => 3600,
+            '/blog/*'  => 1800,
+            '/blog/**' => 900,
+        ]]);
+        $service = new PrerenderService();
+
+        $exact = $service->describeTtlForRoute('/blog');
+        $this->assertSame('/blog', $exact['matched_pattern']);
+        $this->assertSame(3600, $exact['ttl_seconds']);
+
+        $oneLevel = $service->describeTtlForRoute('/blog/hello');
+        $this->assertSame('/blog/*', $oneLevel['matched_pattern']);
+        $this->assertSame(1800, $oneLevel['ttl_seconds']);
+
+        $deep = $service->describeTtlForRoute('/blog/tags/foo/bar');
+        $this->assertSame('/blog/**', $deep['matched_pattern']);
+        $this->assertSame(900, $deep['ttl_seconds']);
+
+        $miss = $service->describeTtlForRoute('/nope');
+        $this->assertNull($miss['matched_pattern']);
+        $this->assertSame('default', $miss['source']);
+        $this->assertSame(7 * 86400, $miss['ttl_seconds']);
+    }
+
+    public function test_safe_cache_path_accepts_route_special_chars(): void
+    {
+        // Regression: P1 fix widened the regex. A route like /events/social-(2024)
+        // should produce an inspectable cache_path.
+        $service = new PrerenderService();
+        $html = '<html><head><title>X</title></head></html>';
+        $this->writeSnapshot('example.com/events/social-(2024)/index.html', $html);
+        $rows = $service->inventory(null, false);
+        $this->assertNotEmpty($rows);
+        $rel = $rows[0]['cache_path'];
+        $this->assertNotNull($service->inspect($rel), 'inspect must accept routes containing ( ) chars');
+    }
+
+    public function test_burst_backpressure_coalesces_to_tenant_wide(): void
+    {
+        // Seed a tenant row so resolveTenantHost works.
+        $tenantId = (int) DB::table('tenants')->insertGetId([
+            'name'      => 'Burst Test',
+            'slug'      => 'burst-test-' . uniqid(),
+            'domain'    => 'burst-test.example',
+            'is_active' => 1,
+            'created_at'=> date('Y-m-d H:i:s'),
+            'updated_at'=> date('Y-m-d H:i:s'),
+        ]);
+        // Snapshot must exist so invalidateRoutes counts a delete.
+        $abs = $this->tmpCache . '/burst-test.example/page-0/index.html';
+        @mkdir(dirname($abs), 0777, true);
+        file_put_contents($abs, '<html/>');
+
+        // Reset the burst counter just in case a prior test populated it.
+        \Illuminate\Support\Facades\Cache::forget("prerender:burst:tenant:{$tenantId}");
+
+        // First 50 invocations should keep their per-route precision.
+        $service = new PrerenderService();
+        for ($i = 0; $i < 50; $i++) {
+            $abs = $this->tmpCache . "/burst-test.example/page-{$i}/index.html";
+            @mkdir(dirname($abs), 0777, true);
+            file_put_contents($abs, '<html/>');
+            $service->invalidateRoutes($tenantId, ["/page-{$i}"]);
+        }
+
+        // The 51st should flip to a tenant-wide row (routes=null).
+        $abs = $this->tmpCache . '/burst-test.example/page-51/index.html';
+        @mkdir(dirname($abs), 0777, true);
+        file_put_contents($abs, '<html/>');
+        $service->invalidateRoutes($tenantId, ['/page-51']);
+
+        $tenantWide = DB::table('prerender_jobs')
+            ->where('tenant_id', $tenantId)
+            ->whereNull('routes')
+            ->where('status', 'queued')
+            ->exists();
+        $this->assertTrue($tenantWide, 'burst above threshold must enqueue a tenant-wide row');
+    }
+
     private function writeSnapshot(string $rel, string $html): void
     {
         $path = $this->tmpCache . '/' . $rel;
