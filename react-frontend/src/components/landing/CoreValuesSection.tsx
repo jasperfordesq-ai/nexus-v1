@@ -58,7 +58,7 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
             title: t('home.why_timebanking.values.2.title', 'Stay Local'),
             description: t(
               'home.why_timebanking.values.2.description',
-              'Connect with neighbors and strengthen your local community through meaningful skill exchanges.',
+              'Connect with neighbours and strengthen your local community through meaningful skill exchanges.',
             ),
             gradient: 'from-cyan-500 to-teal-500',
           },

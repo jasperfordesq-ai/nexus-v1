@@ -468,7 +468,7 @@ export function BlogPostPage() {
 
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" aria-hidden="true" />
-              {new Date(post.published_at).toLocaleDateString(undefined, {
+              {new Date(post.published_at).toLocaleDateString('en-GB', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',

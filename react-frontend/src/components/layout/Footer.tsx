@@ -228,9 +228,12 @@ export function Footer({ children, copyright }: FooterProps) {
                 <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
                   {t('footer.privacy')}
                 </Link>
-                <span className="max-w-[8rem] truncate font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
-                  {__BUILD_COMMIT__}
-                </span>
+                <span
+                  className="hidden"
+                  aria-hidden="true"
+                  data-build-commit={__BUILD_COMMIT__}
+                  data-build-time={__BUILD_TIME__}
+                />
               </div>
             </div>
           </div>

@@ -117,7 +117,7 @@ export function TrustSafetyPage() {
       {SECTIONS.map((section) => {
         const Icon = section.icon;
         const items = section.count > 0
-          ? Array.from({ length: section.count }, (_, i) => t(`${section.itemsKey}.${i}`))
+          ? Array.from({ length: section.count }, (_, i) => t(`${section.itemsKey}.${i}`, { name: branding.name }))
           : [];
 
         return (
@@ -125,10 +125,10 @@ export function TrustSafetyPage() {
             <GlassCard className="p-6 sm:p-8">
               <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
                 <Icon className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-                {t(section.titleKey)}
+                {t(section.titleKey, { name: branding.name })}
               </h2>
               {section.introKey && (
-                <p className="text-theme-muted mb-4">{t(section.introKey)}</p>
+                <p className="text-theme-muted mb-4">{t(section.introKey, { name: branding.name })}</p>
               )}
               {items.length > 0 && (
                 <ul className="space-y-2">

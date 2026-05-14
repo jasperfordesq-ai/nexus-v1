@@ -78,7 +78,7 @@ class NavigationConfig
                 'label' => 'Local Hubs',
                 'url' => '/groups',
                 'icon' => 'fa-location-dot',
-                'desc' => 'Connect with neighbors nearby',
+                'desc' => 'Connect with neighbours nearby',
                 'pattern' => '/groups',
             ],
             [
