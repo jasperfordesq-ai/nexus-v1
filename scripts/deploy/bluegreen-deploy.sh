@@ -431,17 +431,35 @@ run_candidate_raw_sql_migrations() {
 
     local pending_output
     pending_output="$(docker_exec_app_user "$app_container" php /var/www/html/scripts/safe_migrate.php --pending 2>&1 || true)"
-    if echo "$pending_output" | grep -qi "No pending\|All migrations applied"; then
+    # safe_migrate.php uses these phrasings interchangeably:
+    #   "All migrations are up to date."
+    #   "No pending migrations"
+    if echo "$pending_output" | grep -qiE 'all migrations are up to date|no pending|all migrations applied'; then
         log_ok "No pending raw SQL migrations"
         return 0
     fi
 
     log_warn "Pending raw SQL migrations detected; applying with safe_migrate.php"
-    # safe_migrate.php prompts for confirmation by default; --run-pending plus
-    # piped 'yes' answers automatically. Run as the app user so file perms
-    # match the rest of the candidate's Laravel context.
-    if ! docker_exec_app_user "$app_container" sh -c 'yes | php /var/www/html/scripts/safe_migrate.php --run-pending 2>&1' | tee /dev/stderr | grep -qiE 'Migration complete|migrations applied|No pending'; then
-        log_err "Raw SQL migration run did not report success — aborting before cutover"
+    # safe_migrate.php prompts "Type 'yes' to proceed" on PRODUCTION env. The
+    # `yes` command emits "y" — wrong answer. Pipe the literal string "yes\n".
+    # Trust the exit code; the runner's output formatting (ANSI colours, box
+    # drawing) is unstable for string-matching.
+    local migrate_log
+    migrate_log="$(docker_exec_app_user "$app_container" sh -c "printf 'yes\\n' | php /var/www/html/scripts/safe_migrate.php --run-pending 2>&1; echo EXIT=\$?" || true)"
+    echo "$migrate_log" | tail -40 >&2
+    local migrate_exit
+    migrate_exit="$(echo "$migrate_log" | awk -F= '/^EXIT=/{print $2}' | tail -1)"
+    if [ "${migrate_exit:-1}" -ne 0 ]; then
+        log_err "Raw SQL migration run exited with status ${migrate_exit:-?} — aborting before cutover"
+        return 1
+    fi
+    # Sanity check the result by re-querying --pending. If it still reports
+    # pending, the runner silently failed (e.g. user-abort from a bad
+    # confirmation answer); treat that as a hard failure.
+    local post_check
+    post_check="$(docker_exec_app_user "$app_container" php /var/www/html/scripts/safe_migrate.php --pending 2>&1 || true)"
+    if ! echo "$post_check" | grep -qiE 'all migrations are up to date|no pending|all migrations applied'; then
+        log_err "Raw SQL migrations still pending after --run-pending — aborting before cutover"
         return 1
     fi
     log_ok "Raw SQL migrations applied"
