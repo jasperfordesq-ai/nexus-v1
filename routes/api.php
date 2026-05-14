@@ -2132,6 +2132,9 @@ Route::get('/v2/admin/prerender/jobs',             [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/prerender/jobs/{id}',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'showJob'])->whereNumber('id');
 Route::post('/v2/admin/prerender/jobs',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'enqueue']);
 Route::post('/v2/admin/prerender/jobs/{id}/cancel',[\App\Http\Controllers\Api\AdminPrerenderController::class, 'cancelJob'])->whereNumber('id');
+Route::post('/v2/admin/prerender/purge',           [\App\Http\Controllers\Api\AdminPrerenderController::class, 'purge']);
+Route::get('/v2/admin/prerender/analytics',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'analytics']);
+Route::post('/v2/admin/prerender/auto-recache',    [\App\Http\Controllers\Api\AdminPrerenderController::class, 'autoRecache']);
 Route::get('/v2/admin/prerender/metrics',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'metrics']);
 Route::get('/v2/admin/prerender/realtime-channel', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'realtimeChannel']);
 Route::get('/v2/admin/deliverability/dashboard', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'getDashboard']);

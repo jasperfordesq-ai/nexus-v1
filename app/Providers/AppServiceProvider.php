@@ -1057,6 +1057,14 @@ class AppServiceProvider extends ServiceProvider
         FeedPost::observe(FeedPostObserver::class);
         \App\Models\Comment::observe(CommentObserver::class);
 
+        // Prerender cache invalidation hooks (Phase 2.3). On save/delete, the
+        // observers enqueue a low-priority recache for the affected route(s).
+        // Failures are logged, never thrown — model writes must never block on
+        // the prerender side-channel.
+        \App\Models\Post::observe(\App\Observers\PostPrerenderObserver::class);
+        Listing::observe(\App\Observers\ListingPrerenderObserver::class);
+        Event::observe(\App\Observers\EventPrerenderObserver::class);
+
         // Dynamically merge CorsHelper's full origin list (including tenant custom
         // domains from DB) into Laravel's HandleCors config. This ensures custom
         // tenant domains like hour-timebank.ie pass CORS validation.

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -100,7 +101,13 @@ class PrerenderService
     public function summary(): array
     {
         $tenants = $this->loadTenantTargets();
-        $inventory = $this->inventory(null, false); // shallow — no per-row asset scan
+        // Deep inventory so content_stale_count and asset_invalid_count are
+        // truthful. Cached briefly to keep the dashboard cheap.
+        $inventory = Cache::remember(
+            'prerender:summary:inventory',
+            60,
+            fn () => $this->inventory(null, true)
+        );
         $expected = $this->expectedSnapshotCount($tenants);
         $present = count($inventory);
 
@@ -217,6 +224,8 @@ class PrerenderService
             if ($contentStale && $staleness === 'fresh') $staleness = 'warn';
             if ($contentStale && $staleness === 'warn') $staleness = 'stale';
 
+            $statusCode = $this->readStatusSidecar(dirname($absPath));
+
             $rows[] = [
                 'host'             => $host,
                 'route'            => $route,
@@ -230,6 +239,7 @@ class PrerenderService
                 'asset_issues'     => $assetIssues,
                 'content_stale'    => $contentStale,
                 'content_stale_reason' => $contentStaleReason,
+                'http_status'      => $statusCode,
             ];
         }
 
@@ -333,11 +343,14 @@ class PrerenderService
 
         $hasNoscript = (bool) ($xp && $xp->query('//noscript')->length > 0);
 
-        return [
+        $statusCode = $this->readStatusSidecar(dirname($abs));
+
+        $result = [
             'cache_path'  => $safe,
             'size_bytes'  => $size,
             'mtime'       => $mtime,
             'age_s'       => time() - $mtime,
+            'http_status' => $statusCode,
             'title'       => $title,
             'meta_description' => $metaDescription,
             'canonical'   => $canonical,
@@ -367,6 +380,8 @@ class PrerenderService
             ),
             'preview' => $preview,
         ];
+        $result['seo'] = $this->seoScore($result);
+        return $result;
     }
 
     // -------------------------------------------------------------------------
@@ -457,16 +472,288 @@ class PrerenderService
     }
 
     // -------------------------------------------------------------------------
+    // Crawler analytics (Phase 3.2)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Aggregate the bot-only JSONL access log written by nginx
+     * (see nginx.bluegreen.conf — log_format prerender_bot_jsonl).
+     *
+     * Returns:
+     *   total_hits, hits_by_status, hits_by_crawler, hits_by_host, top_uris,
+     *   recent (last 100 rows).
+     *
+     * The log is line-bounded to the last MAX_BYTES from the tail to keep
+     * memory predictable; rotation is the caller's responsibility (logrotate
+     * or a cron tail-and-truncate).
+     */
+    public function crawlerAnalytics(?string $sinceIso = null, int $limit = 200): array
+    {
+        $logPath = $this->cachePath . '/.bot-access.jsonl';
+        $empty = [
+            'total_hits'      => 0,
+            'window_started_at' => $sinceIso,
+            'hits_by_status'  => [],
+            'hits_by_crawler' => [],
+            'hits_by_host'    => [],
+            'top_uris'        => [],
+            'recent'          => [],
+            'log_path'        => $logPath,
+            'log_size_bytes'  => is_file($logPath) ? @filesize($logPath) : 0,
+        ];
+        if (!is_readable($logPath)) return $empty;
+
+        $sinceTs = $sinceIso ? @strtotime($sinceIso) : (time() - 7 * 24 * 3600);
+        if (!$sinceTs) $sinceTs = time() - 7 * 24 * 3600;
+
+        // Tail up to 8 MB of log — typical bot traffic is well under that for
+        // a week; if higher, increase or move to a rotated archive.
+        $maxBytes = 8 * 1024 * 1024;
+        $size = (int) @filesize($logPath);
+        $offset = $size > $maxBytes ? $size - $maxBytes : 0;
+
+        $byStatus = [];
+        $byCrawler = [];
+        $byHost = [];
+        $uriCounts = [];
+        $recent = [];
+        $total = 0;
+        $verifiedCount = 0;
+        $spoofedByCrawler = [];
+
+        $fh = @fopen($logPath, 'r');
+        if (!$fh) return $empty;
+        if ($offset > 0) @fseek($fh, $offset);
+        // Discard the (likely partial) first line after a seek.
+        if ($offset > 0) fgets($fh);
+
+        while (($line = fgets($fh)) !== false) {
+            $line = trim($line);
+            if ($line === '') continue;
+            $row = json_decode($line, true);
+            if (!is_array($row)) continue;
+            $ts = isset($row['ts']) ? (int) strtotime((string) $row['ts']) : 0;
+            if ($ts < $sinceTs) continue;
+
+            $total++;
+            $status = (int) ($row['status'] ?? 0);
+            $crawler = (string) ($row['crawler'] ?? 'other');
+            $host = (string) ($row['host'] ?? '');
+            $uri = (string) ($row['uri'] ?? '');
+
+            $byStatus[$status] = ($byStatus[$status] ?? 0) + 1;
+            $byCrawler[$crawler] = ($byCrawler[$crawler] ?? 0) + 1;
+            if ($host !== '') $byHost[$host] = ($byHost[$host] ?? 0) + 1;
+            $verified = (string) ($row['verified'] ?? '');
+            if ($verified === '1') {
+                $verifiedCount++;
+            } else {
+                // Only crawlers that SHOULD verify (i.e. major search engines).
+                // Social unfurlers don't publish IP ranges so we don't expect
+                // them to be in the trusted list.
+                if (in_array($crawler, ['googlebot', 'bingbot', 'duckduckbot', 'applebot', 'google-extended'], true)) {
+                    $spoofedByCrawler[$crawler] = ($spoofedByCrawler[$crawler] ?? 0) + 1;
+                }
+            }
+            if ($uri !== '') {
+                $key = $host . $uri;
+                $uriCounts[$key] = ($uriCounts[$key] ?? 0) + 1;
+            }
+
+            if (count($recent) < $limit) {
+                $recent[] = [
+                    'ts'      => $row['ts'] ?? null,
+                    'host'    => $host,
+                    'uri'     => $uri,
+                    'status'  => $status,
+                    'crawler' => $crawler,
+                    'ua'      => $row['ua'] ?? '',
+                    'ip'      => $row['ip'] ?? '',
+                ];
+            }
+        }
+        fclose($fh);
+
+        arsort($byStatus);
+        arsort($byCrawler);
+        arsort($byHost);
+        arsort($uriCounts);
+
+        // Keep recent in newest-first order.
+        $recent = array_reverse($recent);
+
+        $topUris = [];
+        $i = 0;
+        foreach ($uriCounts as $k => $n) {
+            $topUris[] = ['url' => $k, 'hits' => $n];
+            if (++$i >= 50) break;
+        }
+
+        return [
+            'total_hits'      => $total,
+            'verified_hits'   => $verifiedCount,
+            'spoofed_by_crawler' => $spoofedByCrawler,
+            'window_started_at' => date('c', $sinceTs),
+            'hits_by_status'  => $byStatus,
+            'hits_by_crawler' => $byCrawler,
+            'hits_by_host'    => $byHost,
+            'top_uris'        => $topUris,
+            'recent'          => $recent,
+            'log_path'        => $logPath,
+            'log_size_bytes'  => $size,
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Content-change invalidation (Phase 2.3)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Invalidate (delete + enqueue recache) the snapshot for a specific route
+     * across all tenants the route belongs to. Safe to call from model
+     * observers in response to save/delete events.
+     *
+     * @param int $tenantId         The tenant whose snapshot should be touched.
+     * @param array<int,string> $routes  Route paths to invalidate, e.g. ['/blog/foo', '/blog'].
+     * @param bool $enqueueRecache  If true, also enqueue a low-priority recache job.
+     */
+    public function invalidateRoutes(int $tenantId, array $routes, bool $enqueueRecache = true): int
+    {
+        $routes = array_values(array_unique(array_filter($routes, fn($r) => is_string($r) && $r !== '' && $r[0] === '/')));
+        if (empty($routes)) return 0;
+
+        // Resolve tenant host + prefix.
+        $row = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->where('is_active', 1)
+            ->select('slug', DB::raw("COALESCE(domain, '') as domain"))
+            ->first();
+        if (!$row) return 0;
+
+        $appHost = $this->frontendHost();
+        $domain = trim((string) $row->domain);
+        $host = $domain !== '' ? $domain : $appHost;
+        $prefix = $domain !== '' ? '' : '/' . $row->slug;
+
+        $deleted = 0;
+        foreach ($routes as $route) {
+            $outRoute = $prefix . $route;
+            $rel = $route === '/' ? $host . '/index.html' : $host . $outRoute . '/index.html';
+            $abs = $this->cachePath . '/' . $rel;
+            if (is_file($abs)) {
+                @unlink($abs);
+                @unlink(dirname($abs) . '/_status');
+                $deleted++;
+            }
+        }
+
+        if ($enqueueRecache && $deleted > 0) {
+            $this->enqueueJob(
+                $tenantId,
+                implode(',', $routes),
+                false, // force (snapshots are gone — they'll be re-rendered)
+                false,
+                null,
+                self::PRIORITY_LOW
+            );
+        }
+        return $deleted;
+    }
+
+    // -------------------------------------------------------------------------
+    // Cache purge (wildcard)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Delete snapshot files whose route matches a glob pattern.
+     *
+     * Pattern uses fnmatch semantics:
+     *   /blog/*           — every direct child of /blog
+     *   /blog/**          — every descendant of /blog
+     *   /listings/*       — direct children only (no nested)
+     *   /                 — homepage only
+     *
+     * Optional $hostFilter scopes the purge to a single host (tenant domain or
+     * app-host slug prefix). NULL = every tenant.
+     *
+     * Returns the list of cache_paths deleted. The caller is responsible for
+     * enqueueing recache jobs if it wants the routes re-rendered.
+     *
+     * @return array{deleted:list<string>, dry_run:bool, pattern:string, host:?string}
+     */
+    public function purgePattern(string $pattern, ?string $hostFilter = null, bool $dryRun = false): array
+    {
+        $pattern = trim($pattern);
+        if ($pattern === '' || $pattern[0] !== '/') {
+            return ['deleted' => [], 'dry_run' => $dryRun, 'pattern' => $pattern, 'host' => $hostFilter];
+        }
+
+        $allowDoubleStar = str_contains($pattern, '**');
+        $globRegex = $this->globToRegex($pattern, $allowDoubleStar);
+        $deleted = [];
+
+        foreach ($this->inventory(null, false) as $row) {
+            if ($hostFilter !== null && $row['host'] !== $hostFilter) continue;
+            if (!preg_match($globRegex, $row['route'])) continue;
+
+            $abs = $this->cachePath . '/' . $row['cache_path'];
+            if (!$dryRun && is_file($abs)) {
+                @unlink($abs);
+                // Best effort: clean up the now-empty directory.
+                @rmdir(dirname($abs));
+                // Drop status sidecar if present (see Phase 1.2).
+                @unlink(dirname($abs) . '/_status');
+            }
+            $deleted[] = $row['cache_path'];
+        }
+
+        return [
+            'deleted'  => $deleted,
+            'dry_run'  => $dryRun,
+            'pattern'  => $pattern,
+            'host'     => $hostFilter,
+        ];
+    }
+
+    private function globToRegex(string $glob, bool $allowDoubleStar): string
+    {
+        // Escape regex metacharacters except the glob wildcards we honour.
+        $out = '';
+        $i = 0;
+        $len = strlen($glob);
+        while ($i < $len) {
+            $c = $glob[$i];
+            if ($allowDoubleStar && $c === '*' && $i + 1 < $len && $glob[$i + 1] === '*') {
+                $out .= '.*';
+                $i += 2;
+                continue;
+            }
+            if ($c === '*')      { $out .= '[^/]*'; }
+            elseif ($c === '?')  { $out .= '[^/]';  }
+            else                  { $out .= preg_quote($c, '#'); }
+            $i++;
+        }
+        return '#^' . $out . '$#';
+    }
+
+    // -------------------------------------------------------------------------
     // Job queue
     // -------------------------------------------------------------------------
+
+    /** Priority constants. Lower number wins. See migration for full table. */
+    public const PRIORITY_HIGH   = 3;
+    public const PRIORITY_NORMAL = 5;
+    public const PRIORITY_LOW    = 7;
 
     public function enqueueJob(
         ?int $tenantId,
         ?string $routes,
         bool $force,
         bool $dryRun,
-        ?int $requestedBy
+        ?int $requestedBy,
+        int $priority = self::PRIORITY_NORMAL
     ): int {
+        $priority = max(1, min(9, $priority));
         if ($routes !== null) {
             $routes = substr(trim($routes), 0, 2000);
             if ($routes === '') $routes = null;
@@ -479,7 +766,14 @@ class PrerenderService
             ->where('dry_run', $dryRun ? 1 : 0)
             ->orderByDesc('id')
             ->first();
-        if ($existing) return (int) $existing->id;
+        if ($existing) {
+            // If a higher-priority caller is enqueueing a dup, promote it.
+            if ($priority < (int) ($existing->priority ?? self::PRIORITY_NORMAL)) {
+                DB::table('prerender_jobs')->where('id', $existing->id)->update(['priority' => $priority]);
+                $this->broadcastJob((int) $existing->id);
+            }
+            return (int) $existing->id;
+        }
 
         $id = (int) DB::table('prerender_jobs')->insertGetId([
             'requested_by'  => $requestedBy,
@@ -487,6 +781,7 @@ class PrerenderService
             'routes'        => $routes,
             'force_render'  => $force ? 1 : 0,
             'dry_run'       => $dryRun ? 1 : 0,
+            'priority'      => $priority,
             'status'        => 'queued',
             'queued_at'     => date('Y-m-d H:i:s'),
         ]);
@@ -554,6 +849,7 @@ class PrerenderService
         return DB::transaction(function () use ($claimedBy): ?array {
             $row = DB::table('prerender_jobs')
                 ->where('status', 'queued')
+                ->orderBy('priority')
                 ->orderBy('queued_at')
                 ->orderBy('id')
                 ->lockForUpdate()
@@ -783,6 +1079,58 @@ class PrerenderService
         return $rel;
     }
 
+    /**
+     * Look up the TTL (seconds) for a route based on config/prerender.php
+     * patterns. Most specific match wins; falls back to `default`.
+     *
+     * Glob semantics:
+     *   `/`          — exact match only
+     *   `/blog/*`    — direct children
+     *   `/blog/**`   — every descendant
+     */
+    public function ttlForRoute(string $route): int
+    {
+        $patterns = config('prerender.ttl', []);
+        if (!is_array($patterns)) return 7 * 24 * 3600;
+
+        $best = null;
+        $bestSpecificity = -1;
+        foreach ($patterns as $pat => $ttl) {
+            if ($pat === 'default') continue;
+            if (!$this->routeMatchesPattern($route, $pat)) continue;
+            // Specificity heuristic: longer literal prefix = more specific;
+            // `**` patterns are less specific than `*` at the same depth.
+            $literal = strpos($pat, '*');
+            $specificity = $literal === false ? strlen($pat) * 100 : $literal * 10 - substr_count($pat, '*');
+            if ($specificity > $bestSpecificity) {
+                $bestSpecificity = $specificity;
+                $best = (int) $ttl;
+            }
+        }
+        return $best ?? (int) ($patterns['default'] ?? 7 * 24 * 3600);
+    }
+
+    private function routeMatchesPattern(string $route, string $pattern): bool
+    {
+        if ($route === $pattern) return true;
+        $allowDoubleStar = str_contains($pattern, '**');
+        $re = $this->globToRegex($pattern, $allowDoubleStar);
+        return (bool) preg_match($re, $route);
+    }
+
+    /**
+     * Read the worker's `_status` sidecar for a snapshot directory. Returns
+     * 200 if absent (the implicit default).
+     */
+    private function readStatusSidecar(string $dir): int
+    {
+        $path = $dir . '/_status';
+        if (!is_readable($path)) return 200;
+        $raw = trim((string) @file_get_contents($path, false, null, 0, 8));
+        $n = (int) $raw;
+        return ($n >= 100 && $n < 600) ? $n : 200;
+    }
+
     private function readJsonFile(string $path): ?array
     {
         if (!is_readable($path)) return null;
@@ -963,6 +1311,7 @@ class PrerenderService
             'routes'         => $r['routes'] ?? null,
             'force'          => (bool) $r['force_render'],
             'dry_run'        => (bool) $r['dry_run'],
+            'priority'       => isset($r['priority']) ? (int) $r['priority'] : self::PRIORITY_NORMAL,
             'planned_count'  => $r['planned_count'] !== null ? (int) $r['planned_count'] : null,
             'rendered_count' => $r['rendered_count'] !== null ? (int) $r['rendered_count'] : null,
             'invalid_count'  => $r['invalid_count'] !== null ? (int) $r['invalid_count'] : null,
@@ -996,6 +1345,113 @@ class PrerenderService
         $node = $nodes->item(0);
         $v = $node->getAttribute($attr);
         return $v === '' ? null : $v;
+    }
+
+    /**
+     * Compute a 0-100 SEO score for a snapshot from its parsed flags. The
+     * weights are deliberately simple — this is a hygiene signal, not a
+     * comprehensive audit. Heavy SEO work belongs in a dedicated audit tool.
+     *
+     * Scoring rubric (max 100):
+     *    title present + length 10–70    : 15
+     *    meta description 50–160 chars   : 10
+     *    canonical present + absolute    : 10
+     *    og:title + og:description       : 10
+     *    og:image                        :  5
+     *    exactly one h1                  : 10
+     *    JSON-LD present + valid         : 15
+     *    no asset issues                 : 10
+     *    has noscript fallback           :  5
+     *    title doesn't repeat across site:  (deferred — needs corpus)
+     *    body text >= 800 chars          : 10
+     *
+     * @param array $insp Result of inspect()
+     */
+    public function seoScore(array $insp): array
+    {
+        $score = 0;
+        $issues = [];
+        $tips = [];
+
+        $title = (string) ($insp['title'] ?? '');
+        $titleLen = mb_strlen($title);
+        if ($titleLen >= 10 && $titleLen <= 70) {
+            $score += 15;
+        } elseif ($titleLen > 0) {
+            $score += 5;
+            $tips[] = $titleLen < 10 ? 'Title too short (<10 chars)' : 'Title too long (>70 chars)';
+        } else {
+            $issues[] = 'Missing <title>';
+        }
+
+        $desc = (string) ($insp['meta_description'] ?? '');
+        $descLen = mb_strlen($desc);
+        if ($descLen >= 50 && $descLen <= 160) {
+            $score += 10;
+        } elseif ($descLen > 0) {
+            $score += 4;
+            $tips[] = $descLen < 50 ? 'Meta description too short (<50 chars)' : 'Meta description too long (>160 chars)';
+        } else {
+            $issues[] = 'Missing meta description';
+        }
+
+        $canonical = (string) ($insp['canonical'] ?? '');
+        if ($canonical !== '' && (str_starts_with($canonical, 'http://') || str_starts_with($canonical, 'https://'))) {
+            $score += 10;
+        } elseif ($canonical !== '') {
+            $score += 3;
+            $tips[] = 'Canonical should be an absolute URL';
+        } else {
+            $issues[] = 'Missing canonical link';
+        }
+
+        $og = $insp['og_tags'] ?? [];
+        $hasOgTitle = isset($og['og:title']) && $og['og:title'] !== '';
+        $hasOgDesc  = isset($og['og:description']) && $og['og:description'] !== '';
+        $hasOgImage = isset($og['og:image']) && $og['og:image'] !== '';
+        if ($hasOgTitle && $hasOgDesc) $score += 10;
+        else $issues[] = 'Open Graph title/description incomplete';
+        if ($hasOgImage) $score += 5;
+        else $tips[] = 'Add og:image for richer social cards';
+
+        $h1Count = is_array($insp['h1_texts'] ?? null) ? count($insp['h1_texts']) : 0;
+        if ($h1Count === 1) $score += 10;
+        elseif ($h1Count === 0) $issues[] = 'No <h1> on page';
+        else { $score += 4; $tips[] = "Multiple <h1> tags ({$h1Count}) — use exactly one"; }
+
+        $jsonLd = $insp['json_ld'] ?? [];
+        $blocks = (int) ($jsonLd['blocks_count'] ?? 0);
+        $allValid = (bool) ($jsonLd['all_valid'] ?? true);
+        if ($blocks > 0 && $allValid) $score += 15;
+        elseif ($blocks > 0) { $score += 5; $issues[] = 'Invalid JSON-LD block'; }
+        else $tips[] = 'No structured data — consider adding JSON-LD';
+
+        $assetIssues = is_array($insp['asset_issues'] ?? null) ? count($insp['asset_issues']) : 0;
+        if ($assetIssues === 0) $score += 10;
+        else $issues[] = "{$assetIssues} dead asset reference(s)";
+
+        if (!empty($insp['flags']['has_noscript'])) $score += 5;
+        else $tips[] = 'No <noscript> fallback';
+
+        // Rough body-content signal from the preview snippet.
+        $previewText = strip_tags((string) ($insp['preview'] ?? ''));
+        if (mb_strlen($previewText) >= 800) $score += 10;
+        elseif (mb_strlen($previewText) >= 300) $score += 4;
+        else $issues[] = 'Body content very thin (<300 chars of text)';
+
+        $score = max(0, min(100, $score));
+
+        $grade = $score >= 90 ? 'A'
+               : ($score >= 80 ? 'B'
+               : ($score >= 65 ? 'C'
+               : ($score >= 50 ? 'D' : 'F')));
+
+        return [
+            'score'  => $score,
+            'grade'  => $grade,
+            'issues' => array_values($issues),
+            'tips'   => array_values($tips),
+        ];
     }
 
     private function extractSchemaTypes(array $json): array

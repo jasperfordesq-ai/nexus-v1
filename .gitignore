@@ -81,6 +81,8 @@ CLAUDE.md
 !/scripts/prerender-tenants.sh
 !/scripts/prerender-worker.mjs
 !/scripts/prerender-job-processor.sh
+!/scripts/refresh-bot-ip-ranges.sh
+!/scripts/refresh-bot-ua-list.sh
 !/scripts/seo-ping.sh
 !/scripts/audit-static-services.php
 !/scripts/audit-fk-cascade.php

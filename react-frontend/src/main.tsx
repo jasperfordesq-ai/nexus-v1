@@ -16,6 +16,12 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 import { initSentry, SentryErrorBoundary, addSentryBreadcrumb } from '@/lib/sentry';
 initSentry();
 
+// Initialise the prerender readiness signal. Routes that load data and want a
+// truthful snapshot should call usePrerenderReady(dataLoaded). Static pages
+// can leave it alone — the worker falls back to a DOM-content heuristic.
+import { initPrerenderReady } from '@/hooks/usePrerenderReady';
+initPrerenderReady();
+
 // Eagerly import the install prompt singleton so its `beforeinstallprompt`
 // listener attaches before Chrome fires the event. The event only fires once
 // per page load and is lost if no listener is registered in time.

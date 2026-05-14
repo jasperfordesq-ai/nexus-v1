@@ -122,6 +122,13 @@ FILTER_TENANT=""
 FILTER_ROUTES=""
 FORCE_RENDER=0
 DRY_RUN=0
+# Default: ask the PHP container for the dynamic plan (static floor + sitemap).
+# Set NEXUS_PRERENDER_NO_SITEMAP=1 to fall back to the hardcoded PUBLIC_ROUTES
+# floor only — useful as an emergency switch if the planner misbehaves.
+USE_SITEMAP_PLAN=1
+if [ "${NEXUS_PRERENDER_NO_SITEMAP:-0}" = "1" ]; then
+    USE_SITEMAP_PLAN=0
+fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -129,12 +136,15 @@ while [[ $# -gt 0 ]]; do
         --routes) FILTER_ROUTES="${2:-}"; shift 2 ;;
         --force) FORCE_RENDER=1; shift ;;
         --dry-run) DRY_RUN=1; shift ;;
+        --no-sitemap) USE_SITEMAP_PLAN=0; shift ;;
         *) log_err "Unknown pre-render option: $1"; exit 2 ;;
     esac
 done
 
 if [ -n "$FILTER_ROUTES" ]; then
+    # Explicit --routes overrides the sitemap plan completely.
     IFS=',' read -r -a PUBLIC_ROUTES <<< "$FILTER_ROUTES"
+    USE_SITEMAP_PLAN=0
 fi
 
 if [ -n "$FILTER_TENANT" ] && [[ ! "$FILTER_TENANT" =~ ^[A-Za-z0-9_-]+$ ]]; then
@@ -267,6 +277,28 @@ get_frontend_host() {
     echo "$FRONTEND_URL" | sed 's|https\?://||' | sed 's|/.*||'
 }
 
+# Ask the PHP container for the full per-tenant route plan (static floor +
+# sitemap-derived URLs). Output: JSON to stdout. Empty string on any failure
+# so the caller can fall back to the hardcoded list.
+get_route_plan() {
+    local APP_CONTAINER ARGS
+    APP_CONTAINER=$(docker ps --format '{{.Names}}' 2>/dev/null \
+        | grep -E '^nexus-(blue|green)-php-app$' \
+        | head -1 || true)
+    APP_CONTAINER="${APP_CONTAINER:-nexus-php-app}"
+
+    if ! docker ps --format '{{.Names}}' | grep -q "^${APP_CONTAINER}$"; then
+        return 0
+    fi
+
+    ARGS=(php artisan prerender:plan-routes)
+    if [ -n "$FILTER_TENANT" ]; then ARGS+=(--tenant="$FILTER_TENANT"); fi
+
+    # Strip non-JSON stderr; only the last JSON object line counts.
+    docker exec "$APP_CONTAINER" "${ARGS[@]}" 2>/dev/null \
+        | awk '/^\{/{ json=$0 } END{ print json }' || true
+}
+
 get_tenants() {
     local DB_USER DB_PASS DB_NAME QUERY
     DB_USER=$(grep "^DB_USER=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
@@ -352,7 +384,41 @@ should_render_cache_path() {
     return 1
 }
 
-build_manifest() {
+# Emit one manifest entry. All callers use this so format stays consistent.
+emit_manifest_entry() {
+    local HOST="$1" PREFIX="$2" ROUTE="$3" TENANT_ID="$4" SLUG="$5"
+    local FULL_URL RENDER_URL OUT_ROUTE OUT_PATH CACHE_PATH
+    FULL_URL="https://${HOST}${PREFIX}${ROUTE}"
+    RENDER_URL=$(append_query_param "$FULL_URL" "nexus_prerender_bypass=1")
+    OUT_ROUTE="${PREFIX}${ROUTE}"
+    CACHE_PATH=$(route_cache_path "$HOST" "$OUT_ROUTE")
+    OUT_PATH="/output/${CACHE_PATH}"
+
+    if ! should_render_cache_path "$CACHE_PATH"; then
+        return 1
+    fi
+
+    if [ "$FIRST" -eq 1 ]; then
+        FIRST=0
+    else
+        echo ","
+    fi
+
+    printf '{"url":"%s","canonicalUrl":"%s","output":"%s","cachePath":"%s","tenantId":"%s","tenantSlug":"%s","host":"%s","route":"%s"}' \
+        "$(json_escape "$RENDER_URL")" \
+        "$(json_escape "$FULL_URL")" \
+        "$(json_escape "$OUT_PATH")" \
+        "$(json_escape "$CACHE_PATH")" \
+        "$(json_escape "$TENANT_ID")" \
+        "$(json_escape "$SLUG")" \
+        "$(json_escape "$HOST")" \
+        "$(json_escape "$ROUTE")"
+    return 0
+}
+
+# Legacy path: build a manifest from PUBLIC_ROUTES × tenants. Used when the
+# sitemap planner is unavailable or the operator passed --routes/--no-sitemap.
+build_manifest_static() {
     local TENANTS="$1"
     local APP_HOST="$2"
     local MANIFEST_FILE="$3"
@@ -379,33 +445,9 @@ build_manifest() {
 
             for ROUTE in "${PUBLIC_ROUTES[@]}"; do
                 TOTAL=$((TOTAL + 1))
-                local FULL_URL RENDER_URL OUT_ROUTE OUT_PATH CACHE_PATH
-                FULL_URL="https://${HOST}${PREFIX}${ROUTE}"
-                RENDER_URL=$(append_query_param "$FULL_URL" "nexus_prerender_bypass=1")
-                OUT_ROUTE="${PREFIX}${ROUTE}"
-                CACHE_PATH=$(route_cache_path "$HOST" "$OUT_ROUTE")
-                OUT_PATH="/output/${CACHE_PATH}"
-
-                if ! should_render_cache_path "$CACHE_PATH"; then
-                    continue
+                if emit_manifest_entry "$HOST" "$PREFIX" "$ROUTE" "$TENANT_ID" "$SLUG"; then
+                    COUNT=$((COUNT + 1))
                 fi
-
-                if [ "$FIRST" -eq 1 ]; then
-                    FIRST=0
-                else
-                    echo ","
-                fi
-
-                printf '{"url":"%s","canonicalUrl":"%s","output":"%s","cachePath":"%s","tenantId":"%s","tenantSlug":"%s","host":"%s","route":"%s"}' \
-                    "$(json_escape "$RENDER_URL")" \
-                    "$(json_escape "$FULL_URL")" \
-                    "$(json_escape "$OUT_PATH")" \
-                    "$(json_escape "$CACHE_PATH")" \
-                    "$(json_escape "$TENANT_ID")" \
-                    "$(json_escape "$SLUG")" \
-                    "$(json_escape "$HOST")" \
-                    "$(json_escape "$ROUTE")"
-                COUNT=$((COUNT + 1))
             done
         done <<< "$TENANTS"
 
@@ -414,6 +456,84 @@ build_manifest() {
 
     SELECTED_COUNT="$COUNT"
     TOTAL_COUNT="$TOTAL"
+}
+
+# Sitemap path: build a manifest from the planner's per-tenant route lists.
+# Parses the JSON with python3 (always available on the host's playwright base).
+# Each tenant gets the union of the static floor + dynamic sitemap URLs.
+build_manifest_from_plan() {
+    local PLAN_JSON="$1"
+    local MANIFEST_FILE="$2"
+    local PARSED
+    PARSED=$(echo "$PLAN_JSON" | python3 - <<'PYEOF' 2>/dev/null || true
+import json, sys
+try:
+    plan = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+for t in plan.get('tenants', []):
+    tid = str(t.get('tenant_id', ''))
+    slug = t.get('slug', '') or ''
+    host = t.get('host', '') or ''
+    prefix = t.get('prefix', '') or ''
+    if not (tid and host):
+        continue
+    for r in t.get('routes', []):
+        if not r or not r.startswith('/'):
+            continue
+        # Tab-separated tuples — bash splits cleanly on these.
+        print(f"{tid}\t{slug}\t{host}\t{prefix}\t{r}")
+PYEOF
+    )
+
+    if [ -z "$PARSED" ]; then
+        return 1
+    fi
+
+    local FIRST=1
+    local COUNT=0
+    local TOTAL=0
+
+    {
+        echo '{"urls":['
+        while IFS=$'\t' read -r TENANT_ID SLUG HOST PREFIX ROUTE; do
+            [ -n "$TENANT_ID" ] && [ -n "$HOST" ] || continue
+            TOTAL=$((TOTAL + 1))
+            if emit_manifest_entry "$HOST" "$PREFIX" "$ROUTE" "$TENANT_ID" "$SLUG"; then
+                COUNT=$((COUNT + 1))
+            fi
+        done <<< "$PARSED"
+        echo ']}'
+    } > "$MANIFEST_FILE"
+
+    SELECTED_COUNT="$COUNT"
+    TOTAL_COUNT="$TOTAL"
+    return 0
+}
+
+build_manifest() {
+    local TENANTS="$1"
+    local APP_HOST="$2"
+    local MANIFEST_FILE="$3"
+
+    if [ "$USE_SITEMAP_PLAN" -eq 1 ]; then
+        local PLAN_JSON
+        PLAN_JSON="$(get_route_plan)"
+        if [ -n "$PLAN_JSON" ]; then
+            if build_manifest_from_plan "$PLAN_JSON" "$MANIFEST_FILE"; then
+                log_info "Route plan: sitemap-driven ($SELECTED_COUNT selected / $TOTAL_COUNT candidate)"
+                emit_event "plan_source" "\"source\":\"sitemap\",\"selected\":$SELECTED_COUNT,\"total\":$TOTAL_COUNT"
+                return 0
+            fi
+            log_warn "Sitemap plan parse failed; falling back to static route list"
+        else
+            log_warn "Sitemap plan unavailable (php container or artisan failed); falling back to static route list"
+        fi
+    fi
+
+    build_manifest_static "$TENANTS" "$APP_HOST" "$MANIFEST_FILE"
+    log_info "Route plan: static floor only ($SELECTED_COUNT selected / $TOTAL_COUNT candidate)"
+    emit_event "plan_source" "\"source\":\"static\",\"selected\":$SELECTED_COUNT,\"total\":$TOTAL_COUNT"
 }
 
 validate_output_assets() {
@@ -500,8 +620,20 @@ inject_rendered_pages() {
             mv -f "$file" "$dest"
         done
 
+        # Move _status sidecars (status code propagation, Phase 1.2) alongside
+        # their index.html siblings.
+        find "$INCOMING_DIR" -name _status -type f | while IFS= read -r file; do
+            rel="${file#$INCOMING_DIR/}"
+            dest="$PRERENDER_DIR/$rel"
+            mkdir -p "$(dirname "$dest")"
+            mv -f "$file" "$dest"
+        done
+
         if [ -f "$INCOMING_DIR/.prerender-results.json" ]; then
             mv -f "$INCOMING_DIR/.prerender-results.json" "$PRERENDER_DIR/.last-run.json"
+        fi
+        if [ -f "$INCOMING_DIR/.prerender-status-overrides.json" ]; then
+            mv -f "$INCOMING_DIR/.prerender-status-overrides.json" "$PRERENDER_DIR/.status-overrides.json"
         fi
 
         rm -f "$INCOMING_DIR/.prerender-successes.txt" "$INCOMING_DIR/.prerender-failures.txt"
@@ -514,6 +646,97 @@ inject_rendered_pages() {
     '
 
     log_ok "$FILE_COUNT pre-rendered page(s) injected into $NGINX_CONTAINER"
+}
+
+# Generate a per-route nginx override include from the worker's status manifest.
+# The include defines a map that drives the error_page fallback in the server
+# block; reloading nginx after we write it activates the new status routing.
+#
+# Output file inside the nginx container:
+#   /etc/nginx/conf.d/prerender-status-overrides.conf
+#
+# Shape:
+#   map "$host$uri" $nexus_prerender_status_override {
+#       default "";
+#       "hour-timebank.ie/community-not-found/" "404";
+#       ...
+#   }
+write_nginx_status_overrides() {
+    local MANIFEST_FILE="$PRERENDER_DIR/.status-overrides.json"
+    # The file is `include`d from inside a `map` block in nginx.bluegreen.conf,
+    # so it must contain ONLY data lines: `"key" "value";`. The map default is
+    # already set ("") in the parent block.
+    local LIST_PATH="/etc/nginx/prerender-status-overrides.list"
+    local BACKUP_PATH="${LIST_PATH}.bak"
+
+    if ! docker exec "$NGINX_CONTAINER" test -f "$MANIFEST_FILE" 2>/dev/null; then
+        # No manifest from this run — leave any prior list in place. If the
+        # last run had non-200 routes and they were re-rendered as 200 this
+        # time, the snapshots' missing `_status` sidecar already means the
+        # bot won't see the old status (snapshot body wins via try_files).
+        return 0
+    fi
+
+    docker exec -e MANIFEST_FILE="$MANIFEST_FILE" -e LIST_PATH="$LIST_PATH" -e BACKUP_PATH="$BACKUP_PATH" "$NGINX_CONTAINER" sh -c '
+        set -eu
+        TMP="$(mktemp /tmp/prerender-status.XXXX.list)"
+        {
+            echo "# Auto-generated by scripts/prerender-tenants.sh — do not edit."
+            echo "# Data lines for the map in nginx.bluegreen.conf."
+            python3 - "$MANIFEST_FILE" <<"PYEOF"
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+except Exception:
+    sys.exit(0)
+for cache_path, meta in data.items():
+    if not isinstance(meta, dict):
+        continue
+    status = meta.get("status")
+    if status in (200, None):
+        continue
+    if not isinstance(cache_path, str) or "/" not in cache_path:
+        continue
+    if not cache_path.endswith("/index.html"):
+        continue
+    key = cache_path[:-len("index.html")]
+    if not key or any(c in key for c in ["\"", "\\", "\n", "\r"]):
+        continue
+    # Two flavours of $uri normalisation: "host/route/" and "host/route".
+    # nginx may present either depending on whether the request URI ends
+    # with a slash. Emit both so the map matches.
+    base = key.rstrip("/")
+    # The leading "host" segment must be split into host + path. Bash already
+    # stored cache_path as "<host>/<route>/index.html"; key now looks like
+    # "<host>/<route>/". Rewrite to "<host><route>/" by inserting after host.
+    if "/" in base:
+        host, _, route = base.partition("/")
+        route = "/" + route
+    else:
+        host, route = base, "/"
+    full = f"{host}{route}"
+    print(f"    \"{full}\" \"{status}\";")
+    if not route.endswith("/"):
+        print(f"    \"{full}/\" \"{status}\";")
+PYEOF
+        } > "$TMP"
+
+        # Snapshot the current list so we can revert on nginx -t failure.
+        cp -f "$LIST_PATH" "$BACKUP_PATH" 2>/dev/null || true
+        mv -f "$TMP" "$LIST_PATH"
+    '
+
+    # Validate. nginx -t loads the whole config including our list file;
+    # if it fails (malformed line, etc) we revert and skip the reload.
+    if docker exec "$NGINX_CONTAINER" nginx -t >/dev/null 2>&1; then
+        docker exec "$NGINX_CONTAINER" nginx -s reload >/dev/null 2>&1 || true
+        docker exec "$NGINX_CONTAINER" rm -f "$BACKUP_PATH" 2>/dev/null || true
+        emit_event "status_overrides_applied"
+    else
+        log_warn "nginx -t failed after writing status overrides; reverting"
+        docker exec "$NGINX_CONTAINER" sh -c '[ -f "$0" ] && mv -f "$0" "$1"' "$BACKUP_PATH" "$LIST_PATH" 2>/dev/null || true
+        emit_event "status_overrides_revert" "\"reason\":\"nginx_t_failed\""
+    fi
 }
 
 main() {
@@ -597,6 +820,7 @@ main() {
         -v "$OUTPUT_DIR:/output" \
         -w /work \
         -e "PRERENDER_CONCURRENCY=$PRERENDER_CONCURRENCY" \
+        -e "PRERENDER_VIEWPORT=${PRERENDER_VIEWPORT:-desktop}" \
         "$PLAYWRIGHT_IMAGE" \
         bash -c "if [ ! -d node_modules/playwright ]; then npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1; fi; node worker.mjs" \
         < "$MANIFEST_FILE"
@@ -621,6 +845,9 @@ main() {
     if [ "$FILE_COUNT" -gt 0 ]; then
         log_info "Injecting rendered pages atomically into $NGINX_CONTAINER..."
         inject_rendered_pages "$FILE_COUNT"
+        # Update the per-route status-code override map before reloading so
+        # the reload picks up both the new snapshots and their status routing.
+        write_nginx_status_overrides
         docker exec "$NGINX_CONTAINER" nginx -s reload 2>/dev/null || true
     else
         log_warn "No rendered pages were valid enough to inject"

@@ -144,6 +144,7 @@ class AdminPrerenderController extends BaseApiController
         $routes = $payload['routes'] ?? null;
         $force = (bool) ($payload['force'] ?? false);
         $dryRun = (bool) ($payload['dry_run'] ?? false);
+        $priority = isset($payload['priority']) ? max(1, min(9, (int) $payload['priority'])) : PrerenderService::PRIORITY_NORMAL;
 
         $tenantId = null;
         if (is_string($tenantSlug) && $tenantSlug !== '') {
@@ -178,12 +179,86 @@ class AdminPrerenderController extends BaseApiController
             $routesValue,
             $force,
             $dryRun,
-            $userId
+            $userId,
+            $priority
         );
 
         return $this->respondWithData([
             'job_id' => $jobId,
             'job'    => $this->service->getJob($jobId),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/purge
+     *
+     * Body:
+     *   pattern:      string  — required, glob like "/blog/*" or "/listings/**"
+     *   tenant_slug?: string  — limit to a single tenant
+     *   dry_run?:     bool    — return matches without deleting
+     *   recache?:     bool    — also enqueue a low-priority recache job
+     *
+     * Requires super_admin: a poorly-chosen pattern can blow away the whole
+     * cache, which is fine operationally (snapshots regenerate) but expensive.
+     */
+    public function purge(Request $r): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+
+        $payload = $r->json()->all();
+        $pattern = trim((string) ($payload['pattern'] ?? ''));
+        if ($pattern === '' || $pattern[0] !== '/') {
+            return $this->error('Pattern must start with "/"', 400, 'VALIDATION_INVALID');
+        }
+        if (!preg_match('#^/[A-Za-z0-9._~/%:@!$()+,;=\-\*\?]*$#', $pattern)) {
+            return $this->error('Invalid pattern characters', 400, 'VALIDATION_INVALID');
+        }
+
+        $hostFilter = null;
+        $tenantSlug = $payload['tenant_slug'] ?? null;
+        $tenantId = null;
+        if (is_string($tenantSlug) && $tenantSlug !== '') {
+            if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $tenantSlug)) {
+                return $this->error('Invalid tenant slug', 400, 'VALIDATION_INVALID');
+            }
+            $row = \DB::table('tenants')->where('slug', $tenantSlug)->where('is_active', 1)->first();
+            if (!$row) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+            $tenantId = (int) $row->id;
+            // Resolve host so purgePattern can filter on it.
+            $domain = trim((string) ($row->domain ?? ''));
+            $appHost = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+                       ?: 'app.project-nexus.ie';
+            $hostFilter = $domain !== '' ? $domain : $appHost;
+        }
+
+        $dryRun = (bool) ($payload['dry_run'] ?? false);
+        $recache = (bool) ($payload['recache'] ?? false);
+
+        $result = $this->service->purgePattern($pattern, $hostFilter, $dryRun);
+
+        $jobId = null;
+        if ($recache && !$dryRun && !empty($result['deleted'])) {
+            // Enqueue a low-priority recache. We can't pass a glob to
+            // prerender-tenants.sh; the worker discovers missing snapshots
+            // on the next pass, so a force-render of the same tenant scope
+            // is the broadest sensible action.
+            $jobId = $this->service->enqueueJob(
+                $tenantId,
+                null,
+                false,
+                false,
+                $userId,
+                PrerenderService::PRIORITY_LOW
+            );
+        }
+
+        return $this->respondWithData([
+            'pattern'      => $pattern,
+            'tenant_slug'  => $tenantSlug,
+            'dry_run'      => $dryRun,
+            'deleted_count'=> count($result['deleted']),
+            'deleted'      => array_slice($result['deleted'], 0, 500),
+            'recache_job_id' => $jobId,
         ]);
     }
 
@@ -196,6 +271,42 @@ class AdminPrerenderController extends BaseApiController
             return $this->error('Job is not cancellable (already claimed or finished)', 409, 'CONFLICT');
         }
         return $this->respondWithData(['cancelled' => true, 'id' => $id]);
+    }
+
+    /**
+     * GET /api/v2/admin/prerender/analytics?since=ISO8601&limit=200
+     *
+     * Aggregates the bot-only JSONL access log nginx writes for every search
+     * engine / social / AI crawler hit. Returns hits by status, crawler, host,
+     * top URIs, and the most recent rows. Default window is 7 days.
+     */
+    public function analytics(Request $r): JsonResponse
+    {
+        $this->requireAdmin();
+        $since = $r->query('since');
+        $limit = (int) $r->query('limit', 200);
+        $limit = max(10, min(1000, $limit));
+        return $this->respondWithData(
+            $this->service->crawlerAnalytics(is_string($since) ? $since : null, $limit)
+        );
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/auto-recache
+     *
+     * Trigger one immediate auto-recache pass. Same logic as the cron, but
+     * exposed for manual operator control. Always dry-runs unless `apply=1`.
+     */
+    public function autoRecache(Request $r): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $apply = (bool) $r->json('apply', false);
+        $exit = \Artisan::call('prerender:auto-recache', $apply ? [] : ['--dry-run' => true]);
+        return $this->respondWithData([
+            'exit_code' => $exit,
+            'output'    => \Artisan::output(),
+            'applied'   => $apply,
+        ]);
     }
 
     /**
