@@ -415,6 +415,26 @@ class AdminPrerenderController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/admin/prerender/purge-unexpected
+     *
+     * Sweep the snapshot cache for routes that aren't in any tenant's current
+     * expected set (e.g. /jobs snapshots for a tenant with job_vacancies off).
+     * Common after toggling a feature off, or to clean up the inventory after
+     * the engine went tenant-aware (this fix's first run).
+     *
+     * Body:
+     *   apply: bool  — false = dry run (returns what would be deleted)
+     *
+     * Returns: { deleted_total, by_tenant: { slug: [routes] }, dry_run }
+     */
+    public function purgeUnexpected(Request $r): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $apply = (bool) $r->json('apply', false);
+        return $this->respondWithData($this->service->purgeUnexpectedSnapshots(!$apply));
+    }
+
+    /**
      * GET /api/v2/admin/prerender/metrics
      *
      * Prometheus-format text. Add to your scrape config as:

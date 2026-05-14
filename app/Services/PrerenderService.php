@@ -42,7 +42,14 @@ use Illuminate\Support\Facades\Schema;
  */
 class PrerenderService
 {
-    /** Routes the prerender script targets — keep in sync with scripts/prerender-tenants.sh PUBLIC_ROUTES. */
+    /**
+     * @deprecated Use routesForTenant($tenant) — it filters by feature/module
+     * flags per tenant. This flat list renders every feature-gated route for
+     * every tenant, generating 404s for tenants that don't have e.g. marketplace,
+     * jobs, or events enabled. Retained only for legacy Coverage callers that
+     * compare against a global expected set; new code should always go through
+     * the tenant-aware resolver.
+     */
     public const EXPECTED_ROUTES = [
         '/', '/about', '/faq', '/contact', '/help', '/explore', '/listings',
         '/blog', '/terms', '/privacy', '/accessibility', '/cookies',
@@ -53,6 +60,60 @@ class PrerenderService
         '/pilot-inquiry', '/pilot-apply', '/developers',
         '/partner', '/social-prescribing', '/impact-report',
         '/impact-summary', '/strategic-plan',
+    ];
+
+    /**
+     * Always-public routes that exist for every tenant regardless of feature
+     * flags. These cover the platform skeleton (homepage, contact, legal,
+     * pilot funnel, etc.) and never produce a 404 when prerendered.
+     *
+     * Routes NOT in this list and NOT covered by routesForTenant()'s feature
+     * gates should not be prerendered — the React 404 page will respond and
+     * the worker will capture a `_status=404` sidecar, which is a waste of
+     * CPU and clutters the inventory.
+     */
+    private const ALWAYS_PUBLIC_ROUTES = [
+        '/', '/about', '/faq', '/contact', '/help', '/explore',
+        '/terms', '/privacy', '/accessibility', '/cookies',
+        '/community-guidelines', '/trust-and-safety', '/acceptable-use',
+        '/legal', '/legal/history', '/timebanking-guide',
+        '/platform/terms', '/platform/privacy', '/platform/disclaimer',
+        '/features', '/changelog', '/developers',
+        '/pilot-inquiry', '/pilot-apply',
+        // Tenant-gated marketing pages — the React app's TenantSlugGate
+        // decides whether to render the actual content or a fallback for the
+        // wrong tenant; either way the response is 200, so it's safe to
+        // prerender for every tenant.
+        '/partner', '/social-prescribing',
+        '/impact-report', '/impact-summary', '/strategic-plan',
+    ];
+
+    /**
+     * Feature-gated static routes — included only when the named feature is
+     * enabled on the tenant. Mirrors SitemapService::getStaticPageUrls() gating
+     * so static + sitemap stay consistent.
+     *
+     * Format: feature_name => [route, route, ...]
+     */
+    private const FEATURE_GATED_ROUTES = [
+        'blog'                => ['/blog'],
+        'events'              => ['/events'],
+        'groups'              => ['/groups'],
+        'job_vacancies'       => ['/jobs'],
+        'volunteering'        => ['/volunteering'],
+        'ideation_challenges' => ['/ideation'],
+        'resources'           => ['/resources'],
+        'organisations'       => ['/organisations'],
+        'marketplace'         => ['/marketplace', '/marketplace/free', '/marketplace/map'],
+        'kb'                  => ['/kb'],
+    ];
+
+    /**
+     * Module-gated static routes (modules live in tenants.configuration.modules,
+     * features in tenants.features — different storage, same idea).
+     */
+    private const MODULE_GATED_ROUTES = [
+        'listings' => ['/listings'],
     ];
 
     public const STALE_AGE_SECONDS = 14 * 24 * 3600;
@@ -403,8 +464,13 @@ class PrerenderService
         foreach ($tenants as $t) {
             $host = $t['host'];
             $prefix = $t['prefix'];
+            // Resolve THIS tenant's expected static route set — features they
+            // don't have aren't expected to be rendered.
+            $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
+            $tenantRoutes = $this->routesForTenant($tObj);
+
             $rendered = 0; $missing = []; $stale = []; $invalidAssets = [];
-            foreach (self::EXPECTED_ROUTES as $route) {
+            foreach ($tenantRoutes as $route) {
                 $expectedRoute = $prefix . $route;
                 $found = $byHost[$host][$expectedRoute] ?? null;
                 if ($found === null) { $missing[] = $expectedRoute; continue; }
@@ -416,7 +482,7 @@ class PrerenderService
                 'tenant_id'      => $t['tenant_id'],
                 'slug'           => $t['slug'],
                 'host'           => $host,
-                'expected'       => count(self::EXPECTED_ROUTES),
+                'expected'       => count($tenantRoutes),
                 'rendered'       => $rendered,
                 'missing'        => count($missing),
                 'missing_routes' => $missing,
@@ -1033,6 +1099,57 @@ class PrerenderService
     // -------------------------------------------------------------------------
 
     /**
+     * Resolve the per-tenant static-route floor based on tenants.features and
+     * tenants.configuration.modules. Mirrors SitemapService gating so the
+     * prerender engine and the published sitemap agree on what exists.
+     *
+     * Accepts either a stdClass row (with `features` + `configuration` JSON
+     * strings) or a tenant_id + lazy fetch.
+     *
+     * @return list<string>
+     */
+    public function routesForTenant(int|object $tenant): array
+    {
+        if (is_int($tenant)) {
+            $row = DB::table('tenants')
+                ->where('id', $tenant)
+                ->where('is_active', 1)
+                ->select('id', 'features', 'configuration')
+                ->first();
+            if (!$row) return [];
+            $tenant = $row;
+        }
+
+        $features = $this->decodeJsonColumn($tenant->features ?? null);
+        $configuration = $this->decodeJsonColumn($tenant->configuration ?? null);
+        $modules = is_array($configuration['modules'] ?? null) ? $configuration['modules'] : [];
+
+        $routes = self::ALWAYS_PUBLIC_ROUTES;
+
+        // Features default to TRUE per TenantFeatureConfig::FEATURE_DEFAULTS,
+        // so an unset feature key means "on". Modules also default on.
+        foreach (self::FEATURE_GATED_ROUTES as $feature => $featureRoutes) {
+            if (($features[$feature] ?? true) === true || ($features[$feature] ?? true) === 1) {
+                foreach ($featureRoutes as $r) $routes[] = $r;
+            }
+        }
+        foreach (self::MODULE_GATED_ROUTES as $module => $moduleRoutes) {
+            if (($modules[$module] ?? true) === true || ($modules[$module] ?? true) === 1) {
+                foreach ($moduleRoutes as $r) $routes[] = $r;
+            }
+        }
+
+        return array_values(array_unique($routes));
+    }
+
+    private function decodeJsonColumn(?string $raw): array
+    {
+        if (!is_string($raw) || $raw === '') return [];
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
      * @return list<array{tenant_id:int, slug:string, host:string, prefix:string}>
      */
     public function loadTenantTargets(): array
@@ -1041,7 +1158,7 @@ class PrerenderService
         $rows = DB::table('tenants')
             ->where('is_active', 1)
             ->where('id', '<>', 1)
-            ->select('id', 'slug', DB::raw("COALESCE(domain, '') as domain"))
+            ->select('id', 'slug', DB::raw("COALESCE(domain, '') as domain"), 'features', 'configuration')
             ->orderBy('id')
             ->get();
 
@@ -1051,13 +1168,101 @@ class PrerenderService
             $host = $domain !== '' ? $domain : $appHost;
             $prefix = $domain !== '' ? '' : '/' . $r->slug;
             $out[] = [
-                'tenant_id' => (int) $r->id,
-                'slug'      => (string) $r->slug,
-                'host'      => $host,
-                'prefix'    => $prefix,
+                'tenant_id'      => (int) $r->id,
+                'slug'           => (string) $r->slug,
+                'host'           => $host,
+                'prefix'         => $prefix,
+                // Pass the raw JSON through so callers can use routesForTenant
+                // without a second DB query.
+                'features'       => $r->features ?? null,
+                'configuration'  => $r->configuration ?? null,
             ];
         }
         return $out;
+    }
+
+    /**
+     * Sweep the snapshot cache for rows whose route is NOT in the tenant's
+     * current expected set — typically 404 leftovers from before this code
+     * went tenant-aware, or from a feature being turned off on a tenant.
+     *
+     * Returns the per-tenant list of deleted cache paths. Caller decides
+     * whether to also enqueue recaches (none needed — the deleted snapshots
+     * shouldn't exist for these tenants in the first place).
+     *
+     * @return array{deleted_total:int, by_tenant:array<string,list<string>>, dry_run:bool}
+     */
+    public function purgeUnexpectedSnapshots(bool $dryRun = false): array
+    {
+        $tenants = $this->loadTenantTargets();
+        $byHost = [];
+        foreach ($tenants as $t) {
+            $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
+            $expected = array_flip($this->routesForTenant($tObj));
+            // Sitemap-derived dynamic routes are bounded by content; we trust
+            // those to exist as long as the row exists. They get filtered out
+            // by checking the route prefix — anything under /blog, /listings,
+            // /events, /jobs, /marketplace, /groups, /volunteering, /resources,
+            // /organisations, /ideation, /kb, /page is dynamic and we leave
+            // those alone here (the drift detector handles dynamic content).
+            $byHost[$t['host']] = [
+                'slug'     => $t['slug'],
+                'expected' => $expected,
+            ];
+        }
+
+        $byTenant = [];
+        $deletedTotal = 0;
+        foreach ($this->inventory(null, false) as $row) {
+            $bucket = $byHost[$row['host']] ?? null;
+            if (!$bucket) continue;
+
+            // Skip dynamic-content routes — they're not in the static
+            // expected set but they ARE legitimate snapshots.
+            if ($this->isDynamicContentRoute($row['route'])) continue;
+
+            if (isset($bucket['expected'][$row['route']])) continue;
+
+            // This static route isn't expected for this tenant — purge it.
+            $byTenant[$bucket['slug']][] = $row['route'];
+            $deletedTotal++;
+
+            if (!$dryRun) {
+                $abs = $this->cachePath . '/' . $row['cache_path'];
+                @unlink($abs);
+                @unlink(dirname($abs) . '/_status');
+                @unlink(dirname($abs) . '/index.md');
+                @rmdir(dirname($abs));
+            }
+        }
+
+        return [
+            'deleted_total' => $deletedTotal,
+            'by_tenant'     => $byTenant,
+            'dry_run'       => $dryRun,
+        ];
+    }
+
+    /**
+     * Returns true for routes that represent dynamic, content-table-backed
+     * URLs (blog posts, listings, events, etc). Used by purgeUnexpectedSnapshots
+     * to avoid deleting legitimately-rendered detail pages just because they
+     * aren't in the static floor.
+     */
+    private function isDynamicContentRoute(string $route): bool
+    {
+        static $prefixes = [
+            '/blog/', '/listings/', '/events/', '/jobs/', '/marketplace/',
+            '/marketplace/category/', '/groups/', '/volunteering/',
+            '/volunteering/opportunities/', '/resources/', '/organisations/',
+            '/ideation/', '/kb/', '/page/',
+        ];
+        foreach ($prefixes as $p) {
+            if (str_starts_with($route, $p) && strlen($route) > strlen($p)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function frontendHost(): string
@@ -1081,7 +1286,18 @@ class PrerenderService
 
     private function expectedSnapshotCount(array $tenants): int
     {
-        return count($tenants) * count(self::EXPECTED_ROUTES);
+        // Sum each tenant's per-tenant expected route count rather than
+        // multiplying by a global constant. Tenants with features disabled
+        // legitimately have fewer expected static snapshots.
+        $total = 0;
+        foreach ($tenants as $t) {
+            $tObj = (object) [
+                'features' => $t['features'] ?? null,
+                'configuration' => $t['configuration'] ?? null,
+            ];
+            $total += count($this->routesForTenant($tObj));
+        }
+        return $total;
     }
 
     private function safeCachePath(string $rel): ?string

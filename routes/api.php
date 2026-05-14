@@ -2133,6 +2133,7 @@ Route::get('/v2/admin/prerender/jobs/{id}',        [\App\Http\Controllers\Api\Ad
 Route::post('/v2/admin/prerender/jobs',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'enqueue']);
 Route::post('/v2/admin/prerender/jobs/{id}/cancel',[\App\Http\Controllers\Api\AdminPrerenderController::class, 'cancelJob'])->whereNumber('id');
 Route::post('/v2/admin/prerender/purge',           [\App\Http\Controllers\Api\AdminPrerenderController::class, 'purge']);
+Route::post('/v2/admin/prerender/purge-unexpected',[\App\Http\Controllers\Api\AdminPrerenderController::class, 'purgeUnexpected']);
 Route::post('/v2/admin/prerender/invalidate',      [\App\Http\Controllers\Api\AdminPrerenderController::class, 'invalidate']);
 Route::get('/v2/admin/prerender/analytics',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'analytics']);
 Route::post('/v2/admin/prerender/auto-recache',    [\App\Http\Controllers\Api\AdminPrerenderController::class, 'autoRecache']);

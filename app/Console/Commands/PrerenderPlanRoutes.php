@@ -63,15 +63,24 @@ class PrerenderPlanRoutes extends Command
             ->orderBy('id');
         if ($tenantFilter !== '') $query->where('slug', $tenantFilter);
 
+        // Pull features + configuration so the resolver can gate routes
+        // per-tenant without a second query loop.
+        $prerender = app(PrerenderService::class);
+
         $tenants = [];
-        foreach ($query->get(['id', 'slug', 'domain']) as $t) {
+        foreach ($query->get(['id', 'slug', 'domain', 'features', 'configuration']) as $t) {
             $domain = trim((string) ($t->domain ?? ''));
             $host = $domain !== '' ? $domain : $appHost;
             $prefix = $domain !== '' ? '' : '/' . $t->slug;
 
             $routes = [];
             if ($includeStatic) {
-                foreach (PrerenderService::EXPECTED_ROUTES as $r) $routes[$r] = true;
+                // Tenant-aware static floor — only routes whose feature/module
+                // gate is on for this tenant. No more rendering /jobs for a
+                // tenant with job_vacancies disabled.
+                foreach ($prerender->routesForTenant($t) as $r) {
+                    $routes[$r] = true;
+                }
             }
             if ($includeSitemap) {
                 foreach ($this->routesFromSitemap((int) $t->id, $host, $prefix) as $r) {

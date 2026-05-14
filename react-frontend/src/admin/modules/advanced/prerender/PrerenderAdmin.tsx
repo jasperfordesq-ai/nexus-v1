@@ -415,6 +415,29 @@ function FreshnessControls({
   const [autoRecOutput, setAutoRecOutput] = useState<string>('');
   const [driftLoading, setDriftLoading] = useState(false);
   const [driftOutput, setDriftOutput] = useState<string>('');
+  const [purgeLoading, setPurgeLoading] = useState(false);
+  const [purgeOutput, setPurgeOutput] = useState<{ deleted_total: number; by_tenant: Record<string, string[]>; dry_run: boolean } | null>(null);
+
+  const runPurgeUnexpected = async (apply: boolean) => {
+    setPurgeLoading(true);
+    setPurgeOutput(null);
+    try {
+      const res = await adminPrerender.purgeUnexpected(apply);
+      if (res.data) {
+        setPurgeOutput(res.data);
+        toast.success(
+          apply
+            ? `Purged ${res.data.deleted_total} ungated snapshots across ${Object.keys(res.data.by_tenant).length} tenants`
+            : `Dry run: ${res.data.deleted_total} snapshots would be purged`
+        );
+        if (apply) onActed();
+      }
+    } catch {
+      toast.error('Purge-unexpected failed');
+    } finally {
+      setPurgeLoading(false);
+    }
+  };
 
   const runAutoRecache = async (apply: boolean) => {
     setAutoRecLoading(true);
@@ -532,6 +555,57 @@ function FreshnessControls({
               </Code>
             )}
           </div>
+        </div>
+
+        <Divider className="my-2" />
+
+        <div className="space-y-2">
+          <p className="font-medium flex items-center gap-2">
+            <Trash size={16} className="text-danger" />Purge ungated snapshots (per-tenant 404 cleanup)
+          </p>
+          <p className="text-sm text-default-500">
+            Sweep snapshots whose route isn&apos;t in a tenant&apos;s expected set. Common after toggling
+            a feature off, or for the one-time cleanup of 404s left from the era when every tenant
+            was prerendered against the global route list regardless of feature flags. Dynamic
+            content routes (blog posts, listings, events, etc.) are left alone — only static routes
+            that shouldn&apos;t exist for the tenant get deleted.
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="flat"
+              onPress={() => runPurgeUnexpected(false)}
+              isLoading={purgeLoading}
+              isDisabled={!isSuperAdmin}
+              size="sm"
+            >
+              Dry run
+            </Button>
+            <Button
+              color="danger"
+              onPress={() => runPurgeUnexpected(true)}
+              isLoading={purgeLoading}
+              isDisabled={!isSuperAdmin}
+              size="sm"
+              startContent={<Trash size={14} />}
+            >
+              Apply
+            </Button>
+          </div>
+          {purgeOutput && (
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                {purgeOutput.dry_run ? 'Would delete' : 'Deleted'} {purgeOutput.deleted_total}{' '}
+                snapshots across {Object.keys(purgeOutput.by_tenant).length} tenants
+              </p>
+              {Object.keys(purgeOutput.by_tenant).length > 0 && (
+                <Code className="text-xs whitespace-pre-wrap block max-h-64 overflow-auto">
+                  {Object.entries(purgeOutput.by_tenant)
+                    .map(([slug, routes]) => `${slug} (${routes.length}):\n  ${routes.join('\n  ')}`)
+                    .join('\n\n')}
+                </Code>
+              )}
+            </div>
+          )}
         </div>
       </CardBody>
     </Card>

@@ -1944,6 +1944,13 @@ export const adminPrerender = {
       { apply },
     ),
 
+  purgeUnexpected: (apply: boolean) =>
+    api.post<{
+      deleted_total: number;
+      by_tenant: Record<string, string[]>;
+      dry_run: boolean;
+    }>('/v2/admin/prerender/purge-unexpected', { apply }),
+
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */
   metricsUrl: '/api/v2/admin/prerender/metrics',
 };
