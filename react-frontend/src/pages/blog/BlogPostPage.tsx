@@ -67,6 +67,10 @@ interface BlogPostDetail {
   reading_time: number;
   meta_title: string | null;
   meta_description: string | null;
+  meta_keywords?: string | null;
+  canonical_url?: string | null;
+  og_image_url?: string | null;
+  noindex?: boolean;
   author: {
     id: number;
     name: string;
@@ -386,8 +390,8 @@ export function BlogPostPage() {
     origin: window.location.origin,
     pathname: window.location.pathname,
     profileUrl: tenantPath,
-    publisherName: branding.name || 'NEXUS',
-    publisherLogo: branding.logo,
+    publisherName: branding?.name || 'NEXUS',
+    publisherLogo: branding?.logo,
     fallbackAuthorName: t('post.unknown_author'),
   });
 
@@ -396,9 +400,13 @@ export function BlogPostPage() {
       <PageMeta
         title={post.meta_title || post.title}
         description={post.meta_description || post.excerpt}
-        image={post.featured_image ? resolveAssetUrl(post.featured_image) : undefined}
+        keywords={post.meta_keywords || undefined}
+        image={post.og_image_url || (post.featured_image ? resolveAssetUrl(post.featured_image) : undefined)}
+        url={post.canonical_url || undefined}
         type="article"
+        noIndex={post.noindex === true}
         publishedTime={post.published_at || post.created_at}
+        modifiedTime={post.updated_at || undefined}
       />
 
       {/* Article JSON-LD structured data */}

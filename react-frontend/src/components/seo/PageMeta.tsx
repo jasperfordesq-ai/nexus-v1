@@ -147,12 +147,10 @@ export function PageMeta({
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const canonicalUrl = url || buildCanonicalUrl(origin, location.pathname);
 
-  // OG image fallback chain: explicit prop → tenant og_image_url → tenant logo → platform default
-  const ogImage =
-    image ||
-    branding.og_image_url ||
-    branding.logo ||
-    `${origin}/og-default.svg`;
+  // OG image fallback chain: explicit prop -> tenant og_image_url -> tenant logo -> platform default
+  const richCardImage = image || branding.og_image_url || branding.logo;
+  const ogImage = richCardImage || `${origin}/og-default.svg`;
+  const twitterCard = richCardImage ? 'summary_large_image' : 'summary';
 
   return (
     <Helmet>
@@ -168,22 +166,18 @@ export function PageMeta({
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph / Facebook (respects admin toggle) */}
-      {enableOpenGraph && (
-        <>
-          <meta property="og:type" content={type} />
-          <meta property="og:site_name" content={siteName} />
-          <meta property="og:title" content={fullTitle} />
-          <meta property="og:description" content={metaDescription} />
-          {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-          <meta property="og:image" content={ogImage} />
-          <meta property="og:image:width" content="1200" />
-          <meta property="og:image:height" content="630" />
-          <meta property="og:locale" content={ogLocale} />
-          {ogLocaleAlternates.map((locale) => (
-            <meta key={locale} property="og:locale:alternate" content={locale} />
-          ))}
-        </>
-      )}
+      {enableOpenGraph && <meta property="og:type" content={type} />}
+      {enableOpenGraph && <meta property="og:site_name" content={siteName} />}
+      {enableOpenGraph && <meta property="og:title" content={fullTitle} />}
+      {enableOpenGraph && <meta property="og:description" content={metaDescription} />}
+      {enableOpenGraph && canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+      {enableOpenGraph && <meta property="og:image" content={ogImage} />}
+      {enableOpenGraph && <meta property="og:image:width" content="1200" />}
+      {enableOpenGraph && <meta property="og:image:height" content="630" />}
+      {enableOpenGraph && <meta property="og:locale" content={ogLocale} />}
+      {enableOpenGraph && ogLocaleAlternates.map((locale) => (
+        <meta key={locale} property="og:locale:alternate" content={locale} />
+      ))}
 
       {/* Article-specific OG tags */}
       {enableOpenGraph && type === 'article' && publishedTime && (
@@ -194,14 +188,10 @@ export function PageMeta({
       )}
 
       {/* Twitter Card (respects admin toggle) */}
-      {enableTwitterCards && (
-        <>
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={fullTitle} />
-          <meta name="twitter:description" content={metaDescription} />
-          <meta name="twitter:image" content={ogImage} />
-        </>
-      )}
+      {enableTwitterCards && <meta name="twitter:card" content={twitterCard} />}
+      {enableTwitterCards && <meta name="twitter:title" content={fullTitle} />}
+      {enableTwitterCards && <meta name="twitter:description" content={metaDescription} />}
+      {enableTwitterCards && <meta name="twitter:image" content={ogImage} />}
     </Helmet>
   );
 }

@@ -39,7 +39,7 @@ class BlogService
 
         $query = $this->post->newQuery()
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color']);
+            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata']);
         $this->excludePlaceholderPosts($query);
 
         if (! empty($filters['category_id'])) {
@@ -87,7 +87,7 @@ class BlogService
     {
         $query = $this->post->newQuery()
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color']);
+            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata']);
         $this->excludePlaceholderPosts($query);
 
         if ($categoryId) {
@@ -115,7 +115,7 @@ class BlogService
     {
         $post = $this->post->newQuery()
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color'])
+            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata'])
             ->whereNotIn('slug', self::PLACEHOLDER_BLOG_SLUGS)
             ->whereRaw("LOWER(CONCAT_WS(' ', title, excerpt, content, html_render)) NOT LIKE ?", ['%lorem ipsum%'])
             ->where('slug', $slug)
@@ -126,6 +126,7 @@ class BlogService
         }
 
         $baseUrl = rtrim(env('APP_URL', 'https://api.project-nexus.ie'), '/');
+        $seo = $post->seoMetadata;
         $content = $post->html_render ?? $post->content ?? '';
         $wordCount = str_word_count(strip_tags($content));
         $readingTime = max(1, (int) ceil($wordCount / 200));
@@ -142,8 +143,12 @@ class BlogService
             'updated_at'       => $post->updated_at ? (string) $post->updated_at : null,
             'views'            => 0,
             'reading_time'     => $readingTime,
-            'meta_title'       => $post->title ?? null,
-            'meta_description' => $post->excerpt ?? null,
+            'meta_title'       => $seo?->meta_title ?: ($post->title ?? null),
+            'meta_description' => $seo?->meta_description ?: ($post->excerpt ?? null),
+            'meta_keywords'    => $seo?->meta_keywords ?: null,
+            'canonical_url'    => $seo?->canonical_url ?: null,
+            'og_image_url'     => $seo?->og_image_url ?: null,
+            'noindex'          => (bool) ($seo?->noindex ?? false),
             'author'           => $this->formatAuthor($post->author, $baseUrl),
             'category'         => $post->category ? [
                 'id'    => $post->category->id,
@@ -188,6 +193,8 @@ class BlogService
 
     private function formatPostSummary(Post $post, string $baseUrl): array
     {
+        $seo = $post->seoMetadata;
+
         return [
             'id'             => $post->id,
             'title'          => $post->title ?? '',
@@ -198,6 +205,8 @@ class BlogService
             'created_at'     => (string) $post->created_at,
             'views'          => 0,
             'reading_time'   => 3,
+            'meta_title'     => $seo?->meta_title ?: null,
+            'meta_description' => $seo?->meta_description ?: null,
             'author'         => $this->formatAuthor($post->author, $baseUrl),
             'category'       => $post->category ? [
                 'id'    => $post->category->id,
