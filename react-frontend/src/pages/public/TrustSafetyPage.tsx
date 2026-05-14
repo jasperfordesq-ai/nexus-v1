@@ -70,6 +70,11 @@ export function TrustSafetyPage() {
   const { branding, tenantPath } = useTenant();
   usePageTitle(t('trust_safety.page_title'));
 
+  // Robust brand-name resolution so the {{name}} placeholder in the legal
+  // copy can never render literally (regression observed when prerender
+  // snapshots ran before tenant bootstrap completed — see CHANGELOG 2026-05-14).
+  const brandName = branding.name?.trim() || 'this platform';
+
   return (
     <motion.div
       variants={containerVariants}
@@ -79,7 +84,7 @@ export function TrustSafetyPage() {
     >
       <PageMeta
         title={t('trust_safety.page_title')}
-        description={t('trust_safety.meta_description', { name: branding.name })}
+        description={t('trust_safety.meta_description', { name: brandName })}
       />
 
       {/* Hero */}
@@ -91,7 +96,7 @@ export function TrustSafetyPage() {
           {t('trust_safety.heading')}
         </h1>
         <p className="text-theme-muted text-lg max-w-2xl mx-auto">
-          {t('trust_safety.subtitle', { name: branding.name })}
+          {t('trust_safety.subtitle', { name: brandName })}
         </p>
       </motion.div>
 
@@ -117,7 +122,7 @@ export function TrustSafetyPage() {
       {SECTIONS.map((section) => {
         const Icon = section.icon;
         const items = section.count > 0
-          ? Array.from({ length: section.count }, (_, i) => t(`${section.itemsKey}.${i}`, { name: branding.name }))
+          ? Array.from({ length: section.count }, (_, i) => t(`${section.itemsKey}.${i}`, { name: brandName }))
           : [];
 
         return (
@@ -125,10 +130,10 @@ export function TrustSafetyPage() {
             <GlassCard className="p-6 sm:p-8">
               <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
                 <Icon className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-                {t(section.titleKey, { name: branding.name })}
+                {t(section.titleKey, { name: brandName })}
               </h2>
               {section.introKey && (
-                <p className="text-theme-muted mb-4">{t(section.introKey, { name: branding.name })}</p>
+                <p className="text-theme-muted mb-4">{t(section.introKey, { name: brandName })}</p>
               )}
               {items.length > 0 && (
                 <ul className="space-y-2">
