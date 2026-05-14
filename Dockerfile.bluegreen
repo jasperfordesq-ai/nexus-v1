@@ -167,6 +167,11 @@ COPY resources ./resources
 COPY routes ./routes
 COPY views ./views
 COPY artisan ./artisan
+# Include the operational scripts directory so commands that run inside the
+# container (the raw-SQL migration gate, audit scripts, etc) have access to
+# them at deploy time. The directory is heavily git-allowlisted; only files
+# explicitly un-ignored in .gitignore are present in the build context.
+COPY scripts ./scripts
 
 # Bake the build commit into the image so /version.php has a valid commit field
 # the moment a container starts — closes the race window where the drift
