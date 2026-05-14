@@ -465,7 +465,12 @@ build_manifest_from_plan() {
     local PLAN_JSON="$1"
     local MANIFEST_FILE="$2"
     local PARSED
-    PARSED=$(echo "$PLAN_JSON" | python3 - <<'PYEOF' 2>/dev/null || true
+    # Heredoc-in-command-substitution gotcha: bash requires the heredoc
+    # delimiter to be the very last token on the line that opens it — adding
+    # `2>/dev/null || true` there triggers a parse error. Wrap the whole
+    # python call in an outer subshell with `|| true` to swallow non-zero
+    # exits without confusing the parser.
+    PARSED=$( ( echo "$PLAN_JSON" | python3 - 2>/dev/null <<'PYEOF'
 import json, sys
 try:
     plan = json.load(sys.stdin)
@@ -481,10 +486,9 @@ for t in plan.get('tenants', []):
     for r in t.get('routes', []):
         if not r or not r.startswith('/'):
             continue
-        # Tab-separated tuples — bash splits cleanly on these.
         print(f"{tid}\t{slug}\t{host}\t{prefix}\t{r}")
 PYEOF
-    )
+    ) || true )
 
     if [ -z "$PARSED" ]; then
         return 1
