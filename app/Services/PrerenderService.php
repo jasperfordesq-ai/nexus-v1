@@ -78,7 +78,7 @@ class PrerenderService
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
         '/legal', '/legal/history', '/timebanking-guide',
         '/platform/terms', '/platform/privacy', '/platform/disclaimer',
-        '/features', '/changelog', '/developers',
+        '/features', '/changelog', '/developers', '/development-status',
         '/pilot-inquiry', '/pilot-apply',
         // Tenant-gated marketing pages — the React app's TenantSlugGate
         // decides whether to render the actual content or a fallback for the
@@ -1195,36 +1195,80 @@ class PrerenderService
     public function purgeUnexpectedSnapshots(bool $dryRun = false): array
     {
         $tenants = $this->loadTenantTargets();
-        $byHost = [];
+        // Build a (host, route)-keyed expected set. Inventory rows store the
+        // route WITH the tenant prefix for app-host tenants (e.g.
+        // /partner-demo/about), so we must apply the prefix here too or the
+        // purge would shred every legitimate prefixed snapshot.
+        // Multiple tenants can share a host (the app host), so we union the
+        // expected sets across tenants per host.
+        $expectedByHost = [];
+        $slugByHostRoute = []; // For reporting only — which tenant "owned" the missing route.
         foreach ($tenants as $t) {
             $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
-            $expected = array_flip($this->routesForTenant($tObj));
-            // Sitemap-derived dynamic routes are bounded by content; we trust
-            // those to exist as long as the row exists. They get filtered out
-            // by checking the route prefix — anything under /blog, /listings,
-            // /events, /jobs, /marketplace, /groups, /volunteering, /resources,
-            // /organisations, /ideation, /kb, /page is dynamic and we leave
-            // those alone here (the drift detector handles dynamic content).
-            $byHost[$t['host']] = [
-                'slug'     => $t['slug'],
-                'expected' => $expected,
-            ];
+            $tenantRoutes = $this->routesForTenant($tObj);
+            $prefix = $t['prefix']; // '' for custom-domain tenants, '/slug' for app-host
+            foreach ($tenantRoutes as $r) {
+                $prefixed = $prefix . $r;
+                $expectedByHost[$t['host']][$prefixed] = true;
+                $slugByHostRoute[$t['host']][$prefixed] = $t['slug'];
+            }
         }
 
         $byTenant = [];
         $deletedTotal = 0;
         foreach ($this->inventory(null, false) as $row) {
-            $bucket = $byHost[$row['host']] ?? null;
-            if (!$bucket) continue;
+            $hostExpected = $expectedByHost[$row['host']] ?? null;
+            if ($hostExpected === null) continue;
+
+            // Strip tenant prefix before the dynamic check — app-host routes
+            // carry it (e.g. /partner-demo/blog/foo), but isDynamicContentRoute
+            // matches the canonical /blog/ form. Use any tenant-prefix from
+            // this host's expected map to detect and strip.
+            $tenantLocalRoute = $row['route'];
+            foreach (array_keys($slugByHostRoute[$row['host']] ?? []) as $expRoute) {
+                if (preg_match('#^/[A-Za-z0-9_-]+/#', $expRoute, $pm)) {
+                    $candidate = rtrim($pm[0], '/');
+                    if (str_starts_with($tenantLocalRoute, $candidate . '/')) {
+                        $tenantLocalRoute = substr($tenantLocalRoute, strlen($candidate));
+                        break;
+                    }
+                    if ($tenantLocalRoute === $candidate) {
+                        $tenantLocalRoute = '/';
+                        break;
+                    }
+                }
+            }
 
             // Skip dynamic-content routes — they're not in the static
-            // expected set but they ARE legitimate snapshots.
-            if ($this->isDynamicContentRoute($row['route'])) continue;
+            // expected set but they ARE legitimate snapshots. The drift
+            // detector keeps them fresh from DB state.
+            if ($this->isDynamicContentRoute($tenantLocalRoute)) continue;
 
-            if (isset($bucket['expected'][$row['route']])) continue;
+            if (isset($hostExpected[$row['route']])) continue;
+
+            // Resolve which tenant this prefixed orphan most likely belonged
+            // to. For app-host tenants the prefix is the slug; for
+            // custom-domain tenants there's only one tenant per host so use
+            // any expected entry.
+            $slug = '(unknown)';
+            $firstSeg = '';
+            if (preg_match('#^/([A-Za-z0-9_-]+)#', $row['route'], $m)) $firstSeg = $m[1];
+            if ($firstSeg !== '') {
+                // Look up any prefix match in the host's expected map.
+                foreach ($slugByHostRoute[$row['host']] ?? [] as $eRoute => $eSlug) {
+                    if (str_starts_with($eRoute, '/' . $firstSeg . '/') || $eRoute === '/' . $firstSeg) {
+                        $slug = $eSlug;
+                        break;
+                    }
+                }
+            }
+            if ($slug === '(unknown)') {
+                // Fall back to whatever tenant is on this host (single-tenant case).
+                $slug = reset($slugByHostRoute[$row['host']]) ?: '(unknown)';
+            }
 
             // This static route isn't expected for this tenant — purge it.
-            $byTenant[$bucket['slug']][] = $row['route'];
+            $byTenant[$slug][] = $row['route'];
             $deletedTotal++;
 
             if (!$dryRun) {
