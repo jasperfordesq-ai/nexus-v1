@@ -404,6 +404,49 @@ optimize_candidate_laravel() {
     log_ok "Candidate Laravel caches rebuilt"
 }
 
+run_candidate_raw_sql_migrations() {
+    # Platform-level raw SQL files live in /var/www/html/migrations/*.sql, not
+    # Laravel's database/migrations/. Laravel's `migrate --pretend` gate does
+    # not see them, so historically these had to be applied by hand at deploy
+    # time. safe_migrate.php tracks applied files via the `migrations` table's
+    # migration_name column and runs only the pending ones — same logic, but
+    # automated and idempotent.
+    #
+    # Safe to run on every deploy: if all files are already recorded, this
+    # exits in milliseconds with "No pending migrations."
+    local color="$1"
+    local app_container
+    app_container="$(container_name "$color" app)"
+
+    if [ "$LARAVEL_MIGRATE" != "1" ]; then
+        return 0
+    fi
+
+    log_step "=== Candidate Raw SQL Migrations ($color) ==="
+
+    if ! docker exec "$app_container" test -f /var/www/html/scripts/safe_migrate.php 2>/dev/null; then
+        log_info "safe_migrate.php not present in candidate — skipping raw SQL migrations"
+        return 0
+    fi
+
+    local pending_output
+    pending_output="$(docker_exec_app_user "$app_container" php /var/www/html/scripts/safe_migrate.php --pending 2>&1 || true)"
+    if echo "$pending_output" | grep -qi "No pending\|All migrations applied"; then
+        log_ok "No pending raw SQL migrations"
+        return 0
+    fi
+
+    log_warn "Pending raw SQL migrations detected; applying with safe_migrate.php"
+    # safe_migrate.php prompts for confirmation by default; --run-pending plus
+    # piped 'yes' answers automatically. Run as the app user so file perms
+    # match the rest of the candidate's Laravel context.
+    if ! docker_exec_app_user "$app_container" sh -c 'yes | php /var/www/html/scripts/safe_migrate.php --run-pending 2>&1' | tee /dev/stderr | grep -qiE 'Migration complete|migrations applied|No pending'; then
+        log_err "Raw SQL migration run did not report success — aborting before cutover"
+        return 1
+    fi
+    log_ok "Raw SQL migrations applied"
+}
+
 run_candidate_migrations() {
     local color="$1"
     local app_container
@@ -413,6 +456,10 @@ run_candidate_migrations() {
         log_info "Skipping database migrations (--no-migrate)"
         return 0
     fi
+
+    # Apply platform-level raw SQL files first (idempotent, see above), then
+    # run Laravel's own migrations.
+    run_candidate_raw_sql_migrations "$color" || return 1
 
     log_step "=== Candidate Laravel Migrations ($color) ==="
     write_deploy_status "running" "Candidate Laravel Migrations ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"

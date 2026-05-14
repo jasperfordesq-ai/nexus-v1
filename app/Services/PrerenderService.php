@@ -1007,9 +1007,20 @@ class PrerenderService
         try {
             $row = $this->getJob($id);
             if (!$row) return;
+            // Pusher's HTTP API caps event payloads at 10 KiB. Drift-detector
+            // jobs can carry 80+ routes plus 250 KiB log excerpts — well over
+            // the limit. Strip / truncate fields the realtime UI doesn't need
+            // for a status update; the inspect modal fetches the full row via
+            // a separate REST call when the user clicks in.
+            $broadcastRow = $row;
+            unset($broadcastRow['log_excerpt']);
+            if (isset($broadcastRow['routes']) && is_string($broadcastRow['routes']) && strlen($broadcastRow['routes']) > 400) {
+                $broadcastRow['routes'] = substr($broadcastRow['routes'], 0, 400) . '…';
+                $broadcastRow['routes_truncated'] = true;
+            }
             $rt = app(RealtimeService::class);
             $rt->broadcast(self::REALTIME_CHANNEL, self::REALTIME_EVENT, [
-                'job' => $row,
+                'job' => $broadcastRow,
                 'ts'  => time(),
             ]);
         } catch (\Throwable $e) {
