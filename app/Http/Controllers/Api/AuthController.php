@@ -189,26 +189,24 @@ class AuthController extends BaseApiController
             $isMobile = $this->tokenService->isMobileRequest();
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
-            // ADMIN 2FA ENFORCEMENT — admins/super-admins MUST have 2FA enabled.
-            // If they don't, hard-block normal login and route them through the
-            // first-time setup flow. The setup token is a regular 2FA challenge
-            // with method='totp_setup' so the TwoFactorController endpoints can
-            // distinguish the setup flow from a normal verify flow.
+            // ADMIN 2FA ENFORCEMENT — DISABLED until the dedicated setup UI
+            // ships. Re-enable via the FORCE_ADMIN_2FA env flag once the
+            // first-time setup page is in place. See temporary rollback at
+            // commit 7fecb5b13 → unblock at <next>.
             $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
-            // Admin-level roles in V1 are: admin, tenant_admin, org_admin,
-            // super_admin (rare). Plus the is_super_admin / is_tenant_super_admin
-            // boolean flags can elevate a member-role user. Keep this list in
-            // sync with the route guards if new admin roles are added.
             $isAdminAccount = in_array(($user['role'] ?? ''), ['admin', 'tenant_admin', 'org_admin', 'super_admin'], true)
                 || !empty($user['is_super_admin'])
                 || !empty($user['is_tenant_super_admin']);
 
-            if ($isAdminAccount && !$has2faEnabled) {
+            if (
+                filter_var(env('FORCE_ADMIN_2FA', false), FILTER_VALIDATE_BOOLEAN)
+                && $isAdminAccount
+                && !$has2faEnabled
+            ) {
                 $setupToken = $this->twoFactorChallengeManager->create(
                     (int)$user['id'],
                     ['totp_setup']
                 );
-
                 return response()->json([
                     'success' => false,
                     'requires_2fa_setup' => true,
