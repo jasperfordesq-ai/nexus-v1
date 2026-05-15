@@ -189,12 +189,42 @@ class AuthController extends BaseApiController
             $isMobile = $this->tokenService->isMobileRequest();
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
+            // ADMIN 2FA ENFORCEMENT — admins/super-admins MUST have 2FA enabled.
+            // If they don't, hard-block normal login and route them through the
+            // first-time setup flow. The setup token is a regular 2FA challenge
+            // with method='totp_setup' so the TwoFactorController endpoints can
+            // distinguish the setup flow from a normal verify flow.
+            $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
+            $isAdminAccount = ($user['role'] ?? '') === 'admin'
+                || ($user['role'] ?? '') === 'super_admin'
+                || !empty($user['is_super_admin'])
+                || !empty($user['is_tenant_super_admin']);
+
+            if ($isAdminAccount && !$has2faEnabled) {
+                $setupToken = $this->twoFactorChallengeManager->create(
+                    (int)$user['id'],
+                    ['totp_setup']
+                );
+
+                return response()->json([
+                    'success' => false,
+                    'requires_2fa_setup' => true,
+                    'two_factor_token' => $setupToken,
+                    'code' => 'AUTH_2FA_SETUP_REQUIRED',
+                    'message' => __('api_controllers_1.auth.two_factor_setup_required'),
+                    'user' => [
+                        'id' => $user['id'],
+                        'first_name' => $user['first_name'],
+                        'email_masked' => $this->maskEmail($user['email']),
+                    ],
+                ], 200);
+            }
+
             // 2FA CHECK — ENFORCED FOR ALL USERS WHO HAVE IT ENABLED
             // user_totp_settings.is_enabled is the single source of truth.
             // The users.totp_enabled column can drift (e.g. initializeSetup resets
             // the settings row to is_enabled=0 but leaves users.totp_enabled=1),
             // which would gate login on 2FA the verify endpoint can't satisfy.
-            $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
             $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
 
             if ($has2faEnabled && !$isTrustedDevice) {

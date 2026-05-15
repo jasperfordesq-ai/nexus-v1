@@ -29,7 +29,32 @@ class TwoFactorController extends BaseApiController
 
     public function __construct(
         private readonly TotpService $totpService,
+        private readonly \App\Services\TwoFactorChallengeManager $challengeManager,
+        private readonly \App\Services\TokenService $tokenService,
     ) {}
+
+    /**
+     * Resolve the acting user ID from either:
+     *   - a normal authenticated request (Bearer / session), OR
+     *   - a 2FA setup challenge token submitted as `two_factor_token`
+     *     (created by AuthController::login when an admin without 2FA
+     *     authenticates). The challenge must have method='totp_setup'.
+     *
+     * Returns the user ID. On invalid setup token, falls through to the
+     * normal requireAuth() flow which will 401 the request.
+     */
+    private function resolveSetupUserId(): array
+    {
+        $allInput = $this->getAllInput();
+        $setupToken = $allInput['two_factor_token'] ?? null;
+        if (is_string($setupToken) && $setupToken !== '') {
+            $challenge = $this->challengeManager->get($setupToken);
+            if ($challenge && in_array('totp_setup', $challenge['methods'] ?? [], true)) {
+                return [(int) $challenge['user_id'], $setupToken];
+            }
+        }
+        return [$this->requireAuth(), null];
+    }
 
     /** GET auth/2fa/status */
     public function status(): JsonResponse
@@ -46,7 +71,7 @@ class TwoFactorController extends BaseApiController
     /** POST auth/2fa/setup */
     public function setup(): JsonResponse
     {
-        $userId = $this->requireAuth();
+        [$userId, $setupToken] = $this->resolveSetupUserId();
         $this->rateLimit('2fa_setup', 5, 300);
 
         if ($this->totpService->isEnabled($userId)) {
@@ -82,7 +107,7 @@ class TwoFactorController extends BaseApiController
     /** POST auth/2fa/verify */
     public function verify(): JsonResponse
     {
-        $userId = $this->requireAuth();
+        [$userId, $setupToken] = $this->resolveSetupUserId();
         $this->rateLimit('2fa_verify', 10, 300);
 
         $data = $this->getAllInput();
@@ -153,9 +178,48 @@ class TwoFactorController extends BaseApiController
             Log::warning('[2FA] Failed to send 2FA enabled email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
-        return $this->respondWithData([
-            'backup_codes' => $result['backup_codes'] ?? [],
-        ]);
+        // If we were authenticated via a 2FA setup token (first-time admin
+        // setup flow), consume the token and issue real access + refresh
+        // tokens so the admin lands on a fully authenticated session.
+        $issuedTokens = null;
+        if ($setupToken !== null) {
+            $this->challengeManager->consume($setupToken);
+
+            $userRow = User::query()->find($userId);
+            if ($userRow) {
+                $isMobile = false;
+                $accessToken = $this->tokenService->generateToken(
+                    (int) $userRow->id,
+                    (int) $userRow->tenant_id,
+                    [
+                        'role' => $userRow->role,
+                        'email' => $userRow->email,
+                        'is_super_admin' => !empty($userRow->is_super_admin),
+                        'is_tenant_super_admin' => !empty($userRow->is_tenant_super_admin),
+                    ],
+                    $isMobile
+                );
+                $refreshToken = $this->tokenService->generateRefreshToken(
+                    (int) $userRow->id,
+                    (int) $userRow->tenant_id,
+                    $isMobile
+                );
+                $issuedTokens = [
+                    'access_token' => $accessToken,
+                    'refresh_token' => $refreshToken,
+                    'token_type' => 'Bearer',
+                    'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
+                    'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
+                ];
+            }
+        }
+
+        $payload = ['backup_codes' => $result['backup_codes'] ?? []];
+        if ($issuedTokens !== null) {
+            $payload['login_complete'] = true;
+            $payload = array_merge($payload, $issuedTokens);
+        }
+        return $this->respondWithData($payload);
     }
 
     /** POST auth/2fa/disable */
