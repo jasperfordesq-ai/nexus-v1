@@ -86,8 +86,10 @@ interface AuthContextValue extends AuthState {
 interface LoginResult {
   success: boolean;
   requires2FA: boolean;
+  requires2FASetup?: boolean;
   error?: string;
   errorCode?: string;
+  retryAfter?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -224,6 +226,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         twoFactorMethods: twoFAData.methods || ['totp'],
       }));
       return { success: true, requires2FA: true };
+    }
+
+    // Admin without 2FA — store the setup-scoped token as the active
+    // access token so the existing /settings/security UI works for the
+    // first-time setup flow.
+    if (data && 'requires_2fa_setup' in data && (data as { requires_2fa_setup?: boolean }).requires_2fa_setup) {
+      const setupResp = data as { setup_token?: string; two_factor_token?: string };
+      const setupToken = setupResp.setup_token || setupResp.two_factor_token;
+      if (setupToken) {
+        tokenManager.setAccessToken(setupToken);
+      }
+      setState((prev) => ({ ...prev, status: 'idle', error: null }));
+      return { success: false, requires2FA: false, requires2FASetup: true, error: 'Two-factor authentication is required for administrator accounts.' };
     }
 
     // Login successful without 2FA

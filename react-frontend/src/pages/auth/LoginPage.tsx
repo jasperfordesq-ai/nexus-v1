@@ -244,6 +244,11 @@ export function LoginPage() {
     if (turnstileSiteKey && !turnstileToken) return;
 
     const result = await login({ email, password, turnstile_token: turnstileToken || undefined });
+    // Admin without 2FA — route directly into the setup flow.
+    if (!result.success && result.requires2FASetup) {
+      navigate(tenantPath('/settings/security?force_2fa_setup=1'), { replace: true });
+      return;
+    }
     if (!result.success && result.errorCode) {
       setLoginErrorCode(result.errorCode);
       // Extract retry_after seconds from 429 response
