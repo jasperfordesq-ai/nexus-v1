@@ -368,7 +368,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(RegistrationService::class, function ($app) {
-            return new RegistrationService(new User());
+            return new RegistrationService(
+                new User(),
+                $app->make(\App\Services\TenantSettingsService::class),
+                $app->make(\App\Services\TurnstileService::class),
+            );
         });
 
         $this->app->singleton(TokenService::class, function ($app) {
