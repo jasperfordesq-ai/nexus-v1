@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Loader2 from 'lucide-react/icons/loader-circle';
-import Info from 'lucide-react/icons/info';
+import { Info } from 'lucide-react';
 import type { PasswordCheckState } from '@/hooks/usePasswordCheck';
 import { PASSWORD_MIN_LENGTH } from '@/hooks/usePasswordCheck';
 
