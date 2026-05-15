@@ -33,6 +33,11 @@ class RegistrationController extends BaseApiController
         $data = $this->getAllInput();
         $tenantId = $this->getTenantId();
 
+        // Bot honeypot — normalise both `website` (Blade-style) and
+        // `honeypot` (explicit) into the same key the service checks.
+        // A non-empty value silently 200s without creating a user.
+        $data['honeypot'] = $data['honeypot'] ?? $data['website'] ?? null;
+
         $result = $this->registrationService->register($data, $tenantId);
 
         if (isset($result['error'])) {

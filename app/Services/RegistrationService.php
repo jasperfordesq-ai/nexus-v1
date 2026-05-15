@@ -13,6 +13,7 @@ use App\Core\Validator as NexusValidator;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\User;
+use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -29,15 +30,38 @@ class RegistrationService
 {
     public function __construct(
         private readonly User $user,
+        private readonly TenantSettingsService $tenantSettings,
     ) {}
 
     /**
      * Register a new user account.
      *
+     * Honeypot: if $data['honeypot'] is non-empty, the submission is treated as
+     * a bot probe — we silently return a success-shaped response without
+     * creating any DB row or firing any events. Real users never see the
+     * hidden field; bots that auto-fill every input give themselves away.
+     *
      * @return array Registration result with user data and status flags
      */
     public function register(array $data, int $tenantId): array
     {
+        // Bot honeypot — must run BEFORE validation so attackers can't
+        // distinguish "honeypot triggered" from "validation failed" via the
+        // error message returned. Mirrors the success response shape.
+        if (!empty($data['honeypot'])) {
+            Log::info('registration.honeypot_triggered', [
+                'tenant_id' => $tenantId,
+                'ip' => request()?->ip(),
+                'ua' => substr((string) request()?->userAgent(), 0, 200),
+                'honeypot_value' => substr((string) $data['honeypot'], 0, 100),
+            ]);
+            return [
+                'user' => null,
+                'requires_verification' => true,
+                'message' => __('emails_misc.registration.success_message'),
+            ];
+        }
+
         $validator = validator($data, [
             'first_name' => 'required|string|max:100',
             'last_name'  => 'required|string|max:100',
@@ -158,8 +182,16 @@ class RegistrationService
             return false;
         }
 
+        // Honour the tenant's admin_approval toggle. When ON, email
+        // verification clears the email-verify gate but the account stays
+        // pending until an admin promotes it (was previously promoted to
+        // 'active' unconditionally — the toggle's "must be approved before
+        // activation" label was effectively a no-op for the alpha frontend).
+        $requiresAdminApproval = $this->tenantSettings
+            ->requiresAdminApproval((int) $user->tenant_id);
+
         $user->update([
-            'status'             => 'active',
+            'status'             => $requiresAdminApproval ? 'pending' : 'active',
             'verification_token' => null,
             'email_verified_at'  => now(),
         ]);

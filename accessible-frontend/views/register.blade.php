@@ -25,6 +25,14 @@
 
             <form method="post" action="{{ route('govuk-alpha.register.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                 @csrf
+                {{-- Honeypot — hidden from real users (CSS off-screen + aria-hidden + tabindex=-1)
+                     but auto-filled by form-spam bots. RegistrationService::register() silently
+                     no-ops if this comes back non-empty. Do NOT use `display:none` — many bots
+                     skip those; off-screen positioning catches more. --}}
+                <div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
+                    <label for="website">Website (leave blank)</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" value="">
+                </div>
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="first_name">{{ __('govuk_alpha.auth.first_name_label') }}</label>
                     <input class="govuk-input govuk-!-width-two-thirds" id="first_name" name="first_name" type="text" autocomplete="given-name" required>

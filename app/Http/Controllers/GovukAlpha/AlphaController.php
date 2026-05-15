@@ -232,6 +232,9 @@ class AlphaController extends Controller
             'location' => $request->input('location'),
             'password' => $request->input('password'),
             'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
+            // Bot honeypot — hidden input in the Blade form. Real users
+            // never see or fill it; bots auto-fill everything.
+            'honeypot' => $request->input('website'),
         ], TenantContext::getId());
 
         if (isset($result['error'])) {

@@ -30,7 +30,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
         Route::get('/logout', [AlphaController::class, 'logout'])->name('logout');
         Route::get('/register', [AlphaController::class, 'register'])->name('register');
-        Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:30,1')->name('register.store');
+        Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:5,5')->name('register.store');
 
         Route::get('/dashboard', [AlphaController::class, 'dashboard'])->name('dashboard');
         Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
