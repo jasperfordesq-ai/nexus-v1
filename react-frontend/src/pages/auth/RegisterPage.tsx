@@ -84,8 +84,14 @@ export function RegisterPage() {
   // Bot protection
   const [formStartTime] = useState(() => Date.now());
   const honeypotRef = useRef<HTMLInputElement>(null);
-  // Cloudflare Turnstile — explicit render via shared hook.
-  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
+  // Cloudflare Turnstile — interaction-only widget via shared hook.
+  const {
+    token: turnstileToken,
+    status: turnstileStatus,
+    siteKey: turnstileSiteKey,
+    containerRef: turnstileRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   // Tenant state
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -388,13 +394,18 @@ export function RegisterPage() {
       }
       // No gates — redirect to dashboard (fully authenticated)
       navigate(tenantPath('/dashboard'), { replace: true });
+    } else if (turnstileSiteKey) {
+      // Turnstile tokens are single-use — reset the widget so the user can
+      // retry after fixing the validation issue (duplicate email, weak
+      // password, etc.) instead of being stuck with a consumed token.
+      resetTurnstile();
     }
   }, [
     formStartTime, clearError, password, passwordConfirm, tenants, selectedTenantId,
     tenant?.id, register, firstName, lastName, email, profileType, organizationName,
     location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
     requiresInviteCode, inviteCode, navigate, tenantPath,
-    turnstileSiteKey, turnstileToken,
+    turnstileSiteKey, turnstileToken, resetTurnstile,
   ]);
 
   const passwordValid = passwordCheck.isAcceptable;
@@ -891,7 +902,16 @@ export function RegisterPage() {
           {renderStepContent(4)}
 
           {/* Cloudflare Turnstile — explicit render via useTurnstile hook. */}
-          {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
+          {turnstileSiteKey && (
+            <div>
+              <div ref={turnstileRef} className="my-2 min-h-[1px]" />
+              {turnstileStatus === 'error' && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  {t('register.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+                </p>
+              )}
+            </div>
+          )}
 
           <Button
             type="submit"
@@ -1029,7 +1049,12 @@ export function RegisterPage() {
             steps. Explicit render via useTurnstile hook. */}
         {turnstileSiteKey && currentStep === 4 && (
           <div className="pt-2">
-            <div ref={turnstileRef} />
+            <div ref={turnstileRef} className="min-h-[1px]" />
+            {turnstileStatus === 'error' && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                {t('register.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+              </p>
+            )}
           </div>
         )}
       </form>

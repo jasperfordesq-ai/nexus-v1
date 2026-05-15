@@ -27,6 +27,7 @@
         $statusMessages = [
             'contact-failed' => __('govuk_alpha.contact.error_fallback'),
             'contact-rate-limited' => __('govuk_alpha.contact.rate_limited'),
+            'contact-turnstile-failed' => __('govuk_alpha.contact.turnstile_failed'),
         ];
         $subjectOptions = ['general', 'account', 'technical', 'feedback', 'other'];
     @endphp

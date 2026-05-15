@@ -188,7 +188,22 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-required']);
         }
 
-        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
+        // Surface the specific failure reason so the Blade page can show a
+        // useful message instead of a generic "login failed" for every code
+        // path (Turnstile, rate limit, suspended, unverified, etc.).
+        $errors = $payload['errors'] ?? [];
+        $code = (string) ($errors[0]['code'] ?? '');
+        $status = match (true) {
+            $code === 'TURNSTILE_FAILED'              => 'turnstile-failed',
+            $code === 'RATE_LIMIT_EXCEEDED',
+            $code === 'RATE_LIMITED'                  => 'rate-limited',
+            $code === 'AUTH_EMAIL_NOT_VERIFIED'       => 'email-not-verified',
+            $code === 'AUTH_PENDING_VERIFICATION'     => 'pending-verification',
+            $code === 'AUTH_ACCOUNT_SUSPENDED'        => 'account-suspended',
+            default                                    => 'login-failed',
+        };
+
+        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
     public function logout(Request $request, string $tenantSlug): RedirectResponse
@@ -245,7 +260,19 @@ class AlphaController extends Controller
         ], TenantContext::getId());
 
         if (isset($result['error'])) {
-            return redirect()->route('govuk-alpha.register', ['tenantSlug' => $tenantSlug, 'status' => 'register-failed']);
+            // Map service-level error codes to specific Blade statuses so the
+            // user sees a useful message ("the security check failed" vs "you
+            // already have an account") instead of a single generic prompt.
+            $code = (string) ($result['code'] ?? '');
+            $status = match (true) {
+                $code === 'TURNSTILE_FAILED'      => 'register-turnstile-failed',
+                $code === 'VALIDATION_DUPLICATE'  => 'register-duplicate',
+                $code === 'PASSWORD_PWNED'        => 'register-password-pwned',
+                $code === 'VALIDATION_ERROR'      => 'register-validation',
+                default                            => 'register-failed',
+            };
+            return redirect()->route('govuk-alpha.register', ['tenantSlug' => $tenantSlug, 'status' => $status])
+                ->withInput();
         }
 
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'register-created']);
@@ -331,7 +358,7 @@ class AlphaController extends Controller
         $turnstileToken = $request->input('cf-turnstile-response');
         if (! app(\App\Services\TurnstileService::class)->verify($turnstileToken, $request->ip())) {
             return redirect()
-                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-validation'])
+                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-turnstile-failed'])
                 ->withErrors(['turnstile' => __('api.turnstile_failed')])
                 ->withInput();
         }

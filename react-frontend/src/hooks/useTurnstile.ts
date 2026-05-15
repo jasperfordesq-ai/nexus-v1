@@ -35,12 +35,15 @@ interface TurnstileApi {
       sitekey: string;
       callback: (token: string) => void;
       theme?: 'light' | 'dark' | 'auto';
+      appearance?: 'always' | 'execute' | 'interaction-only';
       'error-callback'?: () => void;
       'expired-callback'?: () => void;
+      'timeout-callback'?: () => void;
     },
   ) => string;
   remove: (widgetId: string) => void;
   reset: (widgetId?: string) => void;
+  execute: (widgetId?: string) => void;
 }
 
 declare global {
@@ -52,14 +55,18 @@ declare global {
 const SCRIPT_ID = 'cf-turnstile-script';
 const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 
+export type TurnstileStatus = 'idle' | 'loading' | 'ready' | 'solved' | 'error';
+
 export function useTurnstile() {
   const [token, setToken] = useState<string>('');
+  const [status, setStatus] = useState<TurnstileStatus>('idle');
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
 
   useEffect(() => {
     if (!siteKey) return;
+    setStatus('loading');
 
     // Inject api.js once per page.
     if (!document.getElementById(SCRIPT_ID)) {
@@ -72,20 +79,48 @@ export function useTurnstile() {
     }
 
     let cancelled = false;
+    let attempts = 0;
     const tryRender = () => {
       if (cancelled) return;
-      if (!containerRef.current) return;
+      if (!containerRef.current) {
+        // Container not yet mounted — retry briefly, then give up.
+        if (attempts++ < 50) window.setTimeout(tryRender, 100);
+        else setStatus('error');
+        return;
+      }
       if (!window.turnstile) {
-        window.setTimeout(tryRender, 100);
+        if (attempts++ < 100) window.setTimeout(tryRender, 100);
+        else setStatus('error');
         return;
       }
       try {
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
-          callback: (t: string) => setToken(t),
+          // interaction-only: widget stays invisible for trusted clients and
+          // only renders a visible challenge when Cloudflare actually needs
+          // human input. Solves silently for ~99% of legitimate users so
+          // non-technical members never see a "Verify you are human" box.
+          appearance: 'interaction-only',
+          callback: (t: string) => {
+            setToken(t);
+            setStatus('solved');
+          },
           theme: 'auto',
-          'expired-callback': () => setToken(''),
+          'expired-callback': () => {
+            setToken('');
+            setStatus('ready');
+          },
+          'error-callback': () => {
+            setToken('');
+            setStatus('error');
+          },
+          'timeout-callback': () => {
+            setToken('');
+            setStatus('error');
+          },
         });
+        // Render succeeded — widget will either solve silently or prompt.
+        if (!cancelled && status !== 'solved') setStatus((s: TurnstileStatus) => (s === 'solved' ? s : 'ready'));
       } catch {
         // Already rendered or container detached — fall through silently.
       }
@@ -103,8 +138,22 @@ export function useTurnstile() {
       }
       widgetIdRef.current = null;
       setToken('');
+      setStatus('idle');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- status omitted intentionally; we don't want to re-render the widget on every state transition
   }, [siteKey]);
 
-  return { token, siteKey, containerRef };
+  const reset = () => {
+    if (widgetIdRef.current && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetIdRef.current);
+        setToken('');
+        setStatus('ready');
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  return { token, status, siteKey, containerRef, reset };
 }

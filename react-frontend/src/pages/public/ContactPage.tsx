@@ -64,7 +64,13 @@ export function ContactPage() {
   // pages because Cloudflare's api.js auto-discovery only scans the DOM
   // once on script load (no MutationObserver), so SPA-routed pages that
   // mount after that scan never get a widget rendered.
-  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
+  const {
+    token: turnstileToken,
+    status: turnstileStatus,
+    siteKey: turnstileSiteKey,
+    containerRef: turnstileRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -84,10 +90,14 @@ export function ContactPage() {
       if (response.success) {
         setSubmitted(true);
       } else {
+        // Turnstile token is single-use — reset so the user can retry without
+        // a stuck disabled submit button.
+        if (turnstileSiteKey) resetTurnstile();
         setError(response.error || t('contact.error_fallback'));
       }
     } catch (err) {
       logError('Failed to submit contact form', err);
+      if (turnstileSiteKey) resetTurnstile();
       setError(t('contact.error_fallback'));
     } finally {
       setIsSubmitting(false);
@@ -208,7 +218,16 @@ export function ContactPage() {
                 }}
               />
 
-              {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
+              {turnstileSiteKey && (
+                <div>
+                  <div ref={turnstileRef} className="my-2 min-h-[1px]" />
+                  {turnstileStatus === 'error' && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      {t('contact.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <Button
                 type="submit"

@@ -29,29 +29,58 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Cloudflare Turnstile — explicit render (see useTurnstile for why this
-  // is required on lazy-loaded SPA pages).
-  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
+  // Cloudflare Turnstile — interaction-only widget rendered via shared hook.
+  const {
+    token: turnstileToken,
+    status: turnstileStatus,
+    siteKey: turnstileSiteKey,
+    containerRef: turnstileRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     if (turnstileSiteKey && !turnstileToken) return;
 
-    try {
-      setIsLoading(true);
-      await api.post('/auth/forgot-password', {
-        email,
-        turnstile_token: turnstileToken || undefined,
-      });
+    setSubmitError(null);
+    setIsLoading(true);
+
+    const response = await api.post<{ message?: string }>('/auth/forgot-password', {
+      email,
+      turnstile_token: turnstileToken || undefined,
+    });
+
+    setIsLoading(false);
+    // Turnstile token is single-use — reset whether we succeeded or failed
+    // so the user can retry without being stuck with a consumed challenge.
+    if (turnstileSiteKey) resetTurnstile();
+
+    if (response.success) {
       setIsSubmitted(true);
-    } catch {
-      // Don't reveal if email exists or not for security
-      setIsSubmitted(true);
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    // Surface concrete failures so the user knows they should retry rather
+    // than waiting forever for an email that will never arrive.
+    if (response.code === 'RATE_LIMIT_EXCEEDED') {
+      setSubmitError(t('forgot_password.rate_limited', {
+        defaultValue: 'Too many reset attempts. Please wait an hour before trying again, or contact support.',
+      }));
+      return;
+    }
+    if (response.code === 'VALIDATION_INVALID_FORMAT' || response.code === 'TURNSTILE_FAILED') {
+      setSubmitError(t('forgot_password.turnstile_failed', {
+        defaultValue: 'The security check failed. Please reload the page and try again.',
+      }));
+      return;
+    }
+    // Generic fallthrough — show the message so the user has a chance to act.
+    setSubmitError(response.error || t('forgot_password.generic_error', {
+      defaultValue: "We couldn't process that request. Please try again, or email support if it persists.",
+    }));
   }
 
   if (isSubmitted) {
@@ -124,6 +153,15 @@ export function ForgotPasswordPage() {
             </p>
           </div>
 
+          {submitError && (
+            <div
+              role="alert"
+              className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400"
+            >
+              {submitError}
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
@@ -131,7 +169,7 @@ export function ForgotPasswordPage() {
               label={t('forgot_password.email_address_label')}
               placeholder={t('forgot_password.email_placeholder')}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setSubmitError(null); }}
               startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
@@ -141,7 +179,16 @@ export function ForgotPasswordPage() {
               isRequired
             />
 
-            {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
+            {turnstileSiteKey && (
+              <div>
+                <div ref={turnstileRef} className="my-2 min-h-[1px]" />
+                {turnstileStatus === 'error' && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    {t('forgot_password.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+                  </p>
+                )}
+              </div>
+            )}
 
             <Button
               type="submit"

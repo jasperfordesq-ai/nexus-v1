@@ -93,7 +93,7 @@ class AuthController extends BaseApiController
         if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
             return $this->authError(
                 __('api.turnstile_failed'),
-                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                ApiErrorCodes::TURNSTILE_FAILED,
                 422
             );
         }

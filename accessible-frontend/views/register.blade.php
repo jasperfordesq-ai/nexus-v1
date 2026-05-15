@@ -10,13 +10,22 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.register_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.auth.register_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
 
-            @if (($status ?? '') === 'register-failed')
+            @if (in_array($status ?? '', ['register-failed', 'register-turnstile-failed', 'register-duplicate', 'register-password-pwned', 'register-validation'], true))
+                @php
+                    $registerErrorMessage = match ($status) {
+                        'register-turnstile-failed' => __('govuk_alpha.auth.register_turnstile_failed'),
+                        'register-duplicate'        => __('govuk_alpha.auth.register_duplicate'),
+                        'register-password-pwned'   => __('govuk_alpha.auth.register_password_pwned'),
+                        'register-validation'       => __('govuk_alpha.auth.register_validation'),
+                        default                     => __('govuk_alpha.auth.register_failed'),
+                    };
+                @endphp
                 <div class="govuk-error-summary" data-module="govuk-error-summary">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
                             <ul class="govuk-list govuk-error-summary__list">
-                                <li><a href="#first_name">{{ __('govuk_alpha.auth.register_failed') }}</a></li>
+                                <li><a href="#first_name">{{ $registerErrorMessage }}</a></li>
                             </ul>
                         </div>
                     </div>

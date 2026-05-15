@@ -82,10 +82,16 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Cloudflare Turnstile — explicit render (see useTurnstile for why this
-  // is required: Cloudflare's auto-discovery scans the DOM once and never
-  // again, so SPA pages need to render the widget ourselves).
-  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
+  // Cloudflare Turnstile — explicit render in interaction-only mode. The
+  // widget stays invisible for legitimate users; only a tiny fraction get
+  // a visible challenge. See useTurnstile for the why behind explicit render.
+  const {
+    token: turnstileToken,
+    status: turnstileStatus,
+    siteKey: turnstileSiteKey,
+    containerRef: turnstileRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   // 2FA state
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -249,11 +255,15 @@ export function LoginPage() {
       navigate(tenantPath('/settings/security?force_2fa_setup=1'), { replace: true });
       return;
     }
-    if (!result.success && result.errorCode) {
-      setLoginErrorCode(result.errorCode);
-      // Extract retry_after seconds from 429 response
-      if (result.errorCode === 'RATE_LIMITED' || (result as { retryAfter?: number }).retryAfter) {
-        setLoginRetryAfter((result as { retryAfter?: number }).retryAfter ?? null);
+    if (!result.success) {
+      // Turnstile tokens are single-use — reset the widget on any failure so
+      // the user can retry without being stuck with a consumed token.
+      if (turnstileSiteKey) resetTurnstile();
+      if (result.errorCode) {
+        setLoginErrorCode(result.errorCode);
+        if (result.errorCode === 'RATE_LIMITED' || (result as { retryAfter?: number }).retryAfter) {
+          setLoginRetryAfter((result as { retryAfter?: number }).retryAfter ?? null);
+        }
       }
     }
   };
@@ -585,7 +595,16 @@ export function LoginPage() {
                       </Link>
                     </div>
 
-                    {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
+                    {turnstileSiteKey && (
+                      <div>
+                        <div ref={turnstileRef} className="my-2 min-h-[1px]" />
+                        {turnstileStatus === 'error' && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                            {t('login.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
+                          </p>
+                        )}
+                      </div>
+                    )}
 
                     <Button
                       type="submit"

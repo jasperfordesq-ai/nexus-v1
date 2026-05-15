@@ -37,7 +37,7 @@ class CoreController extends BaseApiController
             ?? $allInput['cfTurnstileResponse']
             ?? null;
         if (! app(\App\Services\TurnstileService::class)->verify($turnstileToken, request()?->ip())) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.turnstile_failed'), null, 422);
+            return $this->respondWithError(\App\Core\ApiErrorCodes::TURNSTILE_FAILED, __('api.turnstile_failed'), null, 422);
         }
 
         $name = trim($this->input('name', ''));

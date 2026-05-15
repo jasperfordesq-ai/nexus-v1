@@ -48,7 +48,16 @@ class RegistrationController extends BaseApiController
         $result = $this->registrationService->register($data, $tenantId);
 
         if (isset($result['error'])) {
-            return $this->respondWithError('REGISTRATION_FAILED', $result['error'], null, 422);
+            // Surface specific failure codes from the service so the frontend
+            // can distinguish Turnstile failures, validation errors, duplicate
+            // accounts, and pwned-password rejections — instead of one
+            // catch-all REGISTRATION_FAILED message.
+            return $this->respondWithError(
+                $result['code'] ?? 'REGISTRATION_FAILED',
+                $result['error'],
+                null,
+                (int) ($result['status'] ?? 422)
+            );
         }
 
         return $this->respondWithData($result, null, 201);

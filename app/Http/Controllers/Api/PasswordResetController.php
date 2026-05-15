@@ -55,7 +55,7 @@ class PasswordResetController extends BaseApiController
             ?? null;
         if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
             return $this->respondWithError(
-                ApiErrorCodes::VALIDATION_INVALID_FORMAT,
+                ApiErrorCodes::TURNSTILE_FAILED,
                 __('api.turnstile_failed'),
                 null,
                 422
@@ -74,13 +74,29 @@ class PasswordResetController extends BaseApiController
             );
         }
 
-        // Additional rate limit by email - 3 requests per hour
+        // Additional rate limit by email - 10 requests per hour. Bumped from
+        // 3/hr (2026-05-15) because legitimate users frustrated by typos or
+        // missing inbox delivery were silently rate-limited and never saw a
+        // reset email at all. Bots are caught by the per-IP throttle (5/min)
+        // and the Turnstile gate above, so the per-email cap exists only to
+        // prevent a single-account spam loop, not as a primary defence.
         $emailKey = 'forgot_password_email:' . strtolower($email);
-        if (!RateLimiter::attempt($emailKey, 3, 3600)) {
-            // Still return success to prevent enumeration
-            return $this->respondWithData([
-                'message' => __('api_controllers_2.password_reset.link_sent')
+        if (!RateLimiter::attempt($emailKey, 10, 3600)) {
+            $masked = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
+            Log::warning('[PasswordReset] per-email rate limit hit', [
+                'email_masked' => $masked,
+                'ip' => \App\Core\ClientIp::get(),
             ]);
+            // Surface the rate limit so the frontend can tell the user to wait
+            // rather than promising an email that will never arrive. This is
+            // safe against enumeration: the limiter triggers regardless of
+            // whether the email belongs to a real account.
+            return $this->respondWithError(
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                __('api.too_many_attempts'),
+                'email',
+                429
+            );
         }
 
         // Process reset request (don't reveal if user exists)
@@ -284,11 +300,18 @@ class PasswordResetController extends BaseApiController
      */
     private function processPasswordResetRequest(string $email): void
     {
+        $masked = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
         // Find user by email (check across all tenants for this operation)
         $user = User::findGlobalByEmail($email);
 
         if (!$user) {
-            // User doesn't exist, but we don't reveal this
+            // User doesn't exist, but we don't reveal this. Log so operators
+            // can diagnose "no email arrived" complaints — distinguishes
+            // "wrong email" from "mailer broken".
+            Log::info('[PasswordReset] reset requested for unknown email', [
+                'email_masked' => $masked,
+                'ip' => \App\Core\ClientIp::get(),
+            ]);
             return;
         }
 
@@ -361,9 +384,16 @@ class PasswordResetController extends BaseApiController
                 $subject = __('emails.password_reset.subject', ['community' => $tenantName]);
                 $mailer->send($email, $subject, $html);
             });
+            Log::info('[PasswordReset] reset email dispatched', [
+                'email_masked' => $masked,
+                'user_id' => $user['id'] ?? null,
+                'tenant_id' => $userTenantId,
+            ]);
         } catch (\Throwable $e) {
-            $maskedEmail = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
-            Log::warning('[PasswordReset] Password reset email failed for ' . $maskedEmail . ': ' . $e->getMessage());
+            Log::warning('[PasswordReset] Password reset email failed for ' . $masked . ': ' . $e->getMessage(), [
+                'user_id' => $user['id'] ?? null,
+                'tenant_id' => $userTenantId,
+            ]);
         }
     }
 

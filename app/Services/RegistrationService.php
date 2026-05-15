@@ -71,7 +71,11 @@ class RegistrationService
         // controller, which renders the form again so the user can retry.
         $turnstileToken = $data['turnstile_token'] ?? null;
         if (! $this->turnstile->verify($turnstileToken, request()?->ip())) {
-            return ['error' => __('api.turnstile_failed')];
+            return [
+                'error' => __('api.turnstile_failed'),
+                'code'  => \App\Core\ApiErrorCodes::TURNSTILE_FAILED,
+                'status' => 422,
+            ];
         }
 
         $validator = validator($data, [
@@ -101,14 +105,22 @@ class RegistrationService
 
         if ($validator->fails()) {
             $errors = $validator->errors()->first();
-            return ['error' => $errors];
+            return [
+                'error' => $errors,
+                'code'  => \App\Core\ApiErrorCodes::VALIDATION_ERROR,
+                'status' => 422,
+            ];
         }
 
         // Have I Been Pwned k-anonymity check — reject passwords that
         // appear in known breach corpora. Defends against credential-
         // stuffing in a way password complexity rules cannot.
         if ($this->pwnedPassword->isPwned((string) $data['password'])) {
-            return ['error' => __('api.password_pwned')];
+            return [
+                'error' => __('api.password_pwned'),
+                'code'  => 'PASSWORD_PWNED',
+                'status' => 422,
+            ];
         }
 
         $user = DB::transaction(function () use ($data, $tenantId) {
@@ -165,7 +177,11 @@ class RegistrationService
         }, 3);
 
         if ($user === null) {
-            return ['error' => __('emails_misc.registration.error_generic')];
+            return [
+                'error' => __('emails_misc.registration.error_generic'),
+                'code'  => \App\Core\ApiErrorCodes::VALIDATION_DUPLICATE,
+                'status' => 409,
+            ];
         }
 
         // Dispatch UserRegistered event (triggers welcome notification, etc.)

@@ -68,6 +68,8 @@ export interface RegisterResult {
   nextSteps?: string[];
   message?: string;
   error?: string;
+  /** Backend error code (TURNSTILE_FAILED, VALIDATION_DUPLICATE, REGISTRATION_FAILED, etc.) */
+  errorCode?: string;
 }
 
 interface AuthContextValue extends AuthState {
@@ -456,7 +458,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         status: 'error',
         error: response.error ?? 'Registration failed',
       }));
-      return { success: false, error: response.error ?? 'Registration failed' };
+      return {
+        success: false,
+        error: response.error ?? 'Registration failed',
+        errorCode: response.code,
+      };
     }
 
     const responseData = response.data as Record<string, unknown>;

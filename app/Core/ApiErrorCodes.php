@@ -128,6 +128,9 @@ class ApiErrorCodes
     /** Generic validation error */
     public const VALIDATION_ERROR = 'VALIDATION_ERROR';
 
+    /** Cloudflare Turnstile challenge failed or missing */
+    public const TURNSTILE_FAILED = 'TURNSTILE_FAILED';
+
     /** Value is too short */
     public const VALIDATION_TOO_SHORT = 'VALIDATION_TOO_SHORT';
 
@@ -267,6 +270,9 @@ class ApiErrorCodes
 
             // 413 Payload Too Large
             self::UPLOAD_TOO_LARGE => 413,
+
+            // 422 Unprocessable Entity
+            self::TURNSTILE_FAILED => 422,
 
             // 429 Too Many Requests
             self::RATE_LIMIT_EXCEEDED,

@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Cloudflare Turnstile rollout UX + silent-failure regressions (emergency).** Same-day hotfix to today's Turnstile/bot-defence rollout. Two valuable members reported real problems: one found the visible "Verify you are human" widget confusing and suspicious, another could not get a password reset email no matter how many times he tried.
+  - **Widget is now invisible for legitimate users.** Switched the Turnstile widget to `appearance: 'interaction-only'` (Cloudflare's silent-pass mode). The widget only renders visibly when Cloudflare actually decides a human challenge is needed — roughly 1% of legitimate sessions. The other 99% never see a widget at all.
+  - **Forgot-password no longer silently swallows errors.** The page previously caught every error and showed a fake "we've sent you an email" success message — including when a Turnstile failure or rate limit blocked the request. It now distinguishes Turnstile failures, rate-limit hits, and generic errors with distinct messages so users know to retry.
+  - **Per-email reset rate limit raised from 3/hr to 10/hr.** Legitimate users hitting the 3/hr ceiling silently got "we sent you an email" with no email ever sent. The cap now matches realistic usage; bots are still blocked by per-IP throttle (5/min) + Turnstile. The endpoint now returns a real 429 instead of fake success.
+  - **Single-use Turnstile tokens are reset on every failed submit** across login, register, forgot-password, and contact pages. Previously a failed validation locked the form because the consumed token couldn't be re-used until full page reload.
+  - **Backend uses a dedicated `TURNSTILE_FAILED` error code** (was wrongly reusing `VALIDATION_REQUIRED_FIELD` / `VALIDATION_INVALID_FORMAT`). All four API call sites updated.
+  - **Registration controller now passes specific error codes through** so the React UI can show "this password appears in known breaches" vs "an account already exists" vs "the security check failed" — instead of a single catch-all message.
+  - **GovUK Alpha Blade flows get the same treatment.** `storeLogin` and `storeRegister` now map API error codes to distinct page statuses (`turnstile-failed`, `rate-limited`, `email-not-verified`, `account-suspended`, `register-duplicate`, `register-password-pwned`, etc.) so the accessible frontend shows useful messages too.
+  - **Diagnostic logging added** to the password-reset flow: per-email rate hits, unknown-email reset requests, and successful email dispatches are now logged with masked email + IP. Distinguishes "wrong email" from "mailer broken" when investigating future complaints.
+  - **New optional `useTurnstile().status` + `useTurnstile().reset()`** for callers that need to react to widget load failures or reset after a failed submit.
+
 ### Added
 
 - **Prerender engine — Round 4: tests + retry + sitemap explorer.**

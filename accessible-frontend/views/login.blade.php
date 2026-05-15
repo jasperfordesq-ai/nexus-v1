@@ -10,16 +10,25 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.login_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.auth.login_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
 
-            @if (in_array($status ?? '', ['login-failed', 'two-factor-required'], true))
+            @if (in_array($status ?? '', ['login-failed', 'two-factor-required', 'turnstile-failed', 'rate-limited', 'email-not-verified', 'pending-verification', 'account-suspended'], true))
+                @php
+                    $loginErrorMessage = match ($status) {
+                        'two-factor-required'   => __('govuk_alpha.auth.two_factor_required'),
+                        'turnstile-failed'      => __('govuk_alpha.auth.turnstile_failed'),
+                        'rate-limited'          => __('govuk_alpha.auth.rate_limited'),
+                        'email-not-verified'    => __('govuk_alpha.auth.email_not_verified'),
+                        'pending-verification'  => __('govuk_alpha.auth.pending_verification'),
+                        'account-suspended'     => __('govuk_alpha.auth.account_suspended'),
+                        default                 => __('govuk_alpha.auth.login_failed'),
+                    };
+                @endphp
                 <div class="govuk-error-summary" data-module="govuk-error-summary">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
                             <ul class="govuk-list govuk-error-summary__list">
                                 <li>
-                                    <a href="#email">
-                                        {{ ($status ?? '') === 'two-factor-required' ? __('govuk_alpha.auth.two_factor_required') : __('govuk_alpha.auth.login_failed') }}
-                                    </a>
+                                    <a href="#email">{{ $loginErrorMessage }}</a>
                                 </li>
                             </ul>
                         </div>
