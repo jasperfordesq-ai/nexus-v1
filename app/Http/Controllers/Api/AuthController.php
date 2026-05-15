@@ -30,6 +30,7 @@ class AuthController extends BaseApiController
         private readonly TokenService $tokenService,
         private readonly TotpService $totpService,
         private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
+        private readonly \App\Services\TurnstileService $turnstile,
     ) {}
 
     /**
@@ -79,6 +80,21 @@ class AuthController extends BaseApiController
                 __('api.email_and_password_required'),
                 ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
                 400
+            );
+        }
+
+        // Cloudflare Turnstile gate (login). Rejects bots before they can
+        // even consume the per-IP/per-email rate budget. Verifier short-
+        // circuits to true when TURNSTILE_SECRET_KEY is unset (dev mode).
+        $turnstileToken = $data['turnstile_token']
+            ?? $data['cf-turnstile-response']
+            ?? $data['cfTurnstileResponse']
+            ?? null;
+        if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
+            return $this->authError(
+                __('api.turnstile_failed'),
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                422
             );
         }
 

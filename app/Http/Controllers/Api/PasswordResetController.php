@@ -29,6 +29,7 @@ class PasswordResetController extends BaseApiController
 
     public function __construct(
         private readonly TokenService $tokenService,
+        private readonly \App\Services\TurnstileService $turnstile,
     ) {}
 
     /** Token expiry in seconds (1 hour) */
@@ -42,6 +43,23 @@ class PasswordResetController extends BaseApiController
     {
         // Rate limit by IP - 5 requests per 15 minutes
         $this->rateLimit('forgot_password', 5, 900);
+
+        // Cloudflare Turnstile gate (forgot-password). Prevents bots from
+        // enumerating email addresses via the reset flow. Verifier short-
+        // circuits when TURNSTILE_SECRET_KEY is unset.
+        $allInput = $this->getAllInput();
+        $turnstileToken = $allInput['turnstile_token']
+            ?? $allInput['cf-turnstile-response']
+            ?? $allInput['cfTurnstileResponse']
+            ?? null;
+        if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_INVALID_FORMAT,
+                __('api.turnstile_failed'),
+                null,
+                422
+            );
+        }
 
         $email = $this->input('email');
 

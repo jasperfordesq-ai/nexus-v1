@@ -48,6 +48,14 @@
                     <input class="govuk-input" id="password" name="password" type="password" autocomplete="current-password" required>
                 </div>
 
+                @if($turnstileSiteKey ?? false)
+                    {{-- Cloudflare Turnstile — bot challenge on login. --}}
+                    <div class="govuk-form-group">
+                        <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="auto"></div>
+                    </div>
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                @endif
+
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.login_action') }}</button>
             </form>
 

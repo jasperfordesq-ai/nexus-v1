@@ -7,7 +7,7 @@
  * Forgot Password Page - Request password reset
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
@@ -28,14 +28,37 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
+
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+    const CB = '__nexusTurnstileForgotCb';
+    (window as unknown as Record<string, (t: string) => void>)[CB] = (token: string) => {
+      setTurnstileToken(token);
+    };
+    if (!document.getElementById('cf-turnstile-script')) {
+      const s = document.createElement('script');
+      s.id = 'cf-turnstile-script';
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+    return () => { setTurnstileToken(''); };
+  }, [turnstileSiteKey]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
+    if (turnstileSiteKey && !turnstileToken) return;
 
     try {
       setIsLoading(true);
-      await api.post('/auth/forgot-password', { email });
+      await api.post('/auth/forgot-password', {
+        email,
+        turnstile_token: turnstileToken || undefined,
+      });
       setIsSubmitted(true);
     } catch {
       // Don't reveal if email exists or not for security
@@ -132,11 +155,20 @@ export function ForgotPasswordPage() {
               isRequired
             />
 
+            {turnstileSiteKey && (
+              <div
+                className="cf-turnstile"
+                data-sitekey={turnstileSiteKey}
+                data-callback="__nexusTurnstileForgotCb"
+                data-theme="auto"
+              />
+            )}
+
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               isLoading={isLoading}
-              isDisabled={!email.trim()}
+              isDisabled={!email.trim() || (!!turnstileSiteKey && !turnstileToken)}
             >
               {t('forgot_password.send_button')}
             </Button>

@@ -138,6 +138,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'login',
             'status' => self::asStr($request->query('status')) ?: null,
+            'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
         ]);
     }
 
