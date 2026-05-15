@@ -4,25 +4,22 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Validation utilities for the NEXUS React frontend
+ * Validation utilities for the NEXUS React frontend.
  *
- * Password requirements must match backend (PasswordResetApiController.php):
- * - Minimum 12 characters
- * - At least one uppercase letter
- * - At least one lowercase letter
- * - At least one number
- * - At least one special character
+ * Password policy (aligned with NIST SP 800-63B, 2026 rewrite):
+ *   - 12 character minimum (length is the primary security signal).
+ *   - NO mandatory character classes — they push users to predictable
+ *     patterns and don't actually slow down attackers.
+ *   - Real defence is a Have I Been Pwned check (k-anonymity) run live
+ *     via the usePasswordCheck() hook. See src/hooks/usePasswordCheck.ts.
+ *
+ * Server-side mirror lives in:
+ *   - V1 PHP: app/Services/RegistrationService.php +
+ *     app/Http/Controllers/Api/PasswordResetController.php
+ *   - V2 .NET: src/Nexus.Api/Controllers/AuthController.cs
  */
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Constants - must match backend PasswordResetApiController
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const PASSWORD_MIN_LENGTH = 12;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Password Validation
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface PasswordRequirement {
   id: string;
@@ -30,92 +27,56 @@ export interface PasswordRequirement {
   test: (password: string) => boolean;
 }
 
+/**
+ * Single requirement: length. The live HIBP check that gates submission
+ * lives in usePasswordCheck() — it isn't a synchronous boolean, so it's
+ * intentionally not in this list.
+ */
 export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
   {
     id: 'length',
     label: 'auth.password_requirements.length',
     test: (p) => p.length >= PASSWORD_MIN_LENGTH,
   },
-  {
-    id: 'uppercase',
-    label: 'auth.password_requirements.uppercase',
-    test: (p) => /[A-Z]/.test(p),
-  },
-  {
-    id: 'lowercase',
-    label: 'auth.password_requirements.lowercase',
-    test: (p) => /[a-z]/.test(p),
-  },
-  {
-    id: 'number',
-    label: 'auth.password_requirements.number',
-    test: (p) => /[0-9]/.test(p),
-  },
-  {
-    id: 'special',
-    label: 'auth.password_requirements.special',
-    test: (p) => /[\W_]/.test(p),
-  },
 ];
 
 /**
- * Validate a password against all requirements
- *
- * @param password - The password to validate
- * @returns Array of error messages (empty if valid)
+ * Synchronous password validation — length only. The live HIBP check is
+ * asynchronous and gates submission separately (see usePasswordCheck).
  */
 export function validatePassword(password: string): string[] {
-  const errors: string[] = [];
-
-  for (const req of PASSWORD_REQUIREMENTS) {
-    if (!req.test(password)) {
-      errors.push(req.label);
-    }
-  }
-
-  return errors;
+  return password.length >= PASSWORD_MIN_LENGTH ? [] : ['auth.password_requirements.length'];
 }
 
 /**
- * Check if a password meets all requirements
- *
- * @param password - The password to check
- * @returns true if password is valid
+ * Synchronous "minimum bar" check — used by the form to enable the
+ * password-strength UI. Full acceptability also requires the HIBP check
+ * (handled by usePasswordCheck.isAcceptable).
  */
 export function isPasswordValid(password: string): boolean {
-  return PASSWORD_REQUIREMENTS.every((req) => req.test(password));
+  return password.length >= PASSWORD_MIN_LENGTH;
 }
 
 /**
- * Get the password strength as a percentage (0-100)
- *
- * @param password - The password to check
- * @returns Strength percentage
+ * Length-based strength indicator (0–100). Used for the visual progress
+ * bar in the password field. Caps at 100 once the minimum is exceeded by
+ * a healthy margin (20+ chars).
  */
 export function getPasswordStrength(password: string): number {
   if (!password) return 0;
-
-  const passedCount = PASSWORD_REQUIREMENTS.filter((req) =>
-    req.test(password)
-  ).length;
-
-  return Math.round((passedCount / PASSWORD_REQUIREMENTS.length) * 100);
+  const len = password.length;
+  if (len >= 20) return 100;
+  if (len >= PASSWORD_MIN_LENGTH) return 70 + Math.round(((len - PASSWORD_MIN_LENGTH) / (20 - PASSWORD_MIN_LENGTH)) * 30);
+  return Math.round((len / PASSWORD_MIN_LENGTH) * 60);
 }
 
-/**
- * Get password strength level for UI display
- *
- * @param password - The password to check
- * @returns 'weak' | 'fair' | 'good' | 'strong'
- */
 export function getPasswordStrengthLevel(
-  password: string
+  password: string,
 ): 'weak' | 'fair' | 'good' | 'strong' {
-  const strength = getPasswordStrength(password);
-
-  if (strength < 40) return 'weak';
-  if (strength < 60) return 'fair';
-  if (strength < 100) return 'good';
+  const s = getPasswordStrength(password);
+  if (s < 40) return 'weak';
+  if (s < 60) return 'fair';
+  if (s < 90) return 'good';
   return 'strong';
 }
 

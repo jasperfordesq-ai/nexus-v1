@@ -89,7 +89,11 @@ class RegistrationService
                     }
                 },
             ],
-            'password'   => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            // NIST SP 800-63B: length is the primary signal, character-class
+            // rules ARE NOT (they push users toward predictable patterns).
+            // Real defence is the HIBP breach check that runs immediately
+            // after this validator.
+            'password'   => ['required', 'string', Password::min(12)],
         ], [
             'location.required' => __('api.location_required'),
             'phone.required' => __('api.phone_required'),

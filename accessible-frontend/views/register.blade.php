@@ -59,11 +59,14 @@
                     <input class="govuk-input" id="location" name="location" type="text" autocomplete="address-level2" required>
                 </div>
 
-                <div class="govuk-form-group">
+                <div class="govuk-form-group" id="password-form-group">
                     <label class="govuk-label" for="password">{{ __('govuk_alpha.auth.password_label') }}</label>
                     <div id="password-hint" class="govuk-hint">{{ __('govuk_alpha.auth.password_hint') }}</div>
-                    <input class="govuk-input govuk-!-width-two-thirds" id="password" name="password" type="password" autocomplete="new-password" aria-describedby="password-hint" required>
+                    <input class="govuk-input govuk-!-width-two-thirds" id="password" name="password" type="password" autocomplete="new-password" aria-describedby="password-hint password-strength-msg" minlength="12" required>
+                    <p id="password-strength-msg" class="govuk-body-s govuk-!-margin-top-2" aria-live="polite"></p>
                 </div>
+
+                <script src="/assets/js/password-strength.js" defer></script>
 
                 <div class="govuk-form-group">
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">

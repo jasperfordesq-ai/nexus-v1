@@ -111,7 +111,7 @@ return [
     'valid_email_required'         => 'Valid email is required',
     'invalid_email'                => 'Invalid email',
     'email_already_exists'         => 'A user with this email already exists',
-    'password_min_length'          => 'Password must be at least 8 characters',
+    'password_min_length'          => 'Password must be at least 12 characters',
     'password_uppercase'           => 'Password must contain at least one uppercase letter',
     'password_lowercase'           => 'Password must contain at least one lowercase letter',
     'password_number'              => 'Password must contain at least one number',

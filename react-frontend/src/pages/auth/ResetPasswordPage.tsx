@@ -24,7 +24,8 @@ import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
-import { validatePassword, PASSWORD_REQUIREMENTS } from '@/lib/validation';
+import { usePasswordCheck } from '@/hooks/usePasswordCheck';
+import { PasswordStrength } from '@/components/auth/PasswordStrength';
 
 export function ResetPasswordPage() {
   const { t } = useTranslation('auth');
@@ -39,6 +40,8 @@ export function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  // Live password check — length + HIBP breach lookup.
+  const passwordCheck = usePasswordCheck(password);
   // Track whether the confirm-password field has been blurred so we only
   // show the mismatch error after the user has left the field (onBlur pattern).
   const [confirmTouched, setConfirmTouched] = useState(false);
@@ -73,10 +76,9 @@ export function ResetPasswordPage() {
     e.preventDefault();
     setError('');
 
-    // Validation - must match backend requirements (PasswordResetApiController)
-    const passwordErrors = validatePassword(password);
-    if (passwordErrors.length > 0) {
-      setError(t(passwordErrors[0] ?? ''));
+    // Validation — length + HIBP breach check via usePasswordCheck.
+    if (!passwordCheck.isAcceptable) {
+      setError(passwordCheck.message);
       return;
     }
     if (password !== confirmPassword) {
@@ -193,29 +195,10 @@ export function ResetPasswordPage() {
                 }}
                 isRequired
               />
-              {/* Password requirements checklist */}
-              {password && (
-                <ul className="mt-2 space-y-1 text-xs">
-                  {PASSWORD_REQUIREMENTS.map((req) => {
-                    const passed = req.test(password);
-                    return (
-                      <li
-                        key={req.id}
-                        className={`flex items-center gap-1.5 ${
-                          passed ? 'text-emerald-400' : 'text-theme-subtle'
-                        }`}
-                      >
-                        {passed ? (
-                          <Check className="w-3 h-3" />
-                        ) : (
-                          <X className="w-3 h-3" />
-                        )}
-                        {t(req.label)}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+              {/* Password strength — length + HIBP breach check */}
+              <div className="mt-2">
+                <PasswordStrength state={passwordCheck} />
+              </div>
             </div>
 
             <Input

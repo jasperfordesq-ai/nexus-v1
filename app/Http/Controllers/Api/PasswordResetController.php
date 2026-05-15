@@ -408,48 +408,19 @@ class PasswordResetController extends BaseApiController
      */
     private function validatePasswordStrength(string $password): array
     {
+        // NIST SP 800-63B aligned: enforce length only, no mandatory
+        // character classes. The HIBP breach check (called by the
+        // resetPassword handler immediately after this) is the meaningful
+        // defence; complexity rules push users to predictable patterns
+        // without slowing down attackers.
         $errors = [];
-
         if (strlen($password) < self::MIN_PASSWORD_LENGTH) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_TOO_SHORT,
                 'message' => __('api.password_min_length_generic', ['length' => self::MIN_PASSWORD_LENGTH]),
-                'field' => 'password'
+                'field' => 'password',
             ];
         }
-
-        if (!preg_match('/[A-Z]/', $password)) {
-            $errors[] = [
-                'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => __('api.password_uppercase'),
-                'field' => 'password'
-            ];
-        }
-
-        if (!preg_match('/[a-z]/', $password)) {
-            $errors[] = [
-                'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => __('api.password_lowercase'),
-                'field' => 'password'
-            ];
-        }
-
-        if (!preg_match('/[0-9]/', $password)) {
-            $errors[] = [
-                'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => __('api.password_number'),
-                'field' => 'password'
-            ];
-        }
-
-        if (!preg_match('/[\W_]/', $password)) {
-            $errors[] = [
-                'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => __('api.password_special_char'),
-                'field' => 'password'
-            ];
-        }
-
         return $errors;
     }
 
