@@ -65,6 +65,9 @@ class RegistrationService
         }
 
         $user = DB::transaction(function () use ($data, $tenantId) {
+            // Retried up to 3x by the outer DB::transaction(..., 3) call below
+            // to recover from MySQL 1213 deadlocks under registration spikes
+            // (Fixes NEXUS-PHP-M).
             // Check uniqueness inside the transaction to prevent race conditions
             // where two concurrent registrations with the same email both pass the check
             $exists = $this->user->newQuery()
@@ -112,7 +115,7 @@ class RegistrationService
             $user->save();
 
             return $user;
-        });
+        }, 3);
 
         if ($user === null) {
             return ['error' => __('emails_misc.registration.error_generic')];
