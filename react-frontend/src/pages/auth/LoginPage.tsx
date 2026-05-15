@@ -30,6 +30,7 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldX from 'lucide-react/icons/shield-x';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import { GlassCard } from '@/components/ui';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { PageMeta } from '@/components/seo';
@@ -81,27 +82,10 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Cloudflare Turnstile — bot challenge on login (credential-stuffing
-  // defence). Widget renders when VITE_TURNSTILE_SITE_KEY is configured;
-  // server-side verifier short-circuits when secret key is unset.
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
-  useEffect(() => {
-    if (!turnstileSiteKey) return;
-    const CB = '__nexusTurnstileLoginCb';
-    (window as unknown as Record<string, (t: string) => void>)[CB] = (token: string) => {
-      setTurnstileToken(token);
-    };
-    if (!document.getElementById('cf-turnstile-script')) {
-      const s = document.createElement('script');
-      s.id = 'cf-turnstile-script';
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async = true;
-      s.defer = true;
-      document.head.appendChild(s);
-    }
-    return () => { setTurnstileToken(''); };
-  }, [turnstileSiteKey]);
+  // Cloudflare Turnstile — explicit render (see useTurnstile for why this
+  // is required: Cloudflare's auto-discovery scans the DOM once and never
+  // again, so SPA pages need to render the widget ourselves).
+  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
 
   // 2FA state
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -596,14 +580,7 @@ export function LoginPage() {
                       </Link>
                     </div>
 
-                    {turnstileSiteKey && (
-                      <div
-                        className="cf-turnstile"
-                        data-sitekey={turnstileSiteKey}
-                        data-callback="__nexusTurnstileLoginCb"
-                        data-theme="auto"
-                      />
-                    )}
+                    {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
 
                     <Button
                       type="submit"

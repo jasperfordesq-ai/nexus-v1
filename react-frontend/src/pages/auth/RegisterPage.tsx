@@ -39,6 +39,7 @@ import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
@@ -82,8 +83,8 @@ export function RegisterPage() {
   // Bot protection
   const [formStartTime] = useState(() => Date.now());
   const honeypotRef = useRef<HTMLInputElement>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
+  // Cloudflare Turnstile — explicit render via shared hook.
+  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
 
   // Tenant state
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -150,25 +151,7 @@ export function RegisterPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Cloudflare Turnstile — load api.js once, register callback that writes
-  // the token into state. Widget only rendered when site key is set, so
-  // dev/CI builds without a key skip the effect entirely.
-  useEffect(() => {
-    if (!turnstileSiteKey) return;
-    const CB = '__nexusTurnstileCb';
-    (window as unknown as Record<string, (t: string) => void>)[CB] = (token: string) => {
-      setTurnstileToken(token);
-    };
-    if (!document.getElementById('cf-turnstile-script')) {
-      const s = document.createElement('script');
-      s.id = 'cf-turnstile-script';
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async = true;
-      s.defer = true;
-      document.head.appendChild(s);
-    }
-    return () => { setTurnstileToken(''); };
-  }, [turnstileSiteKey]);
+  // Cloudflare Turnstile widget mount + token state handled by useTurnstile() above.
 
   // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
@@ -939,17 +922,8 @@ export function RegisterPage() {
           {renderStepContent(3)}
           {renderStepContent(4)}
 
-          {/* Cloudflare Turnstile — rendered only when VITE_TURNSTILE_SITE_KEY
-              is configured. Widget mounts via api.js script loaded in the
-              useEffect above and writes the token via __nexusTurnstileCb. */}
-          {turnstileSiteKey && (
-            <div
-              className="cf-turnstile"
-              data-sitekey={turnstileSiteKey}
-              data-callback="__nexusTurnstileCb"
-              data-theme="auto"
-            />
-          )}
+          {/* Cloudflare Turnstile — explicit render via useTurnstile hook. */}
+          {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
 
           <Button
             type="submit"
@@ -1084,15 +1058,10 @@ export function RegisterPage() {
 
         {/* Cloudflare Turnstile — only on the final step so the challenge
             resolves close to submission and doesn't expire during earlier
-            steps. */}
+            steps. Explicit render via useTurnstile hook. */}
         {turnstileSiteKey && currentStep === 4 && (
           <div className="pt-2">
-            <div
-              className="cf-turnstile"
-              data-sitekey={turnstileSiteKey}
-              data-callback="__nexusTurnstileCb"
-              data-theme="auto"
-            />
+            <div ref={turnstileRef} />
           </div>
         )}
       </form>

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { useApi, useMutation, usePaginatedApi } from './useApi';
+export { useTurnstile } from './useTurnstile';
 export { useAuth } from '../contexts/AuthContext';
 export { useApiErrorHandler } from './useApiErrorHandler';
 export { usePageTitle } from './usePageTitle';

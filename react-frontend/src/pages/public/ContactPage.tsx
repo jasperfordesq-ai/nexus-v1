@@ -9,7 +9,8 @@
  * Uses V2 API: POST /api/v2/contact
  */
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
@@ -59,25 +60,11 @@ export function ContactPage() {
     message: '',
   });
 
-  // Cloudflare Turnstile — bot challenge on contact submissions.
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
-  useEffect(() => {
-    if (!turnstileSiteKey) return;
-    const CB = '__nexusTurnstileContactCb';
-    (window as unknown as Record<string, (t: string) => void>)[CB] = (token: string) => {
-      setTurnstileToken(token);
-    };
-    if (!document.getElementById('cf-turnstile-script')) {
-      const s = document.createElement('script');
-      s.id = 'cf-turnstile-script';
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async = true;
-      s.defer = true;
-      document.head.appendChild(s);
-    }
-    return () => { setTurnstileToken(''); };
-  }, [turnstileSiteKey]);
+  // Cloudflare Turnstile — explicit-render hook. Required for lazy-loaded
+  // pages because Cloudflare's api.js auto-discovery only scans the DOM
+  // once on script load (no MutationObserver), so SPA-routed pages that
+  // mount after that scan never get a widget rendered.
+  const { token: turnstileToken, siteKey: turnstileSiteKey, containerRef: turnstileRef } = useTurnstile();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -221,14 +208,7 @@ export function ContactPage() {
                 }}
               />
 
-              {turnstileSiteKey && (
-                <div
-                  className="cf-turnstile"
-                  data-sitekey={turnstileSiteKey}
-                  data-callback="__nexusTurnstileContactCb"
-                  data-theme="auto"
-                />
-              )}
+              {turnstileSiteKey && <div ref={turnstileRef} className="my-2" />}
 
               <Button
                 type="submit"
