@@ -32,6 +32,7 @@ class RegistrationService
         private readonly User $user,
         private readonly TenantSettingsService $tenantSettings,
         private readonly TurnstileService $turnstile,
+        private readonly PwnedPasswordService $pwnedPassword,
     ) {}
 
     /**
@@ -97,6 +98,13 @@ class RegistrationService
         if ($validator->fails()) {
             $errors = $validator->errors()->first();
             return ['error' => $errors];
+        }
+
+        // Have I Been Pwned k-anonymity check — reject passwords that
+        // appear in known breach corpora. Defends against credential-
+        // stuffing in a way password complexity rules cannot.
+        if ($this->pwnedPassword->isPwned((string) $data['password'])) {
+            return ['error' => __('api.password_pwned')];
         }
 
         $user = DB::transaction(function () use ($data, $tenantId) {

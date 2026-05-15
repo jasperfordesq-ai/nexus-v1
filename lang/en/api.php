@@ -127,6 +127,7 @@ return [
     'label_required'               => 'Label is required',
     'location_required'            => 'Location is required',
     'turnstile_failed'              => 'We could not verify that you are human. Please retry the challenge and submit again.',
+    'password_pwned'                => 'This password appears in a known data breach and cannot be used. Please choose a different password.',
     'subject_required'             => 'Subject is required',
     'status_required'              => 'Status is required',
     'reason_required'              => 'A reason is required',

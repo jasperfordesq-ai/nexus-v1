@@ -30,6 +30,7 @@ class PasswordResetController extends BaseApiController
     public function __construct(
         private readonly TokenService $tokenService,
         private readonly \App\Services\TurnstileService $turnstile,
+        private readonly \App\Services\PwnedPasswordService $pwnedPassword,
     ) {}
 
     /** Token expiry in seconds (1 hour) */
@@ -146,6 +147,17 @@ class PasswordResetController extends BaseApiController
         $passwordErrors = $this->validatePasswordStrength($password);
         if (!empty($passwordErrors)) {
             return $this->respondWithErrors($passwordErrors, 400);
+        }
+
+        // HIBP check — reject if the chosen new password appears in known
+        // breach corpora. Same rule as registration.
+        if ($this->pwnedPassword->isPwned($password)) {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.password_pwned'),
+                'password',
+                422
+            );
         }
 
         // Find and validate the reset token

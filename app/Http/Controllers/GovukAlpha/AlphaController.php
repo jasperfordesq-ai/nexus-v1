@@ -319,12 +319,22 @@ class AlphaController extends Controller
             'activeNav' => 'contact',
             'status' => self::asStr($request->query('status')) ?: null,
             'contactUser' => $user ? (array) $user : null,
+            'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
         ]);
     }
 
     public function storeContact(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+
+        // Cloudflare Turnstile gate on contact form submissions.
+        $turnstileToken = $request->input('cf-turnstile-response');
+        if (! app(\App\Services\TurnstileService::class)->verify($turnstileToken, $request->ip())) {
+            return redirect()
+                ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-validation'])
+                ->withErrors(['turnstile' => __('api.turnstile_failed')])
+                ->withInput();
+        }
 
         $name = trim(self::asStr($request->input('name')));
         $email = trim(self::asStr($request->input('email')));

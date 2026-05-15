@@ -29,6 +29,17 @@ class CoreController extends BaseApiController
     {
         $this->rateLimit('contact_form', 5, 60);
 
+        // Cloudflare Turnstile gate. Verifier short-circuits when
+        // TURNSTILE_SECRET_KEY is unset (dev mode).
+        $allInput = $this->getAllInput();
+        $turnstileToken = $allInput['turnstile_token']
+            ?? $allInput['cf-turnstile-response']
+            ?? $allInput['cfTurnstileResponse']
+            ?? null;
+        if (! app(\App\Services\TurnstileService::class)->verify($turnstileToken, request()?->ip())) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.turnstile_failed'), null, 422);
+        }
+
         $name = trim($this->input('name', ''));
         $email = trim($this->input('email', ''));
         $subject = trim($this->input('subject', 'General Inquiry'));

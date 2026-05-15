@@ -126,6 +126,14 @@
                         </div>
                     </fieldset>
 
+                    @if($turnstileSiteKey ?? false)
+                        {{-- Cloudflare Turnstile bot challenge --}}
+                        <div class="govuk-form-group">
+                            <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="auto"></div>
+                        </div>
+                        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                    @endif
+
                     <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.contact.form.submit') }}</button>
 
                     @if (!($isAuthenticated ?? false))
