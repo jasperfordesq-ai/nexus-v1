@@ -73,6 +73,7 @@ services:
         VITE_PUSHER_CLUSTER: ${PUSHER_CLUSTER:-eu}
         VITE_GIPHY_API_KEY: ${GIPHY_API_KEY:-}
         VITE_STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+        VITE_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
         BUILD_COMMIT: ${BUILD_COMMIT:-candidate}
     image: nexus-react-prod:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-react
