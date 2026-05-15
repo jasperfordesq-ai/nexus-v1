@@ -66,6 +66,14 @@ class AuthController extends BaseApiController
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
+        // Defensive coercion: attackers send email[]=foo to break type-hinted helpers.
+        if (!is_string($email)) {
+            $email = '';
+        }
+        if (!is_string($password)) {
+            $password = '';
+        }
+
         if (empty($email) || empty($password)) {
             return $this->authError(
                 __('api.email_and_password_required'),

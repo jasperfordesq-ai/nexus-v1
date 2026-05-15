@@ -51,6 +51,22 @@ class AlphaController extends Controller
         private readonly RegistrationService $registrationService,
     ) {}
 
+    /**
+     * Safely coerce a request value to a string, returning the default when
+     * the value is an array or non-scalar (e.g. attacker passes `?q[]=foo`).
+     * Avoids PHP "Array to string conversion" warnings reported via Sentry.
+     */
+    private static function asStr(mixed $value, string $default = ''): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value) || is_bool($value)) {
+            return (string) $value;
+        }
+        return $default;
+    }
+
     public function tenantChooser(): Response|RedirectResponse
     {
         $tenant = TenantContext::get();
@@ -104,7 +120,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'home',
             'isAuthenticated' => $this->currentUserId() !== null,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
             'modules' => [
                 'feed' => TenantContext::hasModule('feed'),
                 'listings' => TenantContext::hasModule('listings'),
@@ -121,7 +137,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.auth.login_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'login',
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -200,7 +216,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.auth.register_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -269,7 +285,7 @@ class AlphaController extends Controller
             'profileStats' => $this->profileStats($profile),
             'feedItems' => $feedItems,
             'listings' => $listings,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -291,7 +307,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.contact.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'contact',
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
             'contactUser' => $user ? (array) $user : null,
         ]);
     }
@@ -300,9 +316,9 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
 
-        $name = trim((string) $request->input('name', ''));
-        $email = trim((string) $request->input('email', ''));
-        $message = trim((string) $request->input('message', ''));
+        $name = trim(self::asStr($request->input('name')));
+        $email = trim(self::asStr($request->input('email')));
+        $message = trim(self::asStr($request->input('message')));
 
         $errors = [];
         if ($name === '') {
@@ -325,7 +341,7 @@ class AlphaController extends Controller
         $request->merge([
             'name' => $name,
             'email' => $email,
-            'subject' => trim((string) $request->input('subject', '')) ?: 'General Inquiry',
+            'subject' => trim(self::asStr($request->input('subject'))) ?: 'General Inquiry',
             'message' => $message,
         ]);
 
@@ -426,7 +442,7 @@ class AlphaController extends Controller
             'activeNav' => 'events',
             'event' => $event,
             'requiresAuth' => $this->currentUserId() === null,
-            'status' => request()->query('status'),
+            'status' => self::asStr(request()->query('status')) ?: null,
         ]);
     }
 
@@ -603,7 +619,7 @@ class AlphaController extends Controller
             'activeNav' => 'volunteering',
             'opportunity' => $opportunity,
             'requiresAuth' => $this->currentUserId() === null,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -619,7 +635,7 @@ class AlphaController extends Controller
 
         try {
             VolunteerService::apply($id, $userId, [
-                'message' => trim((string) $request->input('message', '')),
+                'message' => trim(self::asStr($request->input('message'))),
                 'shift_id' => $request->input('shift_id') ? (int) $request->input('shift_id') : null,
             ]);
         } catch (\Throwable $e) {
@@ -651,7 +667,7 @@ class AlphaController extends Controller
             'logs' => VolunteerService::getMyHours($userId, ['limit' => 10])['items'] ?? [],
             'organizations' => $this->volunteeringHourOrganizations($organizations, $applications),
             'applications' => $applications,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -671,7 +687,7 @@ class AlphaController extends Controller
                 'opportunity_id' => $request->input('opportunity_id') ? (int) $request->input('opportunity_id') : null,
                 'date' => $request->input('date'),
                 'hours' => (float) $request->input('hours'),
-                'description' => trim((string) $request->input('description', '')),
+                'description' => trim(self::asStr($request->input('description'))),
             ]);
         } catch (\Throwable $e) {
             report($e);
@@ -707,7 +723,7 @@ class AlphaController extends Controller
                     'type' => $type,
                     'mode' => $mode === 'recent' ? 'recent' : 'ranked',
                     'subtype' => $subtype,
-                    'cursor' => $request->query('cursor'),
+                    'cursor' => self::asStr($request->query('cursor')) ?: null,
                 ]);
                 $items = $this->attachPostMedia($result['items'] ?? []);
                 $meta = [
@@ -733,7 +749,7 @@ class AlphaController extends Controller
             'selectedSubtype' => $subtype,
             'requiresAuth' => $userId === null,
             'error' => $error,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -745,7 +761,7 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
         }
 
-        $content = trim((string) $request->input('content', ''));
+        $content = trim(self::asStr($request->input('content')));
         if ($content === '') {
             return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-empty']);
         }
@@ -797,7 +813,7 @@ class AlphaController extends Controller
         }
 
         $targetType = $this->normalizeFeedTargetType($type);
-        $content = trim((string) $request->input('content', ''));
+        $content = trim(self::asStr($request->input('content')));
 
         if ($content === '') {
             return $this->redirectToFeed($request, $tenantSlug, 'comment-empty', $targetType, $id);
@@ -1082,7 +1098,7 @@ class AlphaController extends Controller
             'exchangeWorkflowEnabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'activeExchange' => $userId && !$isOwner ? ExchangeWorkflowService::getActiveExchangeForListing($userId, $id) : null,
-            'status' => request()->query('status'),
+            'status' => self::asStr(request()->query('status')) ?: null,
         ]);
     }
 
@@ -1113,7 +1129,7 @@ class AlphaController extends Controller
             'activeNav' => 'exchanges',
             'listing' => $listing,
             'config' => BrokerControlConfigService::getConfig('exchange_workflow'),
-            'status' => request()->query('status'),
+            'status' => self::asStr(request()->query('status')) ?: null,
         ]);
     }
 
@@ -1143,7 +1159,7 @@ class AlphaController extends Controller
             $exchangeId = ExchangeWorkflowService::createRequest($userId, $listingId, [
                 'proposed_hours' => $hours,
                 'prep_time' => $prepTime !== null && $prepTime !== '' ? (float) $prepTime : null,
-                'message' => trim((string) $request->input('message', '')) ?: null,
+                'message' => trim(self::asStr($request->input('message'))) ?: null,
             ]);
         } catch (\Throwable $e) {
             report($e);
@@ -1171,8 +1187,9 @@ class AlphaController extends Controller
         if ($status) {
             $filters['status'] = $status;
         }
-        if ($request->query('cursor')) {
-            $filters['cursor'] = $request->query('cursor');
+        $cursorParam = self::asStr($request->query('cursor'));
+        if ($cursorParam !== '') {
+            $filters['cursor'] = $cursorParam;
         }
 
         $result = app(ExchangeService::class)->getAll($userId, $filters);
@@ -1208,7 +1225,7 @@ class AlphaController extends Controller
             'activeNav' => 'exchanges',
             'exchange' => $exchange,
             'history' => ExchangeWorkflowService::getExchangeHistory($id),
-            'status' => request()->query('status'),
+            'status' => self::asStr(request()->query('status')) ?: null,
             'currentUserId' => $userId,
         ]);
     }
@@ -1232,11 +1249,11 @@ class AlphaController extends Controller
         try {
             $ok = match ($action) {
                 'accept' => ExchangeWorkflowService::acceptRequest($id, $userId),
-                'decline' => ExchangeWorkflowService::declineRequest($id, $userId, trim((string) $request->input('reason', ''))),
+                'decline' => ExchangeWorkflowService::declineRequest($id, $userId, trim(self::asStr($request->input('reason')))),
                 'start' => ExchangeWorkflowService::startProgress($id, $userId),
                 'complete' => ExchangeWorkflowService::markReadyForConfirmation($id, $userId),
                 'confirm' => ExchangeWorkflowService::confirmCompletion($id, $userId, max(0.25, min(24, (float) $request->input('hours', 0)))),
-                'cancel' => ExchangeWorkflowService::cancelExchange($id, $userId, trim((string) $request->input('reason', ''))),
+                'cancel' => ExchangeWorkflowService::cancelExchange($id, $userId, trim(self::asStr($request->input('reason')))),
                 default => false,
             };
         } catch (\Throwable $e) {
@@ -1263,7 +1280,7 @@ class AlphaController extends Controller
         $result = MessageService::getConversations($userId, [
             'limit' => 20,
             'archived' => $showArchived,
-            'cursor' => $request->query('cursor'),
+            'cursor' => self::asStr($request->query('cursor')) ?: null,
         ]);
 
         return $this->view('accessible-frontend::messages', [
@@ -1275,7 +1292,7 @@ class AlphaController extends Controller
             'showArchived' => $showArchived,
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($userId),
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
             'currentUserId' => $userId,
         ]);
     }
@@ -1294,7 +1311,7 @@ class AlphaController extends Controller
 
         $result = MessageService::getMessages($userId, $currentUserId, [
             'limit' => 50,
-            'cursor' => $request->query('cursor'),
+            'cursor' => self::asStr($request->query('cursor')) ?: null,
         ]);
         MessageService::markAsRead($userId, $currentUserId);
 
@@ -1311,7 +1328,7 @@ class AlphaController extends Controller
             'messages' => array_reverse($result['items'] ?? []),
             'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
             'listing' => $listing,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
             'currentUserId' => $currentUserId,
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($currentUserId),
@@ -1327,7 +1344,7 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $body = trim((string) $request->input('body', ''));
+        $body = trim(self::asStr($request->input('body')));
         if ($body === '') {
             return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-empty']);
         }
@@ -1443,7 +1460,7 @@ class AlphaController extends Controller
             'profile' => $profile,
             'displayName' => $displayName,
             'isOwnProfile' => $id === $viewerId,
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
             'profileStats' => $this->profileStats($profile),
             'profileListings' => $this->profileListings($id),
             'profileSkills' => $this->profileSkills($id, $profile),
@@ -1470,7 +1487,7 @@ class AlphaController extends Controller
             'activeNav' => 'profile',
             'profile' => $profile,
             'displayName' => $this->profileDisplayName($profile),
-            'status' => $request->query('status'),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -1487,14 +1504,14 @@ class AlphaController extends Controller
         $privacyProfile = $this->allowed($request->input('privacy_profile', 'public'), ['public', 'members', 'connections'], 'public');
 
         $data = [
-            'first_name' => trim((string) $request->input('first_name', '')),
-            'last_name' => trim((string) $request->input('last_name', '')),
-            'phone' => trim((string) $request->input('phone', '')),
+            'first_name' => trim(self::asStr($request->input('first_name'))),
+            'last_name' => trim(self::asStr($request->input('last_name'))),
+            'phone' => trim(self::asStr($request->input('phone'))),
             'profile_type' => $profileType,
-            'organization_name' => trim((string) $request->input('organization_name', '')),
-            'tagline' => trim((string) $request->input('tagline', '')),
-            'bio' => trim((string) $request->input('bio', '')),
-            'location' => trim((string) $request->input('location', '')),
+            'organization_name' => trim(self::asStr($request->input('organization_name'))),
+            'tagline' => trim(self::asStr($request->input('tagline'))),
+            'bio' => trim(self::asStr($request->input('bio'))),
+            'location' => trim(self::asStr($request->input('location'))),
         ];
 
         if (!$this->profileSettingsInputIsValid($data)) {
@@ -1902,10 +1919,10 @@ class AlphaController extends Controller
         ];
 
         $filters = [
-            'search' => trim((string) $request->query('q', '')) ?: null,
+            'search' => trim(self::asStr($request->query('q'))) ?: null,
             'type' => $type,
-            'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
-            'cursor' => $request->query('cursor'),
+            'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
+            'cursor' => self::asStr($request->query('cursor')) ?: null,
             'hours' => $hours,
             'service' => $service,
             'posted' => $posted,
@@ -1935,24 +1952,24 @@ class AlphaController extends Controller
     private function eventFilters(Request $request): array
     {
         return [
-            'search' => trim((string) $request->query('q', '')) ?: null,
+            'search' => trim(self::asStr($request->query('q'))) ?: null,
             'when' => $this->allowed($request->query('when', 'upcoming'), ['upcoming', 'past', 'all'], 'upcoming'),
-            'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
-            'cursor' => $request->query('cursor'),
+            'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
+            'cursor' => self::asStr($request->query('cursor')) ?: null,
         ];
     }
 
     private function eventInput(Request $request): array
     {
-        $maxAttendees = trim((string) $request->input('max_attendees', ''));
-        $location = trim((string) $request->input('location', ''));
-        $onlineLink = trim((string) $request->input('online_link', ''));
-        $endTime = trim((string) $request->input('end_time', ''));
-        $categoryId = $request->input('category_id');
+        $maxAttendees = trim(self::asStr($request->input('max_attendees')));
+        $location = trim(self::asStr($request->input('location')));
+        $onlineLink = trim(self::asStr($request->input('online_link')));
+        $endTime = trim(self::asStr($request->input('end_time')));
+        $categoryId = self::asStr($request->input('category_id'));
 
         return [
-            'title' => trim((string) $request->input('title', '')),
-            'description' => trim((string) $request->input('description', '')),
+            'title' => trim(self::asStr($request->input('title'))),
+            'description' => trim(self::asStr($request->input('description'))),
             'start_time' => $request->input('start_time'),
             'end_time' => $endTime !== '' ? $endTime : null,
             'location' => $location !== '' ? $location : null,
@@ -1966,10 +1983,10 @@ class AlphaController extends Controller
     private function volunteeringFilters(Request $request): array
     {
         return [
-            'search' => trim((string) $request->query('q', '')) ?: null,
-            'category_id' => $request->query('category_id') ? (int) $request->query('category_id') : null,
+            'search' => trim(self::asStr($request->query('q'))) ?: null,
+            'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
             'is_remote' => $request->boolean('is_remote') ? true : null,
-            'cursor' => $request->query('cursor'),
+            'cursor' => self::asStr($request->query('cursor')) ?: null,
         ];
     }
 
@@ -2007,9 +2024,9 @@ class AlphaController extends Controller
     private function memberFilters(Request $request): array
     {
         return [
-            'q' => trim((string) $request->query('q', '')),
+            'q' => trim(self::asStr($request->query('q'))),
             'sort' => $this->allowed($request->query('sort', 'name'), ['name', 'joined', 'rating', 'hours_given'], 'name'),
-            'order' => $this->allowed(strtoupper((string) $request->query('order', 'ASC')), ['ASC', 'DESC'], 'ASC'),
+            'order' => $this->allowed(strtoupper(self::asStr($request->query('order'))), ['ASC', 'DESC'], 'ASC'),
             'limit' => $this->intQuery($request, 'limit', 20, 1, 100),
             'offset' => $this->intQuery($request, 'offset', 0, 0, 100000),
         ];

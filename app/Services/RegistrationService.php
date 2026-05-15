@@ -48,7 +48,7 @@ class RegistrationService
                 'string',
                 'max:30',
                 function (string $attribute, mixed $value, \Closure $fail): void {
-                    if (!NexusValidator::isPhone((string) $value)) {
+                    if (!is_string($value) || !NexusValidator::isPhone($value)) {
                         $fail(__('api.phone_invalid'));
                     }
                 },

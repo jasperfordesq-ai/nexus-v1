@@ -75,7 +75,7 @@ class EventService
             });
         }
 
-        if ($cursor !== null) {
+        if (is_string($cursor)) {
             $cursorId = base64_decode($cursor, true);
             if ($cursorId !== false) {
                 $query->where('id', '<', (int) $cursorId);
@@ -654,7 +654,7 @@ class EventService
         }
 
         $cursorId = null;
-        if ($cursor) {
+        if (is_string($cursor) && $cursor !== '') {
             $decoded = base64_decode($cursor, true);
             if ($decoded && is_numeric($decoded)) {
                 $cursorId = (int) $decoded;

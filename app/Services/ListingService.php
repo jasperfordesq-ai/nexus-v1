@@ -101,7 +101,7 @@ class ListingService
 
             // Decode Meilisearch offset cursor (format: "meili:<offset>")
             $meiliOffset = 0;
-            if ($cursor !== null) {
+            if (is_string($cursor)) {
                 $decoded = base64_decode($cursor, true);
                 if ($decoded !== false && str_starts_with($decoded, 'meili:')) {
                     $meiliOffset = (int) substr($decoded, 6);
@@ -314,7 +314,7 @@ class ListingService
         }
 
         // Cursor pagination (ID-based, descending)
-        if ($cursor !== null) {
+        if (is_string($cursor)) {
             $cursorId = base64_decode($cursor, true);
             if ($cursorId !== false) {
                 $query->where('id', '<', (int) $cursorId);
@@ -723,7 +723,7 @@ class ListingService
         // Decode offset cursor (format: "nearby:<offset>")
         $offset = 0;
         $cursor = $filters['cursor'] ?? null;
-        if ($cursor !== null) {
+        if (is_string($cursor)) {
             $decoded = base64_decode($cursor, true);
             if ($decoded !== false && str_starts_with($decoded, 'nearby:')) {
                 $offset = (int) substr($decoded, 7);

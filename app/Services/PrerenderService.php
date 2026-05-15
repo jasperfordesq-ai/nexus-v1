@@ -187,8 +187,15 @@ class PrerenderService
         $events = $this->tailEvents(1);
         $contentStale = $this->contentStalenessCounts($inventory);
 
-        $activeJobs = (int) DB::table('prerender_jobs')->whereIn('status', ['claimed', 'running'])->count();
-        $queuedJobs = (int) DB::table('prerender_jobs')->where('status', 'queued')->count();
+        // Tolerate the prerender_jobs table being absent — the migration may
+        // not have run yet (e.g. fresh deploys). Treat as "no jobs" instead of
+        // hard-500'ing the admin dashboard.
+        $activeJobs = 0;
+        $queuedJobs = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('prerender_jobs')) {
+            $activeJobs = (int) DB::table('prerender_jobs')->whereIn('status', ['claimed', 'running'])->count();
+            $queuedJobs = (int) DB::table('prerender_jobs')->where('status', 'queued')->count();
+        }
 
         return [
             'cache_readable'        => $this->cacheReadable(),
@@ -945,6 +952,9 @@ class PrerenderService
 
     public function listJobs(int $limit = 50, ?string $status = null): array
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('prerender_jobs')) {
+            return [];
+        }
         $q = DB::table('prerender_jobs as j')
             ->leftJoin('users as u', 'u.id', '=', 'j.requested_by')
             ->leftJoin('tenants as t', 't.id', '=', 'j.tenant_id')

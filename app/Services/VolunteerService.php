@@ -71,7 +71,7 @@ class VolunteerService
             });
         }
 
-        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('id', '<', (int) $cid);
         }
 
@@ -391,7 +391,7 @@ class VolunteerService
             ->whereNotNull('a.shift_id')
             ->select('s.*', 'o.title as opportunity_title', 'o.location', 'a.id as application_id');
 
-        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('s.id', '<', (int) $cid);
         }
 
@@ -423,7 +423,7 @@ class VolunteerService
             ->with(['organization:id,name', 'opportunity:id,title'])
             ->where('user_id', $userId);
 
-        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('id', '<', (int) $cid);
         }
 
@@ -533,7 +533,7 @@ class VolunteerService
             });
         }
 
-        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('id', '<', (int) $cid);
         }
 
