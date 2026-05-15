@@ -217,6 +217,9 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
             'status' => self::asStr($request->query('status')) ?: null,
+            // Site key is public — embedded in the HTML. Empty string
+            // hides the widget so dev/CI without a key still works.
+            'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
         ]);
     }
 
@@ -235,6 +238,9 @@ class AlphaController extends Controller
             // Bot honeypot — hidden input in the Blade form. Real users
             // never see or fill it; bots auto-fill everything.
             'honeypot' => $request->input('website'),
+            // Cloudflare Turnstile challenge token (cf-turnstile-response
+            // hidden input rendered by the widget).
+            'turnstile_token' => $request->input('cf-turnstile-response'),
         ], TenantContext::getId());
 
         if (isset($result['error'])) {

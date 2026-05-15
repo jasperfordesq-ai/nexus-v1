@@ -74,6 +74,19 @@
                     </div>
                 </div>
 
+                @if($turnstileSiteKey)
+                    {{-- Cloudflare Turnstile challenge. Renders an invisible
+                         or interactive bot-check; the resolved token is posted
+                         back as a `cf-turnstile-response` hidden input which
+                         the server verifies via siteverify. Without the site
+                         key (dev/CI) the widget is omitted entirely and the
+                         server-side TurnstileService no-ops. --}}
+                    <div class="govuk-form-group">
+                        <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="auto"></div>
+                    </div>
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                @endif
+
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.register_action') }}</button>
             </form>
 

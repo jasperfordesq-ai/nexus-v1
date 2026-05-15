@@ -31,6 +31,7 @@ class RegistrationService
     public function __construct(
         private readonly User $user,
         private readonly TenantSettingsService $tenantSettings,
+        private readonly TurnstileService $turnstile,
     ) {}
 
     /**
@@ -60,6 +61,16 @@ class RegistrationService
                 'requires_verification' => true,
                 'message' => __('emails_misc.registration.success_message'),
             ];
+        }
+
+        // Cloudflare Turnstile verification. Token is the cf-turnstile-response
+        // hidden input rendered by the widget on the client. Service no-ops
+        // (returns true) when TURNSTILE_SECRET_KEY is unset, so dev/CI work
+        // unchanged. A returned `error` field surfaces the failure to the
+        // controller, which renders the form again so the user can retry.
+        $turnstileToken = $data['turnstile_token'] ?? null;
+        if (! $this->turnstile->verify($turnstileToken, request()?->ip())) {
+            return ['error' => __('api.turnstile_failed')];
         }
 
         $validator = validator($data, [

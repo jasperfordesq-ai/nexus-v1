@@ -38,6 +38,13 @@ class RegistrationController extends BaseApiController
         // A non-empty value silently 200s without creating a user.
         $data['honeypot'] = $data['honeypot'] ?? $data['website'] ?? null;
 
+        // Cloudflare Turnstile token. Accept both the form field name
+        // (`cf-turnstile-response`) and a JSON-friendly variant.
+        $data['turnstile_token'] = $data['turnstile_token']
+            ?? $data['cf-turnstile-response']
+            ?? $data['cfTurnstileResponse']
+            ?? null;
+
         $result = $this->registrationService->register($data, $tenantId);
 
         if (isset($result['error'])) {
