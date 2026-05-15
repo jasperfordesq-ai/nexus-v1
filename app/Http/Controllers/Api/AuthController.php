@@ -195,8 +195,11 @@ class AuthController extends BaseApiController
             // with method='totp_setup' so the TwoFactorController endpoints can
             // distinguish the setup flow from a normal verify flow.
             $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
-            $isAdminAccount = ($user['role'] ?? '') === 'admin'
-                || ($user['role'] ?? '') === 'super_admin'
+            // Admin-level roles in V1 are: admin, tenant_admin, org_admin,
+            // super_admin (rare). Plus the is_super_admin / is_tenant_super_admin
+            // boolean flags can elevate a member-role user. Keep this list in
+            // sync with the route guards if new admin roles are added.
+            $isAdminAccount = in_array(($user['role'] ?? ''), ['admin', 'tenant_admin', 'org_admin', 'super_admin'], true)
                 || !empty($user['is_super_admin'])
                 || !empty($user['is_tenant_super_admin']);
 
