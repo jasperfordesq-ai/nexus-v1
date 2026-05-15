@@ -65,6 +65,28 @@ class SecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
+        // Telemetry: log array-shaped query params (?email[]=x, ?cursor[]=…).
+        // These are the fingerprint of the type-juggling bot that hit /admin/alpha/*
+        // on 2026-05-14 (see V1 commit 07005a057 + Sentry NEXUS-PHP-G..Q). The
+        // hardening already coerces these to '' so they're harmless to the app,
+        // but logging them gives us intent telemetry without depending on Sentry
+        // catching a crash. info-level only — do not page on it.
+        $arrayParams = [];
+        foreach ($request->query->all() as $k => $v) {
+            if (is_array($v)) {
+                $arrayParams[] = $k;
+            }
+        }
+        if ($arrayParams !== []) {
+            \Illuminate\Support\Facades\Log::info('security.array_query_params', [
+                'path' => $request->path(),
+                'method' => $request->method(),
+                'ip' => $request->ip(),
+                'ua' => substr((string) $request->userAgent(), 0, 200),
+                'params' => $arrayParams,
+            ]);
+        }
+
         // Generate a per-request nonce for CSP script-src. Blade templates can
         // read this via $request->attributes->get('csp_nonce') or the shared
         // 'cspNonce' view variable and emit <script nonce="{{ $cspNonce }}">.
