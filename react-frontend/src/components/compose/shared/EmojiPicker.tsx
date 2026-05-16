@@ -101,7 +101,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
           <Smile className="w-4 h-4" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-2">
+      <PopoverContent className="w-72 p-2 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         {/* Search */}
         <Input
           size="sm"

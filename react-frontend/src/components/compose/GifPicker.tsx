@@ -101,7 +101,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
           <Film className="w-4 h-4" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-2">
+      <PopoverContent className="w-80 p-2 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         {/* Search input */}
         <Input
           size="sm"

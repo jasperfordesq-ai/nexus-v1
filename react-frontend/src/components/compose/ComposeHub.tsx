@@ -172,7 +172,7 @@ export function ComposeHub({
         size="2xl"
         scrollBehavior="inside"
         classNames={{
-          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] max-h-[85vh]',
+          base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] max-h-[85vh]',
           wrapper: 'items-center',
           backdrop: 'bg-black/60 backdrop-blur-sm',
           body: 'px-6',

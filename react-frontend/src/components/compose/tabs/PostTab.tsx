@@ -349,7 +349,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
                 <Calendar className="w-5 h-5" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-4 w-72 space-y-3">
+            <PopoverContent className="p-4 w-72 space-y-3 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
               <p className="text-sm font-medium text-[var(--text-primary)]">{t('compose.schedule_label')}</p>
               <DatePicker
                 label={t('compose.schedule_date_label')}

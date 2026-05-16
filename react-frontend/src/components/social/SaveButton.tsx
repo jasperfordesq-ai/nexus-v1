@@ -191,7 +191,7 @@ export function SaveButton({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="p-2 min-w-[240px]">
+      <PopoverContent className="p-2 min-w-[240px] bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         <div className="w-full">
           <p className="text-xs font-semibold uppercase tracking-wider px-2 pt-1 pb-2 text-[var(--text-muted)]">
             {t('collections.save_to')}

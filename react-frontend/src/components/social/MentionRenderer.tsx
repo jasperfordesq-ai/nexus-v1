@@ -108,7 +108,7 @@ function MentionLink({
           {linkContent}
         </span>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className="bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         <div className="p-3 flex items-center gap-3 max-w-[200px]">
           <Avatar
             name={displayName}

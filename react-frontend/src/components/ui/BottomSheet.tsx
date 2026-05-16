@@ -64,7 +64,7 @@ export function BottomSheet({
       backdrop="blur"
       hideCloseButton
       classNames={{
-        base: `bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-t-2xl sm:rounded-2xl ${maxHeightClass} overflow-hidden ${className}`,
+        base: `bg-[var(--surface-dropdown)] border border-[var(--border-default)] rounded-t-2xl sm:rounded-2xl ${maxHeightClass} overflow-hidden ${className}`,
         backdrop: 'bg-black/60 backdrop-blur-sm',
         wrapper: 'sm:items-center items-end',
       }}

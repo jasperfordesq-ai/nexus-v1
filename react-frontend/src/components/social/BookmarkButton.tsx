@@ -158,7 +158,7 @@ export function BookmarkButton({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -4 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="absolute top-full right-0 mt-2 z-50 rounded-xl bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20 p-1"
+            className="absolute top-full right-0 mt-2 z-50 rounded-xl bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl shadow-black/20 p-1"
           >
             <BookmarkCollectionPicker
               selectedId={collectionId}

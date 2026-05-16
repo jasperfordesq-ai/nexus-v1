@@ -322,7 +322,7 @@ export function PostDetailPage() {
           setReportReason('');
         }}
         classNames={{
-          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+          base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)]',
           backdrop: 'bg-black/60 backdrop-blur-sm',
         }}
       >

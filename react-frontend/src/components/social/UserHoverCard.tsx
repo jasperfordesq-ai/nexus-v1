@@ -202,7 +202,7 @@ export const UserHoverCard = memo(function UserHoverCard({
         </span>
       </PopoverTrigger>
       <PopoverContent
-        className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[280px]"
+        className="p-0 !bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[280px]"
         onMouseEnter={handlePopoverMouseEnter}
         onMouseLeave={handlePopoverMouseLeave}
       >

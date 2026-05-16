@@ -49,7 +49,7 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           <Info className="w-3.5 h-3.5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-3 max-w-[240px]">
+      <PopoverContent className="p-3 max-w-[240px] bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         <p className="text-xs font-semibold text-[var(--text-primary)] mb-2">
           {t('why_shown.title')}
         </p>
