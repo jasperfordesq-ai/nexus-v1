@@ -28,6 +28,9 @@ class RegistrationControllerTest extends TestCase
         RateLimiter::clear('api:registration:ip:::1');
         RateLimiter::clear('register_success_ip:127.0.0.1');
         RateLimiter::clear('register_success_ip:::1');
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId);
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId . ':ttl');
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_hourly:' . $this->testTenantId);
     }
 
     // ------------------------------------------------------------------
@@ -57,7 +60,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser@example.com',
+            'email' => 'newuser@gmail.com',
         ]);
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
@@ -68,7 +71,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -82,7 +85,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -96,7 +99,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'phone' => 'not-a-phone',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -111,7 +114,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -131,7 +134,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -152,7 +155,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'StrongPassword123!',
@@ -173,7 +176,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => '555',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -266,7 +269,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
@@ -285,13 +288,13 @@ class RegistrationControllerTest extends TestCase
     public function test_register_rejects_when_tenant_breaker_tripped(): void
     {
         // Trip the breaker directly via the cache key the service reads.
-        \Illuminate\Support\Facades\Cache::put('register_tenant_breaker:1', true, 3600);
+        \Illuminate\Support\Facades\Cache::put('register_tenant_breaker:' . $this->testTenantId, true, 3600);
 
         try {
             $response = $this->apiPost('/v2/auth/register', [
                 'first_name' => 'Test',
                 'last_name' => 'User',
-                'email' => 'newuser-' . uniqid() . '@example.com',
+                'email' => 'newuser-' . uniqid() . '@gmail.com',
                 'location' => 'Toronto, Canada',
                 'phone' => '+15551234567',
                 'password' => 'StrongPassword123!',
@@ -306,8 +309,8 @@ class RegistrationControllerTest extends TestCase
             $body = json_decode((string) $response->getContent(), true);
             $this->assertSame('REGISTRATION_TENANT_PAUSED', $body['errors'][0]['code'] ?? null);
         } finally {
-            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:1');
-            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:1:ttl');
+            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId);
+            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId . ':ttl');
         }
     }
 
@@ -316,7 +319,7 @@ class RegistrationControllerTest extends TestCase
         $response = $this->apiPost('/v2/auth/register', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@example.com',
+            'email' => 'newuser-' . uniqid() . '@gmail.com',
             'location' => 'Anywhere',
             'phone' => '+15551234567',
             'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',

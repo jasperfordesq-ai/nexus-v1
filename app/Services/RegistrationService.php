@@ -252,6 +252,21 @@ class RegistrationService
             ];
         }
 
+        // Password confirmation match — cheap local check, runs BEFORE any
+        // DNS / external lookups so a user who typo'd their password gets a
+        // useful inline error instead of an opaque email-domain rejection.
+        // Optional field: a client that omits it bypasses this check, but
+        // both first-party frontends include it.
+        if (array_key_exists('password_confirmation', $data)) {
+            if ((string) ($data['password_confirmation'] ?? '') !== (string) $data['password']) {
+                return [
+                    'error' => __('api.password_mismatch'),
+                    'code'  => 'PASSWORD_MISMATCH',
+                    'status' => 422,
+                ];
+            }
+        }
+
         // Reject disposable / throwaway email domains (mailinator, 10minutemail,
         // tempmail, etc.). Removes the cheapest bot-signup path: no inbox to
         // pay for, no SMS to pay for = zero cost per registration. Forcing
@@ -286,22 +301,6 @@ class RegistrationService
                 'code'  => 'EMAIL_DOMAIN_INVALID',
                 'status' => 422,
             ];
-        }
-
-        // Password confirmation match — the frontend forms collect a confirm
-        // field; enforce it server-side so a scripted submission can't skip.
-        // The `password_confirmation` field is optional (a client that omits
-        // it bypasses this check) — make it required when ANY password
-        // confirmation value is sent, AND require the field whenever the
-        // request looks like a normal form submission.
-        if (array_key_exists('password_confirmation', $data)) {
-            if ((string) ($data['password_confirmation'] ?? '') !== (string) $data['password']) {
-                return [
-                    'error' => __('api.password_mismatch'),
-                    'code'  => 'PASSWORD_MISMATCH',
-                    'status' => 422,
-                ];
-            }
         }
 
         // Have I Been Pwned k-anonymity check — reject passwords that
