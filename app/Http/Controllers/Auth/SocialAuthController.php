@@ -94,7 +94,7 @@ class SocialAuthController extends Controller
 
     public function callback(Request $request, string $provider)
     {
-        $frontend = rtrim((string) config('app.frontend_url', env('FRONTEND_URL', 'https://app.project-nexus.ie')), '/');
+        $frontend = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
         try {
             $state = (string) ($request->input('state') ?? '');

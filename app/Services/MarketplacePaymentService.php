@@ -920,7 +920,7 @@ class MarketplacePaymentService
     {
         $client = StripeService::client();
 
-        $frontendBase = rtrim(env('REACT_FRONTEND_URL', env('APP_URL', 'https://app.project-nexus.ie')), '/');
+        $frontendBase = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
         try {
             $accountLink = $client->accountLinks->create([

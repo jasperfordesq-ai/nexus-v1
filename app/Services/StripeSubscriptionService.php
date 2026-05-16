@@ -257,7 +257,7 @@ class StripeSubscriptionService
             throw new \RuntimeException("Tenant {$tenantId} has no Stripe customer — subscribe to a plan first");
         }
 
-        $frontendBase = rtrim(env('REACT_FRONTEND_URL', env('APP_URL', 'https://app.project-nexus.ie')), '/');
+        $frontendBase = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
         try {
             $client = StripeService::client();
