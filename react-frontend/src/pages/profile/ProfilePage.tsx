@@ -751,6 +751,15 @@ export function ProfilePage() {
                     {!isOwnProfile && isAuthenticated && profile.id ? (
                       <VereinCrossInvitationButton userId={profile.id} />
                     ) : null}
+                    {hasWallet && isAuthenticated && (
+                      <Button
+                        color="secondary"
+                        startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => setIsTransferModalOpen(true)}
+                      >
+                        {t('send_credits')}
+                      </Button>
+                    )}
                     {isAuthenticated && (
                       <Dropdown>
                         <DropdownTrigger>
@@ -762,7 +771,6 @@ export function ProfilePage() {
                           aria-label={t('profile_actions')}
                           onAction={(key) => {
                             if (key === 'review') setIsReviewModalOpen(true);
-                            if (key === 'credits') setIsTransferModalOpen(true);
                             if (key === 'disconnect') setIsDisconnectConfirmOpen(true);
                             if (key === 'block') setIsBlockConfirmOpen(true);
                           }}
@@ -770,11 +778,6 @@ export function ProfilePage() {
                           {hasReviews ? (
                             <DropdownItem key="review" startContent={<Star className="w-4 h-4" />}>
                               {t('write_review')}
-                            </DropdownItem>
-                          ) : null}
-                          {hasWallet ? (
-                            <DropdownItem key="credits" startContent={<ArrowUpRight className="w-4 h-4" />}>
-                              {t('send_credits')}
                             </DropdownItem>
                           ) : null}
                           {hasConnections && connectionStatus === 'connected' ? (
