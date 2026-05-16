@@ -32,6 +32,7 @@ import { useDisclosure } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -736,6 +737,11 @@ export function JobDetailPage() {
 
   const deadlineDate = vacancy.deadline ? new Date(vacancy.deadline) : null;
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
+  const vacancySocial = vacancy as JobVacancy & {
+    is_liked?: boolean;
+    likes_count?: number;
+    comments_count?: number;
+  };
 
   return (
     <>
@@ -815,6 +821,18 @@ export function JobDetailPage() {
               qualificationData={qualificationData}
               onCheckQualification={handleCheckQualification}
             />
+
+            <GlassCard className="p-4 sm:p-5">
+              <SocialInteractionPanel
+                targetType="job"
+                targetId={vacancy.id}
+                initialLiked={vacancySocial.is_liked ?? false}
+                initialLikesCount={vacancySocial.likes_count ?? 0}
+                initialCommentsCount={vacancySocial.comments_count ?? 0}
+                title={vacancy.title}
+                description={vacancy.description}
+              />
+            </GlassCard>
 
             {/* Apply button (mobile) */}
             <div className="lg:hidden">

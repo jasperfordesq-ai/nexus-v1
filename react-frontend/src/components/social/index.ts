@@ -16,6 +16,9 @@ export { MostAppreciatedWidget } from './MostAppreciatedWidget';
 export { CommentsSection } from './CommentsSection';
 export type { CommentsSectionProps } from './CommentsSection';
 
+export { SocialInteractionPanel } from './SocialInteractionPanel';
+export type { SocialInteractionPanelProps } from './SocialInteractionPanel';
+
 export { LikersModal } from './LikersModal';
 export type { LikersModalProps } from './LikersModal';
 

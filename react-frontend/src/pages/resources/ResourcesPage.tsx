@@ -51,6 +51,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -80,6 +81,9 @@ interface Resource {
     name: string;
     color: string;
   } | null;
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
 }
 
 interface ResourceCategory {
@@ -833,6 +837,17 @@ export function ResourcesPage() {
                         )}
                       </div>
                     </div>
+                    <SocialInteractionPanel
+                      targetType="resource"
+                      targetId={resource.id}
+                      initialLiked={resource.is_liked ?? false}
+                      initialLikesCount={resource.likes_count ?? 0}
+                      initialCommentsCount={resource.comments_count ?? 0}
+                      title={resource.title}
+                      description={resource.description}
+                      className="mt-3"
+                      compact
+                    />
                   </GlassCard>
                 </motion.div>
               ))}

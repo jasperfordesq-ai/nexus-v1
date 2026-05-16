@@ -25,6 +25,10 @@
     "open": "Open",
     "closed": "Closed"
   },
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  },
   "tabs": {
     "open": "Open",
     "closed": "Closed",

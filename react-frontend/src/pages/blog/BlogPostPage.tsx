@@ -4,23 +4,18 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Blog Post Detail Page - Single blog article view with comments
+ * Blog Post Detail Page - Single blog article view with shared social comments
  *
  * Uses V2 API: GET /api/v2/blog/{slug}
- * Uses V2 API: GET /api/v2/comments?target_type=blog&target_id={id}
- * Uses V2 API: POST /api/v2/comments
- * Uses V2 API: POST /api/v2/comments/{id}/reactions
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Button,
-  Input,
   Chip,
   Avatar,
-  Textarea,
 } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -29,27 +24,18 @@ import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageCircle from 'lucide-react/icons/message-circle';
-import Send from 'lucide-react/icons/send';
-import ChevronDown from 'lucide-react/icons/chevron-down';
-import ChevronUp from 'lucide-react/icons/chevron-up';
-import Reply from 'lucide-react/icons/reply';
-import Smile from 'lucide-react/icons/smile';
-import Heart from 'lucide-react/icons/heart';
-import ThumbsUp from 'lucide-react/icons/thumbs-up';
-import ThumbsDown from 'lucide-react/icons/thumbs-down';
-import Laugh from 'lucide-react/icons/laugh';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Breadcrumbs } from '@/components/navigation';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { SocialInteractionPanel } from '@/components/social';
+import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -81,24 +67,9 @@ interface BlogPostDetail {
     name: string;
     color: string;
   } | null;
-}
-
-interface CommentAuthor {
-  id: number;
-  name: string;
-  avatar: string | null;
-}
-
-interface BlogComment {
-  id: number;
-  content: string;
-  created_at: string;
-  edited: boolean;
-  is_own: boolean;
-  author: CommentAuthor;
-  reactions: Record<string, number>;
-  user_reactions: string[];
-  replies: BlogComment[];
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
 }
 
 interface ArticleStructuredDataOptions {
@@ -143,46 +114,23 @@ function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStruct
   };
 }
 
-/* ───────────────────────── Emoji Picker ───────────────────────── */
-
-const REACTION_EMOJIS = [
-  { emoji: 'love', icon: Heart },
-  { emoji: 'like', icon: ThumbsUp },
-  { emoji: 'laugh', icon: Laugh },
-  { emoji: 'wow', icon: Smile },
-  { emoji: 'sad', icon: ThumbsDown },
-  { emoji: 'celebrate', icon: Smile },
-];
-
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function BlogPostPage() {
   const { t } = useTranslation('blog');
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated, user } = useAuth();
   const { tenantPath, branding } = useTenant();
-  const toast = useToast();
   const [post, setPost] = useState<BlogPostDetail | null>(null);
   usePageTitle(post?.title || t('page_title'));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Comments state
-  const [comments, setComments] = useState<BlogComment[]>([]);
-  const [commentCount, setCommentCount] = useState(0);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-
   // AbortController refs to cancel stale requests
   const abortPostRef = useRef<AbortController | null>(null);
-  const abortCommentsRef = useRef<AbortController | null>(null);
 
-  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  // Keep the latest translator available inside async callbacks.
   const tRef = useRef(t);
   tRef.current = t;
-  const toastRef = useRef(toast);
-  toastRef.current = toast;
 
   const loadPost = useCallback(async () => {
     if (!slug) return;
@@ -213,111 +161,9 @@ export function BlogPostPage() {
     }
   }, [slug]);
 
-  const loadComments = useCallback(async (postId: number) => {
-    abortCommentsRef.current?.abort();
-    const controller = new AbortController();
-    abortCommentsRef.current = controller;
-
-    try {
-      setIsLoadingComments(true);
-      const response = await api.get<{ comments: BlogComment[] }>(
-        `/v2/comments?target_type=blog&target_id=${postId}`
-      );
-
-      if (controller.signal.aborted) return;
-
-      if (response.success && response.data) {
-        const loaded = response.data.comments ?? [];
-        setComments(loaded);
-        // Count all comments including replies
-        const countAll = (list: BlogComment[]): number =>
-          list.reduce((acc, c) => acc + 1 + (c.replies ? countAll(c.replies) : 0), 0);
-        setCommentCount(countAll(loaded));
-      }
-    } catch (err) {
-      if (controller.signal.aborted) return;
-      logError('Failed to load comments', err);
-    } finally {
-      setIsLoadingComments(false);
-    }
-  }, []);
-
   useEffect(() => {
     loadPost();
   }, [loadPost]);
-
-  useEffect(() => {
-    if (post?.id) {
-      loadComments(post.id);
-    }
-  }, [post?.id, loadComments]);
-
-  const handleSubmitComment = async () => {
-    if (!newComment.trim() || !post) return;
-
-    try {
-      setIsSubmittingComment(true);
-      const response = await api.post('/v2/comments', {
-        target_type: 'blog',
-        target_id: post.id,
-        content: newComment.trim(),
-      });
-
-      if (response.success) {
-        // Optimistic add
-        const optimisticComment: BlogComment = {
-          id: Date.now(),
-          content: newComment.trim(),
-          created_at: new Date().toISOString(),
-          edited: false,
-          is_own: true,
-          author: {
-            id: user?.id ?? 0,
-            name: user ? `${user.first_name} ${user.last_name}` : t('post.you'),
-            avatar: user?.avatar ?? null,
-          },
-          reactions: {},
-          user_reactions: [],
-          replies: [],
-        };
-        setComments((prev) => [optimisticComment, ...prev]);
-        setCommentCount((prev) => prev + 1);
-        setNewComment('');
-        toastRef.current.success(tRef.current('post.comment_posted'));
-        // Reload to get server data
-        loadComments(post.id);
-      }
-    } catch (err) {
-      logError('Failed to submit comment', err);
-      toastRef.current.error(tRef.current('post.comment_failed'));
-    } finally {
-      setIsSubmittingComment(false);
-    }
-  };
-
-  const handleToggleReaction = async (commentId: number, emoji: string) => {
-    if (!isAuthenticated) return;
-
-    // Optimistic update
-    setComments((prev) => updateCommentReaction(prev, commentId, emoji));
-
-    try {
-      const response = await api.post<{ action: string; reactions: Record<string, number> }>(
-        `/v2/comments/${commentId}/reactions`,
-        { reaction_type: emoji }
-      );
-      if (response.success && response.data) {
-        const { action, reactions } = response.data;
-        setComments((prev) =>
-          updateCommentReactionFromServer(prev, commentId, emoji, action, reactions)
-        );
-      }
-    } catch (err) {
-      logError('Failed to toggle reaction', err);
-      // Revert on error
-      setComments((prev) => updateCommentReaction(prev, commentId, emoji));
-    }
-  };
 
   const categoryColorMap: Record<string, string> = {
     blue: 'bg-blue-500/10 text-[var(--color-info)]',
@@ -497,7 +343,7 @@ export function BlogPostPage() {
 
             <span className="flex items-center gap-1">
               <MessageCircle className="w-4 h-4" aria-hidden="true" />
-              {t('post.comment_count', { count: commentCount })}
+              {t('post.comment_count', { count: post.comments_count ?? 0 })}
             </span>
           </div>
         </motion.div>
@@ -536,95 +382,16 @@ export function BlogPostPage() {
           transition={{ delay: 0.3 }}
         >
           <GlassCard className="p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-theme-primary flex items-center gap-2 mb-6">
-              <MessageCircle className="w-5 h-5 text-blue-400" aria-hidden="true" />
-              {t('post.comments_heading', { count: commentCount })}
-            </h2>
-
-            {/* Add Comment Form */}
-            {isAuthenticated ? (
-              <div className="flex items-start gap-3 mb-6">
-                <Avatar
-                  name={user ? `${user.first_name} ${user.last_name}` : t('post.you')}
-                  src={resolveAvatarUrl(user?.avatar)}
-                  size="sm"
-                  className="mt-1 flex-shrink-0"
-                />
-                <div className="flex-1">
-                  <Textarea
-                    placeholder={t('post.comment_placeholder')}
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    minRows={2}
-                    maxRows={6}
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary text-sm',
-                      inputWrapper: 'bg-theme-elevated border-theme-default',
-                    }}
-                  />
-                  <div className="flex justify-end mt-2">
-                    <Button
-                      className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
-                      size="sm"
-                      onPress={handleSubmitComment}
-                      isLoading={isSubmittingComment}
-                      isDisabled={!newComment.trim()}
-                      startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                    >
-                      {t('post.post_comment')}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-4 mb-6 bg-theme-elevated rounded-xl">
-                <p className="text-sm text-theme-muted mb-2">{t('post.sign_in_prompt')}</p>
-                <Button
-                  as={Link}
-                  to={tenantPath("/login")}
-                  size="sm"
-                  variant="flat"
-                  className="text-indigo-500"
-                >
-                  {t('post.sign_in')}
-                </Button>
-              </div>
-            )}
-
-            {/* Comments List */}
-            {isLoadingComments ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-start gap-3 animate-pulse">
-                    <div className="w-8 h-8 rounded-full bg-theme-hover flex-shrink-0" />
-                    <div className="flex-1">
-                      <div className="h-3 bg-theme-hover rounded w-1/4 mb-2" />
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-1" />
-                      <div className="h-4 bg-theme-hover rounded w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : comments.length === 0 ? (
-              <div className="text-center py-8">
-                <MessageCircle className="w-10 h-10 text-theme-subtle mx-auto mb-3 opacity-50" aria-hidden="true" />
-                <p className="text-sm text-theme-subtle">{t('post.no_comments')}</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {comments.map((comment) => (
-                  <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    postId={post.id}
-                    isAuthenticated={isAuthenticated}
-                    currentUser={user}
-                    onReaction={handleToggleReaction}
-                    onReplySubmitted={() => loadComments(post.id)}
-                  />
-                ))}
-              </div>
-            )}
+            <SocialInteractionPanel
+              targetType="blog"
+              targetId={post.id}
+              initialLiked={post.is_liked ?? false}
+              initialLikesCount={post.likes_count ?? 0}
+              initialCommentsCount={post.comments_count ?? 0}
+              title={post.title}
+              description={post.excerpt}
+              defaultShowComments={typeof window !== 'undefined' && /^#comment-\d+$/.test(window.location.hash)}
+            />
           </GlassCard>
         </motion.div>
 
@@ -647,343 +414,6 @@ export function BlogPostPage() {
 
 /* ───────────────────────── Comment Item ───────────────────────── */
 
-interface CommentItemProps {
-  comment: BlogComment;
-  postId: number;
-  isAuthenticated: boolean;
-  currentUser: { id: number; first_name?: string; last_name?: string; avatar?: string | null } | null;
-  onReaction: (commentId: number, emoji: string) => void;
-  onReplySubmitted: () => void;
-  depth?: number;
-}
-
-function CommentItem({
-  comment,
-  postId,
-  isAuthenticated,
-  currentUser,
-  onReaction,
-  onReplySubmitted,
-  depth = 0,
-}: CommentItemProps) {
-  const { t } = useTranslation('blog');
-  const toast = useToast();
-  const { tenantPath } = useTenant();
-  const [showReplies, setShowReplies] = useState(depth === 0);
-  const [showReplyInput, setShowReplyInput] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
-  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  const hasReplies = comment.replies && comment.replies.length > 0;
-  const hasReactions = Object.keys(comment.reactions).length > 0;
-
-  const handleSubmitReply = async () => {
-    if (!replyContent.trim()) return;
-
-    try {
-      setIsSubmittingReply(true);
-      const response = await api.post('/v2/comments', {
-        target_type: 'blog',
-        target_id: postId,
-        parent_id: comment.id,
-        content: replyContent.trim(),
-      });
-
-      if (response.success) {
-        setReplyContent('');
-        setShowReplyInput(false);
-        toast.success(t('post.reply_posted'));
-        onReplySubmitted();
-      }
-    } catch (err) {
-      logError('Failed to submit reply', err);
-      toast.error(t('post.reply_failed'));
-    } finally {
-      setIsSubmittingReply(false);
-    }
-  };
-
-  const reactionIconMap: Record<string, typeof Heart> = {
-    love: Heart,
-    like: ThumbsUp,
-    laugh: Laugh,
-    wow: Smile,
-    sad: ThumbsDown,
-    celebrate: Smile,
-  };
-
-  return (
-    <div className={`${depth > 0 ? 'ml-3 sm:ml-6 md:ml-10' : ''}`}>
-      <div className="flex items-start gap-2.5">
-        <Link to={tenantPath(`/profile/${comment.author.id}`)} className="flex-shrink-0">
-          <Avatar
-            name={comment.author.name}
-            src={resolveAvatarUrl(comment.author.avatar)}
-            size="sm"
-            className={depth > 0 ? 'w-7 h-7' : 'w-8 h-8'}
-          />
-        </Link>
-        <div className="flex-1 min-w-0">
-          {/* Comment Bubble */}
-          <div className="bg-theme-elevated rounded-2xl px-4 py-2.5">
-            <div className="flex items-center gap-2 mb-0.5">
-              <Link
-                to={tenantPath(`/profile/${comment.author.id}`)}
-                className="text-xs font-semibold text-theme-primary hover:underline"
-              >
-                {comment.author.name}
-              </Link>
-              {comment.edited && (
-                <span className="text-xs text-theme-subtle">{t('post.edited')}</span>
-              )}
-            </div>
-            <SafeHtml content={comment.content} className="text-sm text-theme-muted whitespace-pre-wrap" as="div" />
-          </div>
-
-          {/* Reactions Display */}
-          {hasReactions && (
-            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-              {Object.entries(comment.reactions).map(([emoji, count]) => {
-                const IconComp = reactionIconMap[emoji] || Smile;
-                const isActive = comment.user_reactions.includes(emoji);
-                return (
-                  <Button
-                    key={emoji}
-                    size="sm"
-                    variant="flat"
-                    className={`min-w-0 h-6 px-2 text-xs gap-1 ${
-                      isActive
-                        ? 'bg-indigo-500/15 text-indigo-500'
-                        : 'bg-theme-hover text-theme-subtle'
-                    }`}
-                    onPress={() => onReaction(comment.id, emoji)}
-                    isDisabled={!isAuthenticated}
-                    aria-label={`${emoji} reaction (${count})`}
-                  >
-                    <IconComp className="w-3 h-3" aria-hidden="true" />
-                    {count}
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Action Row */}
-          <div className="flex items-center gap-3 mt-1 px-1">
-            <span className="text-xs text-theme-subtle">{formatRelativeTime(comment.created_at)}</span>
-
-            {/* React Button */}
-            {isAuthenticated && (
-              <div className="relative">
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="text-xs text-theme-subtle p-0 min-w-0 h-auto hover:text-indigo-400"
-                  onPress={() => setShowEmojiPicker(!showEmojiPicker)}
-                  aria-label={t('post.aria_add_reaction')}
-                >
-                  <Smile className="w-3.5 h-3.5" aria-hidden="true" />
-                </Button>
-                <AnimatePresence>
-                  {showEmojiPicker && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9, y: -4 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9, y: -4 }}
-                      className="absolute bottom-full left-0 mb-1 flex gap-1 bg-content1 border border-theme-default rounded-xl px-2 py-1.5 shadow-lg z-20"
-                    >
-                      {REACTION_EMOJIS.map((r) => {
-                        const IconComp = r.icon;
-                        return (
-                          <Button
-                            key={r.emoji}
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            className="min-w-0 w-7 h-7 hover:bg-theme-hover"
-                            onPress={() => {
-                              onReaction(comment.id, r.emoji);
-                              setShowEmojiPicker(false);
-                            }}
-                            aria-label={t('post.reaction_' + r.emoji)}
-                          >
-                            <IconComp className="w-4 h-4" />
-                          </Button>
-                        );
-                      })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* Reply Button */}
-            {isAuthenticated && depth < 2 && (
-              <Button
-                variant="light"
-                size="sm"
-                className="text-xs text-theme-subtle p-0 min-w-0 h-auto hover:text-indigo-400"
-                onPress={() => setShowReplyInput(!showReplyInput)}
-                startContent={<Reply className="w-3.5 h-3.5" aria-hidden="true" />}
-              >
-                {t('post.reply')}
-              </Button>
-            )}
-
-            {/* Toggle Replies */}
-            {hasReplies && (
-              <Button
-                variant="light"
-                size="sm"
-                className="text-xs text-indigo-500 p-0 min-w-0 h-auto"
-                onPress={() => setShowReplies(!showReplies)}
-                startContent={
-                  showReplies
-                    ? <ChevronUp className="w-3.5 h-3.5" aria-hidden="true" />
-                    : <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
-                }
-              >
-                {showReplies ? t('post.hide') : t('post.reply_count', { count: comment.replies.length })}
-              </Button>
-            )}
-          </div>
-
-          {/* Reply Input */}
-          <AnimatePresence>
-            {showReplyInput && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 overflow-hidden"
-              >
-                <div className="flex items-start gap-2">
-                  <Avatar
-                    name={currentUser ? `${currentUser.first_name ?? ''} ${currentUser.last_name ?? ''}`.trim() || t('post.you') : t('post.you')}
-                    src={resolveAvatarUrl(currentUser?.avatar)}
-                    size="sm"
-                    className="w-6 h-6 mt-1 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <Input
-                      placeholder={t('post.reply_to', { name: comment.author.name })}
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitReply()}
-                      size="sm"
-                      classNames={{
-                        input: 'bg-transparent text-theme-primary text-sm',
-                        inputWrapper: 'bg-theme-elevated border-theme-default h-9',
-                      }}
-                      endContent={
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          className="text-indigo-500 min-w-0 w-auto h-auto p-0"
-                          onPress={handleSubmitReply}
-                          isDisabled={!replyContent.trim() || isSubmittingReply}
-                          isLoading={isSubmittingReply}
-                          aria-label={t('post.aria_send_reply')}
-                        >
-                          <Send className="w-4 h-4" />
-                        </Button>
-                      }
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Nested Replies */}
-          <AnimatePresence>
-            {showReplies && hasReplies && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-3 space-y-3 border-l-2 border-theme-default pl-0 overflow-hidden"
-              >
-                {comment.replies.map((reply) => (
-                  <CommentItem
-                    key={reply.id}
-                    comment={reply}
-                    postId={postId}
-                    isAuthenticated={isAuthenticated}
-                    currentUser={currentUser}
-                    onReaction={onReaction}
-                    onReplySubmitted={onReplySubmitted}
-                    depth={depth + 1}
-                  />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ───────────────────────── Helpers ───────────────────────── */
-
-/**
- * Recursively toggle a reaction on a comment in the tree.
- * Used for optimistic updates.
- */
-function updateCommentReaction(
-  comments: BlogComment[],
-  commentId: number,
-  emoji: string
-): BlogComment[] {
-  return comments.map((c) => {
-    if (c.id === commentId) {
-      const isActive = c.user_reactions.includes(emoji);
-      const newUserReactions = isActive
-        ? c.user_reactions.filter((e) => e !== emoji)
-        : [...c.user_reactions, emoji];
-      const newReactions = { ...c.reactions };
-      if (isActive) {
-        newReactions[emoji] = Math.max(0, (newReactions[emoji] || 1) - 1);
-        if (newReactions[emoji] === 0) delete newReactions[emoji];
-      } else {
-        newReactions[emoji] = (newReactions[emoji] || 0) + 1;
-      }
-      return {
-        ...c,
-        user_reactions: newUserReactions,
-        reactions: newReactions,
-      };
-    }
-    if (c.replies && c.replies.length > 0) {
-      return { ...c, replies: updateCommentReaction(c.replies, commentId, emoji) };
-    }
-    return c;
-  });
-}
-
-function updateCommentReactionFromServer(
-  comments: BlogComment[],
-  commentId: number,
-  reactionType: string,
-  action: string,
-  reactions: Record<string, number>
-): BlogComment[] {
-  return comments.map((c) => {
-    if (c.id === commentId) {
-      return {
-        ...c,
-        user_reactions: action === 'removed' ? [] : [reactionType],
-        reactions,
-      };
-    }
-    if (c.replies && c.replies.length > 0) {
-      return { ...c, replies: updateCommentReactionFromServer(c.replies, commentId, reactionType, action, reactions) };
-    }
-    return c;
-  });
-}
 
 export default BlogPostPage;

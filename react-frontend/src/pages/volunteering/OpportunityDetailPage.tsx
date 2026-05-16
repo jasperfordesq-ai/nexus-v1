@@ -54,6 +54,7 @@ import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useTenant } from '@/contexts';
 import { useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -97,6 +98,9 @@ interface OpportunityDetail {
   has_applied?: boolean;
   application?: Application | null;
   is_owner?: boolean;
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
 }
 
 interface OppApplicationItem {
@@ -854,6 +858,16 @@ export function OpportunityDetailPage() {
               </div>
             </div>
           )}
+
+          <SocialInteractionPanel
+            targetType="volunteer"
+            targetId={opp.id}
+            initialLiked={opp.is_liked ?? false}
+            initialLikesCount={opp.likes_count ?? 0}
+            initialCommentsCount={opp.comments_count ?? 0}
+            title={opp.title}
+            description={opp.description}
+          />
         </GlassCard>
       </motion.div>
 

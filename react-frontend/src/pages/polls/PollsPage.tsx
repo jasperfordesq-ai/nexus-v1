@@ -61,6 +61,7 @@ import Filter from 'lucide-react/icons/filter';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -97,6 +98,9 @@ interface Poll {
   poll_type?: 'standard' | 'ranked';
   category?: string | null;
   is_anonymous?: boolean;
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
 }
 
 type PollTab = 'open' | 'closed' | 'mine';
@@ -189,7 +193,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                     startContent={<ListOrdered className="w-3 h-3" />}
                     className="text-[10px] h-5"
                   >
-                    Ranked
+                    {t('badges.ranked')}
                   </Chip>
                 )}
                 {/* P3 - Anonymous badge */}
@@ -200,7 +204,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                     className="text-[10px] h-5 bg-gray-500/10 text-gray-400"
                     startContent={<EyeOff className="w-3 h-3" />}
                   >
-                    Anonymous
+                    {t('badges.anonymous')}
                   </Chip>
                 )}
                 {/* P2 - Category badge */}
@@ -343,6 +347,18 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
             {poll.options.length} {t('options')}
           </span>
         </div>
+
+        <SocialInteractionPanel
+          targetType="poll"
+          targetId={poll.id}
+          initialLiked={poll.is_liked ?? false}
+          initialLikesCount={poll.likes_count ?? 0}
+          initialCommentsCount={poll.comments_count ?? 0}
+          title={poll.question}
+          description={poll.description}
+          className="mt-3"
+          compact
+        />
       </div>
     </GlassCard>
   );

@@ -26,6 +26,7 @@ import ChevronUp from 'lucide-react/icons/chevron-up';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
+import { SocialInteractionPanel } from '@/components/social';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
@@ -40,6 +41,9 @@ export interface Discussion {
     avatar_url?: string | null;
   };
   reply_count: number;
+  comments_count?: number;
+  likes_count?: number;
+  is_liked?: boolean;
   is_pinned?: boolean;
   last_reply_at?: string | null;
   created_at: string;
@@ -228,6 +232,17 @@ export function GroupDiscussionTab({
                             <div className="p-3 rounded-lg bg-theme-elevated/50">
                               <SafeHtml content={expandedDiscussion.content ?? ''} className="text-sm text-theme-muted whitespace-pre-wrap" as="div" />
                             </div>
+
+                            <SocialInteractionPanel
+                              targetType="discussion"
+                              targetId={discussion.id}
+                              initialLiked={discussion.is_liked ?? false}
+                              initialLikesCount={discussion.likes_count ?? 0}
+                              initialCommentsCount={discussion.comments_count ?? 0}
+                              title={discussion.title}
+                              description={expandedDiscussion.content}
+                              compact
+                            />
 
                             {/* Messages */}
                             {expandedDiscussion.messages && expandedDiscussion.messages.length > 0 && (

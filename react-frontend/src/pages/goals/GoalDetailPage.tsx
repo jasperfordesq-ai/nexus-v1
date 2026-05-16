@@ -29,14 +29,13 @@ import Users from 'lucide-react/icons/users';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Globe from 'lucide-react/icons/globe';
 import Lock from 'lucide-react/icons/lock';
-import Heart from 'lucide-react/icons/heart';
-import MessageCircle from 'lucide-react/icons/message-circle';
 import History from 'lucide-react/icons/history';
 import Sparkles from 'lucide-react/icons/sparkles';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -66,6 +65,7 @@ interface Goal {
   is_buddy?: boolean;
   likes_count?: number;
   comments_count?: number;
+  is_liked?: boolean;
   checkin_frequency?: string | null;
 }
 
@@ -318,26 +318,6 @@ export function GoalDetailPage() {
               </Link>
             </div>
           )}
-          {(goal.likes_count !== undefined || goal.comments_count !== undefined) && (
-            <div className="bg-theme-elevated rounded-xl p-3">
-              <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
-                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('goals.detail.social')}
-              </div>
-              <div className="flex items-center gap-3 text-sm text-theme-primary font-medium">
-                {goal.likes_count !== undefined && (
-                  <span className="flex items-center gap-1">
-                    <Heart className="w-3.5 h-3.5 text-rose-400" aria-hidden="true" /> {goal.likes_count}
-                  </span>
-                )}
-                {goal.comments_count !== undefined && (
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" /> {goal.comments_count}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Owner info */}
@@ -359,6 +339,16 @@ export function GoalDetailPage() {
         )}
 
         {/* Progress history (only for owner / public goals — endpoint is open but UI hides it for stranger-private) */}
+        <SocialInteractionPanel
+          targetType="goal"
+          targetId={goal.id}
+          initialLiked={goal.is_liked ?? false}
+          initialLikesCount={goal.likes_count ?? 0}
+          initialCommentsCount={goal.comments_count ?? 0}
+          title={goal.title}
+          description={goal.description}
+        />
+
         {(showPrivateFields || goal.is_public) && (
           <div>
             <h2 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">

@@ -19,7 +19,12 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
   useTranslation: () => ({
+    i18n: { language: 'en' },
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.defaultValue as string | undefined) ?? key,
   }),
@@ -79,6 +84,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string | null) => url ?? '',
   formatRelativeTime: (d: string) => d,

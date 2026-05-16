@@ -48,7 +48,7 @@ import type { ReactionType } from '@/components/social';
 // Must stay in sync with the allowlist in SocialController::showItem.
 const POLYMORPHIC_TYPES = new Set<FeedItem['type']>([
   'post', 'listing', 'event', 'poll', 'goal', 'review',
-  'volunteer', 'challenge', 'blog', 'discussion', 'job',
+  'volunteer', 'challenge', 'resource', 'blog', 'discussion', 'job',
 ]);
 
 export function PostDetailPage() {

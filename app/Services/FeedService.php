@@ -1553,7 +1553,7 @@ class FeedService
 
             case 'blog':
                 $rows = DB::select(
-                    "SELECT p.id, p.title, p.content, p.featured_image as image_url, p.created_at,
+                    "SELECT p.id, p.slug, p.title, p.content, p.featured_image as image_url, p.created_at,
                            0 as likes_count, p.author_id as user_id, 'blog' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,

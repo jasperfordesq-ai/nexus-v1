@@ -31,6 +31,7 @@ import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
+import { SocialInteractionPanel } from '@/components/social';
 import type { JSX } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -49,6 +50,9 @@ interface Review {
   is_anonymous: boolean;
   reviewer: Reviewer;
   created_at: string;
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
 }
 
 interface PendingReview {
@@ -144,6 +148,17 @@ function ReviewCard({
         {review.comment && (
           <p className="mt-1.5 text-sm text-[var(--color-text-muted)] leading-relaxed">{review.comment}</p>
         )}
+        <SocialInteractionPanel
+          targetType="review"
+          targetId={review.id}
+          initialLiked={review.is_liked ?? false}
+          initialLikesCount={review.likes_count ?? 0}
+          initialCommentsCount={review.comments_count ?? 0}
+          title={displayName}
+          description={review.comment}
+          className="mt-3"
+          compact
+        />
       </div>
     </div>
   );

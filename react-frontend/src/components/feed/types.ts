@@ -25,6 +25,7 @@ export interface FeedItem {
   content: string;
   content_truncated?: boolean;
   title?: string;
+  slug?: string;
   author_name?: string;
   author_avatar?: string;
   author_id?: number;
@@ -208,7 +209,7 @@ export function getItemDetailPath(item: FeedItem): string | null {
     case 'volunteer':
       return `/volunteering/opportunities/${item.id}`;
     case 'blog':
-      return `/blog/${item.id}`;
+      return item.slug ? `/blog/${item.slug}` : `/feed/item/blog/${item.id}`;
     case 'discussion':
     case 'resource':
     case 'badge_earned':

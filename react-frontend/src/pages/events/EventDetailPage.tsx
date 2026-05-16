@@ -59,6 +59,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -531,6 +532,11 @@ export function EventDetailPage() {
   const endTimeLabel = endDate
     ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
     : null;
+  const eventSocial = event as Event & {
+    is_liked?: boolean;
+    likes_count?: number;
+    comments_count?: number;
+  };
 
   return (
     <motion.div
@@ -1297,6 +1303,17 @@ export function EventDetailPage() {
             )}
           </div>
         )}
+
+        <SocialInteractionPanel
+          targetType="event"
+          targetId={event.id}
+          initialLiked={eventSocial.is_liked ?? false}
+          initialLikesCount={eventSocial.likes_count ?? 0}
+          initialCommentsCount={eventSocial.comments_count ?? 0}
+          title={event.title}
+          description={event.description}
+          className="mt-8"
+        />
       </GlassCard>
 
       {/* E7: Other Events in This Series */}

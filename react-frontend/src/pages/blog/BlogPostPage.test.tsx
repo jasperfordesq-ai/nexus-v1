@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -82,6 +82,12 @@ vi.mock('@/components/ui', () => ({
   SkeletonList: () => null,
 }));
 
+vi.mock('@/components/social', () => ({
+  SocialInteractionPanel: ({ targetType, targetId }: { targetType: string; targetId: number }) => (
+    <div data-testid="social-panel" data-target-type={targetType} data-target-id={targetId} />
+  ),
+}));
+
 vi.mock('dompurify', () => ({
   default: { sanitize: (html: string) => html },
 }));
@@ -111,7 +117,6 @@ import { BlogPostPage } from './BlogPostPage';
 import { api } from '@/lib/api';
 
 const mockApiGet = vi.mocked(api.get);
-const mockApiPost = vi.mocked(api.post);
 
 const mockPost = {
   id: 1,
@@ -128,22 +133,9 @@ const mockPost = {
   meta_description: null,
   author: { id: 5, name: 'Jane Doe', avatar: null },
   category: { id: 1, name: 'Community', color: 'blue' },
-};
-
-const mockComments = {
-  comments: [
-    {
-      id: 1,
-      content: 'Great article!',
-      created_at: '2026-01-16T09:00:00Z',
-      edited: false,
-      is_own: false,
-      author: { id: 2, name: 'Bob', avatar: null },
-      reactions: {},
-      user_reactions: [],
-      replies: [],
-    },
-  ],
+  is_liked: false,
+  likes_count: 4,
+  comments_count: 2,
 };
 
 describe('BlogPostPage', () => {
@@ -163,7 +155,7 @@ describe('BlogPostPage', () => {
       if (url.includes('/v2/blog/')) {
         return Promise.resolve({ success: true, data: mockPost });
       }
-      return Promise.resolve({ success: true, data: mockComments });
+      return Promise.resolve({ success: true, data: null });
     });
 
     render(<BlogPostPage />);
@@ -178,7 +170,7 @@ describe('BlogPostPage', () => {
       if (url.includes('/v2/blog/')) {
         return Promise.resolve({ success: true, data: mockPost });
       }
-      return Promise.resolve({ success: true, data: mockComments });
+      return Promise.resolve({ success: true, data: null });
     });
 
     render(<BlogPostPage />);
@@ -193,7 +185,7 @@ describe('BlogPostPage', () => {
       if (url.includes('/v2/blog/')) {
         return Promise.resolve({ success: true, data: mockPost });
       }
-      return Promise.resolve({ success: true, data: mockComments });
+      return Promise.resolve({ success: true, data: null });
     });
 
     render(<BlogPostPage />);
@@ -203,18 +195,19 @@ describe('BlogPostPage', () => {
     });
   });
 
-  it('renders comments after loading', async () => {
+  it('renders the shared social panel for blog comments', async () => {
     mockApiGet.mockImplementation((url: string) => {
       if (url.includes('/v2/blog/')) {
         return Promise.resolve({ success: true, data: mockPost });
       }
-      return Promise.resolve({ success: true, data: mockComments });
+      return Promise.resolve({ success: true, data: null });
     });
 
     render(<BlogPostPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Great article!')).toBeInTheDocument();
+      expect(screen.getByTestId('social-panel')).toHaveAttribute('data-target-type', 'blog');
+      expect(screen.getByTestId('social-panel')).toHaveAttribute('data-target-id', '1');
     });
   });
 
@@ -239,59 +232,4 @@ describe('BlogPostPage', () => {
     });
   });
 
-  it('submits a comment when form is filled and posted', async () => {
-    mockApiGet.mockImplementation((url: string) => {
-      if (url.includes('/v2/blog/')) {
-        return Promise.resolve({ success: true, data: mockPost });
-      }
-      return Promise.resolve({ success: true, data: { comments: [] } });
-    });
-    mockApiPost.mockResolvedValue({ success: true });
-
-    render(<BlogPostPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('How Timebanking Works')).toBeInTheDocument();
-    });
-
-    // Find the textarea for commenting
-    const textarea = document.querySelector('textarea');
-    if (textarea) {
-      fireEvent.change(textarea, { target: { value: 'My test comment' } });
-
-      const submitButton = screen.getAllByRole('button').find(btn =>
-        btn.getAttribute('disabled') === null
-      );
-      if (submitButton) {
-        fireEvent.click(submitButton);
-        await waitFor(() => {
-          expect(mockApiPost).toHaveBeenCalled();
-        });
-      }
-    }
-  });
-
-  it('shows sign in prompt for unauthenticated users in comments section', async () => {
-    const { useAuth } = await import('@/contexts');
-    vi.mocked(useAuth).mockReturnValue({ isAuthenticated: false, user: null });
-
-    mockApiGet.mockImplementation((url: string) => {
-      if (url.includes('/v2/blog/')) {
-        return Promise.resolve({ success: true, data: mockPost });
-      }
-      return Promise.resolve({ success: true, data: { comments: [] } });
-    });
-
-    render(<BlogPostPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('How Timebanking Works')).toBeInTheDocument();
-    });
-
-    // Sign in link should be visible
-    const loginLinks = screen.getAllByRole('link').filter(l =>
-      l.getAttribute('href')?.includes('/login')
-    );
-    expect(loginLinks.length).toBeGreaterThan(0);
-  });
 });

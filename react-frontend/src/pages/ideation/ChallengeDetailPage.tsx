@@ -71,6 +71,7 @@ import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -99,6 +100,9 @@ interface Challenge {
   cover_image: string | null;
   is_favorited: boolean;
   favorites_count: number;
+  is_liked?: boolean;
+  likes_count?: number;
+  comments_count?: number;
   views_count: number;
   is_featured: boolean;
   campaign_id?: number | null;
@@ -983,6 +987,17 @@ export function ChallengeDetailPage() {
             </span>
           )}
         </div>
+
+        <SocialInteractionPanel
+          targetType="challenge"
+          targetId={challenge.id}
+          initialLiked={challenge.is_liked ?? false}
+          initialLikesCount={challenge.likes_count ?? 0}
+          initialCommentsCount={challenge.comments_count ?? 0}
+          title={challenge.title}
+          description={challenge.description}
+          className="mt-4"
+        />
 
         {/* Prize */}
         {challenge.prize_description && (

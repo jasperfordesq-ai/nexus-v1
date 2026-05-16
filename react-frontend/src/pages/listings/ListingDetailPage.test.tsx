@@ -58,6 +58,7 @@ vi.mock('@/hooks', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || null),
 }));
