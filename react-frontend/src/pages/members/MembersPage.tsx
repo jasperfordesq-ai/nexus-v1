@@ -13,7 +13,6 @@ import { motion } from 'framer-motion';
 import { Input, Select, SelectItem, Avatar, Button, Chip, Tooltip } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
-import MapIcon from 'lucide-react/icons/map';
 import MapPin from 'lucide-react/icons/map-pin';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
@@ -36,7 +35,6 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
-import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -494,26 +492,13 @@ export function MembersPage() {
                 isIconOnly
                 size="sm"
                 variant="light"
-                className={`rounded-none transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria.list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" aria-hidden="true" />
               </Button>
-              {MAPS_ENABLED && (
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
-                  aria-label={t('aria.map_view')}
-                  aria-pressed={viewMode === 'map'}
-                  onPress={() => setViewMode('map')}
-                >
-                  <MapIcon className="w-4 h-4" aria-hidden="true" />
-                </Button>
-              )}
             </div>
           </div>
         </div>

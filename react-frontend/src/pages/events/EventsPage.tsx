@@ -13,8 +13,6 @@ import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Calendar from 'lucide-react/icons/calendar';
-import List from 'lucide-react/icons/list';
-import MapIcon from 'lucide-react/icons/map';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';
@@ -31,11 +29,9 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { formatDateTime, formatDateValue, formatMonthShort, resolveAssetUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -104,7 +100,6 @@ export function EventsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(null);
 
   const activeFilterCount = useMemo(() => {
@@ -335,32 +330,6 @@ export function EventsPage() {
 
           <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
 
-          {MAPS_ENABLED && (
-            <div className="flex min-h-[40px] rounded-xl overflow-hidden border border-theme-default bg-theme-elevated" role="group" aria-label={t('view_mode_aria')}>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' : 'text-theme-muted hover:bg-theme-hover'}`}
-                aria-label={t('view_list')}
-                aria-pressed={viewMode === 'list'}
-                onPress={() => setViewMode('list')}
-              >
-                <List className="w-4 h-4" aria-hidden="true" />
-              </Button>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                className={`rounded-none ${viewMode === 'map' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' : 'text-theme-muted hover:bg-theme-hover'}`}
-                aria-label={t('view_map')}
-                aria-pressed={viewMode === 'map'}
-                onPress={() => setViewMode('map')}
-              >
-                <MapIcon className="w-4 h-4" aria-hidden="true" />
-              </Button>
-            </div>
-          )}
         </div>
 
         {activeFilterCount > 0 && (
@@ -476,28 +445,6 @@ export function EventsPage() {
                   </Link>
                 )
               }
-            />
-          ) : viewMode === 'map' ? (
-            <EntityMapView
-              items={events}
-              getCoordinates={(e) =>
-                e.coordinates ? { lat: Number(e.coordinates.lat), lng: Number(e.coordinates.lng) } : null
-              }
-              getMarkerConfig={(e) => ({
-                id: e.id,
-                title: e.title,
-              })}
-              renderInfoContent={(e) => (
-                <div className="p-2 max-w-[250px]">
-                  <h4 className="font-semibold text-sm text-theme-primary">{e.title}</h4>
-                  {e.location && <p className="text-xs text-theme-muted mt-0.5">{e.location}</p>}
-                  <p className="text-xs text-theme-muted mt-1">
-                    {formatDateValue(e.start_date)}
-                  </p>
-                </div>
-              )}
-              isLoading={isLoading}
-              emptyMessage={t('no_location')}
             />
           ) : (
             <motion.div

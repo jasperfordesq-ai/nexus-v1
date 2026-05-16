@@ -23,6 +23,7 @@ import {
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import KeyRound from 'lucide-react/icons/key-round';
+import Lock from 'lucide-react/icons/lock';
 import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
@@ -55,8 +56,6 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
   const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();
 
   const [loading, setLoading] = useState(true);
-  const [toggling, setToggling] = useState<string | null>(null);
-
   // Language state
   const [langDefault, setLangDefault] = useState(defaultLanguage);
   const [langSupported, setLangSupported] = useState<string[]>(supportedLanguages);
@@ -111,23 +110,6 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
   useEffect(() => {
     loadSettings();
   }, [loadSettings]);
-
-  const mapsEnabled = config?.features?.maps ?? true;
-
-  const handleMapsKillSwitch = async (enabled: boolean) => {
-    setToggling('maps');
-    const res = await adminConfig.updateFeature('maps', enabled);
-    if (res.success) {
-      onConfigChange((prev) =>
-        prev ? { ...prev, features: { ...prev.features, maps: enabled } } : prev
-      );
-      toast.success(`Maps ${enabled ? 'enabled' : 'disabled'}`);
-      refreshTenant();
-    } else {
-      toast.error(res.error || 'Failed to update maps');
-    }
-    setToggling(null);
-  };
 
   const handleLangToggle = (code: string, checked: boolean) => {
     if (code === 'en') return;
@@ -299,13 +281,9 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
           <CardBody className="px-4 pb-4 space-y-4">
             <div className="flex flex-wrap gap-2 items-center text-xs">
               <span className="text-default-500">{t('tenant_features.currently_serving', { defaultValue: 'Currently serving:' })}</span>
-              <span className={`px-2 py-0.5 rounded-full font-medium ${mapsEnabled ? (mapProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300') : 'bg-default-200 text-default-600'}`}>
+              <span className="px-2 py-0.5 rounded-full font-medium bg-default-200 text-default-600">
                 {t('tenant_features.status_maps', { defaultValue: 'Maps' })}{': '}
-                {!mapsEnabled
-                  ? t('tenant_features.status_off', { defaultValue: 'off' })
-                  : mapProvider === 'google'
-                    ? t('tenant_features.status_google_paid', { defaultValue: 'Google (paid)' })
-                    : t('tenant_features.status_osm_free', { defaultValue: 'OpenStreetMap (free)' })}
+                {t('tenant_features.status_off', { defaultValue: 'off' })}
               </span>
               <span className={`px-2 py-0.5 rounded-full font-medium ${geocodingProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300'}`}>
                 {t('tenant_features.status_autocomplete', { defaultValue: 'Autocomplete' })}{': '}
@@ -315,7 +293,7 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
               </span>
             </div>
 
-            {(geocodingProvider === 'google' || (mapsEnabled && mapProvider === 'google')) && (
+            {geocodingProvider === 'google' && (
               <div className="rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-2 text-xs text-warning-700 dark:text-warning-300 border border-warning-200 dark:border-warning-800">
                 {t('tenant_features.cost_warning', { defaultValue: 'This tenant is configured to use paid Google services. Google Places autocomplete is typically the largest cost driver — sessions billed per keystroke burst. Switch to Nominatim to remove that bill component entirely.' })}
               </div>
@@ -323,21 +301,26 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
 
             <Divider />
 
-            <div className="flex items-center justify-between rounded-lg bg-warning-50 dark:bg-warning-900/10 px-3 py-3">
+            <div className="flex items-center justify-between rounded-lg bg-default-100 dark:bg-default-50/5 px-3 py-3 opacity-60">
               <div className="pr-4">
-                <p className="font-medium text-sm">
-                  {t('tenant_features.maps_kill_switch_label', { defaultValue: 'Map display (kill switch)' })}
-                </p>
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <p className="font-medium text-sm">
+                    {t('tenant_features.maps_kill_switch_label', { defaultValue: 'Map display (kill switch)' })}
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-default-200 text-default-600">
+                    <Lock size={10} />
+                    {'Platform policy'}
+                  </span>
+                </div>
                 <p className="text-xs text-default-500 mt-0.5">
-                  {t('tenant_features.maps_kill_switch_desc', { defaultValue: 'When off: no map components render, no Google API key is delivered to browsers. Address autocomplete continues to work via the chosen geocoding provider.' })}
+                  {'Map view is globally disabled. Google Places autocomplete remains active via the geocoding provider below.'}
                 </p>
               </div>
               <Switch
-                isSelected={mapsEnabled}
-                onValueChange={handleMapsKillSwitch}
-                isDisabled={toggling === 'maps'}
+                isSelected={false}
+                isDisabled={true}
                 size="sm"
-                aria-label="Map display kill switch"
+                aria-label="Map display kill switch (locked off)"
               />
             </div>
 
@@ -359,7 +342,7 @@ export default function PlatformInfrastructure({ config, onConfigChange }: Platf
                 }}
                 className="max-w-xs"
                 size="sm"
-                isDisabled={!mapsEnabled}
+                isDisabled={true}
               >
                 <SelectItem key="google">{t('tenant_features.provider_google', { defaultValue: 'Google Maps (paid)' })}</SelectItem>
                 <SelectItem key="openstreetmap">{t('tenant_features.provider_osm', { defaultValue: 'OpenStreetMap (free)' })}</SelectItem>
