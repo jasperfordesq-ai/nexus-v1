@@ -53,7 +53,11 @@ class SitemapController
                 [(int) $tenant->id]
             );
 
-            if (!empty($subTenants)) {
+            // Filter to sub-tenants with a non-empty slug — a null slug would
+            // generate an invalid '/sitemap-.xml' entry.
+            $subTenants = array_filter($subTenants, fn ($s) => !empty($s->slug));
+
+            if (!empty($subTenants) && !empty($tenant->slug)) {
                 $sitemaps = [
                     ['loc' => "{$baseUrl}/sitemap-{$tenant->slug}.xml", 'lastmod' => null],
                 ];
@@ -101,15 +105,27 @@ class SitemapController
 
         // Single query: fetch the tenant and its parent's domain in one round-trip.
         // parent_domain is non-null only when the tenant has no own domain and its
-        // immediate parent has one — signals sub-tenant path routing (timebanking.uk/cardiff).
-        $row = DB::selectOne(
-            "SELECT t.id, t.slug, t.domain, p.domain AS parent_domain
-             FROM tenants t
-             LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 AND p.id > 1
-             WHERE t.slug = ? AND t.is_active = 1
-             LIMIT 1",
-            [$slug]
-        );
+        // immediate parent has one — signals sub-tenant path routing.
+        // 'main' is the canonical alias SitemapService::generateIndex() uses for the
+        // master tenant, which stores slug = NULL rather than the string 'main'.
+        if ($slug === 'main') {
+            $row = DB::selectOne(
+                "SELECT t.id, t.slug, t.domain, p.domain AS parent_domain
+                 FROM tenants t
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 AND p.id > 1
+                 WHERE (t.slug IS NULL OR t.slug = '') AND t.is_active = 1
+                 ORDER BY t.id LIMIT 1"
+            );
+        } else {
+            $row = DB::selectOne(
+                "SELECT t.id, t.slug, t.domain, p.domain AS parent_domain
+                 FROM tenants t
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 AND p.id > 1
+                 WHERE t.slug = ? AND t.is_active = 1
+                 LIMIT 1",
+                [$slug]
+            );
+        }
 
         if (!$row) {
             return $this->xmlResponse($this->emptyUrlset(), 404);

@@ -128,6 +128,7 @@ class TenantContext
                 self::$tenant = $domainTenant;
                 self::$basePath = '';
                 self::$cachedId = (int) $domainTenant['id'];
+                self::$parentDomain = null;
                 return;
             }
         }
