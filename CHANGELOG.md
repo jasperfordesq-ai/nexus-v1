@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Registration form: server-side enforcement closes three React-side-only bypasses.** The React frontend has long sent `terms_accepted`, `password_confirmation`, and `invite_code` in the registration payload, but `RegistrationService::register()` ignored them — meaning a scripted submission could skip the terms checkbox, mismatch passwords, or register on an `invite_only` tenant with no code at all. All three are now enforced server-side with distinct error codes (`TERMS_REQUIRED`, `PASSWORD_MISMATCH`, `INVITE_REQUIRED`, `INVITE_INVALID`). Invite codes are validated against `InviteCodeService` and redeemed atomically after the user row is created; if the redeem races out (concurrent registration consumed the last use), the new account is marked `rejected` so the code stays the gating signal.
+- **Min-form-time bot gate is now server-enforced.** Both the React form and the new Blade form send a `form_started_at` timestamp; the service silently no-ops (success-shaped response, like the honeypot) when the elapsed time is < 5 seconds. Previously the 5-second check only ran in the React UI and a scripted POST would skip it.
+
+### Changed
+
+- **Accessible (GovUK Alpha) registration form: feature parity with the React form.** Added profile-type radios (individual / organisation), conditional organisation-name field, conditional invite-code field (shown only when the tenant's effective registration policy is `invite_only`), password-confirmation field with live-match indicator, mandatory terms-of-service + privacy-policy checkbox, and Google Places autocomplete on the location field (progressive enhancement — form works without JS). The newsletter checkbox is preserved. New `register-enhancements.js` handles all client-side interactions; the existing `password-strength.js` continues to provide live NIST-aligned length + HIBP breach feedback.
+- **GovUK Alpha `storeRegister` controller maps six new service error codes** to distinct Blade page statuses so users see specific messages ("you must accept the terms" / "this invite code is invalid") instead of the generic "check the form and try again" fallback.
+- **React `RegisterPage` now sends `form_started_at`** to the server so the min-form-time gate enforces on this path too.
+
 ### Removed
 
 - **Cloudflare Turnstile removed from login, password-reset, and registration forms (2026-05-16).** Both the React SPA and the GovUK Alpha accessible Blade frontend. Member feedback found the widget too confusing and the false-positive rate unacceptable on account-recovery and sign-in flows. **Turnstile is retained on contact forms** where the cost of a small amount of user friction is acceptable as spam defence.

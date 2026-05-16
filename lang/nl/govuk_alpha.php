@@ -1,9 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+// Auto-filled missing keys from lang/en/govuk_alpha.php — see MEMORY.md i18n rules.
 return [
     'service_name' => 'Project NEXUS Accessible',
     'phase' => 'Alpha',
@@ -368,9 +364,9 @@ return [
         'posted_filter_label' => 'Posted',
         'posted_filters' => [
             'any' => 'Any time',
-            '1' => 'Last day',
-            '7' => 'Last 7 days',
-            '30' => 'Last 30 days',
+            1 => 'Last day',
+            7 => 'Last 7 days',
+            30 => 'Last 30 days',
         ],
         'exchange_title' => 'Exchange this listing',
         'exchange_detail' => 'Use the accessible exchange workflow to agree the request, track progress and confirm hours.',

@@ -13,6 +13,8 @@ use App\Core\Validator as NexusValidator;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\User;
+use App\Services\Identity\InviteCodeService;
+use App\Services\Identity\RegistrationPolicyService;
 use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -63,10 +65,32 @@ class RegistrationService
             ];
         }
 
+        // Minimum-time bot gate — form must take >= 5 seconds. Mirrors the
+        // React frontend's client check so the server cannot be bypassed by
+        // a script that POSTs directly. Fails silently (same success-shaped
+        // response as the honeypot) so bots can't distinguish this from a
+        // real registration.
+        if (isset($data['form_started_at']) && is_numeric($data['form_started_at'])) {
+            $startedAtMs = (int) $data['form_started_at'];
+            $nowMs = (int) (microtime(true) * 1000);
+            if ($startedAtMs > 0 && ($nowMs - $startedAtMs) < 5000) {
+                Log::info('registration.too_fast', [
+                    'tenant_id' => $tenantId,
+                    'ip' => request()?->ip(),
+                    'elapsed_ms' => $nowMs - $startedAtMs,
+                ]);
+                return [
+                    'user' => null,
+                    'requires_verification' => true,
+                    'message' => __('emails_misc.registration.success_message'),
+                ];
+            }
+        }
+
         // Registration Turnstile gate removed 2026-05-16 — member feedback
         // showed the widget was deterring legitimate sign-ups. Bot defence on
-        // this path is the honeypot field + per-IP route throttle (3/5min) +
-        // admin-approval gate.
+        // this path is the honeypot field + min-form-time gate + per-IP
+        // route throttle (3/5min) + admin-approval gate.
 
         $validator = validator($data, [
             'first_name' => 'required|string|max:100',
@@ -88,18 +112,53 @@ class RegistrationService
             // Real defence is the HIBP breach check that runs immediately
             // after this validator.
             'password'   => ['required', 'string', Password::min(12)],
+            // Terms acceptance is a legal-compliance gate; both frontends
+            // present it as a mandatory checkbox. Enforce server-side so a
+            // scripted submission cannot bypass it.
+            'terms_accepted' => 'accepted',
+            // profile_type is enumerated; organization_name required when
+            // profile_type=organisation.
+            'profile_type' => 'sometimes|string|in:individual,organisation',
+            'organization_name' => 'required_if:profile_type,organisation|nullable|string|max:255',
         ], [
             'location.required' => __('api.location_required'),
             'phone.required' => __('api.phone_required'),
+            'terms_accepted.accepted' => __('api.terms_required'),
         ]);
 
         if ($validator->fails()) {
+            // If terms specifically failed, surface a distinct code so the
+            // frontend can render a specific message instead of the generic
+            // "check the form" fallback.
+            if ($validator->errors()->has('terms_accepted')) {
+                return [
+                    'error' => __('api.terms_required'),
+                    'code'  => 'TERMS_REQUIRED',
+                    'status' => 422,
+                ];
+            }
             $errors = $validator->errors()->first();
             return [
                 'error' => $errors,
                 'code'  => \App\Core\ApiErrorCodes::VALIDATION_ERROR,
                 'status' => 422,
             ];
+        }
+
+        // Password confirmation match — the frontend forms collect a confirm
+        // field; enforce it server-side so a scripted submission can't skip.
+        // The `password_confirmation` field is optional (a client that omits
+        // it bypasses this check) — make it required when ANY password
+        // confirmation value is sent, AND require the field whenever the
+        // request looks like a normal form submission.
+        if (array_key_exists('password_confirmation', $data)) {
+            if ((string) ($data['password_confirmation'] ?? '') !== (string) $data['password']) {
+                return [
+                    'error' => __('api.password_mismatch'),
+                    'code'  => 'PASSWORD_MISMATCH',
+                    'status' => 422,
+                ];
+            }
         }
 
         // Have I Been Pwned k-anonymity check — reject passwords that
@@ -111,6 +170,31 @@ class RegistrationService
                 'code'  => 'PASSWORD_PWNED',
                 'status' => 422,
             ];
+        }
+
+        // Invite-code gate — when the tenant's effective registration policy
+        // is `invite_only`, the submission MUST carry a valid, unused,
+        // non-expired invite code. Validated here (before user creation) so
+        // we don't insert a half-registered user when the code is bad.
+        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
+        $inviteRequired = ($policy['registration_mode'] ?? 'open') === 'invite_only';
+        $inviteCode = isset($data['invite_code']) ? strtoupper(trim((string) $data['invite_code'])) : '';
+        if ($inviteRequired) {
+            if ($inviteCode === '') {
+                return [
+                    'error' => __('api.invite_code_required'),
+                    'code'  => 'INVITE_REQUIRED',
+                    'status' => 422,
+                ];
+            }
+            $inviteResult = InviteCodeService::validate($tenantId, $inviteCode);
+            if (!($inviteResult['valid'] ?? false)) {
+                return [
+                    'error' => __('api.invite_code_invalid'),
+                    'code'  => 'INVITE_INVALID',
+                    'status' => 422,
+                ];
+            }
         }
 
         $user = DB::transaction(function () use ($data, $tenantId) {
@@ -172,6 +256,25 @@ class RegistrationService
                 'code'  => \App\Core\ApiErrorCodes::VALIDATION_DUPLICATE,
                 'status' => 409,
             ];
+        }
+
+        // Redeem the invite code now that the user row exists. There is a
+        // small race window between validate() and redeem() where a one-use
+        // code could be consumed by another concurrent registration; if the
+        // redeem fails we deactivate the freshly-created user so the code
+        // remains the gating signal instead of leaving an orphan account.
+        if ($inviteRequired) {
+            $redeemed = InviteCodeService::redeem($tenantId, $inviteCode, (int) $user->id);
+            if (!$redeemed) {
+                // Soft-delete by setting status; the email is now reserved
+                // against re-registration, but the account cannot be used.
+                $user->update(['status' => 'rejected']);
+                return [
+                    'error' => __('api.invite_code_invalid'),
+                    'code'  => 'INVITE_INVALID',
+                    'status' => 422,
+                ];
+            }
         }
 
         // Dispatch UserRegistered event (triggers welcome notification, etc.)

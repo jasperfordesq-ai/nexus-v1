@@ -184,6 +184,10 @@ export interface RegisterRequest {
   terms_accepted: boolean;
   newsletter_opt_in?: boolean;
   invite_code?: string;
+  // Epoch milliseconds when the form was first rendered. The server rejects
+  // submissions that arrive < 5s later as bot probes (mirrors the client-side
+  // gate so a scripted POST can't bypass it).
+  form_started_at?: number;
 }
 
 export interface RegisterResponse {

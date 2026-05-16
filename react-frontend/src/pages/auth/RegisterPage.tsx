@@ -365,6 +365,7 @@ export function RegisterPage() {
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
       invite_code: requiresInviteCode ? inviteCode.trim().toUpperCase() : undefined,
+      form_started_at: formStartTime,
     } as Parameters<typeof register>[0]);
 
     if (result.success) {

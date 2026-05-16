@@ -226,12 +226,50 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
 
+        $tenantId = TenantContext::getId();
+        $policy = \App\Services\Identity\RegistrationPolicyService::getEffectivePolicy($tenantId);
+        $requiresInviteCode = ($policy['registration_mode'] ?? 'open') === 'invite_only';
+
+        // Resolve maps config to drive the Google Places autocomplete on the
+        // location field. Mirrors MapsConfigController's gating: no API key
+        // unless maps feature is on AND provider is google.
+        $mapsEnabled = TenantContext::hasFeature('maps');
+        $mapProvider = $this->resolveTenantSetting($tenantId, 'general.map_provider', 'google');
+        $geocodingProvider = $this->resolveTenantSetting($tenantId, 'general.geocoding_provider', 'google');
+        $tenantGoogleKey = $this->resolveTenantSetting($tenantId, 'general.google_maps_api_key', '');
+        $envGoogleKey = (string) (getenv('GOOGLE_MAPS_API_KEY') ?: '');
+        $googleApiKey = ($mapsEnabled && $geocodingProvider === 'google')
+            ? ($tenantGoogleKey !== '' ? $tenantGoogleKey : $envGoogleKey)
+            : '';
+
         return $this->view('accessible-frontend::register', [
             'title' => __('govuk_alpha.auth.register_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
             'status' => self::asStr($request->query('status')) ?: null,
+            'requiresInviteCode' => $requiresInviteCode,
+            'googleMapsApiKey' => $googleApiKey,
+            'geocodingProvider' => $geocodingProvider,
+            // Server timestamp (ms) used by the min-form-time bot gate. Sent
+            // back as a hidden field so we don't need a session round-trip.
+            'formStartedAt' => (int) (microtime(true) * 1000),
         ]);
+    }
+
+    private function resolveTenantSetting(int $tenantId, string $key, string $default): string
+    {
+        if ($tenantId <= 0) {
+            return $default;
+        }
+        try {
+            $value = DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', $key)
+                ->value('setting_value');
+            return is_string($value) && $value !== '' ? $value : $default;
+        } catch (\Throwable) {
+            return $default;
+        }
     }
 
     public function storeRegister(Request $request, string $tenantSlug): RedirectResponse
@@ -244,8 +282,16 @@ class AlphaController extends Controller
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'location' => $request->input('location'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
             'password' => $request->input('password'),
+            'password_confirmation' => $request->input('password_confirmation'),
+            'profile_type' => $request->input('profile_type', 'individual'),
+            'organization_name' => $request->input('organization_name'),
+            'invite_code' => $request->input('invite_code'),
+            'terms_accepted' => $request->boolean('terms_accepted'),
             'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
+            'form_started_at' => $request->input('form_started_at'),
             // Bot honeypot — hidden input in the Blade form. Real users
             // never see or fill it; bots auto-fill everything.
             'honeypot' => $request->input('website'),
@@ -259,6 +305,10 @@ class AlphaController extends Controller
             $status = match (true) {
                 $code === 'VALIDATION_DUPLICATE'  => 'register-duplicate',
                 $code === 'PASSWORD_PWNED'        => 'register-password-pwned',
+                $code === 'PASSWORD_MISMATCH'     => 'register-password-mismatch',
+                $code === 'TERMS_REQUIRED'        => 'register-terms-required',
+                $code === 'INVITE_REQUIRED'       => 'register-invite-required',
+                $code === 'INVITE_INVALID'        => 'register-invite-invalid',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',
                 default                            => 'register-failed',
             };
