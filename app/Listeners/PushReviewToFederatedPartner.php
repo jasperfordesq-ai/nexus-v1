@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Log;
  * `federated_identities` row (i.e. they came from an external federation
  * partner), push the review to that partner's API so reputation follows them.
  *
- * Local-only reviews (receiver has no federated identity) are a no-op — the
+ * Local-only reviews (receiver has no federated identity) are a no-op â€” the
  * existing local review row is all that's needed.
  *
  * Feature-gated the same way as the other federation push listeners:
@@ -44,7 +44,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
     {
         try {
             // Restore tenant context for the queued worker (no tenant is set
-            // on queue boot — all DB reads below must be scoped correctly).
+            // on queue boot â€” all DB reads below must be scoped correctly).
             if ($event->tenantId > 0) {
                 TenantContext::setById($event->tenantId);
             }
@@ -73,7 +73,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
             }
 
             // Look up ANY federated identity rows for the receiver. A user
-            // may be federated to multiple partners — push to each so the
+            // may be federated to multiple partners â€” push to each so the
             // review lands wherever they have a reputation presence.
             $identities = FederatedIdentity::query()
                 ->where('local_user_id', $receiverId)
@@ -92,6 +92,8 @@ class PushReviewToFederatedPartner implements ShouldQueue
                 'tenant_id' => $event->tenantId ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 

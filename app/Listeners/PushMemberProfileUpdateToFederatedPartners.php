@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushMemberProfileUpdateToFederatedPartners — propagates profile changes for
+ * PushMemberProfileUpdateToFederatedPartners â€” propagates profile changes for
  * federated members (users who have a `federated_identities` row) to each
  * partner they are linked with.  Only partners with `allow_member_sync = 1`
  * receive the update.  The payload only includes fields actually changed to
@@ -71,7 +71,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
             // profile update occurred before this queue job ran.
             $freshUser = \App\Models\User::find((int) $event->user->id);
             if (!$freshUser) {
-                // User was deleted between dispatch and processing — nothing to push.
+                // User was deleted between dispatch and processing â€” nothing to push.
                 return;
             }
 
@@ -133,6 +133,8 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
                 'user_id'   => $event->user->id ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

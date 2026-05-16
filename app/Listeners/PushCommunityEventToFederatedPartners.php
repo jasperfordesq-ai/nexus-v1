@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushCommunityEventToFederatedPartners — broadcasts local community events to
+ * PushCommunityEventToFederatedPartners â€” broadcasts local community events to
  * active external federation partners that have `allow_events = 1`.
  *
  * Handles both CommunityEventCreated and CommunityEventUpdated; `action` in
@@ -90,6 +90,8 @@ class PushCommunityEventToFederatedPartners implements ShouldQueue
                 'event_id'  => $eventModel->id ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 

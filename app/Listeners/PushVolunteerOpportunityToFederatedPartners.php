@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushVolunteerOpportunityToFederatedPartners — broadcasts local volunteer
+ * PushVolunteerOpportunityToFederatedPartners â€” broadcasts local volunteer
  * opportunities to external federation partners that have
  * `allow_volunteering = 1`.  Handles both create and update; `action` in the
  * payload disambiguates so remote partners can upsert.
@@ -50,7 +50,7 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
 
             // Only push opportunities that are explicitly marked for federation.
             // The vol_opportunities schema does not yet have a federated_visibility
-            // column — check is_federated (if present) or fall back to is_active
+            // column â€” check is_federated (if present) or fall back to is_active
             // as a minimum gate so inactive/draft opportunities are never pushed.
             // TODO: add `is_federated` tinyint column to vol_opportunities to allow
             //       per-opportunity opt-in (mirrors listings.federated_visibility).
@@ -114,6 +114,8 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 'opportunity_id' => $opportunity->id ?? null,
                 'error'          => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

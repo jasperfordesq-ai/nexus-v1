@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -17,7 +17,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushFederationDataRetraction — GDPR Article 17 enforcement for federated data.
+ * PushFederationDataRetraction â€” GDPR Article 17 enforcement for federated data.
  *
  * When a user deletes their account or opts out of federation, this listener
  * notifies every active federated partner that holds a linked identity for
@@ -87,6 +87,8 @@ class PushFederationDataRetraction implements ShouldQueue
                 'user_id'   => $userId ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

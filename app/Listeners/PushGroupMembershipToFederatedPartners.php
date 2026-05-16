@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushGroupMembershipToFederatedPartners — broadcasts group join events to
+ * PushGroupMembershipToFederatedPartners â€” broadcasts group join events to
  * external federation partners that have `allow_groups = 1`.
  */
 class PushGroupMembershipToFederatedPartners implements ShouldQueue
@@ -45,7 +45,7 @@ class PushGroupMembershipToFederatedPartners implements ShouldQueue
             }
 
             // Only push membership events for groups that are federated.
-            // Load the group to check its federated_visibility — matches the
+            // Load the group to check its federated_visibility â€” matches the
             // gate used in PushGroupToFederatedPartners.
             $group = Group::find($event->groupId);
             if (!$group) {
@@ -101,6 +101,8 @@ class PushGroupMembershipToFederatedPartners implements ShouldQueue
                 'group_id'  => $event->groupId ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

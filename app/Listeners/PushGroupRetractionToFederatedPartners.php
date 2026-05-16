@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushGroupRetractionToFederatedPartners — notifies federation partners when a
+ * PushGroupRetractionToFederatedPartners â€” notifies federation partners when a
  * group is deleted or a member leaves, so shadow tables stay in sync.
  *
  * Handles two events:
@@ -103,6 +103,8 @@ class PushGroupRetractionToFederatedPartners implements ShouldQueue
                 'tenant_id' => $tenantId ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

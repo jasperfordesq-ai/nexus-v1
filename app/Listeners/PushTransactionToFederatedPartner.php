@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -16,7 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushTransactionToFederatedPartner — pushes a completed local transaction
+ * PushTransactionToFederatedPartner â€” pushes a completed local transaction
  * to an external federation partner when either participant is federated.
  *
  * Queued so the local wallet flow is never blocked by outbound HTTP.
@@ -54,7 +54,7 @@ class PushTransactionToFederatedPartner implements ShouldQueue
             $partnerId = (int) ($transaction->external_partner_id ?? 0);
 
             if ($partnerId <= 0) {
-                // Nothing to push — transaction is flagged federated but has
+                // Nothing to push â€” transaction is flagged federated but has
                 // no external partner linkage (purely cross-tenant internal).
                 return;
             }
@@ -90,6 +90,8 @@ class PushTransactionToFederatedPartner implements ShouldQueue
                 'transaction_id' => $event->transaction->id ?? null,
                 'error'          => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushGroupToFederatedPartners — broadcasts newly-created groups to external
+ * PushGroupToFederatedPartners â€” broadcasts newly-created groups to external
  * federation partners that have `allow_groups = 1`.
  */
 class PushGroupToFederatedPartners implements ShouldQueue
@@ -100,6 +100,8 @@ class PushGroupToFederatedPartners implements ShouldQueue
                 'group_id'  => $group->id ?? null,
                 'error'     => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

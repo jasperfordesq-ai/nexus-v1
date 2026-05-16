@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushListingToFederatedPartners — broadcasts new local listings to active
+ * PushListingToFederatedPartners â€” broadcasts new local listings to active
  * external federation partners that have allow_listing_search=1.
  *
  * Runs asynchronously via the queue so local listing creation is never blocked
@@ -40,7 +40,7 @@ class PushListingToFederatedPartners implements ShouldQueue
             // Ensure tenant context is set for queued execution
             TenantContext::setById($event->tenantId);
 
-            // 1. Tenant-level feature gate — CLAUDE.md mandates TenantContext::hasFeature
+            // 1. Tenant-level feature gate â€” CLAUDE.md mandates TenantContext::hasFeature
             if (!TenantContext::hasFeature('federation')) {
                 return;
             }
@@ -105,6 +105,8 @@ class PushListingToFederatedPartners implements ShouldQueue
                 'listing_id' => $event->listing->id ?? null,
                 'error'      => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 

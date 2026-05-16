@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -50,7 +50,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 return;
             }
 
-            // Push to every federated identity owned by EITHER participant —
+            // Push to every federated identity owned by EITHER participant â€”
             // the requester or the receiver may be federated.  We fire a
             // separate POST per identity so each partner sees the acceptance.
             $participantIds = array_filter([
@@ -66,7 +66,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 ->get();
 
             if ($identities->isEmpty()) {
-                return; // purely-local connection — nothing to federate
+                return; // purely-local connection â€” nothing to federate
             }
 
             // Build the set of partner IDs that have allow_connections = 1
@@ -117,6 +117,8 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 'connection_id' => $connection->id ?? null,
                 'error'         => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }

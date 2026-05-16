@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -37,7 +37,7 @@ class SendWelcomeNotification implements ShouldQueue
         try {
             // Tenant context for any notifications/emails below.
             // Search-index upserts are handled by UserObserver (queued + retried)
-            // on the `created` event — no direct indexUser() call here.
+            // on the `created` event â€” no direct indexUser() call here.
             TenantContext::setById($event->tenantId);
 
             // The ENTIRE welcome flow renders in the new user's language
@@ -95,14 +95,14 @@ class SendWelcomeNotification implements ShouldQueue
                         Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
                     }
                 } else {
-                    // Already active user (admin-created) — generic welcome only
+                    // Already active user (admin-created) â€” generic welcome only
                     $html = EmailTemplateBuilder::make()
                         ->theme('success')
                         ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
                         ->previewText(__('emails.welcome.active_preview', ['name' => $safeUserName]))
                         ->greeting($safeUserName)
                         ->paragraph(__('emails.welcome.active_intro', ['community' => $safeTenantName]))
-                        ->highlight(__('emails.welcome.active_get_started'), '✨')
+                        ->highlight(__('emails.welcome.active_get_started'), 'âœ¨')
                         ->bulletList([
                             __('emails.welcome.active_bullet_profile'),
                             __('emails.welcome.active_bullet_listings'),
@@ -125,6 +125,8 @@ class SendWelcomeNotification implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 

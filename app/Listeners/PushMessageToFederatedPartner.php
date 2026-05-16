@@ -1,5 +1,5 @@
-<?php
-// Copyright © 2024–2026 Jasper Ford
+﻿<?php
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushMessageToFederatedPartner — forwards a locally-sent message to an
+ * PushMessageToFederatedPartner â€” forwards a locally-sent message to an
  * external federation partner when the recipient is federated.
  *
  * Only triggers when the underlying Message row has is_federated=1 AND the
@@ -55,7 +55,7 @@ class PushMessageToFederatedPartner implements ShouldQueue
                 return;
             }
 
-            // Resolve receiver's federated partner — by convention, a federated
+            // Resolve receiver's federated partner â€” by convention, a federated
             // recipient has a row in federation_external_user_map or the message
             // itself carries external_partner_id. We check the message first,
             // then fall back to looking up any external partner whose directory
@@ -79,7 +79,7 @@ class PushMessageToFederatedPartner implements ShouldQueue
             }
 
             if ($partnerId <= 0) {
-                // Nothing to push — this is a purely local message flagged
+                // Nothing to push â€” this is a purely local message flagged
                 // federated (rare). Not an error.
                 return;
             }
@@ -115,6 +115,8 @@ class PushMessageToFederatedPartner implements ShouldQueue
                 'message_id' => $event->message->id ?? null,
                 'error'      => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
     }
 }
