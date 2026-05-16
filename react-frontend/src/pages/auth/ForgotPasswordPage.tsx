@@ -8,7 +8,6 @@
  */
 
 import { useState } from 'react';
-import { useTurnstile } from '@/hooks/useTurnstile';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
@@ -31,32 +30,16 @@ export function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Cloudflare Turnstile — interaction-only widget rendered via shared hook.
-  const {
-    token: turnstileToken,
-    status: turnstileStatus,
-    siteKey: turnstileSiteKey,
-    containerRef: turnstileRef,
-    reset: resetTurnstile,
-  } = useTurnstile();
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
-    if (turnstileSiteKey && !turnstileToken) return;
 
     setSubmitError(null);
     setIsLoading(true);
 
-    const response = await api.post<{ message?: string }>('/auth/forgot-password', {
-      email,
-      turnstile_token: turnstileToken || undefined,
-    });
+    const response = await api.post<{ message?: string }>('/auth/forgot-password', { email });
 
     setIsLoading(false);
-    // Turnstile token is single-use — reset whether we succeeded or failed
-    // so the user can retry without being stuck with a consumed challenge.
-    if (turnstileSiteKey) resetTurnstile();
 
     if (response.success) {
       setIsSubmitted(true);
@@ -68,12 +51,6 @@ export function ForgotPasswordPage() {
     if (response.code === 'RATE_LIMIT_EXCEEDED') {
       setSubmitError(t('forgot_password.rate_limited', {
         defaultValue: 'Too many reset attempts. Please wait an hour before trying again, or contact support.',
-      }));
-      return;
-    }
-    if (response.code === 'VALIDATION_INVALID_FORMAT' || response.code === 'TURNSTILE_FAILED') {
-      setSubmitError(t('forgot_password.turnstile_failed', {
-        defaultValue: 'The security check failed. Please reload the page and try again.',
       }));
       return;
     }
@@ -179,22 +156,11 @@ export function ForgotPasswordPage() {
               isRequired
             />
 
-            {turnstileSiteKey && (
-              <div>
-                <div ref={turnstileRef} className="my-2 min-h-[1px]" />
-                {turnstileStatus === 'error' && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                    {t('forgot_password.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
-                  </p>
-                )}
-              </div>
-            )}
-
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               isLoading={isLoading}
-              isDisabled={!email.trim() || (!!turnstileSiteKey && !turnstileToken)}
+              isDisabled={!email.trim()}
             >
               {t('forgot_password.send_button')}
             </Button>

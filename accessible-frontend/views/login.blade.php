@@ -10,11 +10,10 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.login_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.auth.login_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
 
-            @if (in_array($status ?? '', ['login-failed', 'two-factor-required', 'turnstile-failed', 'rate-limited', 'email-not-verified', 'pending-verification', 'account-suspended'], true))
+            @if (in_array($status ?? '', ['login-failed', 'two-factor-required', 'rate-limited', 'email-not-verified', 'pending-verification', 'account-suspended'], true))
                 @php
                     $loginErrorMessage = match ($status) {
                         'two-factor-required'   => __('govuk_alpha.auth.two_factor_required'),
-                        'turnstile-failed'      => __('govuk_alpha.auth.turnstile_failed'),
                         'rate-limited'          => __('govuk_alpha.auth.rate_limited'),
                         'email-not-verified'    => __('govuk_alpha.auth.email_not_verified'),
                         'pending-verification'  => __('govuk_alpha.auth.pending_verification'),
@@ -57,13 +56,10 @@
                     <input class="govuk-input" id="password" name="password" type="password" autocomplete="current-password" required>
                 </div>
 
-                @if($turnstileSiteKey ?? false)
-                    {{-- Cloudflare Turnstile — bot challenge on login. --}}
-                    <div class="govuk-form-group">
-                        <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="auto"></div>
-                    </div>
-                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-                @endif
+                {{-- Cloudflare Turnstile removed 2026-05-16 — member feedback
+                     found the widget too confusing. Bot defence is now the
+                     backend per-email + per-IP brute-force limiter plus
+                     route-level throttle. --}}
 
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.login_action') }}</button>
             </form>

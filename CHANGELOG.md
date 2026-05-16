@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Cloudflare Turnstile removed from login, password-reset, and registration forms (2026-05-16).** Both the React SPA and the GovUK Alpha accessible Blade frontend. Member feedback found the widget too confusing and the false-positive rate unacceptable on account-recovery and sign-in flows. **Turnstile is retained on contact forms** where the cost of a small amount of user friction is acceptable as spam defence.
+  - Bot/brute-force defence on auth endpoints is now: the DB-backed per-email + per-IP brute-force limiter, route-level throttle (login 30/min, password-reset 5/15min, register 3/5min), the registration honeypot, the registration admin-approval gate, and the email-enumeration safety on the password-reset response.
+  - Removed `TurnstileService` injection from `AuthController`, `PasswordResetController`, and `RegistrationService`.
+  - Removed `useTurnstile()` and widget JSX from `LoginPage`, `ForgotPasswordPage`, `RegisterPage` (desktop + mobile mounts).
+  - Removed `cf-turnstile` divs and api.js loader from `accessible-frontend/views/login.blade.php` and `register.blade.php`.
+  - Dead `turnstile_token` request types and dead `register-turnstile-failed` / `turnstile-failed` Blade status branches dropped.
+
 ### Fixed
 
 - **Cloudflare Turnstile rollout UX + silent-failure regressions (emergency).** Same-day hotfix to today's Turnstile/bot-defence rollout. Two valuable members reported real problems: one found the visible "Verify you are human" widget confusing and suspicious, another could not get a password reset email no matter how many times he tried.

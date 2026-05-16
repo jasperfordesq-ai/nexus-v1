@@ -31,7 +31,6 @@ class RegistrationService
     public function __construct(
         private readonly User $user,
         private readonly TenantSettingsService $tenantSettings,
-        private readonly TurnstileService $turnstile,
         private readonly PwnedPasswordService $pwnedPassword,
     ) {}
 
@@ -64,19 +63,10 @@ class RegistrationService
             ];
         }
 
-        // Cloudflare Turnstile verification. Token is the cf-turnstile-response
-        // hidden input rendered by the widget on the client. Service no-ops
-        // (returns true) when TURNSTILE_SECRET_KEY is unset, so dev/CI work
-        // unchanged. A returned `error` field surfaces the failure to the
-        // controller, which renders the form again so the user can retry.
-        $turnstileToken = $data['turnstile_token'] ?? null;
-        if (! $this->turnstile->verify($turnstileToken, request()?->ip())) {
-            return [
-                'error' => __('api.turnstile_failed'),
-                'code'  => \App\Core\ApiErrorCodes::TURNSTILE_FAILED,
-                'status' => 422,
-            ];
-        }
+        // Registration Turnstile gate removed 2026-05-16 — member feedback
+        // showed the widget was deterring legitimate sign-ups. Bot defence on
+        // this path is the honeypot field + per-IP route throttle (3/5min) +
+        // admin-approval gate.
 
         $validator = validator($data, [
             'first_name' => 'required|string|max:100',

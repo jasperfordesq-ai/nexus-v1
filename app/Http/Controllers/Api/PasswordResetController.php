@@ -29,7 +29,6 @@ class PasswordResetController extends BaseApiController
 
     public function __construct(
         private readonly TokenService $tokenService,
-        private readonly \App\Services\TurnstileService $turnstile,
         private readonly \App\Services\PwnedPasswordService $pwnedPassword,
     ) {}
 
@@ -45,22 +44,11 @@ class PasswordResetController extends BaseApiController
         // Rate limit by IP - 5 requests per 15 minutes
         $this->rateLimit('forgot_password', 5, 900);
 
-        // Cloudflare Turnstile gate (forgot-password). Prevents bots from
-        // enumerating email addresses via the reset flow. Verifier short-
-        // circuits when TURNSTILE_SECRET_KEY is unset.
-        $allInput = $this->getAllInput();
-        $turnstileToken = $allInput['turnstile_token']
-            ?? $allInput['cf-turnstile-response']
-            ?? $allInput['cfTurnstileResponse']
-            ?? null;
-        if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
-            return $this->respondWithError(
-                ApiErrorCodes::TURNSTILE_FAILED,
-                __('api.turnstile_failed'),
-                null,
-                422
-            );
-        }
+        // Forgot-password Turnstile gate removed 2026-05-16 — too many false
+        // positives blocked legitimate users from recovering their accounts.
+        // Bot/enumeration defence: per-IP 5/15min route throttle + per-email
+        // 10/hr limiter below + email enumeration safety (always-success
+        // response regardless of whether the address exists).
 
         $email = $this->input('email');
 

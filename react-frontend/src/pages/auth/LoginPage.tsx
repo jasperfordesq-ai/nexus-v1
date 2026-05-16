@@ -30,7 +30,6 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldX from 'lucide-react/icons/shield-x';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { useTurnstile } from '@/hooks/useTurnstile';
 import { GlassCard } from '@/components/ui';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { PageMeta } from '@/components/seo';
@@ -82,16 +81,9 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Cloudflare Turnstile — explicit render in interaction-only mode. The
-  // widget stays invisible for legitimate users; only a tiny fraction get
-  // a visible challenge. See useTurnstile for the why behind explicit render.
-  const {
-    token: turnstileToken,
-    status: turnstileStatus,
-    siteKey: turnstileSiteKey,
-    containerRef: turnstileRef,
-    reset: resetTurnstile,
-  } = useTurnstile();
+  // Cloudflare Turnstile removed from login 2026-05-16 — member feedback
+  // found the widget confusing. Bot defence is now the DB-backed per-email
+  // + per-IP brute force limiter plus route-level throttle:30,1.
 
   // 2FA state
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -246,24 +238,16 @@ export function LoginPage() {
     tokenManager.clearTokens();
     tokenManager.setTenantId(selectedTenantId);
 
-    // Turnstile gate — bail if widget configured but not yet solved
-    if (turnstileSiteKey && !turnstileToken) return;
-
-    const result = await login({ email, password, turnstile_token: turnstileToken || undefined });
+    const result = await login({ email, password });
     // Admin without 2FA — route directly into the setup flow.
     if (!result.success && result.requires2FASetup) {
       navigate(tenantPath('/settings/security?force_2fa_setup=1'), { replace: true });
       return;
     }
-    if (!result.success) {
-      // Turnstile tokens are single-use — reset the widget on any failure so
-      // the user can retry without being stuck with a consumed token.
-      if (turnstileSiteKey) resetTurnstile();
-      if (result.errorCode) {
-        setLoginErrorCode(result.errorCode);
-        if (result.errorCode === 'RATE_LIMITED' || (result as { retryAfter?: number }).retryAfter) {
-          setLoginRetryAfter((result as { retryAfter?: number }).retryAfter ?? null);
-        }
+    if (!result.success && result.errorCode) {
+      setLoginErrorCode(result.errorCode);
+      if (result.errorCode === 'RATE_LIMITED' || (result as { retryAfter?: number }).retryAfter) {
+        setLoginRetryAfter((result as { retryAfter?: number }).retryAfter ?? null);
       }
     }
   };
@@ -595,21 +579,10 @@ export function LoginPage() {
                       </Link>
                     </div>
 
-                    {turnstileSiteKey && (
-                      <div>
-                        <div ref={turnstileRef} className="my-2 min-h-[1px]" />
-                        {turnstileStatus === 'error' && (
-                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                            {t('login.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
                     <Button
                       type="submit"
                       isLoading={isLoading}
-                      isDisabled={!canSubmit || (!!turnstileSiteKey && !turnstileToken)}
+                      isDisabled={!canSubmit}
                       className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                       size="lg"
                       spinner={<Loader2 className="w-4 h-4 animate-spin" />}

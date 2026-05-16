@@ -371,7 +371,6 @@ class AppServiceProvider extends ServiceProvider
             return new RegistrationService(
                 new User(),
                 $app->make(\App\Services\TenantSettingsService::class),
-                $app->make(\App\Services\TurnstileService::class),
                 $app->make(\App\Services\PwnedPasswordService::class),
             );
         });

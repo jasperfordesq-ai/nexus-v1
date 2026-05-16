@@ -10,10 +10,9 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.register_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.auth.register_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
 
-            @if (in_array($status ?? '', ['register-failed', 'register-turnstile-failed', 'register-duplicate', 'register-password-pwned', 'register-validation'], true))
+            @if (in_array($status ?? '', ['register-failed', 'register-duplicate', 'register-password-pwned', 'register-validation'], true))
                 @php
                     $registerErrorMessage = match ($status) {
-                        'register-turnstile-failed' => __('govuk_alpha.auth.register_turnstile_failed'),
                         'register-duplicate'        => __('govuk_alpha.auth.register_duplicate'),
                         'register-password-pwned'   => __('govuk_alpha.auth.register_password_pwned'),
                         'register-validation'       => __('govuk_alpha.auth.register_validation'),
@@ -86,18 +85,10 @@
                     </div>
                 </div>
 
-                @if($turnstileSiteKey)
-                    {{-- Cloudflare Turnstile challenge. Renders an invisible
-                         or interactive bot-check; the resolved token is posted
-                         back as a `cf-turnstile-response` hidden input which
-                         the server verifies via siteverify. Without the site
-                         key (dev/CI) the widget is omitted entirely and the
-                         server-side TurnstileService no-ops. --}}
-                    <div class="govuk-form-group">
-                        <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="auto"></div>
-                    </div>
-                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-                @endif
+                {{-- Cloudflare Turnstile removed from registration 2026-05-16
+                     — member feedback found it deterred legitimate sign-ups.
+                     Bot defence: honeypot input above + per-IP route throttle
+                     + admin-approval gate. --}}
 
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.register_action') }}</button>
             </form>

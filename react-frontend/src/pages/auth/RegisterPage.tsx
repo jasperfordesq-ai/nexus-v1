@@ -39,7 +39,6 @@ import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
-import { useTurnstile } from '@/hooks/useTurnstile';
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
@@ -84,14 +83,9 @@ export function RegisterPage() {
   // Bot protection
   const [formStartTime] = useState(() => Date.now());
   const honeypotRef = useRef<HTMLInputElement>(null);
-  // Cloudflare Turnstile — interaction-only widget via shared hook.
-  const {
-    token: turnstileToken,
-    status: turnstileStatus,
-    siteKey: turnstileSiteKey,
-    containerRef: turnstileRef,
-    reset: resetTurnstile,
-  } = useTurnstile();
+  // Cloudflare Turnstile removed from registration 2026-05-16 — member
+  // feedback found the widget too confusing. Bot defence: honeypot input
+  // + per-IP route throttle (3/5min) + admin-approval gate.
 
   // Tenant state
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -159,8 +153,6 @@ export function RegisterPage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Cloudflare Turnstile widget mount + token state handled by useTurnstile() above.
 
   // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
@@ -357,11 +349,6 @@ export function RegisterPage() {
     const selectedTenant = tenants.find((t) => String(t.id) === selectedTenantId);
     const tenantId = selectedTenant?.id || parseInt(selectedTenantId) || tenant?.id || undefined;
 
-    // Turnstile gate — bail if widget configured but not yet solved
-    if (turnstileSiteKey && !turnstileToken) {
-      return;
-    }
-
     const result = await register({
       first_name: firstName,
       last_name: lastName,
@@ -378,7 +365,6 @@ export function RegisterPage() {
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
       invite_code: requiresInviteCode ? inviteCode.trim().toUpperCase() : undefined,
-      turnstile_token: turnstileToken || undefined,
     } as Parameters<typeof register>[0]);
 
     if (result.success) {
@@ -394,18 +380,12 @@ export function RegisterPage() {
       }
       // No gates — redirect to dashboard (fully authenticated)
       navigate(tenantPath('/dashboard'), { replace: true });
-    } else if (turnstileSiteKey) {
-      // Turnstile tokens are single-use — reset the widget so the user can
-      // retry after fixing the validation issue (duplicate email, weak
-      // password, etc.) instead of being stuck with a consumed token.
-      resetTurnstile();
     }
   }, [
     formStartTime, clearError, password, passwordConfirm, tenants, selectedTenantId,
     tenant?.id, register, firstName, lastName, email, profileType, organizationName,
     location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
     requiresInviteCode, inviteCode, navigate, tenantPath,
-    turnstileSiteKey, turnstileToken, resetTurnstile,
   ]);
 
   const passwordValid = passwordCheck.isAcceptable;
@@ -901,22 +881,10 @@ export function RegisterPage() {
           {renderStepContent(3)}
           {renderStepContent(4)}
 
-          {/* Cloudflare Turnstile — explicit render via useTurnstile hook. */}
-          {turnstileSiteKey && (
-            <div>
-              <div ref={turnstileRef} className="my-2 min-h-[1px]" />
-              {turnstileStatus === 'error' && (
-                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                  {t('register.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
-                </p>
-              )}
-            </div>
-          )}
-
           <Button
             type="submit"
             isLoading={isLoading}
-            isDisabled={!isFormValid || (!!turnstileSiteKey && !turnstileToken)}
+            isDisabled={!isFormValid}
             className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
             size="lg"
             spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
@@ -1035,7 +1003,7 @@ export function RegisterPage() {
             <Button
               type="submit"
               isLoading={isLoading}
-              isDisabled={!isFormValid || (!!turnstileSiteKey && !turnstileToken)}
+              isDisabled={!isFormValid}
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
               spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
             >
@@ -1043,20 +1011,6 @@ export function RegisterPage() {
             </Button>
           )}
         </div>
-
-        {/* Cloudflare Turnstile — only on the final step so the challenge
-            resolves close to submission and doesn't expire during earlier
-            steps. Explicit render via useTurnstile hook. */}
-        {turnstileSiteKey && currentStep === 4 && (
-          <div className="pt-2">
-            <div ref={turnstileRef} className="min-h-[1px]" />
-            {turnstileStatus === 'error' && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                {t('register.turnstile_error', { defaultValue: "Couldn't load security check. Refresh the page to try again." })}
-              </p>
-            )}
-          </div>
-        )}
       </form>
     );
   };

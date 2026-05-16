@@ -138,7 +138,6 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'login',
             'status' => self::asStr($request->query('status')) ?: null,
-            'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
         ]);
     }
 
@@ -190,11 +189,10 @@ class AlphaController extends Controller
 
         // Surface the specific failure reason so the Blade page can show a
         // useful message instead of a generic "login failed" for every code
-        // path (Turnstile, rate limit, suspended, unverified, etc.).
+        // path (rate limit, suspended, unverified, etc.).
         $errors = $payload['errors'] ?? [];
         $code = (string) ($errors[0]['code'] ?? '');
         $status = match (true) {
-            $code === 'TURNSTILE_FAILED'              => 'turnstile-failed',
             $code === 'RATE_LIMIT_EXCEEDED',
             $code === 'RATE_LIMITED'                  => 'rate-limited',
             $code === 'AUTH_EMAIL_NOT_VERIFIED'       => 'email-not-verified',
@@ -233,9 +231,6 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
             'status' => self::asStr($request->query('status')) ?: null,
-            // Site key is public — embedded in the HTML. Empty string
-            // hides the widget so dev/CI without a key still works.
-            'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
         ]);
     }
 
@@ -254,18 +249,14 @@ class AlphaController extends Controller
             // Bot honeypot — hidden input in the Blade form. Real users
             // never see or fill it; bots auto-fill everything.
             'honeypot' => $request->input('website'),
-            // Cloudflare Turnstile challenge token (cf-turnstile-response
-            // hidden input rendered by the widget).
-            'turnstile_token' => $request->input('cf-turnstile-response'),
         ], TenantContext::getId());
 
         if (isset($result['error'])) {
             // Map service-level error codes to specific Blade statuses so the
-            // user sees a useful message ("the security check failed" vs "you
-            // already have an account") instead of a single generic prompt.
+            // user sees a useful message ("you already have an account" vs a
+            // password breach hit) instead of a single generic prompt.
             $code = (string) ($result['code'] ?? '');
             $status = match (true) {
-                $code === 'TURNSTILE_FAILED'      => 'register-turnstile-failed',
                 $code === 'VALIDATION_DUPLICATE'  => 'register-duplicate',
                 $code === 'PASSWORD_PWNED'        => 'register-password-pwned',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',

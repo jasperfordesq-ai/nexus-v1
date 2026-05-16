@@ -30,7 +30,6 @@ class AuthController extends BaseApiController
         private readonly TokenService $tokenService,
         private readonly TotpService $totpService,
         private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
-        private readonly \App\Services\TurnstileService $turnstile,
     ) {}
 
     /**
@@ -83,21 +82,10 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Cloudflare Turnstile gate (login). Rejects bots before they can
-        // even consume the per-IP/per-email rate budget. Verifier short-
-        // circuits to true when TURNSTILE_SECRET_KEY is unset (dev mode).
-        $turnstileToken = $data['turnstile_token']
-            ?? $data['cf-turnstile-response']
-            ?? $data['cfTurnstileResponse']
-            ?? null;
-        if (! $this->turnstile->verify($turnstileToken, \App\Core\ClientIp::get())) {
-            return $this->authError(
-                __('api.turnstile_failed'),
-                ApiErrorCodes::TURNSTILE_FAILED,
-                422
-            );
-        }
-
+        // Login Turnstile gate removed 2026-05-16 — member feedback found the
+        // widget too confusing and the false-positive rate unacceptable. Bot
+        // defence on this endpoint is the DB-backed per-email + per-IP brute
+        // force limiter below + route-level throttle:30,1.
         // SECURITY: Database-based brute force protection (tracks FAILED attempts only)
         // Route-level throttle:30,1 middleware handles general request-rate DoS protection.
         $ip = \App\Core\ClientIp::get();
