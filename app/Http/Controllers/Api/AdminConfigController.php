@@ -67,6 +67,15 @@ class AdminConfigController extends BaseApiController
     ];
 
     /**
+     * Settings that only a platform super-admin (God) may modify.
+     * Tenant admins and tenant super-admins are rejected with 403.
+     */
+    private const PLATFORM_SUPER_ADMIN_ONLY_KEYS = [
+        'email_verification',
+        'admin_approval',
+    ];
+
+    /**
      * Settings whose stored value contains a credential and should be
      * returned masked from getSettings (e.g. "AIza••••••••YJ4") so the
      * admin UI can show whether a key is configured without leaking it.
@@ -779,6 +788,21 @@ class AdminConfigController extends BaseApiController
 
         if (empty($directUpdates) && empty($kvUpdates)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_settings', ['keys' => implode(', ', $unknownKeys)]), null, 422);
+        }
+
+        // Platform-super-admin-only keys — reject tenant admins with 403
+        $godOnlyKeys = array_intersect(array_keys($kvUpdates), self::PLATFORM_SUPER_ADMIN_ONLY_KEYS);
+        if (!empty($godOnlyKeys)) {
+            try {
+                $this->requirePlatformSuperAdmin();
+            } catch (\Throwable) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    'Only platform super-admins may change email verification or admin approval settings.',
+                    null,
+                    403
+                );
+            }
         }
 
         if (!empty($directUpdates)) {

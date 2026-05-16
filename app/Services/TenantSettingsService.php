@@ -76,10 +76,24 @@ class TenantSettingsService
 
     /**
      * Check if email verification is required for this tenant.
+     *
+     * Defaults to TRUE (fail-closed). Email verification is a platform-wide
+     * security baseline. Only God (platform super-admin) may disable it.
+     *
+     * Reads the bare `email_verification` key first; falls back to the
+     * historical `general.email_verification` prefix so legacy tenants whose
+     * settings were seeded with the old key form still resolve.
      */
     public function requiresEmailVerification(int $tenantId): bool
     {
-        return $this->getBool($tenantId, 'email_verification', false);
+        $value = $this->get($tenantId, 'email_verification');
+        if ($value === null) {
+            $value = $this->get($tenantId, 'general.email_verification');
+        }
+        if ($value === null) {
+            return true;
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -241,7 +255,7 @@ class TenantSettingsService
         }
 
         // Check email verification requirement
-        if ($tenantId > 0 && $this->getBool($tenantId, 'email_verification', false)) {
+        if ($tenantId > 0 && $this->requiresEmailVerification($tenantId)) {
             if (empty($user['email_verified_at'])) {
                 return [
                     'code' => 'AUTH_EMAIL_NOT_VERIFIED',

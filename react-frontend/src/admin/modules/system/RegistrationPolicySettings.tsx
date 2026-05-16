@@ -13,7 +13,7 @@ import {
   Card, CardBody, CardHeader, Select, SelectItem, Switch, Button, Spinner, Chip,
   Divider, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
-  Accordion, AccordionItem,
+  Accordion, AccordionItem, Tooltip,
 } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Save from 'lucide-react/icons/save';
@@ -40,7 +40,7 @@ import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { ProviderHealthDashboard } from './ProviderHealthDashboard';
 import { RegistrationBreakerCard } from './RegistrationBreakerCard';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
@@ -101,6 +101,12 @@ export function RegistrationPolicySettings() {
   usePageTitle("System");
   const toast = useToast();
   const { tenant } = useTenant();
+  const { user } = useAuth();
+  const userRecord = user as Record<string, unknown> | null;
+  const isGod =
+    (user?.role as string) === 'god' ||
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true;
 
   const [policy, setPolicy] = useState<RegistrationPolicy | null>(null);
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
@@ -478,15 +484,23 @@ export function RegistrationPolicySettings() {
           </CardHeader>
           <CardBody>
             <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-medium">{"Require Email"}</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{"Require Email Verification"}</p>
+                  {!isGod && (
+                    <Tooltip content="Only platform super-admins may change this setting">
+                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>God only</Chip>
+                    </Tooltip>
+                  )}
+                </div>
                 <p className="text-sm text-default-500">
-                  {"Require members to verify their email address before accessing the platform"}
+                  {"Members must verify their email address before accessing the platform"}
                 </p>
               </div>
               <Switch
                 isSelected={policy.require_email_verify}
                 onValueChange={(val) => setPolicy(prev => prev ? { ...prev, require_email_verify: val } : prev)}
+                isDisabled={!isGod}
                 aria-label={"Require Email Verification"}
               />
             </div>

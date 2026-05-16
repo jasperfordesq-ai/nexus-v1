@@ -9,14 +9,15 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem, Chip, Tooltip } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Scale from 'lucide-react/icons/scale';
+import Lock from 'lucide-react/icons/lock';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast, useTenant, useAuth } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
@@ -76,6 +77,12 @@ export function AdminSettings() {
   usePageTitle("System");
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
+  const { user } = useAuth();
+  const userRecord = user as Record<string, unknown> | null;
+  const isGod =
+    (user?.role as string) === 'god' ||
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true;
 
   const [form, setForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [originalForm, setOriginalForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
@@ -268,24 +275,40 @@ export function AdminSettings() {
               />
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">{"Require email verification"}</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{"Require email verification"}</p>
+                  {!isGod && (
+                    <Tooltip content="Only platform super-admins may change this setting">
+                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>God only</Chip>
+                    </Tooltip>
+                  )}
+                </div>
                 <p className="text-sm text-default-500">{"Members must verify their email before accessing the platform"}</p>
               </div>
               <Switch
                 isSelected={form.email_verification}
                 onValueChange={(val) => setForm(prev => ({ ...prev, email_verification: val }))}
+                isDisabled={!isGod}
                 aria-label={"Email Verification"}
               />
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">{"Admin approval required"}</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{"Admin approval required"}</p>
+                  {!isGod && (
+                    <Tooltip content="Only platform super-admins may change this setting">
+                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>God only</Chip>
+                    </Tooltip>
+                  )}
+                </div>
                 <p className="text-sm text-default-500">{"New accounts must be approved by an admin before activation"}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}
                 onValueChange={(val) => setForm(prev => ({ ...prev, admin_approval: val }))}
+                isDisabled={!isGod}
                 aria-label={"Admin Approval"}
               />
             </div>

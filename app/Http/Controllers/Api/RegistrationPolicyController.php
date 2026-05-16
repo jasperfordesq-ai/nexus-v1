@@ -55,6 +55,20 @@ class RegistrationPolicyController extends BaseApiController
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
+        // Only platform super-admins (God) may disable email verification
+        if (isset($input['require_email_verify']) && !(bool) $input['require_email_verify']) {
+            try {
+                $this->requirePlatformSuperAdmin();
+            } catch (\Throwable) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    'Only platform super-admins may disable email verification.',
+                    'require_email_verify',
+                    403
+                );
+            }
+        }
+
         try {
             $policy = $this->registrationPolicyService->upsertPolicy($tenantId, $input);
             return $this->respondWithData($policy);
