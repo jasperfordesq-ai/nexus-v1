@@ -71,6 +71,7 @@ class PrerenderPlanRoutes extends Command
         // are prerendered at timebanking.uk/slug rather than app.project-nexus.ie/slug.
         $parentDomainMap = DB::table('tenants as p')
             ->join('tenants as c', 'c.parent_id', '=', 'p.id')
+            ->where('p.id', '>', 1)          // exclude platform master (id=1)
             ->where('p.is_active', 1)
             ->where('c.is_active', 1)
             ->whereNotNull('p.domain')

@@ -115,6 +115,10 @@ export function detectTenantFromUrl(): { slug: string | null; source: 'subdomain
 /**
  * Extract tenant slug from the first path segment.
  * Returns null if the segment is a reserved path or empty.
+ *
+ * Slugs are normalised to lowercase here; the DB enforces lowercase on write
+ * (TenantHierarchyService validates with lowercase slug rule), so the
+ * lowercased value will always match the stored slug.
  */
 function extractSlugFromPath(pathname: string): string | null {
   const segments = pathname.split('/').filter(Boolean);

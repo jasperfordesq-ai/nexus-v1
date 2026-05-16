@@ -97,34 +97,33 @@ class SitemapController
      */
     public function tenant(SitemapService $service, Request $request, string $slug): Response
     {
-        $tenantId = $service->resolveTenantBySlug($slug);
+        $host = $request->header('X-Sitemap-Host', $request->getHost());
 
-        if ($tenantId === null) {
+        // Single query: fetch the tenant and its parent's domain in one round-trip.
+        // parent_domain is non-null only when the tenant has no own domain and its
+        // immediate parent has one — signals sub-tenant path routing (timebanking.uk/cardiff).
+        $row = DB::selectOne(
+            "SELECT t.id, t.slug, t.domain, p.domain AS parent_domain
+             FROM tenants t
+             LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 AND p.id > 1
+             WHERE t.slug = ? AND t.is_active = 1
+             LIMIT 1",
+            [$slug]
+        );
+
+        if (!$row) {
             return $this->xmlResponse($this->emptyUrlset(), 404);
         }
 
-        $host = $request->header('X-Sitemap-Host', $request->getHost());
-
-        // Determine the correct base URL. If this tenant has no own domain but
-        // the request host is its parent's domain, use host/slug as the base URL
-        // so sitemap entries are timebanking.uk/cardiff/... not timebanking.uk/...
-        $tenantRow = DB::selectOne(
-            "SELECT domain, parent_id, slug FROM tenants WHERE id = ? AND is_active = 1",
-            [$tenantId]
-        );
+        // Use host/slug as the base URL when the request host IS the parent's domain,
+        // so entries read timebanking.uk/cardiff/... rather than timebanking.uk/...
         $baseUrl = 'https://' . $host;
-        if ($tenantRow && empty($tenantRow->domain) && !empty($tenantRow->parent_id)) {
-            $parentRow = DB::selectOne(
-                "SELECT domain FROM tenants WHERE id = ? AND is_active = 1",
-                [(int) $tenantRow->parent_id]
-            );
-            if ($parentRow && !empty($parentRow->domain)
-                && rtrim((string) $parentRow->domain, '/') === $host) {
-                $baseUrl = 'https://' . $host . '/' . $tenantRow->slug;
-            }
+        if (empty($row->domain) && !empty($row->parent_domain)
+            && rtrim((string) $row->parent_domain, '/') === $host) {
+            $baseUrl = 'https://' . $host . '/' . $slug;
         }
 
-        $xml = $service->generateForTenant($tenantId, $baseUrl);
+        $xml = $service->generateForTenant((int) $row->id, $baseUrl);
         return $this->xmlResponse($xml);
     }
 

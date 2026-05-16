@@ -320,7 +320,14 @@ get_tenants() {
     # parent does — used for sub-tenant path routing (timebanking.uk/cardiff).
     QUERY="SELECT t.id, t.slug, COALESCE(t.domain, '') as domain, COALESCE(p.domain, '') as parent_domain FROM tenants t LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 WHERE t.is_active = 1 AND t.id <> 1"
     if [ -n "$FILTER_TENANT" ]; then
-        QUERY="$QUERY AND slug = '$FILTER_TENANT'"
+        # Defense-in-depth: re-validate here at the point of use.
+        # Top-level validation (line ~159) runs first; this is a safety net
+        # against future callers that bypass the top-level check.
+        if [[ ! "$FILTER_TENANT" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            log_err "get_tenants: FILTER_TENANT contains invalid characters"
+            return 1
+        fi
+        QUERY="$QUERY AND t.slug = '$FILTER_TENANT'"
     fi
     QUERY="$QUERY ORDER BY id"
 

@@ -408,7 +408,7 @@ class TenantContext
             'caring', 'caring-community', 'proposals', 'newsletter', 'onboarding',
             // Public info pages
             'home', 'about', 'contact', 'faq', 'help', 'legal', 'terms', 'privacy',
-            'accessibility', 'cookies', 'community-guidelines', 'acceptable-use',
+            'platform', 'accessibility', 'cookies', 'community-guidelines', 'acceptable-use',
             'timebanking-guide', 'partner', 'partner-with-us', 'social-prescribing',
             'strategic-plan', 'impact-summary', 'impact-report', 'our-story',
             'how-it-works', 'guide', 'news', 'post',

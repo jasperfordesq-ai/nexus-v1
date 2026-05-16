@@ -386,10 +386,13 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'New parent tenant not found'];
             }
 
-            // Prevent circular hierarchy: new parent cannot be a descendant of this tenant
-            $tenantPath = $tenant->path ?? ('/' . $tenantId . '/');
-            $newParentPath = $newParent->path ?? ('/' . $newParentId . '/');
-            if (str_starts_with($newParentPath, $tenantPath)) {
+            // Prevent circular hierarchy: new parent cannot be a descendant of this tenant.
+            // Requires both path fields to be populated — null means the tree is corrupt;
+            // fail safe rather than allowing an undetectable cycle.
+            if (empty($tenant->path) || empty($newParent->path)) {
+                return ['success' => false, 'error' => 'Cannot move tenant: hierarchy path data is missing. Re-save the affected tenants to rebuild paths.'];
+            }
+            if (str_starts_with($newParent->path, $tenant->path)) {
                 return ['success' => false, 'error' => 'Cannot move a tenant under one of its own descendants'];
             }
 
