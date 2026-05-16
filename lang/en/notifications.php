@@ -32,6 +32,7 @@ return [
     // =========================================================================
     'liked_your_content'         => ':name liked your :content_type',
     'commented_on_your_content'  => ':name commented on your :content_type: ":comment"',
+    'replied_to_your_comment'    => ':name replied to your comment: ":comment"',
     'shared_your_content'        => ':name shared your :content_type',
     'content_getting_attention'  => 'Your :content_type is getting attention!',
     'content_reaching_more'      => 'Your content is reaching more people!',
@@ -39,12 +40,16 @@ return [
     // Social email subjects
     'email_new_like_title'       => 'New Like on Your :content_type',
     'email_new_comment_title'    => 'New Comment on Your :content_type',
+    'email_new_comment_reply_title' => 'New Reply to Your Comment',
+    'email_new_comment_reply_subject' => ':title - :community',
     'email_shared_title'         => 'Your :content_type Was Shared',
     'email_liked_subtitle'       => ':name liked your :content_type',
     'email_commented_subtitle'   => ':name commented on your :content_type',
+    'email_replied_to_comment_subtitle' => ':name replied to your comment on a :content_type',
     'email_shared_subtitle'      => ':name shared your :content_type with their network',
     'email_view_content'         => 'View :content_type',
     'email_view_comment'         => 'View Comment',
+    'email_view_reply'           => 'View Reply',
 
     // =========================================================================
     // IdeationChallengeService

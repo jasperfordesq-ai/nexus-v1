@@ -103,18 +103,23 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
 
   // Guard against double-loading
   const loadingRef = useRef(false);
+  const targetKey = `${targetType}:${targetId}`;
+  const previousTargetKeyRef = useRef(targetKey);
 
   // Sync state when initial values change (e.g. after API data loads)
-  const initializedRef = useRef(false);
   useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      return;
+    if (previousTargetKeyRef.current !== targetKey) {
+      previousTargetKeyRef.current = targetKey;
+      loadingRef.current = false;
+      setComments([]);
+      setCommentsLoading(false);
+      setCommentsLoaded(false);
     }
+
     setIsLiked(initialLiked);
     setLikesCount(initialLikesCount);
     setCommentsCount(initialCommentsCount);
-  }, [initialLiked, initialLikesCount, initialCommentsCount]);
+  }, [targetKey, initialLiked, initialLikesCount, initialCommentsCount]);
 
   /* ───── Like ───── */
 

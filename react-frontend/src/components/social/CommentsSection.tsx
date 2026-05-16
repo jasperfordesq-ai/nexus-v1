@@ -70,8 +70,16 @@ interface CommentItemProps {
   onEdit: (commentId: number, content: string) => Promise<boolean>;
   onDelete: (commentId: number) => Promise<boolean>;
   onToggleReaction: (commentId: number, emoji: string) => Promise<void>;
+  replyingTo: number | null;
+  replyContent: string;
+  isSubmittingReply: boolean;
+  highlightedCommentId: number | null;
+  onReplyContentChange: (value: string) => void;
+  onSubmitReply: () => void;
+  onCancelReply: () => void;
   isAuthenticated: boolean;
   currentUserId?: number;
+  searchMentions?: (query: string) => Promise<MentionUser[]>;
 }
 
 function CommentItemInner({
@@ -81,8 +89,16 @@ function CommentItemInner({
   onEdit,
   onDelete,
   onToggleReaction,
+  replyingTo,
+  replyContent,
+  isSubmittingReply,
+  highlightedCommentId,
+  onReplyContentChange,
+  onSubmitReply,
+  onCancelReply,
   isAuthenticated,
   currentUserId,
+  searchMentions,
 }: CommentItemProps) {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
@@ -116,8 +132,16 @@ function CommentItemInner({
   const userReactions = comment.user_reactions ?? [];
   const hasReactions = Object.keys(reactions).length > 0;
 
+  const isReplyingHere = replyingTo === comment.id;
+  const isHighlighted = highlightedCommentId === comment.id;
+
   return (
-    <div className={`flex items-start gap-2.5 ${depth > 0 ? 'ms-6 sm:ms-8 ps-3 border-s-2 border-[var(--color-primary)]/20' : ''}`}>
+    <div
+      id={`comment-${comment.id}`}
+      className={`scroll-mt-24 flex items-start gap-2.5 rounded-2xl transition-[background-color,box-shadow] duration-500 ${
+        depth > 0 ? 'ms-6 sm:ms-8 ps-3 border-s-2 border-[var(--color-primary)]/20' : ''
+      } ${isHighlighted ? 'bg-[var(--color-primary)]/10 ring-2 ring-[var(--color-primary)]/30' : ''}`}
+    >
       <UserHoverCard userId={comment.author.id}>
         <Link to={tenantPath(`/profile/${comment.author.id}`)}>
           <Avatar
@@ -302,6 +326,60 @@ function CommentItemInner({
           )}
         </AnimatePresence>
 
+        <AnimatePresence>
+          {isReplyingHere && isAuthenticated && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -4 }}
+              animate={{ opacity: 1, height: 'auto', y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -4 }}
+              transition={{ duration: 0.16, ease: 'easeOut' }}
+              className="mt-2"
+            >
+              <div className="flex gap-2 items-end">
+                <MentionInput
+                  placeholder={t('write_reply_to', { name: comment.author.name })}
+                  value={replyContent}
+                  onChange={onReplyContentChange}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmitReply(); } }}
+                  size="sm"
+                  radius="full"
+                  classNames={{
+                    input: 'bg-transparent text-[var(--text-primary)] text-xs',
+                    inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] h-8',
+                  }}
+                  autoFocus
+                  searchMentions={searchMentions}
+                  endContent={
+                    <div className="flex gap-1">
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
+                        onPress={onSubmitReply}
+                        isDisabled={!replyContent.trim() || isSubmittingReply}
+                        aria-label={tr('send_reply', 'Send reply')}
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className="text-[var(--text-subtle)] min-w-0 w-auto h-auto p-0"
+                        onPress={onCancelReply}
+                        aria-label={tr('cancel', 'Cancel')}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  }
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Nested replies */}
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-2 space-y-2">
@@ -314,8 +392,16 @@ function CommentItemInner({
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onToggleReaction={onToggleReaction}
+                replyingTo={replyingTo}
+                replyContent={replyContent}
+                isSubmittingReply={isSubmittingReply}
+                highlightedCommentId={highlightedCommentId}
+                onReplyContentChange={onReplyContentChange}
+                onSubmitReply={onSubmitReply}
+                onCancelReply={onCancelReply}
                 isAuthenticated={isAuthenticated}
                 currentUserId={currentUserId}
+                searchMentions={searchMentions}
               />
             ))}
           </div>
@@ -400,6 +486,7 @@ function MentionInput({
   const [mentionQuery, setMentionQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (newValue: string) => {
@@ -464,7 +551,10 @@ function MentionInput({
 
   // Cleanup debounce on unmount
   useEffect(() => {
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+    };
   }, []);
 
   return (
@@ -476,7 +566,10 @@ function MentionInput({
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={() => { setTimeout(() => setShowMentions(false), 200); }}
+        onBlur={() => {
+          if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+          blurTimeoutRef.current = setTimeout(() => setShowMentions(false), 200);
+        }}
         size={size}
         radius={radius}
         classNames={inputClassNames}
@@ -544,6 +637,8 @@ export function CommentsSection({
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [highlightedCommentId, setHighlightedCommentId] = useState<number | null>(null);
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load comments on mount if not already loaded
   useEffect(() => {
@@ -565,7 +660,7 @@ export function CommentsSection({
     setReplyContent('');
   }, []);
 
-  const handleSubmitReply = async () => {
+  const handleSubmitReply = useCallback(async () => {
     if (!replyContent.trim() || isSubmittingReply || !replyingTo) return;
     setIsSubmittingReply(true);
     const ok = await submitComment(replyContent.trim(), replyingTo);
@@ -574,7 +669,55 @@ export function CommentsSection({
       setReplyContent('');
     }
     setIsSubmittingReply(false);
-  };
+  }, [isSubmittingReply, replyContent, replyingTo, submitComment]);
+
+  const handleCancelReply = useCallback(() => {
+    setReplyingTo(null);
+    setReplyContent('');
+  }, []);
+
+  useEffect(() => {
+    if (!commentsLoaded || commentsLoading || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const hash = window.location.hash.replace(/^#/, '');
+    const match = /^comment-(\d+)$/.exec(hash);
+    if (!match) {
+      return undefined;
+    }
+
+    const commentId = Number(match[1]);
+    if (!Number.isFinite(commentId)) {
+      return undefined;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById(`comment-${commentId}`);
+      if (!target) return;
+
+      setHighlightedCommentId(commentId);
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedCommentId(null);
+        highlightTimeoutRef.current = null;
+      }, 2400);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [comments, commentsLoaded, commentsLoading]);
+
+  useEffect(() => () => {
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -650,60 +793,17 @@ export function CommentsSection({
                 onEdit={editComment}
                 onDelete={deleteComment}
                 onToggleReaction={toggleReaction}
+                replyingTo={replyingTo}
+                replyContent={replyContent}
+                isSubmittingReply={isSubmittingReply}
+                highlightedCommentId={highlightedCommentId}
+                onReplyContentChange={setReplyContent}
+                onSubmitReply={() => { void handleSubmitReply(); }}
+                onCancelReply={handleCancelReply}
                 isAuthenticated={isAuthenticated}
                 currentUserId={currentUserId}
+                searchMentions={searchMentions}
               />
-
-              {/* Reply input for this comment */}
-              {replyingTo === comment.id && isAuthenticated && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="ml-10 sm:ml-12 mt-2"
-                >
-                  <div className="flex gap-2 items-end">
-                    <MentionInput
-                      placeholder={tr('write_reply', 'Write a reply...')}
-                      value={replyContent}
-                      onChange={setReplyContent}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmitReply(); } }}
-                      size="sm"
-                      radius="full"
-                      classNames={{
-                        input: 'bg-transparent text-[var(--text-primary)] text-xs',
-                        inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] h-8',
-                      }}
-                      autoFocus
-                      searchMentions={searchMentions}
-                      endContent={
-                        <div className="flex gap-1">
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
-                            onPress={handleSubmitReply}
-                            isDisabled={!replyContent.trim() || isSubmittingReply}
-                            aria-label={tr('send_reply', 'Send reply')}
-                          >
-                            <Send className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            className="text-[var(--text-subtle)] min-w-0 w-auto h-auto p-0"
-                            onPress={() => setReplyingTo(null)}
-                            aria-label={tr('cancel', 'Cancel')}
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      }
-                    />
-                  </div>
-                </motion.div>
-              )}
             </div>
           ))}
         </div>

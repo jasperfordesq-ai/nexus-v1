@@ -179,6 +179,7 @@ export function ListingDetailPage() {
     initialLikesCount: socialInit.likes,
     initialCommentsCount: socialInit.comments,
   });
+  const { commentsLoaded, commentsLoading, loadComments } = social;
 
   // Likers modal
   const { isOpen: isLikersOpen, onOpen: onLikersOpen, onClose: onLikersClose } = useDisclosure();
@@ -252,6 +253,17 @@ export function ListingDetailPage() {
 
   // Reset image error state when navigating to a different listing
   useEffect(() => { setImageError(false); }, [id]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !/^#comment-\d+$/.test(window.location.hash)) {
+      return;
+    }
+
+    setShowComments(true);
+    if (!commentsLoaded && !commentsLoading) {
+      void loadComments();
+    }
+  }, [id, commentsLoaded, commentsLoading, loadComments]);
 
   async function handleDelete() {
     if (!listing) return;
@@ -338,10 +350,13 @@ export function ListingDetailPage() {
   };
 
   function toggleComments() {
-    setShowComments((prev) => !prev);
-    if (!social.commentsLoaded) {
-      void social.loadComments();
-    }
+    setShowComments((prev) => {
+      const next = !prev;
+      if (next && !commentsLoaded && !commentsLoading) {
+        void loadComments();
+      }
+      return next;
+    });
   }
 
   const isOwner = user && listing && user.id === listing.user_id;
@@ -641,6 +656,7 @@ export function ListingDetailPage() {
                 variant="light"
                 size="sm"
                 onPress={toggleComments}
+                aria-expanded={showComments}
                 className="hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
               >
                 {social.commentsCount} {social.commentsCount === 1 ? t('comment') : t('comments')}
@@ -712,6 +728,7 @@ export function ListingDetailPage() {
               className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
+              aria-expanded={showComments}
             >
               {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
             </Button>

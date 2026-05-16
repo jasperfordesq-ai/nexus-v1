@@ -81,7 +81,7 @@ class SocialNotificationService
     /**
      * Notify user when someone comments on their content.
      */
-    public static function notifyComment($contentOwnerId, $commenterId, $contentType, $contentId, $commentText): void
+    public static function notifyComment($contentOwnerId, $commenterId, $contentType, $contentId, $commentText, ?int $commentId = null): void
     {
         if ($contentOwnerId == $commenterId) {
             return;
@@ -107,7 +107,9 @@ class SocialNotificationService
             }
 
             $ownerEmail = $owner->email ?? null;
-            $link = self::getContentLink($contentType, $contentId);
+            $link = $commentId
+                ? self::getCommentDeepLink($contentType, $contentId, $commentId)
+                : self::getContentLink($contentType, $contentId);
             $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
 
             // Render bell text + email content under the recipient's preferred locale.
@@ -126,6 +128,59 @@ class SocialNotificationService
             });
         } catch (\Throwable $e) {
             Log::warning("SocialNotificationService::notifyComment error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Notify a comment author when someone replies directly to their comment.
+     */
+    public static function notifyCommentReply(
+        int $commentOwnerId,
+        int $replierId,
+        int $replyCommentId,
+        string $contentType,
+        int $contentId,
+        string $replyText
+    ): void {
+        if ($commentOwnerId === $replierId) {
+            return;
+        }
+
+        try {
+            $tenantId = TenantContext::getId();
+
+            $replier = DB::table('users')
+                ->where('id', $replierId)
+                ->where('tenant_id', $tenantId)
+                ->select(['name', 'avatar_url'])
+                ->first();
+            $replierName = $replier->name ?? __('emails.common.fallback_someone');
+
+            $owner = DB::table('users')
+                ->where('id', $commentOwnerId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->first();
+            if (!$owner) {
+                return;
+            }
+
+            $ownerEmail = $owner->email ?? null;
+            $link = self::getCommentDeepLink($contentType, $contentId, $replyCommentId);
+            $shortReply = strlen($replyText) > 50 ? substr($replyText, 0, 50) . '...' : $replyText;
+
+            LocaleContext::withLocale($owner, function () use ($owner, $commentOwnerId, $replier, $replierName, $contentType, $replyText, $shortReply, $ownerEmail, $link) {
+                $message = __('notifications.replied_to_your_comment', ['name' => $replierName, 'comment' => $shortReply]);
+
+                Notification::createNotification((int) $commentOwnerId, $message, $link, 'comment_reply');
+
+                if ($ownerEmail && self::shouldSendEmail($commentOwnerId, 'comment')) {
+                    $emailLink = TenantContext::getSlugPrefix() . $link;
+                    self::sendCommentReplyEmail($owner, $replier, $contentType, $replyText, $emailLink);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::warning("SocialNotificationService::notifyCommentReply error: " . $e->getMessage());
         }
     }
 
@@ -198,8 +253,8 @@ class SocialNotificationService
         $routes = [
             'post' => '/feed',
             'feed_post' => '/feed',
-            'blog_post' => '/blog/' . $contentId,
-            'blog' => '/blog/' . $contentId,
+            'blog_post' => self::getBlogLink((int) $contentId),
+            'blog' => self::getBlogLink((int) $contentId),
             'listing' => '/listings/' . $contentId,
             'event' => '/events/' . $contentId,
             'goal' => '/goals',
@@ -214,6 +269,34 @@ class SocialNotificationService
             'comment' => '/feed',
         ];
         return $routes[$contentType] ?? '/';
+    }
+
+    private static function getBlogLink(int $contentId): string
+    {
+        try {
+            $slug = DB::table('posts')
+                ->where('id', $contentId)
+                ->where('tenant_id', TenantContext::getId())
+                ->value('slug');
+
+            if (is_string($slug) && $slug !== '') {
+                return '/blog/' . $slug;
+            }
+        } catch (\Throwable $e) {
+            Log::warning("SocialNotificationService::getBlogLink error: " . $e->getMessage());
+        }
+
+        return '/blog/' . $contentId;
+    }
+
+    private static function getCommentDeepLink($contentType, $contentId, int $commentId): string
+    {
+        $base = match ($contentType) {
+            'post', 'feed_post' => '/feed/posts/' . $contentId,
+            default => self::getContentLink($contentType, $contentId),
+        };
+
+        return $base . '#comment-' . $commentId;
     }
 
     /**
@@ -304,6 +387,39 @@ class SocialNotificationService
             $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
         } catch (\Throwable $e) {
             Log::warning("sendCommentEmail error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send comment reply notification email.
+     */
+    private static function sendCommentReplyEmail($owner, $replier, string $contentType, string $replyText, string $link): void
+    {
+        try {
+            $tenant = TenantContext::get();
+            $tenantName = $tenant['name'] ?? __('emails.common.platform_name');
+            $fullLink = TenantContext::getFrontendUrl() . $link;
+
+            $replierName = $replier->name ?? __('emails.common.fallback_someone');
+            $contentLabel = self::getContentLabel($contentType);
+
+            $title = __('notifications.email_new_comment_reply_title');
+            $subject = __('notifications.email_new_comment_reply_subject', ['title' => $title, 'community' => $tenantName]);
+            $subtitle = __('notifications.email_replied_to_comment_subtitle', ['name' => $replierName, 'content_type' => $contentLabel]);
+            $body = "\"" . htmlspecialchars($replyText) . "\"";
+
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title($title)
+                ->paragraph($subtitle)
+                ->paragraph($body)
+                ->button(__('notifications.email_view_reply'), $fullLink)
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($owner->email, $subject, $html);
+        } catch (\Throwable $e) {
+            Log::warning("sendCommentReplyEmail error: " . $e->getMessage());
         }
     }
 

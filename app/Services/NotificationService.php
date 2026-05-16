@@ -24,7 +24,7 @@ class NotificationService
         'connections'  => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted', 'federation_connection_request', 'federation_connection_accepted'],
         'reviews'      => ['review', 'new_review', 'review_received'],
         'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received', 'federation_transaction'],
-        'social'       => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
+        'social'       => ['like', 'comment', 'comment_reply', 'reaction', 'mention', 'post_like', 'post_comment'],
         'events'       => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
         'groups'       => ['group_invite', 'group_join', 'group_post', 'federation_group_join'],
         'listings'     => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],

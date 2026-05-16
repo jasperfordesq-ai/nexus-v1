@@ -53,24 +53,7 @@ vi.mock('@/contexts/ToastContext', () => ({
 
 vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
-  useSocialInteractions: vi.fn(() => ({
-    isLiked: false,
-    likesCount: 0,
-    commentsCount: 0,
-    isLiking: false,
-    comments: [],
-    commentsLoading: false,
-    commentsLoaded: false,
-    toggleLike: vi.fn(),
-    loadComments: vi.fn(),
-    submitComment: vi.fn(),
-    editComment: vi.fn(),
-    deleteComment: vi.fn(),
-    toggleReaction: vi.fn(),
-    searchMentions: vi.fn(),
-    shareToFeed: vi.fn(),
-    loadLikers: vi.fn(),
-  })),
+  useSocialInteractions: vi.fn(),
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
@@ -132,6 +115,7 @@ vi.mock('@/components/feedback', () => ({
       {description && <p>{description}</p>}
     </div>
   ),
+  ErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/components/location', () => ({
@@ -153,6 +137,30 @@ vi.mock('@/components/listings/FeaturedBadge', () => ({
 }));
 
 import { ListingDetailPage } from './ListingDetailPage';
+import { useSocialInteractions } from '@/hooks';
+
+const mockUseSocialInteractions = vi.mocked(useSocialInteractions);
+
+const createSocialMock = (overrides: Partial<ReturnType<typeof useSocialInteractions>> = {}) => ({
+  isLiked: false,
+  likesCount: 0,
+  commentsCount: 0,
+  isLiking: false,
+  comments: [],
+  commentsLoading: false,
+  commentsLoaded: false,
+  toggleLike: vi.fn(),
+  loadComments: vi.fn(),
+  submitComment: vi.fn(),
+  editComment: vi.fn(),
+  deleteComment: vi.fn(),
+  availableReactions: ['like', 'love', 'laugh', 'wow', 'sad', 'celebrate'] as const,
+  toggleReaction: vi.fn(),
+  searchMentions: vi.fn(),
+  shareToFeed: vi.fn(),
+  loadLikers: vi.fn(),
+  ...overrides,
+});
 
 const mockListing = {
   id: 1,
@@ -176,6 +184,8 @@ const mockListing = {
 describe('ListingDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState(null, '', '/test/listings/1');
+    mockUseSocialInteractions.mockReturnValue(createSocialMock());
     api.get.mockImplementation((url: string) => {
       if (url.includes('/config')) return Promise.resolve({ success: true, data: { exchange_workflow_enabled: true } });
       if (url.includes('/check')) return Promise.resolve({ success: true, data: null });
@@ -237,5 +247,21 @@ describe('ListingDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Offering')).toBeInTheDocument();
     });
+  });
+
+  it('opens and loads the shared comments panel for comment notification links', async () => {
+    const loadComments = vi.fn().mockResolvedValue(undefined);
+    mockUseSocialInteractions.mockReturnValue(createSocialMock({
+      commentsCount: 1,
+      loadComments,
+    }));
+    window.history.replaceState(null, '', '/test/listings/1#comment-123');
+
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('comments-section')).toBeInTheDocument();
+    });
+    expect(loadComments).toHaveBeenCalledTimes(1);
   });
 });

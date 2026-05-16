@@ -19,21 +19,14 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Input,
   Tooltip,
   Skeleton,
   Divider,
   Card,
   CardBody,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
 } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
-import Send from 'lucide-react/icons/send';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';
 import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
@@ -55,7 +48,6 @@ import Users from 'lucide-react/icons/users';
 import Trophy from 'lucide-react/icons/trophy';
 import Zap from 'lucide-react/icons/zap';
 import Pencil from 'lucide-react/icons/pencil';
-import X from 'lucide-react/icons/x';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Landmark from 'lucide-react/icons/landmark';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +60,8 @@ import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, form
 import { useFeedTracking } from '@/hooks/useFeedTracking';
 import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 import { useLongPress } from '@/hooks/useLongPress';
-import type { FeedItem, FeedComment, PollData } from './types';
+import { useSocialInteractions } from '@/hooks/useSocialInteractions';
+import type { FeedItem, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { WhyShown } from './WhyShown';
 import { FeedContentRenderer } from './FeedContentRenderer';
@@ -77,10 +70,9 @@ import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
 import { VideoPlayer } from './VideoPlayer';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
+import { CommentsSection } from '@/components/social/CommentsSection';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
-import { MentionRenderer } from '@/components/social/MentionRenderer';
 import { UserHoverCard } from '@/components/social/UserHoverCard';
-import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
 import { ShareButton, SharedByAttribution } from './ShareButton';
 import { QuotedPostEmbed } from './QuotedPostEmbed';
 import { BookmarkButton } from '@/components/social';
@@ -113,6 +105,8 @@ export interface FeedCardProps {
   feedMode?: 'ranking' | 'recent';
   isAuthenticated: boolean;
   currentUserId?: number;
+  currentUserAvatar?: string | null;
+  currentUserName?: string | null;
   /** Whether the current user is an admin (shows admin delete on all posts). */
   isAdmin?: boolean;
   /** If true, comments section is open and loaded immediately on mount. */
@@ -339,226 +333,6 @@ function useDoubleTap(onDoubleTap: () => void, delay = 300) {
   return handleTap;
 }
 
-/* ───────────────────────── Comment Item ───────────────────────── */
-
-interface CommentItemProps {
-  comment: FeedComment;
-  currentUserId?: number;
-  isAuthenticated: boolean;
-  onEdit: (commentId: number, content: string) => Promise<boolean>;
-  onDelete: (commentId: number) => Promise<boolean>;
-}
-
-export const CommentItem = React.memo(function CommentItem({ comment, currentUserId, isAuthenticated, onEdit, onDelete }: CommentItemProps) {
-  const { t } = useTranslation('feed');
-  const { tenantPath } = useTenant();
-  const [showReplies, setShowReplies] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
-  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeletingComment, setIsDeletingComment] = useState(false);
-
-  const isOwn = currentUserId === comment.author.id || comment.is_own;
-
-  const handleSaveEdit = async () => {
-    if (!editContent.trim()) return;
-    setIsSubmittingEdit(true);
-    const ok = await onEdit(comment.id, editContent.trim());
-    if (ok) setIsEditing(false);
-    setIsSubmittingEdit(false);
-  };
-
-  const handleDelete = () => {
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    setIsDeletingComment(true);
-    await onDelete(comment.id);
-    setIsDeletingComment(false);
-    setShowDeleteModal(false);
-  };
-
-  return (
-    <div className="flex items-start gap-2.5">
-      <Link to={tenantPath(`/profile/${comment.author.id}`)}>
-        <Avatar
-          name={comment.author.name}
-          src={resolveAvatarUrl(comment.author.avatar)}
-          size="sm"
-          className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
-        />
-      </Link>
-      <div className="flex-1 min-w-0">
-        <div className="bg-theme-elevated rounded-2xl px-3.5 py-2.5 border border-theme-default">
-          <div className="flex items-center gap-2">
-            <Link
-              to={tenantPath(`/profile/${comment.author.id}`)}
-              className="text-xs font-semibold text-theme-primary hover:text-primary transition-colors"
-            >
-              {comment.author.name}
-            </Link>
-            {comment.edited && (
-              <span className="text-[10px] text-theme-subtle italic">({t('card.edited')})</span>
-            )}
-          </div>
-          {isEditing ? (
-            <div className="mt-1.5 space-y-2">
-              <Input
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                size="sm"
-                classNames={{
-                  input: 'bg-transparent text-theme-primary text-xs',
-                  inputWrapper: 'bg-[var(--surface-hover)] border-theme-default min-h-[32px]',
-                }}
-              />
-              <div className="flex gap-1.5">
-                <Button
-                  size="sm"
-                  isIconOnly
-                  variant="flat"
-                  className="w-6 h-6 min-w-0 bg-emerald-500/20 text-emerald-500"
-                  onPress={handleSaveEdit}
-                  isLoading={isSubmittingEdit}
-                  aria-label={t('card.save')}
-                >
-                  <Check className="w-3 h-3" />
-                </Button>
-                <Button
-                  size="sm"
-                  isIconOnly
-                  variant="flat"
-                  className="w-6 h-6 min-w-0 bg-red-500/10 text-[var(--color-error)]"
-                  onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
-                  aria-label={t('card.cancel')}
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              </div>
-            </div>
-          ) : containsHtml(comment.content) ? (
-            <SafeHtml content={comment.content} className="text-xs text-theme-secondary mt-0.5 whitespace-pre-wrap leading-relaxed" as="div" />
-          ) : (
-            <p className="text-xs text-theme-secondary mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
-          )}
-        </div>
-        <div className="flex items-center gap-3 mt-1 px-1">
-          <span className="text-[10px] text-theme-subtle">
-            <Clock className="w-2.5 h-2.5 inline me-0.5 -mt-px" aria-hidden="true" />
-            {formatRelativeTime(comment.created_at)}
-          </span>
-          {comment.replies && comment.replies.length > 0 && (
-            <Button
-              variant="light"
-              size="sm"
-              className="text-[10px] text-primary p-0 min-w-0 h-auto"
-              onPress={() => setShowReplies(!showReplies)}
-            >
-              {showReplies ? t('card.hide') : `${comment.replies.length}`} {comment.replies.length === 1 ? t('card.reply') : t('card.replies')}
-            </Button>
-          )}
-          {isAuthenticated && !isEditing && isOwn && (
-            <>
-              <Button
-                variant="light"
-                size="sm"
-                onPress={() => { setIsEditing(true); setEditContent(comment.content); }}
-                className="text-[10px] text-theme-subtle hover:text-theme-primary flex items-center gap-0.5 h-auto p-0 min-w-0"
-                startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
-              >
-                {t('card.edit')}
-              </Button>
-              <Button
-                variant="light"
-                size="sm"
-                onPress={handleDelete}
-                className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
-                startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
-              >
-                {t('card.delete')}
-              </Button>
-            </>
-          )}
-        </div>
-
-        {/* Delete Comment Confirmation Modal */}
-        <Modal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          size="sm"
-          classNames={{
-            base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)]',
-            backdrop: 'bg-black/60 backdrop-blur-sm',
-          }}
-        >
-          <ModalContent>
-            <ModalHeader className="text-theme-primary text-sm">
-              {t('card.delete_comment_title')}
-            </ModalHeader>
-            <ModalBody>
-              <p className="text-sm text-theme-muted">{t('card.delete_comment_body')}</p>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                size="sm"
-                variant="flat"
-                onPress={() => setShowDeleteModal(false)}
-                className="text-theme-muted"
-              >
-                {t('card.cancel')}
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                variant="flat"
-                isLoading={isDeletingComment}
-                onPress={confirmDelete}
-                className="font-medium"
-              >
-                {t('card.delete')}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        {/* Nested Replies */}
-        <AnimatePresence>
-          {showReplies && comment.replies && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-2 ms-2 space-y-2 border-s-2 border-primary/30 ps-3"
-            >
-              {comment.replies.map((reply) => (
-                <div key={reply.id} className="flex items-start gap-2">
-                  <Avatar
-                    name={reply.author.name}
-                    src={resolveAvatarUrl(reply.author.avatar)}
-                    size="sm"
-                    className="w-6 h-6 flex-shrink-0"
-                  />
-                  <div>
-                    <div className="bg-theme-elevated rounded-xl px-2.5 py-1.5 border border-theme-default">
-                      <span className="text-[10px] font-semibold text-theme-primary">{reply.author.name}</span>
-                      <p className="text-[11px] text-theme-secondary whitespace-pre-wrap">{reply.content}</p>
-                    </div>
-                    <span className="text-[10px] text-theme-subtle ms-1">
-                      {formatRelativeTime(reply.created_at)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-});
-
 /* ───────────────────────── Feed Card ───────────────────────── */
 
 const FeedCard = React.memo(function FeedCard({
@@ -576,6 +350,8 @@ const FeedCard = React.memo(function FeedCard({
   feedMode = 'ranking',
   isAuthenticated,
   currentUserId,
+  currentUserAvatar,
+  currentUserName,
   isAdmin,
   defaultShowComments = false,
 }: FeedCardProps) {
@@ -583,18 +359,16 @@ const FeedCard = React.memo(function FeedCard({
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [showComments, setShowComments] = useState(defaultShowComments);
-  const [comments, setComments] = useState<FeedComment[]>([]);
-  const [isLoadingComments, setIsLoadingComments] = useState(defaultShowComments);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count);
+  const social = useSocialInteractions({
+    targetType: item.type,
+    targetId: item.id,
+    initialLiked: item.is_liked,
+    initialLikesCount: item.likes_count,
+    initialCommentsCount: item.comments_count,
+  });
   const [pollData, setPollData] = useState<PollData | null>(item.poll_data ?? null);
   const [isLoadingPoll, setIsLoadingPoll] = useState(false);
   const [pollLoadError, setPollLoadError] = useState(false);
-
-  useEffect(() => {
-    setLocalCommentsCount(item.comments_count);
-  }, [item.comments_count]);
 
   useEffect(() => {
     if (item.type === 'poll' && item.poll_data) {
@@ -650,15 +424,7 @@ const FeedCard = React.memo(function FeedCard({
   const confettiTriggeredRef = useRef(false);
   const confettiTimeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Tracks whether comments have been loaded at least once (prevents double-load when defaultShowComments=true)
-  const commentLoadedRef = useRef(false);
-
   // H6: Mounted guard — prevents setState calls after unmount
-  const isMountedRef = useRef(true);
-  useEffect(() => {
-    return () => { isMountedRef.current = false; };
-  }, []);
-
   // Clean up confetti timeouts on unmount
   useEffect(() => {
     return () => {
@@ -740,96 +506,8 @@ const FeedCard = React.memo(function FeedCard({
     onVotePoll(item.id, optionId);
   };
 
-  const loadComments = async () => {
-    try {
-      setIsLoadingComments(true);
-      const response = await api.get<{ comments: FeedComment[] }>(
-        `/v2/comments?target_type=${item.type}&target_id=${item.id}`
-      );
-
-      if (response.success && response.data) {
-        if (isMountedRef.current) setComments(response.data.comments ?? []);
-      }
-    } catch (err) {
-      logError('Failed to load comments', err);
-      if (isMountedRef.current) {
-        toast.error(t('card.comments_load_failed'));
-        setShowComments(false); // Roll back the toggle
-      }
-    } finally {
-      if (isMountedRef.current) setIsLoadingComments(false);
-    }
-  };
-
-  // Auto-load comments on mount when defaultShowComments is true
-  useEffect(() => {
-    if (defaultShowComments) {
-      loadComments();
-      commentLoadedRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount; defaultShowComments is initial prop
-  }, []);
-
   const toggleComments = () => {
-    if (!showComments && !commentLoadedRef.current) {
-      loadComments();
-    }
     setShowComments(!showComments);
-  };
-
-  const handleSubmitComment = async () => {
-    if (!newComment.trim() || isSubmittingComment) return;
-
-    try {
-      setIsSubmittingComment(true);
-      const response = await api.post('/v2/comments', {
-        target_type: item.type,
-        target_id: item.id,
-        content: newComment.trim(),
-      });
-
-      if (response.success) {
-        if (isMountedRef.current) setNewComment('');
-        if (isMountedRef.current) setLocalCommentsCount((prev) => prev + 1);
-        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: +1 } });
-        loadComments(); // Reload to show new comment
-      }
-    } catch (err) {
-      logError('Failed to submit comment', err);
-    } finally {
-      setIsSubmittingComment(false);
-    }
-  };
-
-  const handleEditComment = async (commentId: number, content: string): Promise<boolean> => {
-    try {
-      const response = await api.put(`/v2/comments/${commentId}`, { content });
-      if (response.success) {
-        loadComments();
-        return true;
-      }
-      return false;
-    } catch (err) {
-      logError('Failed to edit comment', err);
-      return false;
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number): Promise<boolean> => {
-    try {
-      const response = await api.delete<{ deleted_count?: number }>(`/v2/comments/${commentId}`);
-      if (response.success) {
-        const delta = Math.max(1, response.data?.deleted_count ?? 1);
-        setLocalCommentsCount((prev) => Math.max(0, prev - delta));
-        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { comments_count_delta: -delta } });
-        loadComments();
-        return true;
-      }
-      return false;
-    } catch (err) {
-      logError('Failed to delete comment', err);
-      return false;
-    }
   };
 
   return (
@@ -1791,7 +1469,7 @@ const FeedCard = React.memo(function FeedCard({
         )}
 
         {/* Stats Row — Reactions + Comments Count + Views */}
-        {((item.reactions?.total ?? item.likes_count) > 0 || localCommentsCount > 0 || (item.views_count ?? 0) > 0) && (
+        {((item.reactions?.total ?? item.likes_count) > 0 || social.commentsCount > 0 || (item.views_count ?? 0) > 0) && (
           <div className="flex items-center justify-between text-xs text-theme-subtle mb-3">
             <span className="flex items-center gap-3">
               {item.reactions && item.reactions.total > 0 ? (
@@ -1819,14 +1497,14 @@ const FeedCard = React.memo(function FeedCard({
                 </span>
               )}
             </span>
-            {localCommentsCount > 0 && (
+            {social.commentsCount > 0 && (
               <Button
                 variant="light"
                 size="sm"
                 className="text-xs text-theme-subtle hover:text-theme-primary p-0 min-w-0 h-auto"
                 onPress={toggleComments}
               >
-                {localCommentsCount} {localCommentsCount === 1 ? t('card.comment') : t('card.comments')}
+                {social.commentsCount} {social.commentsCount === 1 ? t('card.comment') : t('card.comments')}
               </Button>
             )}
           </div>
@@ -1956,69 +1634,22 @@ const FeedCard = React.memo(function FeedCard({
               transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="mt-3 pt-3 border-t border-theme-default space-y-3"
             >
-              {/* Comment Input */}
-              {isAuthenticated && (
-                <div className="flex items-start gap-2.5">
-                  <Input
-                    placeholder={t('card.write_comment')}
-                    aria-label={t('card.write_comment')}
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitComment()}
-                    size="sm"
-                    radius="full"
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary text-sm',
-                      inputWrapper: 'bg-theme-elevated border-theme-default hover:border-primary/40 h-9',
-                    }}
-                    endContent={
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        className="text-primary min-w-0 w-auto h-auto p-0 disabled:opacity-30"
-                        onPress={handleSubmitComment}
-                        isDisabled={!newComment.trim() || isSubmittingComment}
-                        aria-label={t('card.send_comment')}
-                      >
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    }
-                  />
-                </div>
-              )}
-
-              {/* Comments List */}
-              {isLoadingComments ? (
-                <div className="space-y-3">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <Skeleton className="w-7 h-7 rounded-full flex-shrink-0" />
-                      <div className="flex-1">
-                        <Skeleton className="h-3 w-20 rounded mb-1.5" />
-                        <Skeleton className="h-3 w-3/4 rounded" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : comments.length === 0 ? (
-                <p className="text-xs text-theme-subtle text-center py-3 italic">
-                  {t('card.no_comments')}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {comments.map((comment) => (
-                    <CommentItem
-                      key={comment.id}
-                      comment={comment}
-                      currentUserId={currentUserId}
-                      isAuthenticated={isAuthenticated}
-                      onEdit={handleEditComment}
-                      onDelete={handleDeleteComment}
-                    />
-                  ))}
-                </div>
-              )}
+              <CommentsSection
+                comments={social.comments}
+                commentsCount={social.commentsCount}
+                commentsLoading={social.commentsLoading}
+                commentsLoaded={social.commentsLoaded}
+                loadComments={social.loadComments}
+                submitComment={social.submitComment}
+                editComment={social.editComment}
+                deleteComment={social.deleteComment}
+                toggleReaction={social.toggleReaction}
+                searchMentions={social.searchMentions}
+                isAuthenticated={isAuthenticated}
+                currentUserId={currentUserId}
+                currentUserAvatar={currentUserAvatar ?? undefined}
+                currentUserName={currentUserName ?? undefined}
+              />
             </motion.div>
           )}
         </AnimatePresence>

@@ -57,6 +57,28 @@ describe('useSocialInteractions', () => {
       expect(result.current.availableReactions).toBeDefined();
       expect(result.current.availableReactions.length).toBeGreaterThan(0);
     });
+
+    it('resets comments when the social target changes', async () => {
+      mockApi.get.mockResolvedValue({
+        success: true,
+        data: { comments: [{ id: 1, content: 'Old comment', replies: [] }], count: 1 },
+      });
+
+      const { result, rerender } = renderHook(
+        ({ targetId }) => useSocialInteractions({ ...defaultOptions, targetId }),
+        { initialProps: { targetId: 42 } },
+      );
+
+      await act(async () => { await result.current.loadComments(); });
+      expect(result.current.comments).toHaveLength(1);
+      expect(result.current.commentsLoaded).toBe(true);
+
+      rerender({ targetId: 43 });
+
+      expect(result.current.comments).toEqual([]);
+      expect(result.current.commentsLoaded).toBe(false);
+      expect(result.current.commentsCount).toBe(3);
+    });
   });
 
   describe('toggleLike', () => {

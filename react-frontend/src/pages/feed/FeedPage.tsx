@@ -1159,6 +1159,8 @@ export function FeedPage() {
                         feedMode={feedMode}
                         isAuthenticated={isAuthenticated}
                         currentUserId={user?.id}
+                        currentUserAvatar={user?.avatar}
+                        currentUserName={user?.first_name || user?.name}
                         isAdmin={isAdmin}
                       />
                     </motion.div>

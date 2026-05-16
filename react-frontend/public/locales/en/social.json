@@ -16,6 +16,14 @@
   "no_comments": "No comments yet. Be the first to comment!",
   "no_likes": "No likes yet",
   "react": "React",
+  "reaction": {
+    "like": "Like",
+    "love": "Love",
+    "laugh": "Laugh",
+    "wow": "Wow",
+    "sad": "Sad",
+    "celebrate": "Celebrate"
+  },
   "reply": "Reply",
   "save": "Save",
   "send_comment": "Send comment",
@@ -27,6 +35,7 @@
   "shared_to_feed": "Shared to your feed",
   "write_comment": "Write a comment...",
   "write_reply": "Write a reply...",
+  "write_reply_to": "Reply to {{name}}...",
   "you": "You",
   "endorsement_update_failed": "Failed to update endorsement",
   "presence": {

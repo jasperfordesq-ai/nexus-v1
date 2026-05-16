@@ -59,8 +59,8 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-import { FeedCard, CommentItem } from './FeedCard';
-import type { FeedItem, FeedComment } from './types';
+import { FeedCard } from './FeedCard';
+import type { FeedItem } from './types';
 
 const baseFeedItem: FeedItem = {
   id: 1,
@@ -255,83 +255,5 @@ describe('FeedCard', () => {
     render(<FeedCard {...defaultProps} item={item} />);
     expect(screen.queryByText(/likes?$/)).not.toBeInTheDocument();
     expect(screen.queryByText(/comments?$/)).not.toBeInTheDocument();
-  });
-});
-
-describe('CommentItem', () => {
-  const baseComment: FeedComment = {
-    id: 1,
-    content: 'Great post!',
-    created_at: '2026-02-21T12:00:00Z',
-    edited: false,
-    is_own: false,
-    author: { id: 5, name: 'Alice', avatar: '/alice.png' },
-    reactions: {},
-    user_reactions: [],
-    replies: [],
-  };
-
-  it('renders comment content and author', () => {
-    render(<CommentItem comment={baseComment} />);
-    expect(screen.getByText('Great post!')).toBeInTheDocument();
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-  });
-
-  it('shows edited indicator', () => {
-    const comment = { ...baseComment, edited: true };
-    render(<CommentItem comment={comment} />);
-    expect(screen.getByText('(edited)')).toBeInTheDocument();
-  });
-
-  it('does not show edited indicator when not edited', () => {
-    render(<CommentItem comment={baseComment} />);
-    expect(screen.queryByText('(edited)')).not.toBeInTheDocument();
-  });
-
-  it('shows reply count button when replies exist', () => {
-    const comment: FeedComment = {
-      ...baseComment,
-      replies: [
-        {
-          id: 2,
-          content: 'Thanks!',
-          created_at: '2026-02-21T13:00:00Z',
-          edited: false,
-          is_own: false,
-          author: { id: 6, name: 'Bob', avatar: null },
-          reactions: {},
-          user_reactions: [],
-          replies: [],
-        },
-      ],
-    };
-    render(<CommentItem comment={comment} />);
-    expect(screen.getByText(/1 reply/)).toBeInTheDocument();
-  });
-
-  it('uses singular "reply" for 1 reply', () => {
-    const comment: FeedComment = {
-      ...baseComment,
-      replies: [
-        {
-          id: 2,
-          content: 'Thanks!',
-          created_at: '2026-02-21T13:00:00Z',
-          edited: false,
-          is_own: false,
-          author: { id: 6, name: 'Bob', avatar: null },
-          reactions: {},
-          user_reactions: [],
-          replies: [],
-        },
-      ],
-    };
-    render(<CommentItem comment={comment} />);
-    expect(screen.getByText(/1 reply$/)).toBeInTheDocument();
-  });
-
-  it('does not show reply button when no replies', () => {
-    render(<CommentItem comment={baseComment} />);
-    expect(screen.queryByText(/repl/)).not.toBeInTheDocument();
   });
 });

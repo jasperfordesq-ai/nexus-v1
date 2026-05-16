@@ -45,6 +45,34 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    private function createListing(int $userId): int
+    {
+        return DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'title' => 'Comment target listing ' . uniqid(),
+            'description' => 'A listing with social comments.',
+            'type' => 'offer',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createBlogPost(int $userId): int
+    {
+        return DB::table('posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_id' => $userId,
+            'title' => 'Comment target blog post ' . uniqid(),
+            'slug' => 'comment-target-blog-post-' . uniqid(),
+            'content' => 'A blog article with social comments.',
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     private function createComment(int $postId, int $userId): int
     {
         return DB::table('comments')->insertGetId([
@@ -66,6 +94,19 @@ class CommentsControllerTest extends TestCase
             'target_id' => $postId,
             'user_id' => $userId,
             'parent_id' => $parentId,
+            'content' => $content,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createTargetComment(string $targetType, int $targetId, int $userId, string $content = 'Parent comment'): int
+    {
+        return DB::table('comments')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'target_type' => $targetType,
+            'target_id' => $targetId,
+            'user_id' => $userId,
             'content' => $content,
             'created_at' => now(),
             'updated_at' => now(),
@@ -163,6 +204,173 @@ class CommentsControllerTest extends TestCase
             'target_id' => $postId,
             'user_id' => $user->id,
             'content' => 'A useful reply',
+        ]);
+    }
+
+    public function test_store_accepts_blog_post_alias_as_unified_blog_target(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->createBlogPost($user->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'blog_post',
+            'target_id' => $postId,
+            'content' => 'A useful blog comment',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'blog',
+            'target_id' => $postId,
+            'user_id' => $user->id,
+            'content' => 'A useful blog comment',
+        ]);
+    }
+
+    public function test_store_reply_notifies_parent_comment_author_and_content_owner(): void
+    {
+        $postOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $parentAuthor = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $postId = $this->createPost($postOwner->id);
+        $parentCommentId = $this->createComment($postId, $parentAuthor->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'parent_id' => $parentCommentId,
+            'content' => 'A direct reply',
+        ]);
+
+        $response->assertStatus(201);
+        $replyId = (int) $response->json('data.id');
+
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $parentAuthor->id,
+            'type' => 'comment_reply',
+            'link' => "/feed/posts/{$postId}#comment-{$replyId}",
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $postOwner->id,
+            'type' => 'comment',
+            'link' => "/feed/posts/{$postId}#comment-{$replyId}",
+        ]);
+    }
+
+    public function test_store_listing_reply_notifies_parent_comment_author_and_content_owner(): void
+    {
+        $listingOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $parentAuthor = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $listingId = $this->createListing($listingOwner->id);
+        $parentCommentId = $this->createTargetComment('listing', $listingId, $parentAuthor->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'listing',
+            'target_id' => $listingId,
+            'parent_id' => $parentCommentId,
+            'content' => 'A direct listing reply',
+        ]);
+
+        $response->assertStatus(201);
+        $replyId = (int) $response->json('data.id');
+
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $parentAuthor->id,
+            'type' => 'comment_reply',
+            'link' => "/listings/{$listingId}#comment-{$replyId}",
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $listingOwner->id,
+            'type' => 'comment',
+            'link' => "/listings/{$listingId}#comment-{$replyId}",
+        ]);
+    }
+
+    public function test_store_blog_reply_uses_slugged_comment_deep_link(): void
+    {
+        $blogOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $parentAuthor = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $postId = $this->createBlogPost($blogOwner->id);
+        $slug = (string) DB::table('posts')->where('id', $postId)->value('slug');
+        $parentCommentId = $this->createTargetComment('blog', $postId, $parentAuthor->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'blog_post',
+            'target_id' => $postId,
+            'parent_id' => $parentCommentId,
+            'content' => 'A direct blog reply',
+        ]);
+
+        $response->assertStatus(201);
+        $replyId = (int) $response->json('data.id');
+
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $parentAuthor->id,
+            'type' => 'comment_reply',
+            'link' => "/blog/{$slug}#comment-{$replyId}",
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $blogOwner->id,
+            'type' => 'comment',
+            'link' => "/blog/{$slug}#comment-{$replyId}",
+        ]);
+    }
+
+    public function test_store_reply_does_not_duplicate_notification_when_parent_author_owns_post(): void
+    {
+        $postOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $postId = $this->createPost($postOwner->id);
+        $parentCommentId = $this->createComment($postId, $postOwner->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'parent_id' => $parentCommentId,
+            'content' => 'A direct reply',
+        ]);
+
+        $response->assertStatus(201);
+
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $postOwner->id)
+            ->whereIn('type', ['comment', 'comment_reply'])
+            ->count());
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $postOwner->id,
+            'type' => 'comment_reply',
         ]);
     }
 

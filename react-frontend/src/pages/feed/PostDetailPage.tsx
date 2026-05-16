@@ -308,6 +308,8 @@ export function PostDetailPage() {
             feedMode="recent"
             isAuthenticated={isAuthenticated}
             currentUserId={user?.id}
+            currentUserAvatar={user?.avatar}
+            currentUserName={user?.first_name || user?.name}
             defaultShowComments
           />
         ) : null}

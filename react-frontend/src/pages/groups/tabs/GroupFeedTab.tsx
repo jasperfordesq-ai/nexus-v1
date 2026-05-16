@@ -195,6 +195,8 @@ export function GroupFeedTab({
                   feedMode="recent"
                   isAuthenticated={isAuthenticated}
                   currentUserId={currentUser?.id}
+                  currentUserAvatar={currentUser?.avatar}
+                  currentUserName={currentUser?.first_name || currentUser?.name}
                 />
               </motion.div>
             ))}

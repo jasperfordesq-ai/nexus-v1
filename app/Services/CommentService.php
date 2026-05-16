@@ -123,7 +123,13 @@ class CommentService
 
     public static function normalizeTargetType(string $targetType): string
     {
-        return $targetType === 'feed_post' ? 'post' : $targetType;
+        return match ($targetType) {
+            'feed_post' => 'post',
+            'blog_post' => 'blog',
+            'volunteering', 'volunteering_opportunity' => 'volunteer',
+            'ideation_challenge' => 'challenge',
+            default => $targetType,
+        };
     }
 
     public static function targetIsCommentableAndVisible(string $targetType, int $targetId, ?int $viewerId): bool
@@ -207,17 +213,32 @@ class CommentService
             Log::warning("CommentService::create mention processing failed: " . $e->getMessage());
         }
 
+        $replyRecipientId = null;
+        if (!empty($parentId)) {
+            try {
+                $replyRecipientId = self::notifyParentCommentAuthor($comment, $userId, $tenantId);
+            } catch (\Throwable $e) {
+                Log::warning('CommentService::create parent comment notification failed', [
+                    'comment_id' => $comment->id,
+                    'parent_id' => $parentId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         // Notify the content owner that someone commented on their content (platform + email)
         try {
             $ownerId = self::resolveContentOwnerId($targetType, $targetId, $tenantId);
 
-            if ($ownerId && $ownerId !== $userId) {
+            if ($ownerId && $ownerId !== $userId && $ownerId !== $replyRecipientId) {
                 SocialNotificationService::notifyComment(
                     $ownerId,
                     $userId,
                     $targetType,
                     $targetId,
-                    $content
+                    $content,
+                    (int) $comment->id
                 );
             }
         } catch (\Throwable $e) {
@@ -706,6 +727,46 @@ class CommentService
             ->first();
 
         return $row ? (int) $row->{$ownerColumn} : null;
+    }
+
+    /**
+     * Notify the direct parent comment author that their comment received a reply.
+     *
+     * Returns the resolved recipient ID so callers can avoid sending a duplicate
+     * generic content-owner notification when the post owner is also the comment
+     * author.
+     */
+    private static function notifyParentCommentAuthor(Comment $reply, int $replierId, int $tenantId): ?int
+    {
+        if (!$reply->parent_id) {
+            return null;
+        }
+
+        $parent = DB::table('comments')
+            ->where('id', (int) $reply->parent_id)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'user_id'])
+            ->first();
+
+        if (!$parent) {
+            return null;
+        }
+
+        $recipientId = (int) $parent->user_id;
+        if ($recipientId === $replierId) {
+            return $recipientId;
+        }
+
+        SocialNotificationService::notifyCommentReply(
+            $recipientId,
+            $replierId,
+            (int) $reply->id,
+            (string) $reply->target_type,
+            (int) $reply->target_id,
+            (string) $reply->content
+        );
+
+        return $recipientId;
     }
 
     /**

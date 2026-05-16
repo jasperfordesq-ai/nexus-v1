@@ -7,7 +7,7 @@
  * Blog Post Detail Page - Single blog article view with comments
  *
  * Uses V2 API: GET /api/v2/blog/{slug}
- * Uses V2 API: GET /api/v2/comments?target_type=blog_post&target_id={id}
+ * Uses V2 API: GET /api/v2/comments?target_type=blog&target_id={id}
  * Uses V2 API: POST /api/v2/comments
  * Uses V2 API: POST /api/v2/comments/{id}/reactions
  */
@@ -221,7 +221,7 @@ export function BlogPostPage() {
     try {
       setIsLoadingComments(true);
       const response = await api.get<{ comments: BlogComment[] }>(
-        `/v2/comments?target_type=blog_post&target_id=${postId}`
+        `/v2/comments?target_type=blog&target_id=${postId}`
       );
 
       if (controller.signal.aborted) return;
@@ -258,7 +258,7 @@ export function BlogPostPage() {
     try {
       setIsSubmittingComment(true);
       const response = await api.post('/v2/comments', {
-        target_type: 'blog_post',
+        target_type: 'blog',
         target_id: post.id,
         content: newComment.trim(),
       });
@@ -684,7 +684,7 @@ function CommentItem({
     try {
       setIsSubmittingReply(true);
       const response = await api.post('/v2/comments', {
-        target_type: 'blog_post',
+        target_type: 'blog',
         target_id: postId,
         parent_id: comment.id,
         content: replyContent.trim(),

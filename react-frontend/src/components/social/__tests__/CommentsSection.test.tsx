@@ -9,6 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
@@ -16,7 +17,12 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, options?: string | { name?: string; defaultValue?: string }) => {
+      if (key === 'write_reply_to' && typeof options === 'object') {
+        return `Reply to ${options.name}...`;
+      }
+      return typeof options === 'string' ? options : options?.defaultValue ?? key;
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },
@@ -50,7 +56,15 @@ vi.mock('@/lib/helpers', () => ({
 }));
 
 vi.mock('@/hooks/useSocialInteractions', () => ({
-  AVAILABLE_REACTIONS: ['👍', '❤️', '😂', '😮', '😢', '🎉'],
+  COMMENT_REACTION_EMOJI_MAP: {
+    like: '\uD83D\uDC4D',
+    love: '\u2764\uFE0F',
+    laugh: '\uD83D\uDE02',
+    wow: '\uD83D\uDE2E',
+    sad: '\uD83D\uDE22',
+    celebrate: '\uD83C\uDF89',
+  },
+  AVAILABLE_REACTIONS: ['like', 'love', 'laugh', 'wow', 'sad', 'celebrate'],
 }));
 
 import { CommentsSection } from '../CommentsSection';
@@ -75,6 +89,7 @@ const mockComment: FeedComment = {
   reactions: {},
   user_reactions: [],
   edited: false,
+  is_own: false,
 };
 
 const defaultProps = {
@@ -194,5 +209,43 @@ describe('CommentsSection', () => {
     );
     expect(screen.getByText('Edit')).toBeInTheDocument();
     expect(screen.getByText('Delete')).toBeInTheDocument();
+  });
+
+  it('submits replies to nested comments with the nested comment as parent', async () => {
+    const user = userEvent.setup();
+    const submitComment = vi.fn().mockResolvedValue(true);
+    const commentWithReply: FeedComment = {
+      ...mockComment,
+      replies: [
+        {
+          id: 2,
+          content: 'Nested reply',
+          created_at: '2026-01-01T00:01:00Z',
+          author: { id: 11, name: 'Bob', avatar: null },
+          replies: [],
+          reactions: {},
+          user_reactions: [],
+          edited: false,
+          is_own: false,
+        },
+      ],
+    };
+
+    render(
+      <W>
+        <CommentsSection
+          {...defaultProps}
+          comments={[commentWithReply]}
+          commentsCount={2}
+          submitComment={submitComment}
+        />
+      </W>,
+    );
+
+    await user.click(screen.getAllByText('Reply')[1]);
+    await user.type(screen.getByPlaceholderText('Reply to Bob...'), 'Thanks Bob');
+    await user.click(screen.getByLabelText('Send reply'));
+
+    expect(submitComment).toHaveBeenCalledWith('Thanks Bob', 2);
   });
 });

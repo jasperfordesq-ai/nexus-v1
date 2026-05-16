@@ -385,6 +385,8 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
               feedMode="recent"
               isAuthenticated={isAuthenticated}
               currentUserId={user?.id}
+              currentUserAvatar={user?.avatar}
+              currentUserName={user?.first_name || user?.name}
             />
           </motion.div>
         ))}
