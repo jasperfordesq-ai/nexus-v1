@@ -1841,4 +1841,5 @@ return [
     'location_not_verified' => 'Pick your town, city or area from the suggestions as you type. Free-text locations are not accepted.',
     'email_disposable' => 'Throwaway / temporary email addresses are not accepted. Use a permanent email address from a real provider.',
     'email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers. Check for typos and try again.',
+    'registration_daily_limit' => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow.',
 ];

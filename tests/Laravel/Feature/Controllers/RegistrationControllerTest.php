@@ -26,6 +26,8 @@ class RegistrationControllerTest extends TestCase
         }
         RateLimiter::clear('api:registration:ip:127.0.0.1');
         RateLimiter::clear('api:registration:ip:::1');
+        RateLimiter::clear('register_success_ip:127.0.0.1');
+        RateLimiter::clear('register_success_ip:::1');
     }
 
     // ------------------------------------------------------------------
@@ -251,6 +253,33 @@ class RegistrationControllerTest extends TestCase
         $this->assertSame(422, $response->getStatusCode());
         $body = json_decode((string) $response->getContent(), true);
         $this->assertSame('EMAIL_DOMAIN_INVALID', $body['errors'][0]['code'] ?? null);
+    }
+
+    public function test_register_rejects_when_daily_ip_cap_exceeded(): void
+    {
+        // Burn the default cap (5) of successful slots for this IP.
+        for ($i = 0; $i < 5; $i++) {
+            RateLimiter::hit('register_success_ip:127.0.0.1', 86400);
+            RateLimiter::hit('register_success_ip:::1', 86400);
+        }
+
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
+        ]);
+
+        $this->assertSame(429, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('REGISTRATION_DAILY_LIMIT', $body['errors'][0]['code'] ?? null);
     }
 
     public function test_register_rejects_null_island_coordinates(): void

@@ -312,6 +312,7 @@ class AlphaController extends Controller
                 $code === 'LOCATION_NOT_VERIFIED' => 'register-location-unverified',
                 $code === 'EMAIL_DISPOSABLE'      => 'register-email-disposable',
                 $code === 'EMAIL_DOMAIN_INVALID'  => 'register-email-domain-invalid',
+                $code === 'REGISTRATION_DAILY_LIMIT' => 'register-daily-limit',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',
                 default                            => 'register-failed',
             };

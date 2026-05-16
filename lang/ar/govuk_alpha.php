@@ -233,6 +233,7 @@ return [
         'register_location_unverified' => 'Pick your town, city or area from the autocomplete suggestions as you type. Free-text locations are not accepted.',
         'register_email_disposable' => 'Throwaway and temporary email addresses (such as mailinator, 10minutemail, tempmail) are not accepted. Use a permanent email address from a real provider.',
         'register_email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers configured. Check for typos in the domain name and try again.',
+        'register_daily_limit' => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow, or contact a community administrator if you need help.',
     ],
     'feed' => [
         'title' => 'Feed',

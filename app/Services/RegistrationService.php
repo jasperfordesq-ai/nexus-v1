@@ -21,6 +21,7 @@ use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -95,6 +96,33 @@ class RegistrationService
         // showed the widget was deterring legitimate sign-ups. Bot defence on
         // this path is the honeypot field + min-form-time gate + per-IP
         // route throttle (3/5min) + admin-approval gate.
+
+        // Per-IP daily cap on SUCCESSFUL registrations. Stacks on top of the
+        // existing 3/5min route throttle: that one caps raw request volume,
+        // this one caps how many accounts a single IP can actually create
+        // per 24h. Configurable via env REGISTRATION_DAILY_CAP_PER_IP (set
+        // to 0 to disable). Default 5 — comfortably above any plausible
+        // household-shared-IP use case, brutal for anyone trying to grind
+        // out hundreds of fake accounts overnight from a single residential
+        // proxy. The counter only increments on a successful create, so a
+        // user typing wrong passwords doesn't burn quota.
+        $dailyCap = (int) (getenv('REGISTRATION_DAILY_CAP_PER_IP') ?: 5);
+        $ip = request()?->ip() ?: '0.0.0.0';
+        $dailyCapKey = 'register_success_ip:' . $ip;
+        if ($dailyCap > 0 && RateLimiter::tooManyAttempts($dailyCapKey, $dailyCap)) {
+            $retryAfter = RateLimiter::availableIn($dailyCapKey);
+            Log::info('registration.daily_cap_exceeded', [
+                'tenant_id' => $tenantId,
+                'ip' => $ip,
+                'retry_after_s' => $retryAfter,
+            ]);
+            return [
+                'error' => __('api.registration_daily_limit'),
+                'code'  => 'REGISTRATION_DAILY_LIMIT',
+                'status' => 429,
+                'retry_after' => $retryAfter,
+            ];
+        }
 
         $validator = validator($data, [
             'first_name' => 'required|string|max:100',
@@ -358,6 +386,13 @@ class RegistrationService
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+
+        // Burn one slot from the per-IP daily cap (see top of method).
+        // Done here, after the user row is committed and the event has
+        // fired, so failed attempts don't count against the quota.
+        if ($dailyCap > 0) {
+            RateLimiter::hit($dailyCapKey, 86400);
         }
 
         return [
