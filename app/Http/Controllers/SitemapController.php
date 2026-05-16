@@ -42,7 +42,38 @@ class SitemapController
         );
 
         if ($tenant) {
-            // Tenant custom domain — that tenant's sitemap, this domain's URLs
+            // Check if this tenant has direct sub-tenants that inherit its domain
+            // (sub-tenants with no own domain). If so, return a sitemap index so
+            // Google discovers both the parent's and sub-tenants' content.
+            $subTenants = DB::select(
+                "SELECT id, slug, updated_at FROM tenants
+                  WHERE parent_id = ? AND is_active = 1
+                    AND (domain IS NULL OR domain = '')
+                  ORDER BY slug",
+                [(int) $tenant->id]
+            );
+
+            if (!empty($subTenants)) {
+                $sitemaps = [
+                    ['loc' => "{$baseUrl}/sitemap-{$tenant->slug}.xml", 'lastmod' => null],
+                ];
+                foreach ($subTenants as $sub) {
+                    $lastmod = null;
+                    if (!empty($sub->updated_at)) {
+                        try {
+                            $lastmod = substr((string) $sub->updated_at, 0, 10);
+                        } catch (\Throwable) {}
+                    }
+                    $sitemaps[] = [
+                        'loc'     => "{$baseUrl}/sitemap-{$sub->slug}.xml",
+                        'lastmod' => $lastmod,
+                    ];
+                }
+                $xml = $service->buildSitemapIndexPublic($sitemaps);
+                return $this->xmlResponse($xml);
+            }
+
+            // No sub-tenants — single-tenant domain, serve flat sitemap
             $xml = $service->generateForTenant((int) $tenant->id, $baseUrl);
             return $this->xmlResponse($xml);
         }
@@ -73,8 +104,27 @@ class SitemapController
         }
 
         $host = $request->header('X-Sitemap-Host', $request->getHost());
-        $xml = $service->generateForTenant($tenantId, 'https://' . $host);
 
+        // Determine the correct base URL. If this tenant has no own domain but
+        // the request host is its parent's domain, use host/slug as the base URL
+        // so sitemap entries are timebanking.uk/cardiff/... not timebanking.uk/...
+        $tenantRow = DB::selectOne(
+            "SELECT domain, parent_id, slug FROM tenants WHERE id = ? AND is_active = 1",
+            [$tenantId]
+        );
+        $baseUrl = 'https://' . $host;
+        if ($tenantRow && empty($tenantRow->domain) && !empty($tenantRow->parent_id)) {
+            $parentRow = DB::selectOne(
+                "SELECT domain FROM tenants WHERE id = ? AND is_active = 1",
+                [(int) $tenantRow->parent_id]
+            );
+            if ($parentRow && !empty($parentRow->domain)
+                && rtrim((string) $parentRow->domain, '/') === $host) {
+                $baseUrl = 'https://' . $host . '/' . $tenantRow->slug;
+            }
+        }
+
+        $xml = $service->generateForTenant($tenantId, $baseUrl);
         return $this->xmlResponse($xml);
     }
 

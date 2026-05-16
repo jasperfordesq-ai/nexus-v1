@@ -45,6 +45,14 @@ class TenantContext
     private static $headerTenantId = null;
 
     /**
+     * When a slug-only sub-tenant is resolved from a parent's custom domain
+     * (e.g. timebanking.uk/cardiff → cardiff tenant), this holds the parent's
+     * domain string so getFrontendUrl() can return the correct base URL for
+     * emails and notifications, and the bootstrap response can inform the SPA.
+     */
+    private static ?string $parentDomain = null;
+
+    /**
      * Query a single tenant row and return as associative array (or false/null).
      *
      * @param string $column Column to match
@@ -90,10 +98,33 @@ class TenantContext
                     return;
                 }
 
-                // If it's a specific tenant domain (not Master), LOCK IT.
-                // We do NOT allow path-based overrides on a tenant domain.
+                // Check if the path contains a direct child tenant's slug.
+                // This enables sub-tenants to be reached at the parent's domain:
+                // e.g. timebanking.uk/cardiff → resolve to the 'cardiff' child tenant.
+                $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+                $pathSegments = array_values(array_filter(explode('/', trim($path, '/'))));
+                $firstSegment = $pathSegments[0] ?? '';
+
+                if ($firstSegment !== '' && !in_array($firstSegment, self::getReservedPaths(), true)) {
+                    $childRow = DB::table('tenants')
+                        ->where('slug', $firstSegment)
+                        ->where('parent_id', (int) $domainTenant['id'])
+                        ->where('is_active', 1)
+                        ->first();
+
+                    if ($childRow) {
+                        self::$tenant = (array) $childRow;
+                        self::$basePath = '/' . $firstSegment;
+                        self::$cachedId = (int) $childRow->id;
+                        self::$parentDomain = (string) $domainTenant['domain'];
+                        return;
+                    }
+                }
+
+                // No child tenant found — lock to the custom-domain (parent) tenant.
                 self::$tenant = $domainTenant;
                 self::$basePath = '';
+                self::$cachedId = (int) $domainTenant['id'];
                 return;
             }
         }
@@ -202,80 +233,7 @@ class TenantContext
         $segments = array_values(array_filter(explode('/', trim($path, '/'))));
         $firstSegment = $segments[0] ?? '';
 
-        // Comprehensive Reserved List (Global Routes that belong to Master/System)
-        // If a path starts with these, it is NOT a tenant slug.
-        $reserved = [
-            'login',
-            'register',
-            'dashboard',
-            'admin',
-            'admin-legacy',
-            'super-admin',
-            'logout',
-            'api',
-            'v2',
-            'assets',
-            'downloads',
-            'uploads',
-            'test-email',
-            'sitemap.xml',
-            'robots.txt',
-            'cron',
-            'mobile',
-            'mobile-download',
-            'home',
-            'about',
-            'contact',
-            'terms',
-            'how-it-works',
-            'our-story',
-            'impact-report',
-            'guide',
-            'timebanking-guide',
-            'partner-with-us',
-            'partner',
-            'social-prescribing',
-            'strategic-plan',
-            'faq',
-            'impact-summary',
-            'migrate-messages',
-            'legal',
-            'newsletter',
-            'onboarding',
-            'post',
-            'share-target',
-            'accessibility',
-            // Features (Global Routes handled by Master if no Tenant Slug)
-            'wallet',
-            'listings',
-            'groups',
-            'community-groups',
-            'members',
-            'profile',
-            'reviews',
-            'notifications',
-            'connections',
-            'messages',
-            'compose', // Message Composition
-            'events',
-            'volunteering',
-            'feed',
-            'resources',
-            'polls',
-            'goals',
-            'blog',
-            'news', // Public News Alias
-            'help', // New Help Center
-            'search', // Unified Discovery Engine
-            'proposals', // Governance Module
-            'federation', // Multi-Tenant Federation
-            'privacy',
-            'password',
-            'settings', // User Settings
-            'dev', // Development tools (component library, storybook, etc.)
-            'consent-required', // GDPR consent re-acceptance
-            'consent', // GDPR consent accept/decline actions
-        ];
+        $reserved = self::getReservedPaths();
 
         if (!empty($firstSegment) && !in_array($firstSegment, $reserved)) {
             $tenant = self::fetchTenant('slug', $firstSegment);
@@ -388,6 +346,7 @@ class TenantContext
         self::$cachedId = null;
         self::$tokenTenantId = null;
         self::$headerTenantId = null;
+        self::$parentDomain = null;
     }
 
     /**
@@ -414,6 +373,56 @@ class TenantContext
     public static function getBasePath()
     {
         return self::$basePath;
+    }
+
+    /**
+     * Returns the custom domain of the parent tenant when the current tenant is a
+     * slug-only sub-tenant resolved from a parent-domain URL (e.g. timebanking.uk/cardiff).
+     * Null in all other cases.
+     */
+    public static function getParentDomain(): ?string
+    {
+        return self::$parentDomain;
+    }
+
+    /**
+     * Paths that are reserved platform/SPA routes and must never be treated as tenant slugs.
+     * Shared by both domain-based child-slug resolution (step 1) and path-based resolution
+     * (step 3) so the two stay in sync automatically.
+     */
+    private static function getReservedPaths(): array
+    {
+        return [
+            // Auth & session
+            'login', 'register', 'logout', 'password', 'verify-email', 'verify-identity',
+            'consent-required', 'consent',
+            // Core app routes
+            'dashboard', 'feed', 'listings', 'messages', 'compose', 'notifications',
+            'wallet', 'profile', 'settings', 'members', 'connections',
+            // Feature modules
+            'events', 'groups', 'community-groups', 'volunteering', 'organisations',
+            'federation', 'blog', 'resources', 'polls', 'goals', 'reviews',
+            'exchanges', 'group-exchanges', 'matches', 'search', 'explore',
+            'achievements', 'leaderboard', 'nexus-score', 'activity', 'skills',
+            'ideation', 'jobs', 'kb', 'marketplace', 'chat',
+            'caring', 'caring-community', 'proposals', 'newsletter', 'onboarding',
+            // Public info pages
+            'home', 'about', 'contact', 'faq', 'help', 'legal', 'terms', 'privacy',
+            'accessibility', 'cookies', 'community-guidelines', 'acceptable-use',
+            'timebanking-guide', 'partner', 'partner-with-us', 'social-prescribing',
+            'strategic-plan', 'impact-summary', 'impact-report', 'our-story',
+            'how-it-works', 'guide', 'news', 'post',
+            'features', 'changelog', 'development-status',
+            'communities', 'local-groups', 'services',
+            // System / admin
+            'admin', 'admin-legacy', 'super-admin', 'broker', 'dev',
+            'api', 'v2', 'assets', 'downloads', 'uploads',
+            'cron', 'test-email', 'mobile', 'mobile-download', 'share-target',
+            'migrate-messages',
+            // Static files / well-known
+            'sitemap.xml', 'robots.txt', 'manifest.json', 'service-worker.js',
+            'favicon.ico', 'health', 'classic', '.well-known', 'page',
+        ];
     }
 
     /**
@@ -503,6 +512,23 @@ class TenantContext
             $tenant = self::get();
             if (!empty($tenant['domain']) && ($tenant['id'] ?? 0) > 1) {
                 return 'https://' . rtrim($tenant['domain'], '/');
+            }
+            // Sub-tenant accessed via parent's custom domain (e.g. timebanking.uk/cardiff).
+            // Emails / notifications for this tenant should link to timebanking.uk/cardiff/...
+            // so getFrontendUrl() must return the parent's domain, not app.project-nexus.ie.
+            if (!empty(self::$parentDomain)) {
+                return 'https://' . rtrim(self::$parentDomain, '/');
+            }
+            // Queued-job path: $parentDomain is null (setById was used, not HTTP resolve).
+            // If tenant has no domain but has a parent, look up the parent's domain from DB.
+            if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
+                $parentDomain = \Illuminate\Support\Facades\DB::table('tenants')
+                    ->where('id', (int) $tenant['parent_id'])
+                    ->where('is_active', 1)
+                    ->value('domain');
+                if (!empty($parentDomain)) {
+                    return 'https://' . rtrim((string) $parentDomain, '/');
+                }
             }
         } catch (\Throwable $e) {
             // Tenant not resolved yet — fall through

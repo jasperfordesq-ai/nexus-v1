@@ -318,7 +318,14 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
     return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
   }, []);
-  const usePathBasedSlug = isSharedHost && !!effectiveTenantSlug;
+
+  // A slug-only sub-tenant accessed via its parent's custom domain also needs path-based
+  // slug routing even though the hostname is not a shared platform domain.
+  // e.g. timebanking.uk/cardiff → the bootstrap returns parent_domain: 'timebanking.uk'
+  // and the slug prefix '/cardiff' must still be prepended to all internal links.
+  const isParentDomainSubTenant = !!state.tenant?.parent_domain;
+
+  const usePathBasedSlug = (isSharedHost && !!effectiveTenantSlug) || isParentDomainSubTenant;
 
   /**
    * Fetch tenant bootstrap data
@@ -544,15 +551,19 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   /**
    * Build a path with the current tenant slug prefix.
    * Preserves the slug in all internal navigation.
+   *
+   * On shared platform domains (app.project-nexus.ie / localhost), the slug comes from
+   * the URL. On parent-domain sub-tenants (timebanking.uk/cardiff), effectiveTenantSlug
+   * is null (the URL slug isn't detected from a custom domain) so we fall back to the
+   * slug returned by the bootstrap API.
    */
   const tenantPath = useCallback((path: string): string => {
-    // Only prepend slug when on a path-based domain (localhost, app.project-nexus.ie).
-    // On custom domains (timebank.global), paths stay clean — domain identifies tenant.
     if (!usePathBasedSlug) {
       return path.startsWith('/') ? path : '/' + path;
     }
-    return buildTenantPath(path, effectiveTenantSlug);
-  }, [effectiveTenantSlug, usePathBasedSlug]);
+    const slug = effectiveTenantSlug || state.tenant?.slug || null;
+    return buildTenantPath(path, slug);
+  }, [effectiveTenantSlug, usePathBasedSlug, state.tenant?.slug]);
 
   const supportedLanguages = useMemo<string[]>(
     () => state.tenant?.supported_languages ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'],
@@ -613,16 +624,19 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       hasModule,
       hasGroupTab,
       refreshTenant,
-      // Only expose slug when path-based routing is active (slug appears in URL).
-      // On custom domains, slug is null — the domain identifies the tenant.
-      tenantSlug: usePathBasedSlug ? (effectiveTenantSlug || null) : null,
+      // Only expose slug when path-based routing is active (slug appears in URL path).
+      // On plain custom domains (no parent-domain sub-tenant), domain identifies tenant → null.
+      // On parent-domain sub-tenants (timebanking.uk/cardiff), fall back to bootstrap slug.
+      tenantSlug: usePathBasedSlug
+        ? (effectiveTenantSlug || state.tenant?.slug || null)
+        : null,
       tenantPath,
       supportedLanguages,
       defaultLanguage,
       mapProvider,
       geocodingProvider,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, isParentDomainSubTenant, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
   );
 
   return (

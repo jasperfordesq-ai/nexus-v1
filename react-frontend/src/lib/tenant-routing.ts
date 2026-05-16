@@ -99,9 +99,16 @@ export function detectTenantFromUrl(): { slug: string | null; source: 'subdomain
   }
 
   // R1: Custom domain — not project-nexus.ie
-  // The backend resolves tenant from Host header via bootstrap API.
-  // We don't extract slug from URL; the bootstrap call handles it.
-  // Return null slug but the bootstrap API will resolve tenant from domain.
+  // Check whether the first path segment is a sub-tenant slug.
+  // Direct child tenants of a domain-owning parent are reachable at parent.domain/child-slug
+  // (e.g. timebanking.uk/cardiff). We attempt the path segment as a slug and let the
+  // bootstrap API validate it: valid sub-tenant → returns parent_domain; unknown → 404.
+  // Reserved paths (login, dashboard, listings, etc.) are excluded by extractSlugFromPath,
+  // so standard SPA routes on the parent domain are never misidentified as tenant slugs.
+  const potentialSlug = extractSlugFromPath(pathname);
+  if (potentialSlug) {
+    return { slug: potentialSlug, source: 'path' };
+  }
   return { slug: null, source: null };
 }
 

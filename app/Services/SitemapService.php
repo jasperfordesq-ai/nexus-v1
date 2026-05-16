@@ -41,20 +41,28 @@ class SitemapService
     {
         return Cache::remember(self::CACHE_PREFIX . 'index', self::CACHE_TTL, function () {
             $tenants = DB::select(
-                "SELECT id, slug, domain, updated_at FROM tenants WHERE is_active = 1 ORDER BY id"
+                "SELECT t.id, t.slug, t.domain, t.parent_id, t.updated_at,
+                        p.domain as parent_domain
+                 FROM tenants t
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1
+                 WHERE t.is_active = 1 ORDER BY t.id"
             );
 
-            // Use the frontend URL for sub-sitemap references so Google finds
-            // them on the same domain as the content URLs.
             $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
             $sitemaps = [];
 
             foreach ($tenants as $tenant) {
                 $slug = !empty($tenant->slug) ? $tenant->slug : 'main';
-                // Tenants with custom domains get their sitemap referenced from that domain
-                $base = !empty($tenant->domain) ? ('https://' . rtrim($tenant->domain, '/')) : $frontendBase;
+                if (!empty($tenant->domain)) {
+                    $base = 'https://' . rtrim($tenant->domain, '/');
+                } elseif (!empty($tenant->parent_domain)) {
+                    // Sub-tenant inheriting parent's domain — sitemap at parentdomain/slug
+                    $base = 'https://' . rtrim($tenant->parent_domain, '/');
+                } else {
+                    $base = $frontendBase;
+                }
                 $sitemaps[] = [
-                    'loc' => "{$base}/sitemap-{$slug}.xml",
+                    'loc'     => "{$base}/sitemap-{$slug}.xml",
                     'lastmod' => $this->formatDate($tenant->updated_at),
                 ];
             }
@@ -73,7 +81,7 @@ class SitemapService
         $cacheKey = self::CACHE_PREFIX . "tenant:{$tenantId}" . ($overrideBaseUrl ? ':' . md5($overrideBaseUrl) : '');
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId, $overrideBaseUrl) {
             $tenant = DB::selectOne(
-                "SELECT id, slug, domain, features, configuration FROM tenants WHERE id = ? AND is_active = 1",
+                "SELECT id, slug, domain, parent_id, features, configuration FROM tenants WHERE id = ? AND is_active = 1",
                 [$tenantId]
             );
 
@@ -94,7 +102,11 @@ class SitemapService
     {
         return Cache::remember(self::CACHE_PREFIX . 'app-domain', self::CACHE_TTL, function () {
             $tenants = DB::select(
-                "SELECT id, slug, domain, features, configuration FROM tenants WHERE is_active = 1 ORDER BY id"
+                "SELECT t.id, t.slug, t.domain, t.parent_id, t.features, t.configuration,
+                        p.domain as parent_domain
+                 FROM tenants t
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1
+                 WHERE t.is_active = 1 ORDER BY t.id"
             );
 
             $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
@@ -103,6 +115,11 @@ class SitemapService
             foreach ($tenants as $tenant) {
                 // Skip tenants with their own custom domain — they have their own sitemap
                 if (!empty($tenant->domain)) {
+                    continue;
+                }
+                // Skip sub-tenants whose parent has a custom domain — canonical URL is
+                // parentdomain.com/slug, not app.project-nexus.ie/slug
+                if (!empty($tenant->parent_domain)) {
                     continue;
                 }
 
@@ -646,6 +663,15 @@ class SitemapService
         return $xml;
     }
 
+    /**
+     * Public wrapper used by SitemapController for per-domain sitemap indexes.
+     * @param list<array{loc: string, lastmod: ?string}> $sitemaps
+     */
+    public function buildSitemapIndexPublic(array $sitemaps): string
+    {
+        return $this->buildSitemapIndexXml($sitemaps);
+    }
+
     private function buildSitemapIndexXml(array $sitemaps): string
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -691,6 +717,17 @@ class SitemapService
         // Custom domain takes priority
         if (!empty($tenant->domain)) {
             return 'https://' . rtrim($tenant->domain, '/');
+        }
+
+        // Sub-tenant: use parent's domain if available (e.g. timebanking.uk/cardiff)
+        if (!empty($tenant->parent_id)) {
+            $parentDomain = DB::selectOne(
+                "SELECT domain FROM tenants WHERE id = ? AND is_active = 1",
+                [(int) $tenant->parent_id]
+            )?->domain ?? '';
+            if (!empty($parentDomain)) {
+                return 'https://' . rtrim($parentDomain, '/') . '/' . $tenant->slug;
+            }
         }
 
         $frontendBase = rtrim(

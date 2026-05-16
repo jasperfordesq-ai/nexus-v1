@@ -67,11 +67,33 @@ class PrerenderPlanRoutes extends Command
         // per-tenant without a second query loop.
         $prerender = app(PrerenderService::class);
 
+        // Build a parent-domain lookup so sub-tenants (no own domain, has parent_id)
+        // are prerendered at timebanking.uk/slug rather than app.project-nexus.ie/slug.
+        $parentDomainMap = DB::table('tenants as p')
+            ->join('tenants as c', 'c.parent_id', '=', 'p.id')
+            ->where('p.is_active', 1)
+            ->where('c.is_active', 1)
+            ->whereNotNull('p.domain')
+            ->where('p.domain', '<>', '')
+            ->whereNull('c.domain')
+            ->pluck('p.domain', 'c.id')
+            ->map(fn ($d) => trim((string) $d))
+            ->toArray(); // [child_id => parent_domain]
+
         $tenants = [];
         foreach ($query->get(['id', 'slug', 'domain', 'features', 'configuration']) as $t) {
             $domain = trim((string) ($t->domain ?? ''));
-            $host = $domain !== '' ? $domain : $appHost;
-            $prefix = $domain !== '' ? '' : '/' . $t->slug;
+            $parentDomain = $parentDomainMap[(int) $t->id] ?? '';
+            if ($domain !== '') {
+                $host   = $domain;
+                $prefix = '';
+            } elseif ($parentDomain !== '') {
+                $host   = $parentDomain;
+                $prefix = '/' . $t->slug;
+            } else {
+                $host   = $appHost;
+                $prefix = '/' . $t->slug;
+            }
 
             $routes = [];
             if ($includeStatic) {

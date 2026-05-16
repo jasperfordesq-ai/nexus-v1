@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * TenantHierarchyService — Native Laravel implementation.
@@ -257,6 +258,22 @@ class TenantHierarchyService
                 "Updated tenant '{$tenant->name}' (" . implode(', ', array_keys($update)) . ")"
             );
 
+            // Bootstrap cache invalidation.
+            // Always bust the tenant itself (name, slug, branding, etc. may have changed).
+            // If the domain changed, also bust all direct children: they cache a parent_domain
+            // field that references this tenant's domain — their cached value is now stale.
+            $idsToFlush = [$tenantId];
+            if (array_key_exists('domain', $update)) {
+                $childIds = DB::table('tenants')
+                    ->where('parent_id', $tenantId)
+                    ->where('is_active', 1)
+                    ->pluck('id')
+                    ->map(fn ($id) => (int) $id)
+                    ->toArray();
+                $idsToFlush = array_merge($idsToFlush, $childIds);
+            }
+            self::bustBootstrapCache(...$idsToFlush);
+
             return ['success' => true];
         } catch (\Throwable $e) {
             Log::error('TenantHierarchyService::updateTenant failed', ['error' => $e->getMessage()]);
@@ -414,6 +431,10 @@ class TenantHierarchyService
                 ['parent_id' => $newParentId, 'path' => $newPath],
                 "Moved tenant '{$tenant->name}' from parent ID {$oldParentId} to {$newParentId}"
             );
+
+            // The moved tenant's parent_domain in the bootstrap response has changed.
+            // Bust its cache immediately so the next bootstrap call reflects the new parent.
+            self::bustBootstrapCache($tenantId);
 
             return ['success' => true];
         } catch (\Throwable $e) {
@@ -668,6 +689,28 @@ class TenantHierarchyService
             'GB', 'UK' => 'england_wales',
             default => 'custom',
         };
+    }
+
+    /**
+     * Invalidate the bootstrap cache for one or more tenants.
+     *
+     * The cache key format mirrors RedisCache::buildKey(): "t{id}:tenant_bootstrap".
+     * Called after any mutation that changes hierarchy-derived data (parent_domain):
+     *   - moveTenant: bust the moved tenant (its parent_domain changes)
+     *   - updateTenant with domain change: bust the tenant + all direct children
+     *     (direct children expose parent_domain pointing to this tenant's domain)
+     */
+    private static function bustBootstrapCache(int ...$tenantIds): void
+    {
+        foreach ($tenantIds as $id) {
+            try {
+                Cache::store('redis')->forget("t{$id}:tenant_bootstrap");
+            } catch (\Throwable $e) {
+                Log::warning("TenantHierarchyService: failed to bust bootstrap cache for tenant {$id}", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**

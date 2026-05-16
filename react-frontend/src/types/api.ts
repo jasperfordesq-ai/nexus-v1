@@ -1229,6 +1229,13 @@ export interface TenantConfig {
   default_language?: string;
   /** Per-tenant landing page configuration (sections, content, ordering) */
   landing_page_config?: import('./landing-page').LandingPageConfig;
+  /**
+   * Custom domain of the immediate parent tenant.
+   * Present only for slug-only sub-tenants whose parent has a custom domain
+   * (e.g. parent: timebanking.uk, child slug: cardiff → parent_domain: 'timebanking.uk').
+   * When set, the SPA must use path-prefixed routing: timebanking.uk/cardiff/dashboard.
+   */
+  parent_domain?: string;
 }
 
 export interface GroupTabConfig {

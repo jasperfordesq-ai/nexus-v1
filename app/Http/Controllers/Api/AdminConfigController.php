@@ -1268,11 +1268,21 @@ class AdminConfigController extends BaseApiController
         $sitemapService = app(\App\Services\SitemapService::class);
         $stats = $sitemapService->getStats($tenantId);
 
-        $tenant = DB::selectOne("SELECT slug, domain FROM tenants WHERE id = ?", [$tenantId]);
+        $tenant = DB::selectOne("SELECT slug, domain, parent_id FROM tenants WHERE id = ?", [$tenantId]);
         $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
-        $sitemapUrl = !empty($tenant->domain)
-            ? 'https://' . rtrim($tenant->domain, '/') . '/sitemap.xml'
-            : $frontendBase . '/sitemap.xml';
+        if (!empty($tenant->domain)) {
+            $sitemapUrl = 'https://' . rtrim($tenant->domain, '/') . '/sitemap.xml';
+        } elseif (!empty($tenant->parent_id)) {
+            $parentDomain = DB::table('tenants')
+                ->where('id', (int) $tenant->parent_id)
+                ->where('is_active', 1)
+                ->value('domain');
+            $sitemapUrl = !empty($parentDomain)
+                ? 'https://' . rtrim((string) $parentDomain, '/') . '/sitemap-' . $tenant->slug . '.xml'
+                : $frontendBase . '/sitemap-' . $tenant->slug . '.xml';
+        } else {
+            $sitemapUrl = $frontendBase . '/sitemap.xml';
+        }
 
         return $this->respondWithData([
             'sitemap_url' => $sitemapUrl,

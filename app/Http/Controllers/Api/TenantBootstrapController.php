@@ -323,6 +323,19 @@ class TenantBootstrapController extends BaseApiController
             $data['tagline'] = $tenant['tagline'];
         }
 
+        // If this tenant has no custom domain but its parent does, expose that parent
+        // domain so the SPA knows to use path-prefixed routing (e.g. timebanking.uk/cardiff).
+        // Computed from DB so the value is correct whether resolved via slug or parent-domain path.
+        if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
+            $parentDomain = DB::table('tenants')
+                ->where('id', (int) $tenant['parent_id'])
+                ->where('is_active', 1)
+                ->value('domain');
+            if (!empty($parentDomain)) {
+                $data['parent_domain'] = $parentDomain;
+            }
+        }
+
         $data['default_layout'] = $tenant['default_layout'] ?? 'modern';
         $data['branding'] = $this->buildBrandingData($tenant, $config);
         $data['features'] = $this->buildFeaturesData($features);

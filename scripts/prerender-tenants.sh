@@ -316,7 +316,9 @@ get_tenants() {
 
     # Tenant 1 is the platform/sales root. project-nexus.ie is served by the
     # sales-site container, not the React tenant frontend.
-    QUERY="SELECT id, slug, COALESCE(domain, '') as domain FROM tenants WHERE is_active = 1 AND id <> 1"
+    # parent_domain: parent's domain when this tenant has no own domain but its
+    # parent does — used for sub-tenant path routing (timebanking.uk/cardiff).
+    QUERY="SELECT t.id, t.slug, COALESCE(t.domain, '') as domain, COALESCE(p.domain, '') as parent_domain FROM tenants t LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 WHERE t.is_active = 1 AND t.id <> 1"
     if [ -n "$FILTER_TENANT" ]; then
         QUERY="$QUERY AND slug = '$FILTER_TENANT'"
     fi
@@ -438,13 +440,16 @@ build_manifest_static() {
     {
         echo '{"urls":['
 
-        while IFS=$'\t' read -r TENANT_ID SLUG DOMAIN; do
+        while IFS=$'\t' read -r TENANT_ID SLUG DOMAIN PARENT_DOMAIN; do
             [ -n "$TENANT_ID" ] || continue
 
             local HOST PREFIX
             if [ -n "$DOMAIN" ]; then
                 HOST="$DOMAIN"
                 PREFIX=""
+            elif [ -n "$PARENT_DOMAIN" ]; then
+                HOST="$PARENT_DOMAIN"
+                PREFIX="/${SLUG}"
             elif [ -n "$SLUG" ]; then
                 HOST="$APP_HOST"
                 PREFIX="/${SLUG}"
