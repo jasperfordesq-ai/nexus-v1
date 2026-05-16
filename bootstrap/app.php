@@ -395,6 +395,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ], 429, ['API-Version' => '2.0']);
         });
 
+        // Symfony Console CLI-input noise — not application bugs. These fire
+        // when an operator types a bad artisan command (`artisan tinker` with
+        // tinker uninstalled, `artisan x --columns` with no such option, etc.).
+        // Filtering them out of Sentry keeps the dashboard signal-to-noise high.
+        $exceptions->dontReport([
+            \Symfony\Component\Console\Exception\CommandNotFoundException::class,
+            \Symfony\Component\Console\Exception\RuntimeException::class,
+        ]);
+
         // Sentry — captures unhandled exceptions and wires tracing context.
         // Driven by config/sentry.php (which reads SENTRY_DSN_PHP from .env).
         Integration::handles($exceptions);
