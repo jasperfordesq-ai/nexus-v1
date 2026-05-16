@@ -126,14 +126,6 @@ export default function ModuleConfiguration() {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 pb-8">
       <PageHeader
@@ -156,9 +148,9 @@ export default function ModuleConfiguration() {
         <Input
           size="sm"
           variant="bordered"
-          type="search"
+          type="text"
           name="module-config-search"
-          autoComplete="off"
+          autoComplete="new-password"
           placeholder={"Search modules"}
           startContent={<Search size={16} className="text-default-400" />}
           value={searchQuery}
@@ -189,8 +181,15 @@ export default function ModuleConfiguration() {
         </ButtonGroup>
       </div>
 
+      {/* Loading state — inline so the search Input is never unmounted (prevents browser search-history re-injection) */}
+      {loading && (
+        <div className="flex justify-center items-center min-h-[300px]">
+          <Spinner size="lg" />
+        </div>
+      )}
+
       {/* Core Modules section */}
-      {filteredCore.length > 0 && (
+      {!loading && filteredCore.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-4">{"Core Modules"}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -209,7 +208,7 @@ export default function ModuleConfiguration() {
       )}
 
       {/* Optional Features section */}
-      {filteredFeatures.length > 0 && (
+      {!loading && filteredFeatures.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-4">{"Optional Features"}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -228,7 +227,7 @@ export default function ModuleConfiguration() {
       )}
 
       {/* No results */}
-      {filteredCore.length === 0 && filteredFeatures.length === 0 && (
+      {!loading && filteredCore.length === 0 && filteredFeatures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-default-400">
           <Search size={48} className="mb-4" />
           <p className="text-lg">{"No modules match your search"}</p>
@@ -244,7 +243,7 @@ export default function ModuleConfiguration() {
       )}
 
       {/* Platform Infrastructure — tenant-wide settings that aren't tied to a module */}
-      {!searchQuery && (
+      {!loading && !searchQuery && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-1">{"Platform Infrastructure"}</h2>
           <p className="text-sm text-default-500 mb-4">
