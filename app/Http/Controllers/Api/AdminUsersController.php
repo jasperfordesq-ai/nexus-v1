@@ -1986,7 +1986,7 @@ class AdminUsersController extends BaseApiController
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $eligible = DB::select(
-            "SELECT id, email, is_approved, is_super_admin, is_tenant_super_admin
+            "SELECT id, email, first_name, preferred_language, tenant_id, is_approved, is_super_admin, is_tenant_super_admin
              FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
             array_merge([$tenantId], $ids)
         );
@@ -2018,6 +2018,10 @@ class AdminUsersController extends BaseApiController
                     'is_approved' => 1,
                     'tenant_id' => $tenantId,
                 ]);
+                $userArr = (array) $row;
+                $creditsAwarded = $this->grantWelcomeCredits($userArr, $adminId);
+                $this->sendApprovalWelcomeEmail($userArr, $creditsAwarded);
+                $this->sendApprovalInAppNotification($userArr, $creditsAwarded);
                 $touchedIds[] = $id;
                 $success++;
             } catch (\Throwable $e) {

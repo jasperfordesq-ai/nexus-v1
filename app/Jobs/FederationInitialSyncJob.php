@@ -55,66 +55,70 @@ class FederationInitialSyncJob implements ShouldQueue
 
     public function handle(): void
     {
-        // Confirm the partnership is still active — it may have been suspended
-        // or terminated between approval and when this job was dequeued.
-        $partnership = DB::table('federation_partnerships')
-            ->where('id', $this->partnershipId)
-            ->where('status', 'active')
-            ->first();
+        try {
+            // Confirm the partnership is still active — it may have been suspended
+            // or terminated between approval and when this job was dequeued.
+            $partnership = DB::table('federation_partnerships')
+                ->where('id', $this->partnershipId)
+                ->where('status', 'active')
+                ->first();
 
-        if (! $partnership) {
-            Log::info('FederationInitialSyncJob: partnership no longer active, skipping', [
-                'partnership_id' => $this->partnershipId,
-            ]);
-            return;
-        }
+            if (! $partnership) {
+                Log::info('FederationInitialSyncJob: partnership no longer active, skipping', [
+                    'partnership_id' => $this->partnershipId,
+                ]);
+                return;
+            }
 
-        $memberCount  = $this->countOptedInMembers($this->tenantId);
-        $listingCount = $this->countActiveListings($this->tenantId);
+            $memberCount  = $this->countOptedInMembers($this->tenantId);
+            $listingCount = $this->countActiveListings($this->tenantId);
 
-        $partnerMemberCount  = $this->countOptedInMembers($this->partnerTenantId);
-        $partnerListingCount = $this->countActiveListings($this->partnerTenantId);
+            $partnerMemberCount  = $this->countOptedInMembers($this->partnerTenantId);
+            $partnerListingCount = $this->countActiveListings($this->partnerTenantId);
 
-        // Write an audit entry from each side so both tenants see the event.
-        TenantContext::setById($this->tenantId);
-        FederationAuditService::log(
-            'partnership_initial_sync_complete',
-            $this->tenantId,
-            $this->partnerTenantId,
-            null,
-            [
+            // Write an audit entry from each side so both tenants see the event.
+            TenantContext::setById($this->tenantId);
+            FederationAuditService::log(
+                'partnership_initial_sync_complete',
+                $this->tenantId,
+                $this->partnerTenantId,
+                null,
+                [
+                    'partnership_id'        => $this->partnershipId,
+                    'opted_in_members'      => $memberCount,
+                    'active_listings'       => $listingCount,
+                    'partner_members'       => $partnerMemberCount,
+                    'partner_listings'      => $partnerListingCount,
+                ]
+            );
+
+            TenantContext::setById($this->partnerTenantId);
+            FederationAuditService::log(
+                'partnership_initial_sync_complete',
+                $this->partnerTenantId,
+                $this->tenantId,
+                null,
+                [
+                    'partnership_id'        => $this->partnershipId,
+                    'opted_in_members'      => $partnerMemberCount,
+                    'active_listings'       => $partnerListingCount,
+                    'partner_members'       => $memberCount,
+                    'partner_listings'      => $listingCount,
+                ]
+            );
+
+            Log::info('FederationInitialSyncJob: completed', [
                 'partnership_id'        => $this->partnershipId,
+                'tenant_id'             => $this->tenantId,
+                'partner_tenant_id'     => $this->partnerTenantId,
                 'opted_in_members'      => $memberCount,
                 'active_listings'       => $listingCount,
                 'partner_members'       => $partnerMemberCount,
                 'partner_listings'      => $partnerListingCount,
-            ]
-        );
-
-        TenantContext::setById($this->partnerTenantId);
-        FederationAuditService::log(
-            'partnership_initial_sync_complete',
-            $this->partnerTenantId,
-            $this->tenantId,
-            null,
-            [
-                'partnership_id'        => $this->partnershipId,
-                'opted_in_members'      => $partnerMemberCount,
-                'active_listings'       => $partnerListingCount,
-                'partner_members'       => $memberCount,
-                'partner_listings'      => $listingCount,
-            ]
-        );
-
-        Log::info('FederationInitialSyncJob: completed', [
-            'partnership_id'        => $this->partnershipId,
-            'tenant_id'             => $this->tenantId,
-            'partner_tenant_id'     => $this->partnerTenantId,
-            'opted_in_members'      => $memberCount,
-            'active_listings'       => $listingCount,
-            'partner_members'       => $partnerMemberCount,
-            'partner_listings'      => $partnerListingCount,
-        ]);
+            ]);
+        } finally {
+            TenantContext::reset();
+        }
     }
 
     public function failed(\Throwable $e): void

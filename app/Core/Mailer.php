@@ -116,7 +116,13 @@ class Mailer
      */
     public static function forCurrentTenant(): self
     {
-        return new self(TenantContext::getId());
+        $tenantId = TenantContext::getId();
+        if ($tenantId === null) {
+            \Illuminate\Support\Facades\Log::warning('Mailer::forCurrentTenant() called with no tenant context — falling back to platform SMTP', [
+                'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5),
+            ]);
+        }
+        return new self($tenantId);
     }
 
     /**
