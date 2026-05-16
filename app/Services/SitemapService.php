@@ -140,25 +140,6 @@ class SitemapService
     }
 
     /**
-     * Resolve a tenant ID from a slug (for the public controller).
-     */
-    public function resolveTenantBySlug(string $slug): ?int
-    {
-        if ($slug === 'main') {
-            $tenant = DB::selectOne(
-                "SELECT id FROM tenants WHERE (slug IS NULL OR slug = '') AND is_active = 1 ORDER BY id LIMIT 1"
-            );
-        } else {
-            $tenant = DB::selectOne(
-                "SELECT id FROM tenants WHERE slug = ? AND is_active = 1",
-                [$slug]
-            );
-        }
-
-        return $tenant ? (int) $tenant->id : null;
-    }
-
-    /**
      * Clear cached sitemaps. If tenantId is null, clears everything.
      */
     public function clearCache(?int $tenantId = null): int
