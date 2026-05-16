@@ -835,7 +835,7 @@ class AdminUsersController extends BaseApiController
                 $tenant = $this->resolveUserTenant($user);
                 $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                 $tenantName = $tenant['name'];
-                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+                $loginUrl = $tenant['frontend_url'] . $tenant['slug_prefix'] . '/login';
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('warning')
@@ -1041,7 +1041,7 @@ class AdminUsersController extends BaseApiController
                 $tenant = $this->resolveUserTenant($user);
                 $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                 $tenantName = $tenant['name'];
-                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+                $loginUrl = $tenant['frontend_url'] . $tenant['slug_prefix'] . '/login';
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('warning')
@@ -1314,15 +1314,7 @@ class AdminUsersController extends BaseApiController
                 $tenant = $this->resolveUserTenant($user);
                 $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
-                // Build frontend URL with defensive fallback
-                $appUrl = TenantContext::getFrontendUrl();
-                if (!$appUrl || str_contains($appUrl, 'api.')) {
-                    $appUrl = \App\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
-                    if (str_contains($appUrl, 'api.')) {
-                        $appUrl = str_replace('api.', 'app.', $appUrl);
-                    }
-                }
-                $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
+                $resetLink = $tenant['frontend_url'] . $tenant['slug_prefix'] . "/password/reset?token={$token}";
 
                 $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
                 $html = \App\Core\EmailTemplateBuilder::make()
@@ -1387,7 +1379,7 @@ class AdminUsersController extends BaseApiController
                     <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
                 }
 
-                $loginLink = TenantContext::getFrontendUrl() . $resolvedTenant['slug_prefix'] . "/login";
+                $loginLink = $resolvedTenant['frontend_url'] . $resolvedTenant['slug_prefix'] . "/login";
 
                 if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
                     $html = $mainMessage;
@@ -1646,17 +1638,42 @@ class AdminUsersController extends BaseApiController
             throw new \RuntimeException(__('api.user_missing_tenant_id'));
         }
         $userTenantId = (int) $user['tenant_id'];
-        $tenantName = 'Project NEXUS';
-        $slugPrefix = '';
+        $tenantName   = 'Project NEXUS';
+        $slugPrefix   = '';
+        $frontendUrl  = \App\Core\Env::get('FRONTEND_URL', 'https://app.project-nexus.ie');
 
-        $tenant = DB::selectOne("SELECT name, slug FROM tenants WHERE id = ?", [$userTenantId]);
+        $tenant = DB::selectOne(
+            "SELECT t.name, t.slug, t.domain, p.domain AS parent_domain
+             FROM tenants t
+             LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1
+             WHERE t.id = ?",
+            [$userTenantId]
+        );
+
         if ($tenant) {
             $tenantName = $tenant->name;
-            $slug = $tenant->slug ?? '';
-            $slugPrefix = $slug ? '/' . $slug : '';
+            $slug       = $tenant->slug ?? '';
+
+            if (!empty($tenant->domain)) {
+                // Tenant owns its custom domain — no slug prefix in URLs
+                $frontendUrl = 'https://' . rtrim((string) $tenant->domain, '/');
+                $slugPrefix  = '';
+            } elseif (!empty($tenant->parent_domain)) {
+                // Sub-tenant sharing parent's custom domain (e.g. timebanking.uk/cardiff)
+                $frontendUrl = 'https://' . rtrim((string) $tenant->parent_domain, '/');
+                $slugPrefix  = $slug ? '/' . $slug : '';
+            } else {
+                // Shared platform host (app.project-nexus.ie/slug)
+                $slugPrefix = $slug ? '/' . $slug : '';
+            }
         }
 
-        return ['tenant_id' => $userTenantId, 'name' => $tenantName, 'slug_prefix' => $slugPrefix];
+        return [
+            'tenant_id'    => $userTenantId,
+            'name'         => $tenantName,
+            'slug_prefix'  => $slugPrefix,
+            'frontend_url' => $frontendUrl,
+        ];
     }
 
     /**
@@ -1747,7 +1764,7 @@ class AdminUsersController extends BaseApiController
             return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $creditsAwarded) {
                 $tenant = $this->resolveUserTenant($user);
                 $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+                $loginUrl = $tenant['frontend_url'] . $tenant['slug_prefix'] . '/login';
                 $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
                 $plural = $creditsAwarded !== 1 ? 's' : '';
@@ -1849,7 +1866,7 @@ class AdminUsersController extends BaseApiController
                 $tenant = $this->resolveUserTenant($user);
                 $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                 $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
-                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+                $loginUrl = $tenant['frontend_url'] . $tenant['slug_prefix'] . '/login';
 
                 $html = \App\Core\EmailTemplateBuilder::make()
                     ->theme('brand')
