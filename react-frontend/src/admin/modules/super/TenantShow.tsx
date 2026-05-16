@@ -423,6 +423,7 @@ export function TenantShow() {
                 <DetailField label={"Hero Introduction"} value={tenant.hero_intro} />
                 <DetailField label={"O G Image URL"} value={tenant.og_image_url} />
                 <DetailField label={"Robots Directive"} value={tenant.robots_directive} />
+                <DetailField label={"Organisation Type"} value={tenant.seo_organization_type} />
               </dl>
             </CardBody>
           </Card>

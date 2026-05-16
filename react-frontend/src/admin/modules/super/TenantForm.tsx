@@ -124,6 +124,7 @@ export function TenantForm() {
     hero_intro: '',
     og_image_url: '',
     robots_directive: '',
+    seo_organization_type: '',
     // Location
     location_name: '',
     country_code: '',
@@ -191,6 +192,7 @@ export function TenantForm() {
           hero_intro: tenant.hero_intro || '',
           og_image_url: tenant.og_image_url || '',
           robots_directive: tenant.robots_directive || '',
+          seo_organization_type: tenant.seo_organization_type || '',
           location_name: tenant.location_name || '',
           country_code: tenant.country_code || '',
           service_area: tenant.service_area || '',
@@ -533,6 +535,23 @@ export function TenantForm() {
                 <SelectItem key="noindex, follow">{"Noindex Follow"}</SelectItem>
                 <SelectItem key="index, nofollow">{"Index Nofollow"}</SelectItem>
                 <SelectItem key="noindex, nofollow">{"Noindex Nofollow"}</SelectItem>
+              </Select>
+              <Select
+                label={"Organisation Type (Schema.org)"}
+                placeholder={"Select organisation type..."}
+                selectedKeys={form.seo_organization_type ? [form.seo_organization_type] : []}
+                onSelectionChange={(keys) => {
+                  const arr = Array.from(keys);
+                  updateField('seo_organization_type', arr.length > 0 ? String(arr[0]) : '');
+                }}
+                className="max-w-xs"
+                description={"Controls the Schema.org @type in structured data. LocalBusiness enables areaServed geo-targeting."}
+              >
+                <SelectItem key="NonprofitOrganization">{"Nonprofit Organization (default)"}</SelectItem>
+                <SelectItem key="LocalBusiness">{"Local Business"}</SelectItem>
+                <SelectItem key="CommunityOrganization">{"Community Organization"}</SelectItem>
+                <SelectItem key="VolunteerOrganization">{"Volunteer Organization"}</SelectItem>
+                <SelectItem key="GovernmentOrganization">{"Government Organization"}</SelectItem>
               </Select>
             </CardBody>
           </Card>

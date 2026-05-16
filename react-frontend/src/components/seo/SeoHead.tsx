@@ -55,6 +55,7 @@ export function SeoHead() {
     itemListElement: breadcrumbItems,
   };
 
+  const seo = tenant?.seo;
   const settings = tenant?.settings as Record<string, unknown> | undefined;
 
   // Build Organization JSON-LD. Type defaults to NonprofitOrganization for
@@ -82,9 +83,29 @@ export function SeoHead() {
       }
     : undefined;
 
+  // areaServed — only emitted for LocalBusiness; maps service_area scope to Schema @type.
+  // Combines location_name (e.g. "Cork") with country_code (e.g. "IE") for Google disambiguation.
+  const areaServedTypeMap: Record<string, string> = {
+    local: 'City',
+    regional: 'AdministrativeArea',
+    national: 'Country',
+    international: 'Place',
+  };
+  const areaServedSchemaType = areaServedTypeMap[contact?.service_area ?? ''];
+  const areaServed = orgType === 'LocalBusiness' && (contact?.location || contact?.country_code)
+    ? {
+        ...(areaServedSchemaType ? { '@type': areaServedSchemaType } : {}),
+        ...(contact?.location ? { name: contact.location } : {}),
+        ...(contact?.country_code
+          ? { containedInPlace: { '@type': 'Country', name: contact.country_code } }
+          : {}),
+      }
+    : undefined;
+
   const orgSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': orgType,
+    '@id': `${siteUrl}/#org`,
     name: siteName,
     url: siteUrl,
     ...(branding.logo ? { logo: branding.logo } : {}),
@@ -92,6 +113,7 @@ export function SeoHead() {
     ...(contact?.email ? { email: contact.email } : {}),
     ...(contact?.phone ? { telephone: contact.phone } : {}),
     ...(postalAddress ? { address: postalAddress } : {}),
+    ...(areaServed ? { areaServed } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 
@@ -119,8 +141,22 @@ export function SeoHead() {
     ? settings.seo_bing_verification
     : '';
 
+  // Geo meta tags — emit when we have at least a country code.
+  // geo.region uses ISO 3166-1 alpha-2; geo.placename is the human-readable locality.
+  // ICBM is the legacy lat/long format still read by some crawlers.
+  const geoCountry = contact?.country_code ?? '';
+  const geoPlacename = contact?.location ?? '';
+  const geoLat = contact?.latitude ?? null;
+  const geoLng = contact?.longitude ?? null;
+
   return (
     <Helmet>
+      {/* Robots directive — only emitted when admin has set a non-default value.
+          Default (index, follow) is omitted to keep the HTML clean. */}
+      {seo?.robots_directive && (
+        <meta name="robots" content={seo.robots_directive} />
+      )}
+
       {/* Google Search Console verification */}
       {googleVerification && (
         <meta name="google-site-verification" content={googleVerification} />
@@ -143,6 +179,15 @@ export function SeoHead() {
       <script type="application/ld+json">
         {JSON.stringify(webSiteSchema)}
       </script>
+
+      {/* Geo meta tags — help Google and Bing assign geographic context to
+          this tenant's domain, reducing multi-tenant duplicate-content risk. */}
+      {geoCountry && <meta name="geo.region" content={geoCountry} />}
+      {geoCountry && <meta name="geo.country" content={geoCountry} />}
+      {geoPlacename && <meta name="geo.placename" content={geoPlacename} />}
+      {geoLat !== null && geoLng !== null && (
+        <meta name="ICBM" content={`${geoLat}, ${geoLng}`} />
+      )}
 
       {/* x-default hreflang — clean canonical URL, no ?lng= variants.
           This is the only hreflang needed for a client-side i18n SPA. */}

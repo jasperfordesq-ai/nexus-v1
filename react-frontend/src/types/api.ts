@@ -1189,6 +1189,9 @@ export interface TenantConfig {
     address?: string;
     location?: string;
     country_code?: string;
+    latitude?: number;
+    longitude?: number;
+    service_area?: string;
   };
   social?: {
     facebook?: string;
@@ -1204,6 +1207,7 @@ export interface TenantConfig {
   seo?: {
     meta_title?: string;
     meta_description?: string;
+    robots_directive?: string;
   };
   settings?: Record<string, unknown>;
   compliance?: {

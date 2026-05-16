@@ -359,6 +359,11 @@ class TenantBootstrapController extends BaseApiController
 
         $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
 
+        // Tenant-level SEO overrides (set by super admin, safe for public payload)
+        if (!empty($tenant['seo_organization_type'])) {
+            $data['settings']['seo_organization_type'] = $tenant['seo_organization_type'];
+        }
+
         // Add onboarding module flags to bootstrap (non-sensitive, safe for public payload)
         // filter_var handles both '1'/'0' (from OnboardingConfig) and 'true'/'false' (from EnterpriseConfig)
         $data['settings']['onboarding_enabled'] = filter_var($this->getOnboardingSetting((int) $tenant['id'], 'onboarding.enabled', '1'), FILTER_VALIDATE_BOOLEAN);
@@ -643,6 +648,13 @@ class TenantBootstrapController extends BaseApiController
             $seo['hero_intro'] = $tenant['hero_intro'];
         }
 
+        // robots_directive controls the <meta name="robots"> tag in SeoHead.
+        // Only forward when explicitly set to a non-default value.
+        $robotsDirective = $tenant['robots_directive'] ?? '';
+        if (!empty($robotsDirective) && $robotsDirective !== 'index, follow') {
+            $seo['robots_directive'] = $robotsDirective;
+        }
+
         return $seo;
     }
 
@@ -709,9 +721,18 @@ class TenantBootstrapController extends BaseApiController
         if (!empty($tenant['location_name'])) {
             $contact['location'] = $tenant['location_name'];
         }
-        // ISO-3166 country code — needed by SeoHead JSON-LD addressCountry.
+        // ISO-3166 country code — needed by SeoHead JSON-LD addressCountry and geo meta tags.
         if (!empty($tenant['country_code'])) {
             $contact['country_code'] = $tenant['country_code'];
+        }
+        if (!empty($tenant['latitude'])) {
+            $contact['latitude'] = (float) $tenant['latitude'];
+        }
+        if (!empty($tenant['longitude'])) {
+            $contact['longitude'] = (float) $tenant['longitude'];
+        }
+        if (!empty($tenant['service_area'])) {
+            $contact['service_area'] = $tenant['service_area'];
         }
 
         return $contact;

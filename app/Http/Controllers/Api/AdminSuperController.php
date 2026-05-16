@@ -284,6 +284,7 @@ class AdminSuperController extends BaseApiController
             'hero_intro' => $input['hero_intro'] ?? '',
             'og_image_url' => $input['og_image_url'] ?? '',
             'robots_directive' => $input['robots_directive'] ?? '',
+            'seo_organization_type' => $input['seo_organization_type'] ?? '',
             // Location fields
             'location_name' => $input['location_name'] ?? '',
             'country_code' => $input['country_code'] ?? '',

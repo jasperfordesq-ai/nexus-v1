@@ -1331,6 +1331,7 @@ export interface SuperAdminTenant {
   hero_intro?: string;
   og_image_url?: string;
   robots_directive?: string;
+  seo_organization_type?: string;
   location_name?: string;
   country_code?: string;
   service_area?: string;
@@ -1374,6 +1375,7 @@ export interface CreateTenantPayload {
   hero_intro?: string;
   og_image_url?: string;
   robots_directive?: string;
+  seo_organization_type?: string;
   location_name?: string;
   country_code?: string;
   service_area?: string;
@@ -1404,6 +1406,7 @@ export interface UpdateTenantPayload {
   hero_intro?: string;
   og_image_url?: string;
   robots_directive?: string;
+  seo_organization_type?: string;
   location_name?: string;
   country_code?: string;
   service_area?: string;
