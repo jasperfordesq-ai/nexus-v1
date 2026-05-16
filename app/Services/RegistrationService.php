@@ -120,10 +120,25 @@ class RegistrationService
             // profile_type=organisation.
             'profile_type' => 'sometimes|string|in:individual,organisation',
             'organization_name' => 'required_if:profile_type,organisation|nullable|string|max:255',
+            // Verified-location gate (anti-fraud). Both frontends offer
+            // place-autocomplete (Google Places or Nominatim) which populate
+            // hidden lat/lng inputs only when the user picks a suggestion.
+            // Free-text gibberish like "555" lands with empty lat/lng and is
+            // rejected here. Raises the bar for scripted signups — an
+            // attacker now has to call a Geocoding API themselves to forge
+            // believable coordinates.
+            'latitude'  => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ], [
             'location.required' => __('api.location_required'),
             'phone.required' => __('api.phone_required'),
             'terms_accepted.accepted' => __('api.terms_required'),
+            'latitude.required' => __('api.location_not_verified'),
+            'longitude.required' => __('api.location_not_verified'),
+            'latitude.numeric' => __('api.location_not_verified'),
+            'longitude.numeric' => __('api.location_not_verified'),
+            'latitude.between' => __('api.location_not_verified'),
+            'longitude.between' => __('api.location_not_verified'),
         ]);
 
         if ($validator->fails()) {
@@ -137,10 +152,28 @@ class RegistrationService
                     'status' => 422,
                 ];
             }
+            if ($validator->errors()->has('latitude') || $validator->errors()->has('longitude')) {
+                return [
+                    'error' => __('api.location_not_verified'),
+                    'code'  => 'LOCATION_NOT_VERIFIED',
+                    'status' => 422,
+                ];
+            }
             $errors = $validator->errors()->first();
             return [
                 'error' => $errors,
                 'code'  => \App\Core\ApiErrorCodes::VALIDATION_ERROR,
+                'status' => 422,
+            ];
+        }
+
+        // Reject Null Island (lat=0 AND lng=0) — a single statistically
+        // negligible point in the Gulf of Guinea that's overwhelmingly the
+        // signature of a default-zero coordinate, not a real address.
+        if ((float) $data['latitude'] === 0.0 && (float) $data['longitude'] === 0.0) {
+            return [
+                'error' => __('api.location_not_verified'),
+                'code'  => 'LOCATION_NOT_VERIFIED',
                 'status' => 422,
             ];
         }

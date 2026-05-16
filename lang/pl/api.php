@@ -1838,4 +1838,5 @@ return [
         'relationship_end_invalid_state' => 'Relationship is not in an endable state.',
         'relationship_resume_invalid_state' => 'Only paused relationships can be resumed.',
     ],
+    'location_not_verified' => 'Pick your town, city or area from the suggestions as you type. Free-text locations are not accepted.',
 ];

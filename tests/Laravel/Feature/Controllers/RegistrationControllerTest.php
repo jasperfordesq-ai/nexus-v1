@@ -117,6 +117,8 @@ class RegistrationControllerTest extends TestCase
             'terms_accepted' => true,
             // Backdate so the >= 5s min-form-time bot gate passes.
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
@@ -133,6 +135,8 @@ class RegistrationControllerTest extends TestCase
             'password' => 'StrongPassword123!',
             'password_confirmation' => 'StrongPassword123!',
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
             // terms_accepted intentionally omitted
         ]);
 
@@ -153,10 +157,54 @@ class RegistrationControllerTest extends TestCase
             'password_confirmation' => 'DifferentPassword123!',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
         ]);
 
         $this->assertSame(422, $response->getStatusCode());
         $body = json_decode((string) $response->getContent(), true);
         $this->assertSame('PASSWORD_MISMATCH', $body['errors'][0]['code'] ?? null);
+    }
+
+    public function test_register_rejects_unverified_location(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => '555',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            // latitude / longitude intentionally omitted — simulates the
+            // free-text bypass we've seen in the wild.
+        ]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('LOCATION_NOT_VERIFIED', $body['errors'][0]['code'] ?? null);
+    }
+
+    public function test_register_rejects_null_island_coordinates(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@example.com',
+            'location' => 'Anywhere',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 0,
+            'longitude' => 0,
+        ]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('LOCATION_NOT_VERIFIED', $body['errors'][0]['code'] ?? null);
     }
 }

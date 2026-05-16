@@ -132,6 +132,7 @@ return [
     'terms_required'                => 'You must accept the terms of service and privacy policy to register.',
     'invite_code_required'          => 'An invite code is required to register on this community.',
     'invite_code_invalid'           => 'This invite code is invalid, has expired, or has already been used.',
+    'location_not_verified'         => 'Pick your town, city or area from the suggestions as you type. Free-text locations are not accepted.',
     'subject_required'             => 'Subject is required',
     'status_required'              => 'Status is required',
     'reason_required'              => 'A reason is required',

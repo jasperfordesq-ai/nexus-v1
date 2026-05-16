@@ -131,7 +131,11 @@ export function RegisterPage() {
     : !isPhoneValid(phone)
       ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' })
       : '';
-  const locationError = !location.trim() ? t('register.location_required') : '';
+  const locationError = !location.trim()
+    ? t('register.location_required')
+    : (!(typeof latitude === 'number') || !(typeof longitude === 'number'))
+      ? t('register.location_not_verified', { defaultValue: 'Pick a suggestion from the autocomplete — free-text locations are not accepted.' })
+      : '';
 
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -276,11 +280,20 @@ export function RegisterPage() {
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
   const tenantSelected = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
   const isStep1Valid = tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
+  // Verified-location gate: the server requires lat/lng matched from
+  // place-autocomplete (Google Places or Nominatim). A typed-only location
+  // with no suggestion picked has undefined lat/lng — block the step here
+  // so the user gets an instant inline message instead of a round-trip.
+  const isLocationVerified =
+    typeof latitude === 'number' &&
+    typeof longitude === 'number' &&
+    !(latitude === 0 && longitude === 0);
   const isStep2Valid =
     firstName.trim() &&
     lastName.trim() &&
     (profileType === 'individual' || organizationName.trim()) &&
     location.trim() &&
+    isLocationVerified &&
     phone.trim() &&
     isPhoneValid(phone);
   const isStep3Valid =
@@ -405,6 +418,7 @@ export function RegisterPage() {
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
     location.trim() &&
+    isLocationVerified &&
     phone.trim() &&
     isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&

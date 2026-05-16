@@ -230,6 +230,7 @@ return [
         'register_validation' => 'Some of the details you entered are invalid. Check the form and try again.',
         'register_created' => 'Your registration has been received. Check your email for the next step, then sign in.',
         'signed_out' => 'You have signed out.',
+        'register_location_unverified' => 'Pick your town, city or area from the autocomplete suggestions as you type. Free-text locations are not accepted.',
     ],
     'feed' => [
         'title' => 'Feed',
