@@ -12,6 +12,7 @@ use App\Models\Connection;
 use App\Models\Event;
 use App\Models\EventRsvp;
 use App\Models\FeedPost;
+use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\Listing;
 use App\Models\Message;
@@ -944,8 +945,9 @@ class GamificationService
                 }
             }
         } elseif ($action === 'create') {
+            $count = Group::where('owner_id', $userId)->count();
             foreach (self::getBadgeDefinitions() as $def) {
-                if ($def['type'] === 'group_create') {
+                if ($def['type'] === 'group_create' && $count >= $def['threshold']) {
                     self::awardBadge($userId, $def);
                 }
             }
