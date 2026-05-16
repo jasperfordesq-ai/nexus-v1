@@ -149,12 +149,19 @@ export default function ModuleConfiguration() {
           size="sm"
           variant="bordered"
           type="text"
-          name="module-config-search"
-          autoComplete="new-password"
+          autoComplete="off"
+          data-form-type="other"
+          data-lpignore="true"
+          data-bwignore="true"
+          data-1p-ignore=""
           placeholder={"Search modules"}
           startContent={<Search size={16} className="text-default-400" />}
           value={searchQuery}
-          onValueChange={setSearchQuery}
+          onValueChange={(val) => {
+            // Reject autofill injections — module names never contain @
+            if (val.includes('@')) return;
+            setSearchQuery(val);
+          }}
           className="sm:max-w-xs"
           isClearable
           onClear={() => setSearchQuery('')}
