@@ -292,13 +292,9 @@ class AlphaController extends Controller
             'terms_accepted' => $request->boolean('terms_accepted'),
             'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
             'form_started_at' => $request->input('form_started_at'),
-            // Bot honeypots — hidden inputs in the Blade form. Real users
-            // never see or fill them; bots auto-fill everything. Service
-            // checks all four field names and silent no-ops on any non-empty.
+            // Bot honeypot — hidden input in the Blade form. Real users
+            // never see or fill it; bots auto-fill everything.
             'honeypot' => $request->input('website'),
-            'confirm_email' => $request->input('confirm_email'),
-            'address_line_2' => $request->input('address_line_2'),
-            'referral_code' => $request->input('referral_code'),
         ], TenantContext::getId());
 
         if (isset($result['error'])) {

@@ -80,16 +80,11 @@ export function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Bot protection
+  // Bot protection — single off-screen honeypot. Multi-field decoys
+  // (`confirm_email`, `address_line_2`, etc.) were autofilled by browsers
+  // and silently blocked legitimate users; reverted 2026-05-16.
   const [formStartTime] = useState(() => Date.now());
   const honeypotRef = useRef<HTMLInputElement>(null);
-  // Decoy honeypots with realistic names — multi-field honeypots trip bots
-  // that filter on the legacy `website` name but can't tell which other
-  // inputs to skip. Server (`RegistrationService::register()`) silent-no-ops
-  // if ANY of these come back non-empty.
-  const confirmEmailRef = useRef<HTMLInputElement>(null);
-  const addressLine2Ref = useRef<HTMLInputElement>(null);
-  const referralCodeRef = useRef<HTMLInputElement>(null);
   // Cloudflare Turnstile removed from registration 2026-05-16 — member
   // feedback found the widget too confusing. Bot defence: honeypot input
   // + per-IP route throttle (3/5min) + admin-approval gate.
@@ -138,11 +133,7 @@ export function RegisterPage() {
     : !isPhoneValid(phone)
       ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' })
       : '';
-  const locationError = !location.trim()
-    ? t('register.location_required')
-    : (!(typeof latitude === 'number') || !(typeof longitude === 'number'))
-      ? t('register.location_not_verified', { defaultValue: 'Pick a suggestion from the autocomplete — free-text locations are not accepted.' })
-      : '';
+  const locationError = !location.trim() ? t('register.location_required') : '';
 
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -287,10 +278,11 @@ export function RegisterPage() {
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
   const tenantSelected = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
   const isStep1Valid = tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
-  // Verified-location gate: the server requires lat/lng matched from
-  // place-autocomplete (Google Places or Nominatim). A typed-only location
-  // with no suggestion picked has undefined lat/lng — block the step here
-  // so the user gets an instant inline message instead of a round-trip.
+  // Verified-location is encouraged but NOT a hard client-side gate. If
+  // Google Places fails to load (ad-blocker, slow network, maps disabled
+  // for tenant) lat/lng stay undefined — we still let the user submit and
+  // let the server make the final call. Was a hard block; that silently
+  // disabled the submit button when Places hadn't fired place_changed.
   const isLocationVerified =
     typeof latitude === 'number' &&
     typeof longitude === 'number' &&
@@ -300,7 +292,6 @@ export function RegisterPage() {
     lastName.trim() &&
     (profileType === 'individual' || organizationName.trim()) &&
     location.trim() &&
-    isLocationVerified &&
     phone.trim() &&
     isPhoneValid(phone);
   const isStep3Valid =
@@ -341,11 +332,14 @@ export function RegisterPage() {
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
 
-    // Bot protection checks — any of the decoy honeypots filled means a bot.
-    const honeypotValue = honeypotRef.current?.value
-      || confirmEmailRef.current?.value
-      || addressLine2Ref.current?.value
-      || referralCodeRef.current?.value;
+    // Bot protection — only the legacy `website` honeypot is checked here.
+    // The decoy fields (`confirm_email`, `address_line_2`, `referral_code`)
+    // were autofilled by browsers (Chrome especially ignores autocomplete=
+    // "off" on semantic field names) and silently blocked real users. Keep
+    // them in the DOM so bots that fill everything still get logged via
+    // the server-side honeypot check, but do NOT use them to gate submit
+    // client-side.
+    const honeypotValue = honeypotRef.current?.value;
     if (honeypotValue) {
       // Bot detected - silently fail
       return;
@@ -428,7 +422,6 @@ export function RegisterPage() {
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
     location.trim() &&
-    isLocationVerified &&
     phone.trim() &&
     isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
@@ -887,21 +880,14 @@ export function RegisterPage() {
           {oauthTenantId && (
             <OAuthButtons intent="register" tenantId={oauthTenantId} />
           )}
-          {/* Honeypots - off-screen, invisible to users, fillable by bots.
-              Multiple decoy fields with realistic names trip bots that filter
-              on the legacy `website` name but can't tell which others to skip. */}
+          {/* Honeypot — single field, off-screen. Multi-field decoys were
+              autofilled by browsers and silently blocked real users. */}
           <div
             aria-hidden="true"
             style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
           >
             <label htmlFor="website">{t('register.honeypot_label', 'Website')}</label>
             <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
-            <label htmlFor="confirm_email">Confirm email</label>
-            <input ref={confirmEmailRef} type="email" name="confirm_email" id="confirm_email" tabIndex={-1} autoComplete="off" />
-            <label htmlFor="address_line_2">Address line 2</label>
-            <input ref={addressLine2Ref} type="text" name="address_line_2" id="address_line_2" tabIndex={-1} autoComplete="off" />
-            <label htmlFor="referral_code">Referral code</label>
-            <input ref={referralCodeRef} type="text" name="referral_code" id="referral_code" tabIndex={-1} autoComplete="off" />
           </div>
 
           {/* All steps content */}
@@ -931,20 +917,13 @@ export function RegisterPage() {
         {currentStep === 1 && oauthTenantIdMobile && (
           <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
         )}
-        {/* Honeypots - off-screen, invisible to users, fillable by bots.
-            Multiple decoys (see desktop block for rationale). */}
+        {/* Honeypot — single field, off-screen. See desktop block above. */}
         <div
           aria-hidden="true"
           style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
         >
           <label htmlFor="website">{t('register.honeypot_label')}</label>
           <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
-          <label htmlFor="confirm_email">Confirm email</label>
-          <input ref={confirmEmailRef} type="email" name="confirm_email" id="confirm_email" tabIndex={-1} autoComplete="off" />
-          <label htmlFor="address_line_2">Address line 2</label>
-          <input ref={addressLine2Ref} type="text" name="address_line_2" id="address_line_2" tabIndex={-1} autoComplete="off" />
-          <label htmlFor="referral_code">Referral code</label>
-          <input ref={referralCodeRef} type="text" name="referral_code" id="referral_code" tabIndex={-1} autoComplete="off" />
         </div>
 
         {/* Step indicator */}

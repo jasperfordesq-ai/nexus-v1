@@ -53,18 +53,14 @@ class RegistrationService
      */
     public function register(array $data, int $tenantId): array
     {
-        // Bot honeypots — must run BEFORE validation so attackers can't
+        // Bot honeypot — must run BEFORE validation so attackers can't
         // distinguish "honeypot triggered" from "validation failed" via the
         // error message returned. Mirrors the success response shape.
-        //
-        // Multiple decoy fields with realistic names (`confirm_email`,
-        // `address_line_2`, `referral_code`) sit alongside the legacy
-        // `website` honeypot — all hidden via off-screen CSS. Real users
-        // never see them; naive bots fill every visible input including
-        // hidden-via-CSS ones. Sophisticated bots that filter on field
-        // names get tripped by the realistic-looking decoys because they
-        // can't tell which ones to skip.
-        $honeypotFields = ['honeypot', 'website', 'confirm_email', 'address_line_2', 'referral_code'];
+        // Reverted from the multi-field decoy version 2026-05-16: browsers
+        // (Chrome especially) autofill semantic field names like
+        // `confirm_email` and `address_line_2` regardless of autocomplete=off,
+        // which silently blocked legitimate users.
+        $honeypotFields = ['honeypot', 'website'];
         foreach ($honeypotFields as $field) {
             if (!empty($data[$field])) {
                 Log::info('registration.honeypot_triggered', [
@@ -194,21 +190,21 @@ class RegistrationService
             // profile_type=organisation.
             'profile_type' => 'sometimes|string|in:individual,organisation',
             'organization_name' => 'required_if:profile_type,organisation|nullable|string|max:255',
-            // Verified-location gate (anti-fraud). Both frontends offer
-            // place-autocomplete (Google Places or Nominatim) which populate
-            // hidden lat/lng inputs only when the user picks a suggestion.
-            // Free-text gibberish like "555" lands with empty lat/lng and is
-            // rejected here. Raises the bar for scripted signups — an
-            // attacker now has to call a Geocoding API themselves to forge
-            // believable coordinates.
-            'latitude'  => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            // Verified-location gate (anti-fraud). OPT-IN per tenant /
+            // platform via env REGISTRATION_REQUIRE_VERIFIED_LOCATION (default
+            // off). When off, lat/lng are accepted if supplied but plain-text
+            // locations still pass. When on, the user must pick a place
+            // suggestion. Reverted to opt-in 2026-05-16 because the hard
+            // requirement broke signups on every tenant without Google Maps
+            // configured (no autocomplete → never any lat/lng → 100% reject).
+            // The Null-Island check below still fires when lat/lng ARE
+            // supplied, so an attacker can't pass `0,0` to bypass.
+            'latitude'  => 'sometimes|nullable|numeric|between:-90,90',
+            'longitude' => 'sometimes|nullable|numeric|between:-180,180',
         ], [
             'location.required' => __('api.location_required'),
             'phone.required' => __('api.phone_required'),
             'terms_accepted.accepted' => __('api.terms_required'),
-            'latitude.required' => __('api.location_not_verified'),
-            'longitude.required' => __('api.location_not_verified'),
             'latitude.numeric' => __('api.location_not_verified'),
             'longitude.numeric' => __('api.location_not_verified'),
             'latitude.between' => __('api.location_not_verified'),
@@ -241,10 +237,26 @@ class RegistrationService
             ];
         }
 
-        // Reject Null Island (lat=0 AND lng=0) — a single statistically
-        // negligible point in the Gulf of Guinea that's overwhelmingly the
-        // signature of a default-zero coordinate, not a real address.
-        if ((float) $data['latitude'] === 0.0 && (float) $data['longitude'] === 0.0) {
+        // When the platform has opted in to verified-location enforcement,
+        // require lat/lng AND reject Null Island. Off by default to avoid
+        // bricking tenants without Google Maps configured.
+        $requireVerifiedLocation = filter_var(
+            getenv('REGISTRATION_REQUIRE_VERIFIED_LOCATION') ?: 'false',
+            FILTER_VALIDATE_BOOLEAN
+        );
+        $hasLat = isset($data['latitude']) && $data['latitude'] !== '' && $data['latitude'] !== null;
+        $hasLng = isset($data['longitude']) && $data['longitude'] !== '' && $data['longitude'] !== null;
+        if ($requireVerifiedLocation && (!$hasLat || !$hasLng)) {
+            return [
+                'error' => __('api.location_not_verified'),
+                'code'  => 'LOCATION_NOT_VERIFIED',
+                'status' => 422,
+            ];
+        }
+        // Null Island guard — only fires when lat/lng were supplied. (lat=0
+        // AND lng=0 is a single point in the Gulf of Guinea overwhelmingly
+        // associated with default-zero coordinates, not a real address.)
+        if ($hasLat && $hasLng && (float) $data['latitude'] === 0.0 && (float) $data['longitude'] === 0.0) {
             return [
                 'error' => __('api.location_not_verified'),
                 'code'  => 'LOCATION_NOT_VERIFIED',
