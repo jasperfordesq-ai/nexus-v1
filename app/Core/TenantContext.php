@@ -52,6 +52,9 @@ class TenantContext
      */
     private static ?string $parentDomain = null;
 
+    /** @var array<int, string|null> Per-request cache for parent tenant domain lookups. */
+    private static array $parentDomainByParentId = [];
+
     /**
      * Query a single tenant row and return as associative array (or false/null).
      *
@@ -347,6 +350,7 @@ class TenantContext
         self::$tokenTenantId = null;
         self::$headerTenantId = null;
         self::$parentDomain = null;
+        self::$parentDomainByParentId = [];
     }
 
     /**
@@ -412,7 +416,7 @@ class TenantContext
             'timebanking-guide', 'partner', 'partner-with-us', 'social-prescribing',
             'strategic-plan', 'impact-summary', 'impact-report', 'our-story',
             'how-it-works', 'guide', 'news', 'post',
-            'features', 'changelog', 'development-status',
+            'features', 'changelog', 'development-status', 'platform',
             'communities', 'local-groups', 'services',
             // System / admin
             'admin', 'admin-legacy', 'super-admin', 'broker', 'dev',
@@ -521,11 +525,16 @@ class TenantContext
             }
             // Queued-job path: $parentDomain is null (setById was used, not HTTP resolve).
             // If tenant has no domain but has a parent, look up the parent's domain from DB.
+            // Result is memoized per parent_id to avoid N identical queries in batch jobs.
             if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
-                $parentDomain = \Illuminate\Support\Facades\DB::table('tenants')
-                    ->where('id', (int) $tenant['parent_id'])
-                    ->where('is_active', 1)
-                    ->value('domain');
+                $pid = (int) $tenant['parent_id'];
+                if (!array_key_exists($pid, self::$parentDomainByParentId)) {
+                    self::$parentDomainByParentId[$pid] = \Illuminate\Support\Facades\DB::table('tenants')
+                        ->where('id', $pid)
+                        ->where('is_active', 1)
+                        ->value('domain');
+                }
+                $parentDomain = self::$parentDomainByParentId[$pid];
                 if (!empty($parentDomain)) {
                     return 'https://' . rtrim((string) $parentDomain, '/');
                 }

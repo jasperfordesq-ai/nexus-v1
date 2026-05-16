@@ -24,33 +24,41 @@ export const RESERVED_SUBDOMAINS = new Set([
 ]);
 
 /**
- * Reserved top-level path segments — TRS-001 Section 4 (48 entries).
- * Used for R3 (path-based resolution on app.project-nexus.ie).
+ * Reserved top-level path segments — TRS-001 Section 4.
+ * Used for R3 (path-based resolution on app.project-nexus.ie) and R1 (custom-domain
+ * child-slug resolution). Must stay in sync with TenantContext::getReservedPaths() in PHP.
  * If the first path segment matches, it is a React route, NOT a tenant slug.
  */
 export const RESERVED_PATHS = new Set([
-  // Auth & core pages
-  'login', 'register', 'password', 'logout', 'dashboard', 'listings',
-  'events', 'groups', 'messages', 'notifications', 'wallet', 'feed',
-  'search', 'members', 'connections', 'profile', 'settings', 'exchanges', 'achievements',
-  'leaderboard', 'goals', 'volunteering', 'blog', 'resources',
-  'organisations', 'federation', 'onboarding', 'group-exchanges', 'matches', 'newsletter',
-  'chat',
-  // Feature modules added 2026-03-01
-  'ideation', 'jobs', 'polls', 'kb', 'activity', 'skills', 'reviews',
-  'nexus-score', 'verify-email', 'verify-identity', 'explore', 'marketplace',
-  'caring', 'caring-community',
+  // Auth & session
+  'login', 'register', 'password', 'logout', 'verify-email', 'verify-identity',
+  'consent-required', 'consent',
+  // Core app routes
+  'dashboard', 'feed', 'listings', 'messages', 'compose', 'notifications',
+  'wallet', 'profile', 'settings', 'members', 'connections',
+  // Feature modules
+  'events', 'groups', 'community-groups', 'volunteering', 'organisations',
+  'federation', 'blog', 'resources', 'polls', 'goals', 'reviews',
+  'exchanges', 'group-exchanges', 'matches', 'search', 'explore',
+  'achievements', 'leaderboard', 'nexus-score', 'activity', 'skills',
+  'ideation', 'jobs', 'kb', 'marketplace', 'chat',
+  'caring', 'caring-community', 'proposals', 'newsletter', 'onboarding',
   // Public/info pages
-  'help', 'contact', 'about', 'faq', 'legal', 'terms', 'platform',
-  'privacy', 'accessibility', 'cookies', 'development-status', 'features', 'changelog',
-  'community-guidelines', 'acceptable-use',
-  'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
+  'home', 'about', 'contact', 'faq', 'help', 'legal', 'terms', 'platform',
+  'privacy', 'accessibility', 'cookies', 'community-guidelines', 'acceptable-use',
+  'timebanking-guide', 'partner', 'partner-with-us', 'social-prescribing',
+  'strategic-plan', 'impact-summary', 'impact-report', 'our-story',
+  'how-it-works', 'guide', 'news', 'post',
+  'features', 'changelog', 'development-status',
   'communities', 'local-groups', 'services',
-  // System paths
-  'admin', 'admin-legacy', 'super-admin', 'broker', 'api', 'assets',
-  'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
-  'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
-  'page',
+  // System / admin
+  'admin', 'admin-legacy', 'super-admin', 'broker', 'dev',
+  'api', 'v2', 'assets', 'downloads', 'uploads',
+  'cron', 'test-email', 'mobile', 'mobile-download', 'share-target',
+  'migrate-messages',
+  // Static files / well-known
+  'sitemap.xml', 'robots.txt', 'manifest.json', 'service-worker.js',
+  'favicon.ico', 'health', 'classic', '.well-known', 'page',
 ]);
 
 /**
