@@ -442,10 +442,12 @@ run_candidate_raw_sql_migrations() {
     log_warn "Pending raw SQL migrations detected; applying with safe_migrate.php"
     # safe_migrate.php prompts "Type 'yes' to proceed" on PRODUCTION env. The
     # `yes` command emits "y" — wrong answer. Pipe the literal string "yes\n".
+    # --skip-backup: mysqldump is not present in the PHP container so the
+    # backup step always fails; skip it rather than prompting interactively.
     # Trust the exit code; the runner's output formatting (ANSI colours, box
     # drawing) is unstable for string-matching.
     local migrate_log
-    migrate_log="$(docker_exec_app_user "$app_container" sh -c "printf 'yes\\n' | php /var/www/html/scripts/safe_migrate.php --run-pending 2>&1; echo EXIT=\$?" || true)"
+    migrate_log="$(docker_exec_app_user "$app_container" sh -c "printf 'yes\\n' | php /var/www/html/scripts/safe_migrate.php --run-pending --skip-backup 2>&1; echo EXIT=\$?" || true)"
     echo "$migrate_log" | tail -40 >&2
     local migrate_exit
     migrate_exit="$(echo "$migrate_log" | awk -F= '/^EXIT=/{print $2}' | tail -1)"
