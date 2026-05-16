@@ -233,6 +233,7 @@ return [
         'register_invite_invalid' => 'This invite code is invalid, has expired, or has already been used. Check the code and try again.',
         'register_location_unverified' => 'Pick your town, city or area from the autocomplete suggestions as you type. Free-text locations are not accepted.',
         'register_email_disposable' => 'Throwaway and temporary email addresses (such as mailinator, 10minutemail, tempmail) are not accepted. Use a permanent email address from a real provider.',
+        'register_email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers configured. Check for typos in the domain name and try again.',
         'register_validation' => 'Some of the details you entered are invalid. Check the form and try again.',
         'register_created' => 'Your registration has been received. Check your email for the next step, then sign in.',
         'signed_out' => 'You have signed out.',

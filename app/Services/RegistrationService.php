@@ -14,6 +14,7 @@ use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\DisposableEmailService;
+use App\Services\MxRecordValidator;
 use App\Services\Identity\InviteCodeService;
 use App\Services\Identity\RegistrationPolicyService;
 use App\Services\TenantSettingsService;
@@ -36,6 +37,7 @@ class RegistrationService
         private readonly TenantSettingsService $tenantSettings,
         private readonly PwnedPasswordService $pwnedPassword,
         private readonly DisposableEmailService $disposableEmail,
+        private readonly MxRecordValidator $mxValidator,
     ) {}
 
     /**
@@ -194,6 +196,24 @@ class RegistrationService
             return [
                 'error' => __('api.email_disposable'),
                 'code'  => 'EMAIL_DISPOSABLE',
+                'status' => 422,
+            ];
+        }
+
+        // MX-record check — domain must actually be able to receive email.
+        // Catches typos (`gmial.com`), made-up domains bots fall back to,
+        // and freshly-registered burner domains that haven't been wired up
+        // for mail. Fails open on DNS errors so an outage can't lock users
+        // out. Results are cached 24h.
+        if (!$this->mxValidator->isResolvable((string) $data['email'])) {
+            Log::info('registration.invalid_email_domain', [
+                'tenant_id' => $tenantId,
+                'ip' => request()?->ip(),
+                'email_domain' => substr(strrchr(strtolower((string) $data['email']), '@') ?: '', 1),
+            ]);
+            return [
+                'error' => __('api.email_domain_invalid'),
+                'code'  => 'EMAIL_DOMAIN_INVALID',
                 'status' => 422,
             ];
         }

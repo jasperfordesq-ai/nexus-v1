@@ -229,6 +229,30 @@ class RegistrationControllerTest extends TestCase
         $this->assertSame('EMAIL_DISPOSABLE', $body['errors'][0]['code'] ?? null);
     }
 
+    public function test_register_rejects_email_with_no_mail_servers(): void
+    {
+        // `.invalid` is reserved by RFC 6761 to NEVER resolve — no real
+        // domain will ever exist there, so this assertion is stable across
+        // every CI environment that has DNS.
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'newuser-' . uniqid() . '@nothing-here-' . uniqid() . '.invalid',
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
+        ]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('EMAIL_DOMAIN_INVALID', $body['errors'][0]['code'] ?? null);
+    }
+
     public function test_register_rejects_null_island_coordinates(): void
     {
         $response = $this->apiPost('/v2/auth/register', [

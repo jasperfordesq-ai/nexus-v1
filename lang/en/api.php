@@ -134,6 +134,7 @@ return [
     'invite_code_invalid'           => 'This invite code is invalid, has expired, or has already been used.',
     'location_not_verified'         => 'Pick your town, city or area from the suggestions as you type. Free-text locations are not accepted.',
     'email_disposable'              => 'Throwaway / temporary email addresses are not accepted. Use a permanent email address from a real provider.',
+    'email_domain_invalid'          => 'The email address is not deliverable — the domain has no mail servers. Check for typos and try again.',
     'subject_required'             => 'Subject is required',
     'status_required'              => 'Status is required',
     'reason_required'              => 'A reason is required',
