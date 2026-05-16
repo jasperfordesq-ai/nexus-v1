@@ -6,6 +6,7 @@
 
 namespace App\Jobs;
 
+use App\Core\TenantContext;
 use App\Services\CronJobRunner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,8 +31,12 @@ class RunAdminCronJob implements ShouldQueue
 
     public function handle(CronJobRunner $runner): void
     {
-        $method = $this->method;
-        $runner->$method();
+        try {
+            $method = $this->method;
+            $runner->$method();
+        } finally {
+            TenantContext::reset();
+        }
     }
 
     public function failed(\Throwable $e): void
