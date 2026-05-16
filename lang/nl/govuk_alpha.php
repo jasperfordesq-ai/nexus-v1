@@ -231,6 +231,7 @@ return [
         'register_created' => 'Your registration has been received. Check your email for the next step, then sign in.',
         'signed_out' => 'You have signed out.',
         'register_location_unverified' => 'Pick your town, city or area from the autocomplete suggestions as you type. Free-text locations are not accepted.',
+        'register_email_disposable' => 'Throwaway and temporary email addresses (such as mailinator, 10minutemail, tempmail) are not accepted. Use a permanent email address from a real provider.',
     ],
     'feed' => [
         'title' => 'Feed',

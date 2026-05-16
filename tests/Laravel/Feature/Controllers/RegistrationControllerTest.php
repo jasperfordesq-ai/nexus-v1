@@ -187,6 +187,48 @@ class RegistrationControllerTest extends TestCase
         $this->assertSame('LOCATION_NOT_VERIFIED', $body['errors'][0]['code'] ?? null);
     }
 
+    public function test_register_rejects_disposable_email_domain(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'temp-' . uniqid() . '@mailinator.com',
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
+        ]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('EMAIL_DISPOSABLE', $body['errors'][0]['code'] ?? null);
+    }
+
+    public function test_register_rejects_disposable_subdomain(): void
+    {
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'temp-' . uniqid() . '@foo.mailinator.com',
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
+        ]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame('EMAIL_DISPOSABLE', $body['errors'][0]['code'] ?? null);
+    }
+
     public function test_register_rejects_null_island_coordinates(): void
     {
         $response = $this->apiPost('/v2/auth/register', [

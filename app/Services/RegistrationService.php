@@ -13,6 +13,7 @@ use App\Core\Validator as NexusValidator;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\User;
+use App\Services\DisposableEmailService;
 use App\Services\Identity\InviteCodeService;
 use App\Services\Identity\RegistrationPolicyService;
 use App\Services\TenantSettingsService;
@@ -34,6 +35,7 @@ class RegistrationService
         private readonly User $user,
         private readonly TenantSettingsService $tenantSettings,
         private readonly PwnedPasswordService $pwnedPassword,
+        private readonly DisposableEmailService $disposableEmail,
     ) {}
 
     /**
@@ -174,6 +176,24 @@ class RegistrationService
             return [
                 'error' => __('api.location_not_verified'),
                 'code'  => 'LOCATION_NOT_VERIFIED',
+                'status' => 422,
+            ];
+        }
+
+        // Reject disposable / throwaway email domains (mailinator, 10minutemail,
+        // tempmail, etc.). Removes the cheapest bot-signup path: no inbox to
+        // pay for, no SMS to pay for = zero cost per registration. Forcing
+        // attackers onto real providers raises their per-account cost from
+        // near-zero to "whatever Gmail's account-creation friction is".
+        if ($this->disposableEmail->isDisposable((string) $data['email'])) {
+            Log::info('registration.disposable_email_blocked', [
+                'tenant_id' => $tenantId,
+                'ip' => request()?->ip(),
+                'email_domain' => substr(strrchr(strtolower((string) $data['email']), '@') ?: '', 1),
+            ]);
+            return [
+                'error' => __('api.email_disposable'),
+                'code'  => 'EMAIL_DISPOSABLE',
                 'status' => 422,
             ];
         }

@@ -1839,4 +1839,5 @@ return [
         'relationship_resume_invalid_state' => 'Only paused relationships can be resumed.',
     ],
     'location_not_verified' => 'Pick your town, city or area from the suggestions as you type. Free-text locations are not accepted.',
+    'email_disposable' => 'Throwaway / temporary email addresses are not accepted. Use a permanent email address from a real provider.',
 ];

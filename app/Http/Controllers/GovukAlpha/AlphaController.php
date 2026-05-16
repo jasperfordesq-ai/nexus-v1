@@ -310,6 +310,7 @@ class AlphaController extends Controller
                 $code === 'INVITE_REQUIRED'       => 'register-invite-required',
                 $code === 'INVITE_INVALID'        => 'register-invite-invalid',
                 $code === 'LOCATION_NOT_VERIFIED' => 'register-location-unverified',
+                $code === 'EMAIL_DISPOSABLE'      => 'register-email-disposable',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',
                 default                            => 'register-failed',
             };
