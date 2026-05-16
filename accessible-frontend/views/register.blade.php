@@ -67,13 +67,21 @@
                   data-google-maps-key="{{ $googleMapsApiKey ?? '' }}">
                 @csrf
 
-                {{-- Bot honeypot — hidden from real users (off-screen + aria-hidden + tabindex=-1)
+                {{-- Bot honeypots — hidden from real users (off-screen + aria-hidden + tabindex=-1)
                      but auto-filled by form-spam bots. RegistrationService::register() silently
-                     no-ops if this comes back non-empty. Do NOT use `display:none` — many bots
-                     skip those; off-screen positioning catches more. --}}
+                     no-ops if ANY of these come back non-empty. Do NOT use `display:none` — many
+                     bots skip those; off-screen positioning catches more. Multiple decoys with
+                     realistic names (confirm_email, address_line_2, referral_code) trip
+                     sophisticated bots that filter on field names but can't tell which to skip. --}}
                 <div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
                     <label for="website">Website (leave blank)</label>
                     <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" value="">
+                    <label for="confirm_email">Confirm email (leave blank)</label>
+                    <input type="email" id="confirm_email" name="confirm_email" tabindex="-1" autocomplete="off" value="">
+                    <label for="address_line_2">Address line 2 (leave blank)</label>
+                    <input type="text" id="address_line_2" name="address_line_2" tabindex="-1" autocomplete="off" value="">
+                    <label for="referral_code">Referral code (leave blank)</label>
+                    <input type="text" id="referral_code" name="referral_code" tabindex="-1" autocomplete="off" value="">
                 </div>
 
                 {{-- Min-form-time bot gate. Submitted form must take >= 5s.

@@ -83,6 +83,13 @@ export function RegisterPage() {
   // Bot protection
   const [formStartTime] = useState(() => Date.now());
   const honeypotRef = useRef<HTMLInputElement>(null);
+  // Decoy honeypots with realistic names — multi-field honeypots trip bots
+  // that filter on the legacy `website` name but can't tell which other
+  // inputs to skip. Server (`RegistrationService::register()`) silent-no-ops
+  // if ANY of these come back non-empty.
+  const confirmEmailRef = useRef<HTMLInputElement>(null);
+  const addressLine2Ref = useRef<HTMLInputElement>(null);
+  const referralCodeRef = useRef<HTMLInputElement>(null);
   // Cloudflare Turnstile removed from registration 2026-05-16 — member
   // feedback found the widget too confusing. Bot defence: honeypot input
   // + per-IP route throttle (3/5min) + admin-approval gate.
@@ -334,8 +341,11 @@ export function RegisterPage() {
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
 
-    // Bot protection checks
-    const honeypotValue = honeypotRef.current?.value;
+    // Bot protection checks — any of the decoy honeypots filled means a bot.
+    const honeypotValue = honeypotRef.current?.value
+      || confirmEmailRef.current?.value
+      || addressLine2Ref.current?.value
+      || referralCodeRef.current?.value;
     if (honeypotValue) {
       // Bot detected - silently fail
       return;
@@ -877,17 +887,21 @@ export function RegisterPage() {
           {oauthTenantId && (
             <OAuthButtons intent="register" tenantId={oauthTenantId} />
           )}
-          {/* Honeypot - hidden from users, visible to bots */}
-          <div className="hidden" aria-hidden="true">
+          {/* Honeypots - off-screen, invisible to users, fillable by bots.
+              Multiple decoy fields with realistic names trip bots that filter
+              on the legacy `website` name but can't tell which others to skip. */}
+          <div
+            aria-hidden="true"
+            style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+          >
             <label htmlFor="website">{t('register.honeypot_label', 'Website')}</label>
-            <input
-              ref={honeypotRef}
-              type="text"
-              name="website"
-              id="website"
-              tabIndex={-1}
-              autoComplete="off"
-            />
+            <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
+            <label htmlFor="confirm_email">Confirm email</label>
+            <input ref={confirmEmailRef} type="email" name="confirm_email" id="confirm_email" tabIndex={-1} autoComplete="off" />
+            <label htmlFor="address_line_2">Address line 2</label>
+            <input ref={addressLine2Ref} type="text" name="address_line_2" id="address_line_2" tabIndex={-1} autoComplete="off" />
+            <label htmlFor="referral_code">Referral code</label>
+            <input ref={referralCodeRef} type="text" name="referral_code" id="referral_code" tabIndex={-1} autoComplete="off" />
           </div>
 
           {/* All steps content */}
@@ -917,17 +931,20 @@ export function RegisterPage() {
         {currentStep === 1 && oauthTenantIdMobile && (
           <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
         )}
-        {/* Honeypot - hidden from users, visible to bots */}
-        <div className="hidden" aria-hidden="true">
+        {/* Honeypots - off-screen, invisible to users, fillable by bots.
+            Multiple decoys (see desktop block for rationale). */}
+        <div
+          aria-hidden="true"
+          style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+        >
           <label htmlFor="website">{t('register.honeypot_label')}</label>
-          <input
-            ref={honeypotRef}
-            type="text"
-            name="website"
-            id="website"
-            tabIndex={-1}
-            autoComplete="off"
-          />
+          <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
+          <label htmlFor="confirm_email">Confirm email</label>
+          <input ref={confirmEmailRef} type="email" name="confirm_email" id="confirm_email" tabIndex={-1} autoComplete="off" />
+          <label htmlFor="address_line_2">Address line 2</label>
+          <input ref={addressLine2Ref} type="text" name="address_line_2" id="address_line_2" tabIndex={-1} autoComplete="off" />
+          <label htmlFor="referral_code">Referral code</label>
+          <input ref={referralCodeRef} type="text" name="referral_code" id="referral_code" tabIndex={-1} autoComplete="off" />
         </div>
 
         {/* Step indicator */}

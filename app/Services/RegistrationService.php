@@ -53,21 +53,33 @@ class RegistrationService
      */
     public function register(array $data, int $tenantId): array
     {
-        // Bot honeypot — must run BEFORE validation so attackers can't
+        // Bot honeypots — must run BEFORE validation so attackers can't
         // distinguish "honeypot triggered" from "validation failed" via the
         // error message returned. Mirrors the success response shape.
-        if (!empty($data['honeypot'])) {
-            Log::info('registration.honeypot_triggered', [
-                'tenant_id' => $tenantId,
-                'ip' => request()?->ip(),
-                'ua' => substr((string) request()?->userAgent(), 0, 200),
-                'honeypot_value' => substr((string) $data['honeypot'], 0, 100),
-            ]);
-            return [
-                'user' => null,
-                'requires_verification' => true,
-                'message' => __('emails_misc.registration.success_message'),
-            ];
+        //
+        // Multiple decoy fields with realistic names (`confirm_email`,
+        // `address_line_2`, `referral_code`) sit alongside the legacy
+        // `website` honeypot — all hidden via off-screen CSS. Real users
+        // never see them; naive bots fill every visible input including
+        // hidden-via-CSS ones. Sophisticated bots that filter on field
+        // names get tripped by the realistic-looking decoys because they
+        // can't tell which ones to skip.
+        $honeypotFields = ['honeypot', 'website', 'confirm_email', 'address_line_2', 'referral_code'];
+        foreach ($honeypotFields as $field) {
+            if (!empty($data[$field])) {
+                Log::info('registration.honeypot_triggered', [
+                    'tenant_id' => $tenantId,
+                    'ip' => request()?->ip(),
+                    'ua' => substr((string) request()?->userAgent(), 0, 200),
+                    'field' => $field,
+                    'honeypot_value' => substr((string) $data[$field], 0, 100),
+                ]);
+                return [
+                    'user' => null,
+                    'requires_verification' => true,
+                    'message' => __('emails_misc.registration.success_message'),
+                ];
+            }
         }
 
         // Minimum-time bot gate — form must take >= 5 seconds. Mirrors the
