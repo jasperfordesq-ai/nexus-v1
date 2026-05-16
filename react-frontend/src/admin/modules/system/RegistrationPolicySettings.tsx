@@ -38,6 +38,7 @@ import Shield from 'lucide-react/icons/shield';
 import { VerificationAuditLog } from './VerificationAuditLog';
 import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { ProviderHealthDashboard } from './ProviderHealthDashboard';
+import { RegistrationBreakerCard } from './RegistrationBreakerCard';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -304,6 +305,9 @@ export function RegistrationPolicySettings() {
       <PageHeader title={"Registration Policy Settings"} description={`Configure how new members can register on this platform`} />
 
       <div className="space-y-6">
+
+        {/* ── Tenant Circuit Breaker (always visible, top of page) ── */}
+        <RegistrationBreakerCard />
 
         {/* ── Section 1: Registration Method ── */}
         <Card shadow="sm">

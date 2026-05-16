@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Admin panel: Registration Security card on `/admin/settings/registration-policy`.** Front-and-centre status card for the per-tenant circuit breaker. Polls every 30s. Green chip when signups are flowing normally; red border + alarm-banner + one-click "Resume signups now" button when the breaker has tripped. Includes the live signup count vs threshold so admins can see "we're at 18 of 20 this hour" before the breaker actually fires. Additive — sits above the existing registration-policy form, doesn't touch any existing components.
+
 ### Security
 
 - **Admin approval is now required for every tenant (current and future).** `TenantSettingsService::requiresAdminApproval()` now defaults to TRUE (fail-closed) so any tenant without an explicit setting still enforces the gate. A backfill migration (`migrations/2026_05_16_enforce_admin_approval_all_tenants.sql`) writes `admin_approval=true` to every existing tenant row so the policy is explicit in the database. Tenant seeding (`TenantHierarchyService::seedTenantDefaults`) now writes the bare `admin_approval` key the reader actually checks — the previous `general.admin_approval` row was orphaned (reader never looked it up), which meant new tenants silently ran with admin approval disabled. Already-approved members are unaffected; only new registrations (and accounts still in `status='pending'`) require an admin to approve them before login.
