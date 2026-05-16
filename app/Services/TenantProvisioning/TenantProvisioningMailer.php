@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\TenantProvisioning;
 
+use App\Core\Env;
 use App\I18n\LocaleContext;
 use App\Services\EmailService;
 use App\Services\EmailTemplateBuilder;
@@ -125,10 +126,24 @@ class TenantProvisioningMailer
 
     private static function tenantUrl(object $tenant): string
     {
+        // Custom-domain tenant
         if (! empty($tenant->domain)) {
-            return 'https://' . ltrim((string) $tenant->domain, '/');
+            return 'https://' . rtrim((string) $tenant->domain, '/');
         }
-        $base = (string) (config('app.frontend_url') ?: 'https://app.project-nexus.ie');
-        return rtrim($base, '/') . '/' . $tenant->slug;
+
+        // Sub-tenant sharing a parent's custom domain (e.g. timebanking.uk/cardiff)
+        if (! empty($tenant->parent_id)) {
+            $parentDomain = DB::table('tenants')
+                ->where('id', (int) $tenant->parent_id)
+                ->where('is_active', 1)
+                ->value('domain');
+            if ($parentDomain) {
+                return 'https://' . rtrim((string) $parentDomain, '/') . '/' . $tenant->slug;
+            }
+        }
+
+        // Shared platform host
+        $base = rtrim((string) (Env::get('FRONTEND_URL') ?: 'https://app.project-nexus.ie'), '/');
+        return $base . '/' . $tenant->slug;
     }
 }

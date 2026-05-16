@@ -110,7 +110,7 @@ class JobFeedController extends BaseApiController
             ->limit(100)
             ->get();
 
-        $baseUrl = config('app.url', 'https://app.project-nexus.ie');
+        $baseUrl = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<source>' . "\n";
