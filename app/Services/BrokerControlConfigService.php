@@ -509,7 +509,7 @@ class BrokerControlConfigService
         $tenantId = TenantContext::getId();
         try {
             Cache::forget("broker_config_{$tenantId}");
-            Cache::forget("tenant_bootstrap_{$tenantId}");
+            Cache::store('redis')->forget("t{$tenantId}:tenant_bootstrap");
         } catch (\Throwable $e) {
             // Cache unavailable
         }

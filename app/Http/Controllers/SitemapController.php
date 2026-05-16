@@ -109,12 +109,14 @@ class SitemapController
         // 'main' is the canonical alias SitemapService::generateIndex() uses for the
         // master tenant, which stores slug = NULL rather than the string 'main'.
         if ($slug === 'main') {
+            // Master tenant is always id=1; using an explicit id match avoids returning
+            // the wrong tenant if other rows ever have null/empty slug (data anomaly).
             $row = DB::selectOne(
                 "SELECT t.id, t.slug, t.domain, p.domain AS parent_domain
                  FROM tenants t
                  LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 AND p.id > 1
-                 WHERE (t.slug IS NULL OR t.slug = '') AND t.is_active = 1
-                 ORDER BY t.id LIMIT 1"
+                 WHERE t.id = 1 AND t.is_active = 1
+                 LIMIT 1"
             );
         } else {
             $row = DB::selectOne(

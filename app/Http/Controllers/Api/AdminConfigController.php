@@ -814,6 +814,21 @@ class AdminConfigController extends BaseApiController
             }
             $params[] = $tenantId;
             DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
+
+            // Domain changed → bust direct children's bootstrap caches.
+            // Children expose parent_domain in their bootstrap response; a stale value
+            // would route the SPA to the old domain until the TTL expires.
+            if (array_key_exists('domain', $directUpdates)) {
+                $childIds = DB::table('tenants')
+                    ->where('parent_id', $tenantId)
+                    ->where('is_active', 1)
+                    ->pluck('id')
+                    ->map(fn ($id) => (int) $id)
+                    ->toArray();
+                foreach ($childIds as $childId) {
+                    $this->redisCache->delete('tenant_bootstrap', $childId);
+                }
+            }
         }
 
         if (isset($kvUpdates['welcome_credits'])) {
