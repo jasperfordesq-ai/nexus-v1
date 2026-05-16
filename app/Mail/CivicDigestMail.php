@@ -66,9 +66,7 @@ class CivicDigestMail
                 $tenantData = TenantContext::get();
                 $community = (string) ($tenantData['name'] ?? 'Project NEXUS');
 
-                $base = (string) (config('app.frontend_url') ?: 'https://app.project-nexus.ie');
-                $base = rtrim($base, '/');
-                $digestUrl = $base . '/caring-community/civic-digest';
+                $digestUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/caring-community/civic-digest';
                 $prefsUrl = $digestUrl;
 
                 $name = trim(((string) ($recipient->first_name ?? '')) . ' ' . ((string) ($recipient->last_name ?? '')));

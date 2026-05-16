@@ -1301,13 +1301,16 @@ class AdminUsersController extends BaseApiController
 
         try {
             $token = bin2hex(random_bytes(32));
-            $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+            // Must use SHA-256 (not bcrypt) — PasswordResetController::findValidResetToken()
+            // looks up by hashed token column using hash('sha256', $token).
+            $hashedToken = hash('sha256', $token);
+            $userTenantId = (int) $user['tenant_id'];
 
             // Store in password_resets table (same as user-initiated flow)
-            DB::delete("DELETE FROM password_resets WHERE email = ?", [$user['email']]);
+            DB::delete("DELETE FROM password_resets WHERE email = ? AND tenant_id = ?", [$user['email'], $userTenantId]);
             DB::insert(
-                "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())",
-                [$user['email'], $hashedToken]
+                "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
+                [$user['email'], $userTenantId, $hashedToken]
             );
 
             LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $adminId, $id, $token) {

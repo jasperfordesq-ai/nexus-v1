@@ -528,8 +528,8 @@ class NewsletterService
         $color = '#6366f1';
         $colorDark = '#4f46e5';
 
-        // URLs
-        $frontendUrl = rtrim(config('app.frontend_url', config('app.url', '')), '/');
+        // URLs — TenantContext is set per-newsletter by processQueue() before renderEmail() is called
+        $frontendUrl = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
         $apiUrl = rtrim(config('app.url', ''), '/');
 
         // Personalize content if recipient data available

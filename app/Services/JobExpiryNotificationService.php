@@ -89,7 +89,7 @@ class JobExpiryNotificationService
     {
         $name      = htmlspecialchars($user->first_name ?? __('emails.common.fallback_name'));
         $title     = htmlspecialchars($vacancy->title);
-        $renewUrl  = TenantContext::getFrontendUrl("/jobs/{$vacancy->id}");
+        $renewUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $vacancy->id;
         $deadline  = $vacancy->deadline?->format('d M Y') ?? 'soon';
 
         $greeting = __('emails_misc.jobs.expiry_greeting', ['name' => $name]);

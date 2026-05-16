@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use App\Core\EmailTemplateBuilder;
+use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Services\EmailService;
 use Throwable;
@@ -29,8 +30,7 @@ class VereinCrossInvitationReceived
 
         LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $invitationId, $sourceName, $targetName, $message): void {
             try {
-                $base = (string) (config('app.frontend_url') ?: 'https://app.project-nexus.ie');
-                $url = rtrim($base, '/') . '/me/verein-invitations';
+                $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/me/verein-invitations';
 
                 $name = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
                 $builder = EmailTemplateBuilder::make()

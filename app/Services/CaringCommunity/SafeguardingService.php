@@ -589,8 +589,7 @@ class SafeguardingService
             $reporterName = 'A community member';
         }
 
-        $base = (string) (config('app.frontend_url') ?: 'https://app.project-nexus.ie');
-        $adminUrl = rtrim($base, '/') . '/admin/caring-community/safeguarding/' . $reportId;
+        $adminUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/admin/caring-community/safeguarding/' . $reportId;
 
         $reportPayload = [
             'id'             => $report ? (int) $report->id : $reportId,

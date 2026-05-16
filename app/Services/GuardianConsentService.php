@@ -130,10 +130,8 @@ class GuardianConsentService
 
         // Send consent email to guardian — rendered in the minor's preferred language
         // (best available proxy since the guardian has no account / no known locale).
-        $tenant = TenantContext::get();
-        $tenantSlug = $tenant['slug'] ?? '';
-        $verifyUrl = config('app.frontend_url', 'https://app.project-nexus.ie')
-            . '/' . $tenantSlug
+        $verifyUrl = TenantContext::getFrontendUrl()
+            . TenantContext::getSlugPrefix()
             . '/volunteering/guardian-consent/verify/' . $consentToken;
 
         $minorLocale = DB::table('users')
