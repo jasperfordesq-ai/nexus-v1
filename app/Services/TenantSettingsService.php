@@ -52,10 +52,26 @@ class TenantSettingsService
 
     /**
      * Check if admin approval is required for this tenant.
+     *
+     * Defaults to TRUE (fail-closed). Admin approval is a platform-wide
+     * baseline: every tenant — current or future — requires an admin to
+     * approve a new account before it can log in. A tenant can opt out
+     * explicitly by writing `admin_approval=false` via the admin UI.
+     *
+     * Reads the bare `admin_approval` key first; falls back to the
+     * historical `general.admin_approval` prefix so legacy tenants whose
+     * settings were seeded via TenantHierarchyService still resolve.
      */
     public function requiresAdminApproval(int $tenantId): bool
     {
-        return $this->getBool($tenantId, 'admin_approval', false);
+        $value = $this->get($tenantId, 'admin_approval');
+        if ($value === null) {
+            $value = $this->get($tenantId, 'general.admin_approval');
+        }
+        if ($value === null) {
+            return true;
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -236,7 +252,9 @@ class TenantSettingsService
         }
 
         // Check admin approval requirement for callers that do not include is_approved.
-        if ($tenantId > 0 && $this->getBool($tenantId, 'admin_approval', false)) {
+        // Uses requiresAdminApproval() so the fail-closed default + legacy-key
+        // fallback are honoured consistently with the email-verify gate.
+        if ($tenantId > 0 && $this->requiresAdminApproval($tenantId)) {
             if (empty($user['is_approved'])) {
                 return [
                     'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,

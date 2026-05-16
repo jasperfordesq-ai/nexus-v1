@@ -575,7 +575,10 @@ class TenantHierarchyService
         //    wizard from day one.
         $defaultSettings = [
             ['tenant_id' => $tenantId, 'setting_key' => 'general.registration_mode', 'setting_value' => 'open', 'setting_type' => 'string'],
-            ['tenant_id' => $tenantId, 'setting_key' => 'general.admin_approval', 'setting_value' => 'true', 'setting_type' => 'boolean'],
+            // Bare key — matches what TenantSettingsService::requiresAdminApproval()
+            // and AdminConfigController read/write. The historical `general.`
+            // prefix was orphaned (reader never looked it up).
+            ['tenant_id' => $tenantId, 'setting_key' => 'admin_approval', 'setting_value' => 'true', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'general.email_verification', 'setting_value' => 'true', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'general.maintenance_mode', 'setting_value' => 'false', 'setting_type' => 'boolean'],
             // SEO defaults — ensure every new tenant has sitemap, canonical, OG, and Twitter cards enabled
