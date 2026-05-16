@@ -1137,6 +1137,8 @@ Route::delete('/v2/admin/identity/provider-credentials/{slug}', [\App\Http\Contr
 Route::get('/v2/admin/invite-codes', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'listInviteCodes']);
 Route::post('/v2/admin/invite-codes', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'generateInviteCodes']);
 Route::delete('/v2/admin/invite-codes/{id}', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'deactivateInviteCode']);
+Route::get('/v2/admin/registration/breaker', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getBreakerStatus']);
+Route::post('/v2/admin/registration/resume-signups', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'resumeSignups']);
 Route::get('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'getGroupConfig']);
 Route::put('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfig']);
 Route::put('/v2/admin/config/groups/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfigBulk']);

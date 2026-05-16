@@ -17,7 +17,7 @@
                     'register-invite-required', 'register-invite-invalid',
                     'register-location-unverified', 'register-email-disposable',
                     'register-email-domain-invalid', 'register-daily-limit',
-                    'register-validation',
+                    'register-tenant-paused', 'register-validation',
                 ];
             @endphp
             @if (in_array($status ?? '', $errorStatuses, true))
@@ -33,6 +33,7 @@
                         'register-email-disposable'  => __('govuk_alpha.auth.register_email_disposable'),
                         'register-email-domain-invalid' => __('govuk_alpha.auth.register_email_domain_invalid'),
                         'register-daily-limit'       => __('govuk_alpha.auth.register_daily_limit'),
+                        'register-tenant-paused'     => __('govuk_alpha.auth.register_tenant_paused'),
                         'register-validation'        => __('govuk_alpha.auth.register_validation'),
                         default                      => __('govuk_alpha.auth.register_failed'),
                     };

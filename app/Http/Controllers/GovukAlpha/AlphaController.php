@@ -313,6 +313,7 @@ class AlphaController extends Controller
                 $code === 'EMAIL_DISPOSABLE'      => 'register-email-disposable',
                 $code === 'EMAIL_DOMAIN_INVALID'  => 'register-email-domain-invalid',
                 $code === 'REGISTRATION_DAILY_LIMIT' => 'register-daily-limit',
+                $code === 'REGISTRATION_TENANT_PAUSED' => 'register-tenant-paused',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',
                 default                            => 'register-failed',
             };

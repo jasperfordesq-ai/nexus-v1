@@ -136,6 +136,7 @@ return [
     'email_disposable'              => 'Throwaway / temporary email addresses are not accepted. Use a permanent email address from a real provider.',
     'email_domain_invalid'          => 'The email address is not deliverable — the domain has no mail servers. Check for typos and try again.',
     'registration_daily_limit'      => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow.',
+    'registration_tenant_paused'    => 'Account creation is temporarily paused for this community due to unusually high signup activity. Please try again later or contact a community administrator.',
     'subject_required'             => 'Subject is required',
     'status_required'              => 'Status is required',
     'reason_required'              => 'A reason is required',

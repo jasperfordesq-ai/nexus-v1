@@ -329,6 +329,47 @@ class RegistrationPolicyController extends BaseApiController
         return $this->respondWithData(['valid' => $result['valid'], 'reason' => $result['reason'] ?? null]);
     }
 
+    // ─── Tenant Circuit Breaker (admin) ──────────────────────────────────
+
+    /** GET /api/v2/admin/registration/breaker — current breaker status for this tenant */
+    public function getBreakerStatus(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $tripped = (bool) \Illuminate\Support\Facades\Cache::get('register_tenant_breaker:' . $tenantId);
+        $countInHour = (int) \Illuminate\Support\Facades\Cache::get('register_tenant_hourly:' . $tenantId, 0);
+        $threshold = (int) (getenv('REGISTRATION_TENANT_HOURLY_CAP') ?: 20);
+
+        return $this->respondWithData([
+            'tripped' => $tripped,
+            'count_in_current_hour' => $countInHour,
+            'threshold' => $threshold,
+            'auto_resume_in_seconds' => $tripped ? 3600 : null,
+        ]);
+    }
+
+    /** POST /api/v2/admin/registration/resume-signups — manually clear the breaker */
+    public function resumeSignups(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $tenantId);
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $tenantId . ':ttl');
+        // Also reset the hourly counter so a fresh wave doesn't immediately
+        // re-trip the breaker before a real signup pattern emerges.
+        \Illuminate\Support\Facades\Cache::forget('register_tenant_hourly:' . $tenantId);
+
+        \Illuminate\Support\Facades\Log::warning('registration.breaker_manually_cleared', [
+            'tenant_id' => $tenantId,
+            'admin_user_id' => $adminId,
+            'ip' => request()->ip(),
+        ]);
+
+        return $this->respondWithData(['resumed' => true]);
+    }
+
     /** GET /api/v2/auth/registration-info */
     public function getRegistrationInfo(): JsonResponse
     {

@@ -282,6 +282,35 @@ class RegistrationControllerTest extends TestCase
         $this->assertSame('REGISTRATION_DAILY_LIMIT', $body['errors'][0]['code'] ?? null);
     }
 
+    public function test_register_rejects_when_tenant_breaker_tripped(): void
+    {
+        // Trip the breaker directly via the cache key the service reads.
+        \Illuminate\Support\Facades\Cache::put('register_tenant_breaker:1', true, 3600);
+
+        try {
+            $response = $this->apiPost('/v2/auth/register', [
+                'first_name' => 'Test',
+                'last_name' => 'User',
+                'email' => 'newuser-' . uniqid() . '@example.com',
+                'location' => 'Toronto, Canada',
+                'phone' => '+15551234567',
+                'password' => 'StrongPassword123!',
+                'password_confirmation' => 'StrongPassword123!',
+                'terms_accepted' => true,
+                'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+                'latitude' => 43.6532,
+                'longitude' => -79.3832,
+            ]);
+
+            $this->assertSame(503, $response->getStatusCode());
+            $body = json_decode((string) $response->getContent(), true);
+            $this->assertSame('REGISTRATION_TENANT_PAUSED', $body['errors'][0]['code'] ?? null);
+        } finally {
+            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:1');
+            \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:1:ttl');
+        }
+    }
+
     public function test_register_rejects_null_island_coordinates(): void
     {
         $response = $this->apiPost('/v2/auth/register', [

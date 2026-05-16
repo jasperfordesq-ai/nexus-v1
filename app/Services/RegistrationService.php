@@ -97,6 +97,36 @@ class RegistrationService
         // this path is the honeypot field + min-form-time gate + per-IP
         // route throttle (3/5min) + admin-approval gate.
 
+        // Per-tenant hourly circuit breaker. If a single tenant gets a flood
+        // of signups in one hour (default >20), pause further signups for
+        // that tenant for 1 hour and warn the admin. Auto-resumes when the
+        // pause flag's TTL elapses; admin can also clear it manually via
+        // POST /api/v2/admin/registration/resume-signups.
+        //
+        // Why this matters: even with per-IP caps in place, a determined
+        // attacker on a rotating-proxy network can grind out hundreds of
+        // accounts in an hour. The breaker is the last-line containment —
+        // worst case the tenant loses 1 hour of legitimate signups, which
+        // is way better than waking up to 10,000 fake accounts.
+        $tenantHourlyCap = (int) (getenv('REGISTRATION_TENANT_HOURLY_CAP') ?: 20);
+        $breakerKey = 'register_tenant_breaker:' . $tenantId;
+        $tenantHourlyKey = 'register_tenant_hourly:' . $tenantId;
+        if ($tenantHourlyCap > 0) {
+            if (\Illuminate\Support\Facades\Cache::get($breakerKey)) {
+                $retryAfter = (int) \Illuminate\Support\Facades\Cache::get($breakerKey . ':ttl', 3600);
+                Log::info('registration.tenant_paused', [
+                    'tenant_id' => $tenantId,
+                    'ip' => request()?->ip(),
+                ]);
+                return [
+                    'error' => __('api.registration_tenant_paused'),
+                    'code'  => 'REGISTRATION_TENANT_PAUSED',
+                    'status' => 503,
+                    'retry_after' => $retryAfter,
+                ];
+            }
+        }
+
         // Per-IP daily cap on SUCCESSFUL registrations. Stacks on top of the
         // existing 3/5min route throttle: that one caps raw request volume,
         // this one caps how many accounts a single IP can actually create
@@ -393,6 +423,37 @@ class RegistrationService
         // fired, so failed attempts don't count against the quota.
         if ($dailyCap > 0) {
             RateLimiter::hit($dailyCapKey, 86400);
+        }
+
+        // Tick the per-tenant hourly counter. If this signup pushed the
+        // tenant over the threshold, trip the circuit breaker so the NEXT
+        // signup attempt is rejected with REGISTRATION_TENANT_PAUSED.
+        // Atomic: Cache::increment under Redis or DB cache is safe under
+        // concurrent registrations.
+        if ($tenantHourlyCap > 0) {
+            try {
+                $count = \Illuminate\Support\Facades\Cache::increment($tenantHourlyKey);
+                if ($count === false || $count === 1) {
+                    // First hit in the window — set TTL.
+                    \Illuminate\Support\Facades\Cache::put($tenantHourlyKey, 1, 3600);
+                    $count = 1;
+                }
+                if ((int) $count >= $tenantHourlyCap) {
+                    \Illuminate\Support\Facades\Cache::put($breakerKey, true, 3600);
+                    \Illuminate\Support\Facades\Cache::put($breakerKey . ':ttl', 3600, 3600);
+                    Log::warning('registration.tenant_breaker_tripped', [
+                        'tenant_id' => $tenantId,
+                        'count_in_hour' => $count,
+                        'threshold' => $tenantHourlyCap,
+                        'ip' => request()?->ip(),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::info('registration.tenant_counter_failed', [
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         return [
