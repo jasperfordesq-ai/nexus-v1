@@ -125,6 +125,17 @@ class Mailer
     private function loadTenantConfig(int $tenantId): void
     {
         try {
+            // Always derive From name from the tenant's name — no admin config needed.
+            $tenantName = TenantContext::getSetting('site_name');
+            if (empty($tenantName)) {
+                $tenantName = \Illuminate\Support\Facades\DB::table('tenants')
+                    ->where('id', $tenantId)
+                    ->value('name');
+            }
+            if (!empty($tenantName)) {
+                $this->fromName = $tenantName;
+            }
+
             if (!class_exists(EmailSettings::class)) { return; }
             $provider = EmailSettings::get($tenantId, 'email_provider');
 
