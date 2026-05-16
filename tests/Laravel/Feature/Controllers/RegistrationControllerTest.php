@@ -70,8 +70,8 @@ class RegistrationControllerTest extends TestCase
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Toronto, Canada',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
         ]);
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
@@ -84,8 +84,8 @@ class RegistrationControllerTest extends TestCase
             'last_name' => 'User',
             'email' => 'newuser-' . uniqid() . '@example.com',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
         ]);
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
@@ -99,8 +99,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Toronto, Canada',
             'phone' => 'not-a-phone',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
         ]);
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
@@ -114,8 +114,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             // Backdate so the >= 5s min-form-time bot gate passes.
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
@@ -123,7 +123,7 @@ class RegistrationControllerTest extends TestCase
             'longitude' => -79.3832,
         ]);
 
-        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $this->assertContains($response->getStatusCode(), [200, 201], 'Response body: ' . $response->getContent());
     }
 
     public function test_register_rejects_missing_terms_acceptance(): void
@@ -134,8 +134,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 43.6532,
             'longitude' => -79.3832,
@@ -176,8 +176,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => '555',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             // latitude / longitude intentionally omitted — simulates the
@@ -197,8 +197,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'temp-' . uniqid() . '@mailinator.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 43.6532,
@@ -218,8 +218,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'temp-' . uniqid() . '@foo.mailinator.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 43.6532,
@@ -242,8 +242,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@nothing-here-' . uniqid() . '.invalid',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 43.6532,
@@ -269,8 +269,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Toronto, Canada',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 43.6532,
@@ -319,8 +319,8 @@ class RegistrationControllerTest extends TestCase
             'email' => 'newuser-' . uniqid() . '@example.com',
             'location' => 'Anywhere',
             'phone' => '+15551234567',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
             'terms_accepted' => true,
             'form_started_at' => (int) (microtime(true) * 1000) - 6000,
             'latitude' => 0,

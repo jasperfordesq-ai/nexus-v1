@@ -372,6 +372,8 @@ class AppServiceProvider extends ServiceProvider
                 new User(),
                 $app->make(\App\Services\TenantSettingsService::class),
                 $app->make(\App\Services\PwnedPasswordService::class),
+                $app->make(\App\Services\DisposableEmailService::class),
+                $app->make(\App\Services\MxRecordValidator::class),
             );
         });
 

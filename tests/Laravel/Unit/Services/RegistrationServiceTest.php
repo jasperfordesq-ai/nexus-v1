@@ -7,7 +7,11 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Services\DisposableEmailService;
+use App\Services\MxRecordValidator;
+use App\Services\PwnedPasswordService;
 use App\Services\RegistrationService;
+use App\Services\TenantSettingsService;
 use App\Models\User;
 use Mockery;
 
@@ -20,7 +24,13 @@ class RegistrationServiceTest extends TestCase
     {
         parent::setUp();
         $this->mockUser = Mockery::mock(User::class);
-        $this->service = new RegistrationService($this->mockUser);
+        $this->service = new RegistrationService(
+            $this->mockUser,
+            app(TenantSettingsService::class),
+            app(PwnedPasswordService::class),
+            app(DisposableEmailService::class),
+            app(MxRecordValidator::class),
+        );
     }
 
     public function test_register_fails_with_missing_first_name(): void
