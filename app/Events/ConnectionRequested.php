@@ -14,7 +14,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when one user sends a connection request to another.
@@ -23,7 +22,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ConnectionRequested implements ShouldBroadcast, ShouldRescue
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly Connection $connectionModel,

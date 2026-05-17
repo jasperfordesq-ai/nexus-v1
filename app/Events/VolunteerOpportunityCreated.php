@@ -10,14 +10,13 @@ namespace App\Events;
 
 use App\Models\VolOpportunity;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a volunteer opportunity is created locally.
  */
 class VolunteerOpportunityCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly VolOpportunity $opportunity,

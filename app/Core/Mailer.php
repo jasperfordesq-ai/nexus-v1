@@ -232,6 +232,98 @@ class Mailer
     }
 
     /**
+     * Check if an address is on the local suppression cache. Hydrated from
+     * SendGrid's /v3/suppression/* endpoints via the webhook + periodic sync.
+     * Safe to call before the table exists (defaults to "not suppressed").
+     */
+    private static function isSuppressed(string $email): bool
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_suppression')) {
+                return false;
+            }
+            return \Illuminate\Support\Facades\DB::table('email_suppression')
+                ->where('email', $email)
+                ->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Append a row to email_log capturing the outcome of a send attempt.
+     * Best-effort — never throws, never blocks the email itself.
+     */
+    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
+                return;
+            }
+            $tenantId = TenantContext::getId();
+            $userId = null;
+            try {
+                if ($tenantId !== null) {
+                    $userId = \Illuminate\Support\Facades\DB::table('users')
+                        ->where('email', $to)
+                        ->where('tenant_id', $tenantId)
+                        ->whereNull('deleted_at')
+                        ->value('id');
+                }
+            } catch (\Throwable $e) {
+                // ignore — user lookup is best-effort
+            }
+            \Illuminate\Support\Facades\DB::table('email_log')->insert([
+                'tenant_id'           => $tenantId,
+                'user_id'             => $userId,
+                'recipient_email'     => $to,
+                'subject'             => mb_substr($subject, 0, 255),
+                'provider'            => null,
+                'status'              => $status,
+                'provider_message_id' => $messageId,
+                'error'               => $error,
+                'sent_at'             => in_array($status, ['sent', 'delivered'], true) ? now() : null,
+                'created_at'          => now(),
+                'updated_at'          => now(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::debug('Mailer::logEmail failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Look up the recipient in the current tenant and mint a signed
+     * unsubscribe URL via NotificationUnsubscribeController. Returns null
+     * if the recipient is not a user on this tenant (e.g. admin emails
+     * to external addresses), in which case no List-Unsubscribe header
+     * is added — that's the correct behaviour for one-off external sends.
+     */
+    private function autoDetectUnsubscribeUrl(string $to): ?string
+    {
+        if ($this->tenantId === null) {
+            return null;
+        }
+        try {
+            $userId = \Illuminate\Support\Facades\DB::table('users')
+                ->where('email', $to)
+                ->where('tenant_id', $this->tenantId)
+                ->whereNull('deleted_at')
+                ->value('id');
+            if (!$userId) {
+                return null;
+            }
+            return \App\Http\Controllers\Api\NotificationUnsubscribeController::buildSignedUrl(
+                (int) $userId,
+                $this->tenantId,
+                'all'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::debug('Mailer::autoDetectUnsubscribeUrl failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Mask an email address for safe logging (e.g., "j***@example.com").
      */
     private static function maskEmail(string $email): string
@@ -264,38 +356,75 @@ class Mailer
         $cc = $cc !== null ? self::sanitizeHeaderValue($cc) : null;
         $replyTo = $replyTo !== null ? self::sanitizeHeaderValue($replyTo) : null;
 
+        // Auto-attach a one-click unsubscribe URL if the caller didn't pass one
+        // AND the recipient is a known tenant member. Gmail / Yahoo (Feb 2024)
+        // require List-Unsubscribe on bulk mail; rather than touch every send
+        // call site individually we look up the user by email in the current
+        // tenant and mint a signed token here. Transactional callers (password
+        // reset, 2FA, etc.) typically send to addresses that DO match a user,
+        // so they would also receive the header — that's fine; modern clients
+        // ignore it on visibly-transactional messages and there's no spec
+        // forbidding its presence on transactional mail.
+        if ($unsubscribeUrl === null && $this->tenantId !== null) {
+            $unsubscribeUrl = $this->autoDetectUnsubscribeUrl($to);
+        }
+
+        // Suppression check — refuse to send to an address SendGrid has
+        // already told us bounces / spam-reports / is invalid. Saves quota,
+        // protects sender reputation, and avoids confusion when an admin
+        // wonders "why didn't this email arrive?". The suppression table is
+        // hydrated by the SendGrid event webhook and by periodic sync from
+        // /v3/suppression/* in the Mailer's housekeeping cron.
+        if (self::isSuppressed($to)) {
+            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list');
+            \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
+                'to_masked' => self::maskEmail($to),
+            ]);
+            return false;
+        }
+
         // Route based on configured driver
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
+                self::logEmail($to, $subject, 'sent');
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
-                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed');
+                return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
+            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback');
             return false;
         }
 
         if ($this->driver === 'gmail_api') {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
+                self::logEmail($to, $subject, 'sent');
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
-                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed');
+                return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
+            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback');
             return false;
         }
 
-        return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+        $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+        self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed');
+        return $smtpOk;
     }
 
     /**

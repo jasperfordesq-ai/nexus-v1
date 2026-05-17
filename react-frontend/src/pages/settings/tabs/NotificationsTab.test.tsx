@@ -42,6 +42,8 @@ const defaultNotifications: NotificationSettings = {
   email_org_admin: false,
   push_enabled: true,
   push_campaigns_opted_in: false,
+  caring_smart_nudges: true,
+  federation_notifications_enabled: true,
 };
 
 const defaultProps = {

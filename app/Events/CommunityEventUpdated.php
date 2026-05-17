@@ -10,14 +10,13 @@ namespace App\Events;
 
 use App\Models\Event as CommunityEventModel;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when an existing community event is updated.
  */
 class CommunityEventUpdated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly CommunityEventModel $event,

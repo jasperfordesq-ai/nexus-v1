@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace App\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a user joins a group (membership becomes active).
@@ -18,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class GroupMemberJoined
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly int $groupId,

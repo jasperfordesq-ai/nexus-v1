@@ -8,7 +8,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a member selects safeguarding options that have notify_admin triggers.
@@ -19,7 +18,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class SafeguardingFlaggedEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly int $userId,

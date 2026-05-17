@@ -643,6 +643,13 @@ class UsersController extends BaseApiController
 
         $prefs = User::getNotificationPreferences($userId);
 
+        // `federation_notifications_enabled` lives on the users column,
+        // not in the notification_preferences JSON. Include it in the
+        // payload so the React settings UI can render a toggle for it.
+        $fedEnabled = (bool) (DB::table('users')
+            ->where('id', $userId)
+            ->value('federation_notifications_enabled') ?? 1);
+
         return $this->respondWithData([
             'email_messages'                => (bool) ($prefs['email_messages'] ?? true),
             'email_listings'                => (bool) ($prefs['email_listings'] ?? true),
@@ -657,6 +664,7 @@ class UsersController extends BaseApiController
             'email_org_membership'          => (bool) ($prefs['email_org_membership'] ?? true),
             'email_org_admin'               => (bool) ($prefs['email_org_admin'] ?? true),
             'caring_smart_nudges'           => (bool) ($prefs['caring_smart_nudges'] ?? true),
+            'federation_notifications_enabled' => $fedEnabled,
             'push_enabled'                  => (bool) ($prefs['push_enabled'] ?? true),
             'push_campaigns_opted_in'       => (bool) ($prefs['push_campaigns_opted_in'] ?? false),
         ]);
@@ -693,6 +701,26 @@ class UsersController extends BaseApiController
         }
 
         $success = User::updateNotificationPreferences($userId, $prefs);
+
+        // `federation_notifications_enabled` is a column, not part of the
+        // notification_preferences JSON. Update it separately when present.
+        if (array_key_exists('federation_notifications_enabled', $data)) {
+            try {
+                $tenantId = TenantContext::getId();
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'federation_notifications_enabled' => (bool) $data['federation_notifications_enabled'] ? 1 : 0,
+                        'updated_at' => now(),
+                    ]);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to update federation_notifications_enabled', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+        }
 
         if (!$success) {
             return $this->respondWithError('UPDATE_FAILED', __('api.user_prefs_update_failed'), null, 500);

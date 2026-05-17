@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace App\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired after an inbound federation community event has been persisted
@@ -17,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class FederatedCommunityEventReceived
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     /**
      * @param array<string, mixed> $shadowRow

@@ -10,14 +10,13 @@ namespace App\Events;
 
 use App\Models\Group;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a new group is created locally.
  */
 class GroupCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly Group $group,

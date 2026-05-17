@@ -137,6 +137,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('listings-process-search-alerts');
 
+        // Hourly: pull SendGrid suppression lists (bounces, blocks, invalid
+        // emails, spam reports) into the local email_suppression cache so
+        // the Mailer can refuse to send to dead addresses.
+        $schedule->command('sendgrid:sync-suppressions')
+            ->hourly()
+            ->withoutOverlapping()
+            ->name('sendgrid-sync-suppressions');
+
         $schedule->command('caring:nudges-dispatch')
             ->dailyAt('07:30')
             ->withoutOverlapping()

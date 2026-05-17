@@ -16,7 +16,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when the receiver of a connection request accepts it.
@@ -28,7 +27,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ConnectionAccepted implements ShouldBroadcast, ShouldRescue
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly Connection $connectionModel,

@@ -10,7 +10,6 @@ namespace App\Events;
 
 use App\Models\Event as CommunityEventModel;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a new community event is created locally.
@@ -21,7 +20,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class CommunityEventCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly CommunityEventModel $event,

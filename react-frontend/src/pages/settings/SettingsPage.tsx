@@ -190,6 +190,8 @@ export function SettingsPage() {
     email_org_transfers: true,
     email_org_membership: true,
     email_org_admin: true,
+    caring_smart_nudges: true,
+    federation_notifications_enabled: true,
     push_enabled: true,
     push_campaigns_opted_in: false,
   });

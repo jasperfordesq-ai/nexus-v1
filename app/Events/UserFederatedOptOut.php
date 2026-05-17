@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace App\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a user opts out of federation or their account is deleted.
@@ -17,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class UserFederatedOptOut
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly int $userId,

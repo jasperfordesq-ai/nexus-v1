@@ -332,6 +332,35 @@ class CronJobRunner
                 TenantContext::setById($user['tenant_id']);
             }
 
+            // Honour the user's digest preference. notification_queue rows
+            // can accumulate from dispatch() before a user toggles their
+            // setting off; this is the last gate before we actually send.
+            // Default is true so legacy users with no JSON pref still get
+            // their digest until they opt out.
+            //
+            // Items are still 'pending' here (the claim happens below); we
+            // mark them 'sent' so they don't pile up indefinitely and the
+            // existing 30-day cleanup at the end of run-all will reap them.
+            try {
+                $prefs = User::getNotificationPreferences($userId);
+                if (!(bool) ($prefs['email_digest'] ?? true)) {
+                    echo " - User has email_digest off, marking pending items as consumed without emailing.\n";
+                    DB::update(
+                        "UPDATE notification_queue
+                            SET status = 'sent', sent_at = NOW()
+                          WHERE user_id = ? AND frequency = ? AND status = 'pending'
+                            AND tenant_id = ?",
+                        [$userId, $frequency, $user['tenant_id']]
+                    );
+                    continue;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('processDigest: could not read email_digest pref', [
+                    'user_id' => $userId,
+                    'error'   => $prefError->getMessage(),
+                ]);
+            }
+
             echo "Processing User: {$user['name']} ($count items)...\n";
 
             // Race condition fix: atomically claim items by setting status='processing'

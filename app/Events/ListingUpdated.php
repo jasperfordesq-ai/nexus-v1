@@ -11,7 +11,6 @@ namespace App\Events;
 use App\Models\Listing;
 use App\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when an existing listing (offer or request) is updated.
@@ -20,7 +19,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ListingUpdated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly Listing $listing,

@@ -47,12 +47,22 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 ->where('id', $localUserId)
                 ->where('tenant_id', $event->tenantId)
                 ->where('status', 'active')
-                ->select(['id', 'first_name', 'name', 'preferred_language'])
+                ->select(['id', 'first_name', 'name', 'preferred_language', 'federation_notifications_enabled'])
                 ->first();
             if (! $localUser) {
                 Log::info('[HandleFederatedConnectionReceived] local user gone', [
                     'tenant_id'     => $event->tenantId,
                     'partner_id'    => $event->externalPartnerId,
+                    'local_user_id' => $localUserId,
+                ]);
+                return;
+            }
+
+            // Honour the user's federation-notifications preference.
+            if (isset($localUser->federation_notifications_enabled)
+                && (int) $localUser->federation_notifications_enabled === 0) {
+                Log::info('[HandleFederatedConnectionReceived] user opted out of federation notifications', [
+                    'tenant_id'     => $event->tenantId,
                     'local_user_id' => $localUserId,
                 ]);
                 return;

@@ -38,6 +38,8 @@ export interface NotificationSettings {
   email_org_transfers: boolean;
   email_org_membership: boolean;
   email_org_admin: boolean;
+  caring_smart_nudges: boolean;
+  federation_notifications_enabled: boolean;
   push_enabled: boolean;
   push_campaigns_opted_in: boolean;
 }
@@ -191,6 +193,20 @@ export function NotificationsTab({
               description={t('notification_descriptions.connection_requests')}
               checked={notifications.email_connections}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_connections: checked }))}
+            />
+
+            <SettingToggle
+              label={t('notification_prefs.caring_smart_nudges', 'Caring community smart nudges')}
+              description={t('notification_descriptions.caring_smart_nudges', 'Personalised reminders to check in on members who may need support. Sent only when our caring-community engine identifies a clear, actionable nudge — never bulk.')}
+              checked={notifications.caring_smart_nudges}
+              onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, caring_smart_nudges: checked }))}
+            />
+
+            <SettingToggle
+              label={t('notification_prefs.federation_notifications', 'Cross-platform federation notifications')}
+              description={t('notification_descriptions.federation_notifications', 'Notifications about activity from members on partner timebanks (reviews left for you, connection requests, etc.). Turn off if you only want notifications about activity on this platform.')}
+              checked={notifications.federation_notifications_enabled}
+              onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, federation_notifications_enabled: checked }))}
             />
           </div>
 

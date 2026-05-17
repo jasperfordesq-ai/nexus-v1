@@ -557,6 +557,22 @@ class NotificationDispatcher
                 return;
             }
 
+            // Defence-in-depth: honour `email_transactions` even if the caller
+            // forgot to check. NotifyTransactionCompleted does already, but
+            // any future caller (admin tools, retroactive transfers) would
+            // otherwise bypass the user's preference.
+            try {
+                $prefs = \App\Models\User::getNotificationPreferences($recipientUserId);
+                if (!(bool) ($prefs['email_transactions'] ?? true)) {
+                    return;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('sendCreditEmail: could not read email_transactions pref', [
+                    'user_id' => $recipientUserId,
+                    'error'   => $prefError->getMessage(),
+                ]);
+            }
+
             // Render subject + body under the recipient's preferred locale.
             LocaleContext::withLocale($user, function () use ($user, $senderName, $amount, $description) {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -600,6 +616,20 @@ class NotificationDispatcher
 
             if (!$user || empty($user->email)) {
                 return;
+            }
+
+            // Defence-in-depth: honour `email_transactions` even if the caller
+            // forgot to check (NotifyTransactionCompleted already does).
+            try {
+                $prefs = \App\Models\User::getNotificationPreferences($senderUserId);
+                if (!(bool) ($prefs['email_transactions'] ?? true)) {
+                    return;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('sendCreditSentEmail: could not read email_transactions pref', [
+                    'user_id' => $senderUserId,
+                    'error'   => $prefError->getMessage(),
+                ]);
             }
 
             // The "sender" is the recipient of this confirmation email — render in their locale.
@@ -664,14 +694,17 @@ class NotificationDispatcher
                 return;
             }
 
-            // Respect email_transactions notification preference
+            // Review-request emails are reviews-related, so honour
+            // `email_reviews` (NOT `email_transactions` — that was a
+            // mislabelled key from an earlier refactor). A user who turned
+            // off review emails should not get review-request prompts.
             try {
                 $prefs = \App\Models\User::getNotificationPreferences($userId);
-                if (!(bool) ($prefs['email_transactions'] ?? true)) {
+                if (!(bool) ($prefs['email_reviews'] ?? true)) {
                     return;
                 }
             } catch (\Throwable $prefError) {
-                Log::debug('sendReviewRequestEmail: could not read email_transactions pref', [
+                Log::debug('sendReviewRequestEmail: could not read email_reviews pref', [
                     'user_id' => $userId,
                     'error'   => $prefError->getMessage(),
                 ]);
@@ -717,6 +750,22 @@ class NotificationDispatcher
 
             if (!$user || empty($user->email)) {
                 return;
+            }
+
+            // Honour `email_reviews`. ReviewsController used to call this
+            // method only after checking the pref — but `HandleFederatedReviewReceived`
+            // also calls it (federated reviews), and that path did not check.
+            // Moving the check here closes the gap for every caller.
+            try {
+                $prefs = \App\Models\User::getNotificationPreferences($receiverUserId);
+                if (!(bool) ($prefs['email_reviews'] ?? true)) {
+                    return;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('sendReviewEmail: could not read email_reviews pref', [
+                    'user_id' => $receiverUserId,
+                    'error'   => $prefError->getMessage(),
+                ]);
             }
 
             // Render subject + body under the receiver's preferred locale.

@@ -10,7 +10,6 @@ namespace App\Events;
 
 use App\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a member updates their profile.
@@ -21,7 +20,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class MemberProfileUpdated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     /**
      * @param list<string> $changedFields

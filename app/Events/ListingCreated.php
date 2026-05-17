@@ -13,7 +13,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a new listing (offer or request) is created.
@@ -23,7 +22,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ListingCreated implements ShouldBroadcast, ShouldRescue
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly Listing $listing,

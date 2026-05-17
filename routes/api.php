@@ -2514,6 +2514,13 @@ Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommend
 Route::get('/recommendations/similar/{id}', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::get('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'getSettings']);
 Route::post('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'updateSettings']);
+
+// Generic one-click unsubscribe for ANY bulk / notification email.
+// Public — token-authenticated, no login required (link from an email).
+// Both verbs are required: GET for browser visits, POST for List-Unsubscribe-Post
+// one-click compliance (Gmail / Yahoo Feb-2024 bulk-sender rules).
+Route::get('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::post('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'oneClick'])->withoutMiddleware('auth:sanctum');
 Route::get('/leaderboard', [\App\Http\Controllers\Api\GamificationController::class, 'api']);
 Route::get('/leaderboard/widget', [\App\Http\Controllers\Api\GamificationController::class, 'widget']);
 Route::get('/streaks', [\App\Http\Controllers\Api\GamificationController::class, 'streaks']);

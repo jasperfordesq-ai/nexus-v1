@@ -10,7 +10,6 @@ namespace App\Events;
 
 use App\Models\Review;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired after a Review has been persisted.
@@ -25,7 +24,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ReviewCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly Review $review,

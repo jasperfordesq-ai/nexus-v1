@@ -78,4 +78,80 @@ class EmailMailerRoutingTest extends TestCase
             'EmailService must NOT use Mail::send() — that bypasses SendGrid'
         );
     }
+
+    /**
+     * Scan the entire app/ tree for direct Laravel Mail facade usage.
+     * Every email must route through Mailer::forCurrentTenant() because
+     * the platform .env has SendGrid configured but intentionally NO SMTP
+     * credentials — any Mail::raw / Mail::to / Mail::send call would
+     * attempt SMTP and silently fail in production.
+     *
+     * Multiple bypasses caused real production incidents (safeguarding
+     * critical alerts, billing notifications, monthly reports). This guard
+     * blocks the next one at CI time.
+     *
+     * Allowed exceptions: tests/ (mocks), app/Mail/ Mailable classes
+     * (they're rendered + dispatched via Mailer separately).
+     */
+    public function test_no_mail_facade_usage_anywhere_in_app(): void
+    {
+        $banned = [
+            'Mail::raw(',
+            'Mail::to(',
+            'Mail::send(',
+            'Mail::queue(',
+            'Mail::later(',
+            'Mail::mailer(',
+            '\\Illuminate\\Support\\Facades\\Mail::',
+        ];
+
+        // Allow Mailable classes — they DEFINE the email body, they don't
+        // dispatch it. Dispatch happens via Mailer::forCurrentTenant() at
+        // the call site (e.g. SafeguardingService renders the Mailable's
+        // HTML and pipes it through Mailer).
+        $allowedDirs = [
+            // app/Mail/ — Mailable classes themselves
+            'Mail' . DIRECTORY_SEPARATOR,
+        ];
+
+        $offences = [];
+        $appPath = app_path();
+        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($appPath));
+
+        foreach ($rii as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+            $relPath = str_replace($appPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $skip = false;
+            foreach ($allowedDirs as $allowed) {
+                if (str_starts_with($relPath, $allowed)) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if ($skip) {
+                continue;
+            }
+
+            $contents = file_get_contents($file->getPathname());
+            // Strip comments so we don't trip on docblock mentions like
+            // "uses Mail::raw" in an explanatory comment.
+            $stripped = preg_replace('!/\*.*?\*/!s', '', $contents);
+            $stripped = preg_replace('!//.*?$!m', '', (string) $stripped);
+
+            foreach ($banned as $pattern) {
+                if (str_contains((string) $stripped, $pattern)) {
+                    $offences[] = "{$relPath}: {$pattern}";
+                }
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offences,
+            "Mail:: facade usage detected outside app/Mail/. Route through Mailer::forCurrentTenant() instead:\n  - "
+                . implode("\n  - ", $offences)
+        );
+    }
 }

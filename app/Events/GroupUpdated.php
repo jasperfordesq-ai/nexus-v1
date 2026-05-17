@@ -10,7 +10,6 @@ namespace App\Events;
 
 use App\Models\Group;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a group is updated locally (name, description, visibility,
@@ -18,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class GroupUpdated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly Group $group,

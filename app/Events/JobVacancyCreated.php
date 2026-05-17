@@ -9,7 +9,6 @@ namespace App\Events;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a new job vacancy is created with status = 'open'.
@@ -18,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class JobVacancyCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
 
     public function __construct(
         public readonly JobVacancy $vacancy,

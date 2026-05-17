@@ -8,7 +8,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a member finishes the onboarding wizard.
@@ -18,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class OnboardingCompleted
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly int $userId,

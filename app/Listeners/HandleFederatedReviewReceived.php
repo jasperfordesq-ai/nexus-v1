@@ -52,12 +52,26 @@ class HandleFederatedReviewReceived implements ShouldQueue
                 ->where('id', $receiverId)
                 ->where('tenant_id', $event->tenantId)
                 ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language', 'federation_notifications_enabled'])
                 ->first();
             if (! $receiver) {
                 Log::info('[HandleFederatedReviewReceived] receiver not found locally', [
                     'tenant_id'   => $event->tenantId,
                     'partner_id'  => $event->externalPartnerId,
+                    'receiver_id' => $receiverId,
+                ]);
+                return;
+            }
+
+            // Honour the receiver's federation-notifications preference. The
+            // column defaults to 1; only members who explicitly opted out
+            // (via Settings → Notifications) are skipped. The bell + email
+            // are both suppressed because the whole notification is about
+            // federated activity.
+            if (isset($receiver->federation_notifications_enabled)
+                && (int) $receiver->federation_notifications_enabled === 0) {
+                Log::info('[HandleFederatedReviewReceived] receiver opted out of federation notifications', [
+                    'tenant_id'   => $event->tenantId,
                     'receiver_id' => $receiverId,
                 ]);
                 return;
