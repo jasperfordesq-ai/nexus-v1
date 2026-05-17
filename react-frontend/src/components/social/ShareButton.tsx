@@ -28,6 +28,8 @@ export interface ShareButtonProps {
   description?: string;
   className?: string;
   isAuthenticated: boolean;
+  canShareToFeed?: boolean;
+  shareToFeedDisabledReason?: string;
 }
 
 export function ShareButton({
@@ -36,13 +38,15 @@ export function ShareButton({
   description,
   className = '',
   isAuthenticated,
+  canShareToFeed = true,
+  shareToFeedDisabledReason,
 }: ShareButtonProps) {
   const { t } = useTranslation('social');
   const toast = useToast();
   const [isSharing, setIsSharing] = useState(false);
 
   const handleShareToFeed = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !canShareToFeed) return;
     setIsSharing(true);
     try {
       const ok = await shareToFeed();
@@ -106,8 +110,9 @@ export function ShareButton({
             key="feed"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             onPress={handleShareToFeed}
+            isDisabled={!canShareToFeed}
           >
-            {t('share_to_feed')}
+            {canShareToFeed ? t('share_to_feed') : (shareToFeedDisabledReason ?? t('cannot_share_own_content'))}
           </DropdownItem>
         ) : (
           <DropdownItem

@@ -831,6 +831,7 @@ export function JobDetailPage() {
                 initialCommentsCount={vacancySocial.comments_count ?? 0}
                 title={vacancy.title}
                 description={vacancy.description}
+                targetOwnerId={vacancy.user_id}
               />
             </GlassCard>
 

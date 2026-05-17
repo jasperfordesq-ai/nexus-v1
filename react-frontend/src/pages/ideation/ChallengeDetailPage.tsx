@@ -996,6 +996,7 @@ export function ChallengeDetailPage() {
           initialCommentsCount={challenge.comments_count ?? 0}
           title={challenge.title}
           description={challenge.description}
+          targetOwnerId={challenge.user_id}
           className="mt-4"
         />
 

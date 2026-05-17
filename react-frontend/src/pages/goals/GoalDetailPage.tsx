@@ -347,6 +347,7 @@ export function GoalDetailPage() {
           initialCommentsCount={goal.comments_count ?? 0}
           title={goal.title}
           description={goal.description}
+          targetOwnerId={goal.user_id}
         />
 
         {(showPrivateFields || goal.is_public) && (

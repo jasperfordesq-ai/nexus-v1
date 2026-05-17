@@ -356,6 +356,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
           initialCommentsCount={poll.comments_count ?? 0}
           title={poll.question}
           description={poll.description}
+          targetOwnerId={poll.creator.id}
           className="mt-3"
           compact
         />

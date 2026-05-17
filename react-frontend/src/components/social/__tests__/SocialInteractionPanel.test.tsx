@@ -76,7 +76,9 @@ vi.mock('../LikersModal', () => ({
 }));
 
 vi.mock('../ShareButton', () => ({
-  ShareButton: () => <button data-testid="share-button">Share</button>,
+  ShareButton: ({ canShareToFeed = true }: { canShareToFeed?: boolean }) => (
+    <button data-testid="share-button" data-can-share-to-feed={String(canShareToFeed)}>Share</button>
+  ),
 }));
 
 import { SocialInteractionPanel } from '../SocialInteractionPanel';
@@ -189,5 +191,11 @@ describe('SocialInteractionPanel', () => {
     expect(screen.getByRole('button', { name: 'Toggle like' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
     expect(screen.queryByTestId('share-button')).not.toBeInTheDocument();
+  });
+
+  it('disables feed sharing for content owned by the current user', () => {
+    renderPanel(<SocialInteractionPanel targetType="challenge" targetId={42} targetOwnerId={7} />);
+
+    expect(screen.getByTestId('share-button')).toHaveAttribute('data-can-share-to-feed', 'false');
   });
 });

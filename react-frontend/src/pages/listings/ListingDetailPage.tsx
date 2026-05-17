@@ -754,6 +754,8 @@ export function ListingDetailPage() {
               title={listing.title}
               description={listing.description}
               isAuthenticated={isAuthenticated}
+              canShareToFeed={!isOwner}
+              shareToFeedDisabledReason={t('cannot_share_own_content', { ns: 'social' })}
               className="flex-1 sm:flex-none"
             />
             <Button
@@ -793,6 +795,8 @@ export function ListingDetailPage() {
               title={listing.title}
               description={listing.description}
               isAuthenticated={isAuthenticated}
+              canShareToFeed={!isOwner}
+              shareToFeedDisabledReason={t('cannot_share_own_content', { ns: 'social' })}
               className="flex-1 sm:flex-none"
             />
           </div>

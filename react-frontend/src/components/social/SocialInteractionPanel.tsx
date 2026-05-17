@@ -32,6 +32,7 @@ export interface SocialInteractionPanelProps {
   title?: string;
   description?: string | null;
   showShare?: boolean;
+  targetOwnerId?: number | string | null;
   defaultShowComments?: boolean;
   className?: string;
   commentsClassName?: string;
@@ -51,6 +52,10 @@ const SHAREABLE_TARGET_TYPES = new Set([
   'volunteer',
 ]);
 
+function idsMatch(left: number | string | null | undefined, right: number | string | null | undefined): boolean {
+  return left != null && right != null && String(left) === String(right);
+}
+
 function hasCommentHash() {
   return typeof window !== 'undefined' && /^#comment-\d+$/.test(window.location.hash);
 }
@@ -69,6 +74,7 @@ export function SocialInteractionPanel({
   title,
   description,
   showShare = true,
+  targetOwnerId,
   defaultShowComments = false,
   className,
   commentsClassName,
@@ -118,6 +124,7 @@ export function SocialInteractionPanel({
 
   const currentUserName = getUserName(user, t('you'));
   const currentUserAvatar = user?.avatar_url ?? user?.avatar ?? undefined;
+  const canShareToFeed = targetOwnerId == null || !idsMatch(user?.id, targetOwnerId);
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -202,6 +209,8 @@ export function SocialInteractionPanel({
             title={title}
             description={description ?? undefined}
             isAuthenticated={isAuthenticated}
+            canShareToFeed={canShareToFeed}
+            shareToFeedDisabledReason={t('cannot_share_own_content')}
             className={cn('flex-1 min-w-[7rem]', compact && 'h-8 text-sm')}
           />
         )}

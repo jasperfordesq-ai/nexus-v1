@@ -619,7 +619,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
 export function OpportunityDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const { t } = useTranslation('volunteering');
@@ -867,6 +867,7 @@ export function OpportunityDetailPage() {
             initialCommentsCount={opp.comments_count ?? 0}
             title={opp.title}
             description={opp.description}
+            targetOwnerId={opp.is_owner ? user?.id : undefined}
           />
         </GlassCard>
       </motion.div>

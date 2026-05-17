@@ -1312,6 +1312,7 @@ export function EventDetailPage() {
           initialCommentsCount={eventSocial.comments_count ?? 0}
           title={event.title}
           description={event.description}
+          targetOwnerId={event.organizer?.id ?? (event as { organizer_id?: number | string }).organizer_id}
           className="mt-8"
         />
       </GlassCard>

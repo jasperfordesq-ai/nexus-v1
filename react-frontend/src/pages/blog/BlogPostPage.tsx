@@ -390,6 +390,7 @@ export function BlogPostPage() {
               initialCommentsCount={post.comments_count ?? 0}
               title={post.title}
               description={post.excerpt}
+              targetOwnerId={post.author.id}
               defaultShowComments={typeof window !== 'undefined' && /^#comment-\d+$/.test(window.location.hash)}
             />
           </GlassCard>

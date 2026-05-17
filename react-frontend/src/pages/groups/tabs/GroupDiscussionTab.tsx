@@ -241,6 +241,7 @@ export function GroupDiscussionTab({
                               initialCommentsCount={discussion.comments_count ?? 0}
                               title={discussion.title}
                               description={expandedDiscussion.content}
+                              targetOwnerId={discussion.author.id}
                               compact
                             />
 

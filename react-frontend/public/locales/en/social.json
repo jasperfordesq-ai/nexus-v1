@@ -40,6 +40,7 @@
   "send_comment": "Send comment",
   "send_reply": "Send reply",
   "share": "Share",
+  "cannot_share_own_content": "You cannot share your own content to feed",
   "share_failed": "Failed to share",
   "share_options": "Share options",
   "share_to_feed": "Share to Feed",
