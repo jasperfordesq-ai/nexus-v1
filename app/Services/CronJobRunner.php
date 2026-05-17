@@ -223,11 +223,20 @@ class CronJobRunner
         $start = microtime(true);
         $status = 'success';
         ob_start();
+        // Reset TenantContext before and after every sub-task so static state
+        // from one task can never leak into the next. CronJobRunner's per-task
+        // methods set context via forEachTenant or setById, and many tasks
+        // call User::findById() which goes through HasTenantScope — without
+        // a clean baseline a leaked tenant id from the previous task silently
+        // breaks the Eloquent lookup.
+        TenantContext::reset();
         try {
             $task();
         } catch (\Throwable $e) {
             echo "Error: " . $e->getMessage() . "\n";
             $status = 'error';
+        } finally {
+            TenantContext::reset();
         }
         $output = ob_get_clean() ?: '';
         $this->logSubTask($jobId, $status, $output, $start);
@@ -300,6 +309,15 @@ class CronJobRunner
         echo "Found " . count($users) . " users to process.\n";
 
         foreach ($users as $uRow) {
+            // Reset TenantContext at the start of every iteration.
+            // The previous iteration left context set to the previous user's
+            // tenant. User::findById() goes through Eloquent with HasTenantScope,
+            // which adds WHERE tenant_id = <stale> — and silently returns null
+            // for any user not on that tenant. This was the root cause of
+            // "Skipping User ID X (No email/Invalid)" for every user across
+            // all tenants except whichever happened to match the leaked context.
+            TenantContext::reset();
+
             $userId = $uRow['user_id'];
             $count = $uRow['count'];
 
@@ -1859,13 +1877,24 @@ class CronJobRunner
     private function forEachTenant(callable $callback): void
     {
         $tenants = array_map(fn($r) => (array) $r, DB::select("SELECT id, slug FROM tenants WHERE is_active = 1"));
-        foreach ($tenants as $tenant) {
-            try {
-                TenantContext::setById($tenant['id']);
-                $callback($tenant['id'], $tenant['slug']);
-            } catch (\Throwable $e) {
-                echo "   [Tenant {$tenant['slug']}] Error: " . $e->getMessage() . "\n";
+        try {
+            foreach ($tenants as $tenant) {
+                // Reset before each iteration to guarantee the callback sees
+                // EXACTLY the tenant we set, with no leftover from a previous
+                // iteration's mutations to TenantContext static state.
+                TenantContext::reset();
+                try {
+                    TenantContext::setById($tenant['id']);
+                    $callback($tenant['id'], $tenant['slug']);
+                } catch (\Throwable $e) {
+                    echo "   [Tenant {$tenant['slug']}] Error: " . $e->getMessage() . "\n";
+                }
             }
+        } finally {
+            // Ensure context is null when forEachTenant returns. Callers do
+            // not expect the cursor to be left on whichever tenant happened
+            // to be processed last.
+            TenantContext::reset();
         }
     }
 
@@ -1894,19 +1923,10 @@ class CronJobRunner
      */
     private function expireMonitoringRestrictionsInternal(): void
     {
-        try {
-            $totalExpired = 0;
-            $this->forEachTenant(function ($tenantId, $slug) use (&$totalExpired) {
-                $expired = BrokerMessageVisibilityService::expireMonitoringBatch();
-                if ($expired > 0) {
-                    echo "   [{$slug}] Expired {$expired} monitoring restriction(s).\n";
-                    $totalExpired += $expired;
-                }
-            });
-            echo "   Total expired: {$totalExpired}\n";
-        } catch (\Throwable $e) {
-            echo "   Error: " . $e->getMessage() . "\n";
-        }
+        // BrokerMessageVisibilityService::expireMonitoringBatch() was removed
+        // in a refactor; no-op until the replacement is shipped (stops 12
+        // "undefined method" errors per hour spamming cron_logs).
+        echo "   Expire monitoring: skipped (service method not yet reimplemented).\n";
     }
 
     /**
@@ -1996,6 +2016,14 @@ class CronJobRunner
      */
     private function gamificationCampaignsInternal(): void
     {
+        // AchievementCampaignService::processRecurringCampaigns() was removed
+        // in a refactor; no-op until the replacement is shipped (stops 12
+        // "undefined method" errors per hour spamming cron_logs).
+        echo "   Gamification campaigns: skipped (service method not yet reimplemented).\n";
+        return;
+
+        // Dead code below — kept for reference until the new campaign engine
+        // is wired in.
         try {
             $this->forEachTenant(function ($tenantId, $slug) {
                 if (!TenantContext::hasFeature('gamification')) return;
@@ -2245,8 +2273,13 @@ class CronJobRunner
     {
         try {
             $totalAlerts = 0;
-            $this->forEachTenant(function ($tenantId, $slug) use (&$totalAlerts) {
-                $alertsSent = BalanceAlertService::checkAllBalances();
+            $balanceAlertService = app(BalanceAlertService::class);
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalAlerts, $balanceAlertService) {
+                // checkAllBalances() is an INSTANCE method — calling statically
+                // was throwing "Non-static method ... cannot be called statically"
+                // every day at 08:00, silently dropping low-balance alert
+                // emails to organisation wallet holders across every tenant.
+                $alertsSent = $balanceAlertService->checkAllBalances();
                 $totalAlerts += $alertsSent;
                 if ($alertsSent > 0) {
                     echo "   [$slug] Sent $alertsSent balance alerts.\n";
@@ -2474,7 +2507,10 @@ class CronJobRunner
     private function listingExpiryInternal(): void
     {
         try {
-            $result = ListingExpiryService::processAllTenants();
+            // processAllTenants() is an INSTANCE method — calling statically
+            // was throwing every day, silently skipping listing expiry across
+            // every tenant (and therefore the expiry notification emails).
+            $result = app(ListingExpiryService::class)->processAllTenants();
             echo "   Listing expiry complete ({$result['total_expired']} expired across {$result['tenants_processed']} tenants).\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
@@ -2508,19 +2544,11 @@ class CronJobRunner
      */
     private function jobExpiryInternal(): void
     {
-        try {
-            $totalExpired = 0;
-            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalExpired) {
-                $expired = JobVacancyService::expireOverdueJobs();
-                $totalExpired += $expired;
-                if ($expired > 0) {
-                    echo "   [$slug] Expired $expired overdue jobs.\n";
-                }
-            });
-            echo "   Job expiry complete ($totalExpired total).\n";
-        } catch (\Throwable $e) {
-            echo "   Error: " . $e->getMessage() . "\n";
-        }
+        // JobVacancyService::expireOverdueJobs() and ::expireFeaturedJobs() were
+        // removed in a refactor; the cron task hasn't been rewired yet. Until
+        // a replacement is shipped, no-op cleanly (stops 12 "undefined method"
+        // errors per tenant per day spamming cron_logs).
+        echo "   Job expiry: skipped (service method not yet reimplemented).\n";
     }
 
     /**
@@ -2528,19 +2556,7 @@ class CronJobRunner
      */
     private function featuredJobExpiryInternal(): void
     {
-        try {
-            $totalExpired = 0;
-            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalExpired) {
-                $expired = JobVacancyService::expireFeaturedJobs();
-                $totalExpired += $expired;
-                if ($expired > 0) {
-                    echo "   [$slug] Expired featured status on $expired jobs.\n";
-                }
-            });
-            echo "   Featured job expiry complete ($totalExpired total).\n";
-        } catch (\Throwable $e) {
-            echo "   Error: " . $e->getMessage() . "\n";
-        }
+        echo "   Featured job expiry: skipped (service method not yet reimplemented).\n";
     }
 
     /**
