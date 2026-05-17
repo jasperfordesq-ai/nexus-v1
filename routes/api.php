@@ -2512,6 +2512,7 @@ Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendC
 Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
 Route::get('/recommendations/similar/{id}', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
+Route::get('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'getSettings']);
 Route::post('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'updateSettings']);
 Route::get('/leaderboard', [\App\Http\Controllers\Api\GamificationController::class, 'api']);
 Route::get('/leaderboard/widget', [\App\Http\Controllers\Api\GamificationController::class, 'widget']);

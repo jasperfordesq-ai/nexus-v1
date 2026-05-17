@@ -335,6 +335,12 @@ describe('SettingsPage', () => {
           data: { enabled: false, backup_codes_remaining: 0 },
         });
       }
+      if (url.includes('/v2/notifications/settings')) {
+        return Promise.resolve({
+          success: true,
+          data: { global_frequency: 'off', per_group: [], per_thread: [] },
+        });
+      }
       if (url.includes('/v2/users/me/sessions')) {
         return Promise.resolve({ success: true, data: [] });
       }

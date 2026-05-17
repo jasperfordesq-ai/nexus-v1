@@ -52,11 +52,18 @@ interface NotificationsTabProps {
   marketingConsent: boolean;
   marketingConsentLoading: boolean;
   isOrganisation: boolean;
+  /**
+   * Global activity-digest frequency from notification_settings
+   * (off/instant/daily/weekly). Default is 'off' so members do not get
+   * unsolicited digest email until they opt in here.
+   */
+  digestFrequency: string;
   onNotificationsChange: (updater: (prev: NotificationSettings) => NotificationSettings) => void;
   onMatchDigestFrequencyChange: (value: string) => void;
   onNotifyHotMatchesChange: (value: boolean) => void;
   onNotifyMutualMatchesChange: (value: boolean) => void;
   onMarketingConsentToggle: (checked: boolean) => void;
+  onDigestFrequencyChange: (value: string) => void;
   onSave: () => void;
   onRetry: () => void;
 }
@@ -108,11 +115,13 @@ export function NotificationsTab({
   marketingConsent,
   marketingConsentLoading,
   isOrganisation,
+  digestFrequency,
   onNotificationsChange,
   onMatchDigestFrequencyChange,
   onNotifyHotMatchesChange,
   onNotifyMutualMatchesChange,
   onMarketingConsentToggle,
+  onDigestFrequencyChange,
   onSave,
   onRetry,
 }: NotificationsTabProps) {
@@ -241,6 +250,49 @@ export function NotificationsTab({
               checked={notifications.email_digest}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_digest: checked }))}
             />
+
+            {/*
+              Activity digest frequency — controls how often we batch
+              non-critical activity (new topics, replies, mentions in groups
+              the user joined) into a digest email. Default is 'off' so
+              members do not receive unsolicited digest mail. They opt in
+              here if they want it. Critical events (direct messages,
+              connection requests, transaction confirmations) are always
+              instant regardless of this setting.
+            */}
+            <div className="p-4 rounded-lg bg-theme-elevated">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="font-medium text-theme-primary">
+                    {t('notification_prefs.activity_digest', 'Activity digest frequency')}
+                  </p>
+                  <p className="text-sm text-theme-subtle">
+                    {t(
+                      'notification_descriptions.activity_digest',
+                      'How often to email you a digest of activity in your groups and threads. Direct messages, connection requests, and transaction confirmations are always sent immediately regardless of this setting.'
+                    )}
+                  </p>
+                </div>
+                <Select
+                  aria-label={t('notification_prefs.activity_digest', 'Activity digest frequency')}
+                  selectedKeys={[digestFrequency]}
+                  onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    if (value) onDigestFrequencyChange(value);
+                  }}
+                  className="sm:max-w-[180px]"
+                  classNames={{
+                    trigger: 'bg-theme-elevated border-theme-default',
+                    value: 'text-theme-primary',
+                  }}
+                >
+                  <SelectItem key="off">{t('activity_digest.off', 'Off')}</SelectItem>
+                  <SelectItem key="instant">{t('activity_digest.instant', 'Instant')}</SelectItem>
+                  <SelectItem key="daily">{t('activity_digest.daily', 'Daily')}</SelectItem>
+                  <SelectItem key="weekly">{t('activity_digest.weekly', 'Weekly')}</SelectItem>
+                </Select>
+              </div>
+            </div>
           </div>
 
           {/* Organisation Notifications */}

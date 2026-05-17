@@ -712,13 +712,14 @@ class EventNotificationService
             return $frequency;
         }
 
-        // Fall back to tenant default
+        // Fall back to tenant default. Members opt INTO the daily digest
+        // from notification settings — we don't email until they say yes.
         try {
             $tenant = TenantContext::get();
             $config = json_decode($tenant['configuration'] ?? '{}', true);
-            return $config['notifications']['default_frequency'] ?? 'daily';
+            return $config['notifications']['default_frequency'] ?? 'off';
         } catch (\Throwable $e) {
-            return 'daily';
+            return 'off';
         }
     }
 

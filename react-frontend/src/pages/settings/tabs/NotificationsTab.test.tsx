@@ -41,6 +41,7 @@ const defaultNotifications: NotificationSettings = {
   email_org_membership: false,
   email_org_admin: false,
   push_enabled: true,
+  push_campaigns_opted_in: false,
 };
 
 const defaultProps = {
@@ -53,11 +54,13 @@ const defaultProps = {
   marketingConsent: false,
   marketingConsentLoading: false,
   isOrganisation: false,
+  digestFrequency: 'off',
   onNotificationsChange: vi.fn(),
   onMatchDigestFrequencyChange: vi.fn(),
   onNotifyHotMatchesChange: vi.fn(),
   onNotifyMutualMatchesChange: vi.fn(),
   onMarketingConsentToggle: vi.fn(),
+  onDigestFrequencyChange: vi.fn(),
   onSave: vi.fn(),
   onRetry: vi.fn(),
 };

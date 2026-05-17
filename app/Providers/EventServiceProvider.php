@@ -10,8 +10,14 @@ use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
 use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
+use App\Events\FederatedCommunityEventReceived;
+use App\Events\FederatedConnectionReceived;
 use App\Events\FederatedGroupReceived;
+use App\Events\FederatedListingReceived;
+use App\Events\FederatedMemberUpdated;
+use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
+use App\Events\GroupChatroomMessagePosted;
 use App\Events\GroupCreated;
 use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
@@ -33,10 +39,16 @@ use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\AwardXpOnVolLogApproved;
 use App\Listeners\CopyMessageForBrokerReview;
-use App\Listeners\IngestFederatedVolunteerOpportunity;
-use App\Listeners\PostFeedActivityOnVolLogApproved;
-use App\Listeners\NotifyAdminOfNewCommunityEvent;
+use App\Listeners\HandleFederatedCommunityEventReceived;
+use App\Listeners\HandleFederatedConnectionReceived;
 use App\Listeners\HandleFederatedGroupReceived;
+use App\Listeners\HandleFederatedListingReceived;
+use App\Listeners\HandleFederatedMemberUpdated;
+use App\Listeners\HandleFederatedReviewReceived;
+use App\Listeners\IngestFederatedVolunteerOpportunity;
+use App\Listeners\NotifyAdminOfNewCommunityEvent;
+use App\Listeners\NotifyGroupChatroomMessage;
+use App\Listeners\PostFeedActivityOnVolLogApproved;
 use App\Listeners\NotifyGroupMemberJoined;
 use App\Listeners\NotifyAdminOfNewGroup;
 use App\Listeners\PushGroupRetractionToFederatedPartners;
@@ -194,6 +206,38 @@ class EventServiceProvider extends ServiceProvider
 
         FederatedVolunteeringReceived::class => [
             IngestFederatedVolunteerOpportunity::class,
+        ],
+
+        // Inbound federation: partner platforms pushing data to us.
+        // Controller persists into shadow tables; listeners do post-persist
+        // side-effects (user notifications for member-facing events, audit
+        // logging for bulk content).
+        FederatedReviewReceived::class => [
+            HandleFederatedReviewReceived::class,
+        ],
+
+        FederatedConnectionReceived::class => [
+            HandleFederatedConnectionReceived::class,
+        ],
+
+        FederatedListingReceived::class => [
+            HandleFederatedListingReceived::class,
+        ],
+
+        FederatedCommunityEventReceived::class => [
+            HandleFederatedCommunityEventReceived::class,
+        ],
+
+        FederatedMemberUpdated::class => [
+            HandleFederatedMemberUpdated::class,
+        ],
+
+        // Group chatroom messages: in-app bell notification for members who
+        // weren't online to see the Pusher broadcast. NO email — chat
+        // volume is too high; daily-digest opt-in handles that for users
+        // who want it.
+        GroupChatroomMessagePosted::class => [
+            NotifyGroupChatroomMessage::class,
         ],
     ];
 

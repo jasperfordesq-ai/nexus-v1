@@ -13,7 +13,6 @@ use App\I18n\LocaleContext;
 use App\Mail\SafeguardingCriticalMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use RuntimeException;

@@ -100,13 +100,35 @@ class NotificationDispatcher
             }
         }
 
-        // 4. Default for normal users if no setting found
+        // 4. Default for normal users if no setting found.
+        //
+        // Members do NOT receive a daily-digest email until they explicitly
+        // opt in from notification settings. "Daily" was the previous default
+        // and produced unwanted email for every member of every tenant —
+        // members described it as spam. Critical user-facing events are
+        // forced 'instant' below so disabling the digest does not silence
+        // them. Non-critical chatter (new topics, replies, stories, mentions
+        // in groups the user joined) stays off until the member chooses to
+        // turn it on.
         if ($frequency === null) {
-            $frequency = 'daily';
+            $frequency = 'off';
         }
 
-        // 5. Direct messages override: always instant unless user explicitly opted out
-        if ($activityType === 'new_message' && $frequency !== 'off') {
+        // 5. Critical user-facing events: always 'instant' regardless of the
+        //    digest default. These are direct social actions (someone messaged
+        //    you, someone wants to connect, your volunteer application moved)
+        //    that members reasonably expect to see immediately. They are NOT
+        //    suppressed by an 'off' digest preference — that preference only
+        //    controls topic/reply/mention digest emails.
+        $criticalInstantTypes = [
+            'new_message',
+            'connection_request',
+            'connection_accepted',
+            'vol_application_approved',
+            'vol_application_declined',
+            'vol_hours_approved',
+        ];
+        if (in_array($activityType, $criticalInstantTypes, true)) {
             $frequency = 'instant';
         }
 
@@ -196,11 +218,15 @@ class NotificationDispatcher
             return self::getFrequencySetting($userId, 'global', 0);
         }
 
-        // Global default (if not set in DB, return default from Config)
+        // Global default (if not set in DB, return default from Config).
+        // Members opt INTO the daily digest from notification settings —
+        // we don't email until they say yes. Critical types are forced to
+        // 'instant' in dispatch() above so this 'off' default never silences
+        // direct social actions.
         if ($contextType === 'global') {
             $tenant = TenantContext::get();
             $config = json_decode($tenant['configuration'] ?? '{}', true);
-            return $config['notifications']['default_frequency'] ?? 'daily';
+            return $config['notifications']['default_frequency'] ?? 'off';
         }
 
         return null;

@@ -899,6 +899,46 @@ class UsersController extends BaseApiController
     // ================================================================
 
     /**
+     * GET /api/v2/notifications/settings
+     *
+     * Returns the authenticated user's per-context notification frequency
+     * rows from `notification_settings`. Used by the settings UI to render
+     * the global digest selector ("off / instant / daily / weekly") plus
+     * per-group / per-thread overrides.
+     */
+    public function getSettings(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $rows = DB::table('notification_settings')
+            ->where('user_id', $userId)
+            ->select(['context_type', 'context_id', 'frequency'])
+            ->get();
+
+        // Default the global row to 'off' so the UI shows the spam-safe
+        // default until the user explicitly picks a frequency. Matches the
+        // dispatcher's fallback in NotificationDispatcher::getFrequencySetting.
+        $global = $rows->firstWhere('context_type', 'global');
+        $globalFrequency = $global->frequency ?? 'off';
+
+        $perGroup = $rows->where('context_type', 'group')->map(fn ($r) => [
+            'group_id'  => (int) $r->context_id,
+            'frequency' => $r->frequency,
+        ])->values();
+
+        $perThread = $rows->where('context_type', 'thread')->map(fn ($r) => [
+            'thread_id' => (int) $r->context_id,
+            'frequency' => $r->frequency,
+        ])->values();
+
+        return $this->success([
+            'global_frequency' => $globalFrequency,
+            'per_group'        => $perGroup,
+            'per_thread'       => $perThread,
+        ]);
+    }
+
+    /**
      * POST /api/notifications/settings
      */
     public function updateSettings(): JsonResponse

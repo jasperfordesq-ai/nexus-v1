@@ -199,6 +199,12 @@ export function SettingsPage() {
   const [notifyHotMatches, setNotifyHotMatches] = useState(true);
   const [notifyMutualMatches, setNotifyMutualMatches] = useState(true);
 
+  // Global activity-digest frequency (notification_settings.global). 'off' is
+  // the spam-safe default — members opt in to receive a digest of group/thread
+  // activity. Critical events (DMs, connection requests, transactions) are
+  // always instant regardless of this value.
+  const [digestFrequency, setDigestFrequency] = useState<string>('off');
+
   // Marketing consent
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [marketingConsentLoading, setMarketingConsentLoading] = useState(false);
@@ -302,6 +308,17 @@ export function SettingsPage() {
     }
   }, []);
 
+  const loadDigestFrequency = useCallback(async () => {
+    try {
+      const response = await api.get<{ global_frequency: string }>('/v2/notifications/settings');
+      if (response.success && response.data) {
+        setDigestFrequency(response.data.global_frequency || 'off');
+      }
+    } catch (error) {
+      logError('Failed to load digest frequency', error);
+    }
+  }, []);
+
   const loadMarketingConsent = useCallback(async () => {
     try {
       const response = await api.get<Array<{ consent_type_slug: string; given: boolean }>>('/v2/users/me/consent');
@@ -389,11 +406,12 @@ export function SettingsPage() {
     }
     loadNotificationSettings();
     loadMatchPreferences();
+    loadDigestFrequency();
     loadMarketingConsent();
     loadPrivacySettings();
     loadTwoFactorStatus();
     loadSessions();
-  }, [user, loadNotificationSettings, loadMatchPreferences, loadMarketingConsent, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
+  }, [user, loadNotificationSettings, loadMatchPreferences, loadDigestFrequency, loadMarketingConsent, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
 
   // Re-fetch privacy settings when the privacy tab becomes active
   useEffect(() => {
@@ -469,20 +487,32 @@ export function SettingsPage() {
   const saveNotifications = useCallback(async () => {
     try {
       setIsSaving(true);
-      // Save general notification settings and match digest frequency in parallel
-      const [notifResponse, matchResponse] = await Promise.all([
+      // Save general notification settings, match digest preferences, AND
+      // the global activity-digest frequency in parallel. The digest
+      // endpoint upserts a single row in notification_settings keyed on
+      // (user_id, context_type='global', context_id=0).
+      const [notifResponse, matchResponse, digestResponse] = await Promise.all([
         api.put('/v2/users/me/notifications', notifications),
         api.put('/v2/users/me/match-preferences', {
           notification_frequency: matchDigestFrequency,
           notify_hot_matches: notifyHotMatches,
           notify_mutual_matches: notifyMutualMatches,
         }),
+        api.post('/v2/notifications/settings', {
+          context_type: 'global',
+          frequency: digestFrequency,
+        }),
       ]);
-      if (notifResponse.success && matchResponse.success) {
+      if (notifResponse.success && matchResponse.success && digestResponse.success) {
         setIsDirty(false);
         toast.success(t('toasts.notifications_saved'));
       } else {
-        toast.error(notifResponse.error || matchResponse.error || t('toasts.notifications_save_failed'));
+        toast.error(
+          notifResponse.error
+          || matchResponse.error
+          || digestResponse.error
+          || t('toasts.notifications_save_failed')
+        );
       }
     } catch (error) {
       logError('Failed to save notifications', error);
@@ -490,7 +520,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, toast, t]);
+  }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, digestFrequency, toast, t]);
 
   const savePrivacy = useCallback(async () => {
     try {
@@ -1037,11 +1067,13 @@ export function SettingsPage() {
             marketingConsent={marketingConsent}
             marketingConsentLoading={marketingConsentLoading}
             isOrganisation={profileData.profile_type === 'organisation'}
+            digestFrequency={digestFrequency}
             onNotificationsChange={(updater) => { setNotifications(updater); setIsDirty(true); }}
             onMatchDigestFrequencyChange={(v) => { setMatchDigestFrequency(v); setIsDirty(true); }}
             onNotifyHotMatchesChange={(v) => { setNotifyHotMatches(v); setIsDirty(true); }}
             onNotifyMutualMatchesChange={(v) => { setNotifyMutualMatches(v); setIsDirty(true); }}
             onMarketingConsentToggle={handleMarketingConsentToggle}
+            onDigestFrequencyChange={(v) => { setDigestFrequency(v); setIsDirty(true); }}
             onSave={saveNotifications}
             onRetry={loadNotificationSettings}
           />
