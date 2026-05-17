@@ -116,7 +116,7 @@ class GamificationEmailService
                             $subject = __('emails.gamification_digest.subject');
                             $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                            return $emailService->send($user->email, $subject, $body);
+                            return $emailService->send($user->email, $subject, $body, ['category' => 'gamification_digest']);
                         });
 
                         if ($success) {
@@ -252,7 +252,7 @@ class GamificationEmailService
                 /** @var EmailService $emailService */
                 $emailService = app(EmailService::class);
 
-                return $emailService->send($user->email, $subject, $body);
+                return $emailService->send($user->email, $subject, $body, ['category' => 'gamification_milestone']);
             });
         } catch (\Throwable $e) {
             Log::error('GamificationEmailService: Failed to send milestone email', [

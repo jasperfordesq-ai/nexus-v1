@@ -296,11 +296,17 @@ class EventService
                         ->button(__('emails_created.event.cta'), $eventUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $creator->email,
                         __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'event'
+                    )) {
+                        Log::warning('[EventService] creation email send returned false', ['event_id' => $event->id]);
+                    }
                 });
             }
         } catch (\Throwable $e) {

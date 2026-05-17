@@ -209,7 +209,7 @@ class GroupReportingService
                     $subject = __('emails.group_digest.subject', ['group' => $group->name]);
                     $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                    return $emailService->send($user->email, $subject, $body);
+                    return $emailService->send($user->email, $subject, $body, ['category' => 'group_digest']);
                 });
 
                 if ($success) {

@@ -66,6 +66,7 @@ class AdminUsersService
             ->update(['status' => 'banned', 'ban_reason' => $reason, 'updated_at' => now()]);
 
         if ($affected > 0 && $user && !empty($user->email)) {
+            $previousTenantId = TenantContext::getId();
             try {
                 TenantContext::setById($tenantId);
                 LocaleContext::withLocale($user, function () use ($user, $reason, $userId) {
@@ -80,12 +81,18 @@ class AdminUsersService
                         $builder->paragraph('<strong>' . __('emails_misc.user_ban.banned_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
                     }
                     $html = $builder->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.banned_subject'), $html)) {
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.banned_subject'), $html, null, null, null, 'admin_user_status')) {
                         Log::warning('[AdminUsersService] ban email failed', ['user_id' => $userId]);
                     }
                 });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsersService] ban email error: ' . $e->getMessage());
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById((int) $previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
         }
 
@@ -106,6 +113,7 @@ class AdminUsersService
             ->update(['status' => 'active', 'ban_reason' => null, 'updated_at' => now()]);
 
         if ($affected > 0 && $user && !empty($user->email)) {
+            $previousTenantId = TenantContext::getId();
             try {
                 TenantContext::setById($tenantId);
                 LocaleContext::withLocale($user, function () use ($user, $userId) {
@@ -117,12 +125,18 @@ class AdminUsersService
                         ->greeting($firstName)
                         ->paragraph(__('emails_misc.user_ban.unbanned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]))
                         ->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.unbanned_subject'), $html)) {
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.unbanned_subject'), $html, null, null, null, 'admin_user_status')) {
                         Log::warning('[AdminUsersService] unban email failed', ['user_id' => $userId]);
                     }
                 });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsersService] unban email error: ' . $e->getMessage());
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById((int) $previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             }
         }
 

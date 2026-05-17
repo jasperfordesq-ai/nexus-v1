@@ -99,7 +99,9 @@ class ListingExpiryService
                                 ->render();
 
                             $mailer = Mailer::forCurrentTenant();
-                            $mailer->send($ownerRow->email, __('emails_listings.listings.expired.subject'), $html);
+                            if (!$mailer->send($ownerRow->email, __('emails_listings.listings.expired.subject'), $html, null, null, null, 'listing_expiry')) {
+                                Log::warning("[ListingExpiryService] Email send returned false for user={$listing->user_id}, listing={$listing->id}");
+                            }
                         }
                     } catch (\Exception $e) {
                         Log::warning("[ListingExpiryService] Email send failed for user={$listing->user_id}, listing={$listing->id}: " . $e->getMessage());

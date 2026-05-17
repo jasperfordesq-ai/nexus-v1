@@ -170,7 +170,6 @@ class EventNotificationService
                         // THEIR preferred_language, not the caller's.
                         LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent) {
                             $message = $this->createReminderNotification($userId, $event, $type);
-                            $this->markReminderSent($tenantId, $eventId, $userId, $type);
 
                             // Send reminder email
                             try {
@@ -179,7 +178,7 @@ class EventNotificationService
                                     ? __('notifications.event_reminder_subject_24h', ['title' => $eventTitle])
                                     : __('notifications.event_reminder_subject_1h', ['title' => $eventTitle]);
 
-                                $this->sendEventEmail(
+                                $emailOk = $this->sendEventEmail(
                                     $attendee,
                                     $subject,
                                     $message,
@@ -187,11 +186,20 @@ class EventNotificationService
                                     'event_reminder',
                                     $this->buildReminderEmailHtml($event, $type, $attendee)
                                 );
+
+                                if ($emailOk) {
+                                    $this->markReminderSent($tenantId, $eventId, $userId, $type);
+                                    $sent++;
+                                } else {
+                                    Log::warning("[EventNotificationService] Reminder email returned false; reminder not marked sent", [
+                                        'event_id' => $eventId,
+                                        'user_id' => $userId,
+                                        'type' => $type,
+                                    ]);
+                                }
                             } catch (\Throwable $e) {
                                 Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
                             }
-
-                            $sent++;
                         });
                     } catch (\Throwable $e) {
                         Log::error("[EventNotificationService] Reminder failed: event={$eventId}, user={$userId}, type={$type}: " . $e->getMessage());
@@ -623,22 +631,22 @@ class EventNotificationService
      * @param string $type     Notification type for queue classification
      * @param string|null $htmlBody  Rich HTML email body (optional)
      */
-    private function sendEventEmail(object $user, string $subject, string $content, string $link, string $type, ?string $htmlBody = null): void
+    private function sendEventEmail(object $user, string $subject, string $content, string $link, string $type, ?string $htmlBody = null): bool
     {
         if (empty($user->email)) {
-            return;
+            return false;
         }
 
         $userId = (int) ($user->user_id ?? 0);
         if ($userId <= 0) {
-            return;
+            return false;
         }
 
         // Respect user's notification frequency preference
         $frequency = $this->getUserEventEmailFrequency($userId);
 
         if ($frequency === 'off') {
-            return;
+            return true;
         }
 
         if ($frequency === 'instant') {
@@ -646,7 +654,7 @@ class EventNotificationService
             try {
                 $mailer = Mailer::forCurrentTenant();
                 $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                $sent   = $mailer->send($user->email, $subject, $body);
+                $sent   = $mailer->send($user->email, $subject, $body, null, null, null, 'event_notification');
                 if (!$sent) {
                     Log::warning("[EventNotificationService] Instant email send returned false", [
                         'user_id' => $userId,
@@ -655,6 +663,7 @@ class EventNotificationService
                 }
             } catch (\Throwable $e) {
                 Log::warning("[EventNotificationService] Instant email send failed: " . $e->getMessage());
+                $sent = false;
             }
 
             // Also send web push
@@ -663,6 +672,8 @@ class EventNotificationService
             } catch (\Throwable $e) {
                 Log::debug("[EventNotificationService] WebPush failed: " . $e->getMessage());
             }
+
+            return (bool) $sent;
         } else {
             // Queue for daily/weekly digest
             try {
@@ -677,8 +688,10 @@ class EventNotificationService
                     'created_at'      => now(),
                     'status'          => 'pending',
                 ]);
+                return true;
             } catch (\Throwable $e) {
                 Log::warning("[EventNotificationService] Email queue insert failed: " . $e->getMessage());
+                return false;
             }
         }
     }

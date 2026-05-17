@@ -160,7 +160,9 @@ class GuardianConsentService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html);
+                if (!$mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html, null, null, null, 'guardian_consent')) {
+                    Log::warning('GuardianConsentService consent email send returned false');
+                }
             });
         } catch (\Throwable $e) {
             Log::warning('Failed to send guardian consent email: ' . $e->getMessage());

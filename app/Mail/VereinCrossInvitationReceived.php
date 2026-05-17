@@ -55,7 +55,7 @@ class VereinCrossInvitationReceived
 
                 /** @var EmailService $email */
                 $email = app(EmailService::class);
-                $email->send($recipient->email, $subject, $builder->render());
+                $email->send($recipient->email, $subject, $builder->render(), ['category' => 'verein_federation']);
             } catch (Throwable $e) {
                 // best-effort; in-app notification is primary channel
             }

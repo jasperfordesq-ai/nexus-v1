@@ -227,11 +227,17 @@ class GoalService
                         ->button(__('emails_goals.created.cta'), $goalUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $user->email,
                         __('emails_goals.created.subject', ['title' => $goalTitle, 'community' => $community]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'goal'
+                    )) {
+                        Log::warning('[GoalService] created email send returned false', ['goal_id' => $goal->id]);
+                    }
                 });
             }
         } catch (\Throwable $e) {
@@ -306,11 +312,17 @@ class GoalService
                             ->button(__('emails_goals.abandoned.cta'), $newGoalUrl)
                             ->render();
 
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $user->email,
                             __('emails_goals.abandoned.subject', ['title' => $safeTitle, 'community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'goal'
+                        )) {
+                            Log::warning('[GoalService] abandoned email send returned false');
+                        }
                     });
                 }
             } catch (\Throwable $e) {
@@ -420,11 +432,17 @@ class GoalService
                         ->button(__('emails_goals.completed.cta'), $goalUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $user->email,
                         __('emails_goals.completed.subject', ['title' => $goalTitle, 'community' => $community]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'goal'
+                    )) {
+                        Log::warning('[GoalService] completed email send returned false', ['goal_id' => $goal->id]);
+                    }
                 });
             }
         } catch (\Throwable $e) {

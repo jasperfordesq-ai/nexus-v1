@@ -177,51 +177,65 @@ class IdentityVerificationSessionService
             return;
         }
 
-        // Set tenant context so Mailer + URL helpers resolve correctly
+        // Set tenant context so Mailer + URL helpers resolve correctly.
+        $previousTenantId = TenantContext::getId();
         TenantContext::setById((int) $row->tenant_id);
+        try {
+            LocaleContext::withLocale($row, function () use ($row, $sessionId, $status, $failureReason) {
+                $firstName  = $row->first_name ?? $row->name ?? __('emails.common.fallback_name');
+                $baseUrl    = TenantContext::getFrontendUrl();
+                $basePath   = TenantContext::getSlugPrefix();
 
-        LocaleContext::withLocale($row, function () use ($row, $status, $failureReason) {
-            $firstName  = $row->first_name ?? $row->name ?? __('emails.common.fallback_name');
-            $baseUrl    = TenantContext::getFrontendUrl();
-            $basePath   = TenantContext::getSlugPrefix();
+                if ($status === 'passed') {
+                    $subject  = __('emails.identity_verification.passed_subject');
+                    $ctaUrl   = $baseUrl . $basePath . '/profile';
 
-            if ($status === 'passed') {
-                $subject  = __('emails.identity_verification.passed_subject');
-                $ctaUrl   = $baseUrl . $basePath . '/profile';
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.identity_verification.passed_title'))
+                        ->previewText(__('emails.identity_verification.passed_preview'))
+                        ->greeting(__('emails.identity_verification.passed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
+                        ->paragraph(__('emails.identity_verification.passed_body'))
+                        ->button(__('emails.identity_verification.passed_cta'), $ctaUrl)
+                        ->render();
+                } else {
+                    $subject  = __('emails.identity_verification.failed_subject');
+                    $ctaUrl   = $baseUrl . $basePath . '/settings/security';
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.identity_verification.passed_title'))
-                    ->previewText(__('emails.identity_verification.passed_preview'))
-                    ->greeting(__('emails.identity_verification.passed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
-                    ->paragraph(__('emails.identity_verification.passed_body'))
-                    ->button(__('emails.identity_verification.passed_cta'), $ctaUrl)
-                    ->render();
-            } else {
-                $subject  = __('emails.identity_verification.failed_subject');
-                $ctaUrl   = $baseUrl . $basePath . '/settings/security';
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails.identity_verification.failed_title'))
+                        ->previewText(__('emails.identity_verification.failed_preview'))
+                        ->greeting(__('emails.identity_verification.failed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
+                        ->paragraph(__('emails.identity_verification.failed_body'));
 
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('brand')
-                    ->title(__('emails.identity_verification.failed_title'))
-                    ->previewText(__('emails.identity_verification.failed_preview'))
-                    ->greeting(__('emails.identity_verification.failed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
-                    ->paragraph(__('emails.identity_verification.failed_body'));
+                    if (!empty($failureReason)) {
+                        $builder->infoCard([
+                            __('emails.identity_verification.failed_reason_label') => htmlspecialchars($failureReason, ENT_QUOTES, 'UTF-8'),
+                        ]);
+                    }
 
-                if (!empty($failureReason)) {
-                    $builder->infoCard([
-                        __('emails.identity_verification.failed_reason_label') => htmlspecialchars($failureReason, ENT_QUOTES, 'UTF-8'),
-                    ]);
+                    $html = $builder
+                        ->paragraph(__('emails.identity_verification.failed_retry_note'))
+                        ->button(__('emails.identity_verification.failed_cta'), $ctaUrl)
+                        ->render();
                 }
 
-                $html = $builder
-                    ->paragraph(__('emails.identity_verification.failed_retry_note'))
-                    ->button(__('emails.identity_verification.failed_cta'), $ctaUrl)
-                    ->render();
+                if (!Mailer::forCurrentTenant()->send($row->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    Log::warning('[IdentityVerificationSessionService] result email failed', [
+                        'session_id' => $sessionId,
+                        'user_id' => $row->user_id ?? null,
+                        'status' => $status,
+                    ]);
+                }
+            });
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById((int) $previousTenantId);
+            } else {
+                TenantContext::reset();
             }
-
-            Mailer::forCurrentTenant()->send($row->email, $subject, $html);
-        });
+        }
     }
 
     /**

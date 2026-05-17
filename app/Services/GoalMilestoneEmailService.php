@@ -46,7 +46,7 @@ class GoalMilestoneEmailService
         float $newPercent
     ): void {
         foreach (self::MILESTONES as $milestone) {
-            if ($oldPercent >= $milestone || $newPercent < $milestone) {
+            if ($newPercent < $milestone) {
                 continue;
             }
 
@@ -56,12 +56,11 @@ class GoalMilestoneEmailService
                 continue;
             }
 
-            // Mark as sent before attempting delivery so a mailer failure does
-            // not result in a re-send on the next progress update
-            Cache::forever($cacheKey, true);
-
+            // Only mark as sent after the mailer confirms the email was accepted.
             try {
-                self::sendMilestoneEmail($tenantId, $userId, $goalTitle, $goalId, $milestone);
+                if (self::sendMilestoneEmail($tenantId, $userId, $goalTitle, $goalId, $milestone)) {
+                    Cache::forever($cacheKey, true);
+                }
             } catch (\Throwable $e) {
                 Log::warning('[GoalMilestoneEmailService] email failed', [
                     'goal_id'   => $goalId,
@@ -86,7 +85,7 @@ class GoalMilestoneEmailService
         string $goalTitle,
         int $goalId,
         int $milestone
-    ): void {
+    ): bool {
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
@@ -94,10 +93,10 @@ class GoalMilestoneEmailService
             ->first();
 
         if (!$user || empty($user->email)) {
-            return;
+            return false;
         }
 
-        LocaleContext::withLocale($user, function () use ($user, $userId, $goalTitle, $goalId, $milestone) {
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $goalTitle, $goalId, $milestone) {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $safeTitle = htmlspecialchars($goalTitle, ENT_QUOTES, 'UTF-8');
             $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goalId;
@@ -129,13 +128,16 @@ class GoalMilestoneEmailService
                 ->button($cta, $goalUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+            if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'goal_milestone')) {
                 Log::warning('[GoalMilestoneEmailService] mailer send failed', [
                     'user_id'   => $userId,
                     'goal_id'   => $goalId,
                     'milestone' => $milestone,
                 ]);
+                return false;
             }
+
+            return true;
         });
     }
 }

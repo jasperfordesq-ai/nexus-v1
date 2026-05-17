@@ -611,7 +611,7 @@ class NotificationDispatcher
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $emailBody);
+                $mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction');
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditEmail failed: " . $e->getMessage());
@@ -683,7 +683,7 @@ class NotificationDispatcher
                     'community' => $tenantName,
                 ]);
 
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'transaction');
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditSentEmail failed: " . $e->getMessage());
@@ -745,7 +745,7 @@ class NotificationDispatcher
                     ->button(__('emails.review_request.cta'), $reviewUrl)
                     ->render();
 
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'review');
             });
         } catch (\Exception $e) {
             Log::warning('NotificationDispatcher::sendReviewRequestEmail failed: ' . $e->getMessage());
@@ -807,7 +807,7 @@ class NotificationDispatcher
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $emailBody);
+                $mailer->send($user->email, $subject, $emailBody, null, null, null, 'review');
             });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendReviewEmail failed: " . $e->getMessage());
@@ -856,7 +856,7 @@ class NotificationDispatcher
 
             try {
                 $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
             } catch (\Throwable $e) {
                 Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
             }
@@ -1174,13 +1174,13 @@ HTML;
                     $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
                     $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                     $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
-                    $mailer->send($user->email, $subject, $emailBody);
+                    $mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction');
                 } else {
                     $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
                     $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
                     $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
                     $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-                    $mailer->send($user->email, $subject, $emailBody);
+                    $mailer->send($user->email, $subject, $emailBody, null, null, null, 'exchange');
                 }
             });
         } catch (\Exception $e) {

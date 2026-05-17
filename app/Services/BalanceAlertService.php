@@ -303,7 +303,7 @@ class BalanceAlertService
             ->render();
 
         $subject = __($subjectKey, ['org' => $orgName]);
-        if (!Mailer::forCurrentTenant()->send($owner->email, $subject, $html)) {
+        if (!Mailer::forCurrentTenant()->send($owner->email, $subject, $html, null, null, null, 'balance_alert')) {
             Log::warning('BalanceAlertService: email failed to send', [
                 'owner_id'  => $owner->id,
                 'org_name'  => $orgName,

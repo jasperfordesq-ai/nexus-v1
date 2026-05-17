@@ -215,7 +215,9 @@ class ListingModerationService
                         ->render();
 
                     $mailer = Mailer::forCurrentTenant();
-                    $mailer->send($owner->email, __('emails_listings.listings.rejected.subject'), $html);
+                    if (!$mailer->send($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation')) {
+                        Log::warning("[ListingModerationService] reject email send returned false for user={$listing->user_id}, listing={$listingId}");
+                    }
                 });
             }
         } catch (\Exception $e) {

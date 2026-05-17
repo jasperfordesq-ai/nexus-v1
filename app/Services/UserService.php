@@ -449,7 +449,9 @@ class UserService
                         ->render();
 
                     $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
-                    $mailer->send($oldEmail, $subject, $html);
+                    if (!$mailer->send($oldEmail, $subject, $html, null, null, null, 'security_alert')) {
+                        Log::warning('Email change notification send returned false', ['user_id' => $userId]);
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('Failed to send email change notification to old address', ['user_id' => $userId, 'error' => $e->getMessage()]);
                 }

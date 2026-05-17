@@ -67,7 +67,11 @@ class DonationEmailService
 
                     /** @var EmailService $emailService */
                     $emailService = app(EmailService::class);
-                    $emailService->send($donor->email, $subject, $html);
+                    if (!$emailService->send($donor->email, $subject, $html, ['category' => 'donation'])) {
+                        Log::warning('DonationEmailService: donor confirmation send returned false', [
+                            'donor_id' => $donor->id ?? null,
+                        ]);
+                    }
                 });
             }
         } catch (\Throwable $e) {
@@ -106,7 +110,11 @@ class DonationEmailService
 
                     /** @var EmailService $emailService */
                     $emailService = app(EmailService::class);
-                    $emailService->send($recipient->email, $subject, $html);
+                    if (!$emailService->send($recipient->email, $subject, $html, ['category' => 'donation'])) {
+                        Log::warning('DonationEmailService: recipient notification send returned false', [
+                            'recipient_id' => $recipient->id ?? null,
+                        ]);
+                    }
                 });
             }
         } catch (\Throwable $e) {

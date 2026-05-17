@@ -77,7 +77,11 @@ class TenantProvisioningMailer
 
                     /** @var EmailService $email */
                     $email = app(EmailService::class);
-                    $email->send($applicantEmail, $subject, $html);
+                    if (!$email->send($applicantEmail, $subject, $html, ['category' => 'tenant_provisioning'])) {
+                        Log::warning('TenantProvisioningMailer welcome send returned false', [
+                            'tenant_id' => $tenant->id ?? null,
+                        ]);
+                    }
                 } catch (Throwable $e) {
                     Log::warning('TenantProvisioningMailer welcome failed', ['error' => $e->getMessage()]);
                 }
@@ -123,7 +127,9 @@ class TenantProvisioningMailer
 
                 /** @var EmailService $email */
                 $email = app(EmailService::class);
-                $email->send($applicantEmail, $subject, $html);
+                if (!$email->send($applicantEmail, $subject, $html, ['category' => 'tenant_provisioning'])) {
+                    Log::warning('TenantProvisioningMailer rejection send returned false');
+                }
             } catch (Throwable $e) {
                 Log::warning('TenantProvisioningMailer rejection failed', ['error' => $e->getMessage()]);
             }

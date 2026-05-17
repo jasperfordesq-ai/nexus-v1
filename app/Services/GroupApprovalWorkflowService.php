@@ -127,7 +127,7 @@ class GroupApprovalWorkflowService
                             ->paragraph(__('emails_misc.group_approval.approved_body', ['group' => $groupName]))
                             ->button(__('emails_misc.group_approval.approved_cta'), $fullUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.approved_subject', ['group' => $groupName]), $html)) {
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.approved_subject', ['group' => $groupName]), $html, null, null, null, 'group_approval')) {
                             Log::warning('[GroupApprovalWorkflowService] approveGroup email failed', ['request_id' => $requestId]);
                         }
                     });
@@ -184,7 +184,7 @@ class GroupApprovalWorkflowService
                             $builder->paragraph('<strong>' . __('emails_misc.group_approval.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
                         }
                         $html = $builder->button(__('emails_misc.group_approval.rejected_cta'), $fullUrl)->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.rejected_subject', ['group' => $groupName]), $html)) {
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.rejected_subject', ['group' => $groupName]), $html, null, null, null, 'group_approval')) {
                             Log::warning('[GroupApprovalWorkflowService] rejectGroup email failed', ['request_id' => $requestId]);
                         }
                     });

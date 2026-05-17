@@ -336,7 +336,7 @@ class NewsletterService
                         ? $apiUrl . '/v2/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken)
                         : null;
 
-                    $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl);
+                    $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl, 'newsletter');
 
                     if ($success) {
                         DB::table('newsletter_queue')

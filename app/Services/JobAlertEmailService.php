@@ -39,7 +39,7 @@ class JobAlertEmailService
                 $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
                 $mailer = Mailer::forCurrentTenant();
-                return $mailer->send($recipient->email, $subject, $bodyHtml);
+                return $mailer->send($recipient->email, $subject, $bodyHtml, null, null, null, 'job_alert');
             });
         } catch (\Throwable $e) {
             Log::warning('JobAlertEmailService::sendImmediateAlert failed', [

@@ -150,12 +150,13 @@ class IdentityVerificationPaymentService
         Log::info("Verification payment completed for session {$session['id']}");
 
         // Notify user that their verification fee was received
+        $previousTenantId = TenantContext::getId();
         try {
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
                 TenantContext::setById($tenantId);
-                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['id', 'email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
                     LocaleContext::withLocale($user, function () use ($user) {
                         $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -166,12 +167,22 @@ class IdentityVerificationPaymentService
                             ->paragraph(__('emails_misc.identity_payment.success_body'))
                             ->button(__('emails_misc.identity_payment.success_cta'), $frontendUrl . '/verify-identity')
                             ->render();
-                        Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html);
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html, null, null, null, 'identity_payment')) {
+                            Log::warning('[IdentityVerificationPaymentService] payment success email send returned false', [
+                                'user_id' => $user->id ?? null,
+                            ]);
+                        }
                     });
                 }
             }
         } catch (\Throwable $e) {
             Log::warning('[IdentityVerificationPaymentService] payment success email failed: ' . $e->getMessage());
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById((int) $previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 
@@ -195,12 +206,13 @@ class IdentityVerificationPaymentService
         Log::warning("Verification payment failed for session {$session['id']}");
 
         // Notify user so they can retry
+        $previousTenantId = TenantContext::getId();
         try {
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
                 TenantContext::setById($tenantId);
-                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['id', 'email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
                     LocaleContext::withLocale($user, function () use ($user) {
                         $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -212,12 +224,22 @@ class IdentityVerificationPaymentService
                             ->paragraph(__('emails_misc.identity_payment.failed_body'))
                             ->button(__('emails_misc.identity_payment.failed_cta'), $frontendUrl . '/verify-identity')
                             ->render();
-                        Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html);
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html, null, null, null, 'identity_payment')) {
+                            Log::warning('[IdentityVerificationPaymentService] payment failed email send returned false', [
+                                'user_id' => $user->id ?? null,
+                            ]);
+                        }
                     });
                 }
             }
         } catch (\Throwable $e) {
             Log::warning('[IdentityVerificationPaymentService] payment failed email failed: ' . $e->getMessage());
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById((int) $previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 }

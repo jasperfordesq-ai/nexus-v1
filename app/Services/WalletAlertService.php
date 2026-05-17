@@ -43,9 +43,6 @@ class WalletAlertService
             return;
         }
 
-        // Lock the cache key BEFORE sending to prevent double-sends on concurrent requests
-        Cache::put($cacheKey, true, self::CACHE_TTL);
-
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
@@ -56,20 +53,34 @@ class WalletAlertService
             return;
         }
 
-        LocaleContext::withLocale($user, function () use ($user, $newBalance) {
-            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $balanceFormatted = number_format($newBalance, 1);
-            $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+        $previousTenantId = TenantContext::getId();
+        TenantContext::setById($tenantId);
+        try {
+            $sent = (bool) LocaleContext::withLocale($user, function () use ($user, $newBalance) {
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $balanceFormatted = number_format($newBalance, 1);
+                $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 
-            if ($newBalance <= 0) {
-                self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
-            } else {
-                self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+                if ($newBalance <= 0) {
+                    return self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+                }
+
+                return self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+            });
+
+            if ($sent) {
+                Cache::put($cacheKey, true, self::CACHE_TTL);
             }
-        });
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById((int) $previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
+        }
     }
 
-    private static function sendLowBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): void
+    private static function sendLowBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): bool
     {
         $html = \App\Core\EmailTemplateBuilder::make()
             ->theme('brand')
@@ -80,14 +91,18 @@ class WalletAlertService
             ->button(__('emails.wallet_alert.low_cta'), $baseUrl . '/listings')
             ->render();
 
-        \App\Core\Mailer::forCurrentTenant()->send(
+        return \App\Core\Mailer::forCurrentTenant()->send(
             $email,
             __('emails.wallet_alert.low_subject'),
-            $html
+            $html,
+            null,
+            null,
+            null,
+            'wallet_alert'
         );
     }
 
-    private static function sendEmptyBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): void
+    private static function sendEmptyBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): bool
     {
         $html = \App\Core\EmailTemplateBuilder::make()
             ->theme('brand')
@@ -98,10 +113,14 @@ class WalletAlertService
             ->button(__('emails.wallet_alert.empty_cta'), $baseUrl . '/listings/create')
             ->render();
 
-        \App\Core\Mailer::forCurrentTenant()->send(
+        return \App\Core\Mailer::forCurrentTenant()->send(
             $email,
             __('emails.wallet_alert.empty_subject'),
-            $html
+            $html,
+            null,
+            null,
+            null,
+            'wallet_alert'
         );
     }
 }

@@ -95,6 +95,7 @@ class AdminListingsService
                 }
 
                 // Email notification
+                $previousTenantId = TenantContext::getId();
                 try {
                     TenantContext::setById($tenantId);
                     if ($user && !empty($user->email)) {
@@ -106,12 +107,18 @@ class AdminListingsService
                             ->paragraph(__('emails_misc.listing_moderation.approved_body', ['title' => $safeTitle]))
                             ->button(__('emails_misc.listing_moderation.approved_cta'), $fullUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.approved_subject', ['title' => $safeTitle]), $html)) {
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.approved_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation')) {
                             Log::warning("AdminListingsService::approve email failed for listing #{$listingId}");
                         }
                     }
                 } catch (\Throwable $e) {
                     Log::warning("AdminListingsService::approve email failed for listing #{$listingId}: " . $e->getMessage());
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById((int) $previousTenantId);
+                    } else {
+                        TenantContext::reset();
+                    }
                 }
             });
         }
@@ -177,6 +184,7 @@ class AdminListingsService
                 }
 
                 // Email notification
+                $previousTenantId = TenantContext::getId();
                 try {
                     TenantContext::setById($tenantId);
                     if ($user && !empty($user->email)) {
@@ -190,12 +198,18 @@ class AdminListingsService
                             $builder->paragraph('<strong>' . __('emails_misc.listing_moderation.rejected_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
                         }
                         $html = $builder->button(__('emails_misc.listing_moderation.rejected_cta'), $fullUrl)->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.rejected_subject', ['title' => $safeTitle]), $html)) {
+                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.rejected_subject', ['title' => $safeTitle]), $html, null, null, null, 'listing_moderation')) {
                             Log::warning("AdminListingsService::reject email failed for listing #{$listingId}");
                         }
                     }
                 } catch (\Throwable $e) {
                     Log::warning("AdminListingsService::reject email failed for listing #{$listingId}: " . $e->getMessage());
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById((int) $previousTenantId);
+                    } else {
+                        TenantContext::reset();
+                    }
                 }
             });
         }
