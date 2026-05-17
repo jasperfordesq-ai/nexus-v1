@@ -146,7 +146,7 @@ class ExchangeService
 
         if ($updated) {
             try {
-                $exchange = DB::table('exchange_requests')->where('id', $exchangeId)->first();
+                $exchange = DB::table('exchange_requests')->where('tenant_id', TenantContext::getId())->where('id', $exchangeId)->first();
                 if ($exchange) {
                     NotificationDispatcher::send(
                         (int) $exchange->requester_id,
@@ -180,7 +180,7 @@ class ExchangeService
 
         if ($updated) {
             try {
-                $exchange = DB::table('exchange_requests')->where('id', $exchangeId)->first();
+                $exchange = DB::table('exchange_requests')->where('tenant_id', TenantContext::getId())->where('id', $exchangeId)->first();
                 if ($exchange) {
                     NotificationDispatcher::send(
                         (int) $exchange->requester_id,

@@ -75,19 +75,26 @@ class EventService
             });
         }
 
-        if (is_string($cursor)) {
-            $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
-                $query->where('id', '<', (int) $cursorId);
-            }
-        }
-
         // Proximity filter — inline haversine so response format stays consistent with getAll()
         $nearLat  = isset($filters['near_lat']) ? (float) $filters['near_lat'] : null;
         $nearLng  = isset($filters['near_lng']) ? (float) $filters['near_lng'] : null;
         $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+        $hasProximity = $nearLat !== null && $nearLng !== null && $radiusKm !== null;
 
-        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+        // Cursor handling: proximity uses offset pagination (nearby:N); non-proximity uses ID keyset
+        $offset = 0;
+        if (is_string($cursor)) {
+            $decoded = base64_decode($cursor, true);
+            if ($decoded !== false) {
+                if ($hasProximity && str_starts_with($decoded, 'nearby:')) {
+                    $offset = max(0, min((int) substr($decoded, 7), 10000));
+                } elseif (!$hasProximity && is_numeric($decoded)) {
+                    $query->where('id', '<', (int) $decoded);
+                }
+            }
+        }
+
+        if ($hasProximity) {
             $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
                 . 'cos(radians(?)) * cos(radians(events.latitude)) * cos(radians(events.longitude) - radians(?)) + '
                 . 'sin(radians(?)) * sin(radians(events.latitude))'
@@ -97,11 +104,12 @@ class EventService
                   ->whereNotNull('events.longitude')
                   ->having('distance_km', '<=', $radiusKm)
                   ->orderBy('distance_km');
+            $items = $query->offset($offset)->limit($limit + 1)->get();
         } else {
             $query->orderByDesc('start_time')->orderByDesc('id');
+            $items = $query->limit($limit + 1)->get();
         }
 
-        $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
@@ -143,9 +151,15 @@ class EventService
             return $data;
         })->all();
 
+        if ($hasProximity) {
+            $nextCursor = $hasMore ? base64_encode('nearby:' . ($offset + $limit)) : null;
+        } else {
+            $nextCursor = $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null;
+        }
+
         return [
             'items'    => array_values($result),
-            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'cursor'   => $nextCursor,
             'has_more' => $hasMore,
         ];
     }

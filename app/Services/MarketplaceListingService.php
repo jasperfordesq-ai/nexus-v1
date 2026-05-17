@@ -589,6 +589,11 @@ class MarketplaceListingService
      */
     public static function saveListing(int $userId, int $listingId): void
     {
+        // Validate the listing belongs to the current tenant (HasTenantScope returns null if cross-tenant)
+        if (!MarketplaceListing::find($listingId)) {
+            return;
+        }
+
         MarketplaceSavedListing::firstOrCreate([
             'tenant_id' => TenantContext::getId(),
             'user_id' => $userId,
