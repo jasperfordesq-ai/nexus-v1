@@ -71,15 +71,43 @@ class MxRecordValidator
         return $resolvable;
     }
 
+    /**
+     * RFC 6761 + RFC 2606 reserved domains and TLDs that exist solely for
+     * documentation / testing and must never receive real email. `.invalid`
+     * is the one DNS itself refuses to resolve; the rest (example.com,
+     * example.test, *.localhost, etc.) DO resolve at the DNS layer (some
+     * even have MX records) but are guaranteed to be undeliverable, so we
+     * reject them before the DNS check. A real cyber attack on 2026-05-14
+     * → 2026-05-16 used `testing@example.com` precisely because example.com
+     * passes naive MX/A checks; this list closes that hole.
+     */
+    private const RESERVED_DOMAINS = [
+        'example.com',
+        'example.net',
+        'example.org',
+        'localhost',
+    ];
+
+    private const RESERVED_TLDS = [
+        '.test',
+        '.example',
+        '.invalid',
+        '.localhost',
+    ];
+
     private function resolveLive(string $domain): bool
     {
         // Reject obvious junk before touching DNS.
         if (!preg_match('/^[a-z0-9.-]+$/', $domain) || strlen($domain) > 253) {
             return false;
         }
-        if (str_ends_with($domain, '.invalid')) {
-            // RFC 6761 — `.invalid` is reserved to NEVER resolve.
+        if (in_array($domain, self::RESERVED_DOMAINS, true)) {
             return false;
+        }
+        foreach (self::RESERVED_TLDS as $tld) {
+            if (str_ends_with($domain, $tld)) {
+                return false;
+            }
         }
 
         try {
