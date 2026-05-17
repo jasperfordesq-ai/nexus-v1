@@ -725,11 +725,13 @@ Route::put('/v2/goals/{id}', [\App\Http\Controllers\Api\GoalsController::class, 
 Route::delete('/v2/goals/{id}', [\App\Http\Controllers\Api\GoalsController::class, 'destroy']);
 Route::post('/v2/goals/{id}/progress', [\App\Http\Controllers\Api\GoalsController::class, 'progress']);
 Route::post('/v2/goals/{id}/buddy', [\App\Http\Controllers\Api\GoalsController::class, 'buddy']);
+Route::post('/v2/goals/{id}/buddy/nudge', [\App\Http\Controllers\Api\GoalsController::class, 'buddyNudge']);
 Route::post('/v2/goals/{id}/complete', [\App\Http\Controllers\Api\GoalsController::class, 'complete']);
 Route::get('/v2/goals/{id}/checkins', [\App\Http\Controllers\Api\GoalsController::class, 'listCheckins']);
 Route::post('/v2/goals/{id}/checkins', [\App\Http\Controllers\Api\GoalsController::class, 'createCheckin']);
 Route::get('/v2/goals/{id}/history', [\App\Http\Controllers\Api\GoalsController::class, 'history']);
 Route::get('/v2/goals/{id}/history/summary', [\App\Http\Controllers\Api\GoalsController::class, 'historySummary']);
+Route::get('/v2/goals/{id}/insights', [\App\Http\Controllers\Api\GoalsController::class, 'insights']);
 Route::get('/v2/goals/{id}/reminder', [\App\Http\Controllers\Api\GoalsController::class, 'getReminder']);
 Route::put('/v2/goals/{id}/reminder', [\App\Http\Controllers\Api\GoalsController::class, 'setReminder']);
 Route::delete('/v2/goals/{id}/reminder', [\App\Http\Controllers\Api\GoalsController::class, 'deleteReminder']);

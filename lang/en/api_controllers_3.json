@@ -39,7 +39,32 @@
     "goals": {
         "progress_mentor": "{{name}} made progress on their goal: \"{{title}}\"",
         "completed_mentor": "{{name}} completed their goal: \"{{title}}\"",
-        "completed_self": "Congratulations! You completed your goal: \"{{title}}\""
+        "completed_self": "Congratulations! You completed your goal: \"{{title}}\"",
+        "buddy_joined_owner": "{{name}} has become a buddy for your goal: \"{{title}}\"",
+        "checkin_mentor": "{{name}} checked in on their goal: \"{{title}}\"",
+        "history_created": "Goal created",
+        "history_progress": "Progress updated to {{percent}}%",
+        "history_checkin": "Check-in recorded at {{percent}}%",
+        "history_buddy_joined": "A goal buddy joined",
+        "history_buddy_action": "Goal buddy support sent",
+        "history_milestone": "Milestone reached: {{title}}",
+        "history_completed": "Goal completed",
+        "milestone_quarter": "First quarter",
+        "milestone_half": "Halfway there",
+        "milestone_three_quarters": "Three quarters",
+        "milestone_complete": "Goal complete",
+        "milestone_generic": "Milestone {{number}}",
+        "buddy_note_nudge": "A gentle reminder to check in when you can.",
+        "buddy_note_encouragement": "You are doing well. Keep going.",
+        "buddy_note_offer_help": "I can help if you want to talk through the next step.",
+        "buddy_note_celebration": "That progress is worth celebrating!",
+        "buddy_note_note": "Your buddy sent a note.",
+        "buddy_action_nudge": "sent a nudge for",
+        "buddy_action_encouragement": "sent encouragement for",
+        "buddy_action_offer_help": "offered help with",
+        "buddy_action_celebration": "celebrated progress on",
+        "buddy_action_note": "sent a note about",
+        "buddy_action_owner": "{{name}} {{action}} your goal: \"{{title}}\""
     },
     "feed": {
         "post_shared": "{{name}} shared your post"

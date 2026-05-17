@@ -362,14 +362,38 @@ class GoalsControllerTest extends TestCase
     public function test_create_checkin_on_own_goal(): void
     {
         $user = $this->authenticatedUser();
-        $goal = $this->createGoal(['user_id' => $user->id]);
+        $goal = $this->createGoal([
+            'user_id' => $user->id,
+            'target_value' => 100,
+            'current_value' => 10,
+        ]);
 
         $response = $this->apiPost("/v2/goals/{$goal->id}/checkins", [
             'progress_percent' => 50,
             'note' => 'Making progress!',
+            'mood' => 'motivated',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+        $response->assertJsonPath('data.progress_percent', 50);
+
+        $this->assertDatabaseHas('goal_checkins', [
+            'goal_id' => $goal->id,
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'note' => 'Making progress!',
+            'mood' => 'motivated',
+        ]);
+        $this->assertDatabaseHas('goals', [
+            'id' => $goal->id,
+            'tenant_id' => $this->testTenantId,
+            'current_value' => 50,
+        ]);
+        $this->assertDatabaseHas('goal_progress_history', [
+            'goal_id' => $goal->id,
+            'tenant_id' => $this->testTenantId,
+            'event_type' => 'checkin',
+        ]);
     }
 
     public function test_create_checkin_on_other_goal_returns_404(): void
@@ -394,6 +418,27 @@ class GoalsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_list_private_goal_checkins_forbidden_for_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $goal = $this->createGoal(['user_id' => $owner->id, 'is_public' => false]);
+        $this->authenticatedUser();
+
+        $response = $this->apiGet("/v2/goals/{$goal->id}/checkins");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_private_goal_history_forbidden_for_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $goal = $this->createGoal(['user_id' => $owner->id, 'is_public' => false]);
+        $this->authenticatedUser();
+
+        $this->apiGet("/v2/goals/{$goal->id}/history")->assertStatus(403);
+        $this->apiGet("/v2/goals/{$goal->id}/history/summary")->assertStatus(403);
     }
 
     // ------------------------------------------------------------------

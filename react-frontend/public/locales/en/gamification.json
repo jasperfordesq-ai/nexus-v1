@@ -132,6 +132,17 @@
     "title": "Goals",
     "loading": "Loading goals",
     "subtitle": "Set goals and track your progress",
+    "buddy_explainer": {
+      "title": "Goal buddies keep people moving",
+      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
+      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
+    },
+    "guide": {
+      "checkins_title": "Check-ins",
+      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
+      "progress_title": "Progress",
+      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
+    },
     "new_goal": "New Goal",
     "from_template": "From Template",
     "load_error": "Failed to load goals. Please try again.",
@@ -152,11 +163,13 @@
     "due": "Due: ",
     "buddy_label": "Buddy",
     "youre_a_buddy": "You're a buddy!",
+    "streak_label": "{{count}} check-in streak",
     "mark_complete": "Mark Complete",
     "become_buddy": "Become Buddy",
     "actions_aria": "Goal actions",
     "action_edit": "Edit",
     "action_delete": "Delete",
+    "action_nudge": "Nudge",
     "status": {
       "completed": "Completed",
       "active": "Active"
@@ -172,9 +185,12 @@
       "deadline": "Deadline",
       "created": "Created",
       "buddy": "Buddy",
+      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
       "social": "Social",
       "goal_owner": "Goal Owner",
+      "insights": "Goal insights",
       "progress_timeline": "Progress Timeline",
+      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly.",
       "no_progress": "No progress updates recorded yet."
     },
     "modal": {
@@ -186,6 +202,9 @@
       "description_label": "Description",
       "description_placeholder": "Describe your goal...",
       "target_value_label": "Target Value",
+      "target_value_placeholder": "100",
+      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
+      "checkin_frequency_label": "Check-in cadence",
       "deadline_label": "Deadline (optional)",
       "make_public": "Make Public",
       "make_public_desc": "Others can see and support your goal",
@@ -208,8 +227,17 @@
       "progress_updated": "Progress updated!",
       "progress_failed": "Failed to update progress",
       "buddy_joined": "You are now a buddy!",
-      "buddy_failed": "Failed to become buddy"
+      "buddy_failed": "Failed to become buddy",
+      "buddy_action_sent": "Buddy support sent",
+      "buddy_action_failed": "Failed to send buddy support"
     }
+  },
+  "frequency": {
+    "none": "No cadence",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly"
   },
   "leaderboard": {
     "page_title": "Community",

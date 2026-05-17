@@ -52,7 +52,8 @@ import { useTranslation } from 'react-i18next';
 interface CheckIn {
   id: number;
   goal_id: number;
-  progress_value: number;
+  progress_value?: number | null;
+  progress_percent?: number | null;
   note: string | null;
   mood: string | null;
   created_at: string;
@@ -87,6 +88,11 @@ function getMoodIcon(mood: string) {
 
 function getMoodLabel(mood: string): string {
   return MOODS.find((m) => m.value === mood)?.labelKey || mood;
+}
+
+function getCheckinProgress(checkin: CheckIn): number | null {
+  const value = checkin.progress_value ?? checkin.progress_percent;
+  return value == null ? null : Number(value);
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -148,6 +154,7 @@ export function GoalCheckinModal({
     try {
       setIsSubmitting(true);
       const response = await api.post(`/v2/goals/${goalId}/checkins`, {
+        progress_percent: progressValue,
         progress_value: progressValue,
         note: note.trim() || undefined,
         mood: selectedMood || undefined,
@@ -225,45 +232,48 @@ export function GoalCheckinModal({
                 </div>
               ) : (
                 <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                  {checkins.map((checkin, index) => (
-                    <motion.div
-                      key={checkin.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <GlassCard className="p-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-                              <span className="text-sm font-semibold text-theme-primary">
-                                {checkin.progress_value}%
-                              </span>
-                              {checkin.mood && (
-                                <Chip
-                                  size="sm"
-                                  variant="flat"
-                                  className="text-[10px] bg-theme-elevated"
-                                  startContent={getMoodIcon(checkin.mood)}
-                                >
-                                  {t(getMoodLabel(checkin.mood))}
-                                </Chip>
+                  {checkins.map((checkin, index) => {
+                    const progress = getCheckinProgress(checkin);
+                    return (
+                      <motion.div
+                        key={checkin.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <GlassCard className="p-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+                                <span className="text-sm font-semibold text-theme-primary">
+                                  {progress == null ? t('checkin.progress_unknown') : t('checkin.progress_value', { percent: progress })}
+                                </span>
+                                {checkin.mood && (
+                                  <Chip
+                                    size="sm"
+                                    variant="flat"
+                                    className="text-[10px] bg-theme-elevated"
+                                    startContent={getMoodIcon(checkin.mood)}
+                                  >
+                                    {t(getMoodLabel(checkin.mood))}
+                                  </Chip>
+                                )}
+                              </div>
+                              {checkin.note && (
+                                <p className="text-xs text-theme-muted line-clamp-2 mb-1">
+                                  {checkin.note}
+                                </p>
                               )}
+                              <span className="text-xs text-theme-subtle">
+                                {formatRelativeTime(checkin.created_at)}
+                              </span>
                             </div>
-                            {checkin.note && (
-                              <p className="text-xs text-theme-muted line-clamp-2 mb-1">
-                                {checkin.note}
-                              </p>
-                            )}
-                            <span className="text-xs text-theme-subtle">
-                              {formatRelativeTime(checkin.created_at)}
-                            </span>
                           </div>
-                        </div>
-                      </GlassCard>
-                    </motion.div>
-                  ))}
+                        </GlassCard>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -275,6 +285,9 @@ export function GoalCheckinModal({
                 <label className="text-sm font-medium text-theme-primary mb-2 block">
                   {t('checkin.progress_label')}
                 </label>
+                <p className="text-xs text-theme-muted mb-3">
+                  {t('checkin.progress_help')}
+                </p>
                 <Slider
                   step={5}
                   minValue={0}

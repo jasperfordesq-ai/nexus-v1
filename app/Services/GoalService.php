@@ -27,6 +27,39 @@ class GoalService
         private readonly Goal $goal,
     ) {}
 
+    private function progressPercent(Goal $goal): float
+    {
+        $target = (float) ($goal->target_value ?? 0);
+        $current = (float) ($goal->current_value ?? 0);
+
+        return $target > 0 ? min(100.0, max(0.0, ($current / $target) * 100)) : 0.0;
+    }
+
+    private function recordHistory(Goal $goal, string $eventType, string $description, array $data = [], ?int $createdBy = null): void
+    {
+        DB::table('goal_progress_history')->insert([
+            'goal_id'    => $goal->id,
+            'tenant_id'  => TenantContext::getId(),
+            'event_type' => $eventType,
+            'description'=> $description,
+            'data'       => $data === [] ? null : json_encode($data),
+            'created_at' => now(),
+        ]);
+
+        if (DB::getSchemaBuilder()->hasTable('goal_progress_log')) {
+            DB::table('goal_progress_log')->insert([
+                'goal_id'    => $goal->id,
+                'tenant_id'  => TenantContext::getId(),
+                'event_type' => $eventType === 'milestone' ? 'milestone_reached' : $eventType,
+                'old_value'  => $data['old_value'] ?? null,
+                'new_value'  => $data['new_value'] ?? null,
+                'metadata'   => json_encode($data),
+                'created_by' => $createdBy,
+                'created_at' => now(),
+            ]);
+        }
+    }
+
     /**
      * Get goals with optional filtering and cursor pagination.
      *
@@ -151,15 +184,23 @@ class GoalService
     public function create(int $userId, array $data): Goal
     {
         $goal = $this->goal->newInstance([
-            'user_id'     => $userId,
-            'title'       => trim($data['title']),
-            'description' => trim($data['description'] ?? ''),
-            'deadline'    => $data['deadline'] ?? null,
-            'is_public'   => $data['is_public'] ?? true,
-            'status'      => 'active',
+            'user_id'           => $userId,
+            'title'             => trim($data['title']),
+            'description'       => trim($data['description'] ?? ''),
+            'deadline'          => $data['deadline'] ?? null,
+            'is_public'         => $data['is_public'] ?? true,
+            'status'            => 'active',
+            'target_value'      => max(1, (float) ($data['target_value'] ?? 100)),
+            'current_value'     => max(0, (float) ($data['current_value'] ?? 0)),
+            'checkin_frequency' => $data['checkin_frequency'] ?? 'none',
         ]);
 
         $goal->save();
+        $this->recordHistory($goal, 'created', __('api_controllers_3.goals.history_created'), [
+            'target_value' => (float) $goal->target_value,
+            'progress_value' => $this->progressPercent($goal),
+        ], $userId);
+        app(GoalProgressService::class)->seedDefaultMilestones($goal);
 
         // Send goal-created email
         try {
@@ -211,9 +252,13 @@ class GoalService
             return null;
         }
 
-        $allowed = ['title', 'description', 'deadline', 'is_public', 'status'];
+        $allowed = ['title', 'description', 'deadline', 'is_public', 'status', 'target_value', 'checkin_frequency'];
         $goal->fill(collect($data)->only($allowed)->all());
+        if (isset($data['target_value'])) {
+            $goal->target_value = max(1, (float) $data['target_value']);
+        }
         $goal->save();
+        app(GoalProgressService::class)->syncMilestones($goal);
 
         return $goal->fresh(['user']);
     }
@@ -301,6 +346,15 @@ class GoalService
         $goal->save();
 
         $newPercent = $target > 0 ? min(100.0, ((float) $goal->current_value / $target) * 100) : 0.0;
+        $this->recordHistory($goal, 'progress_update', __('api_controllers_3.goals.history_progress', [
+            'percent' => round($newPercent),
+        ]), [
+            'increment' => $increment,
+            'old_value' => $current,
+            'new_value' => (float) $goal->current_value,
+            'progress_value' => round($newPercent, 2),
+        ], $userId);
+        app(GoalProgressService::class)->syncMilestones($goal);
 
         // Fire milestone emails (25 / 50 / 75 / 100%) — silenced to avoid disrupting the response
         try {
@@ -333,7 +387,13 @@ class GoalService
         $target = (float) ($goal->target_value ?? 1);
         $goal->current_value = $target;
         $goal->status = 'completed';
+        $goal->completed_at = now();
         $goal->save();
+        $this->recordHistory($goal, 'completed', __('api_controllers_3.goals.history_completed'), [
+            'progress_value' => 100,
+            'new_value' => (float) $goal->current_value,
+        ], $userId);
+        app(GoalProgressService::class)->syncMilestones($goal);
 
         // Send goal-completed email
         try {
@@ -391,7 +451,60 @@ class GoalService
 
         $goal->mentor_id = $userId;
         $goal->save();
+        $this->recordHistory($goal, 'buddy_joined', __('api_controllers_3.goals.history_buddy_joined'), [
+            'buddy_id' => $userId,
+        ], $userId);
 
         return $goal->fresh(['user', 'mentor']);
+    }
+
+    /**
+     * Let a buddy send a visible accountability action to the goal owner.
+     */
+    public function createBuddyNote(int $goalId, int $buddyId, array $data): ?array
+    {
+        $goal = $this->goal->newQuery()->find($goalId);
+
+        if (! $goal || (int) ($goal->mentor_id ?? 0) !== $buddyId) {
+            return null;
+        }
+
+        if (!DB::getSchemaBuilder()->hasTable('goal_buddy_notes')) {
+            return null;
+        }
+
+        $type = $data['type'] ?? 'encouragement';
+        if (!in_array($type, ['nudge', 'encouragement', 'offer_help', 'celebration', 'note'], true)) {
+            $type = 'encouragement';
+        }
+
+        $message = trim((string) ($data['message'] ?? ''));
+        $defaults = [
+            'nudge' => __('api_controllers_3.goals.buddy_note_nudge'),
+            'encouragement' => __('api_controllers_3.goals.buddy_note_encouragement'),
+            'offer_help' => __('api_controllers_3.goals.buddy_note_offer_help'),
+            'celebration' => __('api_controllers_3.goals.buddy_note_celebration'),
+            'note' => __('api_controllers_3.goals.buddy_note_note'),
+        ];
+
+        $id = DB::table('goal_buddy_notes')->insertGetId([
+            'goal_id' => $goalId,
+            'tenant_id' => TenantContext::getId(),
+            'buddy_id' => $buddyId,
+            'owner_id' => (int) $goal->user_id,
+            'type' => $type,
+            'message' => $message !== '' ? $message : $defaults[$type],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $note = (array) DB::table('goal_buddy_notes')->where('id', $id)->first();
+        app(GoalProgressService::class)->recordHistory($goal, 'buddy_action', __('api_controllers_3.goals.history_buddy_action'), [
+            'buddy_note_id' => $id,
+            'type' => $type,
+            'message' => $note['message'] ?? null,
+        ]);
+
+        return $note;
     }
 }

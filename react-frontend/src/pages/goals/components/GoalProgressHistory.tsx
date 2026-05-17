@@ -47,7 +47,7 @@ import { formatRelativeTime } from '@/lib/helpers';
 
 interface HistoryEvent {
   id: number;
-  type: 'progress_update' | 'checkin' | 'milestone' | 'buddy_joined' | 'completed' | 'created';
+  type: 'progress_update' | 'checkin' | 'milestone' | 'buddy_joined' | 'buddy_action' | 'completed' | 'created';
   description: string;
   data: Record<string, unknown>;
   created_at: string;
@@ -69,6 +69,7 @@ function getEventIcon(type: string) {
     case 'milestone':
       return <Trophy className="w-3.5 h-3.5" />;
     case 'buddy_joined':
+    case 'buddy_action':
       return <Users className="w-3.5 h-3.5" />;
     case 'completed':
       return <CheckCircle className="w-3.5 h-3.5" />;
@@ -88,6 +89,7 @@ function getEventColor(type: string): string {
     case 'milestone':
       return 'bg-amber-500';
     case 'buddy_joined':
+    case 'buddy_action':
       return 'bg-purple-500';
     case 'completed':
       return 'bg-emerald-500';
@@ -104,6 +106,7 @@ function getEventChipColor(type: string): 'primary' | 'success' | 'warning' | 's
     case 'checkin': return 'primary';
     case 'milestone': return 'warning';
     case 'buddy_joined': return 'secondary';
+    case 'buddy_action': return 'secondary';
     case 'completed': return 'success';
     default: return 'default';
   }
@@ -124,8 +127,9 @@ function getMoodIcon(mood: string) {
 /* ───────────────────────── Helpers ───────────────────────── */
 
 function ProgressValueBar({ data }: { data: Record<string, unknown> | undefined }) {
-  if (!data || data.progress_value == null) return null;
-  const numVal = Number(data.progress_value);
+  const value = data?.progress_value ?? data?.progress_percent;
+  if (value == null) return null;
+  const numVal = Number(value);
   return (
     <div className="mt-2">
       <Progress
@@ -149,6 +153,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
   const [events, setEvents] = useState<HistoryEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const eventLabel = useCallback((type: string) => t(`history.event.${type}`, type.replace(/_/g, ' ')), [t]);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -233,14 +238,14 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
                       color={getEventChipColor(event.type)}
                       className="text-[10px]"
                     >
-                      {event.type.replace(/_/g, ' ')}
+                      {eventLabel(event.type)}
                     </Chip>
                     {typeof event.data?.mood === 'string' ? getMoodIcon(event.data.mood) : null}
                   </div>
                   <p className="text-sm text-theme-primary">{event.description}</p>
 
                   {/* Progress bar for checkins/progress_updates */}
-                  {event.data?.progress_value != null && (
+                  {(event.data?.progress_value != null || event.data?.progress_percent != null) && (
                     <ProgressValueBar data={event.data} />
                   )}
 

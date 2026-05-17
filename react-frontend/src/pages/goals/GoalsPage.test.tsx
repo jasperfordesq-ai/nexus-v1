@@ -69,6 +69,7 @@ vi.mock('@/lib/helpers', () => ({
 
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
+  ConfettiCelebration: () => null,
 
   GlassButton: ({ children }: Record<string, unknown>) => children as never,
   GlassInput: () => null,

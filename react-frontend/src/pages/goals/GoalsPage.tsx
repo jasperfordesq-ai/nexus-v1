@@ -30,6 +30,8 @@ import {
   ModalFooter,
   Textarea,
   Switch,
+  Select,
+  SelectItem,
   Avatar,
   Dropdown,
   DropdownTrigger,
@@ -73,6 +75,7 @@ import { GoalTemplatePickerModal } from './components/GoalTemplatePickerModal';
 import { GoalCheckinModal } from './components/GoalCheckinModal';
 import { GoalReminderToggle } from './components/GoalReminderToggle';
 import { GoalProgressHistory } from './components/GoalProgressHistory';
+import { GoalInsightsPanel } from './components/GoalInsightsPanel';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -88,6 +91,9 @@ interface Goal {
   status: 'active' | 'completed';
   created_at: string;
   updated_at: string;
+  checkin_frequency?: 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  streak_count?: number;
+  best_streak_count?: number;
   user_name: string;
   user_avatar: string | null;
   progress_percentage: number;
@@ -141,6 +147,7 @@ export function GoalsPage() {
     title: '',
     description: '',
     target_value: 100,
+    checkin_frequency: 'weekly' as const,
     deadline: '',
     is_public: false,
   });
@@ -153,6 +160,7 @@ export function GoalsPage() {
     title: '',
     description: '',
     target_value: 100,
+    checkin_frequency: 'weekly' as 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly',
     deadline: '',
     is_public: false,
   });
@@ -242,13 +250,14 @@ export function GoalsPage() {
         title: newGoal.title,
         description: newGoal.description,
         target_value: newGoal.target_value,
+        checkin_frequency: newGoal.checkin_frequency,
         deadline: newGoal.deadline || undefined,
         is_public: newGoal.is_public,
       });
 
       if (response.success) {
         onClose();
-        setNewGoal({ title: '', description: '', target_value: 100, deadline: '', is_public: false });
+        setNewGoal({ title: '', description: '', target_value: 100, checkin_frequency: 'weekly', deadline: '', is_public: false });
         toastRef.current.success(tRef.current('goals.toast.created'));
         loadGoals();
       }
@@ -280,6 +289,7 @@ export function GoalsPage() {
       title: goal.title,
       description: goal.description || '',
       target_value: goal.target_value,
+      checkin_frequency: goal.checkin_frequency ?? 'weekly',
       deadline: goal.deadline ? (goal.deadline.split('T')[0] ?? '') : '',
       is_public: goal.is_public,
     });
@@ -295,6 +305,7 @@ export function GoalsPage() {
         title: editForm.title,
         description: editForm.description,
         target_value: editForm.target_value,
+        checkin_frequency: editForm.checkin_frequency,
         deadline: editForm.deadline || null,
         is_public: editForm.is_public,
       });
@@ -386,6 +397,21 @@ export function GoalsPage() {
     } catch (err) {
       logError('Failed to become buddy', err);
       toastRef.current.error(tRef.current('goals.toast.buddy_failed'));
+    }
+  };
+
+  const handleBuddyAction = async (goal: Goal, type: 'nudge' | 'encouragement' | 'offer_help') => {
+    try {
+      const response = await api.post(`/v2/goals/${goal.id}/buddy/nudge`, { type });
+
+      if (response.success) {
+        toastRef.current.success(tRef.current('goals.toast.buddy_action_sent'));
+      } else {
+        toastRef.current.error(tRef.current('goals.toast.buddy_action_failed'));
+      }
+    } catch (err) {
+      logError('Failed to send buddy action', err);
+      toastRef.current.error(tRef.current('goals.toast.buddy_action_failed'));
     }
   };
 
@@ -491,6 +517,37 @@ export function GoalsPage() {
         </Button>
       </div>
 
+      <GlassCard className="p-4 sm:p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-4">
+          <div className="flex gap-3">
+            <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
+              <Users className="w-5 h-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-theme-primary">{t('goals.buddy_explainer.title')}</h2>
+              <p className="text-sm text-theme-muted mt-1">{t('goals.buddy_explainer.body')}</p>
+              <p className="text-sm text-theme-muted mt-2">{t('goals.buddy_explainer.how')}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-lg bg-theme-elevated p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
+                <ClipboardCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                {t('goals.guide.checkins_title')}
+              </div>
+              <p className="text-sm text-theme-muted mt-1">{t('goals.guide.checkins_body')}</p>
+            </div>
+            <div className="rounded-lg bg-theme-elevated p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
+                <Target className="w-3.5 h-3.5" aria-hidden="true" />
+                {t('goals.guide.progress_title')}
+              </div>
+              <p className="text-sm text-theme-muted mt-1">{t('goals.guide.progress_body')}</p>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
@@ -576,6 +633,7 @@ export function GoalsPage() {
                       onDelete={openDelete}
                       onComplete={handleComplete}
                       onBecomeBuddy={handleBecomeBuddy}
+                      onBuddyAction={handleBuddyAction}
                       onOpenDetail={openDetail}
                       onCheckin={openCheckin}
                       isDiscoverTab={tab === 'discover'}
@@ -624,11 +682,25 @@ export function GoalsPage() {
             <Input
               type="number"
               label={t('goals.modal.target_value_label')}
-              placeholder="100"
+              placeholder={t('goals.modal.target_value_placeholder')}
               value={String(newGoal.target_value)}
               onChange={(e) => setNewGoal((prev) => ({ ...prev, target_value: parseInt(e.target.value) || 0 }))}
               classNames={inputClasses}
             />
+            <p className="text-xs text-theme-muted -mt-2">{t('goals.modal.target_value_help')}</p>
+            <Select
+              label={t('goals.modal.checkin_frequency_label')}
+              selectedKeys={[newGoal.checkin_frequency]}
+              onChange={(e) => setNewGoal((prev) => ({ ...prev, checkin_frequency: (e.target.value || 'weekly') as typeof newGoal.checkin_frequency }))}
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+            >
+              {['none', 'daily', 'weekly', 'biweekly', 'monthly'].map((frequency) => (
+                <SelectItem key={frequency}>{t(`frequency.${frequency}`)}</SelectItem>
+              ))}
+            </Select>
             <Input
               type="date"
               label={t('goals.modal.deadline_label')}
@@ -684,11 +756,25 @@ export function GoalsPage() {
             <Input
               type="number"
               label={t('goals.modal.target_value_label')}
-              placeholder="100"
+              placeholder={t('goals.modal.target_value_placeholder')}
               value={String(editForm.target_value)}
               onChange={(e) => setEditForm((prev) => ({ ...prev, target_value: parseInt(e.target.value) || 0 }))}
               classNames={inputClasses}
             />
+            <p className="text-xs text-theme-muted -mt-2">{t('goals.modal.target_value_help')}</p>
+            <Select
+              label={t('goals.modal.checkin_frequency_label')}
+              selectedKeys={[editForm.checkin_frequency]}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, checkin_frequency: (e.target.value || 'weekly') as typeof editForm.checkin_frequency }))}
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+            >
+              {['none', 'daily', 'weekly', 'biweekly', 'monthly'].map((frequency) => (
+                <SelectItem key={frequency}>{t(`frequency.${frequency}`)}</SelectItem>
+              ))}
+            </Select>
             <Input
               type="date"
               label={t('goals.modal.deadline_label')}
@@ -816,6 +902,7 @@ export function GoalsPage() {
                 {/* Progress Visualization */}
                 <div>
                   <h4 className="text-sm font-semibold text-theme-primary mb-2">{t('goals.detail.progress')}</h4>
+                  <p className="text-xs text-theme-muted mb-2">{t('goals.detail.progress_explainer')}</p>
                   <div className="flex justify-between text-xs text-theme-subtle mb-1">
                     <span>{detailGoal.current_value} / {detailGoal.target_value}</span>
                     <span>{Math.min(100, Math.round(detailGoal.progress_percentage))}%</span>
@@ -872,6 +959,15 @@ export function GoalsPage() {
                       </div>
                     </div>
                   )}
+                  {!detailGoal.buddy_name && detailGoal.is_public && (
+                    <div className="bg-theme-elevated rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
+                        <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                        {t('goals.detail.buddy')}
+                      </div>
+                      <p className="text-sm text-theme-muted">{t('goals.detail.no_buddy')}</p>
+                    </div>
+                  )}
                   {(detailGoal.likes_count !== undefined || detailGoal.comments_count !== undefined) && (
                     <div className="bg-theme-elevated rounded-xl p-3">
                       <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
@@ -908,6 +1004,14 @@ export function GoalsPage() {
                     </div>
                   </div>
                 )}
+
+                <div>
+                  <h4 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
+                    {t('goals.detail.insights')}
+                  </h4>
+                  <GoalInsightsPanel goalId={detailGoal.id} canNudge={detailGoal.is_buddy} />
+                </div>
 
                 {/* G5 - Full Progress History Timeline */}
                 <div>
@@ -955,6 +1059,7 @@ interface GoalCardProps {
   onDelete: (goal: Goal) => void;
   onComplete: (goal: Goal) => void;
   onBecomeBuddy: (goal: Goal) => void;
+  onBuddyAction: (goal: Goal, type: 'nudge' | 'encouragement' | 'offer_help') => void;
   onOpenDetail: (goal: Goal) => void;
   onCheckin: (goal: Goal) => void;
 }
@@ -971,6 +1076,7 @@ function GoalCard({
   onDelete,
   onComplete,
   onBecomeBuddy,
+  onBuddyAction,
   onOpenDetail,
   onCheckin,
 }: GoalCardProps) {
@@ -1044,6 +1150,12 @@ function GoalCard({
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-theme-subtle">
+            {(goal.streak_count ?? 0) > 0 && (
+              <span className="flex items-center gap-1 text-orange-400">
+                <Sparkles className="w-3 h-3" aria-hidden="true" />
+                {t('goals.streak_label', { count: goal.streak_count })}
+              </span>
+            )}
             {deadlineDate && (
               <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-400' : ''}`}>
                 <Calendar className="w-3 h-3" aria-hidden="true" />
@@ -1167,6 +1279,18 @@ function GoalCard({
               onPress={() => onBecomeBuddy(goal)}
             >
               {t('goals.become_buddy')}
+            </Button>
+          )}
+
+          {isBuddyingTab && isBuddy && !isCompleted && (
+            <Button
+              size="sm"
+              variant="flat"
+              className="bg-purple-500/10 text-purple-400"
+              startContent={<MessageCircle className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => onBuddyAction(goal, 'nudge')}
+            >
+              {t('goals.action_nudge')}
             </Button>
           )}
         </div>

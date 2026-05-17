@@ -80,12 +80,16 @@ class GoalTemplateService
      */
     public function create(int $userId, array $data): GoalTemplate
     {
+        $defaultTargetValue = isset($data['default_target_value'])
+            ? max(1, (float) $data['default_target_value'])
+            : 100.0;
+
         $template = $this->template->newInstance([
             'created_by'           => $userId,
             'title'                => trim($data['title']),
             'description'          => trim($data['description'] ?? ''),
             'category'             => $data['category'] ?? null,
-            'default_target_value' => $data['default_target_value'] ?? null,
+            'default_target_value' => $defaultTargetValue,
             'default_milestones'   => $data['default_milestones'] ?? null,
             'is_public'            => $data['is_public'] ?? true,
         ]);
@@ -107,13 +111,21 @@ class GoalTemplateService
         }
 
         $goal = Goal::create([
-            'user_id'      => $userId,
-            'title'        => trim($overrides['title'] ?? $template->title),
-            'description'  => trim($overrides['description'] ?? $template->description ?? ''),
-            'target_value' => $overrides['target_value'] ?? $template->default_target_value,
-            'deadline'     => $overrides['deadline'] ?? null,
-            'is_public'    => $overrides['is_public'] ?? true,
-            'status'       => 'active',
+            'user_id'           => $userId,
+            'title'             => trim($overrides['title'] ?? $template->title),
+            'description'       => trim($overrides['description'] ?? $template->description ?? ''),
+            'target_value'      => max(1, (float) ($overrides['target_value'] ?? $template->default_target_value ?? 100)),
+            'current_value'     => 0,
+            'deadline'          => $overrides['deadline'] ?? null,
+            'is_public'         => $overrides['is_public'] ?? true,
+            'checkin_frequency' => $overrides['checkin_frequency'] ?? 'weekly',
+            'template_id'       => $template->id,
+            'status'            => 'active',
+        ]);
+        app(GoalProgressService::class)->seedDefaultMilestones($goal, $template->default_milestones);
+        app(GoalProgressService::class)->recordHistory($goal, 'created', __('api_controllers_3.goals.history_created'), [
+            'target_value' => (float) $goal->target_value,
+            'template_id' => $template->id,
         ]);
 
         return $goal->fresh(['user']);

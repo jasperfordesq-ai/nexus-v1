@@ -20,6 +20,8 @@ class Goal extends Model
     protected $fillable = [
         'tenant_id', 'user_id', 'title', 'description',
         'deadline', 'is_public', 'status', 'mentor_id',
+        'current_value', 'target_value', 'checkin_frequency',
+        'last_checkin_at', 'completed_at', 'template_id',
     ];
 
     protected $casts = [
@@ -27,6 +29,12 @@ class Goal extends Model
         'mentor_id' => 'integer',
         'is_public' => 'boolean',
         'deadline' => 'date',
+        'current_value' => 'float',
+        'target_value' => 'float',
+        'streak_count' => 'integer',
+        'best_streak_count' => 'integer',
+        'last_checkin_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

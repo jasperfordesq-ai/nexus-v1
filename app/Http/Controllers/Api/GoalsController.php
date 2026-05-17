@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\I18n\LocaleContext;
+use App\Models\Goal;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\GoalService;
@@ -60,8 +61,17 @@ class GoalsController extends BaseApiController
         $target = (float) ($goal['target_value'] ?? 0);
         $current = (float) ($goal['current_value'] ?? 0);
         $goal['progress_percentage'] = $target > 0 ? min(100.0, ($current / $target) * 100) : 0.0;
+        $goal['streak_count'] = (int) ($goal['streak_count'] ?? 0);
+        $goal['best_streak_count'] = (int) ($goal['best_streak_count'] ?? 0);
 
         return $goal;
+    }
+
+    private function canViewGoal(Goal $goal, int $userId): bool
+    {
+        return (bool) $goal->is_public
+            || (int) $goal->user_id === $userId
+            || (int) ($goal->mentor_id ?? 0) === $userId;
     }
 
     // -----------------------------------------------------------------
@@ -119,7 +129,7 @@ class GoalsController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
-        if (! $goal->is_public && (int) $goal->user_id !== $userId) {
+        if (! $this->canViewGoal($goal, $userId)) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
         }
 
@@ -424,7 +434,7 @@ class GoalsController extends BaseApiController
                     $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
                     Notification::createNotification(
                         $goalOwnerId,
-                        "{$buddyName} has become a buddy for your goal: {$goal->title}",
+                        __('api_controllers_3.goals.buddy_joined_owner', ['name' => $buddyName, 'title' => $goal->title]),
                         "/goals/{$id}",
                         'goal_buddy'
                     );
@@ -438,6 +448,43 @@ class GoalsController extends BaseApiController
             'message' => __('api.buddy_added'),
             'goal'    => $this->enrichGoal($goal->toArray()),
         ]);
+    }
+
+    public function buddyNudge(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('goal_buddy_nudge', 20, 60);
+
+        $note = $this->goalService->createBuddyNote($id, $userId, $this->getAllInput());
+        if (! $note) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_buddy_required'), null, 403);
+        }
+
+        try {
+            $goal = $this->goalService->getById($id);
+            if ($goal) {
+                $buddy = User::find($userId);
+                $ownerId = (int) $goal->user_id;
+                $owner = User::find($ownerId);
+                LocaleContext::withLocale($owner, function () use ($buddy, $goal, $ownerId, $id, $note) {
+                    $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
+                    Notification::createNotification(
+                        $ownerId,
+                        __('api_controllers_3.goals.buddy_action_owner', [
+                            'name' => $buddyName,
+                            'title' => $goal->title,
+                            'action' => __('api_controllers_3.goals.buddy_action_' . ($note['type'] ?? 'encouragement')),
+                        ]),
+                        "/goals/{$id}",
+                        'goal_buddy'
+                    );
+                });
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal buddy nudge notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+
+        return $this->respondWithData($note, null, 201);
     }
 
     // -----------------------------------------------------------------
@@ -466,7 +513,7 @@ class GoalsController extends BaseApiController
                     $ownerName = $owner->name ?? __('emails.common.fallback_someone');
                     Notification::createNotification(
                         $mentorId,
-                        "{$ownerName} checked in on their goal: {$goal->title}",
+                        __('api_controllers_3.goals.checkin_mentor', ['name' => $ownerName, 'title' => $goal->title]),
                         "/goals/{$id}",
                         'goal_checkin'
                     );
@@ -481,7 +528,16 @@ class GoalsController extends BaseApiController
 
     public function listCheckins(int $id): JsonResponse
     {
-        $this->getUserId();
+        $userId = $this->getUserId();
+
+        $goal = $this->goalService->getById($id);
+        if (! $goal) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
+        }
+
+        if (! $this->canViewGoal($goal, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
+        }
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -502,11 +558,15 @@ class GoalsController extends BaseApiController
 
     public function history(int $id): JsonResponse
     {
-        $this->getUserId();
+        $userId = $this->getUserId();
 
         $goal = $this->goalService->getById($id);
         if (! $goal) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
+        }
+
+        if (! $this->canViewGoal($goal, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
         }
 
         $filters = [
@@ -528,16 +588,36 @@ class GoalsController extends BaseApiController
 
     public function historySummary(int $id): JsonResponse
     {
-        $this->getUserId();
+        $userId = $this->getUserId();
 
         $goal = $this->goalService->getById($id);
         if (! $goal) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
+        if (! $this->canViewGoal($goal, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
+        }
+
         $summary = $this->progressService->getSummary($id);
 
         return $this->respondWithData($summary);
+    }
+
+    public function insights(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $goal = $this->goalService->getById($id);
+        if (! $goal) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
+        }
+
+        if (! $this->canViewGoal($goal, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
+        }
+
+        return $this->respondWithData($this->progressService->getInsights($id));
     }
 
     // -----------------------------------------------------------------

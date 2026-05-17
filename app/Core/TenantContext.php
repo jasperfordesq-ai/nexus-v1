@@ -503,6 +503,14 @@ class TenantContext
     }
 
     /**
+     * Get the current tenant display name.
+     */
+    public static function getName(string $default = 'Project NEXUS'): string
+    {
+        return (string) self::getSetting('site_name', $default);
+    }
+
+    /**
      * Get the frontend URL for user-facing links (emails, notifications).
      * Priority: FRONTEND_URL env -> tenant site_url -> APP_URL env -> fallback.
      *

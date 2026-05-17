@@ -42,6 +42,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { GoalProgressHistory } from './components/GoalProgressHistory';
+import { GoalInsightsPanel } from './components/GoalInsightsPanel';
 
 interface Goal {
   id: number;
@@ -250,6 +251,7 @@ export function GoalDetailPage() {
         {/* Progress */}
         <div>
           <h2 className="text-sm font-semibold text-theme-primary mb-2">{t('goals.detail.progress')}</h2>
+          <p className="text-xs text-theme-muted mb-2">{t('goals.detail.progress_explainer')}</p>
           <div className="flex justify-between text-xs text-theme-subtle mb-1">
             <span>{goal.current_value} / {goal.target_value}</span>
             <span>{Math.min(100, Math.round(goal.progress_percentage))}%</span>
@@ -318,6 +320,15 @@ export function GoalDetailPage() {
               </Link>
             </div>
           )}
+          {!goal.buddy_name && goal.is_public && (
+            <div className="bg-theme-elevated rounded-xl p-3">
+              <div className="flex items-center gap-2 text-xs text-theme-subtle mb-1">
+                <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                {t('goals.detail.buddy')}
+              </div>
+              <p className="text-sm text-theme-muted">{t('goals.detail.no_buddy')}</p>
+            </div>
+          )}
         </div>
 
         {/* Owner info */}
@@ -337,6 +348,14 @@ export function GoalDetailPage() {
             </div>
           </Link>
         )}
+
+        <div>
+          <h2 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
+            {t('goals.detail.insights')}
+          </h2>
+          <GoalInsightsPanel goalId={goal.id} canNudge={goal.is_buddy} />
+        </div>
 
         {/* Progress history (only for owner / public goals — endpoint is open but UI hides it for stranger-private) */}
         <SocialInteractionPanel

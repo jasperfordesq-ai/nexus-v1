@@ -656,6 +656,7 @@ return [
     // USER-FACING — GOALS
     // ============================================
     'buddy_added'                          => 'You are now a buddy for this goal',
+    'goal_buddy_required'                  => 'Only the goal buddy can send buddy support for this goal',
 
     // ============================================
     // USER-FACING — ENDORSEMENTS

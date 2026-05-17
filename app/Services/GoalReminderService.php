@@ -45,9 +45,10 @@ class GoalReminderService
             ->first();
 
         $values = [
-            'frequency'  => $data['frequency'] ?? 'weekly',
-            'enabled'    => $data['enabled'] ?? true,
-            'updated_at' => now(),
+            'frequency'        => $data['frequency'] ?? 'weekly',
+            'enabled'          => $data['enabled'] ?? true,
+            'next_reminder_at' => $data['next_reminder_at'] ?? static::nextReminderAt($data['frequency'] ?? 'weekly'),
+            'updated_at'       => now(),
         ];
 
         if ($existing) {
@@ -59,6 +60,7 @@ class GoalReminderService
             $id = DB::table('goal_reminders')->insertGetId(array_merge($values, [
                 'goal_id'    => $goalId,
                 'user_id'    => $userId,
+                'tenant_id'  => TenantContext::getId(),
                 'created_at' => now(),
             ]));
         }
