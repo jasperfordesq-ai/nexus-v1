@@ -627,9 +627,23 @@ class SafeguardingService
                 }
 
                 try {
-                    Mail::to($recipient->email)->send(
-                        new SafeguardingCriticalMail($reportPayload, $reporterName)
-                    );
+                    // SafeguardingCriticalMail is a Laravel Mailable, but
+                    // Laravel's default Mail facade uses SMTP which is NOT
+                    // configured in prod — so Mail::to(...)->send(...) silently
+                    // dropped every critical safeguarding alert.
+                    //
+                    // Render the Mailable to HTML and dispatch via the platform
+                    // Mailer (SendGrid via .env or per-tenant config). All other
+                    // outgoing email in the platform routes this way.
+                    $mailable = new SafeguardingCriticalMail($reportPayload, $reporterName);
+                    $subject  = (string) ($mailable->envelope()->subject ?? __('safeguarding.critical.subject'));
+                    $html     = $mailable->render();
+                    $sent     = \App\Core\Mailer::forCurrentTenant()->send($recipient->email, $subject, $html);
+                    if (!$sent) {
+                        Log::warning('[Safeguarding] Critical email returned false from Mailer', [
+                            'user_id' => $userId,
+                        ]);
+                    }
                 } catch (\Throwable $e) {
                     Log::warning('[Safeguarding] Critical email send failed', [
                         'user_id' => $userId,

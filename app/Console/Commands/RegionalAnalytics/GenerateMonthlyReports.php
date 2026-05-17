@@ -124,11 +124,18 @@ class GenerateMonthlyReports extends Command
             if ($email === '') {
                 return;
             }
-            Mail::raw(
-                "Your regional analytics report for {$periodLabel} is ready.\n\nDownload: {$fileUrl}\n\nAll figures are bucketed per the Project NEXUS privacy guarantees.",
-                function ($m) use ($email, $periodLabel) {
-                    $m->to($email)->subject("Regional analytics report — {$periodLabel}");
-                }
+            // Route through the platform Mailer (SendGrid). The default
+            // Laravel Mail::raw() uses SMTP which isn't configured in prod;
+            // emails to subscribers would silently fail.
+            $body = "<p>Your regional analytics report for "
+                . htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8')
+                . " is ready.</p>"
+                . '<p><a href="' . htmlspecialchars($fileUrl, ENT_QUOTES, 'UTF-8') . '">Download report</a></p>'
+                . "<p>All figures are bucketed per the Project NEXUS privacy guarantees.</p>";
+            \App\Core\Mailer::forCurrentTenant()->send(
+                $email,
+                "Regional analytics report — {$periodLabel}",
+                $body
             );
         } catch (\Throwable $e) {
             // Mail errors should not fail the run.

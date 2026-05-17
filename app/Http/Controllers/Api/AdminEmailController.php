@@ -207,7 +207,12 @@ class AdminEmailController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), 'to', 400);
         }
 
-        $mailer = new Mailer();
+        // Use forCurrentTenant() so the test respects the admin's tenant
+        // email_settings (matches testProvider() below). The previous
+        // `new Mailer()` ignored per-tenant overrides and only loaded the
+        // platform .env — fine for platform admins, misleading for tenant
+        // admins on tenants with their own SendGrid/SMTP config.
+        $mailer = Mailer::forCurrentTenant();
         $provider = $mailer->getProviderType();
 
         $result = $mailer->send(
