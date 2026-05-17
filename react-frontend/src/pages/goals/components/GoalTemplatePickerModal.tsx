@@ -150,12 +150,18 @@ export function GoalTemplatePickerModal({
       onClose={onClose}
       size="3xl"
       scrollBehavior="inside"
-      classNames={{ base: 'bg-content1 border border-theme-default' }}
+      placement="top-center"
+      classNames={{
+        backdrop: 'z-[9998]',
+        wrapper: 'z-[9999] items-start px-3 py-4 pt-[calc(env(safe-area-inset-top)_+_7rem)] sm:px-4 sm:pt-[calc(env(safe-area-inset-top)_+_8rem)]',
+        base: 'z-[10000] bg-content1 border border-theme-default my-0 max-h-[calc(100dvh_-_env(safe-area-inset-top)_-_8rem)] sm:max-h-[calc(100dvh_-_env(safe-area-inset-top)_-_9rem)]',
+        body: 'overflow-y-auto',
+      }}
     >
       <ModalContent>
         <ModalHeader className="flex items-center gap-2 text-theme-primary">
           <FileText className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-          Start from Template
+          {t('template.title')}
         </ModalHeader>
         <ModalBody>
           {isLoading ? (

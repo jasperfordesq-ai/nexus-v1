@@ -448,7 +448,10 @@ export function GoalsPage() {
   };
 
   const modalClasses = {
-    base: 'bg-content1 border border-theme-default',
+    backdrop: 'z-[9998]',
+    wrapper: 'z-[9999] items-start px-3 py-4 pt-28 sm:px-4 sm:pt-32',
+    base: 'z-[10000] bg-content1 border border-theme-default my-0 max-h-[calc(100dvh_-_8rem)] sm:max-h-[calc(100dvh_-_9rem)]',
+    body: 'overflow-y-auto',
   };
 
   const inputClasses = {
@@ -517,8 +520,8 @@ export function GoalsPage() {
         </Button>
       </div>
 
-      <GlassCard className="p-4 sm:p-5">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-4">
+      <section className="rounded-lg border border-theme-default bg-theme-elevated/60 p-4 sm:p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-4 lg:items-center">
           <div className="flex gap-3">
             <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
               <Users className="w-5 h-5" aria-hidden="true" />
@@ -530,23 +533,27 @@ export function GoalsPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-lg bg-theme-elevated p-3">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
+            <div className="flex gap-3">
+              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
                 <ClipboardCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('goals.guide.checkins_title')}
               </div>
-              <p className="text-sm text-theme-muted mt-1">{t('goals.guide.checkins_body')}</p>
+              <div>
+                <h3 className="text-xs font-semibold uppercase text-theme-subtle">{t('goals.guide.checkins_title')}</h3>
+                <p className="text-sm text-theme-muted mt-1">{t('goals.guide.checkins_body')}</p>
+              </div>
             </div>
-            <div className="rounded-lg bg-theme-elevated p-3">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
+            <div className="flex gap-3">
+              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400">
                 <Target className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('goals.guide.progress_title')}
               </div>
-              <p className="text-sm text-theme-muted mt-1">{t('goals.guide.progress_body')}</p>
+              <div>
+                <h3 className="text-xs font-semibold uppercase text-theme-subtle">{t('goals.guide.progress_title')}</h3>
+                <p className="text-sm text-theme-muted mt-1">{t('goals.guide.progress_body')}</p>
+              </div>
             </div>
           </div>
         </div>
-      </GlassCard>
+      </section>
 
       {/* Error State */}
       {error && !isLoading && (

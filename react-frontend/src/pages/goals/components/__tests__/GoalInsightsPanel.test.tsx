@@ -74,6 +74,26 @@ describe('GoalInsightsPanel', () => {
     expect(screen.getByText('Keep going')).toBeInTheDocument();
   });
 
+  it('uses a clear helper when no check-in cadence is set', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: {
+        ...mockInsights,
+        checkin_frequency: 'none',
+        next_checkin_due_at: null,
+      },
+    });
+
+    render(<GoalInsightsPanel goalId={42} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No cadence set')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Set a cadence when editing this goal.')).toBeInTheDocument();
+    expect(screen.queryByText('No cadence cadence')).not.toBeInTheDocument();
+  });
+
   it('lets a buddy send a nudge', async () => {
     const user = userEvent.setup();
     render(<GoalInsightsPanel goalId={42} canNudge />);

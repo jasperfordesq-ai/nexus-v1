@@ -92,6 +92,7 @@
     "best_streak": "Best streak: {{count}}",
     "next_checkin": "Next check-in",
     "no_cadence": "No cadence set",
+    "no_cadence_helper": "Set a cadence when editing this goal.",
     "checkin_due": "A check-in is due",
     "frequency": "{{frequency}} cadence",
     "checkins": "Check-ins",

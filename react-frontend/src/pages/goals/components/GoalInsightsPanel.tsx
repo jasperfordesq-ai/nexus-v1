@@ -134,6 +134,12 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
   const milestonePercent = insights.milestone_count > 0
     ? Math.round((insights.completed_milestones / insights.milestone_count) * 100)
     : 0;
+  const hasCheckinCadence = insights.checkin_frequency !== 'none';
+  const nextCheckinHelper = insights.is_checkin_due
+    ? t('insights.checkin_due')
+    : hasCheckinCadence
+      ? t('insights.frequency', { frequency: t(`frequency.${insights.checkin_frequency}`) })
+      : t('insights.no_cadence_helper');
 
   return (
     <div className="space-y-4">
@@ -148,7 +154,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
           icon={<Bell className="w-4 h-4 text-sky-400" aria-hidden="true" />}
           label={t('insights.next_checkin')}
           value={insights.next_checkin_due_at ? formatRelativeTime(insights.next_checkin_due_at) : t('insights.no_cadence')}
-          helper={insights.is_checkin_due ? t('insights.checkin_due') : t('insights.frequency', { frequency: t(`frequency.${insights.checkin_frequency}`) })}
+          helper={nextCheckinHelper}
           tone={insights.is_checkin_due ? 'warning' : 'default'}
         />
         <InsightCard
