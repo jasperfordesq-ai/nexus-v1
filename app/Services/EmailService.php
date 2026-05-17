@@ -33,6 +33,7 @@ class EmailService
                 $options['cc']             ?? null,
                 $options['replyTo']        ?? null,
                 $options['unsubscribeUrl'] ?? null,
+                $options['category']       ?? null,
             );
         } catch (\Throwable $e) {
             Log::error('EmailService::send failed', ['to' => self::maskEmail($to), 'error' => $e->getMessage()]);

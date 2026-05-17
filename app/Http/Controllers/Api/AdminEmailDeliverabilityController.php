@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\EmailMonitorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -54,7 +55,8 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $suppressed = (int) ($rows['suppressed'] ?? 0);
         $total     = $sent + $delivered + $bounced + $failed + $suppressed;
 
-        $deliveredRate = $total > 0 ? round((($sent + $delivered) / $total) * 100, 1) : null;
+        $deliveredRate = $total > 0 ? round(($delivered / $total) * 100, 1) : null;
+        $acceptedRate  = $total > 0 ? round((($sent + $delivered) / $total) * 100, 1) : null;
         $bouncedRate   = $total > 0 ? round(($bounced / $total) * 100, 1) : null;
 
         return $this->respondWithData([
@@ -62,7 +64,10 @@ class AdminEmailDeliverabilityController extends BaseApiController
             'total'           => $total,
             'by_status'       => $rows,
             'delivered_pct'   => $deliveredRate,
+            'accepted_pct'    => $acceptedRate,
+            'unconfirmed_sent' => $sent,
             'bounced_pct'     => $bouncedRate,
+            'warnings'        => app(EmailMonitorService::class)->getWarnings($tenantId),
         ]);
     }
 
@@ -105,7 +110,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->offset($offset)
             ->get([
                 'id', 'user_id', 'recipient_email', 'category', 'subject',
-                'status', 'provider_message_id', 'error',
+                'provider', 'status', 'provider_message_id', 'error',
                 'sent_at', 'delivered_at', 'bounced_at', 'opened_at', 'created_at',
             ]);
 
@@ -233,7 +238,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->orderByDesc('id')
             ->limit(50)
             ->get([
-                'id', 'recipient_email', 'category', 'subject', 'status',
+                'id', 'recipient_email', 'category', 'subject', 'provider', 'status',
                 'error', 'sent_at', 'delivered_at', 'bounced_at', 'opened_at', 'created_at',
             ]);
 

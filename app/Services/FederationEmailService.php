@@ -30,10 +30,15 @@ class FederationEmailService
     /**
      * Send a new message notification to a federation recipient.
      */
-    public static function sendNewMessageNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, string $messagePreview): bool
+    public static function sendNewMessageNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, string $messagePreview, ?int $recipientTenantId = null): bool
     {
         try {
-            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
+            $recipientTenantId ??= TenantContext::getId();
+            if (!$recipientTenantId) {
+                return false;
+            }
+
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
             if (!$recipient || empty($recipient->email)) {
                 return false;
             }
@@ -41,7 +46,11 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $messagePreview) {
+            $previousTenantId = TenantContext::getId();
+            TenantContext::setById($recipientTenantId);
+
+            try {
+                LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $messagePreview) {
                 $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
                 $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
                 $preview = mb_substr(strip_tags($messagePreview), 0, 200);
@@ -68,8 +77,15 @@ class FederationEmailService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($recipient->email, $subject, $html);
-            });
+                $mailer->send($recipient->email, $subject, $html, null, null, null, 'federation_message');
+                });
+            } finally {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
 
             Log::info('[FederationEmail] Message notification sent', [
                 'recipient' => $recipientUserId,

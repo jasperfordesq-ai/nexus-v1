@@ -8844,6 +8844,7 @@ DROP TABLE IF EXISTS `notification_queue`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notification_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `activity_type` varchar(50) NOT NULL,
   `content_snippet` text DEFAULT NULL,
@@ -8854,6 +8855,7 @@ CREATE TABLE `notification_queue` (
   `frequency` enum('instant','daily','weekly') DEFAULT 'daily',
   `email_body` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
+  KEY `notification_queue_tenant_status_frequency_idx` (`tenant_id`,`status`,`frequency`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

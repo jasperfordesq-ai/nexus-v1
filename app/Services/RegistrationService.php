@@ -584,7 +584,7 @@ class RegistrationService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html);
+                $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification');
             });
         } catch (\Throwable $e) {
             Log::warning('RegistrationService: Failed to send verification email', [

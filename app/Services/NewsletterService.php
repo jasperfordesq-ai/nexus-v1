@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Newsletter;
 use App\Models\NewsletterSegment;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -224,8 +225,14 @@ class NewsletterService
      */
     public static function processQueue(int $newsletterId, int $batchSize = 50): array
     {
+        $lockKey = "newsletter_queue:{$newsletterId}:runner_lock";
+        if (!Cache::add($lockKey, getmypid() ?: uniqid('newsletter_', true), 300)) {
+            return ['sent' => 0, 'failed' => 0, 'locked' => true];
+        }
+
         $newsletter = Newsletter::find($newsletterId);
         if (!$newsletter) {
+            Cache::forget($lockKey);
             return ['sent' => 0, 'failed' => 0];
         }
 
@@ -392,6 +399,8 @@ class NewsletterService
                 'sent_at' => now(),
             ]);
         }
+
+        Cache::forget($lockKey);
 
         return ['sent' => $sent, 'failed' => $failed];
     }

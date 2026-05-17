@@ -85,6 +85,7 @@ class NotificationDispatcher
         if (Cache::has($dedupKey)) {
             // Duplicate within 60s window — skip in-app creation but still process email
             Log::debug('NotificationDispatcher: deduplicated', ['user' => $userId, 'type' => $activityType]);
+            return;
         } else {
             Cache::put($dedupKey, 1, now()->addSeconds(60));
             Notification::createNotification((int) $userId, $content, $link, $activityType);
@@ -902,7 +903,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
-                    Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                    Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
                 } catch (\Throwable $e) {
                     Log::warning('[IdentityVerification] passed email failed: ' . $e->getMessage());
                 }
@@ -956,7 +957,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
-                    Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                    Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'identity_verification');
                 } catch (\Throwable $e) {
                     Log::warning('[IdentityVerification] failed email failed: ' . $e->getMessage());
                 }

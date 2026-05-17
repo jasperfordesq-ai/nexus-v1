@@ -130,7 +130,7 @@ class SendGridWebhookController extends BaseApiController
             // reflects real-time SendGrid status. These updates are
             // additive — the existing NewsletterBounce / EmailMonitorService
             // pipelines below continue to run unchanged.
-            $this->updateEmailLogAndSuppression($event, $type);
+            $this->updateEmailLogAndSuppression($event, $type, $tenantId);
 
             switch ($type) {
                 case 'bounce':
@@ -181,7 +181,7 @@ class SendGridWebhookController extends BaseApiController
      * Best-effort: silently no-ops if the new tables don't exist on this
      * deployment yet.
      */
-    private function updateEmailLogAndSuppression(array $event, string $type): void
+    private function updateEmailLogAndSuppression(array $event, string $type, int $tenantId = 0): void
     {
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
@@ -250,6 +250,7 @@ class SendGridWebhookController extends BaseApiController
             if ($logUpdate) {
                 $row = DB::table('email_log')
                     ->where('recipient_email', $email)
+                    ->when($tenantId > 0, fn ($q) => $q->where('tenant_id', $tenantId))
                     ->when($baseId !== '', fn ($q) => $q->where('provider_message_id', 'like', $baseId . '%'))
                     ->orderByDesc('id')
                     ->first();

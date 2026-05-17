@@ -727,12 +727,16 @@ class MarketplacePaymentService
             return; // Not a marketplace payment
         }
 
-        if (in_array($payment->status, ['refunded'], true)) {
+        $refundedAmountCents = $charge->amount_refunded ?? 0;
+        $refundedAmount = $refundedAmountCents / 100;
+
+        if (
+            in_array($payment->status, ['refunded'], true)
+            || ((float) ($payment->refund_amount ?? 0) >= $refundedAmount && $refundedAmount > 0)
+        ) {
             return; // Already processed
         }
 
-        $refundedAmountCents = $charge->amount_refunded ?? 0;
-        $refundedAmount = $refundedAmountCents / 100;
         $isFullRefund = $refundedAmountCents >= ($charge->amount ?? 0);
 
         $payment->refund_amount = $refundedAmount;
@@ -750,7 +754,10 @@ class MarketplacePaymentService
 
         // Notify buyer of the refund
         if ($order) {
+            $previousTenantId = TenantContext::getId();
             try {
+                TenantContext::setById((int) $payment->tenant_id);
+
                 $bellKey = $isFullRefund ? 'api_controllers_3.marketplace_order.refunded' : 'api_controllers_3.marketplace_order.partially_refunded';
                 $emailSubjectKey = $isFullRefund ? 'emails_misc.marketplace_order.refunded_subject' : 'emails_misc.marketplace_order.partially_refunded_subject';
                 $emailTitleKey   = $isFullRefund ? 'emails_misc.marketplace_order.refunded_title'   : 'emails_misc.marketplace_order.partially_refunded_title';
@@ -768,7 +775,11 @@ class MarketplacePaymentService
                     'created_at' => now(),
                 ]);
 
-                $buyer = DB::table('users')->where('id', $order->buyer_id)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+                $buyer = DB::table('users')
+                    ->where('id', $order->buyer_id)
+                    ->where('tenant_id', $payment->tenant_id)
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
+                    ->first();
                 if ($buyer && !empty($buyer->email)) {
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/marketplace/orders/' . $order->id;
                     LocaleContext::withLocale($buyer, function () use ($buyer, $emailTitleKey, $emailBodyKey, $emailSubjectKey, $amountFormatted, $currency, $orderNumber, $fullUrl): void {
@@ -779,10 +790,21 @@ class MarketplacePaymentService
                             ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
                             ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html);
+                        Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html, null, null, null, 'marketplace_refund');
                     });
                 }
+
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
             } catch (\Throwable $e) {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
                 Log::warning('MarketplacePayment webhook: refund notification failed', [
                     'order_id' => $order->id,
                     'error' => $e->getMessage(),

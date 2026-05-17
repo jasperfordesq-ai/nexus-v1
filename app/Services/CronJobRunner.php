@@ -293,6 +293,14 @@ class CronJobRunner
         header('Content-Type: text/plain');
         echo "Starting $frequency digest processing...\n";
 
+        DB::update(
+            "UPDATE notification_queue
+                SET status = 'pending'
+              WHERE frequency = ? AND status = 'processing'
+                AND created_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)",
+            [$frequency]
+        );
+
         // 1. Find users with pending items for this frequency
         $sql = "SELECT user_id, COUNT(*) as count
                 FROM notification_queue
@@ -418,7 +426,7 @@ class CronJobRunner
                 $userTenantId = $user['tenant_id'] ?? null;
                 if (!empty($ids) && $userTenantId) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
-                    $revertSql = "UPDATE notification_queue SET status = 'failed'
+                    $revertSql = "UPDATE notification_queue SET status = 'pending'
                                   WHERE id IN ($inQuery) AND tenant_id = ?";
                     DB::update($revertSql, array_merge($ids, [$userTenantId]));
                 }
@@ -439,6 +447,15 @@ class CronJobRunner
 
         try {
             echo "Processing Instant Queue...\n";
+
+            $lockKey = 'notification_queue:instant:runner_lock';
+            if (!Cache::add($lockKey, getmypid() ?: uniqid('runner_', true), 120)) {
+                echo "Instant queue is already being processed by another runner.\n";
+                $output = ob_get_clean();
+                echo $output;
+                $this->logJob('success', $output);
+                return;
+            }
 
             // Race condition fix: atomically claim up to 50 pending items
             $claimSql = "UPDATE notification_queue
@@ -522,9 +539,13 @@ class CronJobRunner
 
             // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
             DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+            Cache::forget($lockKey);
 
             echo "Done.\n";
         } catch (\Throwable $e) {
+            if (isset($lockKey)) {
+                Cache::forget($lockKey);
+            }
             echo "\nError: " . $e->getMessage() . "\n";
             $status = 'error';
 
@@ -1285,6 +1306,12 @@ class CronJobRunner
      */
     private function runInstantQueueInternal()
     {
+        $lockKey = 'notification_queue:instant:runner_lock';
+        if (!Cache::add($lockKey, getmypid() ?: uniqid('runner_', true), 120)) {
+            echo "   Instant queue is already being processed by another runner.\n";
+            return;
+        }
+
         // Race condition fix: atomically claim up to 50 pending items
         $claimSql = "UPDATE notification_queue
                      SET status = 'processing'
@@ -1295,6 +1322,7 @@ class CronJobRunner
 
         if ($claimed === 0) {
             echo "   No pending instant notifications.\n";
+            Cache::forget($lockKey);
             return;
         }
 
@@ -1363,6 +1391,7 @@ class CronJobRunner
 
         // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
         DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+        Cache::forget($lockKey);
 
         echo "   Sent $sent instant notifications.\n";
     }
@@ -2662,11 +2691,13 @@ class CronJobRunner
             $totalGenerated = 0;
             $totalPatterns = 0;
             $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalGenerated, &$totalPatterns) {
-                $result = RecurringShiftService::processAllPatterns(14);
-                $totalGenerated += $result['shifts_generated'];
-                $totalPatterns += $result['patterns_processed'];
-                if ($result['shifts_generated'] > 0) {
-                    echo "   [$slug] Generated {$result['shifts_generated']} shifts from {$result['patterns_processed']} patterns.\n";
+                $result = app(RecurringShiftService::class)->processAllPatterns(14);
+                $generated = (int) ($result['generated'] ?? 0);
+                $processed = (int) ($result['processed'] ?? 0);
+                $totalGenerated += $generated;
+                $totalPatterns += $processed;
+                if ($generated > 0) {
+                    echo "   [$slug] Generated {$generated} shifts from {$processed} patterns.\n";
                 }
             });
             echo "   Recurring shift generation complete ($totalGenerated shifts from $totalPatterns patterns).\n";

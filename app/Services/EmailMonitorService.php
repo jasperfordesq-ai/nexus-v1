@@ -86,6 +86,11 @@ class EmailMonitorService
      */
     public function recordTokenRefresh(bool $success, ?int $tenantId = null): void
     {
+        static::recordTokenRefreshStatic($success, $tenantId);
+    }
+
+    public static function recordTokenRefreshStatic(bool $success, ?int $tenantId = null): void
+    {
         try {
             $scope = $tenantId ? "tenant:{$tenantId}" : 'global';
             $status = $success ? 'success' : 'failure';
@@ -108,6 +113,11 @@ class EmailMonitorService
      * Record a fallback from primary provider to SMTP.
      */
     public function recordFallbackToSmtp(string $reason, ?int $tenantId = null): void
+    {
+        static::recordFallbackToSmtpStatic($reason, $tenantId);
+    }
+
+    public static function recordFallbackToSmtpStatic(string $reason, ?int $tenantId = null): void
     {
         try {
             $scope = $tenantId ? "tenant:{$tenantId}" : 'global';
@@ -137,6 +147,11 @@ class EmailMonitorService
      */
     public function recordCircuitBreakerOpen(?int $tenantId = null): void
     {
+        static::recordCircuitBreakerOpenStatic($tenantId);
+    }
+
+    public static function recordCircuitBreakerOpenStatic(?int $tenantId = null): void
+    {
         try {
             $scope = $tenantId ? "tenant:{$tenantId}" : 'global';
 
@@ -158,6 +173,11 @@ class EmailMonitorService
      * Record a rate limit hit event.
      */
     public function recordRateLimitHit(?int $tenantId = null): void
+    {
+        static::recordRateLimitHitStatic($tenantId);
+    }
+
+    public static function recordRateLimitHitStatic(?int $tenantId = null): void
     {
         try {
             $scope = $tenantId ? "tenant:{$tenantId}" : 'global';
@@ -244,6 +264,7 @@ class EmailMonitorService
                     'hits' => (int) Cache::get(self::CACHE_PREFIX . "{$scope}:rate_limit:hits", 0),
                     'last_hit' => Cache::get(self::CACHE_PREFIX . "{$scope}:rate_limit:last_hit"),
                 ],
+                'warnings' => $this->getWarnings($tenantId),
                 'period' => 'rolling_24h',
             ];
         } catch (\Throwable $e) {
@@ -257,9 +278,178 @@ class EmailMonitorService
                 'smtp_fallbacks' => ['count' => 0, 'last_reason' => null, 'last_at' => null],
                 'circuit_breaker' => ['opens' => 0, 'last_opened' => null],
                 'rate_limits' => ['hits' => 0, 'last_hit' => null],
+                'warnings' => [[
+                    'code' => 'email_health_unavailable',
+                    'severity' => 'warning',
+                    'message_key' => 'email_health.warnings.unavailable',
+                    'params' => ['error' => $e->getMessage()],
+                ]],
                 'period' => 'rolling_24h',
                 'error' => 'Cache unavailable',
             ];
         }
+    }
+
+    /**
+     * Build tenant-scoped email health warnings from durable tables.
+     *
+     * Returns translation keys + params so the admin UI can render localized
+     * copy without hardcoded API strings.
+     *
+     * @return list<array{code:string,severity:string,message_key:string,params:array<string,mixed>}>
+     */
+    public function getWarnings(?int $tenantId = null): array
+    {
+        $warnings = [];
+
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
+                return [[
+                    'code' => 'email_log_missing',
+                    'severity' => 'critical',
+                    'message_key' => 'email_health.warnings.email_log_missing',
+                    'params' => [],
+                ]];
+            }
+
+            $logQuery = DB::table('email_log');
+            if ($tenantId !== null) {
+                $logQuery->where('tenant_id', $tenantId);
+            }
+
+            $last24h = (clone $logQuery)
+                ->where('created_at', '>=', now()->subDay())
+                ->select('status', DB::raw('COUNT(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status');
+
+            $sent = (int) ($last24h['sent'] ?? 0);
+            $delivered = (int) ($last24h['delivered'] ?? 0);
+            $failed = (int) ($last24h['failed'] ?? 0);
+            $bounced = (int) ($last24h['bounced'] ?? 0);
+            $suppressed = (int) ($last24h['suppressed'] ?? 0);
+            $total = $sent + $delivered + $failed + $bounced + $suppressed;
+            $bad = $failed + $bounced + $suppressed;
+
+            if ($bad > 0) {
+                $rate = $total > 0 ? round(($bad / $total) * 100, 1) : 100.0;
+                $warnings[] = [
+                    'code' => 'recent_email_failures',
+                    'severity' => ($bad >= 5 || $rate >= 25.0) ? 'critical' : 'warning',
+                    'message_key' => 'email_health.warnings.recent_email_failures',
+                    'params' => ['count' => $bad, 'rate' => $rate, 'window_hours' => 24],
+                ];
+            }
+
+            $criticalCategories = [
+                'activation',
+                'admin_welcome',
+                'approval',
+                'email_verification',
+                'identity_verification',
+                'password_reset',
+                'security_alert',
+                'welcome',
+            ];
+
+            $criticalFailures = (clone $logQuery)
+                ->where('created_at', '>=', now()->subDay())
+                ->whereIn('category', $criticalCategories)
+                ->whereIn('status', ['failed', 'suppressed', 'bounced'])
+                ->count();
+
+            if ($criticalFailures > 0) {
+                $warnings[] = [
+                    'code' => 'critical_email_failures',
+                    'severity' => 'critical',
+                    'message_key' => 'email_health.warnings.critical_email_failures',
+                    'params' => ['count' => $criticalFailures, 'window_hours' => 24],
+                ];
+            }
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('notification_queue')) {
+                $queue = DB::table('notification_queue');
+                if ($tenantId !== null) {
+                    $queue->where('tenant_id', $tenantId);
+                }
+
+                $failedQueue = (clone $queue)
+                    ->where('status', 'failed')
+                    ->where('created_at', '>=', now()->subDay())
+                    ->count();
+                if ($failedQueue > 0) {
+                    $warnings[] = [
+                        'code' => 'notification_queue_failures',
+                        'severity' => 'warning',
+                        'message_key' => 'email_health.warnings.notification_queue_failures',
+                        'params' => ['count' => $failedQueue, 'window_hours' => 24],
+                    ];
+                }
+
+                $staleProcessing = (clone $queue)
+                    ->where('status', 'processing')
+                    ->where('created_at', '<', now()->subMinutes(15))
+                    ->count();
+                if ($staleProcessing > 0) {
+                    $warnings[] = [
+                        'code' => 'notification_queue_stale_processing',
+                        'severity' => 'critical',
+                        'message_key' => 'email_health.warnings.notification_queue_stale_processing',
+                        'params' => ['count' => $staleProcessing, 'minutes' => 15],
+                    ];
+                }
+            }
+
+            if ($tenantId !== null && \Illuminate\Support\Facades\Schema::hasTable('users')) {
+                $activeUsers = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->whereNull('deleted_at')
+                    ->whereIn('status', ['active', 'pending'])
+                    ->count();
+
+                $lastSendAt = (clone $logQuery)->max('created_at');
+                if ($activeUsers > 0 && ($lastSendAt === null || strtotime((string) $lastSendAt) < now()->subDays(7)->getTimestamp())) {
+                    $warnings[] = [
+                        'code' => 'no_recent_email_activity',
+                        'severity' => 'info',
+                        'message_key' => 'email_health.warnings.no_recent_email_activity',
+                        'params' => ['days' => 7],
+                    ];
+                }
+
+                $newUsersMissingActivationLog = DB::table('users')
+                    ->where('users.tenant_id', $tenantId)
+                    ->whereNull('users.deleted_at')
+                    ->where('users.created_at', '>=', now()->subDay())
+                    ->whereNotExists(function ($q) use ($tenantId) {
+                        $q->select(DB::raw(1))
+                            ->from('email_log')
+                            ->whereColumn('email_log.user_id', 'users.id')
+                            ->where('email_log.tenant_id', $tenantId)
+                            ->whereIn('email_log.category', ['activation', 'admin_welcome', 'approval', 'email_verification', 'identity_verification', 'welcome'])
+                            ->whereColumn('email_log.created_at', '>=', 'users.created_at');
+                    })
+                    ->count();
+
+                if ($newUsersMissingActivationLog > 0) {
+                    $warnings[] = [
+                        'code' => 'new_users_without_activation_email_log',
+                        'severity' => 'critical',
+                        'message_key' => 'email_health.warnings.new_users_without_activation_email_log',
+                        'params' => ['count' => $newUsersMissingActivationLog, 'window_hours' => 24],
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('EmailMonitorService::getWarnings error', ['error' => $e->getMessage()]);
+            $warnings[] = [
+                'code' => 'email_warning_check_failed',
+                'severity' => 'warning',
+                'message_key' => 'email_health.warnings.check_failed',
+                'params' => ['error' => $e->getMessage()],
+            ];
+        }
+
+        return $warnings;
     }
 }

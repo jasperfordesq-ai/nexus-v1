@@ -238,7 +238,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html)) {
+                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
                     }
                 });
@@ -483,17 +483,22 @@ class WebAuthnController extends BaseApiController
         $input = $this->getAllInput();
         $credentialId = $input['credential_id'] ?? null;
         $tenantId = TenantContext::getId();
+        $deleted = 0;
 
         if ($credentialId) {
-            DB::delete(
+            $deleted = DB::delete(
                 "DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
                 [$credentialId, $userId, $tenantId]
             );
         } else {
-            DB::delete(
+            $deleted = DB::delete(
                 "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
             );
+        }
+
+        if ($deleted === 0) {
+            return $this->respondWithData(['message' => __('api_controllers_2.webauthn.credentials_removed')]);
         }
 
         // Security notification + email — both rendered in user's preferred_language.
@@ -530,7 +535,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html)) {
+                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
                     }
                 });
@@ -625,7 +630,7 @@ class WebAuthnController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                        if (!$mailer->send($user->email, $subject, $html)) {
+                        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
                             Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
                         }
                     });

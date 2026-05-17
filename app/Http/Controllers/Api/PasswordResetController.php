@@ -278,7 +278,7 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
-                $mailer->send($email, $subject, $html);
+                $mailer->send($email, $subject, $html, null, null, null, 'security_alert');
             });
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Failed to send password change email: ' . $e->getMessage());
@@ -386,7 +386,7 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.password_reset.subject', ['community' => $tenantName]);
-                $mailer->send($email, $subject, $html);
+                $mailer->send($email, $subject, $html, null, null, null, 'password_reset');
             });
             Log::info('[PasswordReset] reset email dispatched', [
                 'email_masked' => $masked,

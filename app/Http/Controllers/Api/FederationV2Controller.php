@@ -1902,7 +1902,8 @@ class FederationV2Controller extends BaseApiController
                     (int)$receiverId,
                     $userId,
                     $tenantId,
-                    substr($body, 0, 200)
+                    substr($body, 0, 200),
+                    (int)$receiverTenantId
                 );
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message email: " . $e->getMessage());

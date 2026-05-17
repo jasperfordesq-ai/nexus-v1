@@ -308,7 +308,7 @@ class Mailer
      * Append a row to email_log capturing the outcome of a send attempt.
      * Best-effort — never throws, never blocks the email itself.
      */
-    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null, ?int $tenantIdOverride = null): void
+    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null, ?int $tenantIdOverride = null, ?string $category = null, ?string $provider = null): void
     {
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
@@ -331,8 +331,9 @@ class Mailer
                 'tenant_id'           => $tenantId,
                 'user_id'             => $userId,
                 'recipient_email'     => $to,
+                'category'            => $category !== null ? mb_substr($category, 0, 64) : null,
                 'subject'             => mb_substr($subject, 0, 255),
-                'provider'            => null,
+                'provider'            => $provider,
                 'status'              => $status,
                 'provider_message_id' => $messageId,
                 'error'               => $error,
@@ -402,7 +403,7 @@ class Mailer
      * @param string|null $replyTo Reply-To address (optional)
      * @return bool
      */
-    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null): bool
+    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null): bool
     {
         // Sanitize header-injectable values — strip CR/LF to prevent email header injection
         $to = self::sanitizeHeaderValue($to);
@@ -430,7 +431,7 @@ class Mailer
         // hydrated by the SendGrid event webhook and by periodic sync from
         // /v3/suppression/* in the Mailer's housekeeping cron.
         if (self::isSuppressed($to)) {
-            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId);
+            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId, $category, $this->driver);
             \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -442,7 +443,10 @@ class Mailer
         // request emails in 5 minutes. Configurable cap, default 30/hour
         // per recipient address (well above any legitimate per-user volume).
         if (!self::checkRateLimit($to)) {
-            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId);
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordRateLimitHitStatic($this->tenantId);
+            }
+            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId, $category, $this->driver);
             \Illuminate\Support\Facades\Log::warning('Mailer: rate-limited recipient', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -453,55 +457,73 @@ class Mailer
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId);
+                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'sendgrid');
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId);
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('sendgrid_failed', $this->tenantId);
+                    \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
+                }
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId, $category, 'smtp');
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId);
+            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId, $category, 'sendgrid');
             return false;
         }
 
         if ($this->driver === 'gmail_api') {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent', null, null, $this->tenantId);
+                self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'gmail_api');
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed', $this->tenantId);
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('gmail_api_failed', $this->tenantId);
+                    \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
+                }
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed', $this->tenantId, $category, 'smtp');
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId);
+            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId, $category, 'gmail_api');
             return false;
         }
 
         $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
         if ($smtpOk) {
-            self::logEmail($to, $subject, 'sent', null, null, $this->tenantId);
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', true, $this->tenantId);
+            }
+            self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'smtp');
             return true;
+        }
+
+        if (class_exists(\App\Services\EmailMonitorService::class)) {
+            \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', false, $this->tenantId);
         }
 
         if ($this->usePlatformSendGridFallback()) {
             \Illuminate\Support\Facades\Log::warning("Mailer: SMTP failed, falling back to platform SendGrid for: " . self::maskEmail($to));
             $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId);
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('smtp_failed_platform_sendgrid', $this->tenantId);
+            }
+            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId, $category, 'sendgrid');
             return $sendGridOk;
         }
 
-        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId);
+        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId, $category, 'smtp');
         return false;
     }
 
@@ -621,6 +643,9 @@ class Mailer
         try {
             $accessToken = $this->getGmailAccessToken();
             if (!$accessToken) {
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordEmailSendStatic('gmail_api', false, $this->tenantId);
+                }
                 throw new \Exception("Failed to get Gmail API access token");
             }
 
@@ -658,10 +683,17 @@ class Mailer
                 throw new \Exception("Gmail API error ($httpCode): $errorMsg");
             }
 
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordEmailSendStatic('gmail_api', true, $this->tenantId);
+            }
+
             return true;
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Gmail API Error: " . $e->getMessage());
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordEmailSendStatic('gmail_api', false, $this->tenantId);
+            }
             return false;
         }
     }
@@ -684,6 +716,9 @@ class Mailer
             if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
                 $remainingSeconds = $circuitBreakerExpiry - time();
                 \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordCircuitBreakerOpenStatic($this->tenantId);
+                }
                 return null;
             }
 
@@ -728,6 +763,9 @@ class Mailer
                 $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
                 Cache::put($this->cacheKey(self::CACHE_KEY_CIRCUIT_BREAKER), $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT);
                 \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordCircuitBreakerOpenStatic($this->tenantId);
+                }
             }
         }
 
@@ -766,6 +804,9 @@ class Mailer
 
         if ($curlError) {
             \Illuminate\Support\Facades\Log::warning("Gmail token refresh cURL error: $curlError");
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordTokenRefreshStatic(false, $this->tenantId);
+            }
             return null;
         }
 
@@ -786,11 +827,17 @@ class Mailer
             // contain sensitive material (refresh tokens, secrets) on rare
             // backends.
             \Illuminate\Support\Facades\Log::warning("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $data['error'] ?? '[error body redacted]'));
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordTokenRefreshStatic(false, $this->tenantId);
+            }
             return null;
         }
 
         if (!isset($data['access_token'])) {
             \Illuminate\Support\Facades\Log::warning("Gmail token refresh response missing access_token field");
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordTokenRefreshStatic(false, $this->tenantId);
+            }
             return null;
         }
 
@@ -806,6 +853,9 @@ class Mailer
         }
 
         \Illuminate\Support\Facades\Log::warning("Gmail token refreshed successfully. Expires in {$expiresIn}s.");
+        if (class_exists(\App\Services\EmailMonitorService::class)) {
+            \App\Services\EmailMonitorService::recordTokenRefreshStatic(true, $this->tenantId);
+        }
 
         return $accessToken;
     }

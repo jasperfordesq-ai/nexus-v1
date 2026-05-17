@@ -519,7 +519,7 @@ class AdminUsersController extends BaseApiController
                         ->render();
 
                     $mailer = \App\Core\Mailer::forCurrentTenant();
-                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html);
+                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome');
                 });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsers] Welcome email failed for admin-created user: ' . $e->getMessage());
@@ -851,7 +851,11 @@ class AdminUsersController extends BaseApiController
                 (\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
-                    $html
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'security_alert'
                 );
             });
         } catch (\Throwable $e) {
@@ -1332,7 +1336,11 @@ class AdminUsersController extends BaseApiController
                 $mailer->send(
                     $user['email'],
                     __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
-                    $html
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'password_reset'
                 );
 
                 ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
@@ -1396,7 +1404,7 @@ class AdminUsersController extends BaseApiController
                 }
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($user['email'], $subject, $html);
+                $mailer->send($user['email'], $subject, $html, null, null, null, 'welcome');
 
                 ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
             });
@@ -1803,7 +1811,7 @@ class AdminUsersController extends BaseApiController
                     ? __('emails_misc.admin_actions.approval_subject_credits', ['community' => $tenantNameSafe, 'credits' => $creditsAwarded])
                     : __('emails_misc.admin_actions.approval_subject_approved', ['community' => $tenantNameSafe]);
 
-                $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html);
+                $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html, null, null, null, 'approval');
 
                 if ($result) {
                     \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
@@ -2024,11 +2032,6 @@ class AdminUsersController extends BaseApiController
                 $this->sendApprovalInAppNotification($userArr, $creditsAwarded);
                 $touchedIds[] = $id;
                 $success++;
-
-                $userArr = (array) $row;
-                $creditsAwarded = $this->grantWelcomeCredits($userArr, $adminId);
-                $this->sendApprovalWelcomeEmail($userArr, $creditsAwarded);
-                $this->sendApprovalInAppNotification($userArr, $creditsAwarded);
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] bulk-approve failed for user #{$id}: " . $e->getMessage());
                 $failed++;

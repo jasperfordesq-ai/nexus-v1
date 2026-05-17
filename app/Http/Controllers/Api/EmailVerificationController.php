@@ -95,9 +95,11 @@ class EmailVerificationController extends BaseApiController
             ]);
         }
 
-        // Mark user as verified and activate if pending (tenant-scoped)
+        // Mark user as verified. Only activate already-approved users; tenants
+        // that require admin approval must not become status-active from email
+        // verification alone.
         DB::update(
-            "UPDATE users SET email_verified_at = NOW(), is_verified = 1, status = CASE WHEN status = 'pending' THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
+            "UPDATE users SET email_verified_at = NOW(), is_verified = 1, status = CASE WHEN status = 'pending' AND is_approved = 1 THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
 
@@ -288,7 +290,7 @@ class EmailVerificationController extends BaseApiController
                     ->button(__('emails_misc.auth.verify_email_cta'), $verifyUrl)
                     ->render();
 
-                return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html);
+                return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html, null, null, null, 'email_verification');
             });
         } catch (\Throwable $e) {
             Log::warning('[EmailVerification] Verification email failed for user: ' . $e->getMessage(), ['user_id' => $user['id']]);
