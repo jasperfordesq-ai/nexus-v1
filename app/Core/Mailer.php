@@ -108,8 +108,12 @@ class Mailer
         $envSendGridKey = $envValues['SENDGRID_API_KEY'] ?? '';
         if (!empty($envSendGridKey) && !$this->useGmailApi) {
             $this->sendgridApiKey = $envSendGridKey;
-            $this->fromEmail = $envValues['SENDGRID_FROM_EMAIL'] ?? $this->fromEmail;
-            $this->fromName = $envValues['SENDGRID_FROM_NAME'] ?? $this->fromName;
+            if (!empty($envValues['SENDGRID_FROM_EMAIL'])) {
+                $this->fromEmail = $envValues['SENDGRID_FROM_EMAIL'];
+            }
+            if (!empty($envValues['SENDGRID_FROM_NAME'])) {
+                $this->fromName = $envValues['SENDGRID_FROM_NAME'];
+            }
             $this->driver = 'sendgrid';
         }
 
@@ -304,13 +308,13 @@ class Mailer
      * Append a row to email_log capturing the outcome of a send attempt.
      * Best-effort — never throws, never blocks the email itself.
      */
-    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null): void
+    private static function logEmail(string $to, string $subject, string $status, ?string $messageId = null, ?string $error = null, ?int $tenantIdOverride = null): void
     {
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
                 return;
             }
-            $tenantId = TenantContext::getId();
+            $tenantId = $tenantIdOverride ?? TenantContext::getId();
             $userId = null;
             try {
                 if ($tenantId !== null) {
@@ -426,7 +430,7 @@ class Mailer
         // hydrated by the SendGrid event webhook and by periodic sync from
         // /v3/suppression/* in the Mailer's housekeeping cron.
         if (self::isSuppressed($to)) {
-            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list');
+            self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId);
             \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -438,7 +442,7 @@ class Mailer
         // request emails in 5 minutes. Configurable cap, default 30/hour
         // per recipient address (well above any legitimate per-user volume).
         if (!self::checkRateLimit($to)) {
-            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded');
+            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId);
             \Illuminate\Support\Facades\Log::warning('Mailer: rate-limited recipient', [
                 'to_masked' => self::maskEmail($to),
             ]);
@@ -449,44 +453,83 @@ class Mailer
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent', $this->lastMessageId);
+                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId);
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed');
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId);
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback');
+            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId);
             return false;
         }
 
         if ($this->driver === 'gmail_api') {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent');
+                self::logEmail($to, $subject, 'sent', null, null, $this->tenantId);
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed');
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Gmail + SMTP both failed', $this->tenantId);
                 return $smtpOk;
             }
 
             \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback');
+            self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId);
             return false;
         }
 
         $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-        self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed');
-        return $smtpOk;
+        if ($smtpOk) {
+            self::logEmail($to, $subject, 'sent', null, null, $this->tenantId);
+            return true;
+        }
+
+        if ($this->usePlatformSendGridFallback()) {
+            \Illuminate\Support\Facades\Log::warning("Mailer: SMTP failed, falling back to platform SendGrid for: " . self::maskEmail($to));
+            $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId);
+            return $sendGridOk;
+        }
+
+        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId);
+        return false;
+    }
+
+    /**
+     * Use the platform SendGrid account as the final fallback for tenants with
+     * stale or broken SMTP overrides. This preserves tenant-specific SendGrid
+     * credentials when present and only switches a failed non-SendGrid path.
+     */
+    private function usePlatformSendGridFallback(): bool
+    {
+        $apiKey = (string) (config('mail.sendgrid.api_key') ?? '');
+        if ($apiKey === '') {
+            return false;
+        }
+
+        $this->sendgridApiKey = $apiKey;
+
+        $fromEmail = (string) (config('mail.sendgrid.from_email') ?? '');
+        $fromName = (string) (config('mail.sendgrid.from_name') ?? '');
+
+        if ($fromEmail !== '') {
+            $this->fromEmail = $fromEmail;
+        }
+        if ($fromName !== '') {
+            $this->fromName = $fromName;
+        }
+
+        return $this->fromEmail !== '';
     }
 
     /**

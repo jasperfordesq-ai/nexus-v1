@@ -64,6 +64,8 @@ class OnboardingNurtureService
             } catch (\Throwable $e) {
                 Log::error("[OnboardingNurtureService] Tenant {$tenant->slug} error: " . $e->getMessage());
                 $totalErrors++;
+            } finally {
+                TenantContext::reset();
             }
         }
 

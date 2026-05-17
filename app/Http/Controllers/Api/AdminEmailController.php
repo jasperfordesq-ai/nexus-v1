@@ -82,7 +82,7 @@ class AdminEmailController extends BaseApiController
     public function status(): JsonResponse
     {
         $this->requireAdmin();
-        $mailer = new Mailer();
+        $mailer = Mailer::forCurrentTenant();
         $providerType = $mailer->getProviderType();
 
         $response = [

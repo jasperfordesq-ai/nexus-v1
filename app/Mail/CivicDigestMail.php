@@ -50,7 +50,7 @@ class CivicDigestMail
      * @param list<array<string,mixed>> $items   Digest items as returned by CivicDigestService::digestForMember()
      * @return bool                            true if EmailService::send() returned true; false otherwise
      */
-    public static function send(object $recipient, string $cadence, array $items): bool
+    public static function dispatchDigest(object $recipient, string $cadence, array $items): bool
     {
         if (empty($recipient->email)) {
             return false;
@@ -66,7 +66,8 @@ class CivicDigestMail
                 $tenantData = TenantContext::get();
                 $community = (string) ($tenantData['name'] ?? 'Project NEXUS');
 
-                $digestUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/caring-community/civic-digest';
+                $base = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                $digestUrl = $base . '/caring-community/civic-digest';
                 $prefsUrl = $digestUrl;
 
                 $name = trim(((string) ($recipient->first_name ?? '')) . ' ' . ((string) ($recipient->last_name ?? '')));
@@ -158,7 +159,7 @@ class CivicDigestMail
                 );
                 return $sent === true;
             } catch (Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('CivicDigestMail::send failed', [
+                \Illuminate\Support\Facades\Log::warning('CivicDigestMail::dispatchDigest failed', [
                     'user_id' => $recipient->id ?? null,
                     'error' => $e->getMessage(),
                 ]);

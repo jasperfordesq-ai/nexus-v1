@@ -11,6 +11,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Sentry\Laravel\Integration;
 
 $app = Application::configure(basePath: dirname(__DIR__))
+    // Laravel 12 enables listener auto-discovery in Application::configure().
+    // This app uses an explicit EventServiceProvider map; leaving discovery on
+    // registers the same listeners twice and sends duplicate emails.
+    ->withEvents(false)
     ->withProviders([
         \App\Providers\AppServiceProvider::class,
         \App\Providers\RouteServiceProvider::class,

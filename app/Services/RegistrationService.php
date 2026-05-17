@@ -496,11 +496,18 @@ class RegistrationService
      */
     public function verifyEmail(string $token): bool
     {
+        $tenantId = TenantContext::getId();
+
         /** @var User|null $user */
-        $user = $this->user->newQuery()
+        $query = $this->user->newQuery()
             ->where('verification_token', $token)
-            ->where('status', 'pending')
-            ->first();
+            ->where('status', 'pending');
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        $user = $query->first();
 
         if (! $user) {
             return false;
@@ -530,10 +537,13 @@ class RegistrationService
      */
     public function resendVerification(string $email, int $tenantId = 0): ?string
     {
+        $tenantId = $tenantId > 0 ? $tenantId : (int) TenantContext::getId();
+
         /** @var User|null $user */
         $user = $this->user->newQuery()
             ->where('email', strtolower(trim($email)))
             ->where('status', 'pending')
+            ->where('tenant_id', $tenantId)
             ->first();
 
         if (! $user) {
@@ -543,8 +553,13 @@ class RegistrationService
         $token = Str::random(64);
         $user->update(['verification_token' => $token]);
 
+        if ($tenantId <= 0) {
+            return $token;
+        }
+
         // Send the verification email
         try {
+            TenantContext::setById($tenantId);
             LocaleContext::withLocale($user, function () use ($user, $token) {
                 $appUrl = TenantContext::getFrontendUrl();
                 $basePath = TenantContext::getSlugPrefix();
@@ -576,6 +591,8 @@ class RegistrationService
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
+        } finally {
+            TenantContext::reset();
         }
 
         return $token;

@@ -273,7 +273,7 @@ class CivicDigestDispatch extends Command
 
             $emailSent = false;
             try {
-                $emailSent = CivicDigestMail::send($user, $cadence, $items);
+                $emailSent = CivicDigestMail::dispatchDigest($user, $cadence, $items);
             } catch (Throwable $e) {
                 Log::warning('[CivicDigestDispatch] email send failed', [
                     'tenant_id' => $tenantId,

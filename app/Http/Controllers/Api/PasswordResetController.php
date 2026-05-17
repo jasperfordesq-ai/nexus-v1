@@ -183,7 +183,12 @@ class PasswordResetController extends BaseApiController
 
         // Find the user globally — the reset token validates identity, and the user
         // may be resetting from a different tenant context than where they belong
-        $user = User::findGlobalByEmail($email);
+        $userRow = DB::table('users')
+            ->where('email', $email)
+            ->where('tenant_id', $tokenTenantId)
+            ->whereNull('deleted_at')
+            ->first();
+        $user = $userRow ? (array) $userRow : null;
 
         if (!$user) {
             return $this->respondWithError(
@@ -259,6 +264,7 @@ class PasswordResetController extends BaseApiController
         }
 
         try {
+            TenantContext::setById($tokenTenantId);
             LocaleContext::withLocale($recipientLocale, function () use ($email) {
                 $mailer = Mailer::forCurrentTenant();
                 $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
@@ -276,6 +282,8 @@ class PasswordResetController extends BaseApiController
             });
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Failed to send password change email: ' . $e->getMessage());
+        } finally {
+            TenantContext::reset();
         }
 
         return $this->respondWithData([
@@ -289,8 +297,7 @@ class PasswordResetController extends BaseApiController
     private function processPasswordResetRequest(string $email): void
     {
         $masked = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
-        // Find user by email (check across all tenants for this operation)
-        $user = User::findGlobalByEmail($email);
+        $user = $this->resolvePasswordResetUser($email);
 
         if (!$user) {
             // User doesn't exist, but we don't reveal this. Log so operators
@@ -298,6 +305,7 @@ class PasswordResetController extends BaseApiController
             // "wrong email" from "mailer broken".
             Log::info('[PasswordReset] reset requested for unknown email', [
                 'email_masked' => $masked,
+                'tenant_id' => TenantContext::getId(),
                 'ip' => \App\Core\ClientIp::get(),
             ]);
             return;
@@ -335,6 +343,10 @@ class PasswordResetController extends BaseApiController
         );
 
         // Build reset URL — include tenant base path for correct routing
+        $resetUrl = null;
+        $tenantName = 'Project NEXUS';
+        try {
+            TenantContext::setById($userTenantId);
         $appUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
 
@@ -347,12 +359,16 @@ class PasswordResetController extends BaseApiController
         }
 
         $resetUrl = $appUrl . $basePath . "/password/reset?token=" . $token;
+            $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+        } finally {
+            TenantContext::reset();
+        }
 
         // Send reset email under the user's preferred locale
         try {
-            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl) {
+            TenantContext::setById($userTenantId);
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl, $tenantName) {
                 $mailer = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                 $firstName = $user['first_name'] ?? ($user['name'] ?? null);
                 $greeting = $firstName
                     ? __('emails.password_reset.greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')])
@@ -382,7 +398,44 @@ class PasswordResetController extends BaseApiController
                 'user_id' => $user['id'] ?? null,
                 'tenant_id' => $userTenantId,
             ]);
+        } finally {
+            TenantContext::reset();
         }
+    }
+
+    private function resolvePasswordResetUser(string $email): ?array
+    {
+        $tenantId = TenantContext::getId();
+        $normalizedEmail = strtolower(trim($email));
+
+        if ($tenantId && $tenantId !== 1) {
+            $row = DB::table('users')
+                ->where('email', $normalizedEmail)
+                ->where('tenant_id', $tenantId)
+                ->whereNull('deleted_at')
+                ->first();
+
+            return $row ? (array) $row : null;
+        }
+
+        $rows = DB::table('users')
+            ->where('email', $normalizedEmail)
+            ->whereNull('deleted_at')
+            ->orderBy('id')
+            ->limit(2)
+            ->get();
+
+        if ($rows->count() === 1) {
+            return (array) $rows->first();
+        }
+
+        if ($rows->count() > 1) {
+            Log::warning('[PasswordReset] ambiguous global reset request for email present in multiple tenants', [
+                'email_masked' => substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***'),
+            ]);
+        }
+
+        return null;
     }
 
     /**

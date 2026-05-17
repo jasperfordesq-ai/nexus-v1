@@ -878,10 +878,10 @@ class NotificationDispatcher
             $content = __('notifications.verification_passed');
 
             Notification::createNotification($userId, $content, $link, 'verification_passed');
-            $htmlContent = self::buildVerificationPassedEmail();
-            self::queueNotification($userId, 'verification_passed', $content, $link, 'instant', $htmlContent);
 
-            // Also send a direct email immediately (queue may have delays)
+            // Send a direct email immediately. Do not also queue an instant
+            // email here; the instant queue is processed every minute and
+            // would send an identical verification result email.
             if ($user && !empty($user->email)) {
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl    = TenantContext::getFrontendUrl();
@@ -928,10 +928,9 @@ class NotificationDispatcher
                 : __('notifications.verification_failed');
 
             Notification::createNotification($userId, $content, $link, 'verification_failed');
-            $htmlContent = self::buildVerificationFailedEmail($reason);
-            self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
 
-            // Also send a direct email immediately (queue may have delays)
+            // Send a direct email immediately. Do not also queue an instant
+            // email here; the instant queue would send an identical copy.
             if ($user && !empty($user->email)) {
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl    = TenantContext::getFrontendUrl();

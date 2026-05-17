@@ -40,42 +40,62 @@ class JobExpiryNotificationService
             $tenants = DB::select("SELECT id FROM tenants WHERE is_active = 1");
 
             foreach ($tenants as $tenant) {
-                TenantContext::setById($tenant->id);
+                try {
+                    TenantContext::setById($tenant->id);
 
-                $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email,preferred_language'])
-                    ->where('status', 'open')
-                    ->whereNotNull('deadline')
-                    ->whereBetween('deadline', [now(), now()->addDays(7)])
-                    ->whereNull('expired_at') // not yet expired
-                    ->get();
+                    $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email,preferred_language'])
+                        ->where('status', 'open')
+                        ->whereNotNull('deadline')
+                        ->whereBetween('deadline', [now(), now()->addDays(7)])
+                        ->whereNull('expired_at') // not yet expired
+                        ->whereNotExists(function ($q) {
+                            $q->select(DB::raw(1))
+                                ->from('job_expiry_notifications')
+                                ->whereColumn('job_expiry_notifications.vacancy_id', 'job_vacancies.id')
+                                ->whereColumn('job_expiry_notifications.tenant_id', 'job_vacancies.tenant_id')
+                                ->where('notification_type', 'expiring_soon');
+                        })
+                        ->get();
 
-                foreach ($vacancies as $vacancy) {
-                    try {
-                        $daysLeft = (int) now()->diffInDays($vacancy->deadline);
+                    foreach ($vacancies as $vacancy) {
+                        try {
+                            $daysLeft = (int) now()->diffInDays($vacancy->deadline);
 
-                        // Render notification + email in the RECIPIENT's language, not
-                        // the cron worker's default (which is always 'en' in queue context).
-                        LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft) {
-                            // In-app notification
-                            if ($vacancy->user_id) {
-                                Notification::createNotification(
-                                    (int) $vacancy->user_id,
-                                    __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]),
-                                    "/jobs/{$vacancy->id}",
-                                    'job_expiry'
-                                );
-                            }
+                            // Render notification + email in the RECIPIENT's language, not
+                            // the cron worker's default (which is always 'en' in queue context).
+                            LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft) {
+                                // In-app notification
+                                if ($vacancy->user_id) {
+                                    Notification::createNotification(
+                                        (int) $vacancy->user_id,
+                                        __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]),
+                                        "/jobs/{$vacancy->id}",
+                                        'job_expiry'
+                                    );
+                                }
 
-                            // Email notification
-                            if ($vacancy->creator && $vacancy->creator->email) {
-                                self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
-                            }
-                        });
+                                // Email notification
+                                if ($vacancy->creator && $vacancy->creator->email) {
+                                    self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
+                                }
+                            });
 
-                        $notified++;
-                    } catch (\Throwable $e) {
-                        Log::warning('JobExpiryNotificationService: vacancy failed', ['vacancy_id' => $vacancy->id, 'error' => $e->getMessage()]);
+                            DB::table('job_expiry_notifications')->insert([
+                                'tenant_id' => $vacancy->tenant_id,
+                                'vacancy_id' => $vacancy->id,
+                                'notification_type' => 'expiring_soon',
+                                'sent_at' => now(),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+
+                            $notified++;
+                        } catch (\Throwable $e) {
+                            Log::warning('JobExpiryNotificationService: vacancy failed', ['vacancy_id' => $vacancy->id, 'error' => $e->getMessage()]);
+                        }
                     }
+                } finally {
+                    TenantContext::reset();
                 }
             }
         } catch (\Throwable $e) {
