@@ -95,7 +95,7 @@ class ListingService
         // items than limit). The SQL path handles all filters correctly.
         $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
             || !empty($filters['service_type']) || !empty($filters['posted_within'])
-            || !empty($filters['with_coordinates']);
+            || !empty($filters['with_coordinates']) || !empty($filters['near_lat']);
         if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId = \App\Core\TenantContext::getId();
 
@@ -228,6 +228,11 @@ class ListingService
             // Meilisearch unavailable — fall through to SQL path
         }
         // ── End Meilisearch path ─────────────────────────────────────────────
+
+        // Delegate to haversine proximity search when coordinates are provided
+        if (!empty($filters['near_lat']) && !empty($filters['near_lng']) && !empty($filters['radius_km'])) {
+            return self::getNearby((float) $filters['near_lat'], (float) $filters['near_lng'], $filters);
+        }
 
         $query = Listing::query()
             ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline,is_verified',
