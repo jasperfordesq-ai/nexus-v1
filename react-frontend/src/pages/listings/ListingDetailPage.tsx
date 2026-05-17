@@ -156,6 +156,7 @@ export function ListingDetailPage() {
   const [reportDetails, setReportDetails] = useState('');
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const commentsRegionRef = useRef<HTMLDivElement | null>(null);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -354,6 +355,13 @@ export function ListingDetailPage() {
       const next = !prev;
       if (next && !commentsLoaded && !commentsLoading) {
         void loadComments();
+      }
+      if (next) {
+        window.setTimeout(() => {
+          if (typeof commentsRegionRef.current?.scrollIntoView === 'function') {
+            commentsRegionRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 50);
       }
       return next;
     });
@@ -759,6 +767,65 @@ export function ListingDetailPage() {
             </Button>
           </div>
         )}
+
+        {isAuthenticated && isOwner && (
+          <div className="flex flex-wrap gap-2 sm:gap-3 pt-6 border-t border-theme-default">
+            <Button
+              variant="flat"
+              className={`flex-1 sm:flex-none ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
+              onPress={() => void social.toggleLike()}
+              isDisabled={social.isLiking}
+            >
+              {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
+            </Button>
+            <Button
+              variant="flat"
+              className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              onPress={toggleComments}
+              aria-expanded={showComments}
+            >
+              {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
+            </Button>
+            <ShareButton
+              shareToFeed={social.shareToFeed}
+              title={listing.title}
+              description={listing.description}
+              isAuthenticated={isAuthenticated}
+              className="flex-1 sm:flex-none"
+            />
+          </div>
+        )}
+
+        {showComments && (
+          <div ref={commentsRegionRef} className="mt-5">
+            <ErrorBoundary fallback={
+              <GlassCard className="p-6 text-center text-theme-muted">
+                {t('comments_error')}
+              </GlassCard>
+            }>
+              <GlassCard className="p-6">
+                <CommentsSection
+                  comments={social.comments}
+                  commentsCount={social.commentsCount}
+                  commentsLoading={social.commentsLoading}
+                  commentsLoaded={social.commentsLoaded}
+                  loadComments={social.loadComments}
+                  submitComment={social.submitComment}
+                  editComment={social.editComment}
+                  deleteComment={social.deleteComment}
+                  toggleReaction={social.toggleReaction}
+                  searchMentions={social.searchMentions}
+                  isAuthenticated={isAuthenticated}
+                  currentUserId={user?.id}
+                  currentUserAvatar={user?.avatar ?? undefined}
+                  currentUserName={user?.first_name || user?.name}
+                />
+              </GlassCard>
+            </ErrorBoundary>
+          </div>
+        )}
       </GlassCard>
 
       {/* Delete Confirmation Modal */}
@@ -995,34 +1062,6 @@ export function ListingDetailPage() {
             )}
           </div>
         </GlassCard>
-      )}
-
-      {/* Comments Section — threaded with reactions, replies, edit, delete */}
-      {showComments && (
-        <ErrorBoundary fallback={
-          <GlassCard className="p-6 text-center text-theme-muted">
-            {t('comments_error')}
-          </GlassCard>
-        }>
-          <GlassCard className="p-6">
-            <CommentsSection
-              comments={social.comments}
-              commentsCount={social.commentsCount}
-              commentsLoading={social.commentsLoading}
-              commentsLoaded={social.commentsLoaded}
-              loadComments={social.loadComments}
-              submitComment={social.submitComment}
-              editComment={social.editComment}
-              deleteComment={social.deleteComment}
-              toggleReaction={social.toggleReaction}
-              searchMentions={social.searchMentions}
-              isAuthenticated={isAuthenticated}
-              currentUserId={user?.id}
-              currentUserAvatar={user?.avatar ?? undefined}
-              currentUserName={user?.first_name || user?.name}
-            />
-          </GlassCard>
-        </ErrorBoundary>
       )}
 
       {/* Likers Modal */}
