@@ -1045,6 +1045,34 @@ class AppServiceProvider extends ServiceProvider
         // $langDir stays '' and every __() call returns the raw key as fallback.
         Translator::init(lang_path());
 
+        // STRUCTURAL DEFENSE against cross-tenant queue contamination.
+        //
+        // Horizon runs long-lived worker processes. PHP static state (notably
+        // TenantContext::$cachedId / $tenant) persists between jobs. When an
+        // event like UserRegistered uses SerializesModels, Laravel re-fetches
+        // the model via findOrFail() at deserialize time — and the User model
+        // has HasTenantScope, which filters by TenantContext::getId(). If the
+        // previous job left context set to tenant 2 and the next job is for a
+        // tenant-10 user, findOrFail returns null → ModelNotFoundException →
+        // the welcome / activation email silently fails to send.
+        //
+        // The per-listener finally { TenantContext::reset(); } pattern closes
+        // most of this, but a job that throws during deserialization never
+        // reaches its own finally. Resetting in JobProcessing fires BEFORE
+        // payload deserialization runs, guaranteeing every job starts with a
+        // clean null context regardless of what the previous job did.
+        //
+        // Also resets after each job and on failure as defence-in-depth.
+        \Illuminate\Support\Facades\Queue::before(function () {
+            \App\Core\TenantContext::reset();
+        });
+        \Illuminate\Support\Facades\Queue::after(function () {
+            \App\Core\TenantContext::reset();
+        });
+        \Illuminate\Support\Facades\Queue::failing(function () {
+            \App\Core\TenantContext::reset();
+        });
+
         // Load JSON translation files from lang/{locale}/ subdirectories.
         // Laravel only loads lang/{locale}.json by default. Our email translations
         // are in lang/en/emails.json, lang/en/emails_listings.json, etc.

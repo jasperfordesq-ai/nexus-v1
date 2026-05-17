@@ -9,14 +9,30 @@ namespace App\Events;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Fired when a new user registers on the platform.
+ *
+ * IMPORTANT: this event intentionally does NOT use the SerializesModels trait.
+ *
+ * SerializesModels stores only the User's class+id in the queue payload and
+ * re-fetches via User::findOrFail() at job-pickup time. Because the User model
+ * uses HasTenantScope, that re-fetch is filtered by TenantContext::getId() —
+ * and Horizon's long-lived worker processes can leak a stale TenantContext
+ * between jobs. If the previous job left the context set to tenant 2 and the
+ * current event is for a tenant-10 user, findOrFail() returns null → silent
+ * ModelNotFoundException → the welcome / activation email is never sent.
+ *
+ * Default PHP serialization (used here) snapshots the full in-memory User
+ * object at dispatch time. Listeners read its attributes from the payload
+ * directly, with no DB round-trip, so no TenantScope filter can intervene.
+ *
+ * Slightly larger queue payload; eliminates an entire class of cross-tenant
+ * delivery bugs. Do not re-add SerializesModels.
  */
 class UserRegistered
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public function __construct(
         public readonly User $user,
