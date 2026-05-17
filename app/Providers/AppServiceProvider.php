@@ -1187,7 +1187,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $cachePath = base_path('bootstrap/cache/' . self::TRANSLATION_CACHE_FILE);
 
-        if (is_file($cachePath)) {
+        if (is_file($cachePath) && $this->isJsonTranslationCacheFresh($cachePath, $basePath)) {
             $cached = require $cachePath;
             if (is_array($cached)) {
                 return $cached;
@@ -1198,6 +1198,23 @@ class AppServiceProvider extends ServiceProvider
         $this->writeJsonTranslationCache($cachePath, $translations);
 
         return $translations;
+    }
+
+    private function isJsonTranslationCacheFresh(string $cachePath, string $basePath): bool
+    {
+        $cacheMtime = filemtime($cachePath);
+        if ($cacheMtime === false) {
+            return false;
+        }
+
+        foreach (glob($basePath . DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR . '*.json') ?: [] as $file) {
+            $fileMtime = filemtime($file);
+            if ($fileMtime !== false && $fileMtime > $cacheMtime) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function buildJsonTranslationLines(string $basePath): array

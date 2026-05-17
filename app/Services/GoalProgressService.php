@@ -18,6 +18,28 @@ use Illuminate\Support\Facades\DB;
  */
 class GoalProgressService
 {
+    private function resolveStoredTranslation(?string $value, array $replace = []): ?string
+    {
+        if ($value === null || !str_starts_with($value, 'api_controllers_3.')) {
+            return $value;
+        }
+
+        $translated = __($value, $replace);
+
+        return $translated === $value ? $value : $translated;
+    }
+
+    private function historyReplacements(string $eventType, array $data): array
+    {
+        $percent = $data['progress_percent'] ?? $data['progress_value'] ?? 0;
+
+        return match ($eventType) {
+            'progress_update', 'checkin' => ['percent' => round((float) $percent)],
+            'milestone' => ['title' => (string) ($data['title'] ?? '')],
+            default => [],
+        };
+    }
+
     public function recordHistory(Goal $goal, string $eventType, string $description, array $data = []): void
     {
         if (!DB::getSchemaBuilder()->hasTable('goal_progress_history')) {
@@ -129,7 +151,14 @@ class GoalProgressService
             ->where('goal_id', $goalId)
             ->orderBy('sort_order')
             ->get()
-            ->map(fn ($row) => (array) $row)
+            ->map(function ($row) {
+                $data = (array) $row;
+                $data['title'] = $this->resolveStoredTranslation((string) ($data['title'] ?? ''), [
+                    'number' => $data['sort_order'] ?? '',
+                ]);
+
+                return $data;
+            })
             ->all();
     }
 
@@ -247,6 +276,10 @@ class GoalProgressService
             }
             $row['data'] = is_array($decoded) ? $decoded : [];
             $row['type'] = $r->event_type;
+            $row['description'] = $this->resolveStoredTranslation(
+                (string) ($row['description'] ?? ''),
+                $this->historyReplacements((string) $r->event_type, $row['data'])
+            );
 
             return $row;
         })->all();

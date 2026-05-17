@@ -394,6 +394,10 @@ class GoalsControllerTest extends TestCase
             'tenant_id' => $this->testTenantId,
             'event_type' => 'checkin',
         ]);
+
+        $history = $this->apiGet("/v2/goals/{$goal->id}/history");
+        $history->assertStatus(200);
+        $history->assertJsonFragment(['description' => 'Check-in recorded at 50%']);
     }
 
     public function test_create_checkin_on_other_goal_returns_404(): void
@@ -418,6 +422,26 @@ class GoalsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_insights_resolves_seeded_milestone_labels(): void
+    {
+        $user = $this->authenticatedUser();
+        $goal = $this->createGoal([
+            'user_id' => $user->id,
+            'target_value' => 100,
+            'current_value' => 0,
+        ]);
+
+        $this->apiPost("/v2/goals/{$goal->id}/checkins", [
+            'progress_percent' => 25,
+        ])->assertStatus(201);
+
+        $response = $this->apiGet("/v2/goals/{$goal->id}/insights");
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['title' => 'First quarter']);
+        $response->assertJsonMissing(['title' => 'api_controllers_3.goals.milestone_quarter']);
     }
 
     public function test_list_private_goal_checkins_forbidden_for_non_owner(): void

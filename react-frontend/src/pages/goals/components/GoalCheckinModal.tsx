@@ -180,8 +180,14 @@ export function GoalCheckinModal({
       isOpen={isOpen}
       onClose={onClose}
       size="lg"
+      placement="top-center"
       scrollBehavior="inside"
-      classNames={{ base: 'bg-content1 border border-theme-default' }}
+      classNames={{
+        backdrop: 'z-[1990]',
+        wrapper: 'z-[2000] items-start px-3 pt-[calc(env(safe-area-inset-top)_+_7.25rem)] sm:pt-[calc(env(safe-area-inset-top)_+_7.75rem)]',
+        base: 'bg-content1 border border-theme-default my-0 max-h-[calc(100dvh_-_env(safe-area-inset-top)_-_8.5rem)] sm:max-h-[calc(100dvh_-_env(safe-area-inset-top)_-_9rem)]',
+        body: 'overflow-y-auto',
+      }}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
