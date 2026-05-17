@@ -125,6 +125,13 @@ class SendGridWebhookController extends BaseApiController
                 }
             }
 
+            // Also update the new email_log + email_suppression tables so
+            // the deliverability dashboard at /admin/email-deliverability
+            // reflects real-time SendGrid status. These updates are
+            // additive — the existing NewsletterBounce / EmailMonitorService
+            // pipelines below continue to run unchanged.
+            $this->updateEmailLogAndSuppression($event, $type);
+
             switch ($type) {
                 case 'bounce':
                 case 'dropped':
@@ -142,7 +149,16 @@ class SendGridWebhookController extends BaseApiController
                     $processed++;
                     break;
 
-                // Ignore open/click — we have custom tracking via NewsletterTrackingController
+                case 'open':
+                case 'click':
+                case 'unsubscribe':
+                case 'group_unsubscribe':
+                    // Recorded in email_log / email_suppression by the
+                    // updateEmailLogAndSuppression() call above; no further
+                    // legacy-pipeline action needed.
+                    $processed++;
+                    break;
+
                 default:
                     break;
             }
@@ -152,6 +168,115 @@ class SendGridWebhookController extends BaseApiController
             'received' => count($events),
             'processed' => $processed,
         ]);
+    }
+
+    /**
+     * Update email_log (delivered_at / bounced_at / opened_at / status) and
+     * email_suppression to reflect a real-time event from SendGrid.
+     *
+     * Matches the email_log row by recipient + (sg_message_id prefix). Never
+     * regresses a row that is already in a terminal state (bounced / failed
+     * stays terminal even if a stale `delivered` event arrives later).
+     *
+     * Best-effort: silently no-ops if the new tables don't exist on this
+     * deployment yet.
+     */
+    private function updateEmailLogAndSuppression(array $event, string $type): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
+                return;
+            }
+
+            $email     = (string) ($event['email'] ?? '');
+            $messageId = (string) ($event['sg_message_id'] ?? '');
+            $ts        = isset($event['timestamp']) ? (int) $event['timestamp'] : time();
+            $when      = date('Y-m-d H:i:s', $ts);
+            if ($email === '' || $type === '') {
+                return;
+            }
+
+            // SendGrid's sg_message_id is `<id>.<batch>.<idx>`; the
+            // X-Message-Id we captured at send time is just `<id>`.
+            $baseId = strpos($messageId, '.') !== false
+                ? substr($messageId, 0, (int) strpos($messageId, '.'))
+                : $messageId;
+
+            $update    = ['updated_at' => now()];
+            $reason    = null;
+            $suppress  = false;
+            $logUpdate = true;
+
+            switch ($type) {
+                case 'delivered':
+                    $update['delivered_at'] = $when;
+                    $update['status']       = 'delivered';
+                    break;
+                case 'open':
+                    $update['opened_at'] = $when;
+                    break;
+                case 'bounce':
+                    $update['bounced_at'] = $when;
+                    $update['status']     = 'bounced';
+                    $update['error']      = mb_substr((string) ($event['reason'] ?? 'bounce'), 0, 500);
+                    $reason    = (string) ($event['reason'] ?? null);
+                    $suppress  = 'bounce';
+                    break;
+                case 'dropped':
+                    $update['status'] = 'failed';
+                    $update['error']  = mb_substr('dropped: ' . ($event['reason'] ?? 'unknown'), 0, 500);
+                    $reason    = (string) ($event['reason'] ?? null);
+                    $suppress  = 'block';
+                    break;
+                case 'spamreport':
+                    $update['status'] = 'failed';
+                    $update['error']  = 'recipient marked as spam';
+                    $suppress = 'spam_report';
+                    break;
+                case 'unsubscribe':
+                case 'group_unsubscribe':
+                    $logUpdate = false;
+                    $suppress  = 'unsubscribe';
+                    $reason    = isset($event['asm_group_id']) ? (string) $event['asm_group_id'] : null;
+                    break;
+                case 'click':
+                case 'processed':
+                case 'deferred':
+                case 'group_resubscribe':
+                default:
+                    return; // nothing to persist
+            }
+
+            if ($logUpdate) {
+                $row = DB::table('email_log')
+                    ->where('recipient_email', $email)
+                    ->when($baseId !== '', fn ($q) => $q->where('provider_message_id', 'like', $baseId . '%'))
+                    ->orderByDesc('id')
+                    ->first();
+                if ($row) {
+                    // Don't regress terminal states.
+                    if (isset($update['status']) && in_array($row->status, ['bounced', 'failed'], true)
+                        && $update['status'] === 'delivered') {
+                        unset($update['status']);
+                    }
+                    DB::table('email_log')->where('id', $row->id)->update($update);
+                }
+            }
+
+            if ($suppress !== false && \Illuminate\Support\Facades\Schema::hasTable('email_suppression')) {
+                DB::table('email_suppression')->updateOrInsert(
+                    ['email' => $email, 'reason' => $suppress],
+                    [
+                        'detail'        => $reason !== null ? mb_substr($reason, 0, 500) : null,
+                        'suppressed_at' => $when,
+                        'updated_at'    => now(),
+                        'created_at'    => now(),
+                    ]
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::debug('SendGridWebhook::updateEmailLogAndSuppression failed: ' . $e->getMessage());
+        }
     }
 
     /**

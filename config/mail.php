@@ -115,13 +115,9 @@ return [
         'api_key' => env('SENDGRID_API_KEY'),
         'from_email' => env('SENDGRID_FROM_EMAIL'),
         'from_name' => env('SENDGRID_FROM_NAME'),
-        // Event Webhook authentication. Either set the ECDSA public key
-        // (preferred — copy from SendGrid → Settings → Mail Settings →
-        // Event Webhook → "Signed Event Webhook Public Key" in PEM form) OR
-        // configure a shared secret and add it as a custom header
-        // `X-Nexus-Webhook-Token` in SendGrid's webhook UI.
-        'event_webhook_public_key' => env('SENDGRID_EVENT_WEBHOOK_PUBLIC_KEY'),
-        'webhook_secret'           => env('SENDGRID_WEBHOOK_TOKEN'),
+        // Event Webhook authentication is read by SendGridWebhookController
+        // directly from env('SENDGRID_WEBHOOK_VERIFICATION_KEY') — kept here
+        // as a reference for ops without proxying through config().
     ],
 
     /*

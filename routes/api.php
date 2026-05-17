@@ -2522,12 +2522,6 @@ Route::post('/notifications/settings', [\App\Http\Controllers\Api\UsersControlle
 Route::get('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'oneClick'])->withoutMiddleware('auth:sanctum');
 
-// SendGrid event webhook — receives delivered / bounced / opened / spam-report
-// / unsubscribe events and updates email_log + email_suppression in real time.
-// Public — signature-authenticated (ECDSA via SendGrid's public key, with a
-// shared-secret token fallback).
-Route::post('/v2/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridEventWebhookController::class, 'ingest'])->withoutMiddleware(['auth:sanctum', 'web', 'api', 'throttle:60,1']);
-
 // Admin email deliverability dashboard endpoints (auth + admin middleware required).
 Route::get('/v2/admin/email-deliverability/summary',          [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'summary'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/v2/admin/email-deliverability/logs',             [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'logs'])->middleware(['auth:sanctum', 'admin']);
