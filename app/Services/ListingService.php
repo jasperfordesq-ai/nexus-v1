@@ -447,7 +447,7 @@ class ListingService
         // would be inaccurate.
         $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
             || !empty($filters['service_type']) || !empty($filters['posted_within'])
-            || !empty($filters['with_coordinates']);
+            || !empty($filters['with_coordinates']) || !empty($filters['near_lat']);
         if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId     = \App\Core\TenantContext::getId();
             $meiliFilters = [];
@@ -479,6 +479,39 @@ class ListingService
             if ($meiliResult !== null) {
                 return $meiliResult['total'];
             }
+        }
+
+        // Proximity count: wrap the haversine query in a subquery so COUNT works with HAVING
+        if (!empty($filters['near_lat']) && !empty($filters['near_lng']) && !empty($filters['radius_km'])) {
+            $lat      = (float) $filters['near_lat'];
+            $lon      = (float) $filters['near_lng'];
+            $radiusKm = (float) $filters['radius_km'];
+            $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
+                . 'cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + '
+                . 'sin(radians(?)) * sin(radians(latitude))'
+                . '))))';
+
+            $inner = Listing::query()
+                ->selectRaw("listings.id, {$haversine} AS distance_km", [$lat, $lon, $lat])
+                ->where('status', 'active')
+                ->where(function (Builder $q) {
+                    $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
+                })
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->having('distance_km', '<=', $radiusKm);
+
+            if (!empty($filters['type'])) {
+                $type = $filters['type'];
+                is_array($type) ? $inner->whereIn('type', $type) : $inner->where('type', $type);
+            }
+            if (!empty($filters['category_id'])) {
+                $inner->where('category_id', (int) $filters['category_id']);
+            }
+
+            return DB::table(DB::raw("({$inner->toSql()}) as proximity_count"))
+                ->mergeBindings($inner->getQuery())
+                ->count();
         }
 
         $query = Listing::query();

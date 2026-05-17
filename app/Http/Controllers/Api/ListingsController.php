@@ -147,10 +147,14 @@ class ListingsController extends BaseApiController
         // AG35 — resolve personalised flag (explicit param > user pref > tenant setting > default true)
         $personalised = $this->resolveListingsPersonalisedFlag($userId);
 
+        // Skip re-ranking when proximity is active — getNearby() already returns results sorted
+        // by distance_km ASC and re-ranking would destroy that meaningful ordering.
+        $hasProximity = !empty($filters['near_lat']);
+
         // Apply MatchRank unless the user has explicitly chosen newest-first sort.
         // featured listings get FEATURED_BOOST (5×) inside the ranker so they always pin to top.
         $sortNewest = $this->query('sort') === 'newest' || !$personalised;
-        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && !$sortNewest) {
+        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && !$sortNewest && !$hasProximity) {
             $result['items'] = $this->listingRankingService->rankListings(
                 $result['items'],
                 $userId,
@@ -165,7 +169,7 @@ class ListingsController extends BaseApiController
         }
 
         // AG35 — additional personalisation pass (interest/CF/social/proximity blend)
-        if ($personalised && $userId && !empty($result['items'])) {
+        if ($personalised && $userId && !empty($result['items']) && !$hasProximity) {
             $result['items'] = $this->personalisedFeedService->rank($userId, 'listings', $result['items']);
         }
 

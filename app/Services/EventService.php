@@ -82,7 +82,24 @@ class EventService
             }
         }
 
-        $query->orderByDesc('start_time')->orderByDesc('id');
+        // Proximity filter — inline haversine so response format stays consistent with getAll()
+        $nearLat  = isset($filters['near_lat']) ? (float) $filters['near_lat'] : null;
+        $nearLng  = isset($filters['near_lng']) ? (float) $filters['near_lng'] : null;
+        $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+
+        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+            $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
+                . 'cos(radians(?)) * cos(radians(events.latitude)) * cos(radians(events.longitude) - radians(?)) + '
+                . 'sin(radians(?)) * sin(radians(events.latitude))'
+                . '))))';
+            $query->selectRaw("events.*, {$haversine} AS distance_km", [$nearLat, $nearLng, $nearLat])
+                  ->whereNotNull('events.latitude')
+                  ->whereNotNull('events.longitude')
+                  ->having('distance_km', '<=', $radiusKm)
+                  ->orderBy('distance_km');
+        } else {
+            $query->orderByDesc('start_time')->orderByDesc('id');
+        }
 
         $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
@@ -119,6 +136,9 @@ class EventService
             $data['rsvp_counts'] = ['going' => $goingCount, 'interested' => $interestedCount];
             $data['spots_left'] = $maxAttendees ? max(0, $maxAttendees - $goingCount) : null;
             $data['is_full'] = $maxAttendees ? ($goingCount >= $maxAttendees) : false;
+            if (isset($event->distance_km)) {
+                $data['distance_km'] = round((float) $event->distance_km, 2);
+            }
 
             return $data;
         })->all();

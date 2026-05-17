@@ -121,14 +121,18 @@ export function ListingsPage() {
     return v === 'newest' ? 'newest' : 'recommended';
   });
 
+  // Key used to force-remount ProximityFilter when cleared externally (resets internal radiusKm state)
+  const [proximityKey, setProximityKey] = useState(0);
+
   // Count of active advanced filters (shown as badge on the toggle button)
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (hoursRange !== 'any') count++;
     if (serviceMode !== 'any') count++;
     if (postedWithin !== 'any') count++;
+    if (proximityParams !== null) count++;
     return count;
-  }, [hoursRange, serviceMode, postedWithin]);
+  }, [hoursRange, serviceMode, postedWithin, proximityParams]);
 
   // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
   const cursorRef = useRef<string | null>(null);
@@ -606,7 +610,7 @@ export function ListingsPage() {
               <SelectItem key="30">{t('filter_this_month')}</SelectItem>
             </Select>
 
-            <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
+            <ProximityFilter key={proximityKey} value={proximityParams} onFilter={setProximityParams} />
 
             {activeFilterCount > 0 && (
               <Button
@@ -617,6 +621,8 @@ export function ListingsPage() {
                   setHoursRange('any');
                   setServiceMode('any');
                   setPostedWithin('any');
+                  setProximityParams(null);
+                  setProximityKey((k) => k + 1);
                 }}
                 aria-label={t('clear_filters')}
               >
