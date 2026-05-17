@@ -383,6 +383,39 @@ class EventsControllerTest extends TestCase
     }
 
     // ================================================================
+    // NEARBY — Radius filter actually filters (regression guard)
+    // ================================================================
+
+    public function test_index_with_near_lat_excludes_distant_events(): void
+    {
+        // Dublin city centre ≈ 53.3498, -6.2603
+        // Cork city centre ≈ 51.8985, -8.4756  (~258 km away)
+        $user = $this->authenticatedUser();
+
+        $nearId = $this->createEvent($user->id, [
+            'title'     => 'Near Dublin event',
+            'latitude'  => 53.3490,
+            'longitude' => -6.2600,
+        ]);
+
+        $farId = $this->createEvent($user->id, [
+            'title'     => 'Far Cork event',
+            'latitude'  => 51.8985,
+            'longitude' => -8.4756,
+        ]);
+
+        // 10 km radius centred on Dublin — Cork must be excluded
+        $response = $this->apiGet('/v2/events?near_lat=53.3498&near_lng=-6.2603&radius_km=10');
+
+        $response->assertStatus(200);
+        $data = collect($response->json('data'));
+
+        $ids = $data->pluck('id');
+        $this->assertTrue($ids->contains($nearId), 'Nearby event should be included in results');
+        $this->assertFalse($ids->contains($farId), 'Distant event (Cork) must be excluded by radius filter');
+    }
+
+    // ================================================================
     // TENANT ISOLATION
     // ================================================================
 

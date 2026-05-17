@@ -726,6 +726,75 @@ class ListingsControllerTest extends TestCase
     }
 
     // ================================================================
+    // NEARBY — Radius filter actually filters (regression guard)
+    // ================================================================
+
+    public function test_index_with_near_lat_excludes_distant_listings(): void
+    {
+        // Dublin city centre ≈ 53.3498, -6.2603
+        // Cork city centre ≈ 51.8985, -8.4756  (~258 km away)
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+
+        $near = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id'   => $user->id,
+            'title'     => 'Near Dublin listing',
+            'status'    => 'active',
+            'latitude'  => 53.3490,
+            'longitude' => -6.2600,
+        ]);
+
+        $far = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id'   => $user->id,
+            'title'     => 'Far Cork listing',
+            'status'    => 'active',
+            'latitude'  => 51.8985,
+            'longitude' => -8.4756,
+        ]);
+
+        // 10 km radius centred on Dublin — Cork must be excluded
+        $response = $this->apiGet('/v2/listings?near_lat=53.3498&near_lng=-6.2603&radius_km=10');
+
+        $response->assertStatus(200);
+        $data = collect($response->json('data'));
+
+        $ids = $data->pluck('id');
+        $this->assertTrue($ids->contains($near->id), 'Nearby listing should be included in results');
+        $this->assertFalse($ids->contains($far->id), 'Distant listing (Cork) must be excluded by radius filter');
+    }
+
+    public function test_nearby_endpoint_excludes_distant_listings(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+
+        $near = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id'   => $user->id,
+            'title'     => 'Near Dublin listing',
+            'status'    => 'active',
+            'latitude'  => 53.3490,
+            'longitude' => -6.2600,
+        ]);
+
+        $far = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id'   => $user->id,
+            'title'     => 'Far Cork listing',
+            'status'    => 'active',
+            'latitude'  => 51.8985,
+            'longitude' => -8.4756,
+        ]);
+
+        $response = $this->apiGet('/v2/listings/nearby?lat=53.3498&lon=-6.2603&radius_km=10');
+
+        $response->assertStatus(200);
+        $data = collect($response->json('data'));
+
+        $ids = $data->pluck('id');
+        $this->assertTrue($ids->contains($near->id), 'Nearby listing should appear in /nearby results');
+        $this->assertFalse($ids->contains($far->id), 'Distant listing (Cork) must be excluded by /nearby radius filter');
+    }
+
+    // ================================================================
     // CROSS-TENANT ISOLATION — UPDATE
     // ================================================================
 

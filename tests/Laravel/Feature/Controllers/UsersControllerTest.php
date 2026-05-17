@@ -457,6 +457,43 @@ class UsersControllerTest extends TestCase
     }
 
     // ================================================================
+    // NEARBY MEMBERS — Radius filter actually filters (regression guard)
+    // ================================================================
+
+    public function test_nearby_members_excludes_distant_members(): void
+    {
+        // Dublin city centre ≈ 53.3498, -6.2603
+        // Cork city centre ≈ 51.8985, -8.4756  (~258 km away)
+        $this->authenticatedUser();
+
+        $near = User::factory()->forTenant($this->testTenantId)->create([
+            'status'           => 'active',
+            'is_approved'      => true,
+            'latitude'         => 53.3490,
+            'longitude'        => -6.2600,
+            'privacy_search'   => 1,
+        ]);
+
+        $far = User::factory()->forTenant($this->testTenantId)->create([
+            'status'           => 'active',
+            'is_approved'      => true,
+            'latitude'         => 51.8985,
+            'longitude'        => -8.4756,
+            'privacy_search'   => 1,
+        ]);
+
+        // 10 km radius centred on Dublin — Cork must be excluded
+        $response = $this->apiGet('/v2/members/nearby?lat=53.3498&lon=-6.2603&radius_km=10');
+
+        $response->assertStatus(200);
+        $data = collect($response->json('data'));
+
+        $ids = $data->pluck('id');
+        $this->assertTrue($ids->contains($near->id), 'Nearby member should appear in results');
+        $this->assertFalse($ids->contains($far->id), 'Distant member (Cork) must be excluded by radius filter');
+    }
+
+    // ================================================================
     // SESSIONS
     // ================================================================
 

@@ -481,37 +481,54 @@ class ListingService
             }
         }
 
-        // Proximity count: wrap the haversine query in a subquery so COUNT works with HAVING
+        // Proximity count — raw SQL with explicit binding order avoids Eloquent's
+        // mergeBindings() reordering SELECT bindings after WHERE bindings.
         if (!empty($filters['near_lat']) && !empty($filters['near_lng']) && !empty($filters['radius_km'])) {
             $lat      = (float) $filters['near_lat'];
             $lon      = (float) $filters['near_lng'];
             $radiusKm = (float) $filters['radius_km'];
-            $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
-                . 'cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + '
-                . 'sin(radians(?)) * sin(radians(latitude))'
-                . '))))';
+            $tenantId = TenantContext::getId();
 
-            $inner = Listing::query()
-                ->selectRaw("listings.id, {$haversine} AS distance_km", [$lat, $lon, $lat])
-                ->where('status', 'active')
-                ->where(function (Builder $q) {
-                    $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
-                })
-                ->whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->having('distance_km', '<=', $radiusKm);
+            $whereClauses = [
+                'tenant_id = ?',
+                "status = 'active'",
+                "(moderation_status IS NULL OR moderation_status = 'approved')",
+                'latitude IS NOT NULL',
+                'longitude IS NOT NULL',
+            ];
+            $bindings = [$lat, $lon, $lat, $tenantId];
 
             if (!empty($filters['type'])) {
                 $type = $filters['type'];
-                is_array($type) ? $inner->whereIn('type', $type) : $inner->where('type', $type);
+                if (is_array($type)) {
+                    $placeholders = implode(',', array_fill(0, count($type), '?'));
+                    $whereClauses[] = "type IN ({$placeholders})";
+                    $bindings = array_merge($bindings, array_values($type));
+                } else {
+                    $whereClauses[] = 'type = ?';
+                    $bindings[]     = $type;
+                }
             }
             if (!empty($filters['category_id'])) {
-                $inner->where('category_id', (int) $filters['category_id']);
+                $whereClauses[] = 'category_id = ?';
+                $bindings[]     = (int) $filters['category_id'];
             }
 
-            return DB::table(DB::raw("({$inner->toSql()}) as proximity_count"))
-                ->mergeBindings($inner->getQuery())
-                ->count();
+            $bindings[] = $radiusKm;
+
+            $whereStr = implode(' AND ', $whereClauses);
+            $sql = "SELECT COUNT(*) AS total FROM (
+                SELECT (6371 * acos(LEAST(1.0, GREATEST(-1.0,
+                    cos(radians(?)) * cos(radians(latitude)) *
+                    cos(radians(longitude) - radians(?)) +
+                    sin(radians(?)) * sin(radians(latitude))
+                )))) AS distance_km
+                FROM listings
+                WHERE {$whereStr}
+            ) AS sub WHERE distance_km <= ?";
+
+            $result = DB::selectOne($sql, $bindings);
+            return (int) ($result->total ?? 0);
         }
 
         $query = Listing::query();
