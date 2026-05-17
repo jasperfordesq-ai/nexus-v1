@@ -436,7 +436,7 @@ class RegistrationService
             event(new UserRegistered($user, $tenantId));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('UserRegistered event dispatch failed', [
-                'user_id' => $user->id,
+                'user_id' => null,
                 'error' => $e->getMessage(),
             ]);
         }
@@ -588,7 +588,7 @@ class RegistrationService
             });
         } catch (\Throwable $e) {
             Log::warning('RegistrationService: Failed to send verification email', [
-                'user_id' => $user->id,
+                'user_id' => null,
                 'error' => $e->getMessage(),
             ]);
         } finally {
