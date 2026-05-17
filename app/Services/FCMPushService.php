@@ -55,6 +55,18 @@ class FCMPushService
             return ['sent' => 0, 'failed' => 0, 'errors' => ['FCM not configured']];
         }
 
+        // Honour the user's push_enabled preference. Default true so legacy
+        // users with no JSON pref still receive notifications until they
+        // explicitly opt out. Best-effort — pref-lookup failures don't block.
+        try {
+            $prefs = \App\Models\User::getNotificationPreferences($userId);
+            if (!(bool) ($prefs['push_enabled'] ?? true)) {
+                return ['sent' => 0, 'failed' => 0, 'errors' => []];
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::debug('FCMPushService: pref lookup failed: ' . $e->getMessage());
+        }
+
         $tenantId = TenantContext::getId();
         $tokens = DB::table('fcm_device_tokens')
             ->where('user_id', $userId)
@@ -78,6 +90,23 @@ class FCMPushService
     {
         if (!self::isConfiguredStatic() || empty($userIds)) {
             return ['sent' => 0, 'failed' => 0, 'errors' => empty($userIds) ? [] : ['FCM not configured']];
+        }
+
+        // Filter out users who turned off push_enabled.
+        try {
+            $optedIn = [];
+            foreach ($userIds as $uid) {
+                $prefs = \App\Models\User::getNotificationPreferences((int) $uid);
+                if ((bool) ($prefs['push_enabled'] ?? true)) {
+                    $optedIn[] = (int) $uid;
+                }
+            }
+            $userIds = $optedIn;
+            if (empty($userIds)) {
+                return ['sent' => 0, 'failed' => 0, 'errors' => []];
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::debug('FCMPushService: batch pref filter failed: ' . $e->getMessage());
         }
 
         $tenantId = TenantContext::getId();

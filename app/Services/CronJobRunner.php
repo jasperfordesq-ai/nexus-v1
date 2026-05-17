@@ -791,14 +791,51 @@ class CronJobRunner
             $tasks[] = "password_resets table: skipped (" . $e->getMessage() . ")";
         }
 
-        // 2. Clean old notification queue items (older than 30 days, already sent)
-        // notification_queue housekeeping — tenant_id column added 2026-03-29; cleans up stale sent rows.
+        // 2a. Expire pending digest items older than 7 days.
+        //
+        // Without this, the daily-digest cron will eventually send a member
+        // a "what happened to your group" email summarising activity that's
+        // weeks or months old — they don't want a 7-week-old digest, and
+        // the queue accumulates rows forever if the user has email_digest=off
+        // and the dispatch path keeps inserting new rows.
+        //
+        // We mark them 'failed' (not 'sent') so the audit trail is honest
+        // about the fact they were never delivered, and the 30-day sent-row
+        // cleanup below will reap them.
         try {
-            $sql = "DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
-            DB::delete($sql);
-            $tasks[] = "Cleaned old notification queue entries";
+            $expired = DB::update(
+                "UPDATE notification_queue
+                    SET status = 'failed'
+                  WHERE status = 'pending'
+                    AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
+            );
+            $tasks[] = "Expired {$expired} stale digest queue rows older than 7 days";
+        } catch (\Exception $e) {
+            $tasks[] = "Stale digest expiry: " . $e->getMessage();
+        }
+
+        // 2b. Clean old notification queue items (older than 30 days, already sent or failed)
+        // notification_queue housekeeping — tenant_id column added 2026-03-29; cleans up stale rows.
+        try {
+            $sql = "DELETE FROM notification_queue WHERE status IN ('sent', 'failed') AND COALESCE(sent_at, created_at) < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            $deleted = DB::delete($sql);
+            $tasks[] = "Cleaned {$deleted} old notification queue entries";
         } catch (\Exception $e) {
             $tasks[] = "Notification queue: " . $e->getMessage();
+        }
+
+        // 2c. Clean old email_log rows (older than 90 days).
+        // The audit trail is most useful for the recent past; older rows
+        // are kept long enough to investigate deliverability issues but
+        // not so long that the table grows unbounded.
+        try {
+            $deleted = DB::delete(
+                "DELETE FROM email_log WHERE created_at < DATE_SUB(NOW(), INTERVAL 90 DAY)"
+            );
+            $tasks[] = "Cleaned {$deleted} email_log rows older than 90 days";
+        } catch (\Exception $e) {
+            // Table may not exist on older deployments
+            $tasks[] = "email_log: skipped (" . $e->getMessage() . ")";
         }
 
         // 3. Clean expired newsletter suppression entries
@@ -1952,10 +1989,23 @@ class CronJobRunner
      */
     private function expireMonitoringRestrictionsInternal(): void
     {
-        // BrokerMessageVisibilityService::expireMonitoringBatch() was removed
-        // in a refactor; no-op until the replacement is shipped (stops 12
-        // "undefined method" errors per hour spamming cron_logs).
-        echo "   Expire monitoring: skipped (service method not yet reimplemented).\n";
+        // FEATURE STATUS: not implemented on the current schema.
+        //
+        // BrokerMessageVisibilityService::expireMonitoringBatch() was
+        // referenced by an earlier prototype that tracked broker monitoring
+        // restrictions with an `expires_at` column on a `broker_monitoring`
+        // table. Neither the table nor the column exists on the production
+        // schema (verified 2026-05-17 via SHOW TABLES LIKE '%monitoring%').
+        //
+        // Leaving this as a deliberate no-op rather than guessing at a
+        // replacement: an incorrect implementation that auto-clears the
+        // wrong restrictions would be worse than the current state where
+        // broker tooling shows monitoring as permanent until manual reset.
+        //
+        // If broker monitoring auto-expiry is wanted: design a schema
+        // (broker_monitoring with expires_at), wire BrokerMessageVisibilityService
+        // accordingly, then re-implement this method to call it.
+        echo "   Expire monitoring: skipped (broker monitoring auto-expiry not implemented on current schema).\n";
     }
 
     /**
@@ -2045,24 +2095,17 @@ class CronJobRunner
      */
     private function gamificationCampaignsInternal(): void
     {
-        // AchievementCampaignService::processRecurringCampaigns() was removed
-        // in a refactor; no-op until the replacement is shipped (stops 12
-        // "undefined method" errors per hour spamming cron_logs).
-        echo "   Gamification campaigns: skipped (service method not yet reimplemented).\n";
-        return;
-
-        // Dead code below — kept for reference until the new campaign engine
-        // is wired in.
         try {
-            $this->forEachTenant(function ($tenantId, $slug) {
+            $service = app(\App\Services\AchievementCampaignService::class);
+            $this->forEachTenant(function ($tenantId, $slug) use ($service) {
                 if (!TenantContext::hasFeature('gamification')) return;
-                $results = AchievementCampaignService::processRecurringCampaigns();
+                $results = $service->processRecurringCampaigns();
                 $awarded = 0;
                 foreach ($results as $result) {
                     $awarded += $result['awarded'] ?? 0;
                 }
-                if ($awarded > 0) {
-                    echo "   [$slug] Awarded campaigns to $awarded users.\n";
+                if ($awarded > 0 || count($results) > 0) {
+                    echo "   [$slug] " . count($results) . " campaign(s) ticked, $awarded awards delivered.\n";
                 }
             });
             echo "   Campaigns processed.\n";
@@ -2573,11 +2616,20 @@ class CronJobRunner
      */
     private function jobExpiryInternal(): void
     {
-        // JobVacancyService::expireOverdueJobs() and ::expireFeaturedJobs() were
-        // removed in a refactor; the cron task hasn't been rewired yet. Until
-        // a replacement is shipped, no-op cleanly (stops 12 "undefined method"
-        // errors per tenant per day spamming cron_logs).
-        echo "   Job expiry: skipped (service method not yet reimplemented).\n";
+        try {
+            $totalClosed = 0;
+            $service = app(\App\Services\JobVacancyService::class);
+            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalClosed, $service) {
+                $closed = $service->expireOverdueJobs();
+                $totalClosed += $closed;
+                if ($closed > 0) {
+                    echo "   [$slug] Closed $closed overdue job postings.\n";
+                }
+            });
+            echo "   Job expiry complete ($totalClosed total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
     }
 
     /**
@@ -2585,7 +2637,20 @@ class CronJobRunner
      */
     private function featuredJobExpiryInternal(): void
     {
-        echo "   Featured job expiry: skipped (service method not yet reimplemented).\n";
+        try {
+            $totalUnfeatured = 0;
+            $service = app(\App\Services\JobVacancyService::class);
+            $this->forEachTenant(function (int $tenantId, string $slug) use (&$totalUnfeatured, $service) {
+                $cleared = $service->expireFeaturedJobs();
+                $totalUnfeatured += $cleared;
+                if ($cleared > 0) {
+                    echo "   [$slug] Unfeatured $cleared expired jobs.\n";
+                }
+            });
+            echo "   Featured job expiry complete ($totalUnfeatured total).\n";
+        } catch (\Throwable $e) {
+            echo "   Error: " . $e->getMessage() . "\n";
+        }
     }
 
     /**

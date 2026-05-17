@@ -352,6 +352,7 @@ function useAdminNav(): NavSection[] {
         { label: "Agent Runs", href: '/admin/agents/runs', icon: Bot },
       ] : []),
       { label: "Email Settings", href: '/admin/email-settings', icon: Mail },
+      { label: "Email Deliverability", href: '/admin/email-deliverability', icon: Mail },
       { label: "Algorithm Settings", href: '/admin/algorithm-settings', icon: Cpu },
       { label: "SEO Overview", href: '/admin/seo', icon: Search },
       // Prerender Engine operates cross-tenant — platform super-admins only.

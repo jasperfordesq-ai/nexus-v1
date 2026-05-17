@@ -931,6 +931,60 @@ class JobVacancyService
     }
 
     /**
+     * Cron: clear the `is_featured` flag on jobs whose paid feature window
+     * has expired. Tenant-scoped via the current TenantContext; CronJobRunner
+     * iterates tenants and calls this per-tenant.
+     *
+     * Returns the number of rows updated.
+     */
+    public function expireFeaturedJobs(): int
+    {
+        try {
+            return (int) DB::table('job_vacancies')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('is_featured', 1)
+                ->whereNotNull('featured_until')
+                ->where('featured_until', '<', now())
+                ->update(['is_featured' => 0]);
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService::expireFeaturedJobs failed: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Cron: close job vacancies that have been `open` for more than 180 days
+     * with no recent activity (no applications or owner edits in the last 60
+     * days). Conservative defaults — a stale job listing is worse than an
+     * occasional false positive close. Tenant-scoped via TenantContext.
+     *
+     * `job_vacancies` has no explicit expires_at column, so we use a
+     * recency heuristic instead.
+     *
+     * Returns the number of rows closed.
+     */
+    public function expireOverdueJobs(): int
+    {
+        try {
+            $cutoffOpened    = now()->subDays(180);
+            $cutoffNoEdit    = now()->subDays(60);
+
+            return (int) DB::table('job_vacancies')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('status', 'open')
+                ->where('created_at', '<', $cutoffOpened)
+                ->where(function ($q) use ($cutoffNoEdit) {
+                    $q->whereNull('updated_at')
+                      ->orWhere('updated_at', '<', $cutoffNoEdit);
+                })
+                ->update(['status' => 'closed', 'updated_at' => now()]);
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService::expireOverdueJobs failed: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
      * Get applications for a vacancy (owner/admin only).
      */
     public function getApplications(int $jobId, int $adminId): ?array

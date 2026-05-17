@@ -2521,6 +2521,19 @@ Route::post('/notifications/settings', [\App\Http\Controllers\Api\UsersControlle
 // one-click compliance (Gmail / Yahoo Feb-2024 bulk-sender rules).
 Route::get('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/notifications/unsubscribe', [\App\Http\Controllers\Api\NotificationUnsubscribeController::class, 'oneClick'])->withoutMiddleware('auth:sanctum');
+
+// SendGrid event webhook — receives delivered / bounced / opened / spam-report
+// / unsubscribe events and updates email_log + email_suppression in real time.
+// Public — signature-authenticated (ECDSA via SendGrid's public key, with a
+// shared-secret token fallback).
+Route::post('/v2/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridEventWebhookController::class, 'ingest'])->withoutMiddleware(['auth:sanctum', 'web', 'api', 'throttle:60,1']);
+
+// Admin email deliverability dashboard endpoints (auth + admin middleware required).
+Route::get('/v2/admin/email-deliverability/summary',          [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'summary'])->middleware(['auth:sanctum', 'admin']);
+Route::get('/v2/admin/email-deliverability/logs',             [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'logs'])->middleware(['auth:sanctum', 'admin']);
+Route::get('/v2/admin/email-deliverability/suppressions',     [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'suppressions'])->middleware(['auth:sanctum', 'admin']);
+Route::delete('/v2/admin/email-deliverability/suppressions/{id}', [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'removeSuppression'])->middleware(['auth:sanctum', 'admin']);
+Route::get('/v2/admin/email-deliverability/user/{userId}',    [\App\Http\Controllers\Api\AdminEmailDeliverabilityController::class, 'userHistory'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/leaderboard', [\App\Http\Controllers\Api\GamificationController::class, 'api']);
 Route::get('/leaderboard/widget', [\App\Http\Controllers\Api\GamificationController::class, 'widget']);
 Route::get('/streaks', [\App\Http\Controllers\Api\GamificationController::class, 'streaks']);

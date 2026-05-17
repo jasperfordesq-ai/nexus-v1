@@ -165,4 +165,83 @@ class AchievementCampaignService
     {
         AchievementCampaign::where('id', $id)->delete();
     }
+
+    /**
+     * Cron: process recurring campaigns for the current tenant.
+     *
+     * Scans `achievement_campaigns` where:
+     *   - status = 'running'
+     *   - campaign_type = 'xp_bonus' (the DB enum value for "recurring",
+     *     per self::$typeToDbMap)
+     *   - last_run_at is null OR older than the recurrence_pattern window
+     *
+     * Each eligible campaign just bumps `last_run_at` for now — the actual
+     * award logic (selecting users matching `target_audience` /
+     * `audience_config` and awarding the badge or XP) is intentionally
+     * stubbed here. Wiring real award delivery requires careful tenant-
+     * scoped user-selection logic and a clear product decision on what
+     * "missed runs" should do (catch up vs skip). Until that ships, the
+     * cron entry stops throwing "undefined method" once per hour per
+     * tenant; it logs activity so we can see when this stub fires.
+     *
+     * Returns the number of campaigns that were marked as run this tick.
+     */
+    public function processRecurringCampaigns(): array
+    {
+        $tenantId = TenantContext::getId();
+        if ($tenantId === null) {
+            return ['processed' => 0, 'awarded' => 0];
+        }
+
+        $now = now();
+        $eligibility = function ($pattern, $lastRun) use ($now) {
+            if ($lastRun === null) {
+                return true;
+            }
+            $last = strtotime((string) $lastRun);
+            $sec  = $now->timestamp - $last;
+            return match (strtolower((string) $pattern)) {
+                'daily'   => $sec >= 86400,
+                'weekly'  => $sec >= 86400 * 7,
+                'monthly' => $sec >= 86400 * 28,
+                default   => $sec >= 86400 * 7,
+            };
+        };
+
+        $rows = DB::table('achievement_campaigns')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'running')
+            ->where('campaign_type', 'xp_bonus')
+            ->get();
+
+        $processed = 0;
+        foreach ($rows as $r) {
+            if (!$eligibility($r->recurrence_pattern ?? 'weekly', $r->last_run_at ?? null)) {
+                continue;
+            }
+            try {
+                DB::table('achievement_campaigns')
+                    ->where('id', $r->id)
+                    ->update([
+                        'last_run_at' => $now,
+                    ]);
+                Log::info('AchievementCampaignService: recurring tick (award logic stubbed)', [
+                    'tenant_id'    => $tenantId,
+                    'campaign_id'  => $r->id,
+                    'name'         => $r->name,
+                    'pattern'      => $r->recurrence_pattern,
+                ]);
+                $processed++;
+            } catch (\Throwable $e) {
+                Log::warning('AchievementCampaignService::processRecurringCampaigns failed', [
+                    'campaign_id' => $r->id,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Return shape matches the original cron caller expectation
+        // (an iterable of per-campaign results with `awarded` count).
+        return array_map(fn () => ['awarded' => 0], range(1, $processed));
+    }
 }

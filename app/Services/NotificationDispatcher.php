@@ -147,10 +147,27 @@ class NotificationDispatcher
                 $pushLink = $link;
 
                 $send = function () use ($uid, $pushTitle, $pushContent, $pushLink) {
+                    // Web push (browser) and mobile push (FCM via Capacitor)
+                    // fan out in parallel. A user on multiple devices gets
+                    // notified everywhere they're subscribed. Both are
+                    // failure-isolated so one provider being down doesn't
+                    // suppress the other.
                     try {
                         \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
                     } catch (\Throwable $e) {
                         Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+                    }
+                    try {
+                        if (class_exists(\App\Services\FCMPushService::class)) {
+                            \App\Services\FCMPushService::sendToUser(
+                                $uid,
+                                $pushTitle,
+                                $pushContent,
+                                ['link' => (string) $pushLink]
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        Log::debug('[NotificationDispatcher] FCM push failed: ' . $e->getMessage());
                     }
                 };
 

@@ -145,6 +145,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('sendgrid-sync-suppressions');
 
+        // Every 15 min: reconcile recent email_log `failed` rows against
+        // SendGrid's activity feed so transient false-failures (5xx blips,
+        // network glitches) get repaired to `delivered` once SendGrid
+        // confirms acceptance.
+        $schedule->command('emails:reconcile-transient-failures')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping()
+            ->name('emails-reconcile-transient-failures');
+
         $schedule->command('caring:nudges-dispatch')
             ->dailyAt('07:30')
             ->withoutOverlapping()

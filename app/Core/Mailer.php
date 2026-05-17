@@ -32,6 +32,14 @@ class Mailer
     // SendGrid settings
     private ?string $sendgridApiKey = null;
 
+    /**
+     * Most recent provider message id (X-Message-Id from SendGrid). Captured
+     * inside sendViaSendGrid() on success and read by send() so that the
+     * email_log row records the id — the event webhook later updates the
+     * same row when SendGrid reports delivery / bounce / open.
+     */
+    private ?string $lastMessageId = null;
+
     // Driver: 'smtp', 'gmail_api', or 'sendgrid'
     private string $driver = 'smtp';
 
@@ -232,6 +240,48 @@ class Mailer
     }
 
     /**
+     * Per-recipient hourly rate limit. Each call increments a Redis counter
+     * keyed on the lowercased recipient address; if it exceeds the cap we
+     * refuse to send. Counter expires after 1 hour so the limit is a true
+     * rolling window.
+     *
+     * Cap is configurable via env `MAILER_PER_RECIPIENT_HOURLY_LIMIT`
+     * (default 30). A value of 0 disables the check.
+     *
+     * Returns true if the send is permitted, false if rate-limited.
+     */
+    private static function checkRateLimit(string $email): bool
+    {
+        $limit = (int) (env('MAILER_PER_RECIPIENT_HOURLY_LIMIT', 30));
+        if ($limit <= 0) {
+            return true;
+        }
+        try {
+            $key = 'mailer:rate:' . strtolower($email);
+            $cache = \Illuminate\Support\Facades\Cache::store(
+                config('cache.default', 'redis')
+            );
+            $count = (int) $cache->get($key, 0);
+            if ($count >= $limit) {
+                return false;
+            }
+            // Use put() with a 1-hour TTL on first increment so we don't
+            // double-increment via increment() before set() establishes the
+            // key (a known race in some cache drivers).
+            if ($count === 0) {
+                $cache->put($key, 1, now()->addHour());
+            } else {
+                $cache->increment($key);
+            }
+            return true;
+        } catch (\Throwable $e) {
+            // Cache failure should never block the email path.
+            \Illuminate\Support\Facades\Log::debug('Mailer::checkRateLimit failed: ' . $e->getMessage());
+            return true;
+        }
+    }
+
+    /**
      * Check if an address is on the local suppression cache. Hydrated from
      * SendGrid's /v3/suppression/* endpoints via the webhook + periodic sync.
      * Safe to call before the table exists (defaults to "not suppressed").
@@ -383,11 +433,23 @@ class Mailer
             return false;
         }
 
+        // Per-recipient rate limit. Catches runaway loops / buggy listeners
+        // that would otherwise flood a single member with 50 connection-
+        // request emails in 5 minutes. Configurable cap, default 30/hour
+        // per recipient address (well above any legitimate per-user volume).
+        if (!self::checkRateLimit($to)) {
+            self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded');
+            \Illuminate\Support\Facades\Log::warning('Mailer: rate-limited recipient', [
+                'to_masked' => self::maskEmail($to),
+            ]);
+            return false;
+        }
+
         // Route based on configured driver
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
-                self::logEmail($to, $subject, 'sent');
+                self::logEmail($to, $subject, 'sent', $this->lastMessageId);
                 return true;
             }
 
@@ -476,15 +538,34 @@ class Mailer
             $statusCode = $response->statusCode();
             if ($statusCode >= 200 && $statusCode < 300) {
                 if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', true, $this->tenantId); }
+
+                // Capture SendGrid's X-Message-Id so the event webhook can match
+                // future delivered/bounced/opened events back to this email_log
+                // row. SendGrid returns the message id in a response header on
+                // 202 Accepted. Some PHP SDK versions parse it case-sensitively;
+                // try both common spellings.
+                $headers = $response->headers();
+                $messageId = null;
+                if (is_array($headers)) {
+                    foreach ($headers as $h) {
+                        if (is_string($h) && stripos($h, 'X-Message-Id:') === 0) {
+                            $messageId = trim(substr($h, strlen('X-Message-Id:')));
+                            break;
+                        }
+                    }
+                }
+                $this->lastMessageId = $messageId;
                 return true;
             }
 
             \Illuminate\Support\Facades\Log::warning("SendGrid error ({$statusCode}): " . $response->body());
             if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
+            $this->lastMessageId = null;
             return false;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("SendGrid Error: " . $e->getMessage());
             if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
+            $this->lastMessageId = null;
             return false;
         }
     }

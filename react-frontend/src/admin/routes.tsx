@@ -242,6 +242,7 @@ const OnboardingSettings = lazy(() => import('./modules/system/OnboardingSetting
 // Advanced/SEO module
 const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
 const EmailSettings = lazy(() => import('./modules/advanced/EmailSettings'));
+const EmailDeliverability = lazy(() => import('./modules/advanced/EmailDeliverability'));
 const AlgorithmSettings = lazy(() => import('./modules/advanced/AlgorithmSettings'));
 const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
 const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
@@ -453,6 +454,7 @@ export function AdminRoutes() {
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
       <Route path="email-settings" element={<Lazy><EmailSettings /></Lazy>} />
+      <Route path="email-deliverability" element={<Lazy><EmailDeliverability /></Lazy>} />
       <Route path="feed-algorithm" element={<TenantRedirect to="/admin/algorithm-settings" />} />
       <Route path="algorithm-settings" element={<Lazy><AlgorithmSettings /></Lazy>} />
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />

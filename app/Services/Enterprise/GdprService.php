@@ -843,6 +843,18 @@ class GdprService
             // 1. Generate final data export for legal retention
             $exportPath = $this->generateDataExport($userId);
 
+            // 1b. Capture original email BEFORE anonymisation so we can purge
+            // email_suppression (platform-wide cache keyed on email address).
+            try {
+                $originalEmailRow = $this->query(
+                    "SELECT email FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                )->fetchColumn();
+                $originalEmail = $originalEmailRow !== false ? (string) $originalEmailRow : null;
+            } catch (\Throwable $e) {
+                $originalEmail = null;
+            }
+
             // 2. Anonymize user record
             $anonymizedEmail = "deleted_{$userId}_" . bin2hex(random_bytes(8)) . "@anonymized.local";
             $this->query(
@@ -943,6 +955,36 @@ class GdprService
                 );
             } catch (\Throwable $e) {
                 // Table may not exist
+            }
+
+            // 3d-bis. Email audit trail + suppression cache: user's email
+            // address is PII and must be erased on account deletion.
+            // Anonymising rather than deleting keeps tenant-level aggregate
+            // metrics (delivery rate, bounce rate) intact while removing the
+            // link back to this person.
+            try {
+                $this->query(
+                    "UPDATE email_log
+                        SET recipient_email = 'deleted@anonymized.local',
+                            subject = NULL,
+                            error = NULL
+                      WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                // email_log table may not exist on older deployments
+            }
+            // Clear the platform-wide suppression cache for this address.
+            // We captured the original email at step 1b before anonymisation.
+            if (!empty($originalEmail) && strpos($originalEmail, '@anonymized.local') === false) {
+                try {
+                    $this->query(
+                        "DELETE FROM email_suppression WHERE email = ?",
+                        [$originalEmail]
+                    );
+                } catch (\Throwable $e) {
+                    // Table may not exist on older deployments
+                }
             }
 
             // 3e. Remove connections (personal relationship data)
