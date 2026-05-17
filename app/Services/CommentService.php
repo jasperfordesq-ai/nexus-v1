@@ -256,15 +256,20 @@ class CommentService
 
     /**
      * Update a comment's content (owner only).
+     *
+     * @return string|null Sanitized stored content, or null when not allowed/found.
      */
-    public static function update(int $commentId, int $userId, string $content): bool
+    public static function update(int $commentId, int $userId, string $content): ?string
     {
+        $tenantId = TenantContext::getId();
+
         $comment = Comment::where('id', $commentId)
+            ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
             ->first();
 
         if (!$comment) {
-            return false;
+            return null;
         }
 
         // Server-side XSS prevention: sanitize HTML content before storage
@@ -280,7 +285,7 @@ class CommentService
             Log::warning("CommentService::update mention re-processing failed: " . $e->getMessage());
         }
 
-        return true;
+        return $trimmedContent;
     }
 
     /**
@@ -705,12 +710,23 @@ class CommentService
     {
         // Map target_type → [table, owner_column]
         $map = [
-            'blog_post'  => ['posts',         'author_id'],
-            'blog'       => ['posts',         'author_id'],
-            'listing'    => ['listings',       'user_id'],
-            'feed_post'  => ['feed_posts',     'user_id'],
-            'post'       => ['feed_posts',     'user_id'],
-            'event'      => ['events',         'user_id'],
+            'blog_post'             => ['posts',              'author_id'],
+            'blog'                  => ['posts',              'author_id'],
+            'listing'               => ['listings',           'user_id'],
+            'feed_post'             => ['feed_posts',         'user_id'],
+            'post'                  => ['feed_posts',         'user_id'],
+            'event'                 => ['events',             'user_id'],
+            'goal'                  => ['goals',              'user_id'],
+            'poll'                  => ['polls',              'user_id'],
+            'review'                => ['reviews',            'reviewer_id'],
+            'resource'              => ['resources',          'user_id'],
+            'volunteering'          => ['vol_opportunities',  'created_by'],
+            'volunteering_opportunity' => ['vol_opportunities', 'created_by'],
+            'volunteer'             => ['vol_opportunities',  'created_by'],
+            'ideation_challenge'    => ['ideation_challenges', 'user_id'],
+            'challenge'             => ['ideation_challenges', 'user_id'],
+            'job'                   => ['job_vacancies',      'user_id'],
+            'discussion'            => ['group_discussions',  'user_id'],
         ];
 
         $entry = $map[$targetType] ?? null;

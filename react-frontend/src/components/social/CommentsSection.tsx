@@ -515,7 +515,8 @@ function MentionInput({
   const selectMention = (user: MentionUser) => {
     // Replace @query with @Username — escape regex metacharacters in the query
     const escaped = mentionQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const newValue = value.replace(new RegExp(`@${escaped}$`), `@${user.name} `);
+    const mentionHandle = user.username || user.name.replace(/\s+/g, '');
+    const newValue = value.replace(new RegExp(`@${escaped}$`), `@${mentionHandle} `);
     onChange(newValue);
     setShowMentions(false);
     setMentionResults([]);
@@ -599,7 +600,12 @@ function MentionInput({
                 size="sm"
                 className="w-6 h-6 flex-shrink-0"
               />
-              <span className="text-xs font-medium truncate">{user.name}</span>
+              <span className="min-w-0">
+                <span className="block truncate text-xs font-medium">{user.name}</span>
+                {user.username && (
+                  <span className="block truncate text-[10px] text-[var(--text-subtle)]">@{user.username}</span>
+                )}
+              </span>
             </Button>
           ))}
         </div>

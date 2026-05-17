@@ -206,12 +206,13 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
   const editComment = useCallback(async (commentId: number, content: string): Promise<boolean> => {
     if (!content.trim()) return false;
     try {
-      const res = await api.put(`/v2/comments/${commentId}`, { content: content.trim() });
+      const res = await api.put<{ content?: string }>(`/v2/comments/${commentId}`, { content: content.trim() });
       if (res.success) {
+        const savedContent = res.data?.content ?? content.trim();
         // Update locally
         const updateInTree = (list: FeedComment[]): FeedComment[] =>
           list.map((c) => {
-            if (c.id === commentId) return { ...c, content: content.trim(), edited: true };
+            if (c.id === commentId) return { ...c, content: savedContent, edited: true };
             if (c.replies?.length) return { ...c, replies: updateInTree(c.replies) };
             return c;
           });

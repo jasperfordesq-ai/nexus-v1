@@ -83,7 +83,16 @@ return [
     'content_type_poll'          => 'poll',
     'content_type_resource'      => 'resource',
     'content_type_volunteering'  => 'volunteering opportunity',
+    'content_type_volunteering_opportunity' => 'volunteering opportunity',
+    'content_type_volunteer'     => 'volunteering opportunity',
     'content_type_review'        => 'review',
+    'content_type_blog'          => 'blog post',
+    'content_type_blog_post'     => 'blog post',
+    'content_type_challenge'     => 'challenge',
+    'content_type_ideation_challenge' => 'challenge',
+    'content_type_job'           => 'job',
+    'content_type_discussion'    => 'discussion',
+    'content_type_comment'       => 'comment',
     'content_type_default'       => 'content',
 
     // =========================================================================

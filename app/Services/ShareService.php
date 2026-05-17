@@ -279,7 +279,7 @@ class ShareService
             }
 
             $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
-            $linkPath = $type === 'post' ? "/feed/post/{$id}" : "/{$type}s/{$id}";
+            $linkPath = SocialNotificationService::getContentLink($type, $id);
 
             $owner = DB::table('users')
                 ->where('id', $ownerId)

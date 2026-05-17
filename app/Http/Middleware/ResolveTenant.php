@@ -38,17 +38,18 @@ class ResolveTenant
             return $next($request);
         }
 
-        if (!TenantContext::getId()) {
-            try {
-                TenantContext::resolve();
-            } catch (\Throwable $e) {
-                return response()->json([
-                    'errors' => [
-                        ['code' => 'tenant_resolution_failed', 'message' => 'Unable to resolve tenant'],
-                    ],
-                    'success' => false,
-                ], 400, ['API-Version' => '2.0']);
-            }
+        TenantContext::reset();
+        $this->syncTenantServerVariables($request);
+
+        try {
+            TenantContext::resolve();
+        } catch (\Throwable $e) {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'tenant_resolution_failed', 'message' => 'Unable to resolve tenant'],
+                ],
+                'success' => false,
+            ], 400, ['API-Version' => '2.0']);
         }
 
         // After resolution, verify we have a valid tenant ID
@@ -67,5 +68,14 @@ class ResolveTenant
         Log::shareContext(['tenant_id' => $tenantId]);
 
         return $next($request);
+    }
+
+    private function syncTenantServerVariables(Request $request): void
+    {
+        $_SERVER['HTTP_X_TENANT_ID'] = $request->headers->get('X-Tenant-ID') ?? null;
+        $_SERVER['HTTP_X_TENANT_SLUG'] = $request->headers->get('X-Tenant-Slug') ?? null;
+        $_SERVER['HTTP_AUTHORIZATION'] = $request->headers->get('Authorization') ?? null;
+        $_SERVER['HTTP_HOST'] = $request->getHost();
+        $_SERVER['REQUEST_URI'] = $request->getRequestUri();
     }
 }

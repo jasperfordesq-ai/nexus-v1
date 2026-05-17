@@ -140,15 +140,15 @@ class CommentsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.comment_text_required'), 'content', 400);
         }
 
-        $updated = $this->commentService->update($id, $userId, $content);
+        $updatedContent = $this->commentService->update($id, $userId, $content);
 
-        if (! $updated) {
+        if ($updatedContent === null) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.cannot_edit_comment'), null, 403);
         }
 
         return $this->respondWithData([
             'id'      => $id,
-            'content' => $content,
+            'content' => $updatedContent,
             'edited'  => true,
         ]);
     }

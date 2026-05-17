@@ -24,6 +24,27 @@ use Illuminate\Support\Facades\Log;
  */
 class SocialNotificationService
 {
+    private const OWNER_COLUMNS = [
+        'post' => ['feed_posts', 'user_id'],
+        'feed_post' => ['feed_posts', 'user_id'],
+        'blog' => ['posts', 'author_id'],
+        'blog_post' => ['posts', 'author_id'],
+        'listing' => ['listings', 'user_id'],
+        'event' => ['events', 'user_id'],
+        'goal' => ['goals', 'user_id'],
+        'poll' => ['polls', 'user_id'],
+        'resource' => ['resources', 'user_id'],
+        'volunteering' => ['vol_opportunities', 'created_by'],
+        'volunteering_opportunity' => ['vol_opportunities', 'created_by'],
+        'volunteer' => ['vol_opportunities', 'created_by'],
+        'review' => ['reviews', 'reviewer_id'],
+        'ideation_challenge' => ['ideation_challenges', 'user_id'],
+        'challenge' => ['ideation_challenges', 'user_id'],
+        'job' => ['job_vacancies', 'user_id'],
+        'discussion' => ['group_discussions', 'user_id'],
+        'comment' => ['comments', 'user_id'],
+    ];
+
     public function __construct()
     {
     }
@@ -248,16 +269,16 @@ class SocialNotificationService
     /**
      * Get link to content.
      */
-    private static function getContentLink($contentType, $contentId): string
+    public static function getContentLink($contentType, $contentId): string
     {
         $routes = [
-            'post' => '/feed',
-            'feed_post' => '/feed',
+            'post' => '/feed/posts/' . $contentId,
+            'feed_post' => '/feed/posts/' . $contentId,
             'blog_post' => self::getBlogLink((int) $contentId),
             'blog' => self::getBlogLink((int) $contentId),
             'listing' => '/listings/' . $contentId,
             'event' => '/events/' . $contentId,
-            'goal' => '/goals',
+            'goal' => '/goals/' . $contentId,
             'poll' => '/polls',
             'resource' => '/resources',
             'volunteering' => '/volunteering/opportunities/' . $contentId,
@@ -265,8 +286,10 @@ class SocialNotificationService
             'ideation_challenge' => '/ideation/' . $contentId,
             'challenge' => '/ideation/' . $contentId,
             'challenge_idea' => '/ideation/' . $contentId,
-            'review' => '/dashboard',
-            'comment' => '/feed',
+            'review' => '/reviews',
+            'job' => '/jobs/' . $contentId,
+            'discussion' => self::getDiscussionLink((int) $contentId),
+            'comment' => self::getCommentLink((int) $contentId),
         ];
         return $routes[$contentType] ?? '/';
     }
@@ -287,6 +310,47 @@ class SocialNotificationService
         }
 
         return '/blog/' . $contentId;
+    }
+
+    private static function getDiscussionLink(int $contentId): string
+    {
+        try {
+            $groupId = DB::table('group_discussions')
+                ->where('id', $contentId)
+                ->where('tenant_id', TenantContext::getId())
+                ->value('group_id');
+
+            if ($groupId) {
+                return '/groups/' . $groupId . '#discussion-' . $contentId;
+            }
+        } catch (\Throwable $e) {
+            Log::warning("SocialNotificationService::getDiscussionLink error: " . $e->getMessage());
+        }
+
+        return '/groups';
+    }
+
+    private static function getCommentLink(int $commentId): string
+    {
+        try {
+            $comment = DB::table('comments')
+                ->where('id', $commentId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['target_type', 'target_id'])
+                ->first();
+
+            if ($comment && $comment->target_type && $comment->target_id) {
+                return self::getCommentDeepLink(
+                    (string) $comment->target_type,
+                    (int) $comment->target_id,
+                    $commentId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("SocialNotificationService::getCommentLink error: " . $e->getMessage());
+        }
+
+        return '/feed#comment-' . $commentId;
     }
 
     private static function getCommentDeepLink($contentType, $contentId, int $commentId): string
@@ -462,83 +526,19 @@ class SocialNotificationService
     {
         try {
             $tenantId = TenantContext::getId();
+            $entry = self::OWNER_COLUMNS[$contentType] ?? null;
 
-            switch ($contentType) {
-                case 'post':
-                case 'feed_post':
-                    $userId = DB::table('feed_posts')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'blog_post':
-                case 'blog':
-                    $userId = DB::table('posts')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('author_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'listing':
-                    $userId = DB::table('listings')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'event':
-                    $userId = DB::table('events')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'goal':
-                    $userId = DB::table('goals')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'poll':
-                    $userId = DB::table('polls')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'resource':
-                    $userId = DB::table('resources')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'volunteering':
-                    $userId = DB::table('vol_opportunities')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('created_by');
-                    return $userId ? (int) $userId : null;
-
-                case 'review':
-                    $userId = DB::table('reviews')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('reviewer_id');
-                    return $userId ? (int) $userId : null;
-
-                case 'comment':
-                    $userId = DB::table('comments')
-                        ->where('id', $contentId)
-                        ->where('tenant_id', $tenantId)
-                        ->value('user_id');
-                    return $userId ? (int) $userId : null;
-
-                default:
-                    return null;
+            if (!$entry) {
+                return null;
             }
+
+            [$table, $ownerColumn] = $entry;
+            $userId = DB::table($table)
+                ->where('id', $contentId)
+                ->where('tenant_id', $tenantId)
+                ->value($ownerColumn);
+
+            return $userId ? (int) $userId : null;
         } catch (\Throwable $e) {
             Log::warning("getContentOwnerId error: " . $e->getMessage());
             return null;
@@ -617,6 +617,8 @@ class SocialNotificationService
                     break;
 
                 case 'volunteering':
+                case 'volunteering_opportunity':
+                case 'volunteer':
                     $row = DB::table('vol_opportunities')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
@@ -630,6 +632,34 @@ class SocialNotificationService
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->value('comment');
+                    break;
+
+                case 'ideation_challenge':
+                case 'challenge':
+                    $row = DB::table('ideation_challenges')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'description'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
+                    break;
+
+                case 'job':
+                    $row = DB::table('job_vacancies')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'description'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
+                    break;
+
+                case 'discussion':
+                    $row = DB::table('group_discussions')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title'])
+                        ->first();
+                    $text = $row ? $row->title : '';
                     break;
 
                 case 'comment':

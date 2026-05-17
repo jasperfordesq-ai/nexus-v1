@@ -73,6 +73,18 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    private function createResource(int $userId): int
+    {
+        return DB::table('resources')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'title' => 'Comment target resource ' . uniqid(),
+            'description' => 'A resource with social comments.',
+            'file_path' => '/tmp/comment-target-resource.pdf',
+            'created_at' => now(),
+        ]);
+    }
+
     private function createComment(int $postId, int $userId): int
     {
         return DB::table('comments')->insertGetId([
@@ -343,6 +355,38 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_resource_comment_notifies_content_owner(): void
+    {
+        $resourceOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $commenter = $this->authenticatedUser();
+        $resourceId = $this->createResource($resourceOwner->id);
+
+        $response = $this->apiPost('/v2/comments', [
+            'target_type' => 'resource',
+            'target_id' => $resourceId,
+            'content' => 'This resource is useful',
+        ]);
+
+        $response->assertStatus(201);
+        $commentId = (int) $response->json('data.id');
+
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'resource',
+            'target_id' => $resourceId,
+            'user_id' => $commenter->id,
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $resourceOwner->id,
+            'type' => 'comment',
+            'link' => "/resources#comment-{$commentId}",
+        ]);
+    }
+
     public function test_store_reply_does_not_duplicate_notification_when_parent_author_owns_post(): void
     {
         $postOwner = User::factory()->forTenant($this->testTenantId)->create([
@@ -418,6 +462,30 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_does_not_cross_tenant_even_when_user_id_matches(): void
+    {
+        $owner = $this->authenticatedUser();
+        $foreignCommentId = DB::table('comments')->insertGetId([
+            'tenant_id' => 999,
+            'target_type' => 'post',
+            'target_id' => 1,
+            'user_id' => $owner->id,
+            'content' => 'Foreign tenant comment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->apiPut("/v2/comments/{$foreignCommentId}", [
+            'content' => 'Cross-tenant edit attempt',
+        ])->assertStatus(403);
+
+        $this->assertDatabaseHas('comments', [
+            'id' => $foreignCommentId,
+            'tenant_id' => 999,
+            'content' => 'Foreign tenant comment',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  DELETE /v2/comments/{id}
     // ------------------------------------------------------------------
@@ -460,5 +528,28 @@ class CommentsControllerTest extends TestCase
         $response = $this->apiPost('/v2/comments/1/reactions', ['type' => 'like']);
 
         $response->assertStatus(401);
+    }
+
+    public function test_comment_reaction_notification_deep_links_to_comment(): void
+    {
+        $commentOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $reactor = $this->authenticatedUser();
+        $postId = $this->createPost($reactor->id);
+        $commentId = $this->createComment($postId, $commentOwner->id);
+
+        $response = $this->apiPost("/v2/comments/{$commentId}/reactions", [
+            'reaction_type' => 'love',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $commentOwner->id,
+            'type' => 'like',
+            'link' => "/feed/posts/{$postId}#comment-{$commentId}",
+        ]);
     }
 }
