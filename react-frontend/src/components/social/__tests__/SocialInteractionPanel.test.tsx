@@ -174,4 +174,20 @@ describe('SocialInteractionPanel', () => {
     expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
     expect(screen.queryByTestId('share-button')).not.toBeInTheDocument();
   });
+
+  it('keeps resource comments interactive while hiding share', () => {
+    renderPanel(<SocialInteractionPanel targetType="resource" targetId={18} />);
+
+    expect(screen.getByRole('button', { name: 'Toggle like' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
+    expect(screen.queryByTestId('share-button')).not.toBeInTheDocument();
+  });
+
+  it('honors explicit share suppression for otherwise shareable targets', () => {
+    renderPanel(<SocialInteractionPanel targetType="event" targetId={42} showShare={false} />);
+
+    expect(screen.getByRole('button', { name: 'Toggle like' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
+    expect(screen.queryByTestId('share-button')).not.toBeInTheDocument();
+  });
 });

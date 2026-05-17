@@ -486,6 +486,28 @@ class CommentsControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_returns_sanitized_stored_content(): void
+    {
+        $owner = $this->authenticatedUser();
+        $postId = $this->createPost($owner->id);
+        $commentId = $this->createComment($postId, $owner->id);
+
+        $response = $this->apiPut("/v2/comments/{$commentId}", [
+            'content' => '<strong>Edited</strong><script>alert("xss")</script>',
+        ]);
+
+        $response->assertStatus(200);
+
+        $storedContent = (string) DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $this->testTenantId)
+            ->value('content');
+
+        $this->assertSame($storedContent, $response->json('data.content'));
+        $this->assertStringNotContainsString('<script', $storedContent);
+        $this->assertStringNotContainsString('alert("xss")', $storedContent);
+    }
+
     // ------------------------------------------------------------------
     //  DELETE /v2/comments/{id}
     // ------------------------------------------------------------------

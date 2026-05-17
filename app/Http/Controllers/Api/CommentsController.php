@@ -12,6 +12,8 @@ use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\CommentService;
+use App\Services\ReactionService;
+use App\Services\SocialNotificationService;
 use App\Support\FeedItemTables;
 use Illuminate\Http\JsonResponse;
 
@@ -180,22 +182,24 @@ class CommentsController extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        $emoji = $this->input('emoji');
+        $emoji = $this->input('reaction_type') ?? $this->input('emoji');
 
         if (! $emoji) {
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.emoji_required'), 'emoji', 400);
         }
 
-        // Map frontend emoji names to actual emojis
+        // Legacy aliases accepted by the pre-unified comment reaction endpoint.
         $emojiMap = [
-            'heart'       => "\u{2764}\u{FE0F}",
-            'thumbs_up'   => "\u{1F44D}",
-            'thumbs_down' => "\u{1F44E}",
-            'laugh'       => "\u{1F602}",
-            'angry'       => "\u{1F62E}",
+            'heart'       => 'love',
+            'thumbs_up'   => 'like',
+            'thumbs_down' => 'sad',
+            'angry'       => 'wow',
         ];
 
         $actualEmoji = $emojiMap[$emoji] ?? $emoji;
+        if (!in_array($actualEmoji, ReactionService::VALID_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'emoji', 400);
+        }
 
         $result = $this->commentService->toggleReaction($userId, $tenantId, $id, $actualEmoji);
 
@@ -208,11 +212,13 @@ class CommentsController extends BaseApiController
                     $recipient = User::find((int) $comment->user_id);
                     LocaleContext::withLocale($recipient, function () use ($reactor, $comment) {
                         $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : __('emails.common.fallback_someone');
-                        $link = $comment->target_type && $comment->target_id
-                            ? "/{$comment->target_type}s/{$comment->target_id}"
-                            : null;
                         $message = __('api_controllers_3.comments.reaction', ['name' => $reactorName]);
-                        Notification::createNotification((int) $comment->user_id, $message, $link, 'reaction');
+                        Notification::createNotification(
+                            (int) $comment->user_id,
+                            $message,
+                            SocialNotificationService::getContentLink('comment', (int) $comment->id),
+                            'reaction'
+                        );
                     });
                 }
             } catch (\Throwable $e) {
@@ -222,7 +228,8 @@ class CommentsController extends BaseApiController
 
         return $this->respondWithData([
             'action'    => $result['action'],
-            'emoji'     => $emoji,
+            'emoji'     => $actualEmoji,
+            'reaction_type' => $actualEmoji,
             'reactions' => $result['reactions'],
         ]);
     }

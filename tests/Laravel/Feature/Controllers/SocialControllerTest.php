@@ -64,6 +64,29 @@ class SocialControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_legacy_mention_search_returns_username_for_resolvable_mentions(): void
+    {
+        $this->authenticatedUser();
+
+        User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Mention',
+            'last_name' => 'Target',
+            'name' => 'Mention Target',
+            'username' => 'mentiontarget',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $response = $this->apiPost('/social/mention-search', [
+            'query' => 'mentiontarget',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'username' => 'mentiontarget',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  POST /v2/feed/like
     // ------------------------------------------------------------------
@@ -302,12 +325,24 @@ class SocialControllerTest extends TestCase
                     'review_type' => 'local', 'status' => 'approved',
                     'created_at' => $now, 'updated_at' => $now,
                 ]),
-                'volunteer' => DB::table('vol_opportunities')->insertGetId([
-                    'tenant_id' => $tenantId, 'organization_id' => 0, 'created_by' => $userId,
-                    'title' => 'Test volunteer', 'description' => 'x',
-                    'is_active' => 1, 'status' => 'active',
-                    'created_at' => $now,
-                ]),
+                'volunteer' => (function () use ($tenantId, $userId, $now): int {
+                    $organizationId = DB::table('vol_organizations')->insertGetId([
+                        'tenant_id' => $tenantId,
+                        'user_id' => $userId,
+                        'name' => 'Test volunteer org ' . uniqid(),
+                        'slug' => 'test-volunteer-org-' . uniqid(),
+                        'status' => 'active',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+
+                    return DB::table('vol_opportunities')->insertGetId([
+                        'tenant_id' => $tenantId, 'organization_id' => $organizationId, 'created_by' => $userId,
+                        'title' => 'Test volunteer', 'description' => 'x',
+                        'is_active' => 1, 'status' => 'active',
+                        'created_at' => $now,
+                    ]);
+                })(),
                 'challenge' => DB::table('ideation_challenges')->insertGetId([
                     'tenant_id' => $tenantId, 'user_id' => $userId,
                     'title' => 'Test challenge', 'description' => 'x',
@@ -320,11 +355,11 @@ class SocialControllerTest extends TestCase
                     'type' => 'paid', 'commitment' => 'flexible', 'status' => 'open',
                     'created_at' => $now, 'updated_at' => $now,
                 ]),
-                'blog' => DB::table('blog_posts')->insertGetId([
+                'blog' => DB::table('posts')->insertGetId([
                     'tenant_id' => $tenantId, 'author_id' => $userId,
                     'title' => 'Test blog', 'slug' => 'test-blog-' . uniqid(),
                     'content' => 'x', 'status' => 'published',
-                    'published_at' => $now, 'created_at' => $now, 'updated_at' => $now,
+                    'created_at' => $now, 'updated_at' => $now,
                 ]),
                 'discussion' => (function () use ($tenantId, $userId, $now): int {
                     $groupId = DB::table('groups')->insertGetId([

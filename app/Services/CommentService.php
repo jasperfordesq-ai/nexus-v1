@@ -607,7 +607,7 @@ class CommentService
                   ->orWhere('first_name', 'LIKE', $searchTerm)
                   ->orWhere('username', 'LIKE', $searchTerm);
             })
-            ->select(['id', 'name', 'first_name', 'avatar_url'])
+            ->select(['id', 'name', 'first_name', 'username', 'avatar_url'])
             ->limit($limit)
             ->get()
             ->map(fn ($r) => (array) $r)
