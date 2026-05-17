@@ -2024,6 +2024,11 @@ class AdminUsersController extends BaseApiController
                 $this->sendApprovalInAppNotification($userArr, $creditsAwarded);
                 $touchedIds[] = $id;
                 $success++;
+
+                $userArr = (array) $row;
+                $creditsAwarded = $this->grantWelcomeCredits($userArr, $adminId);
+                $this->sendApprovalWelcomeEmail($userArr, $creditsAwarded);
+                $this->sendApprovalInAppNotification($userArr, $creditsAwarded);
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] bulk-approve failed for user #{$id}: " . $e->getMessage());
                 $failed++;
