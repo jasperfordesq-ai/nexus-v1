@@ -63,7 +63,7 @@ class JobExpiryNotificationService
 
                             // Render notification + email in the RECIPIENT's language, not
                             // the cron worker's default (which is always 'en' in queue context).
-                            LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft) {
+                            $emailOk = LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft): bool {
                                 // In-app notification
                                 if ($vacancy->user_id) {
                                     Notification::createNotification(
@@ -76,9 +76,15 @@ class JobExpiryNotificationService
 
                                 // Email notification
                                 if ($vacancy->creator && $vacancy->creator->email) {
-                                    self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
+                                    return self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
                                 }
+
+                                return true;
                             });
+
+                            if (!$emailOk) {
+                                continue;
+                            }
 
                             DB::table('job_expiry_notifications')->insert([
                                 'tenant_id' => $vacancy->tenant_id,
@@ -105,7 +111,7 @@ class JobExpiryNotificationService
         return $notified;
     }
 
-    private static function sendExpiryEmail(User $user, object $vacancy, int $daysLeft): void
+    private static function sendExpiryEmail(User $user, object $vacancy, int $daysLeft): bool
     {
         $name      = htmlspecialchars($user->first_name ?? __('emails.common.fallback_name'));
         $title     = htmlspecialchars($vacancy->title);
@@ -136,8 +142,11 @@ class JobExpiryNotificationService
 
         $subject = __('notifications.job_expiry_email_subject', ['title' => $title]);
         $mailer = Mailer::forCurrentTenant();
-        if (!$mailer->send($user->email, $subject, $html)) {
+        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'job_expiry')) {
             Log::warning('JobExpiryNotificationService: failed to send expiry email', ['user_id' => $user->id, 'vacancy_id' => $vacancy->id]);
+            return false;
         }
+
+        return true;
     }
 }

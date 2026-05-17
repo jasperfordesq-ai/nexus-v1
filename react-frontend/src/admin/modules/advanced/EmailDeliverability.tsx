@@ -10,6 +10,7 @@ import {
   CardBody,
   CardHeader,
   Chip,
+  Alert,
   Input,
   Select,
   SelectItem,
@@ -21,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@heroui/react';
+import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Mail from 'lucide-react/icons/mail';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Search from 'lucide-react/icons/search';
@@ -28,13 +30,24 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useTranslation } from 'react-i18next';
+
+interface EmailWarning {
+  code: string;
+  severity: 'info' | 'warning' | 'critical';
+  message_key: string;
+  params?: Record<string, unknown>;
+}
 
 interface SummaryData {
   window_days: number;
   total: number;
   by_status: Record<string, number>;
   delivered_pct: number | null;
+  accepted_pct?: number | null;
+  unconfirmed_sent?: number;
   bounced_pct: number | null;
+  warnings?: EmailWarning[];
 }
 
 interface LogRow {
@@ -80,6 +93,7 @@ const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'danger'
 export default function EmailDeliverability() {
   usePageTitle('Email Deliverability');
   const toast = useToast();
+  const { t } = useTranslation('admin');
 
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryDays, setSummaryDays] = useState(7);
@@ -152,6 +166,7 @@ export default function EmailDeliverability() {
   );
 
   const statuses = useMemo(() => Object.keys(summary?.by_status ?? {}), [summary]);
+  const warnings = summary?.warnings ?? [];
 
   return (
     <div className="space-y-6 p-4">
@@ -159,6 +174,26 @@ export default function EmailDeliverability() {
         <Mail className="w-6 h-6 text-theme-primary" />
         <h1 className="text-2xl font-bold text-theme-primary">Email Deliverability</h1>
       </div>
+
+      {warnings.length > 0 && (
+        <div className="space-y-2">
+          {warnings.map((warning) => (
+            <Alert
+              key={`${warning.code}-${warning.severity}`}
+              color={warning.severity === 'critical' ? 'danger' : warning.severity === 'warning' ? 'warning' : 'primary'}
+              variant="flat"
+              startContent={<AlertTriangle className="h-4 w-4" />}
+              title={t(`email_deliverability.warnings.${warning.code}.title`, {
+                defaultValue: t('email_deliverability.warnings.default_title'),
+              })}
+              description={t(`email_deliverability.warnings.${warning.code}.body`, {
+                ...(warning.params ?? {}),
+                defaultValue: t('email_deliverability.warnings.default_body'),
+              })}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Summary card */}
       <Card>

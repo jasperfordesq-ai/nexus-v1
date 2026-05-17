@@ -164,6 +164,7 @@ class EventReminderService
                         );
 
                         // Email notification
+                        $emailOk = true;
                         if (!empty($attendee->email)) {
                             try {
                                 $subjectKey = $reminderType === '24h'
@@ -181,10 +182,18 @@ class EventReminderService
                                     ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
                                     ->render();
 
-                                Mailer::forCurrentTenant()->send($attendee->email, $subject, $html);
+                                $emailOk = Mailer::forCurrentTenant()->send($attendee->email, $subject, $html, null, null, null, 'event_reminder');
+                                if (!$emailOk) {
+                                    \Illuminate\Support\Facades\Log::warning("[EventReminderService] Mailer returned false: event={$eventId}, user={$userId}");
+                                }
                             } catch (\Exception $emailEx) {
                                 \Illuminate\Support\Facades\Log::warning("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
+                                $emailOk = false;
                             }
+                        }
+
+                        if (!$emailOk) {
+                            return;
                         }
 
                         // Mark reminder as sent

@@ -102,10 +102,15 @@ class FederationEmailService
     /**
      * Send a transaction notification to a recipient.
      */
-    public static function sendTransactionNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, float $amount, string $description): bool
+    public static function sendTransactionNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, float $amount, string $description, ?int $recipientTenantId = null): bool
     {
         try {
-            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
+            $recipientTenantId ??= TenantContext::getId();
+            if (!$recipientTenantId) {
+                return false;
+            }
+
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
             if (!$recipient || empty($recipient->email)) {
                 return false;
             }
@@ -113,7 +118,10 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $amount, $description) {
+            $previousTenantId = TenantContext::getId();
+            TenantContext::setById($recipientTenantId);
+            try {
+                LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $amount, $description) {
                 $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
                 $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
@@ -139,8 +147,15 @@ class FederationEmailService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($recipient->email, $subject, $html);
-            });
+                $mailer->send($recipient->email, $subject, $html, null, null, null, 'federation_transaction');
+                });
+            } finally {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
 
             return true;
         } catch (\Exception $e) {
@@ -190,7 +205,7 @@ class FederationEmailService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($sender->email, $subject, $html);
+                $mailer->send($sender->email, $subject, $html, null, null, null, 'federation_transaction');
             });
 
             return true;
@@ -266,7 +281,7 @@ class FederationEmailService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $html);
+                $mailer->send($user->email, $subject, $html, null, null, null, 'federation_digest');
             });
 
             return true;
@@ -345,7 +360,7 @@ class FederationEmailService
                             ->render();
 
                         $mailer = Mailer::forCurrentTenant();
-                        $mailer->send($admin->email, $subject, $html);
+                        $mailer->send($admin->email, $subject, $html, null, null, null, 'federation_partnership');
                     });
                 }
             } finally {
@@ -372,10 +387,15 @@ class FederationEmailService
     /**
      * Send a connection request notification to the recipient.
      */
-    public static function sendConnectionRequestNotification(int $recipientUserId, int $senderUserId, int $senderTenantId): bool
+    public static function sendConnectionRequestNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, ?int $recipientTenantId = null): bool
     {
         try {
-            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
+            $recipientTenantId ??= TenantContext::getId();
+            if (!$recipientTenantId) {
+                return false;
+            }
+
+            $recipient = self::getUserWithEmail($recipientUserId, $recipientTenantId);
             if (!$recipient || empty($recipient->email)) {
                 return false;
             }
@@ -383,7 +403,10 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $senderUserId) {
+            $previousTenantId = TenantContext::getId();
+            TenantContext::setById($recipientTenantId);
+            try {
+                LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $senderUserId) {
                 $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
                 $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
@@ -402,10 +425,16 @@ class FederationEmailService
                     ->button(__('emails.federation.connection_request_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $senderUserId))
                     ->render();
 
-                TenantContext::setById(TenantContext::getId());
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($recipient->email, $subject, $html);
-            });
+                $mailer->send($recipient->email, $subject, $html, null, null, null, 'federation_connection');
+                });
+            } finally {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
 
             Log::info('[FederationEmail] Connection request notification sent', [
                 'recipient' => $recipientUserId,
@@ -423,10 +452,15 @@ class FederationEmailService
     /**
      * Send a connection accepted notification to the original sender.
      */
-    public static function sendConnectionAcceptedNotification(int $senderUserId, int $recipientUserId, int $recipientTenantId): bool
+    public static function sendConnectionAcceptedNotification(int $senderUserId, int $recipientUserId, int $recipientTenantId, ?int $senderTenantId = null): bool
     {
         try {
-            $sender = self::getUserWithEmail($senderUserId, TenantContext::getId());
+            $senderTenantId ??= TenantContext::getId();
+            if (!$senderTenantId) {
+                return false;
+            }
+
+            $sender = self::getUserWithEmail($senderUserId, $senderTenantId);
             if (!$sender || empty($sender->email)) {
                 return false;
             }
@@ -434,7 +468,10 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            LocaleContext::withLocale($sender, function () use ($sender, $recipient, $recipientTenant, $recipientUserId) {
+            $previousTenantId = TenantContext::getId();
+            TenantContext::setById($senderTenantId);
+            try {
+                LocaleContext::withLocale($sender, function () use ($sender, $recipient, $recipientTenant, $recipientUserId) {
                 $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
                 $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
 
@@ -453,10 +490,16 @@ class FederationEmailService
                     ->button(__('emails.federation.connection_accepted_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $recipientUserId))
                     ->render();
 
-                TenantContext::setById(TenantContext::getId());
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($sender->email, $subject, $html);
-            });
+                $mailer->send($sender->email, $subject, $html, null, null, null, 'federation_connection');
+                });
+            } finally {
+                if ($previousTenantId) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
 
             Log::info('[FederationEmail] Connection accepted notification sent', [
                 'sender' => $senderUserId,

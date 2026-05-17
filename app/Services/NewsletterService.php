@@ -230,9 +230,9 @@ class NewsletterService
             return ['sent' => 0, 'failed' => 0, 'locked' => true];
         }
 
+        try {
         $newsletter = Newsletter::find($newsletterId);
         if (!$newsletter) {
-            Cache::forget($lockKey);
             return ['sent' => 0, 'failed' => 0];
         }
 
@@ -400,9 +400,10 @@ class NewsletterService
             ]);
         }
 
-        Cache::forget($lockKey);
-
         return ['sent' => $sent, 'failed' => $failed];
+        } finally {
+            Cache::forget($lockKey);
+        }
     }
 
     /**

@@ -114,7 +114,11 @@ class OnboardingNurtureService
                 }
 
                 try {
-                    LocaleContext::withLocale($user, fn() => self::sendNurtureEmail($tenantId, $userId, $user, $day));
+                    $sentOk = LocaleContext::withLocale($user, fn() => self::sendNurtureEmail($tenantId, $userId, $user, $day));
+                    if (!$sentOk) {
+                        $errors++;
+                        continue;
+                    }
                     Cache::put($cacheKey, true, now()->addDays(self::DEDUP_TTL_DAYS));
                     $sent++;
                 } catch (\Throwable $e) {
@@ -130,11 +134,11 @@ class OnboardingNurtureService
     /**
      * Build and send the appropriate nurture email for the given day.
      */
-    private static function sendNurtureEmail(int $tenantId, int $userId, object $user, int $day): void
+    private static function sendNurtureEmail(int $tenantId, int $userId, object $user, int $day): bool
     {
         $email = $user->email ?? null;
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return;
+            return false;
         }
 
         $tenantData = TenantContext::get();
@@ -169,8 +173,11 @@ class OnboardingNurtureService
             ->render();
 
         $mailer = Mailer::forCurrentTenant();
-        $mailer->send($email, $subject, $html);
+        if (!$mailer->send($email, $subject, $html, null, null, null, 'onboarding_nurture')) {
+            return false;
+        }
 
         Log::info("[OnboardingNurtureService] Sent day-{$day} nurture to user={$userId} tenant={$tenantId}");
+        return true;
     }
 }

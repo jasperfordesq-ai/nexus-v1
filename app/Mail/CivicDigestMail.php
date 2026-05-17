@@ -155,7 +155,7 @@ class CivicDigestMail
                     (string) $recipient->email,
                     $subject,
                     $builder->render(),
-                    ['unsubscribeUrl' => $prefsUrl],
+                    ['unsubscribeUrl' => $prefsUrl, 'category' => 'civic_digest'],
                 );
                 return $sent === true;
             } catch (Throwable $e) {

@@ -12,8 +12,9 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\ConnectionService;
-use App\Services\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
+use App\Models\Notification;
+use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -250,14 +251,11 @@ class ConnectionsController extends BaseApiController
                         ?: ($decliner->name ?? __('emails.common.fallback_someone'));
 
                     // Bell notification
-                    NotificationDispatcher::dispatch(
-                        $requesterId,
-                        'global',
-                        null,
-                        'connection_declined',
+                    Notification::createNotification(
+                        (int) $requesterId,
                         __('emails_misc.social.connection_declined', ['name' => $declinerName]),
                         '/members',
-                        null
+                        'connection_declined'
                     );
 
                     // Email notification
@@ -276,7 +274,7 @@ class ConnectionsController extends BaseApiController
 
                         $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
                         $mailer  = Mailer::forCurrentTenant();
-                        if (!$mailer->send($requester->email, $subject, $html)) {
+                        if (!$mailer->send($requester->email, $subject, $html, null, null, null, 'connection_declined')) {
                             Log::warning('[ConnectionsController] connection declined email failed to send', [
                                 'requester_id' => $requesterId,
                             ]);

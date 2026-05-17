@@ -118,6 +118,7 @@ class GoalReminderService
                     );
 
                     // Email notification
+                    $emailOk = true;
                     if (!empty($reminder->email)) {
                         $goalUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
@@ -131,9 +132,14 @@ class GoalReminderService
                             ->render();
 
                         $subject = __('emails_misc.goals.reminder_subject', ['title' => $goalTitle]);
-                        if (!Mailer::forCurrentTenant()->send($reminder->email, $subject, $html)) {
+                        if (!Mailer::forCurrentTenant()->send($reminder->email, $subject, $html, null, null, null, 'goal_reminder')) {
                             Log::warning('[GoalReminderService] Email failed', ['user_id' => $reminder->user_id, 'reminder_id' => $reminder->id]);
+                            $emailOk = false;
                         }
+                    }
+
+                    if (!$emailOk) {
+                        return;
                     }
 
                     // Advance next_reminder_at

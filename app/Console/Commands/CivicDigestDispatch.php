@@ -316,6 +316,9 @@ class CivicDigestDispatch extends Command
                 if ($pushSent) {
                     $stats['push']++;
                 }
+            }
+
+            if ($emailSent) {
                 $this->service->markSentNow($tenantId, $userId);
             }
         }

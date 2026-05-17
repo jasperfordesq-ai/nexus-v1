@@ -100,10 +100,16 @@ class ListingExpiryReminderService
 
             try {
                 // Cron default is 'en' — switch to the owner's preferred_language.
-                LocaleContext::withLocale($listing, function () use ($userId, $listing, $daysBefore, $tenantId, $listingId) {
-                    $this->sendReminder($userId, $listing, $daysBefore);
+                $handled = LocaleContext::withLocale($listing, function () use ($userId, $listing, $daysBefore, $tenantId, $listingId): bool {
+                    if (!$this->sendReminder($userId, $listing, $daysBefore)) {
+                        return false;
+                    }
                     $this->markReminderSent($tenantId, $listingId, $userId, $daysBefore);
+                    return true;
                 });
+                if (!$handled) {
+                    continue;
+                }
                 $sent++;
             } catch (\Exception $e) {
                 Log::error("[ListingExpiryReminderService] Failed: listing={$listingId}, user={$userId}, window={$daysBefore}: " . $e->getMessage());
@@ -157,10 +163,16 @@ class ListingExpiryReminderService
             $listingId = (int) $listing->id;
 
             try {
-                LocaleContext::withLocale($listing, function () use ($userId, $listing, $tenantId, $listingId) {
-                    $this->sendExpiredNotification($userId, $listing);
+                $handled = LocaleContext::withLocale($listing, function () use ($userId, $listing, $tenantId, $listingId): bool {
+                    if (!$this->sendExpiredNotification($userId, $listing)) {
+                        return false;
+                    }
                     $this->markReminderSent($tenantId, $listingId, $userId, 0);
+                    return true;
                 });
+                if (!$handled) {
+                    continue;
+                }
                 $sent++;
             } catch (\Exception $e) {
                 Log::error("[ListingExpiryReminderService] Expired notify failed: listing={$listingId}, user={$userId}: " . $e->getMessage());
@@ -174,7 +186,7 @@ class ListingExpiryReminderService
     /**
      * Send a listing expiry reminder to the listing owner.
      */
-    private function sendReminder(int $userId, object $listing, int $daysBefore): void
+    private function sendReminder(int $userId, object $listing, int $daysBefore): bool
     {
         $listingId = (int) $listing->id;
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
@@ -230,17 +242,22 @@ class ListingExpiryReminderService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html);
+                if (!$mailer->send($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry')) {
+                    return false;
+                }
             }
         } catch (\Exception $e) {
             Log::warning("[ListingExpiryReminderService] Email send failed for user={$userId}, listing={$listingId}: " . $e->getMessage());
+            return false;
         }
+
+        return true;
     }
 
     /**
      * Send an "expired today" email notification to the listing owner.
      */
-    private function sendExpiredNotification(int $userId, object $listing): void
+    private function sendExpiredNotification(int $userId, object $listing): bool
     {
         $listingId = (int) $listing->id;
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
@@ -275,15 +292,24 @@ class ListingExpiryReminderService
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send(
+                if (!$mailer->send(
                     $email,
                     __('emails_listings.listings.expiry_reminder.expired_subject', ['title' => $title]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'listing_expiry'
+                )) {
+                    return false;
+                }
             }
         } catch (\Exception $e) {
             Log::warning("[ListingExpiryReminderService] Expired email failed for user={$userId}, listing={$listingId}: " . $e->getMessage());
+            return false;
         }
+
+        return true;
     }
 
     /**

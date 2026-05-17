@@ -141,7 +141,7 @@ class GroupInviteService
             $token = Str::random(40);
             $expiresAt = now()->addDays(self::INVITE_EXPIRY_DAYS);
 
-            DB::table('group_invites')->insert([
+            $inviteId = DB::table('group_invites')->insertGetId([
                 'tenant_id' => $tenantId,
                 'group_id' => $groupId,
                 'invited_by' => $inviterId,
@@ -159,8 +159,9 @@ class GroupInviteService
             // body, and CTA in the recipient's preferred_language when we have
             // an existing user record. For brand-new invitees (no account yet)
             // this resolves to null and falls back to the caller's locale.
+            $emailSent = false;
             try {
-                LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId) {
+                $emailSent = LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId): bool {
                     $inviteUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/invite/' . $token;
                     $subject   = __('emails_misc.group_invite.email_subject', ['group' => $group->name]);
                     $body      = __('emails_misc.group_invite.email_body', [
@@ -179,12 +180,24 @@ class GroupInviteService
 
                     $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
 
-                    if (!Mailer::forCurrentTenant()->send($email, $subject, $html)) {
+                    if (!Mailer::forCurrentTenant()->send($email, $subject, $html, null, null, null, 'group_invite')) {
                         Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
+                        return false;
                     }
+
+                    return true;
                 });
             } catch (\Throwable $e) {
                 Log::warning('[GroupInviteService] invite email error: ' . $e->getMessage(), ['email' => $email]);
+            }
+
+            if (!$emailSent) {
+                DB::table('group_invites')
+                    ->where('id', $inviteId)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
+                $results[] = ['email' => $email, 'status' => 'failed'];
+                continue;
             }
 
             $results[] = ['email' => $email, 'status' => 'sent'];
