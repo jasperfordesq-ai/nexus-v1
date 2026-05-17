@@ -177,6 +177,13 @@ export const UserHoverCard = memo(function UserHoverCard({
   const hoursGiven = userData?.stats?.total_hours_given ?? 0;
   const connectionsCount = userData?.stats?.connections_count ?? 0;
   const listingsCount = userData?.stats?.listings_count ?? 0;
+  const portalContainer = typeof document !== 'undefined' ? document.body : undefined;
+  const panelClassName = [
+    'box-border w-[min(21rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)]',
+    'overflow-hidden rounded-xl border border-[var(--border-default)]',
+    'bg-[var(--surface-solid)] text-[var(--text-primary)] shadow-2xl',
+    'backdrop-blur-none',
+  ].join(' ');
 
   return (
     <Popover
@@ -191,6 +198,13 @@ export const UserHoverCard = memo(function UserHoverCard({
       backdrop="transparent"
       offset={8}
       showArrow
+      portalContainer={portalContainer}
+      containerPadding={16}
+      classNames={{
+        base: 'z-[9999] overflow-visible',
+        content: panelClassName,
+        arrow: 'bg-[var(--surface-solid)] border border-[var(--border-default)]',
+      }}
     >
       <PopoverTrigger>
         <span
@@ -202,15 +216,15 @@ export const UserHoverCard = memo(function UserHoverCard({
         </span>
       </PopoverTrigger>
       <PopoverContent
-        className="p-0 !bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[280px]"
+        className="p-0"
         onMouseEnter={handlePopoverMouseEnter}
         onMouseLeave={handlePopoverMouseLeave}
       >
         {isLoading && !userData ? (
           <div className="p-4 space-y-3">
             <div className="flex items-center gap-3">
-              <Skeleton className="w-12 h-12 rounded-full" />
-              <div className="space-y-1.5">
+              <Skeleton className="w-12 h-12 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-1.5">
                 <Skeleton className="h-3.5 w-24 rounded" />
                 <Skeleton className="h-3 w-16 rounded" />
               </div>
@@ -219,9 +233,9 @@ export const UserHoverCard = memo(function UserHoverCard({
             <Skeleton className="h-3 w-3/4 rounded" />
           </div>
         ) : userData ? (
-          <div className="p-4 space-y-3">
+          <div className="box-border w-full min-w-0 p-4 space-y-3">
             {/* User info */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <Link to={tenantPath(`/profile/${userData.id}`)} className="relative flex-shrink-0">
                 <Avatar
                   name={displayName}
@@ -231,7 +245,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                 />
                 <PresenceIndicator userId={userData.id} size="md" />
               </Link>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <Link
                   to={tenantPath(`/profile/${userData.id}`)}
                   className="font-semibold text-sm text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors truncate block"
@@ -251,18 +265,16 @@ export const UserHoverCard = memo(function UserHoverCard({
 
             {/* Bio */}
             {userData.bio && (
-              <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed break-words line-clamp-3">
                 {userData.bio}
               </p>
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
-              <span>{t('hover_card.hours_given', { count: hoursGiven })}</span>
-              <span className="text-[var(--border-default)]">|</span>
-              <span>{t('hover_card.connections', { count: connectionsCount })}</span>
-              <span className="text-[var(--border-default)]">|</span>
-              <span>{t('hover_card.listings', { count: listingsCount })}</span>
+            <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--surface-elevated)] text-center text-[11px] text-[var(--text-muted)]">
+              <span className="min-w-0 truncate px-2 py-2">{t('hover_card.hours_given', { count: hoursGiven })}</span>
+              <span className="min-w-0 truncate border-x border-[var(--border-default)] px-2 py-2">{t('hover_card.connections', { count: connectionsCount })}</span>
+              <span className="min-w-0 truncate px-2 py-2">{t('hover_card.listings', { count: listingsCount })}</span>
             </div>
 
             {/* Skills */}
@@ -273,7 +285,8 @@ export const UserHoverCard = memo(function UserHoverCard({
                     key={skill}
                     size="sm"
                     variant="flat"
-                    className="text-[10px] h-5 bg-[var(--surface-elevated)] text-[var(--text-muted)]"
+                    className="max-w-full text-[10px] h-5 bg-[var(--surface-elevated)] text-[var(--text-muted)]"
+                    classNames={{ content: 'truncate' }}
                   >
                     {skill}
                   </Chip>
@@ -282,36 +295,36 @@ export const UserHoverCard = memo(function UserHoverCard({
             )}
 
             {/* Actions */}
-            <div className="flex gap-2 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-1">
               {userData.connection_status === 'connected' ? (
                 <Button
                   size="sm"
                   variant="flat"
-                  className="flex-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  startContent={<UserCheck className="w-3.5 h-3.5" />}
+                  className="h-8 min-w-0 w-full px-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  startContent={<UserCheck className="w-3.5 h-3.5 shrink-0" />}
                   isDisabled
                 >
-                  {t('hover_card.connected')}
+                  <span className="min-w-0 truncate text-xs">{t('hover_card.connected')}</span>
                 </Button>
               ) : userData.connection_status === 'pending' ? (
                 <Button
                   size="sm"
                   variant="flat"
-                  className="flex-1 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  className="h-8 min-w-0 w-full px-2 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                   isDisabled
                 >
-                  {t('hover_card.pending')}
+                  <span className="min-w-0 truncate text-xs">{t('hover_card.pending')}</span>
                 </Button>
               ) : (
                 <Button
                   size="sm"
                   variant="flat"
-                  className="flex-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
-                  startContent={<UserPlus className="w-3.5 h-3.5" />}
+                  className="h-8 min-w-0 w-full px-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
+                  startContent={<UserPlus className="w-3.5 h-3.5 shrink-0" />}
                   onPress={handleConnect}
                   isLoading={isConnecting}
                 >
-                  {t('hover_card.connect')}
+                  <span className="min-w-0 truncate text-xs">{t('hover_card.connect')}</span>
                 </Button>
               )}
               <Button
@@ -319,10 +332,10 @@ export const UserHoverCard = memo(function UserHoverCard({
                 to={tenantPath(`/messages?to=${userData.id}`)}
                 size="sm"
                 variant="flat"
-                className="flex-1 bg-[var(--surface-elevated)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
-                startContent={<MessageCircle className="w-3.5 h-3.5" />}
+                className="h-8 min-w-0 w-full px-2 bg-[var(--surface-elevated)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
+                startContent={<MessageCircle className="w-3.5 h-3.5 shrink-0" />}
               >
-                {t('hover_card.message')}
+                <span className="min-w-0 truncate text-xs">{t('hover_card.message')}</span>
               </Button>
             </div>
           </div>

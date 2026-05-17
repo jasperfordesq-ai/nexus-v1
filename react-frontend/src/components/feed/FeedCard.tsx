@@ -511,7 +511,7 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   return (
-    <GlassCard ref={(el: HTMLDivElement | null) => { trackingRef(el); setViewRef(el); }} hoverable className="overflow-hidden group relative">
+    <GlassCard ref={(el: HTMLDivElement | null) => { trackingRef(el); setViewRef(el); }} hoverable className="overflow-visible group relative">
       {/* Long-press touch target for mobile context menu */}
       <div onTouchStart={longPressHandlers.onTouchStart} onTouchMove={longPressHandlers.onTouchMove} onTouchEnd={longPressHandlers.onTouchEnd}>
       {/* Confetti celebration overlay for milestones */}
