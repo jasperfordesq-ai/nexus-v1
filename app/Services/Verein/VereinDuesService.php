@@ -286,7 +286,11 @@ class VereinDuesService
             throw new \InvalidArgumentException(__('verein_dues.errors.cannot_remind_status'));
         }
 
-        $this->sendReminderEmail((int) $dues->user_id, (int) $dues->organization_id, (int) $dues->membership_year, (int) $dues->amount_cents, (string) $dues->currency, (string) $dues->due_date);
+        $emailSent = $this->sendReminderEmail((int) $dues->user_id, (int) $dues->organization_id, (int) $dues->membership_year, (int) $dues->amount_cents, (string) $dues->currency, (string) $dues->due_date);
+
+        if (!$emailSent) {
+            return ['dues_id' => $duesId, 'sent' => false];
+        }
 
         DB::table('verein_member_dues')->where('id', $duesId)->update([
             'reminder_count' => DB::raw('reminder_count + 1'),
@@ -572,8 +576,17 @@ class VereinDuesService
         $sent = 0;
         foreach ($rows as $row) {
             try {
-                TenantContext::setById((int) $row->tenant_id);
-                $this->sendReminderEmail((int) $row->user_id, (int) $row->organization_id, (int) $row->membership_year, (int) $row->amount_cents, (string) $row->currency, (string) $row->due_date);
+                $emailSent = TenantContext::runForTenant((int) $row->tenant_id, function () use ($row): bool {
+                    return $this->sendReminderEmail((int) $row->user_id, (int) $row->organization_id, (int) $row->membership_year, (int) $row->amount_cents, (string) $row->currency, (string) $row->due_date);
+                });
+
+                if (!$emailSent) {
+                    Log::warning('VereinDues: reminder email returned false', [
+                        'dues_id' => $row->id,
+                        'tenant_id' => $row->tenant_id,
+                    ]);
+                    continue;
+                }
 
                 DB::table('verein_member_dues')->where('id', $row->id)->update([
                     'reminder_count' => DB::raw('reminder_count + 1'),
@@ -610,9 +623,9 @@ class VereinDuesService
         );
     }
 
-    private function sendReminderEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency, string $dueDate): void
+    private function sendReminderEmail(int $userId, int $organizationId, int $year, int $amountCents, string $currency, string $dueDate): bool
     {
-        $this->sendEmail(
+        return $this->sendEmail(
             $userId,
             $organizationId,
             'emails.verein_dues.reminder_subject',
@@ -649,7 +662,7 @@ class VereinDuesService
         string $linkOrUrl,
         string $ctaKey,
         bool $linkIsAbsolute = false
-    ): void {
+    ): bool {
         $tenantId = TenantContext::getId();
 
         $user = DB::table('users')
@@ -658,7 +671,7 @@ class VereinDuesService
             ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
         if (!$user || empty($user->email)) {
-            return;
+            return false;
         }
 
         $orgName = (string) (DB::table('vol_organizations')->where('id', $organizationId)->value('name') ?? '');
@@ -668,7 +681,7 @@ class VereinDuesService
             ? $linkOrUrl
             : (TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $linkOrUrl);
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $titleKey, $bodyKey, $params, $url, $ctaKey, $userId, $tenantId): void {
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $subjectKey, $titleKey, $bodyKey, $params, $url, $ctaKey, $userId, $tenantId): bool {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $html = EmailTemplateBuilder::make()
@@ -678,9 +691,13 @@ class VereinDuesService
                 ->button(__($ctaKey), $url)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $html, null, null, null, 'verein_dues', ['tenant_id' => $tenantId])) {
+            $sent = \App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $params), $html, null, null, null, 'verein_dues', ['tenant_id' => $tenantId]);
+
+            if (!$sent) {
                 Log::warning('VereinDues: email send failed', ['user_id' => $userId]);
             }
+
+            return $sent;
         });
     }
 

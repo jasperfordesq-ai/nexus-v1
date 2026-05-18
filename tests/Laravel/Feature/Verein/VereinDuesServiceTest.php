@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Verein;
 
 use App\Core\TenantContext;
+use App\Services\EmailDispatchService;
 use App\Services\Verein\VereinDuesService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +177,45 @@ class VereinDuesServiceTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $this->service->waive($duesId, $this->makeUser(), 'Should fail');
+    }
+
+    public function test_send_reminder_does_not_mark_sent_when_email_fails(): void
+    {
+        $u1 = $this->makeUser();
+        $this->joinOrg($u1);
+        $this->configureFee();
+        $year = (int) date('Y');
+        $this->service->generateAnnualDues($this->organizationId, $year);
+
+        $duesId = (int) DB::table('verein_member_dues')
+            ->where('organization_id', $this->organizationId)
+            ->value('id');
+        DB::table('verein_member_dues')
+            ->where('id', $duesId)
+            ->update(['status' => 'overdue', 'reminder_count' => 0, 'last_reminder_at' => null]);
+
+        app()->instance(EmailDispatchService::class, new class extends EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return false;
+            }
+        });
+
+        $result = $this->service->sendReminder($duesId);
+
+        $this->assertFalse($result['sent']);
+        $row = DB::table('verein_member_dues')->where('id', $duesId)->first();
+        $this->assertSame(0, (int) $row->reminder_count);
+        $this->assertNull($row->last_reminder_at);
+    }
+
+    public function test_due_reminder_cron_uses_scoped_tenant_context_and_successful_send_marker(): void
+    {
+        $source = file_get_contents(app_path('Services/Verein/VereinDuesService.php'));
+
+        $this->assertStringContainsString('TenantContext::runForTenant((int) $row->tenant_id', $source);
+        $this->assertStringContainsString('if (!$emailSent)', $source);
+        $this->assertStringContainsString('return $this->sendEmail(', $source);
     }
 
     public function test_mark_paid_writes_ledger_and_flips_status_idempotently(): void

@@ -187,7 +187,7 @@ class EventNotificationService
                                 );
 
                                 if ($emailOk) {
-                                    $this->createReminderNotification($userId, $event, $message);
+                                    $this->createReminderNotification($tenantId, $userId, $event, $message);
                                     $this->markReminderSent($tenantId, $eventId, $userId, $type);
                                     $sent++;
                                 } else {
@@ -815,13 +815,13 @@ class EventNotificationService
     /**
      * Create an in-app reminder notification after the email path is accepted.
      */
-    private function createReminderNotification(int $userId, object $event, string $message): void
+    private function createReminderNotification(int $tenantId, int $userId, object $event, string $message): void
     {
         $link = "/events/{$event->id}";
 
         Notification::create([
             'user_id' => $userId,
-            'tenant_id' => TenantContext::getId(),
+            'tenant_id' => $tenantId,
             'message' => $message,
             'link' => $link,
             'type' => 'event_reminder',

@@ -276,7 +276,7 @@ class EmailMailerRoutingTest extends TestCase
 
         $eventSource = file_get_contents(app_path('Services/EventNotificationService.php'));
         $emailSend = strpos($eventSource, '$emailOk = $this->sendEventEmail(');
-        $bellCreate = strpos($eventSource, '$this->createReminderNotification($userId, $event, $message);');
+        $bellCreate = strpos($eventSource, '$this->createReminderNotification($tenantId, $userId, $event, $message);');
 
         $this->assertNotFalse($emailSend, 'EventNotificationService must send the reminder email.');
         $this->assertNotFalse($bellCreate, 'EventNotificationService must create the reminder bell.');
@@ -284,6 +284,12 @@ class EmailMailerRoutingTest extends TestCase
             $bellCreate,
             $emailSend,
             'EventNotificationService must create event reminder bells only after email acceptance.'
+        );
+
+        $this->assertStringNotContainsString(
+            "'tenant_id' => TenantContext::getId(),",
+            $eventSource,
+            'EventNotificationService reminder bells must use the explicit tenant passed to the scheduler.'
         );
     }
 }
