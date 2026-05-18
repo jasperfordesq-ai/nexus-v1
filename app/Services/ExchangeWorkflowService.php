@@ -795,35 +795,50 @@ class ExchangeWorkflowService
                 ->first();
 
             if ($exchange) {
-                TenantContext::setById($exchange->tenant_id);
-                $link        = '/exchanges/' . $exchangeId;
-                $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                $previousTenantId = TenantContext::getId();
+                try {
+                    TenantContext::setById((int) $exchange->tenant_id);
+                    $link        = '/exchanges/' . $exchangeId;
+                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 
-                foreach ([
-                    ['email' => $exchange->req_email, 'name' => $exchange->req_fname ?? $exchange->req_name, 'lang' => $exchange->req_lang ?? null],
-                    ['email' => $exchange->prov_email, 'name' => $exchange->prov_fname ?? $exchange->prov_name, 'lang' => $exchange->prov_lang ?? null],
-                ] as $party) {
-                    if (empty($party['email'])) {
-                        continue;
+                    foreach ([
+                        ['email' => $exchange->req_email, 'name' => $exchange->req_fname ?? $exchange->req_name, 'lang' => $exchange->req_lang ?? null],
+                        ['email' => $exchange->prov_email, 'name' => $exchange->prov_fname ?? $exchange->prov_name, 'lang' => $exchange->prov_lang ?? null],
+                    ] as $party) {
+                        if (empty($party['email'])) {
+                            continue;
+                        }
+
+                        LocaleContext::withLocale($party['lang'], function () use ($party, $frontendUrl, $link) {
+                            $html = EmailTemplateBuilder::make()
+                                ->theme('warning')
+                                ->title(__('emails.exchange_dispute.title'))
+                                ->previewText(__('emails.exchange_dispute.preview'))
+                                ->greeting($party['name'] ?? __('emails.common.fallback_name'))
+                                ->paragraph(__('emails.exchange_dispute.body'))
+                                ->paragraph(__('emails.exchange_dispute.next_steps'))
+                                ->button(__('emails.exchange_dispute.cta'), $frontendUrl . $link)
+                                ->render();
+
+                            if (!Mailer::forCurrentTenant()->send(
+                                $party['email'],
+                                __('emails.exchange_dispute.subject'),
+                                $html,
+                                null,
+                                null,
+                                null,
+                                'exchange_dispute'
+                            )) {
+                                Log::warning('[ExchangeWorkflowService] dispute notification email returned false', [
+                                    'email' => $party['email'],
+                                ]);
+                            }
+                        });
                     }
-
-                    LocaleContext::withLocale($party['lang'], function () use ($party, $frontendUrl, $link) {
-                        $html = EmailTemplateBuilder::make()
-                            ->theme('warning')
-                            ->title(__('emails.exchange_dispute.title'))
-                            ->previewText(__('emails.exchange_dispute.preview'))
-                            ->greeting($party['name'] ?? __('emails.common.fallback_name'))
-                            ->paragraph(__('emails.exchange_dispute.body'))
-                            ->paragraph(__('emails.exchange_dispute.next_steps'))
-                            ->button(__('emails.exchange_dispute.cta'), $frontendUrl . $link)
-                            ->render();
-
-                        Mailer::forCurrentTenant()->send(
-                            $party['email'],
-                            __('emails.exchange_dispute.subject'),
-                            $html
-                        );
-                    });
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById($previousTenantId);
+                    }
                 }
             }
         } catch (\Throwable $e) {
@@ -920,50 +935,68 @@ class ExchangeWorkflowService
      */
     private static function sendDisputeResolvedEmails(ExchangeRequest $exchange, float $finalHours): void
     {
-        $tenantId   = TenantContext::getId();
-        $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
-        $link = '/exchanges/' . $exchange->id;
-
-        $parties = [];
-
-        $requester = User::find($exchange->requester_id);
-        if ($requester && !empty($requester->email)) {
-            $parties[] = [
-                'email' => $requester->email,
-                'name' => $requester->first_name ?? $requester->name ?? null,
-                'lang' => $requester->preferred_language ?? null,
-            ];
+        $previousTenantId = TenantContext::getId();
+        if (!empty($exchange->tenant_id)) {
+            TenantContext::setById((int) $exchange->tenant_id);
         }
 
-        $provider = User::find($exchange->provider_id);
-        if ($provider && !empty($provider->email)) {
-            $parties[] = [
-                'email' => $provider->email,
-                'name' => $provider->first_name ?? $provider->name ?? null,
-                'lang' => $provider->preferred_language ?? null,
-            ];
-        }
+        try {
+            $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+            $link = '/exchanges/' . $exchange->id;
 
-        foreach ($parties as $party) {
-            LocaleContext::withLocale($party['lang'], function () use ($party, $finalHours, $frontendUrl, $link) {
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.dispute_resolved_title'))
-                    ->previewText(__('emails.dispute_resolved_preview'))
-                    ->greeting($party['name'] ?? __('emails.common.fallback_name'))
-                    ->paragraph(__('emails.dispute_resolved_body', ['hours' => $finalHours]))
-                    ->infoCard([
-                        __('emails.dispute_resolved_hours_label') => number_format($finalHours, 2),
-                    ], null)
-                    ->button(__('emails.dispute_resolved_cta'), $frontendUrl . $link)
-                    ->render();
+            $parties = [];
 
-                Mailer::forCurrentTenant()->send(
-                    $party['email'],
-                    __('emails.dispute_resolved_subject'),
-                    $html
-                );
-            });
+            $requester = User::find($exchange->requester_id);
+            if ($requester && !empty($requester->email)) {
+                $parties[] = [
+                    'email' => $requester->email,
+                    'name' => $requester->first_name ?? $requester->name ?? null,
+                    'lang' => $requester->preferred_language ?? null,
+                ];
+            }
+
+            $provider = User::find($exchange->provider_id);
+            if ($provider && !empty($provider->email)) {
+                $parties[] = [
+                    'email' => $provider->email,
+                    'name' => $provider->first_name ?? $provider->name ?? null,
+                    'lang' => $provider->preferred_language ?? null,
+                ];
+            }
+
+            foreach ($parties as $party) {
+                LocaleContext::withLocale($party['lang'], function () use ($party, $finalHours, $frontendUrl, $link) {
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.dispute_resolved_title'))
+                        ->previewText(__('emails.dispute_resolved_preview'))
+                        ->greeting($party['name'] ?? __('emails.common.fallback_name'))
+                        ->paragraph(__('emails.dispute_resolved_body', ['hours' => $finalHours]))
+                        ->infoCard([
+                            __('emails.dispute_resolved_hours_label') => number_format($finalHours, 2),
+                        ], null)
+                        ->button(__('emails.dispute_resolved_cta'), $frontendUrl . $link)
+                        ->render();
+
+                    if (!Mailer::forCurrentTenant()->send(
+                        $party['email'],
+                        __('emails.dispute_resolved_subject'),
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'exchange_dispute'
+                    )) {
+                        Log::warning('[ExchangeWorkflowService] dispute resolved email returned false', [
+                            'email' => $party['email'],
+                        ]);
+                    }
+                });
+            }
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            }
         }
     }
 

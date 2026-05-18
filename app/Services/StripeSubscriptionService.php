@@ -789,39 +789,48 @@ class StripeSubscriptionService
      */
     private static function sendTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme = 'default'): void
     {
+        $previousTenantId = TenantContext::getId();
         TenantContext::setById($tenantId);
 
-        $admin = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('role', 'admin')
-            ->whereNotNull('email')
-            ->select(['email', 'first_name', 'name', 'preferred_language'])
-            ->first();
+        try {
+            $admin = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('role', 'admin')
+                ->whereNotNull('email')
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->first();
 
-        if (!$admin || empty($admin->email)) {
-            return;
+            if (!$admin || empty($admin->email)) {
+                return;
+            }
+
+            LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $theme, $tenantId) {
+                $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
+                $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+                $builder = EmailTemplateBuilder::make();
+                if ($theme !== 'default') {
+                    $builder->theme($theme);
+                }
+
+                $html = $builder
+                    ->title(__($title['key'], $title['params'] ?? []))
+                    ->greeting($firstName)
+                    ->paragraph(__($body['key'], $body['params'] ?? []))
+                    ->button(__($ctaText['key'], $ctaText['params'] ?? []), $fullUrl)
+                    ->render();
+
+                if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $subject['params'] ?? []), $html, null, null, null, 'billing')) {
+                    Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
+                }
+            });
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
-
-        LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $theme, $tenantId) {
-            $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
-            $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-
-            $builder = EmailTemplateBuilder::make();
-            if ($theme !== 'default') {
-                $builder->theme($theme);
-            }
-
-            $html = $builder
-                ->title(__($title['key'], $title['params'] ?? []))
-                ->greeting($firstName)
-                ->paragraph(__($body['key'], $body['params'] ?? []))
-                ->button(__($ctaText['key'], $ctaText['params'] ?? []), $fullUrl)
-                ->render();
-
-            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $subject['params'] ?? []), $html, null, null, null, 'billing')) {
-                Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
-            }
-        });
     }
 
     /**

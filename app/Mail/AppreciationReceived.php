@@ -12,6 +12,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Services\EmailService;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -58,9 +59,16 @@ class AppreciationReceived
 
                 /** @var EmailService $email */
                 $email = app(EmailService::class);
-                $email->send($recipient->email, $subject, $builder->render(), ['category' => 'appreciation']);
+                if (!$email->send($recipient->email, $subject, $builder->render(), ['category' => 'appreciation'])) {
+                    Log::warning('[AppreciationReceived] email returned false', [
+                        'recipient_id' => $recipient->id ?? null,
+                    ]);
+                }
             } catch (Throwable $e) {
-                // best-effort; in-app notification is primary channel
+                Log::warning('[AppreciationReceived] email failed', [
+                    'recipient_id' => $recipient->id ?? null,
+                    'error' => $e->getMessage(),
+                ]);
             }
         });
     }

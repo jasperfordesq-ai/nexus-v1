@@ -221,7 +221,11 @@ class AdminEmailController extends BaseApiController
             __('api_controllers_2.email_test.subject'),
             '<h2>' . __('api_controllers_2.email_test.heading') . '</h2>' .
             '<p>' . __('api_controllers_2.email_test.body_provider', ['provider' => strtoupper($provider), 'time' => date('Y-m-d H:i:s')]) . '</p>' .
-            '<p>' . __('api_controllers_2.email_test.body_success') . '</p>'
+            '<p>' . __('api_controllers_2.email_test.body_success') . '</p>',
+            null,
+            null,
+            null,
+            'email_test'
         );
 
         if ($result) {
@@ -263,7 +267,11 @@ class AdminEmailController extends BaseApiController
             __('api_controllers_2.email_test.provider_subject'),
             '<h2>' . __('api_controllers_2.email_test.provider_heading') . '</h2>' .
             '<p>' . __('api_controllers_2.email_test.body_provider', ['provider' => htmlspecialchars(strtoupper($provider)), 'time' => date('Y-m-d H:i:s')]) . '</p>' .
-            '<p>' . __('api_controllers_2.email_test.body_tenant_ok') . '</p>'
+            '<p>' . __('api_controllers_2.email_test.body_tenant_ok') . '</p>',
+            null,
+            null,
+            null,
+            'email_test'
         );
 
         if ($result) {

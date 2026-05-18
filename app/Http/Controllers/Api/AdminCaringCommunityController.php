@@ -740,7 +740,11 @@ class AdminCaringCommunityController extends BaseApiController
                         ->render();
 
                     $mailer = Mailer::forCurrentTenant();
-                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome');
+                    if (!$mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
+                        Log::warning('[AdminCC] Assisted onboarding welcome email returned false', [
+                            'email' => $email,
+                        ]);
+                    }
                 });
             } catch (\Throwable $e) {
                 Log::warning('[AdminCC] Assisted onboarding welcome email failed: ' . $e->getMessage());

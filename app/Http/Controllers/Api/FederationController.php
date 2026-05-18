@@ -704,7 +704,15 @@ class FederationController extends BaseApiController
             \Log::warning('[Federation] sender name lookup failed', ['sender_id' => $input['sender_id'] ?? null, 'error' => $e->getMessage()]);
         }
 
-        try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning("FederationV1: email failed: " . $e->getMessage()); }
+        try {
+            if (!$this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200))) {
+                \Illuminate\Support\Facades\Log::warning('FederationV1: email service returned false', [
+                    'recipient_id' => $input['recipient_id'] ?? null,
+                    'sender_id' => $input['sender_id'] ?? null,
+                    'sender_tenant_id' => $partnerTenantId,
+                ]);
+            }
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning("FederationV1: email failed: " . $e->getMessage()); }
         try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $sanitizedSubject, 'body' => $sanitizedBody]); } catch (\Exception $e) { \Log::warning('[Federation] broadcastNewMessage failed', ['error' => $e->getMessage()]); }
         try {
             // Render the federation-message bell under the recipient's

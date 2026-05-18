@@ -1163,11 +1163,20 @@ class IdeationChallengeService
                             ->button(__('emails_ideation.new_idea.cta'), $ideaUrl)
                             ->render();
 
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $owner->email,
                             __('emails_ideation.new_idea.subject', ['challenge' => $challengeTitle, 'community' => $tenantName]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'ideation'
+                        )) {
+                            Log::warning('[IdeationChallengeService] idea submitted email returned false', [
+                                'idea_id' => $ideaId,
+                                'owner_id' => $owner->id ?? null,
+                            ]);
+                        }
                     } catch (\Throwable $emailEx) {
                         Log::warning('[IdeationChallengeService] idea submitted email failed: ' . $emailEx->getMessage());
                     }
@@ -1288,11 +1297,20 @@ class IdeationChallengeService
                             ->button(__('emails_ideation.idea_commented.cta'), $commentUrl)
                             ->render();
 
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $owner->email,
                             __('emails_ideation.idea_commented.subject', ['community' => $tenantName]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'ideation'
+                        )) {
+                            Log::warning('[IdeationChallengeService] idea commented email returned false', [
+                                'idea_id' => $ideaId,
+                                'owner_id' => $owner->id ?? null,
+                            ]);
+                        }
                     } catch (\Throwable $emailEx) {
                         Log::warning('[IdeationChallengeService] idea commented email failed: ' . $emailEx->getMessage());
                     }
@@ -1374,7 +1392,11 @@ class IdeationChallengeService
 
             $mailer = Mailer::forCurrentTenant();
             $subject = $title . ' — ' . $tenantName;
-            $mailer->send($recipient->email, $subject, $html, null, null, null, 'ideation');
+            if (!$mailer->send($recipient->email, $subject, $html, null, null, null, 'ideation')) {
+                Log::warning('[IdeationChallengeService] ideation email returned false', [
+                    'recipient_id' => $recipient->id ?? null,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::sendIdeationEmail error: " . $e->getMessage());
         }

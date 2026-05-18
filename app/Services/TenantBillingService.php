@@ -831,38 +831,47 @@ class TenantBillingService
         string $link,
         array $ctaText
     ): void {
+        $previousTenantId = TenantContext::getId();
         TenantContext::setById($tenantId);
 
-        $admin = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('role', 'admin')
-            ->whereNotNull('email')
-            ->select(['email', 'first_name', 'name', 'preferred_language'])
-            ->first();
+        try {
+            $admin = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('role', 'admin')
+                ->whereNotNull('email')
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->first();
 
-        if (!$admin || empty($admin->email)) {
-            return;
-        }
-
-        LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $tenantId) {
-            $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
-            $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-
-            $resolveParams = fn(array $spec): array =>
-                isset($spec['params_builder']) && is_callable($spec['params_builder'])
-                    ? ($spec['params_builder'])()
-                    : ($spec['params'] ?? []);
-
-            $html = EmailTemplateBuilder::make()
-                ->title(__($title['key'], $resolveParams($title)))
-                ->greeting($firstName)
-                ->paragraph(__($body['key'], $resolveParams($body)))
-                ->button(__($ctaText['key'], $resolveParams($ctaText)), $fullUrl)
-                ->render();
-
-            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $resolveParams($subject)), $html, null, null, null, 'billing')) {
-                Log::warning('[TenantBillingService] tenant admin email failed', ['tenant_id' => $tenantId]);
+            if (!$admin || empty($admin->email)) {
+                return;
             }
-        });
+
+            LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $tenantId) {
+                $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
+                $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+                $resolveParams = fn(array $spec): array =>
+                    isset($spec['params_builder']) && is_callable($spec['params_builder'])
+                        ? ($spec['params_builder'])()
+                        : ($spec['params'] ?? []);
+
+                $html = EmailTemplateBuilder::make()
+                    ->title(__($title['key'], $resolveParams($title)))
+                    ->greeting($firstName)
+                    ->paragraph(__($body['key'], $resolveParams($body)))
+                    ->button(__($ctaText['key'], $resolveParams($ctaText)), $fullUrl)
+                    ->render();
+
+                if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $resolveParams($subject)), $html, null, null, null, 'billing')) {
+                    Log::warning('[TenantBillingService] tenant admin email failed', ['tenant_id' => $tenantId]);
+                }
+            });
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
+        }
     }
 }

@@ -223,11 +223,19 @@ class NewsletterController extends BaseApiController
                             ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
                             ->paragraph(__('emails.newsletter.unsubscribed_body_contact'))
                             ->render();
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $email,
                             __('emails.newsletter.unsubscribed_subject', ['community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'newsletter_unsubscribe'
+                        )) {
+                            Log::warning('[NewsletterController] unsubscribe confirmation email returned false', [
+                                'email' => $email,
+                            ]);
+                        }
                     });
                 }
             } catch (\Throwable $e) {

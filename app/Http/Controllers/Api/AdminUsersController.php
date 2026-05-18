@@ -519,7 +519,11 @@ class AdminUsersController extends BaseApiController
                         ->render();
 
                     $mailer = \App\Core\Mailer::forCurrentTenant();
-                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome');
+                    if (!$mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
+                        Log::warning('[AdminUsers] Welcome email returned false for admin-created user', [
+                            'email' => $email,
+                        ]);
+                    }
                 });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsers] Welcome email failed for admin-created user: ' . $e->getMessage());
@@ -1076,11 +1080,17 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.set_password_cta'), $loginUrl)
                     ->render();
 
-                (\App\Core\Mailer::forCurrentTenant())->send(
+                if (!(\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.set_password_subject', ['community' => $tenantName]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'security_alert'
+                )) {
+                    Log::warning("[AdminUsers] Password-changed email returned false for user #{$id}");
+                }
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send password reset email to user #{$id}: " . $e->getMessage());

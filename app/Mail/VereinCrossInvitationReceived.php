@@ -12,6 +12,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Services\EmailService;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -55,9 +56,18 @@ class VereinCrossInvitationReceived
 
                 /** @var EmailService $email */
                 $email = app(EmailService::class);
-                $email->send($recipient->email, $subject, $builder->render(), ['category' => 'verein_federation']);
+                if (!$email->send($recipient->email, $subject, $builder->render(), ['category' => 'verein_federation'])) {
+                    Log::warning('[VereinCrossInvitationReceived] email returned false', [
+                        'recipient_id' => $recipient->id ?? null,
+                        'invitation_id' => $invitationId,
+                    ]);
+                }
             } catch (Throwable $e) {
-                // best-effort; in-app notification is primary channel
+                Log::warning('[VereinCrossInvitationReceived] email failed', [
+                    'recipient_id' => $recipient->id ?? null,
+                    'invitation_id' => $invitationId,
+                    'error' => $e->getMessage(),
+                ]);
             }
         });
     }

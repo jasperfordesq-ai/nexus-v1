@@ -123,13 +123,18 @@ class FederationPartnershipService
                 );
                 $requestingTenantName = $requestingTenant->name ?? 'A partner community';
 
-                FederationEmailService::sendPartnershipRequestNotification(
+                if (!FederationEmailService::sendPartnershipRequestNotification(
                     $targetTenantId,
                     $requestingTenantId,
                     $requestingTenantName,
                     $federationLevel,
                     $notes
-                );
+                )) {
+                    Log::warning('FederationPartnershipService::requestPartnership email notification returned false', [
+                        'target_tenant_id' => $targetTenantId,
+                        'requesting_tenant_id' => $requestingTenantId,
+                    ]);
+                }
             } catch (\Exception $emailEx) {
                 Log::warning('FederationPartnershipService::requestPartnership email notification failed', [
                     'error' => $emailEx->getMessage(),

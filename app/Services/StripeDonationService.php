@@ -252,51 +252,61 @@ class StripeDonationService
 
             if (!empty($donorEmail)) {
                 // Set tenant context if running from webhook (no active context)
-                if ($donation->tenant_id) {
-                    TenantContext::setById((int) $donation->tenant_id);
-                }
+                $previousTenantId = TenantContext::getId();
 
-                // Render the receipt in the donor's preferred_language so subject,
-                // CTA, info card labels, and body all match THEIR locale rather
-                // than the queue worker's default.
-                LocaleContext::withLocale($donorLocale, function () use ($donation, $donorEmail, $donorName) {
-                    $tenantName    = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $baseUrl       = TenantContext::getFrontendUrl();
-                    $basePath      = TenantContext::getSlugPrefix();
-                    $accountUrl    = $baseUrl . $basePath . '/settings';
-                    $amountDisplay = number_format((float) $donation->amount, 2) . ' ' . strtoupper($donation->currency ?? 'EUR');
-                    $dateDisplay   = date('d M Y');
-                    $firstName     = explode(' ', trim($donorName ?: 'there'))[0];
-
-                    $infoCard = [
-                        __('emails_created.donation.label_amount') => $amountDisplay,
-                        __('emails_created.donation.label_date')   => $dateDisplay,
-                    ];
-
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_created.donation.title'))
-                        ->previewText(__('emails_created.donation.preview', ['community' => $tenantName]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_created.donation.body', ['community' => $tenantName]))
-                        ->infoCard($infoCard)
-                        ->button(__('emails_created.donation.cta'), $accountUrl)
-                        ->render();
-
-                    if (!Mailer::forCurrentTenant()->send(
-                        $donorEmail,
-                        __('emails_created.donation.subject', ['community' => $tenantName]),
-                        $html,
-                        null,
-                        null,
-                        null,
-                        'donation_receipt'
-                    )) {
-                        Log::warning('[StripeDonationService] donation receipt email returned false', [
-                            'donation_id' => $donation->id ?? null,
-                        ]);
+                try {
+                    if ($donation->tenant_id) {
+                        TenantContext::setById((int) $donation->tenant_id);
                     }
-                });
+
+                    // Render the receipt in the donor's preferred_language so subject,
+                    // CTA, info card labels, and body all match THEIR locale rather
+                    // than the queue worker's default.
+                    LocaleContext::withLocale($donorLocale, function () use ($donation, $donorEmail, $donorName) {
+                        $tenantName    = TenantContext::getSetting('site_name', 'Project NEXUS');
+                        $baseUrl       = TenantContext::getFrontendUrl();
+                        $basePath      = TenantContext::getSlugPrefix();
+                        $accountUrl    = $baseUrl . $basePath . '/settings';
+                        $amountDisplay = number_format((float) $donation->amount, 2) . ' ' . strtoupper($donation->currency ?? 'EUR');
+                        $dateDisplay   = date('d M Y');
+                        $firstName     = explode(' ', trim($donorName ?: 'there'))[0];
+
+                        $infoCard = [
+                            __('emails_created.donation.label_amount') => $amountDisplay,
+                            __('emails_created.donation.label_date')   => $dateDisplay,
+                        ];
+
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title(__('emails_created.donation.title'))
+                            ->previewText(__('emails_created.donation.preview', ['community' => $tenantName]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_created.donation.body', ['community' => $tenantName]))
+                            ->infoCard($infoCard)
+                            ->button(__('emails_created.donation.cta'), $accountUrl)
+                            ->render();
+
+                        if (!Mailer::forCurrentTenant()->send(
+                            $donorEmail,
+                            __('emails_created.donation.subject', ['community' => $tenantName]),
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'donation_receipt'
+                        )) {
+                            Log::warning('[StripeDonationService] donation receipt email returned false', [
+                                'donation_id' => $donation->id ?? null,
+                            ]);
+                        }
+                    });
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById($previousTenantId);
+                    } else {
+                        TenantContext::reset();
+                    }
+                }
             }
         } catch (\Throwable $e) {
             Log::warning('[StripeDonationService] donation receipt email failed: ' . $e->getMessage());

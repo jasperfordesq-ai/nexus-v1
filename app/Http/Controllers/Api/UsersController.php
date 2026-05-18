@@ -616,11 +616,19 @@ class UsersController extends BaseApiController
                         ->paragraph(__('emails_misc.admin_actions.self_deletion_body', ['community' => $community]))
                         ->paragraph(__('emails_misc.admin_actions.self_deletion_body_contact'))
                         ->render();
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $userEmail,
                         __('emails_misc.admin_actions.self_deletion_subject', ['community' => $community]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'account_deleted'
+                    )) {
+                        Log::warning('[UsersController] deleteAccount farewell email returned false', [
+                            'user_id' => $userRow->id ?? null,
+                        ]);
+                    }
                 });
             }
         } catch (\Throwable $e) {
@@ -999,7 +1007,7 @@ class UsersController extends BaseApiController
             return $this->error(__('api_controllers_2.users.invalid_context_type'), 400);
         }
 
-        if (!in_array($frequency, ['instant', 'daily', 'weekly', 'off'])) {
+        if (!in_array($frequency, ['instant', 'daily', 'weekly', 'monthly', 'off'])) {
             return $this->error(__('api_controllers_2.users.invalid_frequency'), 400);
         }
 
