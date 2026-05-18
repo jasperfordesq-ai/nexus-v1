@@ -3,13 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-// Compatibility shim — adapts the canonical caring-community/ProximityFilter
-// (radiusKm/onRadiusChange API) to the older value/onFilter API used by
-// ListingsPage, EventsPage, and VolunteeringPage.
+// Proximity filter for Listings, Events, and Volunteering pages.
+// Coordinates come from the user's profile — no browser geolocation popup.
 
-import { useEffect, useState } from 'react';
-import { ProximityFilter as CanonicalProximityFilter } from '@/components/caring-community/ProximityFilter';
-import { useProximity } from '@/hooks/useProximity';
+import { useTranslation } from 'react-i18next';
+import { Button, Select, SelectItem } from '@heroui/react';
+import MapPin from 'lucide-react/icons/map-pin';
+import { useAuth, useToast } from '@/contexts';
 
 export interface ProximityFilterParams {
   near_lat: number;
@@ -23,25 +23,70 @@ interface Props {
   className?: string;
 }
 
-export function ProximityFilter({ value, onFilter, className }: Props) {
-  const { position } = useProximity();
-  const [radiusKm, setRadiusKm] = useState<number | null>(value?.radius_km ?? null);
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100] as const;
+const DEFAULT_RADIUS = 25;
 
-  useEffect(() => {
-    if (radiusKm === null) {
+export function ProximityFilter({ value, onFilter, className }: Props) {
+  const { t } = useTranslation('common');
+  const { user } = useAuth();
+  const toast = useToast();
+
+  const isActive = value !== null;
+  const radiusKm = value?.radius_km ?? DEFAULT_RADIUS;
+
+  function handleToggle() {
+    if (isActive) {
       onFilter(null);
-    } else if (position) {
-      onFilter({ near_lat: position.lat, near_lng: position.lng, radius_km: radiusKm });
+      return;
     }
-    // When radius is set but position not yet available, wait — effect will re-run when position arrives
-  }, [radiusKm, position]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (user?.latitude == null || user?.longitude == null) {
+      toast.error(t('members.near_me_no_location'));
+      return;
+    }
+    onFilter({ near_lat: user.latitude, near_lng: user.longitude, radius_km: DEFAULT_RADIUS });
+  }
+
+  function handleRadiusChange(km: number) {
+    if (user?.latitude == null || user?.longitude == null) return;
+    onFilter({ near_lat: user.latitude, near_lng: user.longitude, radius_km: km });
+  }
 
   return (
-    <CanonicalProximityFilter
-      radiusKm={radiusKm}
-      onRadiusChange={setRadiusKm}
-      className={className}
-    />
+    <div className={['flex flex-wrap items-center gap-2', className].filter(Boolean).join(' ')}>
+      <Button
+        size="sm"
+        variant={isActive ? 'solid' : 'flat'}
+        className={isActive
+          ? 'bg-emerald-600 text-white shadow-sm'
+          : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/10 hover:text-emerald-600'}
+        startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
+        onPress={handleToggle}
+        aria-pressed={isActive}
+      >
+        {t('members.near_me')}
+      </Button>
+
+      {isActive && (
+        <Select
+          aria-label={t('members.radius_label')}
+          selectedKeys={[String(radiusKm)]}
+          disallowEmptySelection
+          onSelectionChange={(keys) => {
+            const val = keys instanceof Set ? ([...keys][0] as string) : String(DEFAULT_RADIUS);
+            handleRadiusChange(Number(val) || DEFAULT_RADIUS);
+          }}
+          className="w-28"
+          classNames={{
+            trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+            value: 'text-theme-primary',
+          }}
+        >
+          {RADIUS_OPTIONS.map((km) => (
+            <SelectItem key={String(km)}>{t(`radius_${km}`)}</SelectItem>
+          ))}
+        </Select>
+      )}
+    </div>
   );
 }
 
