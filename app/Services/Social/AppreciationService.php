@@ -80,7 +80,7 @@ class AppreciationService
             $receiver = DB::table('users')
                 ->where('id', $appreciation->receiver_id)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
+                ->select(['email', 'name', 'first_name', 'last_name', 'preferred_language', 'tenant_id'])
                 ->first();
             if (!$receiver) {
                 return;
@@ -102,6 +102,7 @@ class AppreciationService
                     'first_name' => $receiver->first_name ?? null,
                     'last_name' => $receiver->last_name ?? null,
                     'preferred_language' => $receiver->preferred_language ?? null,
+                    'tenant_id' => $receiver->tenant_id ?? $tenantId,
                 ],
                 $senderName,
                 $appreciation->message,

@@ -183,6 +183,7 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $ideationSource = file_get_contents(app_path('Services/IdeationChallengeService.php'));
         $balanceSource = file_get_contents(app_path('Services/BalanceAlertService.php'));
         $brokerSource = file_get_contents(app_path('Services/BrokerMessageVisibilityService.php'));
+        $appreciationSource = file_get_contents(app_path('Services/Social/AppreciationService.php'));
 
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $ideationSource);
         $this->assertStringContainsString("'tenant_id' => \$tenantId", $ideationSource);
@@ -195,6 +196,9 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         $this->assertStringContainsString("'preferred_language', 'tenant_id'", $brokerSource);
         $this->assertStringContainsString('$broker->tenant_id ?? TenantContext::currentId()', $brokerSource);
         $this->assertStringContainsString("__('emails.common.fallback_manager')", $brokerSource);
+
+        $this->assertStringContainsString("'preferred_language', 'tenant_id'", $appreciationSource);
+        $this->assertStringContainsString("'tenant_id' => \$receiver->tenant_id ?? \$tenantId", $appreciationSource);
     }
 
     public function test_instant_queue_stale_cleanup_only_marks_instant_rows_failed(): void
