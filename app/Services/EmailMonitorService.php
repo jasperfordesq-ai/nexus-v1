@@ -400,6 +400,50 @@ class EmailMonitorService
                 }
             }
 
+            if (\Illuminate\Support\Facades\Schema::hasTable('newsletter_queue')) {
+                $newsletterQueue = DB::table('newsletter_queue');
+                if ($tenantId !== null && \Illuminate\Support\Facades\Schema::hasColumn('newsletter_queue', 'tenant_id')) {
+                    $newsletterQueue->where('tenant_id', $tenantId);
+                }
+
+                $failedNewsletterQueue = (clone $newsletterQueue)
+                    ->where('status', 'failed')
+                    ->where('created_at', '>=', now()->subDay())
+                    ->count();
+                if ($failedNewsletterQueue > 0) {
+                    $warnings[] = [
+                        'code' => 'newsletter_queue_failures',
+                        'severity' => 'warning',
+                        'message_key' => 'email_health.warnings.newsletter_queue_failures',
+                        'params' => ['count' => $failedNewsletterQueue, 'window_hours' => 24],
+                    ];
+                }
+
+                $staleNewsletterProcessing = (clone $newsletterQueue)
+                    ->where('status', 'processing')
+                    ->where(function ($query) {
+                        if (\Illuminate\Support\Facades\Schema::hasColumn('newsletter_queue', 'last_attempted_at')) {
+                            $query->where('last_attempted_at', '<', now()->subMinutes(15))
+                                ->orWhere(function ($nested) {
+                                    $nested->whereNull('last_attempted_at')
+                                        ->where('created_at', '<', now()->subMinutes(15));
+                                });
+                            return;
+                        }
+
+                        $query->where('created_at', '<', now()->subMinutes(15));
+                    })
+                    ->count();
+                if ($staleNewsletterProcessing > 0) {
+                    $warnings[] = [
+                        'code' => 'newsletter_queue_stale_processing',
+                        'severity' => 'critical',
+                        'message_key' => 'email_health.warnings.newsletter_queue_stale_processing',
+                        'params' => ['count' => $staleNewsletterProcessing, 'minutes' => 15],
+                    ];
+                }
+            }
+
             if ($tenantId !== null && \Illuminate\Support\Facades\Schema::hasTable('users')) {
                 $activeUsers = DB::table('users')
                     ->where('tenant_id', $tenantId)

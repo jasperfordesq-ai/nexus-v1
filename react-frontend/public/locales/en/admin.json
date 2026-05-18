@@ -9444,6 +9444,14 @@
         "title": "Stale notification queue",
         "body": "{{count}} notifications have been processing for more than {{minutes}} minutes."
       },
+      "newsletter_queue_failures": {
+        "title": "Newsletter queue failures",
+        "body": "{{count}} newsletter recipients failed in the last {{window_hours}} hours."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Stale newsletter queue",
+        "body": "{{count}} newsletter recipients have been processing for more than {{minutes}} minutes."
+      },
       "no_recent_email_activity": {
         "title": "No recent email activity",
         "body": "This tenant has active members but no email activity in the last {{days}} days."
@@ -9491,6 +9499,26 @@
       "notification_queue_marked_sent_without_email_log": {
         "title": "Notification marked sent without email evidence",
         "body": "{{count}} queued notifications were marked sent without a matching email log entry in the last {{window_hours}} hours."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Newsletter queue missing tenant",
+        "body": "{{count}} newsletter queue rows have no tenant ownership. They cannot be routed reliably until repaired."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Newsletter queue tenant mismatch",
+        "body": "{{count}} newsletter queue rows belong to a different tenant than their newsletter. These rows risk wrong-tenant routing."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "Newsletter emails are stuck",
+        "body": "{{count}} newsletter recipients have been pending for more than {{minutes}} minutes."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Newsletter emails failed",
+        "body": "{{count}} newsletter recipients failed in the last {{window_hours}} hours."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Newsletter marked sent without email evidence",
+        "body": "{{count}} newsletter recipients were marked sent without a matching successful email log entry in the last {{window_hours}} hours."
       },
       "critical_email_attempts_missing_tenant_context": {
         "title": "Critical email missing tenant context",

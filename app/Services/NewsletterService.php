@@ -1383,7 +1383,7 @@ HTML;
 
             foreach ($newsletters as $newsletter) {
                 // Set correct tenant context for this newsletter's tenant
-                TenantContext::setById($newsletter->tenant_id);
+                TenantContext::runForTenant((int) $newsletter->tenant_id, function () use ($newsletter, &$processed): void {
 
                 // Atomically claim by flipping status from 'scheduled' → 'sending'.
                 // If another cron process already claimed this newsletter the UPDATE
@@ -1394,9 +1394,8 @@ HTML;
                     ->update(['status' => 'sending', 'updated_at' => now()]);
 
                 if (!$claimed) {
-                    continue;
+                    return;
                 }
-
                 try {
                     $service = app(self::class);
                     $service->sendNow(
@@ -1413,6 +1412,7 @@ HTML;
                         ->where('status', 'sending')
                         ->update(['status' => 'scheduled', 'updated_at' => now()]);
                 }
+                });
             }
         } catch (\Exception $e) {
             Log::error('processScheduled error: ' . $e->getMessage());
@@ -1447,7 +1447,7 @@ HTML;
 
             foreach ($newsletters as $newsletter) {
                 // Set correct tenant context for this newsletter's tenant
-                TenantContext::setById($newsletter->tenant_id);
+                TenantContext::runForTenant((int) $newsletter->tenant_id, function () use ($newsletter, &$processed): void {
 
                 // Atomically claim by setting status to 'sending' AND updating
                 // last_sent_at in the SAME statement. This prevents a second runner
@@ -1469,9 +1469,8 @@ HTML;
                     ]);
 
                 if (!$claimed) {
-                    continue; // Another runner already claimed it
+                    return; // Another runner already claimed it
                 }
-
                 try {
                     $service = app(self::class);
                     $service->sendNow(
@@ -1498,6 +1497,7 @@ HTML;
                         ->update(['status' => 'scheduled', 'updated_at' => now()]);
                     Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
                 }
+                });
             }
         } catch (\Exception $e) {
             Log::error('processRecurring error: ' . $e->getMessage());

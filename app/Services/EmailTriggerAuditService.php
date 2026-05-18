@@ -81,6 +81,7 @@ class EmailTriggerAuditService
                 $this->checkPasswordResetsWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
+                $this->checkNewsletterQueueHealth($tenantId, $since, $windowHours),
                 $this->checkNotificationStoreHealth($tenantId),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
                 $this->checkTenantProviderConfiguration($tenantId),
@@ -329,6 +330,103 @@ class EmailTriggerAuditService
                 ->groupByRaw($queuedTenantExpr)
                 ->get();
             $issues = array_merge($issues, $this->rowsToIssues($sentWithoutLog, 'notification_queue_marked_sent_without_email_log', 'critical', 'notifications', 'queue_dispatch', ['window_hours' => $windowHours]));
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkNewsletterQueueHealth(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['newsletter_queue'])) {
+            return [];
+        }
+
+        $issues = [];
+        $queueHasTenantId = Schema::hasColumn('newsletter_queue', 'tenant_id');
+        $tenantExpr = $queueHasTenantId ? 'newsletter_queue.tenant_id' : 'newsletters.tenant_id';
+        $staleExpr = Schema::hasColumn('newsletter_queue', 'last_attempted_at')
+            ? 'COALESCE(newsletter_queue.last_attempted_at, newsletter_queue.created_at)'
+            : 'newsletter_queue.created_at';
+
+        if ($queueHasTenantId) {
+            $missingTenant = DB::table('newsletter_queue')
+                ->selectRaw('NULL as tenant_id, COUNT(*) as count')
+                ->whereNull('tenant_id')
+                ->whereIn('status', ['pending', 'processing', 'sent'])
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw('1 = 0'))
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($missingTenant, 'newsletter_queue_missing_tenant_id', 'critical', 'newsletter', 'newsletter_queue_dispatch'));
+        }
+
+        if ($this->hasTables(['newsletters'])) {
+            if ($queueHasTenantId) {
+                $tenantMismatch = DB::table('newsletter_queue as nq')
+                    ->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id')
+                    ->selectRaw('n.tenant_id as tenant_id, COUNT(*) as count')
+                    ->whereNotNull('nq.tenant_id')
+                    ->whereRaw('nq.tenant_id <> n.tenant_id')
+                    ->whereIn('nq.status', ['pending', 'processing', 'sent'])
+                    ->when($tenantId !== null, fn ($q) => $q->where('n.tenant_id', $tenantId))
+                    ->groupBy('n.tenant_id')
+                    ->get();
+                $issues = array_merge($issues, $this->rowsToIssues($tenantMismatch, 'newsletter_queue_tenant_mismatch', 'critical', 'newsletter', 'newsletter_queue_dispatch'));
+            }
+
+            $tenantExpr = $queueHasTenantId ? 'COALESCE(newsletter_queue.tenant_id, newsletters.tenant_id)' : 'newsletters.tenant_id';
+            $pending = DB::table('newsletter_queue')
+                ->join('newsletters', 'newsletters.id', '=', 'newsletter_queue.newsletter_id')
+                ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+                ->where('newsletter_queue.status', 'pending')
+                ->where('newsletter_queue.created_at', '<', now()->subMinutes(15))
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+                ->groupByRaw($tenantExpr)
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($pending, 'newsletter_queue_stuck_pending', 'warning', 'newsletter', 'newsletter_queue_dispatch', ['minutes' => 15]));
+
+            $processing = DB::table('newsletter_queue')
+                ->join('newsletters', 'newsletters.id', '=', 'newsletter_queue.newsletter_id')
+                ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+                ->where('newsletter_queue.status', 'processing')
+                ->whereRaw("{$staleExpr} < ?", [now()->subMinutes(15)])
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+                ->groupByRaw($tenantExpr)
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($processing, 'newsletter_queue_stale_processing', 'critical', 'newsletter', 'newsletter_queue_dispatch', ['minutes' => 15]));
+
+            $failed = DB::table('newsletter_queue')
+                ->join('newsletters', 'newsletters.id', '=', 'newsletter_queue.newsletter_id')
+                ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+                ->where('newsletter_queue.status', 'failed')
+                ->where('newsletter_queue.created_at', '>=', $since)
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+                ->groupByRaw($tenantExpr)
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($failed, 'newsletter_queue_failed_recently', 'warning', 'newsletter', 'newsletter_queue_dispatch', ['window_hours' => $windowHours]));
+        }
+
+        if ($this->hasTables(['email_log']) && ($queueHasTenantId || $this->hasTables(['newsletters']))) {
+            $queuedTenantExpr = $queueHasTenantId ? 'nq.tenant_id' : 'n.tenant_id';
+            $sentWithoutLog = DB::table('newsletter_queue as nq')
+                ->when($this->hasTables(['newsletters']), fn ($q) => $q->join('newsletters as n', 'n.id', '=', 'nq.newsletter_id'))
+                ->selectRaw("{$queuedTenantExpr} as tenant_id, COUNT(*) as count")
+                ->where('nq.status', 'sent')
+                ->where('nq.sent_at', '>=', $since)
+                ->whereNotExists(function ($sub) use ($queuedTenantExpr) {
+                    $sub->select(DB::raw(1))
+                        ->from('email_log')
+                        ->whereRaw('email_log.recipient_email COLLATE utf8mb4_unicode_ci = nq.email COLLATE utf8mb4_unicode_ci')
+                        ->whereRaw("email_log.tenant_id = {$queuedTenantExpr}")
+                        ->whereColumn('email_log.created_at', '>=', 'nq.created_at')
+                        ->where('email_log.category', 'newsletter')
+                        ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
+                })
+                ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$queuedTenantExpr} = ?", [$tenantId]))
+                ->groupByRaw($queuedTenantExpr)
+                ->get();
+            $issues = array_merge($issues, $this->rowsToIssues($sentWithoutLog, 'newsletter_queue_marked_sent_without_email_log', 'critical', 'newsletter', 'newsletter_queue_dispatch', ['window_hours' => $windowHours]));
         }
 
         return $issues;

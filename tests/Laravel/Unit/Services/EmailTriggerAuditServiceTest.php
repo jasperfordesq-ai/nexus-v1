@@ -7,10 +7,15 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Services\EmailTriggerAuditService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 class EmailTriggerAuditServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     public function test_event_matrix_covers_critical_enterprise_email_flows(): void
     {
         $matrix = app(EmailTriggerAuditService::class)->eventMatrix();
@@ -43,5 +48,48 @@ class EmailTriggerAuditServiceTest extends TestCase
         $surface = app(EmailTriggerAuditService::class)->directEmailSendSurface();
 
         $this->assertSame([], $surface);
+    }
+
+    public function test_run_detects_sent_newsletter_queue_without_successful_email_log(): void
+    {
+        if (!Schema::hasTable('newsletters') || !Schema::hasTable('newsletter_queue') || !Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Newsletter email audit tables are not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Newsletter Audit Admin',
+            'email' => 'newsletter-audit-admin@example.test',
+            'role' => 'admin',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => 2,
+            'created_by' => $userId,
+            'subject' => 'Newsletter Audit',
+            'content' => '<p>Audit</p>',
+            'status' => 'sent',
+            'sent_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('newsletter_queue')->insert([
+            'tenant_id' => 2,
+            'newsletter_id' => $newsletterId,
+            'user_id' => $userId,
+            'email' => 'newsletter-audit-recipient@example.test',
+            'status' => 'sent',
+            'sent_at' => now(),
+            'created_at' => now()->subMinute(),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('newsletter_queue_marked_sent_without_email_log', $codes);
     }
 }
