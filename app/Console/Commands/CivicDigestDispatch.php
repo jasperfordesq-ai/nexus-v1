@@ -35,7 +35,7 @@ use Throwable;
 class CivicDigestDispatch extends Command
 {
     protected $signature = 'caring:civic-digest-dispatch '
-        . '{--cadence=daily : daily|weekly} '
+        . '{--cadence=daily : daily|monthly} '
         . '{--tenant= : Restrict to one tenant ID (for testing)} '
         . '{--limit=50 : Max items per recipient}';
 
@@ -50,8 +50,12 @@ class CivicDigestDispatch extends Command
     public function handle(): int
     {
         $cadenceArg = (string) $this->option('cadence');
-        $cadence = in_array($cadenceArg, ['daily', 'weekly'], true) ? $cadenceArg : 'daily';
-        $windowSeconds = $cadence === 'weekly' ? 168 * 3600 : 24 * 3600;
+        $cadence = match ($cadenceArg) {
+            'monthly', 'weekly' => 'monthly',
+            'daily' => 'daily',
+            default => 'daily',
+        };
+        $windowSeconds = $cadence === 'monthly' ? 30 * 86400 : 24 * 3600;
 
         $tenantOption = $this->option('tenant');
         $limitOption = (int) $this->option('limit');
@@ -176,7 +180,7 @@ class CivicDigestDispatch extends Command
                 continue;
             }
             $explicitCadence[$userId] = isset($decoded['cadence']) && is_string($decoded['cadence'])
-                ? $decoded['cadence']
+                ? ($decoded['cadence'] === 'weekly' ? 'monthly' : $decoded['cadence'])
                 : null;
         }
 

@@ -43,7 +43,7 @@ class MatchPreferencesController extends BaseApiController
      * Update match notification preferences.
      *
      * Request body (JSON, all optional):
-     * - notification_frequency: 'daily' | 'weekly' | 'fortnightly' | 'never'
+     * - notification_frequency: 'daily' | 'monthly' | 'fortnightly' | 'never'
      * - notify_hot_matches: bool
      * - notify_mutual_matches: bool
      */
@@ -57,13 +57,16 @@ class MatchPreferencesController extends BaseApiController
         // Only update fields that were provided
         $notificationFrequency = $this->input('notification_frequency');
         if ($notificationFrequency !== null) {
-            $allowed = ['daily', 'weekly', 'fortnightly', 'never'];
+            $allowed = ['daily', 'weekly', 'monthly', 'fortnightly', 'never'];
             if (!in_array($notificationFrequency, $allowed, true)) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    'Invalid frequency. Must be: daily, weekly, fortnightly, or never',
+                    'Invalid frequency. Must be: daily, monthly, fortnightly, or never',
                     'notification_frequency'
                 );
+            }
+            if ($notificationFrequency === 'weekly') {
+                $notificationFrequency = 'monthly';
             }
             $updated['notification_frequency'] = $notificationFrequency;
         }

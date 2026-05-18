@@ -159,10 +159,10 @@ function buildConfigSchema(): ConfigGroup[] {
         { key: 'email_notifications_enabled', label: "Email notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
         { key: 'push_notifications_enabled', label: "Push notifications enabled", description: "Default for new accounts. Members can override in their own settings.", type: 'boolean', default: true },
         {
-          key: 'digest_frequency', label: "Digest frequency", description: "How often the activity digest email is sent.", type: 'select', default: 'weekly',
+          key: 'digest_frequency', label: "Digest frequency", description: "How often the activity digest email is sent.", type: 'select', default: 'monthly',
           options: [
             { label: "Daily", value: 'daily' },
-            { label: "Weekly", value: 'weekly' },
+            { label: "Monthly", value: 'monthly' },
             { label: "Monthly", value: 'monthly' },
             { label: "Never", value: 'never' },
           ],
@@ -210,7 +210,7 @@ const STATIC_SETTINGS: StaticSettingDef[] = [
   { key: 'profanity_filter', type: 'boolean', default: false },
   { key: 'email_notifications_enabled', type: 'boolean', default: true },
   { key: 'push_notifications_enabled', type: 'boolean', default: true },
-  { key: 'digest_frequency', type: 'select', default: 'weekly' },
+  { key: 'digest_frequency', type: 'select', default: 'monthly' },
   { key: 'max_listings_per_user', type: 'number', default: 0, validation: { min: 0 } },
   { key: 'max_groups_per_user', type: 'number', default: 0, validation: { min: 0 } },
   { key: 'max_file_upload_mb', type: 'number', default: 10, validation: { min: 1, max: 100 } },

@@ -90,7 +90,7 @@
     "low_supply_message": "Categories where active requests outnumber available offers. Worth highlighting to potential supporters."
   },
   "civic_digest": {
-    "cadence_invalid": "cadence must be one of: off, daily, weekly",
+    "cadence_invalid": "cadence must be one of: off, daily, monthly",
     "preferred_sub_region_invalid": "preferred_sub_region_id must be numeric or null",
     "opt_out_sources_invalid": "opt_out_sources must be an array of source keys"
   },

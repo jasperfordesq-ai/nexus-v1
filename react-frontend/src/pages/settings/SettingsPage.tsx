@@ -197,7 +197,7 @@ export function SettingsPage() {
   });
 
   // Match digest frequency & preferences
-  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('fortnightly');
+  const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('monthly');
   const [notifyHotMatches, setNotifyHotMatches] = useState(true);
   const [notifyMutualMatches, setNotifyMutualMatches] = useState(true);
 
@@ -301,7 +301,8 @@ export function SettingsPage() {
     try {
       const response = await api.get<{ notification_frequency: string; notify_hot_matches: boolean; notify_mutual_matches: boolean }>('/v2/users/me/match-preferences');
       if (response.success && response.data) {
-        setMatchDigestFrequency(response.data.notification_frequency || 'fortnightly');
+        const nextMatchFrequency = response.data.notification_frequency === 'weekly' ? 'monthly' : response.data.notification_frequency;
+        setMatchDigestFrequency(nextMatchFrequency || 'monthly');
         setNotifyHotMatches(response.data.notify_hot_matches ?? true);
         setNotifyMutualMatches(response.data.notify_mutual_matches ?? true);
       }
@@ -314,7 +315,8 @@ export function SettingsPage() {
     try {
       const response = await api.get<{ global_frequency: string }>('/v2/notifications/settings');
       if (response.success && response.data) {
-        setDigestFrequency(response.data.global_frequency || 'off');
+        const nextFrequency = response.data.global_frequency === 'weekly' ? 'monthly' : response.data.global_frequency;
+        setDigestFrequency(nextFrequency || 'off');
       }
     } catch (error) {
       logError('Failed to load digest frequency', error);

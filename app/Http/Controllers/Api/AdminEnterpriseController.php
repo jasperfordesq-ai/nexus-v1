@@ -692,7 +692,7 @@ class AdminEnterpriseController extends BaseApiController
         'max_listing_images' => 5,
         'email_notifications_enabled' => true,
         'push_notifications_enabled' => true,
-        'digest_frequency' => 'weekly',
+        'digest_frequency' => 'monthly',
         'max_listings_per_user' => 0,
         'max_groups_per_user' => 0,
         'max_file_upload_mb' => 10,

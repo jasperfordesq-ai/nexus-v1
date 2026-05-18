@@ -630,7 +630,7 @@ class EventNotificationService
      *
      * Respects the user's notification frequency setting. If the user has email
      * notifications set to 'off', no email is sent. For 'instant', the email is
-     * sent immediately. For 'daily'/'weekly', it is queued.
+     * sent immediately. For 'daily'/'monthly', it is queued.
      *
      * @param object $user     User object with email, name, first_name, user_id
      * @param string $subject  Email subject line
@@ -683,7 +683,7 @@ class EventNotificationService
 
             return (bool) $sent;
         } else {
-            // Queue for daily/weekly digest
+            // Queue for daily/monthly digest
             try {
                 DB::table('notification_queue')->insert([
                     'tenant_id'       => TenantContext::getId(),
@@ -719,7 +719,7 @@ class EventNotificationService
             ->value('frequency');
 
         if ($frequency !== null) {
-            return $frequency;
+            return $frequency === 'weekly' ? 'monthly' : $frequency;
         }
 
         // Fall back to global setting
@@ -730,7 +730,7 @@ class EventNotificationService
             ->value('frequency');
 
         if ($frequency !== null) {
-            return $frequency;
+            return $frequency === 'weekly' ? 'monthly' : $frequency;
         }
 
         // Fall back to tenant default. Members opt INTO the daily digest
@@ -738,7 +738,8 @@ class EventNotificationService
         try {
             $tenant = TenantContext::get();
             $config = json_decode($tenant['configuration'] ?? '{}', true);
-            return $config['notifications']['default_frequency'] ?? 'off';
+            $default = $config['notifications']['default_frequency'] ?? 'off';
+            return $default === 'weekly' ? 'monthly' : $default;
         } catch (\Throwable $e) {
             return 'off';
         }

@@ -31,7 +31,7 @@ class CivicDigestService
     public const SETTING_TENANT_DEFAULT = 'caring.civic_digest.tenant_default_cadence';
     public const SETTING_USER_PREFIX    = 'caring.civic_digest.user_prefs.';
 
-    private const ALLOWED_CADENCES = ['off', 'daily', 'weekly'];
+    private const ALLOWED_CADENCES = ['off', 'daily', 'monthly'];
 
     private const SOURCE_WEIGHTS = [
         'safety_alert'  => 10,
@@ -177,9 +177,10 @@ class CivicDigestService
             return $defaults;
         }
 
-        $cadence = isset($decoded['cadence']) && in_array($decoded['cadence'], self::ALLOWED_CADENCES, true)
-            ? $decoded['cadence']
+        $cadence = isset($decoded['cadence']) && is_string($decoded['cadence'])
+            ? $this->normalizeCadence($decoded['cadence'])
             : $defaults['cadence'];
+        $cadence ??= $defaults['cadence'];
 
         $preferredSubRegion = isset($decoded['preferred_sub_region_id']) && is_numeric($decoded['preferred_sub_region_id'])
             ? (int) $decoded['preferred_sub_region_id']
@@ -217,11 +218,11 @@ class CivicDigestService
         $merged = $current;
 
         if (array_key_exists('cadence', $prefs)) {
-            if (!is_string($prefs['cadence']) || !in_array($prefs['cadence'], self::ALLOWED_CADENCES, true)) {
+            if (!is_string($prefs['cadence']) || $this->normalizeCadence($prefs['cadence']) === null) {
                 $errors[] = ['field' => 'cadence', 'message' => __('caring_community.civic_digest.cadence_invalid')];
             } else {
-                $merged['cadence'] = $prefs['cadence'];
-                $merged['enabled'] = $prefs['cadence'] !== 'off';
+                $merged['cadence'] = $this->normalizeCadence($prefs['cadence']);
+                $merged['enabled'] = $merged['cadence'] !== 'off';
             }
         }
 
@@ -345,7 +346,7 @@ class CivicDigestService
     public function getTenantCadence(int $tenantId): string
     {
         if (!Schema::hasTable('tenant_settings')) {
-            return 'weekly';
+            return 'monthly';
         }
 
         $row = DB::table('tenant_settings')
@@ -354,11 +355,11 @@ class CivicDigestService
             ->first();
 
         if (!$row || !$row->setting_value) {
-            return 'weekly';
+            return 'monthly';
         }
 
         $value = trim((string) $row->setting_value, "\" \t\n\r\0\x0B");
-        return in_array($value, self::ALLOWED_CADENCES, true) ? $value : 'weekly';
+        return $this->normalizeCadence($value) ?? 'monthly';
     }
 
     /**
@@ -366,7 +367,8 @@ class CivicDigestService
      */
     public function setTenantCadence(int $tenantId, string $cadence): array
     {
-        if (!in_array($cadence, self::ALLOWED_CADENCES, true)) {
+        $cadence = $this->normalizeCadence($cadence);
+        if ($cadence === null) {
             return [
                 'errors' => [
                     ['field' => 'cadence', 'message' => __('caring_community.civic_digest.cadence_invalid')],
@@ -394,6 +396,15 @@ class CivicDigestService
         );
 
         return ['cadence' => $cadence];
+    }
+
+    private function normalizeCadence(string $cadence): ?string
+    {
+        return match ($cadence) {
+            'weekly' => 'monthly',
+            'off', 'daily', 'monthly' => $cadence,
+            default => null,
+        };
     }
 
     // ─────────────────────────────────────────────────────────────────────

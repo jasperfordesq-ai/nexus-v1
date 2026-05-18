@@ -18,7 +18,7 @@ class MatchingService
     private const DEFAULT_PREFERENCES = [
         'max_distance_km'         => 25,
         'min_match_score'         => 50,
-        'notification_frequency'  => 'fortnightly',
+        'notification_frequency'  => 'monthly',
         'notify_hot_matches'      => true,
         'notify_mutual_matches'   => true,
         'categories'              => [],

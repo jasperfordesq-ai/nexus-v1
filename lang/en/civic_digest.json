@@ -1,10 +1,10 @@
 {
   "email": {
     "subject_daily": "Your daily civic digest — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
+    "subject_monthly": "Your monthly civic digest — {{community}}",
     "greeting": "Hi {{name}},",
     "intro_daily": "Here's what's new in your community today — {{count}} update(s) selected for you based on your sub-region and interests.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
+    "intro_monthly": "Here's your monthly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "Nothing new in your community for now. We'll keep you posted.",
     "cta_open": "Open",
     "cta_manage_prefs": "Manage digest preferences",

@@ -1202,19 +1202,19 @@ class SeedAgorisPolish extends Command
         //   caring.civic_digest.tenant_default_cadence    (tenant default)
         //   caring.civic_digest.user_prefs.{userId}       (per-user override)
         // Per-user envelope shape (CivicDigestService::getUserPrefs):
-        //   { enabled, cadence (off|daily|weekly), preferred_sub_region_id, opt_out_sources[] }
+        //   { enabled, cadence (off|daily|monthly), preferred_sub_region_id, opt_out_sources[] }
         // ALLOWED_SOURCES: announcement, project, event, vol_org, care_provider,
         // marketplace, safety_alert, help_request, feed_post.
         if (! Schema::hasTable('tenant_settings')) {
             return;
         }
 
-        // Tenant default cadence — weekly digest by default for residents.
+        // Tenant default cadence — monthly digest by default for residents.
         $this->upsert(
             'tenant_settings',
             ['tenant_id' => $tenantId, 'setting_key' => CivicDigestService::SETTING_TENANT_DEFAULT],
             [
-                'setting_value' => 'weekly',
+                'setting_value' => 'monthly',
                 'setting_type' => 'string',
                 'category' => 'caring',
                 'updated_at' => now(),
@@ -1223,11 +1223,11 @@ class SeedAgorisPolish extends Command
         $this->bump('civic-digest tenant default (AG90)');
 
         $prefs = [
-            'andrea'  => ['cadence' => 'weekly', 'opt_out_sources' => ['safety_alert']], // active resident, opted out of alarms
+            'andrea'  => ['cadence' => 'monthly', 'opt_out_sources' => ['safety_alert']], // active resident, opted out of alarms
             'thomas'  => ['cadence' => 'daily',  'opt_out_sources' => []],                // municipality admin — wants everything
-            'sabine'  => ['cadence' => 'weekly', 'opt_out_sources' => ['vol_org']],
+            'sabine'  => ['cadence' => 'monthly', 'opt_out_sources' => ['vol_org']],
             'marlies' => ['cadence' => 'daily',  'opt_out_sources' => []],                // KISS coordinator — wants everything
-            'theres'  => ['cadence' => 'weekly', 'opt_out_sources' => ['marketplace']],
+            'theres'  => ['cadence' => 'monthly', 'opt_out_sources' => ['marketplace']],
         ];
 
         $now = now()->getTimestamp();

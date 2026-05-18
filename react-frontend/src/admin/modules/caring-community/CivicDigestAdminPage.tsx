@@ -27,10 +27,10 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
-type Cadence = 'off' | 'daily' | 'weekly';
+type Cadence = 'off' | 'daily' | 'monthly';
 
 interface CadenceResponse {
-  cadence: Cadence;
+  cadence: Cadence | 'weekly';
 }
 
 const OPTIONS: { value: Cadence; label: string; description: string }[] = [
@@ -45,9 +45,9 @@ const OPTIONS: { value: Cadence; label: string; description: string }[] = [
     description: 'A digest is sent each morning with the previous day\'s activity.',
   },
   {
-    value: 'weekly',
-    label: 'Weekly',
-    description: 'A digest is sent every Monday covering the previous week.',
+    value: 'monthly',
+    label: 'Monthly',
+    description: 'A digest is sent on the first day of each month covering recent activity.',
   },
 ];
 
@@ -65,7 +65,8 @@ export default function CivicDigestAdminPage() {
     setLoading(true);
     try {
       const res = await api.get<CadenceResponse>('/v2/admin/caring-community/digest/cadence');
-      const next = (res.data?.cadence as Cadence) ?? 'off';
+      const raw = res.data?.cadence ?? 'off';
+      const next: Cadence = raw === 'weekly' ? 'monthly' : raw;
       setCadence(next);
       setDraft(next);
     } catch {
@@ -86,7 +87,8 @@ export default function CivicDigestAdminPage() {
       const res = await api.put<CadenceResponse>('/v2/admin/caring-community/digest/cadence', {
         cadence: draft,
       });
-      const next = (res.data?.cadence as Cadence) ?? draft;
+      const raw = res.data?.cadence ?? draft;
+      const next: Cadence = raw === 'weekly' ? 'monthly' : raw;
       setCadence(next);
       setDraft(next);
       showToast('Digest cadence saved', 'success');

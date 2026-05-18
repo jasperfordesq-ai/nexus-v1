@@ -266,17 +266,17 @@ class CronJobRunner
     }
 
     /**
-     * Run Weekly Digest
-     * Should be triggered once a week (e.g. Friday 5pm).
+     * Run monthly digest.
+     * Kept under the legacy method name for admin/manual trigger compatibility.
      * URI: /cron/weekly-digest
      */
     public function weeklyDigest()
     {
         $this->checkAccess();
-        $this->startJob('weekly-digest');
+        $this->startJob('monthly-digest');
         ob_start();
         try {
-            $this->processDigest('weekly');
+            $this->processDigest('monthly');
             $output = ob_get_clean();
             echo $output;
             $this->logJob('success', $output);
@@ -1002,6 +1002,7 @@ class CronJobRunner
         $minute = (int) date('i');
         $hour = (int) date('H');
         $dayOfWeek = (int) date('w'); // 0 = Sunday
+        $dayOfMonth = (int) date('j');
         $taskNum = 0;
 
         try {
@@ -1215,10 +1216,10 @@ class CronJobRunner
             }
 
             // ── WEEKLY ──
-            if ($dayOfWeek === 5 && $hour === 17 && $minute === 0) {
+            if ($dayOfMonth === 1 && $hour === 17 && $minute === 0) {
                 $taskNum++;
-                echo "\n[{$taskNum}] Processing weekly digest...\n";
-                echo $this->runSubTask('weekly-digest', fn() => $this->processDigest('weekly'));
+                echo "\n[{$taskNum}] Processing monthly digest...\n";
+                echo $this->runSubTask('monthly-digest', fn() => $this->processDigest('monthly'));
             }
 
             if ($dayOfWeek === 0 && $hour === 2 && $minute === 0) {
@@ -1233,24 +1234,24 @@ class CronJobRunner
                 echo $this->runSubTask('gamification-cleanup', fn() => $this->gamificationCleanupInternal());
             }
 
-            if ($dayOfWeek === 1 && $hour === 4 && $minute === 0) {
+            if ($dayOfMonth === 1 && $hour === 4 && $minute === 0) {
                 $taskNum++;
-                echo "\n[{$taskNum}] Gamification weekly digest...\n";
-                echo $this->runSubTask('gamification-weekly-digest', fn() => $this->gamificationWeeklyDigestInternal());
+                echo "\n[{$taskNum}] Gamification monthly digest...\n";
+                echo $this->runSubTask('gamification-monthly-digest', fn() => $this->gamificationWeeklyDigestInternal());
             }
 
-            if ($dayOfWeek === 1 && $hour === 9 && $minute === 0) {
+            if ($dayOfMonth === 1 && $hour === 9 && $minute === 0) {
                 $taskNum++;
-                echo "\n[{$taskNum}] Federation weekly digest...\n";
-                echo $this->runSubTask('federation-weekly-digest', fn() => $this->processFederationWeeklyDigestInternal());
+                echo "\n[{$taskNum}] Federation monthly digest...\n";
+                echo $this->runSubTask('federation-monthly-digest', fn() => $this->processFederationWeeklyDigestInternal());
 
                 $taskNum++;
-                echo "\n[{$taskNum}] Group weekly digests...\n";
-                echo $this->runSubTask('group-weekly-digest', fn() => $this->groupWeeklyDigestsInternal());
+                echo "\n[{$taskNum}] Group monthly digests...\n";
+                echo $this->runSubTask('group-monthly-digest', fn() => $this->groupWeeklyDigestsInternal());
 
                 $taskNum++;
-                echo "\n[{$taskNum}] Match digest weekly...\n";
-                echo $this->runSubTask('match-digest-weekly', fn() => $this->matchDigestInternal('weekly'));
+                echo "\n[{$taskNum}] Match digest monthly...\n";
+                echo $this->runSubTask('match-digest-monthly', fn() => $this->matchDigestInternal('monthly'));
             }
 
             // ── IDENTITY VERIFICATION TASKS ──
@@ -1597,10 +1598,10 @@ class CronJobRunner
     public function matchDigestWeekly()
     {
         $this->checkAccess();
-        $this->startJob('match-digest-weekly');
+        $this->startJob('match-digest-monthly');
         ob_start();
         try {
-            $this->processMatchDigest('weekly');
+            $this->processMatchDigest('monthly');
             $output = ob_get_clean();
             echo $output;
             $this->logJob('success', $output);
@@ -1630,11 +1631,12 @@ class CronJobRunner
                 AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
                 AND (
                     (mp.notification_frequency = ? AND mp.notification_frequency IS NOT NULL)
-                    OR (mp.notification_frequency IS NULL AND ? = 'fortnightly')
+                    OR (mp.notification_frequency = 'weekly' AND ? = 'monthly')
+                    OR (mp.notification_frequency IS NULL AND ? = 'monthly')
                 )";
 
         try {
-            $users = array_map(fn($r) => (array) $r, DB::select($sql, [$frequency, $frequency]));
+            $users = array_map(fn($r) => (array) $r, DB::select($sql, [$frequency, $frequency, $frequency]));
         } catch (\Exception $e) {
             echo "Error fetching users: " . $e->getMessage() . "\n";
             echo "Match preferences table may not exist yet. Run the migration.\n";
@@ -1659,7 +1661,7 @@ class CronJobRunner
                 // Get fresh matches for this user (24h daily, 7d weekly, 14d fortnightly)
                 $lookbackHours = match ($frequency) {
                     'daily' => 24,
-                    'weekly' => 168,
+                    'weekly', 'monthly' => 720,
                     'fortnightly' => 336,
                     default => 24,
                 };
@@ -1893,22 +1895,21 @@ class CronJobRunner
     }
 
     /**
-     * Process Federation Weekly Digest
-     * Sends weekly federation activity summaries to users who have federation enabled.
-     * Should be triggered once a week (e.g. Monday morning).
+     * Process federation monthly digest.
+     * Kept under the legacy method name for admin/manual trigger compatibility.
      * URI: /cron/federation-weekly-digest
      */
     public function federationWeeklyDigest()
     {
         $this->checkAccess();
-        $this->startJob('federation-weekly-digest');
+        $this->startJob('federation-monthly-digest');
 
         header('Content-Type: text/plain');
         ob_start();
         $status = 'success';
 
         try {
-            echo "Starting federation weekly digest processing...\n";
+            echo "Starting federation monthly digest processing...\n";
 
             // Find all users who have federation opted in and email notifications enabled
             $sql = "SELECT u.id, u.tenant_id, u.email, u.first_name
@@ -1922,7 +1923,7 @@ class CronJobRunner
             $users = array_map(fn($r) => (array) $r, DB::select($sql));
 
             if (empty($users)) {
-                echo "No users eligible for federation weekly digest.\n";
+                echo "No users eligible for federation monthly digest.\n";
                 echo "Done.\n";
                 $output = ob_get_clean();
                 echo $output;
@@ -2403,7 +2404,7 @@ class CronJobRunner
             $totalSent = 0;
             $lookbackHours = match ($frequency) {
                 'daily' => 24,
-                'weekly' => 168,
+                'weekly', 'monthly' => 720,
                 'fortnightly' => 336,
                 default => 24,
             };
@@ -2416,11 +2417,12 @@ class CronJobRunner
                         AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
                         AND (
                             (mp.notification_frequency = ? AND mp.notification_frequency IS NOT NULL)
-                            OR (mp.notification_frequency IS NULL AND ? = 'fortnightly')
+                            OR (mp.notification_frequency = 'weekly' AND ? = 'monthly')
+                            OR (mp.notification_frequency IS NULL AND ? = 'monthly')
                         )
                         LIMIT 100";
 
-                $users = array_map(fn($r) => (array) $r, DB::select($sql, [$tenantId, $frequency, $frequency]));
+                $users = array_map(fn($r) => (array) $r, DB::select($sql, [$tenantId, $frequency, $frequency, $frequency]));
 
                 foreach ($users as $user) {
                     try {
@@ -2490,7 +2492,7 @@ class CronJobRunner
     }
 
     /**
-     * Gamification weekly digest emails (Monday 4am)
+     * Gamification monthly digest emails.
      *
      * NOTE: sendWeeklyDigests() iterates all tenants internally,
      * so we must NOT wrap it in forEachTenant() — that caused a nested
@@ -2501,14 +2503,14 @@ class CronJobRunner
         try {
             $result = app(GamificationEmailService::class)->sendWeeklyDigests();
             echo "   Sent {$result['sent']}, skipped {$result['skipped']}, errors {$result['errors']}.\n";
-            echo "   Gamification weekly digest complete.\n";
+            echo "   Gamification monthly digest complete.\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
         }
     }
 
     /**
-     * Group weekly digest emails to group owners (Monday 9am)
+     * Group monthly digest emails to group owners.
      *
      * NOTE: GroupReportingService does not exist yet — this is a stub.
      * When implemented, do NOT wrap in forEachTenant() if the service
@@ -2525,7 +2527,7 @@ class CronJobRunner
 
             $stats = GroupReportingService::sendAllWeeklyDigests();
             echo "   Sent {$stats['sent']}/{$stats['total_groups']} group digests.\n";
-            echo "   Group weekly digests complete.\n";
+            echo "   Group monthly digests complete.\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
         }
@@ -3022,7 +3024,7 @@ class CronJobRunner
     public function gamificationWeeklyDigest(): void
     {
         $this->checkAccess();
-        $this->startJob('gamification-weekly-digest');
+        $this->startJob('gamification-monthly-digest');
         ob_start();
         try { $this->gamificationWeeklyDigestInternal(); $this->logJob('success', ob_get_clean()); }
         catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
@@ -3049,7 +3051,7 @@ class CronJobRunner
     public function groupWeeklyDigest(): void
     {
         $this->checkAccess();
-        $this->startJob('group-weekly-digest');
+        $this->startJob('group-monthly-digest');
         ob_start();
         try { $this->groupWeeklyDigestsInternal(); $this->logJob('success', ob_get_clean()); }
         catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }

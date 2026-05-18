@@ -1904,7 +1904,7 @@ class AdminConfigController extends BaseApiController
             // ── Notifications ──
             ['id' => 'process-queue', 'name' => 'Instant Notification Queue', 'command' => 'runInstantQueue', 'schedule' => '* * * * *', 'category' => 'notifications', 'description' => 'Processes the instant notification queue, sending pending notifications immediately.'],
             ['id' => 'daily-digest', 'name' => 'Daily Digest', 'command' => 'dailyDigest', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends daily notification digest emails to users who opted for daily frequency.'],
-            ['id' => 'weekly-digest', 'name' => 'Weekly Digest', 'command' => 'weeklyDigest', 'schedule' => '0 17 * * 5', 'category' => 'notifications', 'description' => 'Sends weekly notification digest emails (Fridays at 5 PM).'],
+            ['id' => 'weekly-digest', 'name' => 'Monthly Digest', 'command' => 'weeklyDigest', 'schedule' => '0 17 1 * *', 'category' => 'notifications', 'description' => 'Sends monthly notification digest emails (1st of month at 5 PM).'],
 
             // ── Newsletters ──
             ['id' => 'process-newsletters', 'name' => 'Process Scheduled Newsletters', 'command' => 'processNewsletters', 'schedule' => '*/5 * * * *', 'category' => 'newsletters', 'description' => 'Checks for newsletters scheduled to be sent and initiates their sending process.'],
@@ -1921,13 +1921,13 @@ class AdminConfigController extends BaseApiController
             ['id' => 'gamification-campaigns', 'name' => 'Process Achievement Campaigns', 'command' => 'gamificationCampaigns', 'schedule' => '0 * * * *', 'category' => 'gamification', 'description' => 'Processes recurring achievement campaigns.'],
             ['id' => 'gamification-leaderboard', 'name' => 'Leaderboard Snapshot', 'command' => 'gamificationLeaderboard', 'schedule' => '0 0 * * *', 'category' => 'gamification', 'description' => 'Creates daily leaderboard snapshots and finalizes seasons.'],
             ['id' => 'gamification-challenges', 'name' => 'Check Challenge Expirations', 'command' => 'gamificationChallenges', 'schedule' => '30 * * * *', 'category' => 'gamification', 'description' => 'Expires completed challenges and updates statuses.'],
-            ['id' => 'gamification-weekly-digest', 'name' => 'Gamification Weekly Digest', 'command' => 'gamificationWeeklyDigest', 'schedule' => '0 4 * * 1', 'category' => 'gamification', 'description' => 'Sends weekly progress email digests to users.'],
+            ['id' => 'gamification-weekly-digest', 'name' => 'Gamification Monthly Digest', 'command' => 'gamificationWeeklyDigest', 'schedule' => '0 4 1 * *', 'category' => 'gamification', 'description' => 'Sends monthly progress email digests to users.'],
             ['id' => 'gamification-streaks', 'name' => 'Gamification Streak Milestones', 'command' => 'gamificationStreaks', 'schedule' => '0 1 * * *', 'category' => 'gamification', 'description' => 'Checks and awards streak milestones (7/14/30/60/90/180/365 days).'],
             ['id' => 'gamification-cleanup', 'name' => 'Gamification Cleanup', 'command' => 'gamificationCleanup', 'schedule' => '0 3 * * 0', 'category' => 'gamification', 'description' => 'Cleans old XP notifications, campaign awards, and analytics data.'],
 
             // ── Groups ──
             ['id' => 'update-featured-groups', 'name' => 'Update Featured Groups', 'command' => 'updateFeaturedGroups', 'schedule' => '0 8 * * *', 'category' => 'groups', 'description' => 'Updates featured groups based on ranking algorithms.'],
-            ['id' => 'group-weekly-digest', 'name' => 'Group Weekly Digests', 'command' => 'groupWeeklyDigest', 'schedule' => '0 9 * * 1', 'category' => 'groups', 'description' => 'Sends weekly analytics digest emails to group owners.'],
+            ['id' => 'group-weekly-digest', 'name' => 'Group Monthly Digests', 'command' => 'groupWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'groups', 'description' => 'Sends monthly analytics digest emails to group owners.'],
 
             // ── Security ──
             ['id' => 'abuse-detection', 'name' => 'Abuse Detection', 'command' => 'abuseDetection', 'schedule' => '0 * * * *', 'category' => 'security', 'description' => 'Scans transactions for potential abuse patterns.'],
@@ -1955,7 +1955,7 @@ class AdminConfigController extends BaseApiController
             ['id' => 'listing-expiry', 'name' => 'Listing Expiry Processing', 'command' => 'listingExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires listings that have passed their expiry date.'],
             ['id' => 'listing-expiry-reminders', 'name' => 'Listing Expiry Reminders', 'command' => 'listingExpiryReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Warns listing owners 3 days before their listing expires.'],
             ['id' => 'job-expiry', 'name' => 'Job Vacancy Expiry', 'command' => 'jobExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires job vacancies that have passed their closing date.'],
-            ['id' => 'federation-weekly-digest', 'name' => 'Federation Weekly Digest', 'command' => 'federationWeeklyDigest', 'schedule' => '0 9 * * 1', 'category' => 'notifications', 'description' => 'Sends federation activity digest to opted-in tenants.'],
+            ['id' => 'federation-weekly-digest', 'name' => 'Federation Monthly Digest', 'command' => 'federationWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'notifications', 'description' => 'Sends federation activity digest to opted-in tenants.'],
             ['id' => 'balance-alerts', 'name' => 'Balance Alerts', 'command' => 'balanceAlerts', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Checks organization wallet balances and sends low/critical alerts.'],
             ['id' => 'goal-reminders', 'name' => 'Goal Reminders', 'command' => 'goalReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends reminders for goals that are due or behind schedule.'],
             ['id' => 'retry-failed-webhooks', 'name' => 'Retry Failed Webhooks', 'command' => 'retryFailedWebhooks', 'schedule' => '*/5 * * * *', 'category' => 'maintenance', 'description' => 'Retries webhook deliveries that previously failed.'],

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * GroupReportingService — Sends weekly digest emails to group owners/admins.
+ * GroupReportingService — Sends monthly digest emails to group owners/admins.
  *
  * Iterates all active tenants internally (do NOT wrap in forEachTenant).
  * For each tenant with the 'groups' feature enabled, finds groups with
@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Log;
 class GroupReportingService
 {
     /**
-     * Send weekly digest emails to all group owners/admins across all tenants.
+     * Send monthly digest emails to all group owners/admins across all tenants.
      *
      * This method iterates tenants internally — do NOT call from within
      * forEachTenant() or you will get duplicate emails per tenant.
@@ -51,7 +51,7 @@ class GroupReportingService
             return ['sent' => 0, 'total_groups' => 0];
         }
 
-        $weekAgo = now()->subWeek();
+        $digestSince = now()->subDays(30);
 
         foreach ($tenants as $tenant) {
             try {
@@ -99,7 +99,7 @@ class GroupReportingService
                         $result = self::processGroupDigest(
                             $group,
                             $tenant,
-                            $weekAgo,
+                            $digestSince,
                             $emailService
                         );
                         $sent += $result;
@@ -129,9 +129,9 @@ class GroupReportingService
     }
 
     /**
-     * Process and send the weekly digest for a single group.
+     * Process and send the monthly digest for a single group.
      *
-     * Gathers activity stats for the past week and sends an email to
+     * Gathers activity stats for the past month and sends an email to
      * the group owner and any admins who have not opted out.
      *
      * @return int Number of emails sent for this group
@@ -144,13 +144,13 @@ class GroupReportingService
     ): int {
         $tenantId = $tenant->id;
 
-        // Gather weekly activity stats
+        // Gather monthly activity stats
         $newMemberCount = self::countNewMembers($group->id, $tenantId, $weekAgo);
         $newDiscussionCount = self::countNewDiscussions($group->id, $tenantId, $weekAgo);
         $newPostCount = self::countNewPosts($group->id, $tenantId, $weekAgo);
         $newEventCount = self::countNewEvents($group->id, $tenantId, $weekAgo);
 
-        // Skip groups with no activity this week
+        // Skip groups with no activity this month
         if ($newMemberCount === 0 && $newDiscussionCount === 0 && $newPostCount === 0 && $newEventCount === 0) {
             return 0;
         }
@@ -342,7 +342,7 @@ class GroupReportingService
     }
 
     /**
-     * Build the HTML body for a group weekly digest email.
+     * Build the HTML body for a group monthly digest email.
      */
     private static function buildDigestEmailBody(string $name, array $stats, string $communityName): string
     {

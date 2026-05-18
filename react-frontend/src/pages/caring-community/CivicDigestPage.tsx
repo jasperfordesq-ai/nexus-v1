@@ -76,7 +76,7 @@ interface DigestItem {
 
 interface DigestPrefs {
   enabled: boolean;
-  cadence: 'off' | 'daily' | 'weekly';
+  cadence: 'off' | 'daily' | 'weekly' | 'monthly';
   preferred_sub_region_id: number | null;
   opt_out_sources: DigestSource[];
   updated_at: number | null;
@@ -159,14 +159,14 @@ export function CivicDigestPage() {
     { immediate: true },
   );
 
-  const [cadence, setCadence] = useState<'off' | 'daily' | 'weekly'>('weekly');
+  const [cadence, setCadence] = useState<'off' | 'daily' | 'monthly'>('monthly');
   const [preferredSubRegionId, setPreferredSubRegionId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Sync local form state once data arrives
   useEffect(() => {
     if (data?.prefs) {
-      setCadence(data.prefs.cadence);
+      setCadence(data.prefs.cadence === 'weekly' ? 'monthly' : data.prefs.cadence);
       setPreferredSubRegionId(data.prefs.preferred_sub_region_id);
     }
   }, [data?.prefs]);
@@ -382,7 +382,7 @@ export function CivicDigestPage() {
             selectedKeys={[cadence]}
             onChange={(e) => {
               const v = e.target.value;
-              if (v === 'off' || v === 'daily' || v === 'weekly') {
+              if (v === 'off' || v === 'daily' || v === 'monthly') {
                 setCadence(v);
               }
             }}
@@ -390,7 +390,7 @@ export function CivicDigestPage() {
           >
             <SelectItem key="off">{t('prefs_cadence_off')}</SelectItem>
             <SelectItem key="daily">{t('prefs_cadence_daily')}</SelectItem>
-            <SelectItem key="weekly">{t('prefs_cadence_weekly')}</SelectItem>
+            <SelectItem key="monthly">{t('prefs_cadence_monthly')}</SelectItem>
           </Select>
 
           <div className="space-y-2">

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * FederationEmailService — Email notifications for cross-tenant federation events.
  *
- * Sends notification emails for federated messages, transactions, weekly digests,
+ * Sends notification emails for federated messages, transactions, monthly digests,
  * and partnership requests using rich HTML templates via EmailTemplateBuilder.
  */
 class FederationEmailService
@@ -259,25 +259,25 @@ class FederationEmailService
             $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
             $tenantName = $tenant->name ?? __('emails.common.fallback_tenant_name');
 
-            // Gather stats for the week
+            // Gather stats for the month
             $messageCount = (int) (DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM federation_messages
                  WHERE (sender_tenant_id = ? OR receiver_tenant_id = ?)
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
                 [$tenantId, $tenantId]
             )->cnt ?? 0);
 
             $transactionCount = (int) (DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM federation_transactions
                  WHERE (sender_tenant_id = ? OR receiver_tenant_id = ?)
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
                 [$tenantId, $tenantId]
             )->cnt ?? 0);
 
             $connectionCount = (int) (DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM federation_connections
                  WHERE (requester_tenant_id = ? OR receiver_tenant_id = ?)
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
                 [$tenantId, $tenantId]
             )->cnt ?? 0);
 
@@ -312,7 +312,7 @@ class FederationEmailService
             });
 
             if (!$sent) {
-                Log::warning('[FederationEmail] Weekly digest email returned false', [
+                Log::warning('[FederationEmail] Monthly digest email returned false', [
                     'user' => $userId,
                     'tenant' => $tenantId,
                 ]);

@@ -169,8 +169,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->name('caring-hour-transfers-retry');
 
         // AG90 — Personalised civic digest dispatch (email + push).
-        // Daily run at 07:00 for members opted into daily cadence; weekly run
-        // on Mondays at 07:30. Both have idempotency guards inside the command
+        // Daily run at 07:00 for members opted into daily cadence; monthly run
+        // on the 1st at 07:30. Both have idempotency guards inside the command
         // (last_sent_at per user) so re-running within the cadence window is a
         // no-op.
         $schedule->command('caring:civic-digest-dispatch --cadence=daily')
@@ -179,11 +179,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->runInBackground()
             ->name('caring-civic-digest-daily');
 
-        $schedule->command('caring:civic-digest-dispatch --cadence=weekly')
-            ->weeklyOn(1, '07:30')
+        $schedule->command('caring:civic-digest-dispatch --cadence=monthly')
+            ->monthlyOn(1, '07:30')
             ->withoutOverlapping(60)
             ->runInBackground()
-            ->name('caring-civic-digest-weekly');
+            ->name('caring-civic-digest-monthly');
 
         // Listings: auto-unfeature listings whose featured_until has passed
         $schedule->call(function () {

@@ -1010,6 +1010,9 @@ class UsersController extends BaseApiController
         if (!in_array($frequency, ['instant', 'daily', 'weekly', 'monthly', 'off'])) {
             return $this->error(__('api_controllers_2.users.invalid_frequency'), 400);
         }
+        if ($frequency === 'weekly') {
+            $frequency = 'monthly';
+        }
 
         if ($contextType === 'global') {
             $contextId = 0;

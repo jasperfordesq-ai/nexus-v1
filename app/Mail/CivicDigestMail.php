@@ -46,7 +46,7 @@ class CivicDigestMail
      * Send the digest email to a recipient.
      *
      * @param object               $recipient  User-like object with email/first_name/last_name/preferred_language
-     * @param string               $cadence    'daily' | 'weekly'
+     * @param string               $cadence    'daily' | 'monthly'
      * @param list<array<string,mixed>> $items   Digest items as returned by CivicDigestService::digestForMember()
      * @return bool                            true if EmailService::send() returned true; false otherwise
      */
@@ -59,7 +59,7 @@ class CivicDigestMail
             // Service already filters empty digests upstream; defensive guard.
             return false;
         }
-        $cadence = $cadence === 'weekly' ? 'weekly' : 'daily';
+        $cadence = $cadence === 'monthly' || $cadence === 'weekly' ? 'monthly' : 'daily';
 
         return (bool) LocaleContext::withLocale($recipient->preferred_language ?? null, function () use ($recipient, $cadence, $items): bool {
             try {
@@ -76,8 +76,8 @@ class CivicDigestMail
                 }
 
                 $count = count($items);
-                $subjectKey = $cadence === 'weekly' ? 'civic_digest.email.subject_weekly' : 'civic_digest.email.subject_daily';
-                $introKey   = $cadence === 'weekly' ? 'civic_digest.email.intro_weekly'   : 'civic_digest.email.intro_daily';
+                $subjectKey = $cadence === 'monthly' ? 'civic_digest.email.subject_monthly' : 'civic_digest.email.subject_daily';
+                $introKey   = $cadence === 'monthly' ? 'civic_digest.email.intro_monthly'   : 'civic_digest.email.intro_daily';
 
                 $subject = __($subjectKey, ['community' => $community]);
 

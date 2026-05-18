@@ -56,7 +56,7 @@ interface NotificationsTabProps {
   isOrganisation: boolean;
   /**
    * Global activity-digest frequency from notification_settings
-   * (off/instant/daily/weekly). Default is 'off' so members do not get
+   * (off/instant/daily/monthly). Default is 'off' so members do not get
    * unsolicited digest email until they opt in here.
    */
   digestFrequency: string;
@@ -305,7 +305,7 @@ export function NotificationsTab({
                   <SelectItem key="off">{t('activity_digest.off', 'Off')}</SelectItem>
                   <SelectItem key="instant">{t('activity_digest.instant', 'Instant')}</SelectItem>
                   <SelectItem key="daily">{t('activity_digest.daily', 'Daily')}</SelectItem>
-                  <SelectItem key="weekly">{t('activity_digest.weekly', 'Weekly')}</SelectItem>
+                  <SelectItem key="monthly">{t('activity_digest.monthly', 'Monthly')}</SelectItem>
                 </Select>
               </div>
             </div>
@@ -376,7 +376,7 @@ export function NotificationsTab({
                   }}
                 >
                   <SelectItem key="daily">{t('match_digest.daily')}</SelectItem>
-                  <SelectItem key="weekly">{t('match_digest.weekly')}</SelectItem>
+                  <SelectItem key="monthly">{t('match_digest.monthly')}</SelectItem>
                   <SelectItem key="fortnightly">{t('match_digest.fortnightly')}</SelectItem>
                   <SelectItem key="never">{t('match_digest.never')}</SelectItem>
                 </Select>

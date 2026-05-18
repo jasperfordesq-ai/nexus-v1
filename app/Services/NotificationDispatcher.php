@@ -184,6 +184,7 @@ class NotificationDispatcher
 
             case 'daily':
             case 'weekly':
+            case 'monthly':
                 self::queueNotification($userId, $activityType, $content, $link, $frequency);
                 break;
 
@@ -216,7 +217,7 @@ class NotificationDispatcher
             ->value('frequency');
 
         if ($row !== null) {
-            return $row;
+            return $row === 'weekly' ? 'monthly' : $row;
         }
 
         // If 'thread', try 'group' parent
@@ -244,7 +245,8 @@ class NotificationDispatcher
         if ($contextType === 'global') {
             $tenant = TenantContext::get();
             $config = json_decode($tenant['configuration'] ?? '{}', true);
-            return $config['notifications']['default_frequency'] ?? 'off';
+            $default = $config['notifications']['default_frequency'] ?? 'off';
+            return $default === 'weekly' ? 'monthly' : $default;
         }
 
         return null;
@@ -308,8 +310,11 @@ class NotificationDispatcher
             return;
         }
 
-        // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
-        $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
+        // Normalize legacy/unsupported digest frequencies for the queue.
+        $queueFrequency = match ($frequency) {
+            'fortnightly', 'weekly' => 'monthly',
+            default => $frequency,
+        };
 
         // Lookup recipient so bell + email render in their preferred locale.
         $tenantId = TenantContext::getId();
@@ -352,8 +357,11 @@ class NotificationDispatcher
             return;
         }
 
-        // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
-        $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
+        // Normalize legacy/unsupported digest frequencies for the queue.
+        $queueFrequency = match ($frequency) {
+            'fortnightly', 'weekly' => 'monthly',
+            default => $frequency,
+        };
 
         // Lookup recipient so bell + email render in their preferred locale.
         $tenantId = TenantContext::getId();

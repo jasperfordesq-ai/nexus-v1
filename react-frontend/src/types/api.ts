@@ -91,7 +91,7 @@ export interface UserStats {
 }
 
 export interface NotificationPreferences {
-  email_digest: 'daily' | 'weekly' | 'none';
+  email_digest: 'daily' | 'monthly' | 'none';
   push_enabled: boolean;
   email_on_message: boolean;
   email_on_match: boolean;

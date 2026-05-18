@@ -173,4 +173,43 @@ class CivicDigestDispatchTest extends TestCase
         $lastSent = $stub->getLastSentAt(self::TENANT_ID, $userId);
         $this->assertNull($lastSent);
     }
+
+    public function test_legacy_weekly_cadence_is_processed_as_monthly(): void
+    {
+        $userId = $this->makeUser('weekly');
+
+        $stub = Mockery::mock(CivicDigestService::class . '[digestForMember]', [])->makePartial();
+        $stub->setTenantCadence(self::TENANT_ID, 'off');
+        $stub->shouldReceive('digestForMember')->andReturnUsing(function (int $tenantId, int $candidateUserId) use ($userId): array {
+            if ($candidateUserId !== $userId) {
+                return [];
+            }
+
+            return [
+                [
+                    'id' => 'announcement:1',
+                    'source' => 'announcement',
+                    'title' => 'Monthly announcement',
+                    'summary' => 'Hello month',
+                    'occurred_at' => now()->toDateTimeString(),
+                    'sub_region_id' => null,
+                    'audience_match_score' => 7,
+                    'link_path' => '/caring-community/projects/1',
+                ],
+            ];
+        });
+        $this->app->instance(CivicDigestService::class, $stub);
+
+        $emailMock = Mockery::mock(EmailService::class);
+        $emailMock->shouldReceive('send')->once()->andReturn(true);
+        $this->app->instance(EmailService::class, $emailMock);
+
+        $exitCode = $this->artisan('caring:civic-digest-dispatch', [
+            '--cadence' => 'monthly',
+            '--tenant' => self::TENANT_ID,
+        ])->run();
+
+        $this->assertSame(0, $exitCode);
+        $this->assertNotNull($stub->getLastSentAt(self::TENANT_ID, $userId));
+    }
 }

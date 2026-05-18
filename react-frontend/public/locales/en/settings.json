@@ -214,7 +214,7 @@
     "new_reviews": "New Reviews",
     "gamification_digest": "Gamification Digest",
     "achievement_milestones": "Achievement Milestones",
-    "weekly_digest": "Weekly Digest",
+    "weekly_digest": "Monthly Digest",
     "payment_notifications": "Payment Notifications",
     "transfer_notifications": "Transfer Notifications",
     "membership_updates": "Membership Updates",
@@ -313,7 +313,7 @@
     "new_reviews": "New reviews received on your profile or listings",
     "gamification_digest": "Periodic summary of your gamification activity and progress",
     "achievement_milestones": "Badge unlocks, level ups, and achievement notifications",
-    "weekly_digest": "A weekly summary of community activity",
+    "weekly_digest": "A monthly summary of community activity",
     "payment_notifications": "Notifications for organisation payment activity",
     "transfer_notifications": "Notifications for credit transfers",
     "membership_updates": "Member joins, leaves, and membership changes",
@@ -327,9 +327,15 @@
     "frequency": "Digest Frequency",
     "frequency_description": "How often you receive match digest emails",
     "daily": "Daily",
-    "weekly": "Weekly",
+    "monthly": "Monthly",
     "fortnightly": "Fortnightly",
     "never": "Never"
+  },
+  "activity_digest": {
+    "off": "Off",
+    "instant": "Instant",
+    "daily": "Daily",
+    "monthly": "Monthly"
   },
   "privacy_sections": {
     "title": "Privacy Settings",

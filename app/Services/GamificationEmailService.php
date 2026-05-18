@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * GamificationEmailService — Sends weekly progress digests and achievement notifications.
  *
- * Handles weekly digest emails for users with gamification activity
+ * Handles monthly digest emails for users with gamification activity
  * and milestone notification emails for achievements.
  */
 class GamificationEmailService
@@ -29,9 +29,9 @@ class GamificationEmailService
     }
 
     /**
-     * Send weekly progress digests to users who actually have activity.
+     * Send monthly progress digests to users who actually have activity.
      *
-     * Iterates all active tenants, finds users with XP activity in the past 7 days,
+     * Iterates all active tenants, finds users with XP activity in the past 30 days,
      * generates a digest for each, and sends it via EmailService.
      *
      * @return array{sent: int, skipped: int, errors: int}
@@ -69,10 +69,10 @@ class GamificationEmailService
             }
 
             try {
-                // Find users with XP activity in the past 7 days
+                // Find users with XP activity in the past 30 days
                 $activeUserIds = DB::table('user_xp_log')
                     ->where('tenant_id', $tenant->id)
-                    ->where('created_at', '>=', now()->subWeek())
+                    ->where('created_at', '>=', now()->subDays(30))
                     ->distinct()
                     ->pluck('user_id')
                     ->all();
@@ -153,18 +153,18 @@ class GamificationEmailService
     }
 
     /**
-     * Generate a user's weekly digest data.
+     * Generate a user's monthly digest data.
      *
      * @return array{user_id: int, xp_earned: int, badges_earned: array, streak: int, rank: int|null, level: int}
      */
     public function generateUserDigest(int $userId): array
     {
-        $weekAgo = now()->subWeek();
+        $digestSince = now()->subDays(30);
 
         try {
             // XP earned this week
             $xpEarned = (int) UserXpLog::where('user_id', $userId)
-                ->where('created_at', '>=', $weekAgo)
+                ->where('created_at', '>=', $digestSince)
                 ->sum('xp_amount');
         } catch (\Throwable $e) {
             $xpEarned = 0;
@@ -173,7 +173,7 @@ class GamificationEmailService
         try {
             // Badges earned this week
             $badgesEarned = UserBadge::where('user_id', $userId)
-                ->where('awarded_at', '>=', $weekAgo)
+                ->where('awarded_at', '>=', $digestSince)
                 ->get(['badge_key', 'name', 'icon'])
                 ->toArray();
         } catch (\Throwable $e) {
@@ -272,7 +272,7 @@ class GamificationEmailService
     }
 
     /**
-     * Build the HTML body for a weekly digest email.
+     * Build the HTML body for a monthly digest email.
      */
     private function buildDigestEmailBody(string $name, array $digest, string $communityName): string
     {
