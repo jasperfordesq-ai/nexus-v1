@@ -9,11 +9,11 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use App\Services\VettingService;
 
 /**
@@ -607,8 +607,7 @@ class AdminVettingController extends BaseApiController
     </div>
 </div>
 HTML;
-                    $mailer = Mailer::forCurrentTenant();
-                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'vetting')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'vetting')) {
                         Log::warning('AdminVettingController::sendVettingNotification mailer returned false', [
                             'user_id' => $userId,
                             'status' => $status,

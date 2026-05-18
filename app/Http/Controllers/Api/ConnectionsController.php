@@ -7,11 +7,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\ConnectionService;
+use App\Services\EmailDispatchService;
 use Illuminate\Http\JsonResponse;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Log;
@@ -259,8 +259,7 @@ class ConnectionsController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
-                        $mailer  = Mailer::forCurrentTenant();
-                        if (!$mailer->send($requester->email, $subject, $html, null, null, null, 'connection_declined')) {
+                        if (!EmailDispatchService::sendRaw($requester->email, $subject, $html, null, null, null, 'connection_declined')) {
                             Log::warning('[ConnectionsController] connection declined email failed to send', [
                                 'requester_id' => $requesterId,
                             ]);

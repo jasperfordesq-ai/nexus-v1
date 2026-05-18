@@ -8,7 +8,6 @@ namespace App\Services;
 
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
@@ -1390,9 +1389,8 @@ class IdeationChallengeService
                 ->button($ctaLabel, $fullLink)
                 ->render();
 
-            $mailer = Mailer::forCurrentTenant();
             $subject = $title . ' — ' . $tenantName;
-            if (!$mailer->send($recipient->email, $subject, $html, null, null, null, 'ideation')) {
+            if (!EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'ideation')) {
                 Log::warning('[IdeationChallengeService] ideation email returned false', [
                     'recipient_id' => $recipient->id ?? null,
                 ]);

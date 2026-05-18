@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\OnboardingCompleted;
 use App\I18n\LocaleContext;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -65,8 +65,7 @@ class SendOnboardingCompletionEmail implements ShouldQueue
                 return [$subject, $html];
             });
 
-            $mailer = Mailer::forCurrentTenant();
-            $sent   = $mailer->send($user->email, $subject, $html, null, null, null, 'onboarding_completed');
+            $sent = EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'onboarding_completed');
 
             if (!$sent) {
                 Log::warning('SendOnboardingCompletionEmail: email returned false', [

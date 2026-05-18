@@ -8,10 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
@@ -224,7 +224,6 @@ class WebAuthnController extends BaseApiController
 
             if ($user && $user->email) {
                 LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $mailer     = Mailer::forCurrentTenant();
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                     $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -238,7 +237,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
                     }
                 });
@@ -521,7 +520,6 @@ class WebAuthnController extends BaseApiController
 
             if ($user && $user->email) {
                 LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $mailer     = Mailer::forCurrentTenant();
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                     $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -535,7 +533,7 @@ class WebAuthnController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
                     }
                 });
@@ -616,7 +614,6 @@ class WebAuthnController extends BaseApiController
 
                 if ($user && $user->email) {
                     LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                        $mailer     = Mailer::forCurrentTenant();
                         $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                         $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -630,7 +627,7 @@ class WebAuthnController extends BaseApiController
                             ->render();
 
                         $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
-                        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
                             Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
                         }
                     });

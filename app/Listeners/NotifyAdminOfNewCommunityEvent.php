@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\CommunityEventCreated;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -59,15 +59,13 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                 return;
             }
 
-            $mailer = Mailer::forCurrentTenant();
-
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
                     continue;
                 }
 
-                LocaleContext::withLocale($admin, function () use ($admin, $communityEvent, $eventTitle, $eventUrl, $creatorName, $tenantName, $adminEmail, $mailer) {
+                LocaleContext::withLocale($admin, function () use ($admin, $communityEvent, $eventTitle, $eventUrl, $creatorName, $tenantName, $adminEmail) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_event_bell', ['title' => $eventTitle]);
@@ -88,7 +86,7 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_event_cta'), $eventUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_event')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_event')) {
                         Log::warning('NotifyAdminOfNewCommunityEvent: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

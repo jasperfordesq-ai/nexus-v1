@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\JobAlert;
@@ -38,8 +37,7 @@ class JobAlertEmailService
                 $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
                 $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
-                $mailer = Mailer::forCurrentTenant();
-                return $mailer->send($recipient->email, $subject, $bodyHtml, null, null, null, 'job_alert');
+                return EmailDispatchService::sendRaw($recipient->email, $subject, $bodyHtml, null, null, null, 'job_alert');
             });
         } catch (\Throwable $e) {
             Log::warning('JobAlertEmailService::sendImmediateAlert failed', [

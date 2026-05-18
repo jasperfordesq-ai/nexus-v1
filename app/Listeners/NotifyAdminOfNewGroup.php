@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\GroupCreated;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -59,15 +59,13 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                 return;
             }
 
-            $mailer = Mailer::forCurrentTenant();
-
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
                     continue;
                 }
 
-                LocaleContext::withLocale($admin, function () use ($admin, $group, $groupName, $groupUrl, $creatorName, $tenantName, $adminEmail, $mailer) {
+                LocaleContext::withLocale($admin, function () use ($admin, $group, $groupName, $groupUrl, $creatorName, $tenantName, $adminEmail) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_group_bell', ['name' => $groupName]);
@@ -88,7 +86,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_group_cta'), $groupUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_group')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_group')) {
                         Log::warning('NotifyAdminOfNewGroup: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

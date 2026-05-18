@@ -11,6 +11,7 @@ use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -90,8 +91,7 @@ class SendWelcomeNotification implements ShouldQueue
                         ->paragraph(__('emails.welcome.pending_ignore'))
                         ->render();
 
-                    $mailer = \App\Core\Mailer::forCurrentTenant();
-                    if (!$mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation')) {
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation')) {
                         Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
                     }
                 } else {
@@ -113,8 +113,7 @@ class SendWelcomeNotification implements ShouldQueue
                         ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
                         ->render();
 
-                    $mailer = \App\Core\Mailer::forCurrentTenant();
-                    if (!$mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome')) {
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome')) {
                         Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail]);
                     }
                 }

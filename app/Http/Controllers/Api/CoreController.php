@@ -8,8 +8,8 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Services\EmailDispatchService;
 
 /**
  * CoreController -- Contact form, members, listings, groups, notifications.
@@ -67,9 +67,8 @@ class CoreController extends BaseApiController
 
         $sent = false;
         try {
-            $mailer = Mailer::forCurrentTenant();
             $replyTo = "{$name} <{$email}>";
-            $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo, null, 'contact_form');
+            $sent = EmailDispatchService::sendRaw($tenantEmail, $emailSubject, $emailBody, null, $replyTo, null, 'contact_form');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Contact form email error: " . $e->getMessage());
         }

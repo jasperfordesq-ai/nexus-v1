@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
@@ -660,9 +659,8 @@ class EventNotificationService
         if ($frequency === 'instant') {
             // Send immediately
             try {
-                $mailer = Mailer::forCurrentTenant();
                 $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                $sent   = $mailer->send($user->email, $subject, $body, null, null, null, 'event_notification');
+                $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, 'event_notification');
                 if (!$sent) {
                     Log::warning("[EventNotificationService] Instant email send returned false", [
                         'user_id' => $userId,

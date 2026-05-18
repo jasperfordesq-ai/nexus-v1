@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\DB;
 use App\Core\ApiErrorCodes;
 use App\Core\TenantContext;
 use App\Core\RateLimiter;
-use App\Core\Mailer;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\I18n\LocaleContext;
+use App\Services\EmailDispatchService;
 use App\Services\RateLimitService;
 use Illuminate\Support\Facades\Log;
 
@@ -256,8 +256,6 @@ class EmailVerificationController extends BaseApiController
 
         // Send verification email
         try {
-            $mailer = Mailer::forCurrentTenant();
-
             // Get tenant name
             $tenantName = 'Project NEXUS';
             if ($tenantId) {
@@ -276,7 +274,7 @@ class EmailVerificationController extends BaseApiController
 
             // Render in the recipient's preferred_language so the verification
             // email arrives in their locale rather than the request caller's.
-            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($mailer, $user, $tenantName, $verifyUrl) {
+            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($tenantId, $user, $tenantName, $verifyUrl) {
                 $firstName = $user['first_name'] ?? '';
                 $greeting = $firstName !== ''
                     ? __('emails_misc.auth.verify_email_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName])
@@ -290,7 +288,16 @@ class EmailVerificationController extends BaseApiController
                     ->button(__('emails_misc.auth.verify_email_cta'), $verifyUrl)
                     ->render();
 
-                return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html, null, null, null, 'email_verification');
+                return EmailDispatchService::sendRaw(
+                    $user['email'],
+                    __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]),
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'email_verification',
+                    ['tenant_id' => $tenantId]
+                );
             });
         } catch (\Throwable $e) {
             Log::warning('[EmailVerification] Verification email failed for user: ' . $e->getMessage(), ['user_id' => $user['id']]);

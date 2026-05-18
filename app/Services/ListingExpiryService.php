@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplate;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
@@ -98,8 +97,7 @@ class ListingExpiryService
                                 ->button(__('emails_listings.listings.expired.cta'), $listingUrl)
                                 ->render();
 
-                            $mailer = Mailer::forCurrentTenant();
-                            if (!$mailer->send($ownerRow->email, __('emails_listings.listings.expired.subject'), $html, null, null, null, 'listing_expiry')) {
+                            if (!EmailDispatchService::sendRaw($ownerRow->email, __('emails_listings.listings.expired.subject'), $html, null, null, null, 'listing_expiry')) {
                                 Log::warning("[ListingExpiryService] Email send returned false for user={$listing->user_id}, listing={$listing->id}");
                             }
                         }

@@ -14,10 +14,10 @@ use App\Core\Env;
 use App\Core\TenantContext;
 use App\Core\RateLimiter;
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -266,7 +266,6 @@ class PasswordResetController extends BaseApiController
         try {
             TenantContext::setById($tokenTenantId);
             LocaleContext::withLocale($recipientLocale, function () use ($email) {
-                $mailer = Mailer::forCurrentTenant();
                 $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
                 $html = EmailTemplateBuilder::make()
@@ -278,7 +277,7 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
-                if (!$mailer->send($email, $subject, $html, null, null, null, 'security_alert')) {
+                if (!EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'security_alert')) {
                     Log::warning('[PasswordReset] password change email send returned false');
                 }
             });
@@ -370,7 +369,6 @@ class PasswordResetController extends BaseApiController
         try {
             TenantContext::setById($userTenantId);
             $resetEmailSent = (bool) LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl, $tenantName) {
-                $mailer = Mailer::forCurrentTenant();
                 $firstName = $user['first_name'] ?? ($user['name'] ?? null);
                 $greeting = $firstName
                     ? __('emails.password_reset.greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')])
@@ -388,7 +386,7 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.password_reset.subject', ['community' => $tenantName]);
-                return $mailer->send($email, $subject, $html, null, null, null, 'password_reset');
+                return EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'password_reset');
             });
             if ($resetEmailSent) {
                 Log::info('[PasswordReset] reset email dispatched', [

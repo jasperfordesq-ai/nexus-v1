@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\ListingCreated;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,8 +49,6 @@ class NotifyAdminOfNewListing implements ShouldQueue
                 return;
             }
 
-            $mailer = Mailer::forCurrentTenant();
-
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
@@ -58,7 +56,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                 }
 
                 // Each admin's notification renders in THEIR language.
-                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail, $mailer) {
+                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_listing_bell', [
@@ -83,7 +81,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_listing_cta'), $listingUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_listing')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_listing')) {
                         Log::warning('NotifyAdminOfNewListing: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

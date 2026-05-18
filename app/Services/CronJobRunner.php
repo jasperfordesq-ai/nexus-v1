@@ -9,7 +9,6 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Core\Mailer;
 use App\Core\Env;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
@@ -398,11 +397,8 @@ class CronJobRunner
                 ]
             );
 
-            // Create mailer with tenant context for correct SMTP credentials
-            $mailer = Mailer::forCurrentTenant();
-
             // Send Email
-            if ($mailer->send($user['email'], $subject, $body, null, null, null, 'notification_digest')) {
+            if (EmailDispatchService::sendRaw($user['email'], $subject, $body, null, null, null, 'notification_digest', ['tenant_id' => (int) $user['tenant_id']])) {
                 echo " - Email Sent.\n";
 
                 // Mark as Sent
@@ -515,11 +511,8 @@ class CronJobRunner
                             $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
                         }
 
-                        // Create mailer with tenant context for correct SMTP credentials
-                        $mailer = Mailer::forCurrentTenant();
-
                         $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
-                        if ($mailer->send($item['email'], $subject, $body, null, null, null, 'notification_queue')) {
+                        if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
                             DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                             echo "OK.\n";
                         } else {
@@ -1371,11 +1364,8 @@ class CronJobRunner
                     $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
                 }
 
-                // Create mailer with tenant context for correct SMTP credentials
-                $mailer = Mailer::forCurrentTenant();
-
                 $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
-                if ($mailer->send($item['email'], $subject, $body, null, null, null, 'notification_queue')) {
+                if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, 'notification_queue', ['tenant_id' => $itemTenantId])) {
                     DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                     $sent++;
                 } else {

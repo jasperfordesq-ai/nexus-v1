@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
@@ -28,6 +27,7 @@ use App\Services\CaringCommunity\PilotScoreboardService;
 use App\Services\CaringCommunity\SafeguardingService;
 use App\Services\CaringCommunity\VereinMemberImportService;
 use App\Services\CaringCommunityMemberStatementService;
+use App\Services\EmailDispatchService;
 use App\Services\CaringCommunityRolePresetService;
 use App\Services\CaringCommunityWorkflowPolicyService;
 use App\Services\CaringCommunityWorkflowService;
@@ -739,8 +739,7 @@ class AdminCaringCommunityController extends BaseApiController
                         ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
                         ->render();
 
-                    $mailer = Mailer::forCurrentTenant();
-                    if (!$mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
+                    if (!EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
                         Log::warning('[AdminCC] Assisted onboarding welcome email returned false', [
                             'email' => $email,
                         ]);

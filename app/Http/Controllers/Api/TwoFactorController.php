@@ -8,11 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use App\Services\TotpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -155,7 +155,6 @@ class TwoFactorController extends BaseApiController
 
             if ($user && $user->email) {
                 LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $mailer     = Mailer::forCurrentTenant();
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                     $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -169,7 +168,7 @@ class TwoFactorController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
                     }
                 });
@@ -271,7 +270,6 @@ class TwoFactorController extends BaseApiController
 
             if ($user && $user->email) {
                 LocaleContext::withLocale($userLocale, function () use ($user, $userId) {
-                    $mailer     = Mailer::forCurrentTenant();
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                     $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -285,7 +283,7 @@ class TwoFactorController extends BaseApiController
                         ->render();
 
                     $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
-                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert')) {
                         Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
                     }
                 });

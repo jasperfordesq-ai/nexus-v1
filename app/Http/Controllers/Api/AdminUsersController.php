@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Models\ActivityLog;
 use App\Services\AuditLogService;
+use App\Services\EmailDispatchService;
 use App\Services\Enterprise\GdprService;
 use App\Services\GamificationService;
 use App\Services\TenantSettingsService;
@@ -518,8 +519,7 @@ class AdminUsersController extends BaseApiController
                         ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
                         ->render();
 
-                    $mailer = \App\Core\Mailer::forCurrentTenant();
-                    if (!$mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
+                    if (!EmailDispatchService::sendRaw($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html, null, null, null, 'admin_welcome')) {
                         Log::warning('[AdminUsers] Welcome email returned false for admin-created user', [
                             'email' => $email,
                         ]);
@@ -641,14 +641,15 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.suspension_help'))
                     ->render();
 
-                if (!(\App\Core\Mailer::forCurrentTenant())->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
                     $html,
                     null,
                     null,
                     null,
-                    'admin_user_status'
+                    'admin_user_status',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     Log::warning("[AdminUsers] Suspension email send returned false for user #{$id}");
                 }
@@ -701,14 +702,15 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.ban_help'))
                     ->render();
 
-                if (!(\App\Core\Mailer::forCurrentTenant())->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.ban_subject', ['community' => $tenantName]),
                     $html,
                     null,
                     null,
                     null,
-                    'admin_user_status'
+                    'admin_user_status',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     Log::warning("[AdminUsers] Ban email send returned false for user #{$id}");
                 }
@@ -782,14 +784,15 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.deletion_help'))
                     ->render();
 
-                if (!(\App\Core\Mailer::forCurrentTenant())->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.deletion_subject', ['community' => $tenantName]),
                     $html,
                     null,
                     null,
                     null,
-                    'admin_user_status'
+                    'admin_user_status',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     Log::warning("[AdminUsers] Deletion email send returned false for user #{$id}");
                 }
@@ -870,14 +873,15 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.reset_2fa_cta'), $loginUrl)
                     ->render();
 
-                if (!(\App\Core\Mailer::forCurrentTenant())->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
                     $html,
                     null,
                     null,
                     null,
-                    'security_alert'
+                    'security_alert',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     Log::warning("[AdminUsers] 2FA reset email send returned false for user #{$id}");
                 }
@@ -1080,14 +1084,15 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.set_password_cta'), $loginUrl)
                     ->render();
 
-                if (!(\App\Core\Mailer::forCurrentTenant())->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.set_password_subject', ['community' => $tenantName]),
                     $html,
                     null,
                     null,
                     null,
-                    'security_alert'
+                    'security_alert',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     Log::warning("[AdminUsers] Password-changed email returned false for user #{$id}");
                 }
@@ -1362,15 +1367,15 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
                     ->render();
 
-                $mailer = \App\Core\Mailer::forCurrentTenant();
-                if (!$mailer->send(
+                if (!EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
                     $html,
                     null,
                     null,
                     null,
-                    'password_reset'
+                    'password_reset',
+                    ['tenant_id' => $tenant['tenant_id']]
                 )) {
                     throw new \RuntimeException('Password reset email send returned false');
                 }
@@ -1435,8 +1440,7 @@ class AdminUsersController extends BaseApiController
                         ->render();
                 }
 
-                $mailer = \App\Core\Mailer::forCurrentTenant();
-                if (!$mailer->send($user['email'], $subject, $html, null, null, null, 'welcome')) {
+                if (!EmailDispatchService::sendRaw($user['email'], $subject, $html, null, null, null, 'welcome', ['tenant_id' => $userTenantId])) {
                     throw new \RuntimeException('Welcome email send returned false');
                 }
 
@@ -1845,7 +1849,7 @@ class AdminUsersController extends BaseApiController
                     ? __('emails_misc.admin_actions.approval_subject_credits', ['community' => $tenantNameSafe, 'credits' => $creditsAwarded])
                     : __('emails_misc.admin_actions.approval_subject_approved', ['community' => $tenantNameSafe]);
 
-                $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html, null, null, null, 'approval');
+                $result = EmailDispatchService::sendRaw($user['email'], $subject, $html, null, null, null, 'approval', ['tenant_id' => $tenant['tenant_id']]);
 
                 if ($result) {
                     \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
@@ -1922,14 +1926,15 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.reactivation_cta'), $loginUrl)
                     ->render();
 
-                $result = (\App\Core\Mailer::forCurrentTenant())->send(
+                $result = EmailDispatchService::sendRaw(
                     $user['email'],
                     __('emails_misc.admin_actions.reactivation_subject', ['community' => $tenantNameSafe]),
                     $html,
                     null,
                     null,
                     null,
-                    'admin_user_status'
+                    'admin_user_status',
+                    ['tenant_id' => $tenant['tenant_id']]
                 );
 
                 if ($result) {

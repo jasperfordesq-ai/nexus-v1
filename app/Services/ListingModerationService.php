@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplate;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
@@ -214,8 +213,7 @@ class ListingModerationService
                         ->button(__('emails_listings.listings.rejected.cta'), $listingUrl)
                         ->render();
 
-                    $mailer = Mailer::forCurrentTenant();
-                    if (!$mailer->send($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation')) {
+                    if (!EmailDispatchService::sendRaw($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation')) {
                         Log::warning("[ListingModerationService] reject email send returned false for user={$listing->user_id}, listing={$listingId}");
                     }
                 });

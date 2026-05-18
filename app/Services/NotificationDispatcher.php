@@ -600,7 +600,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $senderName, $amount, $description) {
+            LocaleContext::withLocale($user, function () use ($user, $recipientUserId, $senderName, $amount, $description) {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl = TenantContext::getFrontendUrl();
@@ -621,7 +621,7 @@ class NotificationDispatcher
                 $mailer = Mailer::forCurrentTenant();
                 if (!$mailer->send($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
                     Log::warning('NotificationDispatcher::sendCreditEmail mailer returned false', [
-                        'user_id' => $userId,
+                        'user_id' => $recipientUserId,
                     ]);
                 }
             });
@@ -663,7 +663,7 @@ class NotificationDispatcher
             }
 
             // The "sender" is the recipient of this confirmation email — render in their locale.
-            LocaleContext::withLocale($user, function () use ($user, $recipientName, $amount, $description) {
+            LocaleContext::withLocale($user, function () use ($user, $senderUserId, $recipientName, $amount, $description) {
                 $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl         = TenantContext::getFrontendUrl();
@@ -697,7 +697,7 @@ class NotificationDispatcher
 
                 if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'transaction')) {
                     Log::warning('NotificationDispatcher::sendCreditSentEmail mailer returned false', [
-                        'user_id' => $userId,
+                        'user_id' => $senderUserId,
                     ]);
                 }
             });

@@ -7,12 +7,12 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\SafeguardingFlaggedEvent;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -168,8 +168,7 @@ class NotifySafeguardingStaff implements ShouldQueue
             ->render();
 
         $subject = __('emails_misc.safeguarding.onboarding_flag_subject', ['name' => $memberName]);
-        $mailer  = Mailer::forCurrentTenant();
-        $sent    = $mailer->send($staff->email, $subject, $html, null, null, null, 'safeguarding');
+        $sent    = EmailDispatchService::sendRaw($staff->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => $tenantId]);
 
         if (!$sent) {
             Log::critical('NotifySafeguardingStaff: email send returned false — safeguarding notification not delivered', [

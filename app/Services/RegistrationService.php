@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplate;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Core\Validator as NexusValidator;
 use App\Events\UserRegistered;
@@ -584,8 +583,7 @@ class RegistrationService
                     ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
                     ->render();
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification')) {
+                if (!EmailDispatchService::sendRaw($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html, null, null, null, 'email_verification')) {
                     Log::warning('RegistrationService: verification email send returned false', [
                         'user_id' => $user->id ?? null,
                         'tenant_id' => TenantContext::getId(),

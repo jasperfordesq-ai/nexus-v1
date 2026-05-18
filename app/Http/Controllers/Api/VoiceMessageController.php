@@ -10,10 +10,10 @@ use Illuminate\Http\JsonResponse;
 use App\Core\AudioUploader;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Message;
+use App\Services\EmailDispatchService;
 use App\Services\TranscriptionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -144,8 +144,7 @@ class VoiceMessageController extends BaseApiController
                         ->render();
 
                     try {
-                        $mailer = Mailer::forCurrentTenant();
-                        if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml, null, null, null, 'message')) {
+                        if (!EmailDispatchService::sendRaw($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml, null, null, null, 'message')) {
                             Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
                         }
                     } catch (\Throwable $e) {

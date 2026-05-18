@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\MemberProfileUpdated;
 use App\I18n\LocaleContext;
@@ -459,7 +458,6 @@ class UserService
                 }
 
                 try {
-                    $mailer = Mailer::forCurrentTenant();
                     $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
                     $html = EmailTemplateBuilder::make()
@@ -471,7 +469,7 @@ class UserService
                         ->render();
 
                     $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
-                    if (!$mailer->send($oldEmail, $subject, $html, null, null, null, 'security_alert')) {
+                    if (!EmailDispatchService::sendRaw($oldEmail, $subject, $html, null, null, null, 'security_alert')) {
                         Log::warning('Email change notification send returned false', ['user_id' => $userId]);
                     }
                 } catch (\Throwable $e) {

@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\JobVacancy;
@@ -141,8 +140,7 @@ class JobExpiryNotificationService
         HTML;
 
         $subject = __('notifications.job_expiry_email_subject', ['title' => $title]);
-        $mailer = Mailer::forCurrentTenant();
-        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'job_expiry')) {
+        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'job_expiry')) {
             Log::warning('JobExpiryNotificationService: failed to send expiry email', ['user_id' => $user->id, 'vacancy_id' => $vacancy->id]);
             return false;
         }

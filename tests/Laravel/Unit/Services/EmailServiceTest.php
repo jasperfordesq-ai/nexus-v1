@@ -7,10 +7,11 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Services\EmailDispatchService;
 use App\Services\EmailService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 
 class EmailServiceTest extends TestCase
 {
@@ -28,7 +29,14 @@ class EmailServiceTest extends TestCase
 
     public function test_send_returns_true_on_success(): void
     {
-        Mail::shouldReceive('raw')->once();
+        $dispatcher = Mockery::mock(EmailDispatchService::class);
+        $dispatcher->shouldReceive('send')
+            ->once()
+            ->with('test@example.com', 'Hello', 'Body text', Mockery::on(
+                fn (array $options): bool => ($options['source'] ?? null) === 'EmailService'
+            ))
+            ->andReturn(true);
+        $this->app->instance(EmailDispatchService::class, $dispatcher);
 
         $result = $this->service->send('test@example.com', 'Hello', 'Body text');
         $this->assertTrue($result);
@@ -36,7 +44,11 @@ class EmailServiceTest extends TestCase
 
     public function test_send_returns_false_on_mail_failure(): void
     {
-        Mail::shouldReceive('raw')->andThrow(new \RuntimeException('SMTP error'));
+        $dispatcher = Mockery::mock(EmailDispatchService::class);
+        $dispatcher->shouldReceive('send')
+            ->once()
+            ->andThrow(new \RuntimeException('SMTP error'));
+        $this->app->instance(EmailDispatchService::class, $dispatcher);
         Log::shouldReceive('error')->once();
 
         $result = $this->service->send('test@example.com', 'Hello', 'Body text');

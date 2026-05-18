@@ -323,7 +323,7 @@ class EmailTriggerAuditService
         return [
             $this->issue(
                 'direct_email_send_paths_remaining',
-                'info',
+                'warning',
                 $tenantId,
                 'architecture',
                 'direct_send_surface',
@@ -361,8 +361,9 @@ class EmailTriggerAuditService
         ]));
 
         $patterns = [
-            'mailer_factory_send' => '/Mailer::forCurrentTenant\s*\(\s*\)\s*->\s*send\s*\(/',
-            'mailer_variable_send' => '/\$[A-Za-z_][A-Za-z0-9_]*mailer[A-Za-z0-9_]*\s*->\s*send\s*\(/i',
+            'mailer_factory_send' => '/(?:\\\\?App\\\\Core\\\\)?Mailer::forCurrentTenant\s*\(\s*\)\s*\)?\s*->\s*send\s*\(/',
+            'mailer_new_send' => '/new\s+(?:\\\\?App\\\\Core\\\\)?Mailer\s*\([^;]*\)\s*\)?\s*->\s*send\s*\(/',
+            'mailer_variable_send' => '/(?:\$mailer|\$[A-Za-z_][A-Za-z0-9_]*mailer[A-Za-z0-9_]*)\s*->\s*send\s*\(/i',
             'email_service_app_send' => '/app\s*\(\s*EmailService::class\s*\)\s*->\s*send\s*\(/',
             'email_service_variable_send' => '/\$[A-Za-z_][A-Za-z0-9_]*(?:emailService|email)[A-Za-z0-9_]*\s*->\s*send\s*\(/i',
         ];

@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\VolunteerOpportunityCreated;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -60,15 +60,13 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                 return;
             }
 
-            $mailer = Mailer::forCurrentTenant();
-
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
                     continue;
                 }
 
-                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail, $mailer) {
+                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $oppPath, $posterName, $tenantName, $adminEmail) {
                     $adminName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
 
                     $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
@@ -89,7 +87,7 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                         ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
                         ->render();
 
-                    if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity')) {
+                    if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_volunteer_opportunity')) {
                         Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                     }
                 });

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
@@ -159,8 +158,7 @@ class GuardianConsentService
                     ->paragraph(__('emails_misc.guardian.consent_ignore'))
                     ->render();
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html, null, null, null, 'guardian_consent')) {
+                if (!EmailDispatchService::sendRaw($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html, null, null, null, 'guardian_consent')) {
                     Log::warning('GuardianConsentService consent email send returned false');
                 }
             });

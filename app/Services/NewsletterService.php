@@ -241,8 +241,6 @@ class NewsletterService
             ->where('id', $tenantId)
             ->value('name') ?? 'Community';
 
-        $mailer = new \App\Core\Mailer($tenantId);
-
         $sent = 0;
         $failed = 0;
         $suppressedEmails = self::getSuppressedEmails($tenantId);
@@ -336,7 +334,7 @@ class NewsletterService
                         ? $apiUrl . '/v2/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken)
                         : null;
 
-                    $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl, 'newsletter');
+                    $success = EmailDispatchService::sendRaw($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl, 'newsletter', ['tenant_id' => $tenantId]);
 
                     if ($success) {
                         DB::table('newsletter_queue')

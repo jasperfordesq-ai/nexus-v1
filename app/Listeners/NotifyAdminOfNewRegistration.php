@@ -7,11 +7,11 @@
 namespace App\Listeners;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,8 +49,6 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 return;
             }
 
-            $mailer = Mailer::forCurrentTenant();
-
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
@@ -58,7 +56,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 }
 
                 try {
-                    LocaleContext::withLocale($admin, function () use ($admin, $user, $profileUrl, $tenantName, $adminEmail, $mailer) {
+                    LocaleContext::withLocale($admin, function () use ($admin, $user, $profileUrl, $tenantName, $adminEmail) {
                         $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                         $bellContent = __('emails_misc.admin_notify.new_user_bell');
@@ -78,7 +76,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                             ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
                             ->render();
 
-                        if (!$mailer->send($adminEmail, $subject, $html, null, null, null, 'admin_new_registration')) {
+                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_registration')) {
                             Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                         }
                     });

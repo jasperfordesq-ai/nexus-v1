@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\Cache;
@@ -172,8 +171,7 @@ class OnboardingNurtureService
             ->button($cta, $ctaUrl)
             ->render();
 
-        $mailer = Mailer::forCurrentTenant();
-        if (!$mailer->send($email, $subject, $html, null, null, null, 'onboarding_nurture')) {
+        if (!EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'onboarding_nurture', ['tenant_id' => $tenantId])) {
             return false;
         }
 

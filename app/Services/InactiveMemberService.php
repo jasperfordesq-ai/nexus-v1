@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
@@ -224,12 +223,10 @@ class InactiveMemberService
             $communityName  = TenantContext::getSetting('site_name', 'Project NEXUS');
             $safeCommunity  = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
             $feedUrl        = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/feed';
-            $mailer         = Mailer::forCurrentTenant();
-
             foreach ($users as $user) {
                 try {
                     // Re-engagement emails are cron-dispatched → render in recipient's language.
-                    LocaleContext::withLocale($user, function () use ($user, $safeCommunity, $communityName, $feedUrl, $mailer) {
+                    LocaleContext::withLocale($user, function () use ($user, $tenantId, $safeCommunity, $communityName, $feedUrl) {
                         $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
                         $html = EmailTemplateBuilder::make()
@@ -241,7 +238,7 @@ class InactiveMemberService
                             ->render();
 
                         $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
-                        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'inactive_member')) {
+                        if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'inactive_member', ['tenant_id' => $tenantId])) {
                             Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
                         }
                     });

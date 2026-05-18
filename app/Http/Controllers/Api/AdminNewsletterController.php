@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\NewsletterService;
+use App\Services\EmailDispatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -2298,7 +2299,7 @@ class AdminNewsletterController extends BaseApiController
                 __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject')),
             ]);
 
-            $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html, null, null, null, 'newsletter_test');
+            $sent = EmailDispatchService::sendRaw($admin->email, $subject, $html, null, null, null, 'newsletter_test', ['tenant_id' => $tenantId]);
 
             if ($sent) {
                 return $this->respondWithData([

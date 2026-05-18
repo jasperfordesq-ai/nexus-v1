@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplate;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Listing;
@@ -241,8 +240,7 @@ class ListingExpiryReminderService
                     ->button(__('emails_listings.listings.expiry_reminder.cta'), $listingUrl)
                     ->render();
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry')) {
+                if (!EmailDispatchService::sendRaw($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html, null, null, null, 'listing_expiry')) {
                     return false;
                 }
             }
@@ -291,8 +289,7 @@ class ListingExpiryReminderService
                     ->button(__('emails_listings.listings.expiry_reminder.expired_cta'), $listingUrl)
                     ->render();
 
-                $mailer = Mailer::forCurrentTenant();
-                if (!$mailer->send(
+                if (!EmailDispatchService::sendRaw(
                     $email,
                     __('emails_listings.listings.expiry_reminder.expired_subject', ['title' => $title]),
                     $html,

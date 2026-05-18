@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
-use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\BrokerMessageCopy;
@@ -467,9 +466,8 @@ class BrokerMessageVisibilityService
                 ->render();
 
             $subject = __('emails_misc.safeguarding.broker_message_flagged_subject', ['sender' => $senderDisplayName]);
-            $mailer  = Mailer::forCurrentTenant();
 
-            if (!$mailer->send($broker->email, $subject, $html, null, null, null, 'safeguarding')) {
+            if (!EmailDispatchService::sendRaw($broker->email, $subject, $html, null, null, null, 'safeguarding')) {
                 Log::warning('[BrokerMessageVisibilityService] Broker review email failed to send', [
                     'broker_id'    => $broker->id,
                     'broker_email' => $broker->email,

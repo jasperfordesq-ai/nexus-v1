@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Services\EmailDispatchService;
 use App\Models\EmailSettings;
 use App\Services\EmailMonitorService;
 use App\Services\RedisCache;
@@ -216,7 +217,7 @@ class AdminEmailController extends BaseApiController
         $mailer = Mailer::forCurrentTenant();
         $provider = $mailer->getProviderType();
 
-        $result = $mailer->send(
+        $result = EmailDispatchService::sendRaw(
             $to,
             __('api_controllers_2.email_test.subject'),
             '<h2>' . __('api_controllers_2.email_test.heading') . '</h2>' .
@@ -262,7 +263,7 @@ class AdminEmailController extends BaseApiController
         $mailer = Mailer::forCurrentTenant();
         $provider = $mailer->getProviderType();
 
-        $result = $mailer->send(
+        $result = EmailDispatchService::sendRaw(
             $to,
             __('api_controllers_2.email_test.provider_subject'),
             '<h2>' . __('api_controllers_2.email_test.provider_heading') . '</h2>' .
