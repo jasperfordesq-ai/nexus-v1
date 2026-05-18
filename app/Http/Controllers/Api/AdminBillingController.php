@@ -236,8 +236,9 @@ class AdminBillingController extends BaseApiController
         // Email the platform owner. Recipient is the platform owner address —
         // wrap in LocaleContext('en') so the strings always render in English
         // regardless of the API caller's locale.
+        $emailSent = false;
         try {
-            LocaleContext::withLocale('en', function () use ($tenant, $tenantId, $user, $message) {
+            $emailSent = (bool) LocaleContext::withLocale('en', function () use ($tenant, $tenantId, $user, $message): bool {
                 $body = __('emails.billing_upgrade_request.body', [
                     'tenant'    => $tenant,
                     'tenant_id' => $tenantId,
@@ -250,7 +251,7 @@ class AdminBillingController extends BaseApiController
                 // of Laravel's Mail facade — the default Mail mailer is SMTP
                 // and MAIL_USERNAME/PASSWORD are intentionally not set in prod,
                 // so Mail::raw silently failed for this notification.
-                if (!\App\Services\EmailDispatchService::sendRaw(
+                $sent = \App\Services\EmailDispatchService::sendRaw(
                     'jasper@hour-timebank.ie',
                     $subject,
                     nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')),
@@ -259,12 +260,25 @@ class AdminBillingController extends BaseApiController
                     null,
                     'billing',
                     ['tenant_id' => $tenantId]
-                )) {
+                );
+
+                if (!$sent) {
                     Log::warning('BillingController: upgrade request email send returned false', ['tenant_id' => $tenantId]);
                 }
+
+                return $sent;
             });
         } catch (\Throwable $e) {
             Log::warning('BillingController: upgrade request email failed', ['error' => $e->getMessage()]);
+        }
+
+        if (!$emailSent) {
+            return $this->respondWithError(
+                'EMAIL_SEND_FAILED',
+                __('api.billing_upgrade_email_send_failed'),
+                null,
+                500
+            );
         }
 
         return $this->respondWithData(['sent' => true]);

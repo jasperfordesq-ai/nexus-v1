@@ -199,4 +199,33 @@ class EmailMailerRoutingTest extends TestCase
                 ))
         );
     }
+
+    public function test_billing_upgrade_request_does_not_report_sent_when_dispatch_fails(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/AdminBillingController.php'));
+
+        $this->assertStringContainsString(
+            '$emailSent = false;',
+            $source,
+            'Billing upgrade requests must track the dispatch result before reporting sent=true.'
+        );
+
+        $this->assertStringContainsString(
+            'return $sent;',
+            $source,
+            'Billing upgrade requests must return the EmailDispatchService result from the locale callback.'
+        );
+
+        $this->assertStringContainsString(
+            'EMAIL_SEND_FAILED',
+            $source,
+            'Billing upgrade requests must return an API error if the owner notification fails.'
+        );
+
+        $this->assertStringContainsString(
+            "__('api.billing_upgrade_email_send_failed')",
+            $source,
+            'The billing upgrade email failure must use a translated API message.'
+        );
+    }
 }

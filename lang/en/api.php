@@ -468,6 +468,7 @@ return [
     'no_valid_settings'                    => 'No valid settings provided',
     'failed_send_test_email'               => 'Failed to send test email. Check server logs.',
     'failed_send_test_via'                 => 'Failed to send test email via :provider. Check server logs.',
+    'billing_upgrade_email_send_failed'    => 'The upgrade request was recorded, but the notification email could not be sent. Please try again or contact platform support.',
 
     // ============================================
     // ADMIN — ONBOARDING
