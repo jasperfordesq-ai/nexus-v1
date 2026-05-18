@@ -132,13 +132,25 @@ class GenerateMonthlyReports extends Command
                 . " is ready.</p>"
                 . '<p><a href="' . htmlspecialchars($fileUrl, ENT_QUOTES, 'UTF-8') . '">Download report</a></p>'
                 . "<p>All figures are bucketed per the Project NEXUS privacy guarantees.</p>";
-            \App\Core\Mailer::forCurrentTenant()->send(
+            if (!\App\Core\Mailer::forCurrentTenant()->send(
                 $email,
                 "Regional analytics report — {$periodLabel}",
-                $body
-            );
+                $body,
+                null,
+                null,
+                null,
+                'regional_analytics'
+            )) {
+                \Illuminate\Support\Facades\Log::warning('Regional analytics report email send returned false', [
+                    'tenant_id' => $sub->tenant_id ?? null,
+                ]);
+            }
         } catch (\Throwable $e) {
             // Mail errors should not fail the run.
+            \Illuminate\Support\Facades\Log::warning('Regional analytics report email exception', [
+                'tenant_id' => $sub->tenant_id ?? null,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

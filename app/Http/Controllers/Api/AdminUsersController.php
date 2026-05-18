@@ -637,11 +637,17 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.suspension_help'))
                     ->render();
 
-                (\App\Core\Mailer::forCurrentTenant())->send(
+                if (!(\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'admin_user_status'
+                )) {
+                    Log::warning("[AdminUsers] Suspension email send returned false for user #{$id}");
+                }
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send suspension email to user #{$id}: " . $e->getMessage());
@@ -691,11 +697,17 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.ban_help'))
                     ->render();
 
-                (\App\Core\Mailer::forCurrentTenant())->send(
+                if (!(\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.ban_subject', ['community' => $tenantName]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'admin_user_status'
+                )) {
+                    Log::warning("[AdminUsers] Ban email send returned false for user #{$id}");
+                }
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send ban email to user #{$id}: " . $e->getMessage());
@@ -766,11 +778,17 @@ class AdminUsersController extends BaseApiController
                     ->paragraph(__('emails_misc.admin_actions.deletion_help'))
                     ->render();
 
-                (\App\Core\Mailer::forCurrentTenant())->send(
+                if (!(\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.deletion_subject', ['community' => $tenantName]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'admin_user_status'
+                )) {
+                    Log::warning("[AdminUsers] Deletion email send returned false for user #{$id}");
+                }
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send deletion email to user #{$id}: " . $e->getMessage());
@@ -848,7 +866,7 @@ class AdminUsersController extends BaseApiController
                     ->button(__('emails_misc.admin_actions.reset_2fa_cta'), $loginUrl)
                     ->render();
 
-                (\App\Core\Mailer::forCurrentTenant())->send(
+                if (!(\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
                     $html,
@@ -856,7 +874,9 @@ class AdminUsersController extends BaseApiController
                     null,
                     null,
                     'security_alert'
-                );
+                )) {
+                    Log::warning("[AdminUsers] 2FA reset email send returned false for user #{$id}");
+                }
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send 2FA reset email to user #{$id}: " . $e->getMessage());
@@ -1333,7 +1353,7 @@ class AdminUsersController extends BaseApiController
                     ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send(
+                if (!$mailer->send(
                     $user['email'],
                     __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
                     $html,
@@ -1341,7 +1361,9 @@ class AdminUsersController extends BaseApiController
                     null,
                     null,
                     'password_reset'
-                );
+                )) {
+                    throw new \RuntimeException('Password reset email send returned false');
+                }
 
                 ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
             });
@@ -1404,7 +1426,9 @@ class AdminUsersController extends BaseApiController
                 }
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($user['email'], $subject, $html, null, null, null, 'welcome');
+                if (!$mailer->send($user['email'], $subject, $html, null, null, null, 'welcome')) {
+                    throw new \RuntimeException('Welcome email send returned false');
+                }
 
                 ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
             });
@@ -1891,7 +1915,11 @@ class AdminUsersController extends BaseApiController
                 $result = (\App\Core\Mailer::forCurrentTenant())->send(
                     $user['email'],
                     __('emails_misc.admin_actions.reactivation_subject', ['community' => $tenantNameSafe]),
-                    $html
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'admin_user_status'
                 );
 
                 if ($result) {

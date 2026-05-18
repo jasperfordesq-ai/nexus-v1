@@ -330,7 +330,7 @@ class VolunteerExpenseService
                                 $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
                             }
                             $renderedHtml = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
-                            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $renderedHtml)) {
+                            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $renderedHtml, null, null, null, 'volunteer_expense')) {
                                 Log::warning('[VolunteerExpenseService] reviewExpense email failed', ['user_id' => $expense->user_id]);
                             }
                         });
@@ -391,7 +391,7 @@ class VolunteerExpenseService
 
                             $html = $builder->button(__('emails_misc.expense.paid_cta'), $fullUrl)->render();
 
-                            if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.expense.paid_subject', $params), $html)) {
+                            if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.expense.paid_subject', $params), $html, null, null, null, 'volunteer_expense')) {
                                 Log::warning('[VolunteerExpenseService] markPaid email failed', ['user_id' => $expense->user_id]);
                             }
                         });

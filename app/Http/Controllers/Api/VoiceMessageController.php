@@ -145,7 +145,7 @@ class VoiceMessageController extends BaseApiController
 
                     try {
                         $mailer = Mailer::forCurrentTenant();
-                        if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml)) {
+                        if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml, null, null, null, 'message')) {
                             Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
                         }
                     } catch (\Throwable $e) {

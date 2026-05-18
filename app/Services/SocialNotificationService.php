@@ -416,7 +416,13 @@ class SocialNotificationService
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
+            if (!$mailer->send($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+                Log::warning('SocialNotificationService: like email send returned false', [
+                    'owner_id' => $owner->id ?? null,
+                    'content_type' => $contentType,
+                    'content_id' => $contentId,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning("sendLikeEmail error: " . $e->getMessage());
         }
@@ -448,7 +454,13 @@ class SocialNotificationService
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
+            if (!$mailer->send($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+                Log::warning('SocialNotificationService: comment email send returned false', [
+                    'owner_id' => $owner->id ?? null,
+                    'content_type' => $contentType,
+                    'content_id' => $contentId,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning("sendCommentEmail error: " . $e->getMessage());
         }
@@ -481,7 +493,12 @@ class SocialNotificationService
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $subject, $html);
+            if (!$mailer->send($owner->email, $subject, $html, null, null, null, 'social_notification')) {
+                Log::warning('SocialNotificationService: comment reply email send returned false', [
+                    'owner_id' => $owner->id ?? null,
+                    'content_type' => $contentType,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning("sendCommentReplyEmail error: " . $e->getMessage());
         }
@@ -513,7 +530,13 @@ class SocialNotificationService
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
+            if (!$mailer->send($owner->email, $title . ' — ' . $tenantName, $html, null, null, null, 'social_notification')) {
+                Log::warning('SocialNotificationService: share email send returned false', [
+                    'owner_id' => $owner->id ?? null,
+                    'content_type' => $contentType,
+                    'content_id' => $contentId,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning("sendShareEmail error: " . $e->getMessage());
         }

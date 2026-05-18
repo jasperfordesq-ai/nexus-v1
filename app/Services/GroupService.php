@@ -382,11 +382,17 @@ class GroupService
                         ->button(__('emails_created.group.cta'), $groupUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $creator->email,
                         __('emails_created.group.subject', ['name' => $groupName, 'community' => $tenantName]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'group'
+                    )) {
+                        Log::warning('[GroupService] creation email send returned false', ['group_id' => $group->id]);
+                    }
                 });
             }
         } catch (\Throwable $e) {
@@ -927,11 +933,17 @@ class GroupService
                             ->paragraph(__('emails_commerce.group_promoted.responsibilities', ['role' => $roleLabel]))
                             ->button(__('emails_commerce.group_promoted.cta'), $groupUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $member->email,
                             __('emails_commerce.group_promoted.subject', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'group'
+                        )) {
+                            Log::warning('[GroupService] group_promoted email send returned false', ['group_id' => $groupId]);
+                        }
                     });
                 }
             } catch (\Throwable $e) {
@@ -1021,11 +1033,17 @@ class GroupService
                             ->paragraph(__('emails_commerce.group_removed.suggestion'))
                             ->button(__('emails_commerce.group_removed.cta'), $browseUrl)
                             ->render();
-                        Mailer::forCurrentTenant()->send(
+                        if (!Mailer::forCurrentTenant()->send(
                             $member->email,
                             __('emails_commerce.group_removed.subject', ['group_name' => $groupName, 'community' => $community]),
-                            $html
-                        );
+                            $html,
+                            null,
+                            null,
+                            null,
+                            'group'
+                        )) {
+                            Log::warning('[GroupService] group_removed email send returned false', ['group_id' => $group->id]);
+                        }
                     } catch (\Throwable $e) {
                         Log::warning('[GroupService] group_removed email failed: ' . $e->getMessage());
                     }

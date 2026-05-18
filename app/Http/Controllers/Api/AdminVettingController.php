@@ -608,7 +608,12 @@ class AdminVettingController extends BaseApiController
 </div>
 HTML;
                     $mailer = Mailer::forCurrentTenant();
-                    $mailer->send($user->email, $subject, $html);
+                    if (!$mailer->send($user->email, $subject, $html, null, null, null, 'vetting')) {
+                        Log::warning('AdminVettingController::sendVettingNotification mailer returned false', [
+                            'user_id' => $userId,
+                            'status' => $status,
+                        ]);
+                    }
                 }
             });
         } catch (\Throwable $e) {

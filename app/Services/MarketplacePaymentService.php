@@ -583,7 +583,7 @@ class MarketplacePaymentService
                         ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+                    if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_payment')) {
                         Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
                     }
                 });

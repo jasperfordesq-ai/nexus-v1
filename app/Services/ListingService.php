@@ -1121,11 +1121,17 @@ class ListingService
                         ->button(__('emails_created.listing.cta'), $listingUrl)
                         ->render();
 
-                    Mailer::forCurrentTenant()->send(
+                    if (!Mailer::forCurrentTenant()->send(
                         $creator->email,
                         __('emails_created.listing.subject', ['title' => $listingTitle, 'community' => $tenantName]),
-                        $html
-                    );
+                        $html,
+                        null,
+                        null,
+                        null,
+                        'listing'
+                    )) {
+                        Log::warning('[ListingService] creation email send returned false', ['listing_id' => $listing->id]);
+                    }
                 });
             }
         } catch (\Throwable $e) {
@@ -1227,11 +1233,17 @@ class ListingService
                                 ->button(__('emails_created.listing_updated.cta'), $listingUrl)
                                 ->render();
 
-                            Mailer::forCurrentTenant()->send(
+                            if (!Mailer::forCurrentTenant()->send(
                                 $savedUser->email,
                                 __('emails_created.listing_updated.subject', ['community' => $tenantName]),
-                                $html
-                            );
+                                $html,
+                                null,
+                                null,
+                                null,
+                                'listing_update'
+                            )) {
+                                Log::warning('[ListingService] listing updated email send returned false', ['listing_id' => $id]);
+                            }
                         });
                     } catch (\Throwable $e) {
                         Log::warning('[ListingService] listing updated email failed for user: ' . $e->getMessage());

@@ -278,7 +278,9 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
-                $mailer->send($email, $subject, $html, null, null, null, 'security_alert');
+                if (!$mailer->send($email, $subject, $html, null, null, null, 'security_alert')) {
+                    Log::warning('[PasswordReset] password change email send returned false');
+                }
             });
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Failed to send password change email: ' . $e->getMessage());
@@ -367,7 +369,7 @@ class PasswordResetController extends BaseApiController
         // Send reset email under the user's preferred locale
         try {
             TenantContext::setById($userTenantId);
-            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl, $tenantName) {
+            $resetEmailSent = (bool) LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl, $tenantName) {
                 $mailer = Mailer::forCurrentTenant();
                 $firstName = $user['first_name'] ?? ($user['name'] ?? null);
                 $greeting = $firstName
@@ -386,13 +388,21 @@ class PasswordResetController extends BaseApiController
                     ->render();
 
                 $subject = __('emails.password_reset.subject', ['community' => $tenantName]);
-                $mailer->send($email, $subject, $html, null, null, null, 'password_reset');
+                return $mailer->send($email, $subject, $html, null, null, null, 'password_reset');
             });
-            Log::info('[PasswordReset] reset email dispatched', [
-                'email_masked' => $masked,
-                'user_id' => $user['id'] ?? null,
-                'tenant_id' => $userTenantId,
-            ]);
+            if ($resetEmailSent) {
+                Log::info('[PasswordReset] reset email dispatched', [
+                    'email_masked' => $masked,
+                    'user_id' => $user['id'] ?? null,
+                    'tenant_id' => $userTenantId,
+                ]);
+            } else {
+                Log::warning('[PasswordReset] reset email send returned false', [
+                    'email_masked' => $masked,
+                    'user_id' => $user['id'] ?? null,
+                    'tenant_id' => $userTenantId,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Password reset email failed for ' . $masked . ': ' . $e->getMessage(), [
                 'user_id' => $user['id'] ?? null,

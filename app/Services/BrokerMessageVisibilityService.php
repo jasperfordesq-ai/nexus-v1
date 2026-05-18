@@ -469,7 +469,7 @@ class BrokerMessageVisibilityService
             $subject = __('emails_misc.safeguarding.broker_message_flagged_subject', ['sender' => $senderDisplayName]);
             $mailer  = Mailer::forCurrentTenant();
 
-            if (!$mailer->send($broker->email, $subject, $html)) {
+            if (!$mailer->send($broker->email, $subject, $html, null, null, null, 'safeguarding')) {
                 Log::warning('[BrokerMessageVisibilityService] Broker review email failed to send', [
                     'broker_id'    => $broker->id,
                     'broker_email' => $broker->email,

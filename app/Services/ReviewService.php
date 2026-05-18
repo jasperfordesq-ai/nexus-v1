@@ -274,7 +274,7 @@ class ReviewService
                             ->paragraph(__('emails_misc.review.received_body', ['rating' => (int) $review->rating]))
                             ->button(__('emails_misc.review.received_cta'), $fullUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send($receiver->email, __('emails_misc.review.received_subject'), $html)) {
+                        if (!Mailer::forCurrentTenant()->send($receiver->email, __('emails_misc.review.received_subject'), $html, null, null, null, 'review')) {
                             Log::warning('[ReviewService] create email failed', ['receiver_id' => $receiverId]);
                         }
                     });

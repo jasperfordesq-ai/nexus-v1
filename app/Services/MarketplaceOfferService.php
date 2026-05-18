@@ -447,7 +447,7 @@ class MarketplaceOfferService
                 ->button(__($ctaKey), $fullUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_offer')) {
                 Log::warning('[MarketplaceOfferService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
             }
         });

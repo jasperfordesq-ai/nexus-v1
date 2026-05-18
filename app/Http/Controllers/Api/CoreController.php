@@ -69,7 +69,7 @@ class CoreController extends BaseApiController
         try {
             $mailer = Mailer::forCurrentTenant();
             $replyTo = "{$name} <{$email}>";
-            $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo);
+            $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo, null, 'contact_form');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Contact form email error: " . $e->getMessage());
         }

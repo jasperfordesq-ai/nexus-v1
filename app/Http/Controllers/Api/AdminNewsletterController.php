@@ -2298,7 +2298,7 @@ class AdminNewsletterController extends BaseApiController
                 __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject')),
             ]);
 
-            $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html);
+            $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html, null, null, null, 'newsletter_test');
 
             if ($sent) {
                 return $this->respondWithData([

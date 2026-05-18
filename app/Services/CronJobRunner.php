@@ -402,7 +402,7 @@ class CronJobRunner
             $mailer = Mailer::forCurrentTenant();
 
             // Send Email
-            if ($mailer->send($user['email'], $subject, $body)) {
+            if ($mailer->send($user['email'], $subject, $body, null, null, null, 'notification_digest')) {
                 echo " - Email Sent.\n";
 
                 // Mark as Sent
@@ -518,18 +518,19 @@ class CronJobRunner
                         // Create mailer with tenant context for correct SMTP credentials
                         $mailer = Mailer::forCurrentTenant();
 
-                        if ($mailer->send($item['email'], $subject, $body)) {
-                            DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                        $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                        if ($mailer->send($item['email'], $subject, $body, null, null, null, 'notification_queue')) {
+                            DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                             echo "OK.\n";
                         } else {
-                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                             echo "FAILED.\n";
                         }
                     } catch (\Throwable $itemError) {
                         // Mark this individual item as failed — do NOT revert to pending
                         echo "ERROR: {$itemError->getMessage()}\n";
                         try {
-                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0)]);
                         } catch (\Throwable $dbError) {
                             echo "Could not mark item {$item['id']} as failed: {$dbError->getMessage()}\n";
                         }
@@ -1372,17 +1373,18 @@ class CronJobRunner
                 // Create mailer with tenant context for correct SMTP credentials
                 $mailer = Mailer::forCurrentTenant();
 
-                if ($mailer->send($item['email'], $subject, $body)) {
-                    DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                if ($mailer->send($item['email'], $subject, $body, null, null, null, 'notification_queue')) {
+                    DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                     $sent++;
                 } else {
-                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], $itemTenantId]);
                 }
             } catch (\Throwable $itemError) {
                 // Mark this individual item as failed — do NOT leave in 'processing' state
                 echo "   ERROR on item {$item['id']}: {$itemError->getMessage()}\n";
                 try {
-                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ? AND tenant_id = ?", [$item['id'], (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0)]);
                 } catch (\Throwable $dbError) {
                     // Last resort — log but don't crash the batch
                 }

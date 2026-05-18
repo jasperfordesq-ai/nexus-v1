@@ -427,11 +427,17 @@ class KnowledgeBaseService
                     ->button(__('emails_content.' . $namespace . '.cta'), $articleUrl)
                     ->render();
 
-                Mailer::forCurrentTenant()->send(
+                if (!Mailer::forCurrentTenant()->send(
                     $author->email,
                     __('emails_content.' . $namespace . '.subject', ['title' => $title, 'community' => $community]),
-                    $html
-                );
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'knowledge_base'
+                )) {
+                    Log::warning('[KnowledgeBaseService] publication email send returned false', ['author_id' => $authorId, 'article_id' => $articleId]);
+                }
             });
         } catch (\Throwable $e) {
             Log::warning('[KnowledgeBaseService] publication email failed for author ' . $authorId . ': ' . $e->getMessage());

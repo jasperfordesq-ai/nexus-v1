@@ -521,7 +521,7 @@ class MarketplaceReportService
 
             $html = $builder->button(__($ctaKey), $fullUrl)->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_report')) {
                 Log::warning('[MarketplaceReportService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
             }
         });

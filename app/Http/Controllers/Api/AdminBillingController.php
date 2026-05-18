@@ -250,11 +250,17 @@ class AdminBillingController extends BaseApiController
                 // of Laravel's Mail facade — the default Mail mailer is SMTP
                 // and MAIL_USERNAME/PASSWORD are intentionally not set in prod,
                 // so Mail::raw silently failed for this notification.
-                \App\Core\Mailer::forCurrentTenant()->send(
+                if (!\App\Core\Mailer::forCurrentTenant()->send(
                     'jasper@hour-timebank.ie',
                     $subject,
-                    nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8'))
-                );
+                    nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')),
+                    null,
+                    null,
+                    null,
+                    'billing'
+                )) {
+                    Log::warning('BillingController: upgrade request email send returned false', ['tenant_id' => $tenantId]);
+                }
             });
         } catch (\Throwable $e) {
             Log::warning('BillingController: upgrade request email failed', ['error' => $e->getMessage()]);

@@ -240,7 +240,7 @@ class InactiveMemberService
                             ->render();
 
                         $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
-                        if (!$mailer->send($user->email, $subject, $html)) {
+                        if (!$mailer->send($user->email, $subject, $html, null, null, null, 'inactive_member')) {
                             Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
                         }
                     });

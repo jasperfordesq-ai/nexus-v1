@@ -374,7 +374,7 @@ class SafeguardingService
                             ->render();
                         $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
                         $emailService = app(\App\Services\EmailService::class);
-                        if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                        if (!$emailService->send($trainee->email, $subject, $emailBody, ['category' => 'safeguarding'])) {
                             Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
                         }
                     }
@@ -454,7 +454,7 @@ class SafeguardingService
                             ->render();
                         $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
                         $emailService = app(\App\Services\EmailService::class);
-                        if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                        if (!$emailService->send($trainee->email, $subject, $emailBody, ['category' => 'safeguarding'])) {
                             Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
                         }
                     }
@@ -1028,7 +1028,7 @@ class SafeguardingService
 
                         $emailService = app(\App\Services\EmailService::class);
                         $subject = __('emails_misc.safeguarding.dlp_assigned_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId]);
-                        $sent = $emailService->send($dlpUser->email, $subject, $emailBody);
+                        $sent = $emailService->send($dlpUser->email, $subject, $emailBody, ['category' => 'safeguarding']);
                         if (!$sent) {
                             Log::critical('SafeguardingService::assignDlp: DLP assignment email failed to send', [
                                 'dlp_user_id' => $dlpUserId,
@@ -1115,7 +1115,8 @@ class SafeguardingService
                             $sent = $emailService->send(
                                 $staff->email,
                                 __('emails_misc.safeguarding.incident_reported_subject', ['severity' => $severityLabel, 'title' => $title]),
-                                $emailBody
+                                $emailBody,
+                                ['category' => 'safeguarding']
                             );
                             if (!$sent) {
                                 Log::critical('SafeguardingService: safeguarding incident email failed to send', [
@@ -1210,7 +1211,12 @@ class SafeguardingService
                         $subject = __('emails_misc.safeguarding.reporter_status_subject', ['incident_id' => $incidentId, 'status' => $safeLabel]);
 
                         $emailService = app(\App\Services\EmailService::class);
-                        $emailService->send($reporter->email, $subject, $html);
+                        if (!$emailService->send($reporter->email, $subject, $html, ['category' => 'safeguarding'])) {
+                            Log::warning('[SafeguardingService] reporter status email send returned false', [
+                                'reporter_id' => $reporterId,
+                                'incident_id' => $incidentId,
+                            ]);
+                        }
                     });
                 }
             } catch (\Throwable $emailEx) {
@@ -1257,7 +1263,7 @@ class SafeguardingService
                     LocaleContext::withLocale($reporter, function () use ($reporter, $reporterId, $incidentId, $emailService, $renderForRecipient) {
                         try {
                             [$subject, $body] = $renderForRecipient();
-                            $sent = $emailService->send($reporter->email, $subject, $body);
+                            $sent = $emailService->send($reporter->email, $subject, $body, ['category' => 'safeguarding']);
                             if (!$sent) {
                                 Log::critical('SafeguardingService: status change email failed for reporter', [
                                     'reporter_id' => $reporterId,
@@ -1281,7 +1287,7 @@ class SafeguardingService
                         LocaleContext::withLocale($dlpUser, function () use ($dlpUser, $dlpUserId, $incidentId, $emailService, $renderForRecipient) {
                             try {
                                 [$subject, $body] = $renderForRecipient();
-                                $sent = $emailService->send($dlpUser->email, $subject, $body);
+                                $sent = $emailService->send($dlpUser->email, $subject, $body, ['category' => 'safeguarding']);
                                 if (!$sent) {
                                     Log::critical('SafeguardingService: status change email failed for DLP', [
                                         'dlp_user_id' => $dlpUserId,

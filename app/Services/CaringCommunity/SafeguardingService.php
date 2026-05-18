@@ -637,7 +637,7 @@ class SafeguardingService
                     $mailable = new SafeguardingCriticalMail($reportPayload, $reporterName);
                     $subject  = (string) ($mailable->envelope()->subject ?? __('safeguarding.critical.subject'));
                     $html     = $mailable->render();
-                    $sent     = \App\Core\Mailer::forCurrentTenant()->send($recipient->email, $subject, $html);
+                    $sent     = \App\Core\Mailer::forCurrentTenant()->send($recipient->email, $subject, $html, null, null, null, 'safeguarding');
                     if (!$sent) {
                         Log::warning('[Safeguarding] Critical email returned false from Mailer', [
                             'user_id' => $userId,

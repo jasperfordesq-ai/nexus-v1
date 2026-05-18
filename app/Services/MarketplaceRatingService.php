@@ -282,7 +282,7 @@ class MarketplaceRatingService
                 ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_rating')) {
                 Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
             }
         });
