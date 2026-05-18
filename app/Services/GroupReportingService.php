@@ -37,6 +37,7 @@ class GroupReportingService
 
         /** @var EmailService $emailService */
         $emailService = app(EmailService::class);
+        $previousTenantId = TenantContext::getId();
 
         try {
             $tenants = DB::table('tenants')
@@ -116,6 +117,12 @@ class GroupReportingService
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+
+        if ($previousTenantId !== null) {
+            TenantContext::setById($previousTenantId);
+        } else {
+            TenantContext::reset();
         }
 
         return ['sent' => $sent, 'total_groups' => $totalGroups];

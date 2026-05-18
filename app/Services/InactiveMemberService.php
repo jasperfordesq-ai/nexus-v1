@@ -209,6 +209,7 @@ class InactiveMemberService
             ->update(['notified_at' => now()]);
 
         // Send re-engagement emails
+        $previousTenantId = TenantContext::getId();
         try {
             TenantContext::setById($tenantId);
 
@@ -250,6 +251,12 @@ class InactiveMemberService
             }
         } catch (\Throwable $e) {
             Log::warning('[InactiveMemberService] markNotified email batch failed: ' . $e->getMessage());
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
 
         return $updated;

@@ -421,6 +421,7 @@ class JobInterviewService
                 ->get();
 
             foreach ($upcoming as $interview) {
+                $previousTenantId = TenantContext::getId();
                 try {
                     $emailOk = true;
 
@@ -521,6 +522,12 @@ class JobInterviewService
                     Log::warning('JobInterviewService::sendReminders failed for interview ' . $interview->id, [
                         'error' => $e->getMessage(),
                     ]);
+                } finally {
+                    if ($previousTenantId !== null) {
+                        TenantContext::setById($previousTenantId);
+                    } else {
+                        TenantContext::reset();
+                    }
                 }
             }
         } catch (\Throwable $e) {

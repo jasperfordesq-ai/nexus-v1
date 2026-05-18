@@ -138,16 +138,25 @@ class ListingExpiryService
             return ['total_expired' => 0, 'total_errors' => 1, 'tenants_processed' => 0];
         }
 
-        foreach ($tenantIds as $tenantId) {
-            try {
-                \App\Core\TenantContext::setById($tenantId);
-                $result = $this->processExpiredListings();
-                $totalExpired += $result['expired'];
-                $totalErrors += $result['errors'];
-                $tenantsProcessed++;
-            } catch (\Exception $e) {
-                Log::error("[ListingExpiryService] Error processing tenant {$tenantId}: " . $e->getMessage());
-                $totalErrors++;
+        $previousTenantId = TenantContext::getId();
+        try {
+            foreach ($tenantIds as $tenantId) {
+                try {
+                    \App\Core\TenantContext::setById($tenantId);
+                    $result = $this->processExpiredListings();
+                    $totalExpired += $result['expired'];
+                    $totalErrors += $result['errors'];
+                    $tenantsProcessed++;
+                } catch (\Exception $e) {
+                    Log::error("[ListingExpiryService] Error processing tenant {$tenantId}: " . $e->getMessage());
+                    $totalErrors++;
+                }
+            }
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
             }
         }
 

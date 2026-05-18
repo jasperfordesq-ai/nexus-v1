@@ -44,6 +44,7 @@ class GamificationEmailService
 
         /** @var EmailService $emailService */
         $emailService = app(EmailService::class);
+        $previousTenantId = TenantContext::getId();
 
         try {
             $tenants = DB::table('tenants')
@@ -140,6 +141,12 @@ class GamificationEmailService
                 ]);
                 $errors++;
             }
+        }
+
+        if ($previousTenantId !== null) {
+            TenantContext::setById($previousTenantId);
+        } else {
+            TenantContext::reset();
         }
 
         return ['sent' => $sent, 'skipped' => $skipped, 'errors' => $errors];

@@ -244,6 +244,8 @@ class FederationEmailService
      */
     public static function sendWeeklyDigest(int $userId, int $tenantId): bool
     {
+        $previousTenantId = TenantContext::getId();
+
         try {
             // Must set tenant context before any tenant-specific call (mailer, URLs, branding).
             // Without this, whatever tenant was last active bleeds into this email.
@@ -320,6 +322,12 @@ class FederationEmailService
         } catch (\Exception $e) {
             Log::error('[FederationEmail] sendWeeklyDigest failed', ['error' => $e->getMessage()]);
             return false;
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
         }
     }
 
