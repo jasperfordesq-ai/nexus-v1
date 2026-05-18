@@ -8768,9 +8768,17 @@
     "no_history_available": "No history available found",
     "no_legal_documents_found": "No legal documents found found",
     "no_members_found": "No members found found",
+    "no_data": "No data",
+    "no_data_available": "No data available",
     "no_recent_broker_activity": "No recent broker activity found",
+    "open_page_help": "Open page help",
+    "help": "Help",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "data_table": "Data",
+    "total_count": "{{count}} total"
   },
   "subtitle": "Subtitle",
   "super_controls": {

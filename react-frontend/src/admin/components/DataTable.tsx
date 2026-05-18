@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   TableHeader,
@@ -79,7 +80,7 @@ export function DataTable<T extends Record<string, any>>({
   keyField = 'id',
   isLoading = false,
   searchable = true,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder,
   totalItems,
   page = 1,
   pageSize = 20,
@@ -92,10 +93,12 @@ export function DataTable<T extends Record<string, any>>({
   topContent,
   emptyContent,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('admin');
   const [searchValue, setSearchValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(undefined);
 
   const totalPages = totalItems ? Math.ceil(totalItems / pageSize) : 1;
+  const effectiveSearchPlaceholder = searchPlaceholder ?? t('shared.search');
 
   const handleSearchChange = useCallback(
     (value: string) => {
@@ -134,21 +137,22 @@ export function DataTable<T extends Record<string, any>>({
   // Top content (search + actions)
   const tableTopContent = useMemo(
     () => (
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 min-w-0">
-        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto min-w-0">
+      <div className="flex min-w-0 flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-3 sm:w-auto">
           {searchable && (
             <Input
-              className="w-full sm:max-w-xs"
+              className="w-full sm:max-w-sm"
               type="search"
               name="datatable-search"
               autoComplete="off"
-              placeholder={searchPlaceholder}
-              aria-label={searchPlaceholder || "Search"}
+              placeholder={effectiveSearchPlaceholder}
+              aria-label={effectiveSearchPlaceholder}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchValue}
               onValueChange={handleSearchChange}
               size="sm"
               variant="bordered"
+              classNames={{ inputWrapper: 'bg-content2/40 border-divider/70' }}
             />
           )}
           {onRefresh && (
@@ -157,7 +161,8 @@ export function DataTable<T extends Record<string, any>>({
               variant="flat"
               size="sm"
               onPress={onRefresh}
-              aria-label={"Refresh"}
+              aria-label={t('shared.refresh')}
+              className="bg-default-100/70 text-default-600"
             >
               <RefreshCw size={16} />
             </Button>
@@ -166,7 +171,7 @@ export function DataTable<T extends Record<string, any>>({
         {topContent && <div className="flex flex-wrap items-center gap-2">{topContent}</div>}
       </div>
     ),
-    [searchable, searchPlaceholder, searchValue, handleSearchChange, onRefresh, topContent],
+    [searchable, effectiveSearchPlaceholder, searchValue, handleSearchChange, onRefresh, topContent, t],
   );
 
   // Bottom content (pagination)
@@ -175,7 +180,7 @@ export function DataTable<T extends Record<string, any>>({
     return (
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-2 py-2">
         <span className="text-sm text-default-400">
-          {totalItems ? `${totalItems.toLocaleString()} total` : ''}
+          {totalItems ? t('shared.total_count', { count: totalItems.toLocaleString() }) : ''}
         </span>
         <Pagination
           total={totalPages}
@@ -186,11 +191,11 @@ export function DataTable<T extends Record<string, any>>({
         />
       </div>
     );
-  }, [onPageChange, totalPages, page, totalItems])
+  }, [onPageChange, totalPages, page, totalItems, t])
 
   return (
     <Table
-      aria-label={"Data"}
+      aria-label={t('shared.data_table')}
       selectionMode={selectable ? 'multiple' : 'none'}
       selectedKeys={selectable && selectedKeys ? (selectedKeys as unknown as Selection) : undefined}
       onSelectionChange={selectable ? handleSelectionChange : undefined}
@@ -202,10 +207,10 @@ export function DataTable<T extends Record<string, any>>({
       bottomContentPlacement="outside"
       classNames={{
         base: 'min-w-0',
-        wrapper: 'shadow-sm max-w-full overflow-x-auto',
+        wrapper: 'max-w-full overflow-x-auto border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]',
         table: 'min-w-max',
-        th: 'whitespace-nowrap',
-        td: 'align-top',
+        th: 'whitespace-nowrap bg-content2/70 text-xs font-semibold uppercase tracking-normal text-default-500',
+        td: 'align-top text-sm',
       }}
     >
       <TableHeader>
@@ -223,7 +228,14 @@ export function DataTable<T extends Record<string, any>>({
       <TableBody
         isLoading={isLoading}
         loadingContent={<Spinner size="lg" />}
-        emptyContent={emptyContent || "No data"}
+        emptyContent={
+          emptyContent || (
+            <span>
+              <span>{t('shared.no_data')}</span>
+              <span className="sr-only">{t('shared.no_data_available')}</span>
+            </span>
+          )
+        }
       >
         {sortedData.map((item) => (
           <TableRow key={String(item[keyField])}>

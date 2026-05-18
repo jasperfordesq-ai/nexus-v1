@@ -11,10 +11,13 @@
 
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AdminSidebar } from './components/AdminSidebar';
 import { AdminHeader } from './components/AdminHeader';
 import { AdminBreadcrumbs } from './components/AdminBreadcrumbs';
+import { PageMeta } from '@/components/seo';
 export function AdminLayout() {
+  const { t } = useTranslation('admin_nav');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const location = useLocation();
@@ -25,6 +28,7 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title={t('admin')} noIndex />
       {/* Sidebar — hidden on mobile, shown on md+ */}
       <div className="hidden md:block">
         <AdminSidebar
@@ -57,7 +61,7 @@ export function AdminLayout() {
           sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
         }`}
       >
-        <div className="p-3 sm:p-4 md:p-6">
+        <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-4 md:p-6">
           <AdminBreadcrumbs />
           <Outlet />
         </div>

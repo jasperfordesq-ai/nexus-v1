@@ -64,16 +64,16 @@ export function StatCard({
   const IconAsComponent = Icon as LucideIcon;
   const iconNode = isValidElement(Icon) ? Icon : <IconAsComponent size={24} />;
   const body = (
-    <CardBody className="flex flex-row items-center gap-4 p-4">
-      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${colorMap[color]}`}>
+    <CardBody className="flex flex-row items-center gap-4 p-4 sm:p-5">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-current/10 ${colorMap[color]}`}>
         {iconNode}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-default-500">{resolvedLabel}</p>
+        <p className="text-sm font-medium text-default-500">{resolvedLabel}</p>
         {loading ? (
           <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
         ) : (
-          <p className="text-2xl font-bold text-foreground">
+          <p className="mt-0.5 text-2xl font-semibold text-foreground">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
         )}
@@ -114,14 +114,14 @@ export function StatCard({
         as={Link}
         to={to}
         aria-label={linkAriaLabel ?? resolvedLabel}
-        className="group text-left transition-shadow hover:shadow-md"
+        className="group border border-divider/70 bg-content1 text-left shadow-sm shadow-black/[0.03] transition-all hover:-translate-y-0.5 hover:shadow-md"
       >
         {body}
       </Card>
     );
   }
 
-  return <Card shadow="sm">{body}</Card>;
+  return <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">{body}</Card>;
 }
 
 export default StatCard;

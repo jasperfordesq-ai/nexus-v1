@@ -27,6 +27,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, CardHeader, Spinner, Button, Chip } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import ListChecks from 'lucide-react/icons/list-checks';
@@ -53,18 +54,19 @@ import { StatCard, PageHeader } from '../../components';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 
 export function AdminDashboard() {
-  usePageTitle("Mission Control");
+  const { t } = useTranslation('admin_dashboard');
+  usePageTitle(t('title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
   /** Quick action items matching the legacy PHP dashboard sidebar */
   const QUICK_ACTIONS = [
-    { label: "Manage Users", path: '/admin/users', icon: UserPlus, color: 'text-primary bg-primary/10' },
-    { label: "View Listings", path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
-    { label: "Send Newsletter", path: '/admin/newsletters', icon: Send, color: 'text-secondary bg-secondary/10' },
-    { label: "New Blog Post", path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
-    { label: "Gamification", path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
-    { label: "Settings", path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
+    { label: t('quick_actions.manage_users'), path: '/admin/users', icon: UserPlus, color: 'text-primary bg-primary/10' },
+    { label: t('quick_actions.view_listings'), path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
+    { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-secondary bg-secondary/10' },
+    { label: t('quick_actions.new_blog_post'), path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
+    { label: t('quick_actions.gamification'), path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
+    { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
   ] as const;
 
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
@@ -103,21 +105,21 @@ export function AdminDashboard() {
         setTrends(Array.isArray(trendsRes.data) ? trendsRes.data : []);
       }
     } catch {
-      toast.error("Failed to load dashboard data");
+      toast.error(t('load_error'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={"Mission Control"}
-        description={"Real-time platform overview and command center"}
+        title={t('title')}
+        description={t('subtitle')}
         actions={
           <Button
             variant="flat"
@@ -126,7 +128,7 @@ export function AdminDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {"Refresh"}
+            {t('refresh')}
           </Button>
         }
       />
@@ -134,7 +136,7 @@ export function AdminDashboard() {
       {showSafeguardingBanner && (
         <Card
           shadow="sm"
-          className="mb-6 border-l-4 border-l-danger bg-danger/5"
+          className="border border-danger/20 border-l-4 border-l-danger bg-danger/5 shadow-sm shadow-danger/10"
           data-testid="safeguarding-disabled-banner"
         >
           <CardBody className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
@@ -143,10 +145,10 @@ export function AdminDashboard() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-danger">
-                {"Safeguarding step is OFF in your onboarding wizard"}
+                {t('safeguarding_banner.title')}
               </p>
               <p className="mt-0.5 text-sm text-default-600">
-                {"Members cannot declare vulnerability or vetting needs when they join. Admin alerts are not firing. Enable the safeguarding step and apply a country preset so your community is protected."}
+                {t('safeguarding_banner.body')}
               </p>
             </div>
             <Button
@@ -157,37 +159,37 @@ export function AdminDashboard() {
               variant="solid"
               className="shrink-0"
             >
-              {"Enable safeguarding"}
+              {t('safeguarding_banner.cta')}
             </Button>
           </CardBody>
         </Card>
       )}
 
       {/* Stats Grid - Row 1: Core Metrics */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={"Total Members"}
+          label={t('stats.total_members')}
           value={stats?.total_users ?? '—'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"Active Listings"}
+          label={t('stats.active_listings')}
           value={stats?.active_listings ?? '—'}
           icon={FileCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={"Transactions"}
+          label={t('stats.transactions')}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={"Hours Exchanged"}
+          label={t('stats.hours_exchanged')}
           value={stats?.total_hours_exchanged ?? '—'}
           icon={Clock}
           color="warning"
@@ -196,30 +198,30 @@ export function AdminDashboard() {
       </div>
 
       {/* Stats Grid - Row 2: This Month */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={"New Users This Month"}
+          label={t('stats.new_users_this_month')}
           value={stats?.new_users_this_month ?? '—'}
           icon={UserPlus}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={"Active Users"}
+          label={t('stats.active_users')}
           value={stats?.active_users ?? '—'}
           icon={UserCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={"Total Listings"}
+          label={t('stats.total_listings')}
           value={stats?.total_listings ?? '—'}
           icon={ListChecks}
           color="default"
           loading={loading}
         />
         <StatCard
-          label={"New Listings This Month"}
+          label={t('stats.new_listings_this_month')}
           value={stats?.new_listings_this_month ?? '—'}
           icon={ListChecks}
           color="default"
@@ -229,15 +231,15 @@ export function AdminDashboard() {
 
       {/* Actionable Alerts: Pending Users + Pending Listings */}
       {((stats?.pending_users ?? 0) > 0 || (stats?.pending_listings ?? 0) > 0) && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 mb-6">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {stats?.pending_users !== undefined && stats.pending_users > 0 && (
-            <Card shadow="sm">
+            <Card shadow="sm" className="border border-warning/20 bg-content1 shadow-sm shadow-warning/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10">
                   <UserCheck size={20} className="text-warning" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">{"Members awaiting approval"}</p>
+                  <p className="text-sm text-default-500">{t('alerts.pending_approvals')}</p>
                   <p className="text-lg font-bold">{stats.pending_users}</p>
                 </div>
                 <Button
@@ -247,20 +249,20 @@ export function AdminDashboard() {
                   color="warning"
                   variant="flat"
                 >
-                  {"Review"}
+                  {t('alerts.review')}
                 </Button>
               </CardBody>
             </Card>
           )}
 
           {stats?.pending_listings !== undefined && stats.pending_listings > 0 && (
-            <Card shadow="sm">
+            <Card shadow="sm" className="border border-primary/20 bg-content1 shadow-sm shadow-primary/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <ListChecks size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">{"Listings awaiting moderation"}</p>
+                  <p className="text-sm text-default-500">{t('alerts.pending_listings')}</p>
                   <p className="text-lg font-bold">{stats.pending_listings}</p>
                 </div>
                 <Button
@@ -270,7 +272,7 @@ export function AdminDashboard() {
                   color="primary"
                   variant="flat"
                 >
-                  {"Review"}
+                  {t('alerts.review')}
                 </Button>
               </CardBody>
             </Card>
@@ -279,13 +281,13 @@ export function AdminDashboard() {
       )}
 
       {/* Quick Actions + Trends + Activity -- 3-column layout on large screens */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         {/* Quick Actions (matches legacy sidebar) */}
-        <Card shadow="sm">
+        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Rocket size={18} className="text-primary" />
-            <h3 className="font-semibold">{"Quick Actions"}</h3>
+            <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="grid grid-cols-2 gap-2">
@@ -295,12 +297,12 @@ export function AdminDashboard() {
                   <Link
                     key={action.path}
                     to={tenantPath(action.path)}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-divider p-3 transition-colors hover:bg-default-100"
+                    className="flex flex-col items-center gap-2 rounded-xl border border-divider/70 bg-content2/30 p-3 text-center transition-all hover:-translate-y-0.5 hover:bg-default-100 hover:shadow-sm"
                   >
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}>
                       <Icon size={20} />
                     </div>
-                    <span className="text-xs font-medium text-center text-default-700">{action.label}</span>
+                    <span className="text-xs font-medium text-default-700">{action.label}</span>
                   </Link>
                 );
               })}
@@ -308,11 +310,11 @@ export function AdminDashboard() {
             <div className="mt-3 pt-3 border-t border-divider">
               <Link
                 to={tenantPath('/admin/enterprise')}
-                className="flex items-center justify-between text-sm text-primary hover:underline"
+                className="flex items-center justify-between rounded-xl px-2 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
               >
                 <span className="flex items-center gap-1.5">
-                  <Chip size="sm" color="secondary" variant="flat">{"Enterprise"}</Chip>
-                  {"Advanced Controls"}
+                  <Chip size="sm" color="secondary" variant="flat">{t('quick_actions.enterprise')}</Chip>
+                  {t('quick_actions.advanced_controls')}
                 </span>
                 <ChevronRight size={14} />
               </Link>
@@ -321,10 +323,10 @@ export function AdminDashboard() {
         </Card>
 
         {/* Monthly Trends */}
-        <Card shadow="sm">
+        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-primary" />
-            <h3 className="font-semibold">{"Transaction Trends"}</h3>
+            <h3 className="font-semibold">{t('trends.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -337,7 +339,7 @@ export function AdminDashboard() {
                   <div key={trend.month} className="flex items-center justify-between">
                     <span className="text-sm text-default-600">{trend.month}</span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium">{trend.hours} {"hrs"}</span>
+                      <span className="text-sm font-medium">{trend.hours} {t('trends.hours_suffix')}</span>
                       <div
                         className="h-2 rounded-full bg-primary"
                         style={{ width: `${Math.min(100, (trend.hours / Math.max(...trends.map((x) => x.hours || 1))) * 100)}px` }}
@@ -348,18 +350,18 @@ export function AdminDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {"No trend data available"}
+                {t('trends.no_data')}
               </p>
             )}
           </CardBody>
         </Card>
 
         {/* Recent Activity */}
-        <Card shadow="sm">
+        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
               <Activity size={18} className="text-primary" />
-              <h3 className="font-semibold">{"Real-time Activity"}</h3>
+              <h3 className="font-semibold">{t('activity.card_title')}</h3>
             </div>
             <Button
               as={Link}
@@ -367,7 +369,7 @@ export function AdminDashboard() {
               size="sm"
               variant="light"
             >
-              {"View All"}
+              {t('activity.view_all')}
             </Button>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -394,7 +396,7 @@ export function AdminDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {"No recent activity to display"}
+                {t('activity.empty')}
               </p>
             )}
           </CardBody>
