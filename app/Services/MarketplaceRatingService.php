@@ -40,75 +40,78 @@ class MarketplaceRatingService
             throw new \InvalidArgumentException('Role must be buyer or seller.');
         }
 
-        $order = MarketplaceOrder::findOrFail($orderId);
+        $order = MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId);
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
 
-        if ($order->status !== 'completed') {
-            throw new \InvalidArgumentException('Can only rate completed orders.');
-        }
-
-        // Verify the rater participated in this order with the claimed role
-        if ($role === 'buyer' && $order->buyer_id !== $raterId) {
-            throw new \InvalidArgumentException('You are not the buyer of this order.');
-        }
-        if ($role === 'seller' && $order->seller_id !== $raterId) {
-            throw new \InvalidArgumentException('You are not the seller of this order.');
-        }
-
-        // Determine the ratee
-        $rateeId = ($role === 'buyer') ? $order->seller_id : $order->buyer_id;
-
-        // Check for existing rating
-        $existingRating = MarketplaceSellerRating::where('order_id', $orderId)
-            ->where('rater_role', $role)
-            ->first();
-
-        if ($existingRating) {
-            throw new \InvalidArgumentException('You have already rated this order.');
-        }
-
-        $rating = (int) ($data['rating'] ?? 0);
-        if ($rating < 1 || $rating > 5) {
-            throw new \InvalidArgumentException('Rating must be between 1 and 5.');
-        }
-
-        $sellerRating = new MarketplaceSellerRating();
-        $sellerRating->tenant_id = TenantContext::getId();
-        $sellerRating->order_id = $orderId;
-        $sellerRating->rater_id = $raterId;
-        $sellerRating->ratee_id = $rateeId;
-        $sellerRating->rater_role = $role;
-        $sellerRating->rating = $rating;
-        $sellerRating->comment = $data['comment'] ?? null;
-        $sellerRating->is_anonymous = (bool) ($data['is_anonymous'] ?? false);
-        $sellerRating->save();
-
-        // Refresh cached seller stats when a buyer rates a seller
-        if ($role === 'buyer') {
-            self::refreshSellerStats($rateeId);
-        }
-
-        // Notify ratee they received a rating (skip if anonymous)
-        if (!$sellerRating->is_anonymous) {
-            try {
-                $link = '/marketplace/orders/' . $orderId;
-                self::sendRatingEmail(
-                    $rateeId,
-                    'emails_misc.marketplace_rating.received_subject',
-                    [],
-                    'emails_misc.marketplace_rating.received_title',
-                    'emails_misc.marketplace_rating.received_body',
-                    [
-                        'rating'       => $rating,
-                        'order_number' => $order->order_number,
-                    ],
-                    $link
-                );
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceRatingService] rateOrder email failed: ' . $e->getMessage());
+        return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $raterId, $role, $data, $tenantId): MarketplaceSellerRating {
+            if ($order->status !== 'completed') {
+                throw new \InvalidArgumentException('Can only rate completed orders.');
             }
-        }
 
-        return $sellerRating;
+            // Verify the rater participated in this order with the claimed role
+            if ($role === 'buyer' && $order->buyer_id !== $raterId) {
+                throw new \InvalidArgumentException('You are not the buyer of this order.');
+            }
+            if ($role === 'seller' && $order->seller_id !== $raterId) {
+                throw new \InvalidArgumentException('You are not the seller of this order.');
+            }
+
+            // Determine the ratee
+            $rateeId = ($role === 'buyer') ? $order->seller_id : $order->buyer_id;
+
+            // Check for existing rating
+            $existingRating = MarketplaceSellerRating::where('order_id', $orderId)
+                ->where('rater_role', $role)
+                ->first();
+
+            if ($existingRating) {
+                throw new \InvalidArgumentException('You have already rated this order.');
+            }
+
+            $rating = (int) ($data['rating'] ?? 0);
+            if ($rating < 1 || $rating > 5) {
+                throw new \InvalidArgumentException('Rating must be between 1 and 5.');
+            }
+
+            $sellerRating = new MarketplaceSellerRating();
+            $sellerRating->tenant_id = $tenantId;
+            $sellerRating->order_id = $orderId;
+            $sellerRating->rater_id = $raterId;
+            $sellerRating->ratee_id = $rateeId;
+            $sellerRating->rater_role = $role;
+            $sellerRating->rating = $rating;
+            $sellerRating->comment = $data['comment'] ?? null;
+            $sellerRating->is_anonymous = (bool) ($data['is_anonymous'] ?? false);
+            $sellerRating->save();
+
+            // Refresh cached seller stats when a buyer rates a seller
+            if ($role === 'buyer') {
+                self::refreshSellerStats($rateeId);
+            }
+
+            // Notify ratee they received a rating (skip if anonymous)
+            if (!$sellerRating->is_anonymous) {
+                try {
+                    $link = '/marketplace/orders/' . $orderId;
+                    self::sendRatingEmail(
+                        $rateeId,
+                        'emails_misc.marketplace_rating.received_subject',
+                        [],
+                        'emails_misc.marketplace_rating.received_title',
+                        'emails_misc.marketplace_rating.received_body',
+                        [
+                            'rating'       => $rating,
+                            'order_number' => $order->order_number,
+                        ],
+                        $link
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[MarketplaceRatingService] rateOrder email failed: ' . $e->getMessage());
+                }
+            }
+
+            return $sellerRating;
+        });
     }
 
     /**
@@ -182,69 +185,72 @@ class MarketplaceRatingService
      */
     public static function openDispute(int $orderId, int $userId, array $data): MarketplaceDispute
     {
-        $order = MarketplaceOrder::findOrFail($orderId);
+        $order = MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId);
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
 
-        // Only buyer or seller can open a dispute
-        if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
-            throw new \InvalidArgumentException('You are not a participant in this order.');
-        }
+        return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $userId, $data, $tenantId): MarketplaceDispute {
+            // Only buyer or seller can open a dispute
+            if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
+                throw new \InvalidArgumentException('You are not a participant in this order.');
+            }
 
-        // Cannot dispute cancelled/refunded orders
-        if (in_array($order->status, ['cancelled', 'refunded'], true)) {
-            throw new \InvalidArgumentException('Cannot dispute a cancelled or refunded order.');
-        }
+            // Cannot dispute cancelled/refunded orders
+            if (in_array($order->status, ['cancelled', 'refunded'], true)) {
+                throw new \InvalidArgumentException('Cannot dispute a cancelled or refunded order.');
+            }
 
-        // Check for existing open dispute
-        $existingDispute = MarketplaceDispute::where('order_id', $orderId)
-            ->whereNotIn('status', ['closed'])
-            ->first();
+            // Check for existing open dispute
+            $existingDispute = MarketplaceDispute::where('order_id', $orderId)
+                ->whereNotIn('status', ['closed'])
+                ->first();
 
-        if ($existingDispute) {
-            throw new \InvalidArgumentException('A dispute already exists for this order.');
-        }
+            if ($existingDispute) {
+                throw new \InvalidArgumentException('A dispute already exists for this order.');
+            }
 
-        $validReasons = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
-        $reason = $data['reason'] ?? '';
-        if (!in_array($reason, $validReasons, true)) {
-            throw new \InvalidArgumentException('Invalid dispute reason.');
-        }
+            $validReasons = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
+            $reason = $data['reason'] ?? '';
+            if (!in_array($reason, $validReasons, true)) {
+                throw new \InvalidArgumentException('Invalid dispute reason.');
+            }
 
-        $dispute = DB::transaction(function () use ($order, $orderId, $userId, $data, $reason) {
-            $dispute = new MarketplaceDispute();
-            $dispute->tenant_id = TenantContext::getId();
-            $dispute->order_id = $orderId;
-            $dispute->opened_by = $userId;
-            $dispute->reason = $reason;
-            $dispute->description = $data['description'];
-            $dispute->evidence_urls = $data['evidence_urls'] ?? null;
-            $dispute->status = 'open';
-            $dispute->save();
+            $dispute = DB::transaction(function () use ($order, $orderId, $userId, $data, $reason, $tenantId) {
+                $dispute = new MarketplaceDispute();
+                $dispute->tenant_id = $tenantId;
+                $dispute->order_id = $orderId;
+                $dispute->opened_by = $userId;
+                $dispute->reason = $reason;
+                $dispute->description = $data['description'];
+                $dispute->evidence_urls = $data['evidence_urls'] ?? null;
+                $dispute->status = 'open';
+                $dispute->save();
 
-            // Move order to disputed status
-            $order->status = 'disputed';
-            $order->save();
+                // Move order to disputed status
+                $order->status = 'disputed';
+                $order->save();
+
+                return $dispute;
+            });
+
+            // Notify the other party that a dispute was opened
+            try {
+                $otherPartyId = ($userId === (int) $order->buyer_id) ? (int) $order->seller_id : (int) $order->buyer_id;
+                $link = '/marketplace/orders/' . $orderId;
+                self::sendRatingEmail(
+                    $otherPartyId,
+                    'emails_misc.marketplace_dispute.opened_subject',
+                    ['order_number' => $order->order_number],
+                    'emails_misc.marketplace_dispute.opened_title',
+                    'emails_misc.marketplace_dispute.opened_body',
+                    ['order_number' => $order->order_number],
+                    $link
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceRatingService] openDispute email failed: ' . $e->getMessage());
+            }
 
             return $dispute;
         });
-
-        // Notify the other party that a dispute was opened
-        try {
-            $otherPartyId = ($userId === (int) $order->buyer_id) ? (int) $order->seller_id : (int) $order->buyer_id;
-            $link = '/marketplace/orders/' . $orderId;
-            self::sendRatingEmail(
-                $otherPartyId,
-                'emails_misc.marketplace_dispute.opened_subject',
-                ['order_number' => $order->order_number],
-                'emails_misc.marketplace_dispute.opened_title',
-                'emails_misc.marketplace_dispute.opened_body',
-                ['order_number' => $order->order_number],
-                $link
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[MarketplaceRatingService] openDispute email failed: ' . $e->getMessage());
-        }
-
-        return $dispute;
     }
 
     /**
@@ -264,7 +270,7 @@ class MarketplaceRatingService
     private static function sendRatingEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link): void
     {
         $tenantId = TenantContext::getId();
-        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language', 'tenant_id'])->first();
 
         if (!$user || empty($user->email)) {
             return;

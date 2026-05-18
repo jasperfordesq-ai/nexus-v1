@@ -434,7 +434,8 @@ class MarketplaceReportService
     {
         $cutoff = now()->subHours(24);
 
-        $overdue = MarketplaceReport::where('status', 'received')
+        $overdue = MarketplaceReport::withoutGlobalScopes()
+            ->where('status', 'received')
             ->where('created_at', '<=', $cutoff)
             ->whereNull('acknowledged_at')
             ->get();
@@ -444,15 +445,15 @@ class MarketplaceReportService
         foreach ($overdue as $report) {
             $previousTenantId = TenantContext::currentId();
 
-            $report->status = 'acknowledged';
-            $report->acknowledged_at = now();
-            $report->save();
-            $count++;
-
             try {
                 // Set tenant context per-report so sendReportEmail uses the correct
                 // tenant's mailer, URLs, and translations.
                 TenantContext::setById((int) $report->tenant_id);
+
+                $report->status = 'acknowledged';
+                $report->acknowledged_at = now();
+                $report->save();
+                $count++;
 
                 // Notify reporter their report is now under review
                 self::sendReportEmail(
