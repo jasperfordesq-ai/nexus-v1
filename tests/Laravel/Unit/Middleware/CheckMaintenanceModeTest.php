@@ -101,6 +101,18 @@ class CheckMaintenanceModeTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function test_handle_allows_public_webauthn_login_routes_during_maintenance(): void
+    {
+        $this->enableMaintenanceMode();
+
+        foreach (['/api/webauthn/auth-challenge', '/api/webauthn/auth-verify'] as $path) {
+            $request = Request::create($path, 'POST');
+            $response = $this->middleware->handle($request, $this->makeNext());
+
+            $this->assertEquals(200, $response->getStatusCode(), "{$path} should remain available");
+        }
+    }
+
     public function test_handle_allows_health_check_during_maintenance(): void
     {
         $this->enableMaintenanceMode();

@@ -30,6 +30,8 @@ class CheckMaintenanceMode
         '/api/v2/tenants',
         '/api/v2/messages/unread-count',
         '/api/v2/notifications/counts',
+        '/api/webauthn/auth-challenge',
+        '/api/webauthn/auth-verify',
         '/health.php',
         '/up',
         '/favicon.ico',
