@@ -9440,6 +9440,10 @@
         "title": "Notification queue failures",
         "body": "{{count}} queued notifications failed in the last {{window_hours}} hours."
       },
+      "notification_queue_suppressed": {
+        "title": "Notification emails suppressed",
+        "body": "{{count}} queued notification emails were suppressed in the last {{window_hours}} hours."
+      },
       "notification_queue_stale_processing": {
         "title": "Stale notification queue",
         "body": "{{count}} notifications have been processing for more than {{minutes}} minutes."
@@ -9479,6 +9483,10 @@
       "notification_queue_failed_recently": {
         "title": "Notification emails failed",
         "body": "{{count}} queued notification emails failed in the last {{window_hours}} hours."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "Notification emails suppressed",
+        "body": "{{count}} queued notification emails were suppressed in the last {{window_hours}} hours."
       },
       "notification_queue_missing_tenant_id": {
         "title": "Notification queue missing tenant",

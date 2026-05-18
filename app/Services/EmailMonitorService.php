@@ -386,6 +386,19 @@ class EmailMonitorService
                     ];
                 }
 
+                $suppressedQueue = (clone $queue)
+                    ->where('status', 'suppressed')
+                    ->where('created_at', '>=', now()->subDay())
+                    ->count();
+                if ($suppressedQueue > 0) {
+                    $warnings[] = [
+                        'code' => 'notification_queue_suppressed',
+                        'severity' => 'warning',
+                        'message_key' => 'email_health.warnings.notification_queue_suppressed',
+                        'params' => ['count' => $suppressedQueue, 'window_hours' => 24],
+                    ];
+                }
+
                 $staleProcessing = (clone $queue)
                     ->where('status', 'processing')
                     ->where('created_at', '<', now()->subMinutes(15))

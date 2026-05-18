@@ -531,7 +531,7 @@ class MarketplaceOrderService
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $extraLines): void {
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $extraLines, $tenantId): void {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $body = __($bodyKey, $bodyParams);
@@ -546,7 +546,7 @@ class MarketplaceOrderService
                 ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_order')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_order', ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceOrderService] email failed', ['user_id' => $userId]);
             }
         });

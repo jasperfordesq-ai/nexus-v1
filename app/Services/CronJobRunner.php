@@ -375,16 +375,16 @@ class CronJobRunner
             // Default is true so legacy users with no JSON pref still get
             // their digest until they opt out.
             //
-            // Items are still 'pending' here (the claim happens below); we
-            // mark them 'sent' so they don't pile up indefinitely and the
-            // existing 30-day cleanup at the end of run-all will reap them.
+            // Items are still 'pending' here (the claim happens below); mark
+            // them as suppressed so the audit trail does not claim an email was
+            // sent when the recipient intentionally opted out of digests.
             try {
                 $prefs = User::getNotificationPreferences($userId);
                 if (!(bool) ($prefs['email_digest'] ?? true)) {
-                    echo " - User has email_digest off, marking pending items as consumed without emailing.\n";
+                    echo " - User has email_digest off, marking pending items as suppressed without emailing.\n";
                     DB::update(
                         "UPDATE notification_queue
-                            SET status = 'sent', sent_at = NOW()
+                            SET status = 'suppressed', sent_at = NULL
                           WHERE user_id = ? AND frequency = ? AND status = 'pending'
                             AND tenant_id = ?",
                         [$userId, $frequency, $userTenantId]
@@ -859,10 +859,10 @@ class CronJobRunner
             $tasks[] = "Stale digest expiry: " . $e->getMessage();
         }
 
-        // 2b. Clean old notification queue items (older than 30 days, already sent or failed)
+        // 2b. Clean old notification queue items (older than 30 days, already sent, failed, or suppressed)
         // notification_queue housekeeping — tenant_id column added 2026-03-29; cleans up stale rows.
         try {
-            $sql = "DELETE FROM notification_queue WHERE status IN ('sent', 'failed') AND COALESCE(sent_at, created_at) < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            $sql = "DELETE FROM notification_queue WHERE status IN ('sent', 'failed', 'suppressed') AND COALESCE(sent_at, created_at) < DATE_SUB(NOW(), INTERVAL 30 DAY)";
             $deleted = DB::delete($sql);
             $tasks[] = "Cleaned {$deleted} old notification queue entries";
         } catch (\Exception $e) {

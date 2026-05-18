@@ -656,7 +656,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $recipientUserId, $senderName, $amount, $description) {
+            LocaleContext::withLocale($user, function () use ($user, $recipientUserId, $senderName, $amount, $description, $tenantId) {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl = TenantContext::getFrontendUrl();
@@ -674,7 +674,7 @@ class NotificationDispatcher
                     htmlspecialchars($tenantName)
                 );
 
-                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction', ['tenant_id' => $tenantId])) {
                     Log::warning('NotificationDispatcher::sendCreditEmail mailer returned false', [
                         'user_id' => $recipientUserId,
                     ]);
@@ -718,7 +718,7 @@ class NotificationDispatcher
             }
 
             // The "sender" is the recipient of this confirmation email — render in their locale.
-            LocaleContext::withLocale($user, function () use ($user, $senderUserId, $recipientName, $amount, $description) {
+            LocaleContext::withLocale($user, function () use ($user, $senderUserId, $recipientName, $amount, $description, $tenantId) {
                 $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl         = TenantContext::getFrontendUrl();
@@ -750,7 +750,7 @@ class NotificationDispatcher
                     'community' => $tenantName,
                 ]);
 
-                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'transaction')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'transaction', ['tenant_id' => $tenantId])) {
                     Log::warning('NotificationDispatcher::sendCreditSentEmail mailer returned false', [
                         'user_id' => $senderUserId,
                     ]);
@@ -800,7 +800,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $otherPersonName, $transactionId) {
+            LocaleContext::withLocale($user, function () use ($user, $otherPersonName, $transactionId, $tenantId) {
                 $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $baseUrl    = TenantContext::getFrontendUrl();
                 $basePath   = TenantContext::getSlugPrefix();
@@ -816,7 +816,7 @@ class NotificationDispatcher
                     ->button(__('emails.review_request.cta'), $reviewUrl)
                     ->render();
 
-                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'review')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'review', ['tenant_id' => $tenantId])) {
                     Log::warning('NotificationDispatcher::sendReviewRequestEmail mailer returned false', [
                         'user_id' => $userId,
                     ]);
@@ -862,7 +862,7 @@ class NotificationDispatcher
             }
 
             // Render subject + body under the receiver's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $receiverUserId, $reviewerName, $rating, $comment, $isAnonymous) {
+            LocaleContext::withLocale($user, function () use ($user, $receiverUserId, $reviewerName, $rating, $comment, $isAnonymous, $tenantId) {
                 $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $baseUrl = TenantContext::getFrontendUrl();
@@ -881,7 +881,7 @@ class NotificationDispatcher
                     htmlspecialchars($tenantName)
                 );
 
-                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'review')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'review', ['tenant_id' => $tenantId])) {
                     Log::warning('NotificationDispatcher::sendReviewEmail mailer returned false', [
                         'user_id' => $receiverUserId,
                     ]);
@@ -914,7 +914,7 @@ class NotificationDispatcher
         }
 
         // Render + send under the recipient's preferred locale.
-        LocaleContext::withLocale($user, function () use ($user) {
+        LocaleContext::withLocale($user, function () use ($user, $tenantId, $userId) {
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl    = TenantContext::getFrontendUrl();
             $basePath   = TenantContext::getSlugPrefix();
@@ -934,7 +934,7 @@ class NotificationDispatcher
 
             try {
                 $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
-                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification', ['tenant_id' => $tenantId])) {
                     Log::warning('[IdentityVerification] started email returned false', [
                         'user_id' => $userId,
                     ]);
@@ -956,7 +956,7 @@ class NotificationDispatcher
             ->select(['first_name', 'email', 'preferred_language'])
             ->first();
 
-        LocaleContext::withLocale($user, function () use ($userId, $user) {
+        LocaleContext::withLocale($user, function () use ($userId, $user, $tenantId) {
             $link = "/dashboard";
             $content = __('notifications.verification_passed');
 
@@ -985,7 +985,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification', ['tenant_id' => $tenantId])) {
                         Log::warning('[IdentityVerification] passed email returned false', [
                             'user_id' => $userId,
                         ]);
@@ -1008,7 +1008,7 @@ class NotificationDispatcher
             ->select(['first_name', 'email', 'preferred_language'])
             ->first();
 
-        LocaleContext::withLocale($user, function () use ($userId, $user, $reason) {
+        LocaleContext::withLocale($user, function () use ($userId, $user, $reason, $tenantId) {
             $link = "/verify-identity";
             $content = !empty($reason)
                 ? __('notifications.verification_failed_reason', ['reason' => $reason])
@@ -1043,7 +1043,7 @@ class NotificationDispatcher
 
                 try {
                     $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'identity_verification', ['tenant_id' => $tenantId])) {
                         Log::warning('[IdentityVerification] failed email returned false', [
                             'user_id' => $userId,
                         ]);
@@ -1248,7 +1248,7 @@ HTML;
             }
 
             // Render subject + body under the recipient's preferred locale.
-            LocaleContext::withLocale($user, function () use ($user, $type, $data, $link) {
+            LocaleContext::withLocale($user, function () use ($user, $type, $data, $link, $tenantId) {
                 $baseUrl = TenantContext::getFrontendUrl();
                 $slugPrefix = TenantContext::getSlugPrefix();
                 $fullUrl = $baseUrl . $slugPrefix . $link;
@@ -1263,7 +1263,7 @@ HTML;
                     $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
                     $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                     $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction', ['tenant_id' => $tenantId])) {
                         Log::warning('NotificationDispatcher: credit received email returned false', [
                             'user_id' => $user->id ?? null,
                         ]);
@@ -1273,7 +1273,7 @@ HTML;
                     $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
                     $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
                     $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'exchange')) {
+                    if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'exchange', ['tenant_id' => $tenantId])) {
                         Log::warning('NotificationDispatcher: exchange email returned false', [
                             'user_id' => $user->id ?? null,
                             'type' => $type,

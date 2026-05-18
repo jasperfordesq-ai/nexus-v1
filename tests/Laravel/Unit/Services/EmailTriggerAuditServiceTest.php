@@ -92,4 +92,38 @@ class EmailTriggerAuditServiceTest extends TestCase
 
         $this->assertContains('newsletter_queue_marked_sent_without_email_log', $codes);
     }
+
+    public function test_run_surfaces_suppressed_notification_queue_rows(): void
+    {
+        if (!Schema::hasTable('notification_queue')) {
+            $this->markTestSkipped('Notification queue table is not available.');
+        }
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Digest Suppressed User',
+            'email' => 'digest-suppressed@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('notification_queue')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'activity_type' => 'digest_suppressed',
+            'content_snippet' => 'Suppressed digest audit row',
+            'link' => '/notifications',
+            'status' => 'suppressed',
+            'frequency' => 'daily',
+            'created_at' => now()->subMinute(),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('notification_queue_suppressed_recently', $codes);
+        $this->assertNotContains('notification_queue_marked_sent_without_email_log', $codes);
+    }
 }

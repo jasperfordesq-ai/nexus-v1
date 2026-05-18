@@ -515,7 +515,7 @@ class MarketplaceReportService
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $noteKey, $noteParams, $ctaKey, $fullUrl, $userId): void {
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $noteKey, $noteParams, $ctaKey, $fullUrl, $userId, $tenantId): void {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $builder = EmailTemplateBuilder::make()
@@ -529,7 +529,7 @@ class MarketplaceReportService
 
             $html = $builder->button(__($ctaKey), $fullUrl)->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_report')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_report', ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceReportService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
             }
         });

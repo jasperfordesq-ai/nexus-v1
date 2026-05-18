@@ -272,7 +272,7 @@ class MarketplaceRatingService
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId): void {
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $tenantId): void {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $html = EmailTemplateBuilder::make()
@@ -282,7 +282,7 @@ class MarketplaceRatingService
                 ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_rating')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_rating', ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
             }
         });

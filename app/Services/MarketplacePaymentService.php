@@ -573,7 +573,7 @@ class MarketplacePaymentService
 
                 $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-                LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId): void {
+                LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId, $tenantId): void {
                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
                     $html = EmailTemplateBuilder::make()
@@ -583,7 +583,7 @@ class MarketplacePaymentService
                         ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                         ->render();
 
-                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_payment')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_payment', ['tenant_id' => $tenantId])) {
                         Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
                     }
                 });
@@ -782,7 +782,7 @@ class MarketplacePaymentService
                     ->first();
                 if ($buyer && !empty($buyer->email)) {
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/marketplace/orders/' . $order->id;
-                    LocaleContext::withLocale($buyer, function () use ($buyer, $emailTitleKey, $emailBodyKey, $emailSubjectKey, $amountFormatted, $currency, $orderNumber, $fullUrl): void {
+                    LocaleContext::withLocale($buyer, function () use ($buyer, $emailTitleKey, $emailBodyKey, $emailSubjectKey, $amountFormatted, $currency, $orderNumber, $fullUrl, $payment): void {
                         $firstName = $buyer->first_name ?? $buyer->name ?? __('emails.common.fallback_name');
                         $html = EmailTemplateBuilder::make()
                             ->title(__($emailTitleKey))
@@ -790,7 +790,7 @@ class MarketplacePaymentService
                             ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
                             ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                             ->render();
-                        if (!\App\Services\EmailDispatchService::sendRaw($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html, null, null, null, 'marketplace_refund')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html, null, null, null, 'marketplace_refund', ['tenant_id' => (int) $payment->tenant_id])) {
                             Log::warning('MarketplacePayment webhook: refund email returned false', [
                                 'order_id' => $order->id,
                                 'buyer_id' => $buyer->id ?? null,

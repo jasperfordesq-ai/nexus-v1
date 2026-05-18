@@ -311,6 +311,16 @@ class EmailTriggerAuditService
             ->get();
         $issues = array_merge($issues, $this->rowsToIssues($failed, 'notification_queue_failed_recently', 'warning', 'notifications', 'queue_dispatch', ['window_hours' => $windowHours]));
 
+        $suppressed = DB::table('notification_queue')
+            ->when(!$queueHasTenantId, fn ($q) => $q->join('users', 'users.id', '=', 'notification_queue.user_id'))
+            ->selectRaw("{$tenantExpr} as tenant_id, COUNT(*) as count")
+            ->where('notification_queue.status', 'suppressed')
+            ->where('notification_queue.created_at', '>=', $since)
+            ->when($tenantId !== null, fn ($q) => $q->whereRaw("{$tenantExpr} = ?", [$tenantId]))
+            ->groupByRaw($tenantExpr)
+            ->get();
+        $issues = array_merge($issues, $this->rowsToIssues($suppressed, 'notification_queue_suppressed_recently', 'warning', 'notifications', 'queue_dispatch', ['window_hours' => $windowHours]));
+
         if ($this->hasTables(['email_log', 'users'])) {
             $queuedTenantExpr = $queueHasTenantId ? 'nq.tenant_id' : 'u.tenant_id';
             $sentWithoutLog = DB::table('notification_queue as nq')

@@ -809,7 +809,7 @@ class ExchangeWorkflowService
                             continue;
                         }
 
-                        LocaleContext::withLocale($party['lang'], function () use ($party, $frontendUrl, $link) {
+                        LocaleContext::withLocale($party['lang'], function () use ($party, $frontendUrl, $link, $exchange) {
                             $html = EmailTemplateBuilder::make()
                                 ->theme('warning')
                                 ->title(__('emails.exchange_dispute.title'))
@@ -827,7 +827,8 @@ class ExchangeWorkflowService
                                 null,
                                 null,
                                 null,
-                                'exchange_dispute'
+                                'exchange_dispute',
+                                ['tenant_id' => (int) $exchange->tenant_id]
                             )) {
                                 Log::warning('[ExchangeWorkflowService] dispute notification email returned false', [
                                     'email' => $party['email'],
@@ -967,7 +968,7 @@ class ExchangeWorkflowService
             }
 
             foreach ($parties as $party) {
-                LocaleContext::withLocale($party['lang'], function () use ($party, $finalHours, $frontendUrl, $link) {
+                LocaleContext::withLocale($party['lang'], function () use ($party, $finalHours, $frontendUrl, $link, $exchange) {
                     $html = EmailTemplateBuilder::make()
                         ->theme('success')
                         ->title(__('emails.dispute_resolved_title'))
@@ -987,7 +988,8 @@ class ExchangeWorkflowService
                         null,
                         null,
                         null,
-                        'exchange_dispute'
+                        'exchange_dispute',
+                        ['tenant_id' => (int) $exchange->tenant_id]
                     )) {
                         Log::warning('[ExchangeWorkflowService] dispute resolved email returned false', [
                             'email' => $party['email'],

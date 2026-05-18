@@ -437,7 +437,7 @@ class MarketplaceOfferService
 
         $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $ctaKey, $fullUrl, $userId): void {
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $ctaKey, $fullUrl, $userId, $tenantId): void {
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
             $html = EmailTemplateBuilder::make()
@@ -447,7 +447,7 @@ class MarketplaceOfferService
                 ->button(__($ctaKey), $fullUrl)
                 ->render();
 
-            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_offer')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_offer', ['tenant_id' => $tenantId])) {
                 Log::warning('[MarketplaceOfferService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
             }
         });
