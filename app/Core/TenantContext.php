@@ -355,6 +355,44 @@ class TenantContext
     }
 
     /**
+     * Run a callback under an explicit tenant context and restore the previous
+     * request state afterwards. This is for queued jobs, webhooks, and batch
+     * email paths where the current HTTP tenant cannot be trusted.
+     *
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    public static function runForTenant(?int $tenantId, callable $callback)
+    {
+        $previousTenant = self::$tenant;
+        $previousBasePath = self::$basePath;
+        $previousCachedId = self::$cachedId;
+        $previousTokenTenantId = self::$tokenTenantId;
+        $previousHeaderTenantId = self::$headerTenantId;
+        $previousParentDomain = self::$parentDomain;
+        $previousParentDomainByParentId = self::$parentDomainByParentId;
+
+        try {
+            if ($tenantId !== null) {
+                if (!self::setById($tenantId)) {
+                    throw new \InvalidArgumentException("Tenant {$tenantId} could not be loaded");
+                }
+            }
+
+            return $callback();
+        } finally {
+            self::$tenant = $previousTenant;
+            self::$basePath = $previousBasePath;
+            self::$cachedId = $previousCachedId;
+            self::$tokenTenantId = $previousTokenTenantId;
+            self::$headerTenantId = $previousHeaderTenantId;
+            self::$parentDomain = $previousParentDomain;
+            self::$parentDomainByParentId = $previousParentDomainByParentId;
+        }
+    }
+
+    /**
      * Set tenant context by ID (for cron jobs, admin areas, etc.)
      *
      * @param int $tenantId

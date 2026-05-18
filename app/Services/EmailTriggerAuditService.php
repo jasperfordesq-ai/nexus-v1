@@ -82,7 +82,8 @@ class EmailTriggerAuditService
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkNotificationQueueHealth($tenantId, $since, $windowHours),
                 $this->checkTenantContextAndWebhookHealth($tenantId, $since, $windowHours),
-                $this->checkTenantProviderConfiguration($tenantId)
+                $this->checkTenantProviderConfiguration($tenantId),
+                $this->checkDirectEmailSendSurface($tenantId)
             );
         } catch (\Throwable $e) {
             Log::warning('EmailTriggerAuditService::run failed', ['error' => $e->getMessage()]);
@@ -149,6 +150,7 @@ class EmailTriggerAuditService
                     ]);
             })
             ->groupBy('users.tenant_id');
+        $this->excludeReservedEmailDomains($q, 'users.email');
 
         if ($tenantId !== null) {
             $q->where('users.tenant_id', $tenantId);
@@ -185,6 +187,7 @@ class EmailTriggerAuditService
                     ->where('email_log.category', 'password_reset');
             })
             ->groupBy('pr.tenant_id');
+        $this->excludeReservedEmailDomains($q, 'pr.email');
 
         if ($tenantId !== null) {
             $q->where('pr.tenant_id', $tenantId);
@@ -223,6 +226,7 @@ class EmailTriggerAuditService
                     ->where('email_log.category', 'group_invite');
             })
             ->groupBy('gi.tenant_id');
+        $this->excludeReservedEmailDomains($q, 'gi.email');
 
         if ($tenantId !== null) {
             $q->where('gi.tenant_id', $tenantId);
@@ -304,6 +308,145 @@ class EmailTriggerAuditService
         }
 
         return $issues;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkDirectEmailSendSurface(?int $tenantId): array
+    {
+        $surface = $this->directEmailSendSurface();
+        if ($surface === []) {
+            return [];
+        }
+
+        return [
+            $this->issue(
+                'direct_email_send_paths_remaining',
+                'info',
+                $tenantId,
+                'architecture',
+                'direct_send_surface',
+                [
+                    'count' => count($surface),
+                    'samples' => array_slice(array_map(
+                        fn (array $row): string => $row['path'] . ':' . $row['line'],
+                        $surface
+                    ), 0, 8),
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * Find legacy raw email send call sites that still bypass the central
+     * business-event dispatcher. This is intentionally advisory today; once
+     * the migration is complete it can become a CI-blocking assertion.
+     *
+     * @return list<array{path:string,line:int,pattern:string}>
+     */
+    public function directEmailSendSurface(): array
+    {
+        $appPath = app_path();
+        if (!is_dir($appPath)) {
+            return [];
+        }
+
+        $allowed = array_filter(array_map('realpath', [
+            app_path('Core/Mailer.php'),
+            app_path('Services/EmailDispatchService.php'),
+            app_path('Services/EmailService.php'),
+            app_path('Services/EmailTriggerAuditService.php'),
+            app_path('Services/NotificationDispatcher.php'),
+        ]));
+
+        $patterns = [
+            'mailer_factory_send' => '/Mailer::forCurrentTenant\s*\(\s*\)\s*->\s*send\s*\(/',
+            'mailer_variable_send' => '/\$[A-Za-z_][A-Za-z0-9_]*mailer[A-Za-z0-9_]*\s*->\s*send\s*\(/i',
+            'email_service_app_send' => '/app\s*\(\s*EmailService::class\s*\)\s*->\s*send\s*\(/',
+            'email_service_variable_send' => '/\$[A-Za-z_][A-Za-z0-9_]*(?:emailService|email)[A-Za-z0-9_]*\s*->\s*send\s*\(/i',
+        ];
+
+        $surface = [];
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($appPath));
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $path = $file->getPathname();
+            $realPath = realpath($path);
+            if ($realPath !== false && in_array($realPath, $allowed, true)) {
+                continue;
+            }
+
+            $relativePath = str_replace($appPath . DIRECTORY_SEPARATOR, '', $path);
+            $lines = file($path, FILE_IGNORE_NEW_LINES);
+            if ($lines === false) {
+                continue;
+            }
+
+            $inBlockComment = false;
+            foreach ($lines as $index => $line) {
+                $codeLine = $this->stripPhpCommentsFromLine((string) $line, $inBlockComment);
+                if (trim($codeLine) === '') {
+                    continue;
+                }
+
+                foreach ($patterns as $name => $pattern) {
+                    if (preg_match($pattern, $codeLine) === 1) {
+                        $surface[] = [
+                            'path' => $relativePath,
+                            'line' => $index + 1,
+                            'pattern' => $name,
+                        ];
+                        break;
+                    }
+                }
+            }
+        }
+
+        usort($surface, fn (array $a, array $b): int => [$a['path'], $a['line']] <=> [$b['path'], $b['line']]);
+
+        return $surface;
+    }
+
+    private function stripPhpCommentsFromLine(string $line, bool &$inBlockComment): string
+    {
+        $remaining = $line;
+
+        while ($remaining !== '') {
+            if ($inBlockComment) {
+                $end = strpos($remaining, '*/');
+                if ($end === false) {
+                    return '';
+                }
+                $remaining = substr($remaining, $end + 2);
+                $inBlockComment = false;
+                continue;
+            }
+
+            $start = strpos($remaining, '/*');
+            $single = strpos($remaining, '//');
+
+            if ($single !== false && ($start === false || $single < $start)) {
+                return substr($remaining, 0, $single);
+            }
+
+            if ($start === false) {
+                return $remaining;
+            }
+
+            $end = strpos($remaining, '*/', $start + 2);
+            if ($end === false) {
+                $inBlockComment = true;
+                return substr($remaining, 0, $start);
+            }
+
+            $remaining = substr($remaining, 0, $start) . substr($remaining, $end + 2);
+        }
+
+        return '';
     }
 
     /**
@@ -452,5 +595,24 @@ class EmailTriggerAuditService
             }
         }
         return true;
+    }
+
+    /**
+     * Reserved test domains are intentionally non-deliverable. They are useful
+     * for local fixtures, but should not be counted as "email failed to fire"
+     * incidents in the enterprise trigger audit.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     */
+    private function excludeReservedEmailDomains($query, string $column): void
+    {
+        foreach ([
+            '%@example.test',
+            '%@example.invalid',
+            '%@test.local',
+            '%@localhost',
+        ] as $pattern) {
+            $query->where($column, 'not like', $pattern);
+        }
     }
 }

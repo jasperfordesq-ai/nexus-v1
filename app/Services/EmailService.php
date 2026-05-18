@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\Mailer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -25,16 +24,8 @@ class EmailService
     public function send(string $to, string $subject, string $body, array $options = []): bool
     {
         try {
-            $mailer = Mailer::forCurrentTenant();
-            return $mailer->send(
-                $to,
-                $subject,
-                $body,
-                $options['cc']             ?? null,
-                $options['replyTo']        ?? null,
-                $options['unsubscribeUrl'] ?? null,
-                $options['category']       ?? null,
-            );
+            $options['source'] ??= 'EmailService';
+            return app(EmailDispatchService::class)->send($to, $subject, $body, $options);
         } catch (\Throwable $e) {
             Log::error('EmailService::send failed', ['to' => self::maskEmail($to), 'error' => $e->getMessage()]);
             return false;

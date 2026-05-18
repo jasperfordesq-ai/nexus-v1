@@ -40,6 +40,35 @@ class EmailMailerRoutingTest extends TestCase
         Mail::assertNothingQueued();
     }
 
+    public function test_email_dispatch_service_uses_tenant_aware_mailer(): void
+    {
+        $source = file_get_contents(app_path('Services/EmailDispatchService.php'));
+
+        $this->assertStringContainsString(
+            'TenantContext::runForTenant',
+            $source,
+            'EmailDispatchService must preserve and restore explicit tenant context'
+        );
+
+        $this->assertStringContainsString(
+            'Mailer::forCurrentTenant()->send(',
+            $source,
+            'EmailDispatchService must use the tenant-aware Mailer'
+        );
+
+        $this->assertStringNotContainsString(
+            'Mail::raw(',
+            $source,
+            'EmailDispatchService must NOT use Mail::raw() - that bypasses SendGrid'
+        );
+
+        $this->assertStringNotContainsString(
+            'Mail::send(',
+            $source,
+            'EmailDispatchService must NOT use Mail::send() - that bypasses SendGrid'
+        );
+    }
+
     /**
      * EmailService::send() should return false (not throw) on failure.
      */
@@ -53,17 +82,17 @@ class EmailMailerRoutingTest extends TestCase
     }
 
     /**
-     * Verify EmailService source code references Mailer::forCurrentTenant,
+     * Verify EmailService source code routes through the auditable dispatcher,
      * not Mail::raw or Mail::send. This is a code-level regression guard.
      */
-    public function test_email_service_source_uses_mailer_class(): void
+    public function test_email_service_source_uses_email_dispatch_service(): void
     {
         $source = file_get_contents(app_path('Services/EmailService.php'));
 
         $this->assertStringContainsString(
-            'Mailer::forCurrentTenant()',
+            'EmailDispatchService::class',
             $source,
-            'EmailService::send() must call Mailer::forCurrentTenant()'
+            'EmailService::send() must route through EmailDispatchService'
         );
 
         $this->assertStringNotContainsString(

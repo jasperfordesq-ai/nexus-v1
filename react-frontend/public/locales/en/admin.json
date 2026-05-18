@@ -9500,6 +9500,10 @@
         "title": "Tenant provider check failed",
         "body": "The email provider configuration audit could not complete for this tenant."
       },
+      "direct_email_send_paths_remaining": {
+        "title": "Legacy direct email paths remain",
+        "body": "{{count}} raw email send paths still bypass the unified notification dispatcher. Keep hardening these paths until every module routes through the auditable dispatcher."
+      },
       "email_trigger_audit_failed": {
         "title": "Email trigger audit failed",
         "body": "The email trigger audit could not complete."

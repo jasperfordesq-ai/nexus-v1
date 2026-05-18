@@ -37,4 +37,18 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertGreaterThanOrEqual(0, $result['score']);
         $this->assertLessThanOrEqual(1000, $result['score']);
     }
+
+    public function test_direct_email_send_surface_is_machine_readable(): void
+    {
+        $surface = app(EmailTriggerAuditService::class)->directEmailSendSurface();
+
+        $this->assertIsArray($surface);
+        foreach ($surface as $row) {
+            $this->assertArrayHasKey('path', $row);
+            $this->assertArrayHasKey('line', $row);
+            $this->assertArrayHasKey('pattern', $row);
+            $this->assertNotSame('Services/EmailService.php', str_replace('\\', '/', $row['path']));
+            $this->assertNotSame('Services/EmailDispatchService.php', str_replace('\\', '/', $row['path']));
+        }
+    }
 }
