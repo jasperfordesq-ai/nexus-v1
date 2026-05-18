@@ -156,6 +156,7 @@ class CivicDigestMail
                     null,
                     $prefsUrl,
                     'civic_digest',
+                    ['tenant_id' => $recipient->tenant_id ?? TenantContext::currentId()]
                 );
                 return $sent === true;
             } catch (Throwable $e) {

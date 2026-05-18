@@ -59,8 +59,31 @@ class NotificationDispatcher
      */
     public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): void
     {
+        $recipientTenantId = self::resolveTenantIdForQueue((int) $userId);
+        if ($recipientTenantId === null) {
+            Log::error('NotificationDispatcher::dispatch could not resolve recipient tenant', [
+                'user_id' => (int) $userId,
+                'activity_type' => $activityType,
+            ]);
+            return;
+        }
+
+        TenantContext::runForTenant($recipientTenantId, function () use ($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId): void {
+            self::dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId);
+        });
+    }
+
+    private static function dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): void
+    {
         // 1. Create In-App Notification (The "Bell") with 60-second deduplication window
-        $tenantId = TenantContext::getId();
+        $tenantId = TenantContext::currentId();
+        if ($tenantId === null) {
+            Log::error('NotificationDispatcher::dispatchForResolvedTenant called without tenant context', [
+                'user_id' => (int) $userId,
+                'activity_type' => $activityType,
+            ]);
+            return;
+        }
 
         // Fix 9: Skip notification if the sending user is muted by the recipient.
         // Only checked when fromUserId is provided — system notifications are never suppressed.

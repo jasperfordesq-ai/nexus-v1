@@ -100,6 +100,26 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         }
     }
 
+    public function test_email_dispatcher_prefers_unique_recipient_tenant_over_leaked_context(): void
+    {
+        $otherTenantId = 999;
+        $email = 'tenant-mismatch-' . uniqid('', true) . '@example.test';
+        User::factory()->forTenant($otherTenantId)->create([
+            'status' => 'active',
+            'email' => $email,
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $method = new \ReflectionMethod(EmailDispatchService::class, 'resolveTenantId');
+        $method->setAccessible(true);
+
+        $tenantId = $method->invoke(app(EmailDispatchService::class), [], $email);
+
+        $this->assertSame($otherTenantId, $tenantId);
+        $this->assertSame($this->testTenantId, TenantContext::currentId());
+    }
+
     public function test_instant_queue_stale_cleanup_only_marks_instant_rows_failed(): void
     {
         $source = file_get_contents(app_path('Services/CronJobRunner.php'));
@@ -202,5 +222,43 @@ class NotificationQueueTenantIntegrityTest extends TestCase
         } finally {
             TenantContext::setById($this->testTenantId);
         }
+    }
+
+    public function test_dispatch_uses_recipient_tenant_for_frequency_when_context_is_leaked(): void
+    {
+        $otherTenantId = 999;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode(['notifications' => ['default_frequency' => 'off']]),
+        ]);
+        DB::table('tenants')->where('id', $otherTenantId)->update([
+            'configuration' => json_encode(['notifications' => ['default_frequency' => 'instant']]),
+        ]);
+
+        $user = User::factory()->forTenant($otherTenantId)->create([
+            'status' => 'active',
+            'email' => 'dispatch-tenant-' . uniqid('', true) . '@example.test',
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        NotificationDispatcher::dispatch(
+            $user->id,
+            'global',
+            0,
+            'new_topic',
+            'Tenant-specific default check',
+            '/notifications',
+            '<p>Tenant-specific default check</p>'
+        );
+
+        $row = DB::table('notification_queue')
+            ->where('user_id', $user->id)
+            ->where('activity_type', 'new_topic')
+            ->orderByDesc('id')
+            ->first();
+
+        $this->assertNotNull($row);
+        $this->assertSame($otherTenantId, (int) $row->tenant_id);
+        $this->assertSame($this->testTenantId, TenantContext::currentId());
     }
 }

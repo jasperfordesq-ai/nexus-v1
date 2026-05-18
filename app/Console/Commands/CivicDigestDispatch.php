@@ -227,7 +227,7 @@ class CivicDigestDispatch extends Command
             });
         }
 
-        $columns = ['id', 'email', 'first_name', 'last_name', 'name', 'preferred_language'];
+        $columns = ['id', 'tenant_id', 'email', 'first_name', 'last_name', 'name', 'preferred_language'];
         $users = $usersQuery->select($columns)->get();
         $stats['candidates'] = $users->count();
 

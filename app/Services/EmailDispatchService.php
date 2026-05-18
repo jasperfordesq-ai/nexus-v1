@@ -130,18 +130,44 @@ class EmailDispatchService
     {
         $tenantId = $options['tenant_id'] ?? $options['tenantId'] ?? null;
 
-        if ($tenantId === null || $tenantId === '') {
-            $tenantId = TenantContext::currentId();
+        if ($tenantId !== null && $tenantId !== '') {
+            return (int) $tenantId;
         }
 
-        if ($tenantId === null || $tenantId === '') {
-            return $this->resolveTenantIdFromRecipientEmail($to);
+        $contextTenantId = TenantContext::currentId();
+        $recipientTenantIds = $this->resolveTenantIdsFromRecipientEmail($to);
+
+        if (count($recipientTenantIds) === 1) {
+            $recipientTenantId = (int) $recipientTenantIds[0];
+            if ($contextTenantId !== null && (int) $contextTenantId !== $recipientTenantId) {
+                Log::warning('EmailDispatchService::send tenant context differed from unique recipient tenant', [
+                    'context_tenant_id' => (int) $contextTenantId,
+                    'recipient_tenant_id' => $recipientTenantId,
+                    'to' => $this->maskEmail($to),
+                ]);
+            }
+
+            return $recipientTenantId;
         }
 
-        return (int) $tenantId;
+        if (count($recipientTenantIds) > 1) {
+            if ($contextTenantId !== null && in_array((int) $contextTenantId, $recipientTenantIds, true)) {
+                return (int) $contextTenantId;
+            }
+
+            Log::warning('EmailDispatchService::send could not infer tenant because recipient email exists in multiple tenants', [
+                'to' => $this->maskEmail($to),
+                'tenant_ids' => $recipientTenantIds,
+            ]);
+        }
+
+        return $contextTenantId !== null ? (int) $contextTenantId : null;
     }
 
-    private function resolveTenantIdFromRecipientEmail(string $email): ?int
+    /**
+     * @return list<int>
+     */
+    private function resolveTenantIdsFromRecipientEmail(string $email): array
     {
         try {
             $tenantIds = DB::table('users')
@@ -153,16 +179,7 @@ class EmailDispatchService
                 ->map(fn ($tenantId): int => (int) $tenantId)
                 ->values();
 
-            if ($tenantIds->count() === 1) {
-                return (int) $tenantIds->first();
-            }
-
-            if ($tenantIds->count() > 1) {
-                Log::warning('EmailDispatchService::send could not infer tenant because recipient email exists in multiple tenants', [
-                    'to' => $this->maskEmail($email),
-                    'tenant_ids' => $tenantIds->all(),
-                ]);
-            }
+            return $tenantIds->all();
         } catch (\Throwable $e) {
             Log::warning('EmailDispatchService::send tenant inference failed', [
                 'to' => $this->maskEmail($email),
@@ -170,7 +187,7 @@ class EmailDispatchService
             ]);
         }
 
-        return null;
+        return [];
     }
 
     private function maskEmail(string $email): string
