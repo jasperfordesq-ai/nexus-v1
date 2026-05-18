@@ -177,7 +177,7 @@ class ExploreService
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
                     AND fp.is_hidden = 0
                 ORDER BY engagement DESC
                 LIMIT 30
@@ -1925,7 +1925,7 @@ class ExploreService
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
                     AND fp.is_hidden = 0
             ", [$tenantId, $tenantId]);
 
@@ -1944,7 +1944,7 @@ class ExploreService
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
                     AND fp.is_hidden = 0
                 ORDER BY (
                     (SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'post' AND lk.target_id = fp.id AND lk.tenant_id = ?)
