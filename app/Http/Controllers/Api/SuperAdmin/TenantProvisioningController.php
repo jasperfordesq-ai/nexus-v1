@@ -28,7 +28,7 @@ class TenantProvisioningController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    private function requireSuperAdmin(): int
+    protected function requireSuperAdmin(): int
     {
         $userId = $this->requireAuth();
         $user = $this->resolveUser();

@@ -253,12 +253,4 @@ class AdminEmailDeliverabilityController extends BaseApiController
         ]);
     }
 
-    private function requireSuperAdmin(): void
-    {
-        $userId = $this->requireAuth();
-        $row = DB::table('users')->where('id', $userId)->first(['role', 'is_super_admin']);
-        if (!$row || !($row->is_super_admin || in_array($row->role, ['god', 'super_admin'], true))) {
-            abort(403, 'platform super-admin required');
-        }
-    }
 }
