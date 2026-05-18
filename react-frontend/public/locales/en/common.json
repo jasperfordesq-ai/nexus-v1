@@ -275,6 +275,8 @@
   "members": {
     "title": "Members",
     "subtitle": "Connect with members of the community",
+    "hero_eyebrow": "Community directory",
+    "count_label": "Members shown",
     "quick_filters": "Member filters",
     "all": "All Members",
     "new": "New Members",
@@ -299,6 +301,9 @@
     "no_members": "No members found",
     "no_members_search": "Try a different search term",
     "no_members_community": "No members in this community yet",
+    "empty_tip_profiles": "Browse complete profiles",
+    "empty_tip_skills": "Search by skill",
+    "empty_tip_location": "Try nearby members",
     "load_more": "Load More",
     "results_matching": "{{shown}} of {{total}} members matching \"{{query}}\"",
     "results_count": "{{count}} members shown",

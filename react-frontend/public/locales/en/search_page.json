@@ -2,6 +2,8 @@
   "page_title": "Search",
   "title": "Search",
   "subtitle": "Find listings, members, events, and groups",
+  "hero_eyebrow": "Search across the community",
+  "results_label": "Results found",
   "search_placeholder": "Search for anything...",
   "tab_all": "All ({{count}})",
   "tab_listings": "Listings ({{count}})",
@@ -13,12 +15,17 @@
   "try_again": "Try Again",
   "no_results_title": "No results found",
   "no_results_desc": "No results for \"{{query}}\". Try a different search term.",
+  "empty_tip_spelling": "Check spelling",
+  "empty_tip_filters": "Reset filters",
+  "empty_tip_broaden": "Use broader words",
   "section_listings": "Listings ({{count}})",
   "section_members": "Members ({{count}})",
   "section_events": "Events ({{count}})",
   "section_groups": "Groups ({{count}})",
   "listing_offering": "Offering",
   "listing_requesting": "Requesting",
+  "hours_estimate": "{{hours}}h",
+  "hours_unknown": "Time not set",
   "view_all_listings": "View all {{count}} listings",
   "view_all_members": "View all {{count}} members",
   "view_all_events": "View all {{count}} events",
@@ -26,6 +33,9 @@
   "members_count": "{{count}} members",
   "initial_title": "Start searching",
   "initial_desc": "Enter a search term to find listings, members, events, and groups",
+  "initial_tip_services": "Services",
+  "initial_tip_people": "People",
+  "initial_tip_events": "Events",
   "toast": {
     "search_failed": "Search failed"
   },
@@ -69,6 +79,7 @@
     "loading_search_results": "Loading search results"
   },
   "page_meta": {
-    "title": "Search"
+    "title": "Search",
+    "description": "Search your community for listings, members, groups, events, and useful local activity across the Project NEXUS timebanking platform."
   }
 }

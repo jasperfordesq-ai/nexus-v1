@@ -30,7 +30,8 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
-import { EmptyState } from '@/components/feedback';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
@@ -310,42 +311,32 @@ export function MembersPage() {
   return (
     <div className="space-y-5">
       <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} noIndex />
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
-                <Users className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('members.title')}</h1>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-theme-muted text-sm">{t('members.subtitle')}</p>
-              {totalCount != null && !isLoading && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" aria-hidden="true" />
-                  {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
-                </span>
-              )}
-              {activeSortBy === 'communityrank' && !isNearbyMode && (
-                <AlgorithmLabel area="members" />
-              )}
-            </div>
-          </div>
-          {isAuthenticated && user && (
-            <Link to={tenantPath(`/profile/${user.id}`)}>
-              <Button
-                color="primary"
-                className="shrink-0 font-semibold shadow-sm"
-                startContent={<UserCircle className="w-4 h-4" />}
-              >
-                {t('members.my_profile')}
-              </Button>
-            </Link>
-          )}
+      <PublicPageHero
+        eyebrow={t('members.hero_eyebrow')}
+        title={t('members.title')}
+        description={t('members.subtitle')}
+        icon={<Users className="h-6 w-6" aria-hidden="true" />}
+        accent="blue"
+        stats={totalCount != null && !isLoading ? [{ label: t('members.count_label'), value: totalCount.toLocaleString() }] : undefined}
+        action={
+          isAuthenticated && user ? (
+            <Button
+              as={Link}
+              to={tenantPath(`/profile/${user.id}`)}
+              color="primary"
+              className="shrink-0 font-semibold shadow-sm"
+              startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('members.my_profile')}
+            </Button>
+          ) : undefined
+        }
+      />
+      {activeSortBy === 'communityrank' && !isNearbyMode && (
+        <div className="-mt-2">
+          <AlgorithmLabel area="members" />
         </div>
-      </div>
+      )}
 
       {/* Quick Filters */}
       <div className="flex flex-wrap items-center gap-2" aria-label={t('members.quick_filters')}>
@@ -558,10 +549,12 @@ export function MembersPage() {
               ))}
             </div>
           ) : members.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<Users className="w-12 h-12" />}
               title={t('members.no_members')}
               description={debouncedQuery ? t('members.no_members_search') : t('members.no_members_community')}
+              tips={[t('members.empty_tip_profiles'), t('members.empty_tip_skills'), t('members.empty_tip_location')]}
+              accent="blue"
               action={debouncedQuery ? (
                 <Button variant="bordered" onPress={resetSearch} startContent={<X className="h-4 w-4" aria-hidden="true" />}>
                   {t('members.clear_search')}

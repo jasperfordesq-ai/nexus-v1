@@ -23,7 +23,8 @@ import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, GroupCardSkeleton } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import { EmptyState } from '@/components/feedback';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -209,39 +210,27 @@ export function GroupsPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title')} description={t('page_description')} />
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
-                <Users className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('title')}</h1>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-theme-muted text-sm">{t('subtitle')}</p>
-              {totalCount != null && !isLoading && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" aria-hidden="true" />
-                  {t('count_pill', { count: totalCount })}
-                </span>
-              )}
-            </div>
-          </div>
-          {isAuthenticated && (
-            <Link to={tenantPath('/groups/create')}>
-              <Button
-                color="primary"
-                className="shrink-0 font-semibold shadow-sm"
-                startContent={<Plus className="w-4 h-4" />}
-              >
-                {t('create_group')}
-              </Button>
-            </Link>
-          )}
-        </div>
-      </div>
+      <PublicPageHero
+        eyebrow={t('hero_eyebrow')}
+        title={t('title')}
+        description={t('subtitle')}
+        icon={<Users className="h-6 w-6" aria-hidden="true" />}
+        accent="indigo"
+        stats={totalCount != null && !isLoading ? [{ label: t('count_label'), value: totalCount.toLocaleString() }] : undefined}
+        action={
+          isAuthenticated ? (
+            <Button
+              as={Link}
+              to={tenantPath('/groups/create')}
+              color="primary"
+              className="shrink-0 font-semibold shadow-sm"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('create_group')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Quick Filters */}
       <div className="flex flex-wrap items-center gap-2" aria-label={t('filters_aria')}>
@@ -344,10 +333,12 @@ export function GroupsPage() {
               ))}
             </div>
           ) : groups.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<Users className="w-12 h-12" aria-hidden="true" />}
               title={t('no_groups')}
               description={t('no_groups_desc')}
+              tips={[t('empty_tip_interests'), t('empty_tip_location'), t('empty_tip_create')]}
+              accent="indigo"
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/groups/create')}>

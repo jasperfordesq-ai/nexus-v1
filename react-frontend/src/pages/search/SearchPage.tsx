@@ -21,7 +21,8 @@ import MapPin from 'lucide-react/icons/map-pin';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
-import { EmptyState } from '@/components/feedback';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { SavedSearches } from '@/components/search/SavedSearches';
 import { AdvancedSearchFilters, defaultFilters } from '@/components/search/AdvancedSearchFilters';
 import type { SearchFilters as AdvancedFilters } from '@/components/search/AdvancedSearchFilters';
@@ -227,16 +228,16 @@ export function SearchPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <PageMeta title={t('page_meta.title')} noIndex />
-      {/* Search Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Search className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          {t('title')}
-        </h1>
-        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
-      </div>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <PageMeta title={t('page_meta.title')} description={t('page_meta.description')} noIndex />
+      <PublicPageHero
+        eyebrow={t('hero_eyebrow')}
+        title={t('title')}
+        description={t('subtitle')}
+        icon={<Search className="h-6 w-6" aria-hidden="true" />}
+        accent="emerald"
+        stats={hasSearched ? [{ label: t('results_label'), value: totalResults.toLocaleString() }] : undefined}
+      />
 
       {/* Search Form */}
       <GlassCard className="p-4">
@@ -345,10 +346,12 @@ export function SearchPage() {
               ))}
             </div>
           ) : totalResults === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<Search className="w-12 h-12" />}
               title={t('no_results_title')}
               description={t('no_results_desc', { query })}
+              tips={[t('empty_tip_spelling'), t('empty_tip_filters'), t('empty_tip_broaden')]}
+              accent="emerald"
             />
           ) : (
             <motion.div
@@ -391,7 +394,9 @@ export function SearchPage() {
                               <p className="text-sm text-theme-subtle line-clamp-2 mt-1">{listing.description}</p>
                               <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                                 <Clock className="w-3 h-3" aria-hidden="true" />
-                                {listing.hours_estimate ?? listing.estimated_hours ?? '—'}h
+                                {listing.hours_estimate ?? listing.estimated_hours
+                                  ? t('hours_estimate', { hours: listing.hours_estimate ?? listing.estimated_hours })
+                                  : t('hours_unknown')}
                               </div>
                             </div>
                           </GlassCard>
@@ -558,13 +563,13 @@ export function SearchPage() {
 
       {/* Initial State */}
       {!hasSearched && (
-        <GlassCard className="p-12 text-center">
-          <Search className="w-16 h-16 text-theme-subtle mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-theme-primary mb-2">{t('initial_title')}</h3>
-          <p className="text-theme-subtle">
-            {t('initial_desc')}
-          </p>
-        </GlassCard>
+        <PublicEmptyState
+          icon={<Search className="w-12 h-12" aria-hidden="true" />}
+          title={t('initial_title')}
+          description={t('initial_desc')}
+          tips={[t('initial_tip_services'), t('initial_tip_people'), t('initial_tip_events')]}
+          accent="emerald"
+        />
       )}
     </div>
   );
