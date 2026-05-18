@@ -30,7 +30,8 @@
     "balance": "Balance",
     "active_listings": "Active Listings",
     "messages": "Messages",
-    "pending": "Pending"
+    "pending": "Pending",
+    "hours_value": "{{value}}h"
   },
   "sections": {
     "recent_listings": "Recent Listings",
@@ -64,6 +65,7 @@
     "request": "Request",
     "user_fallback": "User",
     "empty": "No recent listings",
+    "empty_description": "Create a request or offer to start matching with people nearby.",
     "create_first": "Create your first listing"
   },
   "activity": {
@@ -73,25 +75,30 @@
     "action_goal": "set a new goal",
     "action_post": "shared a post",
     "empty": "No recent activity",
+    "empty_description": "Community updates will appear here once people start posting.",
     "check_feed": "Check out the feed"
   },
   "suggestions": {
-    "empty": "No suggestions yet"
+    "empty": "No suggestions yet",
+    "empty_description": "Matching improves as more listings and profile details are added."
   },
   "groups": {
     "members_count": "{{count}} members",
     "empty": "You haven't joined any groups yet",
+    "empty_description": "Groups help you follow shared interests, projects, and local circles.",
     "discover": "Discover groups"
   },
   "events": {
     "online_event": "Online event",
     "empty": "No upcoming events",
+    "empty_description": "Events from your community will appear here when they are scheduled.",
     "browse": "Browse events"
   },
   "gamification": {
     "level": "Level {{level}}",
     "badges": "Badges",
     "streak": "Streak",
+    "xp_value": "{{count}} XP",
     "xp_progress": "XP Progress",
     "start_earning": "Start earning XP by participating in the community!",
     "streak_days_one": "{{count}} day",
@@ -105,13 +112,22 @@
     "loading_progress": "Loading progress",
     "loading_suggestions": "Loading suggestions",
     "loading_endorsements": "Loading endorsements",
-    "loading_pending_reviews": "Loading pending reviews"
+    "loading_pending_reviews": "Loading pending reviews",
+    "view_all_listings": "View all listings",
+    "view_all_activity": "View all recent activity",
+    "view_all_events": "View all events",
+    "view_all_groups": "View all groups",
+    "view_achievements": "View achievements",
+    "browse_all_listings": "Browse all listings",
+    "view_all_endorsements": "View all endorsements",
+    "view_pending_reviews": "View all pending reviews"
   },
   "reviews": {
     "sent": "Sent {{amount}}h",
     "received": "Received {{amount}}h",
     "review": "Review",
     "none_pending": "No pending reviews",
+    "none_pending_description": "Completed exchanges that need feedback will appear here.",
     "pending_subtitle": "Open this review request",
     "view_all_pending": "View All Pending"
   }

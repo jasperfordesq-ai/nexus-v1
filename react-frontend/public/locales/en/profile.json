@@ -47,7 +47,9 @@
   "about": {
     "heading": "About",
     "no_bio": "No bio added yet.",
-    "skills": "Skills"
+    "skills": "Skills",
+    "no_skills_own": "Add skills in settings so other members know what you can help with.",
+    "no_skills_other": "This member has not added any skills yet."
   },
   "listing_type": {
     "offer": "Offering",
@@ -135,7 +137,8 @@
     "submit_failed_fallback": "Failed to submit review"
   },
   "page_meta": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "{{name}}'s member profile"
   },
   "mute_unavailable": "To mute this user, visit the main feed",
   "report_unavailable": "To report this post, visit the main feed",
@@ -181,5 +184,6 @@
   "show_less": "Show less",
   "read_more": "Read more",
   "read_less": "Read less",
-  "hours_abbrev": "{{hours}}h"
+  "hours_abbrev": "{{hours}}h",
+  "not_available_abbrev": "n/a"
 }

@@ -124,19 +124,49 @@ function SectionIcon({ children, color }: { children: React.ReactNode; color: ke
   );
 }
 
-function SectionHeader({ icon, iconColor, title, linkTo, linkText }: {
-  icon: React.ReactNode; iconColor: keyof typeof iconContainerColors; title: string; linkTo?: string; linkText?: string;
+function SectionHeader({ icon, iconColor, title, linkTo, linkText, linkAriaLabel }: {
+  icon: React.ReactNode; iconColor: keyof typeof iconContainerColors; title: string; linkTo?: string; linkText?: string; linkAriaLabel?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 mb-4">
-      <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2.5 min-w-0">
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <h2 className="flex min-w-0 items-center gap-2.5 text-base font-semibold text-theme-primary sm:text-lg">
         <SectionIcon color={iconColor}>{icon}</SectionIcon>
         <span className="truncate">{title}</span>
       </h2>
       {linkTo && linkText && (
-        <Link to={linkTo} className="text-[var(--color-primary)] hover:opacity-80 text-sm flex items-center gap-1 shrink-0 whitespace-nowrap transition-opacity">
+        <Link to={linkTo} aria-label={linkAriaLabel ?? linkText} className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-1 py-1 text-sm text-[var(--color-primary)] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]">
           {linkText} <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </Link>
+      )}
+    </div>
+  );
+}
+
+interface DashboardEmptyStateProps {
+  icon: React.ReactNode;
+  title: string;
+  description?: string;
+  actionTo?: string;
+  actionLabel?: string;
+}
+
+function DashboardEmptyState({ icon, title, description, actionTo, actionLabel }: DashboardEmptyStateProps) {
+  return (
+    <div className="flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--glass-border)] bg-theme-elevated/60 px-4 py-8 text-center text-theme-subtle">
+      <div className="mb-3 opacity-60">{icon}</div>
+      <p className="text-sm font-medium text-theme-secondary">{title}</p>
+      {description && <p className="mt-1 max-w-sm text-xs leading-5 text-theme-subtle">{description}</p>}
+      {actionTo && actionLabel && (
+        <Button
+          as={Link}
+          to={actionTo}
+          size="sm"
+          variant="flat"
+          className="mt-4 bg-theme-hover text-theme-primary"
+          endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
+        >
+          {actionLabel}
+        </Button>
       )}
     </div>
   );
@@ -249,15 +279,16 @@ export function DashboardPage() {
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } } };
   const levelProgress = normalizePercent(stats.gamification?.level_progress);
+  const walletBalanceValue = stats.walletBalance ? t('stats.hours_value', { value: stats.walletBalance.balance }) : '\u2014';
 
   if (error) {
     return (
       <>
         <PageMeta title={t('meta.title')} description={t('meta.description')} noIndex />
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="mx-auto max-w-xl p-6 text-center sm:p-8" role="alert" aria-live="assertive">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
-          <p className="text-theme-muted mb-4">{error}</p>
+          <p className="mb-5 text-sm leading-6 text-theme-muted">{error}</p>
           <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />} onPress={() => loadDashboardData()}>{t('try_again')}</Button>
         </GlassCard>
       </>
@@ -271,18 +302,16 @@ export function DashboardPage() {
         {/* Onboarding Banner */}
         {user && user.onboarding_completed === false && (
           <motion.div variants={itemVariants}>
-            <GlassCard className="p-5 border-l-4 border-l-indigo-500">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-3">
+            <GlassCard className="border-l-4 border-l-indigo-500 p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
                   <SectionIcon color="indigo"><Sparkles className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" /></SectionIcon>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-semibold text-theme-primary">{t('onboarding.banner_title')}</p>
-                    <p className="text-sm text-theme-muted">{t('onboarding.banner_subtitle')}</p>
+                    <p className="mt-1 text-sm leading-5 text-theme-muted">{t('onboarding.banner_subtitle')}</p>
                   </div>
                 </div>
-                <Link to={tenantPath('/onboarding')}>
-                  <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}>{t('onboarding.get_started')}</Button>
-                </Link>
+                <Button as={Link} to={tenantPath('/onboarding')} size="sm" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto" endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}>{t('onboarding.get_started')}</Button>
               </div>
             </GlassCard>
           </motion.div>
@@ -290,16 +319,14 @@ export function DashboardPage() {
 
         {/* Welcome Header */}
         <motion.div variants={itemVariants}>
-          <GlassCard className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-              <div>
-                <h1 className="text-2xl font-bold text-theme-primary">{t('welcome_back', { name: user?.first_name || user?.name?.split(' ')[0] || t('fallback_name') })}</h1>
-                <p className="text-theme-muted mt-1">{t('community_activity', { community: branding.name })}</p>
+          <GlassCard className="p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold leading-tight text-theme-primary sm:text-3xl">{t('welcome_back', { name: user?.first_name || user?.name?.split(' ')[0] || t('fallback_name') })}</h1>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-theme-muted sm:text-base">{t('community_activity', { community: branding.name })}</p>
               </div>
-              <div className="flex gap-3">
-                <Link to={tenantPath('/listings/create')}>
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>{t('new_listing')}</Button>
-                </Link>
+              <div className="flex shrink-0 gap-3">
+                <Button as={Link} to={tenantPath('/listings/create')} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>{t('new_listing')}</Button>
               </div>
             </div>
           </GlassCard>
@@ -307,7 +334,7 @@ export function DashboardPage() {
 
         {hasCaringCommunity && (
           <motion.div variants={itemVariants}>
-            <GlassCard className="p-6 border-l-4 border-l-emerald-500">
+            <GlassCard className="border-l-4 border-l-emerald-500 p-5 sm:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-start gap-3">
                   <SectionIcon color="emerald">
@@ -321,21 +348,15 @@ export function DashboardPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:min-w-[420px]">
-                  <Link to={tenantPath(CARING_COMMUNITY_ROUTE.href)}>
-                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Heart className="w-4 h-4" aria-hidden="true" />}>
-                      {t('caring_community.actions.open_hub')}
-                    </Button>
-                  </Link>
-                  <Link to={tenantPath('/listings/create?type=request')}>
-                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}>
-                      {t('caring_community.actions.request_help')}
-                    </Button>
-                  </Link>
-                  <Link to={tenantPath('/volunteering?tab=hours')}>
-                    <Button className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Clock className="w-4 h-4" aria-hidden="true" />}>
-                      {t('caring_community.actions.log_hours')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath(CARING_COMMUNITY_ROUTE.href)} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Heart className="w-4 h-4" aria-hidden="true" />}>
+                    {t('caring_community.actions.open_hub')}
+                  </Button>
+                  <Button as={Link} to={tenantPath('/listings/create?type=request')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}>
+                    {t('caring_community.actions.request_help')}
+                  </Button>
+                  <Button as={Link} to={tenantPath('/volunteering?tab=hours')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Clock className="w-4 h-4" aria-hidden="true" />}>
+                    {t('caring_community.actions.log_hours')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>
@@ -344,7 +365,7 @@ export function DashboardPage() {
 
         {/* Stats Grid */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-          <StatCard icon={<Wallet className="w-5 h-5" aria-hidden="true" />} label={t('stats.balance')} value={stats.walletBalance ? `${stats.walletBalance.balance}h` : '\u2014'} color="indigo" href="/wallet" isLoading={isLoading} />
+          <StatCard icon={<Wallet className="w-5 h-5" aria-hidden="true" />} label={t('stats.balance')} value={walletBalanceValue} color="indigo" href="/wallet" isLoading={isLoading} />
           <StatCard icon={<ListTodo className="w-5 h-5" aria-hidden="true" />} label={t('stats.active_listings')} value={stats.activeListingsCount.toString()} color="emerald" href="/listings" isLoading={isLoading} />
           <StatCard icon={<MessageSquare className="w-5 h-5" aria-hidden="true" />} label={t('stats.messages')} value={notificationCounts.messages.toString()} color="amber" href="/messages" isLoading={isLoading} />
           <StatCard icon={<Clock className="w-5 h-5" aria-hidden="true" />} label={t('stats.pending')} value={stats.pendingTransactions.toString()} color="rose" href="/wallet" isLoading={isLoading} />
@@ -355,8 +376,8 @@ export function DashboardPage() {
 
           {/* Recent Listings (span 2) */}
           <motion.div variants={itemVariants} className="md:col-span-2">
-            <GlassCard className="p-6 h-full">
-              <SectionHeader icon={<ListTodo className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} />
+            <GlassCard className="h-full p-5 sm:p-6">
+              <SectionHeader icon={<ListTodo className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_listings')} />
               {isLoading ? (
                 <div aria-label={t('aria.loading_listings')} aria-busy="true" className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-default-300" /></Skeleton>))}
@@ -366,7 +387,7 @@ export function DashboardPage() {
                   {stats.recentListings.map((listing) => (
                     <article key={listing.id}>
                       <Link to={tenantPath(`/listings/${listing.id}`)} className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 group" aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offering') : t('listings.requesting')}`}>
-                        <div className="flex items-start gap-3 min-w-0">
+                        <div className="flex min-w-0 items-start gap-3">
                           <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? t('listings.user_fallback')} size="sm" className="shrink-0" />
                           <div className="min-w-0">
                             <h3 className="font-medium text-theme-primary truncate group-hover:text-[var(--color-primary)] transition-colors">{listing.title}</h3>
@@ -379,11 +400,13 @@ export function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-theme-subtle">
-                  <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
-                  <p>{t('listings.empty')}</p>
-                  <Link to={tenantPath('/listings/create')} className="text-[var(--color-primary)] hover:underline text-sm mt-2 inline-block">{t('listings.create_first')}</Link>
-                </div>
+                <DashboardEmptyState
+                  icon={<ListTodo className="h-10 w-10" aria-hidden="true" />}
+                  title={t('listings.empty')}
+                  description={t('listings.empty_description')}
+                  actionTo={tenantPath('/listings/create')}
+                  actionLabel={t('listings.create_first')}
+                />
               )}
             </GlassCard>
           </motion.div>
@@ -391,8 +414,8 @@ export function DashboardPage() {
           {/* Recent Activity Feed (span 2) */}
           {hasFeedModule && (
             <motion.div variants={itemVariants} className="md:col-span-2">
-              <GlassCard className="p-6 h-full">
-                <SectionHeader icon={<Activity className="w-4 h-4 text-purple-500 dark:text-purple-400" aria-hidden="true" />} iconColor="purple" title={t('sections.recent_activity')} linkTo={tenantPath('/feed')} linkText={t('view_all_caps')} />
+              <GlassCard className="h-full p-5 sm:p-6">
+                <SectionHeader icon={<Activity className="w-4 h-4 text-purple-500 dark:text-purple-400" aria-hidden="true" />} iconColor="purple" title={t('sections.recent_activity')} linkTo={tenantPath('/feed')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_activity')} />
                 {activityLoading ? (
                   <div aria-label={t('aria.loading_activity')} aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -423,11 +446,13 @@ export function DashboardPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-theme-subtle">
-                    <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
-                    <p>{t('activity.empty')}</p>
-                    <Link to={tenantPath('/feed')} className="text-[var(--color-primary)] hover:underline text-sm mt-2 inline-block">{t('activity.check_feed')}</Link>
-                  </div>
+                  <DashboardEmptyState
+                    icon={<Activity className="h-10 w-10" aria-hidden="true" />}
+                    title={t('activity.empty')}
+                    description={t('activity.empty_description')}
+                    actionTo={tenantPath('/feed')}
+                    actionLabel={t('activity.check_feed')}
+                  />
                 )}
               </GlassCard>
             </motion.div>
@@ -436,10 +461,10 @@ export function DashboardPage() {
           {/* Upcoming Events (span 2) */}
           {hasEvents && (
             <motion.div variants={itemVariants} className="md:col-span-2">
-              <GlassCard className="p-6 h-full relative overflow-hidden">
+              <GlassCard className="relative h-full overflow-hidden p-5 sm:p-6">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-rose-500/10 via-transparent to-pink-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<Calendar className="w-4 h-4 text-rose-500 dark:text-rose-400" aria-hidden="true" />} iconColor="rose" title={t('sections.upcoming_events')} linkTo={tenantPath('/events')} linkText={t('view_all_caps')} />
+                  <SectionHeader icon={<Calendar className="w-4 h-4 text-rose-500 dark:text-rose-400" aria-hidden="true" />} iconColor="rose" title={t('sections.upcoming_events')} linkTo={tenantPath('/events')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_events')} />
                   {eventsLoading ? (
                     <div aria-label={t('aria.loading_events')} aria-busy="true" className="space-y-3">
                       {Array.from({ length: 3 }).map((_, i) => (
@@ -468,11 +493,13 @@ export function DashboardPage() {
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-theme-subtle">
-                      <Calendar className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                      <p className="text-sm">{t('events.empty')}</p>
-                      <Link to={tenantPath('/events')} className="text-[var(--color-primary)] hover:underline text-sm mt-1 inline-block">{t('events.browse')}</Link>
-                    </div>
+                    <DashboardEmptyState
+                      icon={<Calendar className="h-10 w-10" aria-hidden="true" />}
+                      title={t('events.empty')}
+                      description={t('events.empty_description')}
+                      actionTo={tenantPath('/events')}
+                      actionLabel={t('events.browse')}
+                    />
                   )}
                 </div>
               </GlassCard>
@@ -482,8 +509,8 @@ export function DashboardPage() {
           {/* My Groups (span 1) */}
           {hasGroups && (
             <motion.div variants={itemVariants} className="md:col-span-1">
-              <GlassCard className="p-6 h-full">
-                <SectionHeader icon={<Users className="w-4 h-4 text-teal-500 dark:text-teal-400" aria-hidden="true" />} iconColor="teal" title={t('sections.my_groups')} linkTo={tenantPath('/groups')} linkText={t('view_all_caps')} />
+              <GlassCard className="h-full p-5 sm:p-6">
+                <SectionHeader icon={<Users className="w-4 h-4 text-teal-500 dark:text-teal-400" aria-hidden="true" />} iconColor="teal" title={t('sections.my_groups')} linkTo={tenantPath('/groups')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_groups')} />
                 {groupsLoading ? (
                   <div aria-label={t('aria.loading_groups')} aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-10 h-10 rounded-lg bg-default-300" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/3" /></Skeleton></div></div>))}
@@ -507,11 +534,13 @@ export function DashboardPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-6 text-theme-subtle">
-                    <Users className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                    <p className="text-sm">{t('groups.empty')}</p>
-                    <Link to={tenantPath('/groups')} className="text-[var(--color-primary)] hover:underline text-sm mt-1 inline-block">{t('groups.discover')}</Link>
-                  </div>
+                  <DashboardEmptyState
+                    icon={<Users className="h-10 w-10" aria-hidden="true" />}
+                    title={t('groups.empty')}
+                    description={t('groups.empty_description')}
+                    actionTo={tenantPath('/groups')}
+                    actionLabel={t('groups.discover')}
+                  />
                 )}
               </GlassCard>
             </motion.div>
@@ -520,10 +549,10 @@ export function DashboardPage() {
           {/* Gamification Preview (span 1) */}
           {hasGamification && (
             <motion.div variants={itemVariants} className="md:col-span-1">
-              <GlassCard className="p-6 h-full relative overflow-hidden">
+              <GlassCard className="relative h-full overflow-hidden p-5 sm:p-6">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-500/10 via-transparent to-orange-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<TrendingUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} />
+                  <SectionHeader icon={<TrendingUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} linkAriaLabel={t('aria.view_achievements')} />
                   {isLoading ? (
                     <div aria-label={t('aria.loading_progress')} aria-busy="true" className="space-y-4">
                       <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/2" /></Skeleton>
@@ -534,7 +563,7 @@ export function DashboardPage() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-theme-primary flex items-center gap-1.5"><Award className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />{t('gamification.level', { level: stats.gamification.level })}</span>
-                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{stats.gamification.xp} XP</Chip>
+                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{t('gamification.xp_value', { count: stats.gamification.xp })}</Chip>
                       </div>
                       <div>
                         <div className="flex justify-between text-xs sm:text-sm mb-1.5">
@@ -553,7 +582,7 @@ export function DashboardPage() {
                   ) : (
                     <div className="space-y-4">
                       <p className="text-sm text-theme-subtle text-center">{t('gamification.start_earning')}</p>
-                      <Link to={tenantPath('/achievements')} className="block text-center text-[var(--color-primary)] hover:opacity-80 text-sm transition-opacity">{t('view_achievements')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" /></Link>
+                      <Button as={Link} to={tenantPath('/achievements')} size="sm" variant="flat" className="w-full bg-theme-elevated text-theme-primary" endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}>{t('view_achievements')}</Button>
                     </div>
                   )}
                 </div>
@@ -564,10 +593,10 @@ export function DashboardPage() {
           {/* Suggested Matches (span 2) */}
           {hasListingsModule && (
             <motion.div variants={itemVariants} className="md:col-span-2">
-              <GlassCard className="p-6 h-full relative overflow-hidden">
+              <GlassCard className="relative h-full overflow-hidden p-5 sm:p-6">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} />
+                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} linkAriaLabel={t('aria.browse_all_listings')} />
                   {suggestedLoading ? (
                     <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-default-300" /></Skeleton>))}
@@ -585,10 +614,13 @@ export function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6 text-theme-subtle">
-                      <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                      <p className="text-sm">{t('suggestions.empty')}</p>
-                    </div>
+                    <DashboardEmptyState
+                      icon={<Sparkles className="h-10 w-10" aria-hidden="true" />}
+                      title={t('suggestions.empty')}
+                      description={t('suggestions.empty_description')}
+                      actionTo={tenantPath('/listings')}
+                      actionLabel={t('browse_all')}
+                    />
                   )}
                 </div>
               </GlassCard>
@@ -598,8 +630,8 @@ export function DashboardPage() {
           {/* Endorsements (span 1) */}
           {(isLoading || stats.myEndorsements.length > 0) && (
             <motion.div variants={itemVariants} className="md:col-span-1">
-              <GlassCard className="p-6 h-full">
-                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} />
+              <GlassCard className="h-full p-5 sm:p-6">
+                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_endorsements')} />
                 {isLoading ? (
                   <div aria-label={t('aria.loading_endorsements')} aria-busy="true" className="space-y-2">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-default-300" /></Skeleton></div>))}
@@ -625,9 +657,9 @@ export function DashboardPage() {
 
           {/* Quick Actions (full width) */}
           <motion.div variants={itemVariants} className="md:col-span-2">
-            <GlassCard className="p-6">
+            <GlassCard className="p-5 sm:p-6">
               <SectionHeader icon={<Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />} iconColor="emerald" title={t('sections.quick_actions')} />
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
                 <QuickActionLink to={tenantPath('/listings/create')} icon={<Plus aria-hidden="true" />} label={t('quick_actions.create_listing')} />
                 <QuickActionLink to={tenantPath('/messages')} icon={<MessageSquare aria-hidden="true" />} label={t('quick_actions.messages')} />
                 <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('quick_actions.view_wallet')} />
@@ -669,10 +701,10 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
   };
   return (
     <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`}>
-      <GlassCard className={`p-4 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ${statGlowColors[color]}`}>
-        <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-br ${colorClasses[color]} mb-3`}>{icon}</div>
-        <div className="text-theme-muted text-sm">{label}</div>
-        {isLoading ? (<Skeleton className="rounded-lg mt-1"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>) : (<div className="text-2xl font-bold text-theme-primary">{value}</div>)}
+      <GlassCard className={`min-h-[124px] p-4 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${statGlowColors[color]}`}>
+        <div className={`mb-3 inline-flex rounded-xl bg-gradient-to-br p-2.5 ${colorClasses[color]}`}>{icon}</div>
+        <div className="text-xs font-medium uppercase tracking-wide text-theme-muted sm:text-sm sm:normal-case sm:tracking-normal">{label}</div>
+        {isLoading ? (<Skeleton className="mt-2 rounded-lg"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>) : (<div className="mt-1 truncate text-2xl font-bold text-theme-primary">{value}</div>)}
       </GlassCard>
     </Link>
   );
@@ -682,9 +714,9 @@ interface QuickActionLinkProps { to: string; icon: React.ReactNode; label: strin
 
 function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
   return (
-    <Link to={to} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-transparent hover:border-[var(--glass-border-hover)] transition-all duration-200 text-theme-secondary hover:text-theme-primary text-center">
-      <span className="text-[var(--color-primary)]">{icon}</span>
-      <span className="text-xs font-medium leading-tight">{label}</span>
+    <Link to={to} className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-xl border border-transparent bg-theme-elevated p-3 text-center text-theme-secondary transition-all duration-200 hover:border-[var(--glass-border-hover)] hover:bg-theme-hover hover:text-theme-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]">
+      <span className="text-[var(--color-primary)] [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
+      <span className="max-w-full text-xs font-medium leading-tight">{label}</span>
     </Link>
   );
 }
@@ -721,7 +753,7 @@ function PendingReviewsCard() {
 
   if (loading) {
     return (
-      <GlassCard className="p-6 h-full">
+      <GlassCard className="h-full p-5 sm:p-6">
         <div className="flex items-center gap-2.5 mb-4">
           <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
@@ -735,21 +767,22 @@ function PendingReviewsCard() {
 
   if (pending.length === 0) {
     return (
-      <GlassCard className="p-6 h-full">
+      <GlassCard className="h-full p-5 sm:p-6">
         <div className="flex items-center gap-2.5 mb-4">
           <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         </div>
-        <div className="text-center py-6 text-theme-subtle">
-          <Star className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-          <p className="text-sm">{t('reviews.none_pending')}</p>
-        </div>
+        <DashboardEmptyState
+          icon={<Star className="h-10 w-10" aria-hidden="true" />}
+          title={t('reviews.none_pending')}
+          description={t('reviews.none_pending_description')}
+        />
       </GlassCard>
     );
   }
 
   return (
-    <GlassCard className="p-6 h-full">
+    <GlassCard className="h-full p-5 sm:p-6">
       <div className="flex items-center gap-2.5 mb-4">
         <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
         <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
@@ -776,7 +809,7 @@ function PendingReviewsCard() {
           </Link>
         ))}
       </div>
-      <Link to={tenantPath('/reviews')} className="block mt-4 text-center text-[var(--color-primary)] hover:opacity-80 text-sm transition-opacity">
+      <Link to={tenantPath('/reviews')} className="mt-4 block rounded-lg py-1 text-center text-sm text-[var(--color-primary)] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]" aria-label={t('aria.view_pending_reviews')}>
         {t('reviews.view_all_pending')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
       </Link>
     </GlassCard>

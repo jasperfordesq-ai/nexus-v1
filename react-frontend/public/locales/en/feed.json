@@ -2,6 +2,7 @@
   "page_title": "Feed",
   "title": "Community Feed",
   "subtitle": "See what's happening in your community",
+  "meta_description": "A private community feed for updates, listings, events, polls, goals, and conversations.",
   "new_post": "New Post",
   "whats_on_your_mind": "What's on your mind?",
   "add_image_aria": "Add image",
@@ -15,9 +16,12 @@
   "session_expired": "Your session has expired. Please log in again.",
   "error_load": "Failed to load feed.",
   "error_load_retry": "Failed to load feed. Please try again.",
+  "error_hint": "Your filters and draft composer are still here. Refresh the feed when your connection is ready.",
+  "loading_label": "Loading community updates...",
   "empty_title": "No posts yet",
   "empty_desc": "Be the first to share something with your community!",
   "empty_filtered": "Nothing matches this view right now. Try a different filter.",
+  "empty_filtered_with_filter": "There are no {{filter}} updates right now. Try all posts or start a new conversation.",
   "filter": {
     "all": "All",
     "posts": "Posts",
@@ -33,6 +37,7 @@
     "following": "Following",
     "saved": "Saved",
     "clear": "Clear feed filters",
+    "show_all": "Show all posts",
     "more": "More",
     "select": "Select feed filter"
   },
@@ -345,7 +350,9 @@
     "your_vote": "Your vote"
   },
   "feed": {
-    "end_of_feed": "You're all caught up!"
+    "end_of_feed": "You're all caught up!",
+    "current_view": "Showing {{filter}}",
+    "region_label": "Community feed"
   },
   "hashtag": {
     "title": "Hashtag",

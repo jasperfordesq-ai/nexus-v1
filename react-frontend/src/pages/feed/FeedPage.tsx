@@ -845,18 +845,22 @@ export function FeedPage() {
   const mobileOverflowFilterOptions = filterOptions.filter((opt) => !mobilePrimaryFilters.has(opt.key));
   const activeOverflowFilter = mobileOverflowFilterOptions.find((opt) => opt.key === filter);
   const hasActiveFeedView = filter !== 'all' || subFilter !== null;
+  const activeFilterLabel = filterOptions.find((opt) => opt.key === filter)?.label ?? t('filter.all');
+  const emptyDescription = filter !== 'all'
+    ? t('empty_filtered_with_filter', { filter: activeFilterLabel })
+    : t('empty_desc');
 
 
   return (
     <>
-    <PageMeta
-      title={t("title")}
-      description={t("subtitle")}
-      noIndex
-    />
-    <div className="mx-auto flex max-w-6xl items-start justify-center gap-6">
-      {/* Main Feed Column */}
-      <div className="w-full min-w-0 max-w-2xl flex-1 space-y-4">
+      <PageMeta
+        title={t('title')}
+        description={t('meta_description')}
+        noIndex
+      />
+      <div className="mx-auto flex w-full max-w-6xl items-start justify-center gap-6 px-0 sm:px-2">
+        {/* Main Feed Column */}
+        <main className="w-full min-w-0 max-w-2xl flex-1 space-y-4" aria-label={t('feed.region_label')}>
 
       {/* Pull-to-refresh indicator (mobile only) */}
       {(pullDistance > 0 || isRefreshing) && (
@@ -869,51 +873,54 @@ export function FeedPage() {
       )}
 
       {/* Compact page header */}
-      <div className="flex flex-col gap-3 rounded-xl border border-theme-default bg-theme-elevated/70 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Newspaper className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <h1 className="truncate text-xl font-semibold text-theme-primary sm:text-2xl">{t('title')}</h1>
-              <p className="text-sm text-theme-muted">{t('subtitle')}</p>
+      <section className="overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)] shadow-sm">
+        <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="min-w-0">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/15">
+                <Newspaper className="w-5 h-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h1 className="text-balance text-2xl font-semibold leading-tight text-theme-primary sm:text-3xl">{t('title')}</h1>
+                <p className="mt-1 max-w-xl text-sm leading-6 text-theme-muted">{t('subtitle')}</p>
+              </div>
             </div>
           </div>
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            {!isLoading && items.length > 0 && (
+              <Chip size="sm" variant="flat" className="bg-primary/10 text-primary">
+                {t('items_loaded', { count: items.length })}
+              </Chip>
+            )}
+            <AlgorithmLabel area="feed" />
+            {isAuthenticated && (
+              <Button
+                className="hidden bg-primary text-white shadow-sm sm:flex"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => openCompose('post')}
+              >
+                {t('new_post')}
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          {!isLoading && items.length > 0 && (
-            <Chip
-              size="sm"
-              variant="flat"
-              className="hidden bg-primary/10 text-primary sm:inline-flex"
-            >
-              {t('items_loaded', { count: items.length })}
-            </Chip>
-          )}
-          <AlgorithmLabel area="feed" />
-          {isAuthenticated && (
-            <Button
-              className="hidden bg-primary text-white shadow-sm sm:flex"
-              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-              onPress={() => openCompose('post')}
-            >
-              {t('new_post')}
-            </Button>
-          )}
+        <div className="border-t border-theme-default bg-theme-elevated/45 px-4 py-2.5 sm:px-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-theme-muted">
+            {t('feed.current_view', { filter: activeFilterLabel })}
+          </p>
         </div>
-      </div>
+      </section>
 
       {/* Feed controls */}
-      <div data-testid="feed-controls" className="w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-2.5 shadow-sm">
-        <div className="flex min-w-0 items-center justify-between gap-3">
+      <section data-testid="feed-controls" className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
             <Button
               isIconOnly
               size="sm"
               variant="light"
-              className="text-theme-muted hover:text-primary"
+              className="self-end text-theme-muted hover:text-primary sm:self-auto"
               onPress={clearFeedControls}
               aria-label={t('filter.clear')}
             >
@@ -922,7 +929,7 @@ export function FeedPage() {
           )}
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0" role="group" aria-label={t('filter.select')}>
           <div className="grid grid-cols-2 gap-2 min-[390px]:flex min-[390px]:items-center sm:flex-wrap">
             {mobilePrimaryFilterOptions.map((opt) => (
               <Button
@@ -992,7 +999,7 @@ export function FeedPage() {
 
         {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
         <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
-      </div>
+      </section>
 
       {/* Stories Bar — loads its own data from /v2/stories */}
       {isAuthenticated && (
@@ -1001,24 +1008,26 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-3.5 hover:border-primary/20 transition-colors">
+        <GlassCard className="p-3.5 transition-colors hover:border-primary/20 sm:p-4">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center"
             role="button"
             tabIndex={0}
             aria-label={t('whats_on_your_mind')}
             onClick={() => openCompose('post')}
             onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCompose('post'); } }}
           >
-            <Avatar
-              name={user?.first_name || t('you')}
-              src={resolveAvatarUrl(user?.avatar)}
-              size="sm"
-              isBordered
-              className="ring-2 ring-[var(--border-default)]"
-            />
-            <div className="flex-1 bg-theme-elevated rounded-full px-4 py-2.5 text-theme-subtle text-sm border border-theme-default hover:border-primary/30 transition-colors">
-              {t('whats_on_your_mind')}
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <Avatar
+                name={user?.first_name || t('you')}
+                src={resolveAvatarUrl(user?.avatar)}
+                size="sm"
+                isBordered
+                className="shrink-0 ring-2 ring-[var(--border-default)]"
+              />
+              <div className="min-h-11 flex-1 rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-sm text-theme-subtle transition-colors hover:border-primary/30">
+                <span className="line-clamp-1">{t('whats_on_your_mind')}</span>
+              </div>
             </div>
             {/*
               Inner buttons must NOT bubble their click to the outer composer-trigger
@@ -1027,7 +1036,7 @@ export function FeedPage() {
               keeps inner button activations local while preserving keyboard support
               on the outer surface.
             */}
-            <div className="flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+            <div className="flex shrink-0 justify-end gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
               <Button
                 isIconOnly
                 size="sm"
@@ -1086,14 +1095,15 @@ export function FeedPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-10 text-center" glow="primary" role="alert">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
+        <GlassCard className="px-5 py-10 text-center sm:p-12" glow="primary" role="alert">
+          <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center mx-auto mb-5 ring-1 ring-warning/20">
             <AlertTriangle className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
-          <p className="text-theme-muted mb-5 text-sm max-w-xs mx-auto">{error}</p>
+          <p className="mx-auto mb-2 max-w-sm text-sm leading-6 text-theme-muted">{error}</p>
+          <p className="mx-auto mb-6 max-w-sm text-xs leading-5 text-theme-subtle">{t('error_hint')}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+            className="bg-primary text-white shadow-lg shadow-primary/20"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadFeed()}
           >
@@ -1106,31 +1116,43 @@ export function FeedPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-4" role="status" aria-live="polite" aria-label={t('loading_label')}>
+              <div className="rounded-xl border border-theme-default bg-theme-elevated/50 px-4 py-3 text-sm text-theme-muted">
+                {t('loading_label')}
+              </div>
               {[0, 1, 2].map((i) => (
                 <FeedSkeleton key={i} index={i} />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <GlassCard className="p-12 text-center">
+            <GlassCard className="px-5 py-12 text-center sm:p-12">
               <div className="mx-auto mb-6">
                 <FeedEmptyIllustration className="w-32 h-32 mx-auto" />
               </div>
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('empty_title')}</h2>
-              <p className="text-sm text-theme-muted mb-6 max-w-xs mx-auto">
-                {filter !== 'all'
-                  ? t('empty_filtered')
-                  : t('empty_desc')}
+              <p className="text-sm leading-6 text-theme-muted mb-6 max-w-sm mx-auto">
+                {emptyDescription}
               </p>
+              <div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
+              {filter !== 'all' && (
+                <Button
+                  variant="flat"
+                  className="text-theme-muted"
+                  onPress={clearFeedControls}
+                >
+                  {t('filter.show_all')}
+                </Button>
+              )}
               {isAuthenticated && (
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
+                  className="bg-primary text-white shadow-lg shadow-primary/20"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => openCompose('post')}
                 >
                   {t('create_post')}
                 </Button>
               )}
+              </div>
             </GlassCard>
           ) : (
             <motion.div
@@ -1314,7 +1336,7 @@ export function FeedPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      </div>
+      </main>
 
       {/* Right Sidebar — full widget panel in normal document flow. */}
       {showDesktopSidebar && (

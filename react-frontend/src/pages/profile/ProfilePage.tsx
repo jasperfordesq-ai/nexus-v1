@@ -555,25 +555,42 @@ export function ProfilePage() {
     visible: { opacity: 1, y: 0 },
   };
 
+  const profileName = profile.name || profile.first_name || t('member_fallback');
+  const profileAvatar = profile.avatar_url || profile.avatar;
+  const joinedDate = profile.created_at
+    ? new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    : null;
+  const metaDescription = t('page_meta.description', { name: profileName });
+  const earnedBadgeCount = gamification?.total_badges ?? gamification?.badges.length ?? 0;
+  const visibleSkills = profile.skills ? (showAllSkills ? profile.skills : profile.skills.slice(0, 8)) : [];
+
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-4xl mx-auto space-y-5 sm:space-y-6"
     >
-      <PageMeta title={profile.name || t('page_meta.title')} noIndex />
+      <PageMeta
+        title={profileName}
+        description={metaDescription}
+        image={profileAvatar ? resolveAvatarUrl(profileAvatar) : undefined}
+        type="profile"
+        noIndex
+      />
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
-        <GlassCard className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        <GlassCard className="overflow-hidden">
+          <div className="h-20 bg-[linear-gradient(135deg,var(--color-primary),var(--color-secondary,var(--color-primary)))] opacity-90" aria-hidden="true" />
+          <div className="px-4 pb-5 sm:px-8 sm:pb-8">
+          <div className="-mt-12 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
             {/* Avatar */}
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               <Avatar
-                src={profile.avatar_url || profile.avatar ? resolveAvatarUrl(profile.avatar_url || profile.avatar) : undefined}
-                name={profile.name}
+                src={profileAvatar ? resolveAvatarUrl(profileAvatar) : undefined}
+                name={profileName}
                 showFallback
-                className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-theme-default"
+                className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-[var(--color-surface)] shadow-lg"
               />
               {hasGamification && profile.level && (
                 <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary,var(--color-primary))] text-white text-xs font-bold">
@@ -583,58 +600,65 @@ export function ProfilePage() {
             </div>
 
             {/* Info */}
-            <div className="flex-1 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary truncate max-w-xs sm:max-w-sm lg:max-w-md">{profile.name || profile.first_name || t('member_fallback')}</h1>
-                {/* Verification badges */}
-                <VerificationBadgeRow userId={profile.id} size="md" />
-                {/* Cross-federation reputation badge */}
-                {profile.federated_partner_id != null && typeof profile.federated_reputation_score === 'number' && (
-                  <FederatedTrustBadge
-                    score={profile.federated_reputation_score}
-                    reviewCount={profile.federated_reputation_count ?? 0}
-                    isFederated
-                    size="md"
-                  />
-                )}
-                {/* Connected chip for other users */}
-                {!isOwnProfile && hasConnections && connectionStatus === 'connected' && (
-                  <Chip
-                    color="success"
-                    variant="flat"
-                    size="sm"
-                    startContent={<UserCheck className="w-3 h-3" />}
-                    className="mt-1"
-                  >
-                    {t('connected')}
-                  </Chip>
-                )}
+            <div className="flex-1 min-w-0 text-center sm:text-left">
+              <div className="flex min-w-0 flex-col items-center gap-2 sm:items-start">
+                <div className="flex w-full min-w-0 flex-col items-center gap-2 sm:flex-row sm:items-start">
+                  <h1 className="min-w-0 max-w-full text-xl font-bold leading-tight text-theme-primary sm:text-2xl lg:text-3xl">
+                    <span className="block overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2">
+                      {profileName}
+                    </span>
+                  </h1>
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                    {/* Verification badges */}
+                    <VerificationBadgeRow userId={profile.id} size="md" />
+                    {/* Cross-federation reputation badge */}
+                    {profile.federated_partner_id != null && typeof profile.federated_reputation_score === 'number' && (
+                      <FederatedTrustBadge
+                        score={profile.federated_reputation_score}
+                        reviewCount={profile.federated_reputation_count ?? 0}
+                        isFederated
+                        size="md"
+                      />
+                    )}
+                    {/* Connected chip for other users */}
+                    {!isOwnProfile && hasConnections && connectionStatus === 'connected' && (
+                      <Chip
+                        color="success"
+                        variant="flat"
+                        size="sm"
+                        startContent={<UserCheck className="w-3 h-3" />}
+                      >
+                        {t('connected')}
+                      </Chip>
+                    )}
+                  </div>
+                </div>
               </div>
               {profile.tagline && (
-                <p className="text-theme-muted mt-1">{profile.tagline}</p>
+                <p className="mt-1 max-w-2xl text-sm text-theme-muted sm:text-base line-clamp-2">{profile.tagline}</p>
               )}
 
               {/* Meta */}
-              <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4 text-sm text-theme-subtle">
+              <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-theme-subtle sm:justify-start">
                 {profile.location && (
                   <Tooltip content={profile.location}>
-                    <span className="flex items-center gap-1 max-w-[200px]">
+                    <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-theme-elevated px-2.5 py-1 sm:max-w-[240px]">
                       <MapPin className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                       <span className="truncate">{profile.location}</span>
                     </span>
                   </Tooltip>
                 )}
-                {profile.created_at && (
-                  <span className="flex items-center gap-1">
+                {joinedDate && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-theme-elevated px-2.5 py-1">
                     <Calendar className="w-4 h-4" aria-hidden="true" />
                     <time dateTime={profile.created_at}>
-                      {t('joined', { date: new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) })}
+                      {t('joined', { date: joinedDate })}
                     </time>
                   </span>
                 )}
                 {typeof profile.rating === 'number' && profile.rating > 0 && (
                   <span
-                    className="flex items-center gap-1"
+                    className="inline-flex items-center gap-1 rounded-full bg-theme-elevated px-2.5 py-1"
                     aria-label={t('aria.rating_summary', { rating: profile.rating.toFixed(1) })}
                   >
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -645,7 +669,7 @@ export function ProfilePage() {
                   isOwnProfile ? (
                     <Link
                       to={tenantPath('/nexus-score')}
-                      className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold hover:bg-indigo-500/25 transition-colors"
+                      className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-1 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-500/25 dark:text-indigo-400"
                       aria-label={t('aria.nexus_score_link', {
                         score: profile.nexus_score.total_score,
                         tier: profile.nexus_score.tier,
@@ -657,7 +681,7 @@ export function ProfilePage() {
                     </Link>
                   ) : (
                     <span
-                      className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
+                      className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400"
                       aria-label={t('aria.nexus_score_summary', {
                         score: profile.nexus_score.total_score,
                         tier: profile.nexus_score.tier,
@@ -672,12 +696,13 @@ export function ProfilePage() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-6">
+              <div className="mt-6 grid w-full grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-start sm:gap-3">
                 {isOwnProfile ? (
-                  <Link to={tenantPath('/settings')}>
+                  <Link to={tenantPath('/settings')} className="w-full sm:w-auto">
                     <Button
                       color="primary"
                       startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+                      className="w-full sm:w-auto"
                     >
                       {t('settings')}
                     </Button>
@@ -701,20 +726,21 @@ export function ProfilePage() {
                 ) : (
                   <>
                     {isAuthenticated && (
-                      <Link to={tenantPath(`/messages/new/${profile.id}`)}>
+                      <Link to={tenantPath(`/messages/new/${profile.id}`)} className="w-full sm:w-auto">
                         <Button
                           color="primary"
                           startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                          className="w-full sm:w-auto"
                         >
                           {t('send_message')}
                         </Button>
                       </Link>
                     )}
                     {!isAuthenticated && (
-                      <Link to={tenantPath('/login')}>
+                      <Link to={tenantPath('/login')} className="w-full sm:w-auto">
                         <Button
                           variant="flat"
-                          className="bg-theme-elevated text-theme-primary"
+                          className="w-full bg-theme-elevated text-theme-primary sm:w-auto"
                           startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                         >
                           {t('login_to_message')}
@@ -726,10 +752,10 @@ export function ProfilePage() {
                         variant="flat"
                         className={
                           connectionStatus === 'pending_sent'
-                            ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                            ? 'w-full bg-amber-500/20 text-amber-600 dark:text-amber-400 sm:w-auto'
                             : connectionStatus === 'pending_received'
-                            ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
-                            : 'bg-theme-elevated text-theme-primary'
+                            ? 'w-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 sm:w-auto'
+                            : 'w-full bg-theme-elevated text-theme-primary sm:w-auto'
                         }
                         startContent={
                           connectionStatus === 'pending_sent' ? (
@@ -756,6 +782,7 @@ export function ProfilePage() {
                         color="secondary"
                         startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => setIsTransferModalOpen(true)}
+                        className="w-full sm:w-auto"
                       >
                         {t('send_credits')}
                       </Button>
@@ -795,6 +822,7 @@ export function ProfilePage() {
                 )}
               </div>
             </div>
+          </div>
           </div>
         </GlassCard>
 
@@ -867,13 +895,13 @@ export function ProfilePage() {
       {/* Tabs Content */}
       <motion.div variants={itemVariants}>
         {(() => {
-          const tabs = [
+          const tabs: Array<{ key: string; icon: typeof User; label: string; count?: number }> = [
             { key: 'about', icon: User, label: t('tabs.about') },
-            { key: 'listings', icon: ListTodo, label: t('tabs.listings') },
+            { key: 'listings', icon: ListTodo, label: t('tabs.listings'), count: profile.stats?.listings_count ?? listings.length },
             { key: 'activity', icon: Rss, label: t('tabs.activity') },
             { key: 'availability', icon: Calendar, label: t('tabs.availability') },
-            ...(hasReviews && reviewsAvailable ? [{ key: 'reviews', icon: Star, label: t('tabs.reviews') }] : []),
-            ...(hasGamification ? [{ key: 'achievements', icon: Award, label: t('tabs.achievements') }] : []),
+            ...(hasReviews && reviewsAvailable ? [{ key: 'reviews', icon: Star, label: t('tabs.reviews'), count: reviewsLoaded ? reviews.length : undefined }] : []),
+            ...(hasGamification ? [{ key: 'achievements', icon: Award, label: t('tabs.achievements'), count: earnedBadgeCount }] : []),
           ];
           return (
             <Tabs
@@ -883,9 +911,9 @@ export function ProfilePage() {
               variant="light"
               classNames={{
                 base: 'w-full overflow-x-auto',
-                tabList: 'bg-theme-elevated p-1 rounded-lg gap-1',
+                tabList: 'w-max max-w-full bg-theme-elevated p-1 rounded-lg gap-1',
                 cursor: 'bg-theme-hover shadow-sm',
-                tab: 'h-auto px-3 py-2 text-xs sm:text-sm',
+                tab: 'h-auto min-w-0 px-3 py-2 text-xs sm:text-sm',
                 tabContent: 'group-data-[selected=true]:text-theme-primary text-theme-muted',
               }}
             >
@@ -897,9 +925,14 @@ export function ProfilePage() {
                     id={`tab-${tab.key}`}
                     aria-controls={`panel-${tab.key}`}
                     title={(
-                      <span className="flex items-center gap-1.5 whitespace-nowrap">
+                      <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap">
                         <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                        {tab.label}
+                        <span className="max-w-[7rem] truncate sm:max-w-none">{tab.label}</span>
+                        {typeof tab.count === 'number' && (
+                          <span className="rounded-full bg-theme-default px-1.5 py-0.5 text-[10px] font-semibold leading-none text-theme-subtle">
+                            {tab.count}
+                          </span>
+                        )}
                       </span>
                     )}
                   />
@@ -939,21 +972,23 @@ export function ProfilePage() {
                   />
                 </div>
               ) : (
-                <p className="text-theme-subtle italic">{t('about.no_bio')}</p>
+                <div className="rounded-lg border border-dashed border-theme-default bg-theme-elevated/50 p-4">
+                  <p className="text-sm text-theme-subtle">{t('about.no_bio')}</p>
+                </div>
               )}
 
-              {profile.skills && profile.skills.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
+                {profile.skills && profile.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {(showAllSkills ? profile.skills : profile.skills.slice(0, 8)).map((skill) => (
+                    {visibleSkills.map((skill) => (
                       <div key={skill} className="inline-flex items-center gap-1.5">
                         <Chip
                           variant="flat"
                           size="sm"
-                          className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
+                          className="max-w-[12rem] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
                         >
-                          {skill}
+                          <span className="block truncate">{skill}</span>
                         </Chip>
                         {!isOwnProfile && isAuthenticated && profile.id && (
                           isLoadingEndorsements ? (
@@ -991,8 +1026,14 @@ export function ProfilePage() {
                       </Chip>
                     )}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="rounded-lg border border-dashed border-theme-default bg-theme-elevated/50 p-4">
+                    <p className="text-sm text-theme-subtle">
+                      {isOwnProfile ? t('about.no_skills_own') : t('about.no_skills_other')}
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Verification Badges Summary */}
               {profile.id && (
@@ -1015,9 +1056,9 @@ export function ProfilePage() {
                         type: listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request'),
                         title: listing.title,
                       })}
-                      className="cursor-pointer"
+                      className="min-w-0 cursor-pointer"
                     >
-                      <article role="listitem">
+                      <article role="listitem" className="h-full min-w-0">
                         <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden cursor-pointer">
                           {listing.image_url && (
                             <img
@@ -1027,7 +1068,7 @@ export function ProfilePage() {
                               loading="lazy"
                             />
                           )}
-                          <div className="p-5 flex flex-col flex-1">
+                          <div className="flex min-w-0 flex-1 flex-col p-5">
                             <div className="flex items-center gap-2 mb-2">
                               <Chip
                                 size="sm"
@@ -1042,11 +1083,11 @@ export function ProfilePage() {
                                 {listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
                               </Chip>
                             </div>
-                            <h3 className="font-medium text-theme-primary mb-1 line-clamp-1">{listing.title}</h3>
+                            <h3 className="mb-1 min-w-0 truncate font-medium text-theme-primary">{listing.title}</h3>
                             <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Clock className="w-3 h-3" aria-hidden="true" />
-                              {t('hours_abbrev', { hours: listing.hours_estimate ?? listing.estimated_hours ?? '\u2014' })}
+                              {t('hours_abbrev', { hours: listing.hours_estimate ?? listing.estimated_hours ?? t('not_available_abbrev') })}
                             </div>
                           </div>
                         </GlassCard>
@@ -1195,12 +1236,12 @@ export function ProfilePage() {
                 <>
                   {/* Summary */}
                   <GlassCard className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 items-center gap-3">
                         <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20">
                           <Trophy className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-sm font-medium text-theme-primary">
                             {t('achievements.badges', { count: gamification.total_badges })}
                           </p>
@@ -1210,8 +1251,8 @@ export function ProfilePage() {
                         </div>
                       </div>
                       {isOwnProfile && (
-                        <Link to={tenantPath('/achievements')}>
-                          <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted">
+                        <Link to={tenantPath('/achievements')} className="w-full sm:w-auto">
+                          <Button size="sm" variant="flat" className="w-full bg-theme-elevated text-theme-muted sm:w-auto">
                             {t('achievements.view_all')}
                           </Button>
                         </Link>
@@ -1220,14 +1261,22 @@ export function ProfilePage() {
                   </GlassCard>
 
                   {/* Badge Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                     {gamification.badges.map((badge) => (
                       <GlassCard
                         key={badge.key}
-                        className={`p-4 text-center ${badge.earned ? '' : 'opacity-50'}`}
+                        className={`min-w-0 p-4 text-center ${badge.earned ? '' : 'opacity-50'}`}
                       >
-                        <div className="text-3xl mb-2">{badge.icon || '🏆'}</div>
-                        <p className="text-sm font-medium text-theme-primary truncate">{badge.name}</p>
+                        <div className="mb-2 flex h-8 items-center justify-center">
+                          {badge.icon ? (
+                            <span className="text-3xl leading-none" aria-hidden="true">{badge.icon}</span>
+                          ) : (
+                            <Trophy className="h-7 w-7 text-[var(--color-warning)]" aria-hidden="true" />
+                          )}
+                        </div>
+                        <Tooltip content={badge.name}>
+                          <p className="truncate text-sm font-medium text-theme-primary">{badge.name}</p>
+                        </Tooltip>
                         <p className="text-xs text-theme-subtle mt-1 line-clamp-2">{badge.description}</p>
                         {badge.earned ? (
                           <span className="inline-block mt-2 text-xs text-emerald-500 font-medium">{t('achievements.badge_earned')}</span>
