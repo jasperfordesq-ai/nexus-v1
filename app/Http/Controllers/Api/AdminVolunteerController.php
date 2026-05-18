@@ -434,7 +434,7 @@ class AdminVolunteerController extends BaseApiController
                             ->button(__("emails.volunteer_approval.{$emailKey}_cta"), $url)
                             ->render();
 
-                        if (!\App\Core\Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $volDetail->email,
                             __("emails.volunteer_approval.{$emailKey}_subject"),
                             $html,
@@ -890,7 +890,7 @@ class AdminVolunteerController extends BaseApiController
                             ->button(__('emails.volunteer_approval.application_approved_cta'), $url)
                             ->render();
 
-                        if (!\App\Core\Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $applicant->email,
                             __('emails.volunteer_approval.application_approved_subject'),
                             $html,

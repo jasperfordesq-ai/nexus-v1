@@ -221,7 +221,7 @@ class IdentityVerificationSessionService
                         ->render();
                 }
 
-                if (!Mailer::forCurrentTenant()->send($row->email, $subject, $html, null, null, null, 'identity_verification')) {
+                if (!\App\Services\EmailDispatchService::sendRaw($row->email, $subject, $html, null, null, null, 'identity_verification')) {
                     Log::warning('[IdentityVerificationSessionService] result email failed', [
                         'session_id' => $sessionId,
                         'user_id' => $row->user_id ?? null,

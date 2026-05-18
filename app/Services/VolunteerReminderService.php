@@ -177,7 +177,7 @@ class VolunteerReminderService
                                         'community' => $communityName,
                                     ]);
 
-                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
                                         Log::warning('[VolunteerReminderService] sendReminders email failed', [
                                             'user_id' => $userId,
                                             'shift_id' => $shift->id,
@@ -525,7 +525,7 @@ class VolunteerReminderService
 
                                         $subject = __('emails_volunteer.shift_starting_soon.subject', ['title' => $opportunityTitle]);
 
-                                        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
                                             Log::warning('[VolunteerReminderService] sendPreShiftReminders email failed', [
                                                 'tenant_id' => $tenantId,
                                                 'user_id'   => $userId,
@@ -685,7 +685,7 @@ class VolunteerReminderService
 
                                         $subject = __('emails_volunteer.post_shift_feedback.subject', ['title' => $opportunityTitle]);
 
-                                        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
+                                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'volunteer_reminder')) {
                                             Log::warning('[VolunteerReminderService] sendPostShiftFeedback email failed', [
                                                 'tenant_id' => $tenantId,
                                                 'user_id'   => $userId,

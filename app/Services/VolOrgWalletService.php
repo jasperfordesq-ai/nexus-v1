@@ -252,7 +252,7 @@ class VolOrgWalletService
                             ->render();
 
                         $subject = __('emails_misc.vol_org_wallet.deposit_subject', ['org' => $result['_org_name'] ?? '']);
-                        if (!Mailer::forCurrentTenant()->send($depositor->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($depositor->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
                             Log::warning('[VolOrgWalletService] Deposit confirmation email failed', ['user_id' => $userId]);
                         }
                     });
@@ -375,7 +375,7 @@ class VolOrgWalletService
                             ->render();
 
                         $subject = __('emails_misc.vol_org_wallet.payment_subject', ['org' => $result['_org_name'] ?? '']);
-                        if (!Mailer::forCurrentTenant()->send($volunteer->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($volunteer->email, $subject, $html, null, null, null, 'vol_org_wallet')) {
                             Log::warning('[VolOrgWalletService] Payment confirmation email failed', ['volunteer_id' => $volunteerId]);
                         }
                     });

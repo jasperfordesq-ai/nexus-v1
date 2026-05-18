@@ -862,7 +862,7 @@ class TenantBillingService
                     ->button(__($ctaText['key'], $resolveParams($ctaText)), $fullUrl)
                     ->render();
 
-                if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $resolveParams($subject)), $html, null, null, null, 'billing')) {
+                if (!\App\Services\EmailDispatchService::sendRaw($admin->email, __($subject['key'], $resolveParams($subject)), $html, null, null, null, 'billing')) {
                     Log::warning('[TenantBillingService] tenant admin email failed', ['tenant_id' => $tenantId]);
                 }
             });

@@ -1163,7 +1163,7 @@ class IdeationChallengeService
                             ->button(__('emails_ideation.new_idea.cta'), $ideaUrl)
                             ->render();
 
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $owner->email,
                             __('emails_ideation.new_idea.subject', ['challenge' => $challengeTitle, 'community' => $tenantName]),
                             $html,
@@ -1297,7 +1297,7 @@ class IdeationChallengeService
                             ->button(__('emails_ideation.idea_commented.cta'), $commentUrl)
                             ->render();
 
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $owner->email,
                             __('emails_ideation.idea_commented.subject', ['community' => $tenantName]),
                             $html,

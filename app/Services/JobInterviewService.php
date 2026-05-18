@@ -578,7 +578,7 @@ class JobInterviewService
                     ->button(__('emails_misc.jobs.interview_email_cta'), $fullUrl)
                     ->render();
 
-                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'job_interview')) {
+                if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'job_interview')) {
                     Log::warning('[JobInterviewService] Interview email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
                     return false;
                 }

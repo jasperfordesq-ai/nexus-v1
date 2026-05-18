@@ -22,6 +22,38 @@ use Illuminate\Support\Facades\Log;
  */
 class EmailDispatchService
 {
+    public static function sendRaw(
+        string $to,
+        string $subject,
+        string $body,
+        ?string $cc = null,
+        ?string $replyTo = null,
+        ?string $unsubscribeUrl = null,
+        ?string $category = null,
+        array $options = []
+    ): bool {
+        $options['cc'] = $cc;
+        $options['replyTo'] = $replyTo;
+        $options['unsubscribeUrl'] = $unsubscribeUrl;
+        $options['category'] = $category;
+        $options['source'] ??= 'EmailDispatchService::sendRaw';
+
+        return app(self::class)->send($to, $subject, $body, $options);
+    }
+
+    /**
+     * Compatibility helper for legacy app(EmailService::class)->send(...)
+     * paths. New business events should use NotificationDispatcher.
+     *
+     * @param array<string,mixed> $options
+     */
+    public static function sendWithOptions(string $to, string $subject, string $body, array $options = []): bool
+    {
+        $options['source'] ??= 'EmailDispatchService::sendWithOptions';
+
+        return app(self::class)->send($to, $subject, $body, $options);
+    }
+
     /**
      * @param array{
      *   cc?:string|null,

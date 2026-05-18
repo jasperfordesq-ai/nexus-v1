@@ -91,7 +91,7 @@ class WalletAlertService
             ->button(__('emails.wallet_alert.low_cta'), $baseUrl . '/listings')
             ->render();
 
-        return \App\Core\Mailer::forCurrentTenant()->send(
+        return \App\Services\EmailDispatchService::sendRaw(
             $email,
             __('emails.wallet_alert.low_subject'),
             $html,
@@ -113,7 +113,7 @@ class WalletAlertService
             ->button(__('emails.wallet_alert.empty_cta'), $baseUrl . '/listings/create')
             ->render();
 
-        return \App\Core\Mailer::forCurrentTenant()->send(
+        return \App\Services\EmailDispatchService::sendRaw(
             $email,
             __('emails.wallet_alert.empty_subject'),
             $html,

@@ -182,7 +182,7 @@ class EventReminderService
                                     ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
                                     ->render();
 
-                                $emailOk = Mailer::forCurrentTenant()->send($attendee->email, $subject, $html, null, null, null, 'event_reminder');
+                                $emailOk = \App\Services\EmailDispatchService::sendRaw($attendee->email, $subject, $html, null, null, null, 'event_reminder');
                                 if (!$emailOk) {
                                     \Illuminate\Support\Facades\Log::warning("[EventReminderService] Mailer returned false: event={$eventId}, user={$userId}");
                                 }

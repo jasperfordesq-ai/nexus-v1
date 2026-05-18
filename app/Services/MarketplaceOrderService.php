@@ -546,7 +546,7 @@ class MarketplaceOrderService
                 ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_order')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, __($subjectKey, $subjectParams), $html, null, null, null, 'marketplace_order')) {
                 Log::warning('[MarketplaceOrderService] email failed', ['user_id' => $userId]);
             }
         });

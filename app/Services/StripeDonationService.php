@@ -286,7 +286,7 @@ class StripeDonationService
                             ->button(__('emails_created.donation.cta'), $accountUrl)
                             ->render();
 
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $donorEmail,
                             __('emails_created.donation.subject', ['community' => $tenantName]),
                             $html,

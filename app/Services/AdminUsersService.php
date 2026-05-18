@@ -81,7 +81,7 @@ class AdminUsersService
                         $builder->paragraph('<strong>' . __('emails_misc.user_ban.banned_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
                     }
                     $html = $builder->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.banned_subject'), $html, null, null, null, 'admin_user_status')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.banned_subject'), $html, null, null, null, 'admin_user_status')) {
                         Log::warning('[AdminUsersService] ban email failed', ['user_id' => $userId]);
                     }
                 });
@@ -125,7 +125,7 @@ class AdminUsersService
                         ->greeting($firstName)
                         ->paragraph(__('emails_misc.user_ban.unbanned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]))
                         ->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.unbanned_subject'), $html, null, null, null, 'admin_user_status')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.user_ban.unbanned_subject'), $html, null, null, null, 'admin_user_status')) {
                         Log::warning('[AdminUsersService] unban email failed', ['user_id' => $userId]);
                     }
                 });

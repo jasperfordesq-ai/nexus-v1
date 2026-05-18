@@ -104,7 +104,7 @@ class ExchangeRatingService
                         ->paragraph(__('emails_misc.exchange_rating.received_body', ['rating' => $rating]))
                         ->button(__('emails_misc.exchange_rating.received_cta'), $fullUrl)
                         ->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.exchange_rating.received_subject'), $html, null, null, null, 'exchange_rating')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.exchange_rating.received_subject'), $html, null, null, null, 'exchange_rating')) {
                         Log::warning('[ExchangeRatingService] submitRating email failed', ['rated_id' => $ratedId]);
                     }
                 });

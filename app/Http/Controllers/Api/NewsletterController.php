@@ -223,7 +223,7 @@ class NewsletterController extends BaseApiController
                             ->paragraph(__('emails.newsletter.unsubscribed_body', ['community' => $community]))
                             ->paragraph(__('emails.newsletter.unsubscribed_body_contact'))
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $email,
                             __('emails.newsletter.unsubscribed_subject', ['community' => $community]),
                             $html,

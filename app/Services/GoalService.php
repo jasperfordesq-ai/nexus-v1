@@ -227,7 +227,7 @@ class GoalService
                         ->button(__('emails_goals.created.cta'), $goalUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $user->email,
                         __('emails_goals.created.subject', ['title' => $goalTitle, 'community' => $community]),
                         $html,
@@ -312,7 +312,7 @@ class GoalService
                             ->button(__('emails_goals.abandoned.cta'), $newGoalUrl)
                             ->render();
 
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $user->email,
                             __('emails_goals.abandoned.subject', ['title' => $safeTitle, 'community' => $community]),
                             $html,
@@ -432,7 +432,7 @@ class GoalService
                         ->button(__('emails_goals.completed.cta'), $goalUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $user->email,
                         __('emails_goals.completed.subject', ['title' => $goalTitle, 'community' => $community]),
                         $html,

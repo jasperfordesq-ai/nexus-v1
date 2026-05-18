@@ -180,7 +180,7 @@ class GroupInviteService
 
                     $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
 
-                    if (!Mailer::forCurrentTenant()->send($email, $subject, $html, null, null, null, 'group_invite')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($email, $subject, $html, null, null, null, 'group_invite')) {
                         Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
                         return false;
                     }

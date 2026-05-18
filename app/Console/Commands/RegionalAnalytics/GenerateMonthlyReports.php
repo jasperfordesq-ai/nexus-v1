@@ -132,7 +132,7 @@ class GenerateMonthlyReports extends Command
                 . " is ready.</p>"
                 . '<p><a href="' . htmlspecialchars($fileUrl, ENT_QUOTES, 'UTF-8') . '">Download report</a></p>'
                 . "<p>All figures are bucketed per the Project NEXUS privacy guarantees.</p>";
-            if (!\App\Core\Mailer::forCurrentTenant()->send(
+            if (!\App\Services\EmailDispatchService::sendRaw(
                 $email,
                 "Regional analytics report — {$periodLabel}",
                 $body,

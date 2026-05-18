@@ -382,7 +382,7 @@ class GroupService
                         ->button(__('emails_created.group.cta'), $groupUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $creator->email,
                         __('emails_created.group.subject', ['name' => $groupName, 'community' => $tenantName]),
                         $html,
@@ -933,7 +933,7 @@ class GroupService
                             ->paragraph(__('emails_commerce.group_promoted.responsibilities', ['role' => $roleLabel]))
                             ->button(__('emails_commerce.group_promoted.cta'), $groupUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $member->email,
                             __('emails_commerce.group_promoted.subject', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]),
                             $html,
@@ -1033,7 +1033,7 @@ class GroupService
                             ->paragraph(__('emails_commerce.group_removed.suggestion'))
                             ->button(__('emails_commerce.group_removed.cta'), $browseUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $member->email,
                             __('emails_commerce.group_removed.subject', ['group_name' => $groupName, 'community' => $community]),
                             $html,

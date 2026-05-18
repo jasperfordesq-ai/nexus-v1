@@ -647,7 +647,7 @@ class LegalDocumentService
                             ->button(__('emails_content.legal_update.cta'), $reviewUrl)
                             ->render();
 
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $user->email,
                             __('emails_content.legal_update.subject', ['community' => $community, 'doc_type' => $docType]),
                             $html,

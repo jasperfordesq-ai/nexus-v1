@@ -426,7 +426,7 @@ class CommunityProjectService
                         $builder->paragraph('<strong>' . __('emails_misc.community_project.rejected_notes_label') . ':</strong> ' . htmlspecialchars($feedback, ENT_QUOTES, 'UTF-8'));
                     }
                     $html = $builder->button(__("emails_misc.community_project.{$prefix}_cta"), $fullUrl)->render();
-                    if (!Mailer::forCurrentTenant()->send($user->email, __("emails_misc.community_project.{$prefix}_subject", ['title' => $safeTitle]), $html, null, null, null, 'community_project')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($user->email, __("emails_misc.community_project.{$prefix}_subject", ['title' => $safeTitle]), $html, null, null, null, 'community_project')) {
                         Log::warning('[CommunityProjectService] review email failed', ['proposal_id' => $proposalId]);
                     }
                 });

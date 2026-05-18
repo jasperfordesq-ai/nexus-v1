@@ -167,7 +167,7 @@ class IdentityVerificationPaymentService
                             ->paragraph(__('emails_misc.identity_payment.success_body'))
                             ->button(__('emails_misc.identity_payment.success_cta'), $frontendUrl . '/verify-identity')
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html, null, null, null, 'identity_payment')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.identity_payment.success_subject'), $html, null, null, null, 'identity_payment')) {
                             Log::warning('[IdentityVerificationPaymentService] payment success email send returned false', [
                                 'user_id' => $user->id ?? null,
                             ]);
@@ -224,7 +224,7 @@ class IdentityVerificationPaymentService
                             ->paragraph(__('emails_misc.identity_payment.failed_body'))
                             ->button(__('emails_misc.identity_payment.failed_cta'), $frontendUrl . '/verify-identity')
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html, null, null, null, 'identity_payment')) {
+                        if (!\App\Services\EmailDispatchService::sendRaw($user->email, __('emails_misc.identity_payment.failed_subject'), $html, null, null, null, 'identity_payment')) {
                             Log::warning('[IdentityVerificationPaymentService] payment failed email send returned false', [
                                 'user_id' => $user->id ?? null,
                             ]);

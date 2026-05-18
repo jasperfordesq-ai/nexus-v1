@@ -296,7 +296,7 @@ class EventService
                         ->button(__('emails_created.event.cta'), $eventUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $creator->email,
                         __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
                         $html,

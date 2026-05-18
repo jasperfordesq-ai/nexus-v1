@@ -228,7 +228,7 @@ class AdminListingsController extends BaseApiController
                         ->paragraph(__('emails_listings.listings.approved.email_body', ['title' => $safeTitle]))
                         ->button(__('emails_listings.listings.approved.email_cta'), $listingUrl)
                         ->render();
-                    if (!\App\Core\Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $owner->email,
                         __('emails_listings.listings.approved.email_subject', ['title' => $safeTitle]),
                         $html,
@@ -308,7 +308,7 @@ class AdminListingsController extends BaseApiController
                         ->paragraph(__('emails_listings.listings.removed.email_body', ['title' => $title]))
                         ->button(__('emails_listings.listings.removed.email_cta'), $fullUrl)
                         ->render();
-                    if (!\App\Core\Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $user->email,
                         __('emails_listings.listings.removed.email_subject', ['title' => $title]),
                         $html,

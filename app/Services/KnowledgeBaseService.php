@@ -427,7 +427,7 @@ class KnowledgeBaseService
                     ->button(__('emails_content.' . $namespace . '.cta'), $articleUrl)
                     ->render();
 
-                if (!Mailer::forCurrentTenant()->send(
+                if (!\App\Services\EmailDispatchService::sendRaw(
                     $author->email,
                     __('emails_content.' . $namespace . '.subject', ['title' => $title, 'community' => $community]),
                     $html,

@@ -128,7 +128,7 @@ class GoalMilestoneEmailService
                 ->button($cta, $goalUrl)
                 ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'goal_milestone')) {
+            if (!\App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'goal_milestone')) {
                 Log::warning('[GoalMilestoneEmailService] mailer send failed', [
                     'user_id'   => $userId,
                     'goal_id'   => $goalId,

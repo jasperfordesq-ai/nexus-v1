@@ -616,7 +616,7 @@ class UsersController extends BaseApiController
                         ->paragraph(__('emails_misc.admin_actions.self_deletion_body', ['community' => $community]))
                         ->paragraph(__('emails_misc.admin_actions.self_deletion_body_contact'))
                         ->render();
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $userEmail,
                         __('emails_misc.admin_actions.self_deletion_subject', ['community' => $community]),
                         $html,

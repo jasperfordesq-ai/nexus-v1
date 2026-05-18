@@ -545,7 +545,7 @@ class JobVacanciesController extends BaseApiController
                             ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
                             ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $applicantUser->email,
                             __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]),
                             $html,
@@ -591,7 +591,7 @@ class JobVacanciesController extends BaseApiController
                             ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
                             ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
                             ->render();
-                        if (!Mailer::forCurrentTenant()->send(
+                        if (!\App\Services\EmailDispatchService::sendRaw(
                             $posterUser->email,
                             __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]),
                             $html,

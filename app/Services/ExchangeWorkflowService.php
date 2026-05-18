@@ -820,7 +820,7 @@ class ExchangeWorkflowService
                                 ->button(__('emails.exchange_dispute.cta'), $frontendUrl . $link)
                                 ->render();
 
-                            if (!Mailer::forCurrentTenant()->send(
+                            if (!\App\Services\EmailDispatchService::sendRaw(
                                 $party['email'],
                                 __('emails.exchange_dispute.subject'),
                                 $html,
@@ -978,7 +978,7 @@ class ExchangeWorkflowService
                         ->button(__('emails.dispute_resolved_cta'), $frontendUrl . $link)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $party['email'],
                         __('emails.dispute_resolved_subject'),
                         $html,

@@ -169,7 +169,7 @@ class VolunteerCertificateService
                         ->paragraph(__('emails_misc.vol_certificate.ready_body', ['hours' => round($totalHours, 2)]))
                         ->button(__('emails_misc.vol_certificate.ready_cta'), $certUrl)
                         ->render();
-                    if (!Mailer::forCurrentTenant()->send($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html, null, null, null, 'volunteer_certificate')) {
+                    if (!\App\Services\EmailDispatchService::sendRaw($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html, null, null, null, 'volunteer_certificate')) {
                         \Illuminate\Support\Facades\Log::warning('[VolunteerCertificateService] certificate ready email send returned false', ['user_id' => $userId]);
                     }
                 });

@@ -250,7 +250,7 @@ class AdminBillingController extends BaseApiController
                 // of Laravel's Mail facade — the default Mail mailer is SMTP
                 // and MAIL_USERNAME/PASSWORD are intentionally not set in prod,
                 // so Mail::raw silently failed for this notification.
-                if (!\App\Core\Mailer::forCurrentTenant()->send(
+                if (!\App\Services\EmailDispatchService::sendRaw(
                     'jasper@hour-timebank.ie',
                     $subject,
                     nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')),

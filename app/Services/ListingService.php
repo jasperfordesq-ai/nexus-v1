@@ -1121,7 +1121,7 @@ class ListingService
                         ->button(__('emails_created.listing.cta'), $listingUrl)
                         ->render();
 
-                    if (!Mailer::forCurrentTenant()->send(
+                    if (!\App\Services\EmailDispatchService::sendRaw(
                         $creator->email,
                         __('emails_created.listing.subject', ['title' => $listingTitle, 'community' => $tenantName]),
                         $html,
@@ -1233,7 +1233,7 @@ class ListingService
                                 ->button(__('emails_created.listing_updated.cta'), $listingUrl)
                                 ->render();
 
-                            if (!Mailer::forCurrentTenant()->send(
+                            if (!\App\Services\EmailDispatchService::sendRaw(
                                 $savedUser->email,
                                 __('emails_created.listing_updated.subject', ['community' => $tenantName]),
                                 $html,

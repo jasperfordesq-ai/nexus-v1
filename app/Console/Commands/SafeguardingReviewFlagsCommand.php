@@ -239,7 +239,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     )
                     ->render();
 
-                return app(EmailService::class)->send(
+                return \App\Services\EmailDispatchService::sendWithOptions(
                     $userBatch['email'],
                     __('safeguarding.review.reminder_subject'),
                     $html,
@@ -336,7 +336,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     // Email
                     if (!empty($admin->email)) {
                         try {
-                            $sent = app(EmailService::class)->send(
+                            $sent = \App\Services\EmailDispatchService::sendWithOptions(
                                 $admin->email,
                                 __('safeguarding.review.escalation_subject'),
                                 $escalationHtml,

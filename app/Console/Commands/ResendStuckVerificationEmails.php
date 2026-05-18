@@ -171,7 +171,7 @@ class ResendStuckVerificationEmails extends Command
                     ->render();
 
                 $subject = __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]);
-                return Mailer::forCurrentTenant()->send($user->email, $subject, $html, null, null, null, 'email_verification');
+                return \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'email_verification');
             }
         );
     }
