@@ -26,8 +26,9 @@ import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -142,33 +143,33 @@ export function OrganisationsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title', { defaultValue: 'Organisations' })} description={t('page_description', { defaultValue: 'Community organisations and partners.' })} />
+      <PageMeta title={t('organisations.page_title')} description={t('organisations.page_description')} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisations.breadcrumb_volunteering'), href: '/volunteering' },
         { label: t('organisations.breadcrumb_organisations') },
       ]} />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Building2 className="w-7 h-7 text-indigo-400" aria-hidden="true" />
-            {t('organisations.heading')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('organisations.subtitle')}</p>
-        </div>
-        {isAuthenticated && (
-          <Link to={tenantPath('/organisations/register')}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              {t('organisations.register_button')}
-            </Button>
-          </Link>
-        )}
-      </div>
+      <PublicPageHero
+        eyebrow={t('organisations.hero_eyebrow')}
+        title={t('organisations.heading')}
+        description={t('organisations.subtitle')}
+        accent="indigo"
+        icon={<Building2 className="h-7 w-7" aria-hidden="true" />}
+        stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_partners_label'), value: organisations.length.toLocaleString() }] : undefined}
+        action={
+          isAuthenticated ? (
+            <Link to={tenantPath('/organisations/register')}>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('organisations.register_button')}
+              </Button>
+            </Link>
+          ) : undefined
+        }
+      />
 
       {/* Search */}
       <div className="w-full sm:max-w-md">
@@ -221,10 +222,21 @@ export function OrganisationsPage() {
               ))}
             </div>
           ) : organisations.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<Building2 className="w-12 h-12" aria-hidden="true" />}
               title={t('organisations.no_organisations_found')}
               description={debouncedQuery ? t('organisations.try_different_search') : t('organisations.no_organisations_available')}
+              accent="indigo"
+              tips={[t('organisations.empty_tip_volunteer'), t('organisations.empty_tip_partner'), t('organisations.empty_tip_register')]}
+              action={
+                isAuthenticated ? (
+                  <Link to={tenantPath('/organisations/register')}>
+                    <Button color="primary" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>
+                      {t('organisations.register_button')}
+                    </Button>
+                  </Link>
+                ) : undefined
+              }
             />
           ) : (
             <>

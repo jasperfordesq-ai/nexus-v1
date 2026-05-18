@@ -325,13 +325,6 @@ export function LoginPage() {
     <>
       <PageMeta title={t("login_meta_title")} description={t("login_meta_description")} noIndex />
       <div className="min-h-screen flex items-center justify-center p-4">
-        {/* Background blobs */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="blob blob-indigo" />
-          <div className="blob blob-purple" />
-          <div className="blob blob-cyan" />
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

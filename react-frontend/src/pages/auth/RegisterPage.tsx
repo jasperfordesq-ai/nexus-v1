@@ -1030,12 +1030,6 @@ export function RegisterPage() {
   if (pendingResult) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 py-12">
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="blob blob-indigo" />
-          <div className="blob blob-purple" />
-          <div className="blob blob-cyan" />
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1142,13 +1136,6 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 py-12">
       <PageMeta title={t('page_meta.register.title')} noIndex />
-      {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="blob blob-indigo" />
-        <div className="blob blob-purple" />
-        <div className="blob blob-cyan" />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

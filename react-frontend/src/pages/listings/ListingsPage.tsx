@@ -46,8 +46,9 @@ import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
-import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -381,40 +382,30 @@ export function ListingsPage() {
         keywords={t("page_meta_keywords")}
       />
       <div className="space-y-5">
-        {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
-                <ListTodo className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('title')}</h1>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-theme-muted text-sm">{t('page_subtitle')}</p>
-              {totalItems != null && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-                  {t('results_count', { count: totalItems })}
-                </span>
-              )}
-              <AlgorithmLabel area="listings" />
-            </div>
+      <PublicPageHero
+        eyebrow={t('hero_eyebrow')}
+        title={t('title')}
+        description={t('page_subtitle')}
+        accent="emerald"
+        icon={<ListTodo className="h-7 w-7" aria-hidden="true" />}
+        stats={totalItems != null ? [{ label: t('hero_results_label'), value: totalItems.toLocaleString() }] : undefined}
+        action={
+          <div className="flex flex-wrap items-center gap-3">
+            <AlgorithmLabel area="listings" />
+            {isAuthenticated && (
+              <Link to={tenantPath('/listings/create')}>
+                <Button
+                  color="primary"
+                  className="shrink-0 font-semibold shadow-sm"
+                  startContent={<Plus className="w-4 h-4" />}
+                >
+                  {t('create')}
+                </Button>
+              </Link>
+            )}
           </div>
-          {isAuthenticated && (
-            <Link to={tenantPath('/listings/create')}>
-              <Button
-                color="primary"
-                className="shrink-0 font-semibold shadow-sm"
-                startContent={<Plus className="w-4 h-4" />}
-              >
-                {t('create')}
-              </Button>
-            </Link>
-          )}
-        </div>
-      </div>
+        }
+      />
 
       {/* Filters */}
       <GlassCard className="p-4">
@@ -664,10 +655,12 @@ export function ListingsPage() {
         (() => {
           const hasActiveFilters = !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || proximityParams);
           return (
-            <EmptyState
+            <PublicEmptyState
               icon={<Search className="w-12 h-12" />}
               title={t('empty')}
               description={hasActiveFilters ? t('empty_subtitle') : t('empty_no_listings')}
+              accent="emerald"
+              tips={hasActiveFilters ? [t('empty_tip_filters'), t('empty_tip_categories')] : [t('empty_tip_offer'), t('empty_tip_request')]}
               action={
                 hasActiveFilters ? (
                   <Button

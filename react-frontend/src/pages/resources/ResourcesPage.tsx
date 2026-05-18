@@ -50,8 +50,9 @@ import ArrowDown from 'lucide-react/icons/arrow-down';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -538,20 +539,16 @@ export function ResourcesPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title', { defaultValue: 'Resources' })} description={t('page_description', { defaultValue: 'Community resources, documents, and guides.' })} />
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
-                <FolderOpen className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h1 className="text-xl font-bold text-theme-primary">{t('resources.heading')}</h1>
-            </div>
-            <p className="text-sm text-theme-muted">{t('resources.subtitle')}</p>
-          </div>
-          {isAuthenticated && (
+      <PageMeta title={t('resources.page_title')} description={t('resources.page_description')} />
+      <PublicPageHero
+        eyebrow={t('resources.hero_eyebrow')}
+        title={t('resources.heading')}
+        description={t('resources.subtitle')}
+        accent="amber"
+        icon={<FolderOpen className="h-7 w-7" aria-hidden="true" />}
+        stats={resources.length > 0 && !isLoading ? [{ label: t('resources.hero_resources_label'), value: resources.length.toLocaleString() }] : undefined}
+        action={
+          isAuthenticated ? (
             <Button
               color="primary"
               className="shrink-0"
@@ -560,9 +557,9 @@ export function ResourcesPage() {
             >
               {t('resources.upload_resource')}
             </Button>
-          )}
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
 
       {/* Search & Admin Controls */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -711,7 +708,7 @@ export function ResourcesPage() {
               ))}
             </div>
           ) : resources.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<FolderOpen className="w-12 h-12" aria-hidden="true" />}
               title={t('resources.no_resources_found')}
               description={
@@ -719,6 +716,8 @@ export function ResourcesPage() {
                   ? t('resources.try_different_search')
                   : t('resources.no_resources_shared')
               }
+              accent="amber"
+              tips={[t('resources.empty_tip_guides'), t('resources.empty_tip_templates'), t('resources.empty_tip_files')]}
             />
           ) : (
             <div className="space-y-3">

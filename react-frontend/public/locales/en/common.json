@@ -172,7 +172,9 @@
     "terms_of_service": "Terms of Service",
     "privacy_policy": "Privacy Policy",
     "cookie_policy": "Cookie Policy",
-    "accessibility": "Accessibility"
+    "accessibility": "Accessibility",
+    "type_community_guidelines": "Community Guidelines",
+    "type_acceptable_use": "Acceptable Use"
   },
   "admin_tools": {
     "section": "Admin Tools",
@@ -1985,6 +1987,17 @@
     "ios_step_2": "Scroll down and tap",
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
+    "generic_title": "Install NEXUS",
+    "generic_intro": "Look for an install option in your browser's menu:",
+    "generic_step_1": "Open your browser menu, usually a three-dot or three-line icon.",
+    "generic_step_2": "Look for Install app, Install this site, or Add to Home screen.",
+    "generic_step_3": "Confirm to add NEXUS to your device.",
+    "manual_note": "If you do not see the option, your browser may have already installed the app or your device may not support it.",
     "got_it": "Got it"
+  },
+  "release_status": {
+    "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
+    "features_link": "Features",
+    "changelog_link": "Changelog"
   }
 }

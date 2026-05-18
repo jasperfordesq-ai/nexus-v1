@@ -152,13 +152,6 @@ export function Layout({
         {t('accessibility.skip_to_content', 'Skip to main content')}
       </a>
 
-      {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="blob blob-indigo" />
-        <div className="blob blob-purple" />
-        <div className="blob blob-cyan" />
-      </div>
-
       {/* Offline indicator */}
       <OfflineIndicator />
 
@@ -243,13 +236,6 @@ export function AuthLayout() {
       >
         {t('accessibility.skip_to_content', 'Skip to main content')}
       </a>
-
-      {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="blob blob-indigo" />
-        <div className="blob blob-purple" />
-        <div className="blob blob-cyan" />
-      </div>
 
       {/* Language switcher — top-right on auth pages */}
       <div className="absolute top-[calc(var(--safe-area-top)+1rem)] right-[calc(var(--safe-area-right)+1rem)] z-20">

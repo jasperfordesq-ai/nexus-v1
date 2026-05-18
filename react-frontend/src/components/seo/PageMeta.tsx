@@ -19,6 +19,7 @@
  *  - seo_twitter_cards → whether to emit Twitter Card tags
  */
 
+import { useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -110,9 +111,12 @@ export function PageMeta({
   // Active language → OG locale (BCP 47). Falls back to en_GB if unknown.
   const activeLang = (i18n.language || 'en').split('-')[0] ?? 'en';
   const ogLocale = OG_LOCALES[activeLang] || OG_LOCALES.en;
-  const ogLocaleAlternates = Object.entries(OG_LOCALES)
-    .filter(([code]) => code !== activeLang)
-    .map(([, locale]) => locale);
+  const ogLocaleAlternates = useMemo(
+    () => Object.entries(OG_LOCALES)
+      .filter(([code]) => code !== activeLang)
+      .map(([, locale]) => locale),
+    [activeLang]
+  );
 
   const settings = tenant?.settings as Record<string, unknown> | undefined;
 
@@ -151,6 +155,132 @@ export function PageMeta({
   const richCardImage = image || branding.og_image_url || branding.logo;
   const ogImage = richCardImage || `${origin}/og-default.svg`;
   const twitterCard = richCardImage ? 'summary_large_image' : 'summary';
+  const ogLocaleAlternatesKey = ogLocaleAlternates.join('|');
+
+  useEffect(() => {
+    const pageMetaAttr = 'data-nexus-page-meta';
+
+    const setMeta = (selector: string, attrs: Record<string, string>) => {
+      let element = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!element) {
+        element = document.createElement('meta');
+        document.head.appendChild(element);
+      }
+
+      element.setAttribute(pageMetaAttr, 'true');
+      Object.entries(attrs).forEach(([key, value]) => {
+        element.setAttribute(key, value);
+      });
+    };
+
+    const setLink = (selector: string, attrs: Record<string, string>) => {
+      let element = document.head.querySelector<HTMLLinkElement>(selector);
+      if (!element) {
+        element = document.createElement('link');
+        document.head.appendChild(element);
+      }
+
+      element.setAttribute(pageMetaAttr, 'true');
+      Object.entries(attrs).forEach(([key, value]) => {
+        element.setAttribute(key, value);
+      });
+    };
+
+    const removeOwned = (selector: string) => {
+      document.head.querySelectorAll(`${selector}[${pageMetaAttr}="true"]`).forEach((element) => {
+        element.remove();
+      });
+    };
+
+    document.title = fullTitle;
+    setMeta('meta[name="description"]', { name: 'description', content: metaDescription });
+
+    if (metaKeywords) {
+      setMeta('meta[name="keywords"]', { name: 'keywords', content: metaKeywords });
+    } else {
+      removeOwned('meta[name="keywords"]');
+    }
+
+    if (enableCanonical && canonicalUrl) {
+      setLink('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl });
+    } else {
+      removeOwned('link[rel="canonical"]');
+    }
+
+    if (noIndex) {
+      setMeta('meta[name="robots"]', { name: 'robots', content: 'noindex, nofollow' });
+    } else {
+      removeOwned('meta[name="robots"]');
+    }
+
+    if (enableOpenGraph) {
+      setMeta('meta[property="og:type"]', { property: 'og:type', content: type });
+      setMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: siteName });
+      setMeta('meta[property="og:title"]', { property: 'og:title', content: fullTitle });
+      setMeta('meta[property="og:description"]', { property: 'og:description', content: metaDescription });
+      if (canonicalUrl) {
+        setMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
+      }
+      setMeta('meta[property="og:image"]', { property: 'og:image', content: ogImage });
+      setMeta('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
+      setMeta('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
+      setMeta('meta[property="og:locale"]', { property: 'og:locale', content: ogLocale });
+      removeOwned('meta[property="og:locale:alternate"]');
+      ogLocaleAlternates.forEach((locale) => {
+        const element = document.createElement('meta');
+        element.setAttribute(pageMetaAttr, 'true');
+        element.setAttribute('property', 'og:locale:alternate');
+        element.setAttribute('content', locale);
+        document.head.appendChild(element);
+      });
+      if (type === 'article' && publishedTime) {
+        setMeta('meta[property="article:published_time"]', {
+          property: 'article:published_time',
+          content: publishedTime,
+        });
+      } else {
+        removeOwned('meta[property="article:published_time"]');
+      }
+      if (type === 'article' && modifiedTime) {
+        setMeta('meta[property="article:modified_time"]', {
+          property: 'article:modified_time',
+          content: modifiedTime,
+        });
+      } else {
+        removeOwned('meta[property="article:modified_time"]');
+      }
+    } else {
+      removeOwned('meta[property^="og:"]');
+      removeOwned('meta[property^="article:"]');
+    }
+
+    if (enableTwitterCards) {
+      setMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: twitterCard });
+      setMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: fullTitle });
+      setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: metaDescription });
+      setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
+    } else {
+      removeOwned('meta[name^="twitter:"]');
+    }
+  }, [
+    canonicalUrl,
+    enableCanonical,
+    enableOpenGraph,
+    enableTwitterCards,
+    fullTitle,
+    metaDescription,
+    metaKeywords,
+    modifiedTime,
+    noIndex,
+    ogImage,
+    ogLocale,
+    ogLocaleAlternates,
+    ogLocaleAlternatesKey,
+    publishedTime,
+    siteName,
+    twitterCard,
+    type,
+  ]);
 
   return (
     <Helmet>

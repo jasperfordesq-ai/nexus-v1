@@ -28,8 +28,9 @@ import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
@@ -187,14 +188,14 @@ export function BlogPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title')} description={t('page_description', { defaultValue: 'Latest blog posts and community stories' })} />
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <BookOpen className="w-7 h-7 text-blue-400" aria-hidden="true" />
-          {t('title')}
-        </h1>
-        <p className="text-theme-muted mt-1">{t('subtitle')}</p>
-      </div>
+      <PublicPageHero
+        eyebrow={t('hero_eyebrow')}
+        title={t('title')}
+        description={t('subtitle')}
+        accent="blue"
+        icon={<BookOpen className="h-7 w-7" aria-hidden="true" />}
+        stats={posts.length > 0 && !isLoading ? [{ label: t('hero_posts_label'), value: posts.length.toLocaleString() }] : undefined}
+      />
 
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -279,7 +280,7 @@ export function BlogPage() {
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<BookOpen className="w-12 h-12" aria-hidden="true" />}
               title={t('empty_title')}
               description={
@@ -287,6 +288,8 @@ export function BlogPage() {
                   ? t('empty_desc_filtered')
                   : t('empty_desc')
               }
+              accent="blue"
+              tips={[t('empty_tip_stories'), t('empty_tip_guides'), t('empty_tip_updates')]}
             />
           ) : (
             <>

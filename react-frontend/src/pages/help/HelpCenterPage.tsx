@@ -25,6 +25,7 @@ import Wallet from 'lucide-react/icons/wallet';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant, useFeature, useModule } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -104,20 +105,27 @@ export function HelpCenterPage() {
     : faqGroups;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 px-1 sm:px-0">
+    <div className="mx-auto max-w-5xl space-y-6 px-1 sm:px-0">
       <PageMeta title={t('help.page_title', { defaultValue: 'Help Center' })} description={t('help.meta_description', { defaultValue: 'Find answers, guides, and support for using the platform.' })} />
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-            <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">{t('help.heading')}</h1>
-          <p className="text-theme-muted mt-2 max-w-lg mx-auto">
-            {t('help.subtitle', { name: branding.name })}
-          </p>
-        </div>
+      <PublicPageHero
+        eyebrow={t('help.hero_eyebrow')}
+        title={t('help.heading')}
+        description={t('help.subtitle', { name: branding.name })}
+        icon={<HelpCircle className="h-6 w-6" aria-hidden="true" />}
+        accent="blue"
+        action={
+          <Button
+            as={Link}
+            to={tenantPath('/contact')}
+            color="primary"
+            startContent={<MessageSquare className="h-4 w-4" aria-hidden="true" />}
+          >
+            {t('help.contact_support')}
+          </Button>
+        }
+      />
 
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         {/* Search */}
         <div className="max-w-md mx-auto mb-8">
           <Input
@@ -159,7 +167,7 @@ export function HelpCenterPage() {
         {loading && (
           <GlassCard className="p-12 text-center">
             <Spinner size="lg" className="mx-auto" />
-            <p className="text-theme-muted mt-4 text-sm">{t('common.loading', 'Loading...')}</p>
+            <p className="text-theme-muted mt-4 text-sm">{t('help.loading')}</p>
           </GlassCard>
         )}
 

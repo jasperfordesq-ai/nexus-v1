@@ -36,8 +36,8 @@ import { MenuProvider } from '@/contexts/MenuContext';
 import { PresenceProvider } from '@/contexts/PresenceContext';
 import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
-import { Spinner } from '@heroui/react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
@@ -124,11 +124,7 @@ function TenantGuard({
   // Without this, pages on custom domains (hour-timebank.ie) fire API calls before
   // the tenant ID is known, causing the API to return master tenant (ID 1) results.
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" aria-label={t('aria.loading_community')}>
-        <Spinner size="lg" color="primary" />
-      </div>
-    );
+    return <LoadingScreen message={t('aria.loading_community')} />;
   }
 
   // If the slug was not found, show "Community Not Found" page

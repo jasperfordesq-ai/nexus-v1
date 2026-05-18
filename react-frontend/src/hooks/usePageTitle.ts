@@ -12,10 +12,20 @@ import { useEffect } from 'react';
 
 export function usePageTitle(title: string) {
   useEffect(() => {
+    const hasHelmetMeta = () => Boolean(document.querySelector(
+      'meta[name="description"][data-rh="true"], link[rel="canonical"][data-rh="true"], meta[property="og:title"][data-rh="true"], meta[name="description"][data-nexus-page-meta="true"], link[rel="canonical"][data-nexus-page-meta="true"], meta[property="og:title"][data-nexus-page-meta="true"]'
+    ));
     const prev = document.title;
-    document.title = title;
+    const raf = window.requestAnimationFrame(() => {
+      if (!hasHelmetMeta()) {
+        document.title = title;
+      }
+    });
     return () => {
-      document.title = prev;
+      window.cancelAnimationFrame(raf);
+      if (!hasHelmetMeta()) {
+        document.title = prev;
+      }
     };
   }, [title]);
 }

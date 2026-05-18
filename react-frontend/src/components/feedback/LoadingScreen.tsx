@@ -9,6 +9,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { Card, CardBody, Skeleton } from '@heroui/react';
 import Loader2 from 'lucide-react/icons/loader-circle';
 import i18n from 'i18next';
 
@@ -29,28 +30,29 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
       aria-live="polite"
       aria-busy="true"
     >
-      {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="blob blob-indigo" />
-        <div className="blob blob-purple" />
-        <div className="blob blob-cyan" />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 text-center"
+        className="relative z-10 w-full max-w-sm px-4"
       >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
-          aria-hidden="true"
-        >
-          <Loader2 className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-        </motion.div>
-        <p className="text-theme-muted">{displayMessage}</p>
-        <span className="sr-only">{displayMessage}</span>
+        <Card className="border border-theme-default bg-theme-surface/80 shadow-xl" radius="lg">
+          <CardBody className="items-center px-6 py-8 text-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20"
+              aria-hidden="true"
+            >
+              <Loader2 className="h-8 w-8 text-indigo-600 dark:text-indigo-300" />
+            </motion.div>
+            <p className="text-sm font-medium text-theme-secondary">{displayMessage}</p>
+            <div className="mt-5 w-full space-y-2" aria-hidden="true">
+              <Skeleton className="mx-auto h-2.5 w-3/4 rounded-full" />
+              <Skeleton className="mx-auto h-2.5 w-1/2 rounded-full" />
+            </div>
+            <span className="sr-only">{displayMessage}</span>
+          </CardBody>
+        </Card>
       </motion.div>
     </div>
   );

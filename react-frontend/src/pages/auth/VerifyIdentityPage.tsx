@@ -372,10 +372,6 @@ export function VerifyIdentityPage() {
   // Start / In-progress states
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="blob blob-indigo" />
-        <div className="blob blob-purple" />
-      </div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md relative z-10">
         <GlassCard className="p-5 sm:p-8">
           <div className="text-center mb-8">

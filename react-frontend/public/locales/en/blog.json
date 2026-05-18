@@ -1,5 +1,7 @@
 {
   "page_title": "Blog",
+  "hero_eyebrow": "Community stories",
+  "hero_posts_label": "Posts shown",
   "title": "Blog & News",
   "subtitle": "Community stories, updates, and announcements",
   "search_placeholder": "Search posts...",
@@ -11,6 +13,9 @@
   "empty_title": "No posts found",
   "empty_desc": "No blog posts have been published yet",
   "empty_desc_filtered": "Try different search terms or clear your filters",
+  "empty_tip_stories": "Member stories",
+  "empty_tip_guides": "Guides",
+  "empty_tip_updates": "Updates",
   "load_more": "Load More Posts",
   "min_read": "{{count}} min read",
   "min_read_short": "{{count}}m",

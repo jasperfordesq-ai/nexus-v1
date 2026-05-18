@@ -29,8 +29,9 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PublicEmptyState } from '@/components/public/PublicEmptyState';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatDateTime, formatDateValue, formatMonthShort, resolveAssetUrl } from '@/lib/helpers';
@@ -258,28 +259,15 @@ export function EventsPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title')} description={t('page_description')} />
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-theme-default bg-theme-elevated px-3 py-1 text-xs font-medium text-theme-muted">
-            <CalendarDays className="h-3.5 w-3.5 text-[var(--color-warning)]" aria-hidden="true" />
-            {t('subtitle')}
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-theme-primary sm:text-4xl">{t('title')}</h1>
-            <p className="max-w-2xl text-sm text-theme-muted sm:text-base">{t('page_description')}</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {totalCount != null && !isLoading && (
-            <Chip
-              variant="flat"
-              color="primary"
-              startContent={<Calendar className="h-3.5 w-3.5" aria-hidden="true" />}
-            >
-              {t('count_pill', { count: totalCount })}
-            </Chip>
-          )}
-          {isAuthenticated && (
+      <PublicPageHero
+        eyebrow={t('subtitle')}
+        title={t('title')}
+        description={t('page_description')}
+        accent="amber"
+        icon={<CalendarDays className="h-7 w-7" aria-hidden="true" />}
+        stats={totalCount != null && !isLoading ? [{ label: t('hero_events_label'), value: totalCount.toLocaleString() }] : undefined}
+        action={
+          isAuthenticated ? (
             <Link to={tenantPath('/events/create')}>
               <Button
                 color="primary"
@@ -289,9 +277,9 @@ export function EventsPage() {
                 {t('create_event')}
               </Button>
             </Link>
-          )}
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
 
       {/* Search & Time Filter */}
       <GlassCard className="p-4 sm:p-5">
@@ -426,7 +414,7 @@ export function EventsPage() {
               ))}
             </div>
           ) : events.length === 0 ? (
-            <EmptyState
+            <PublicEmptyState
               icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
               title={t('no_events')}
               description={
@@ -436,6 +424,8 @@ export function EventsPage() {
                     ? t('no_events_upcoming')
                     : t('no_events_search')
               }
+              accent="amber"
+              tips={[t('empty_tip_workshops'), t('empty_tip_social'), t('empty_tip_online')]}
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/events/create')}>
