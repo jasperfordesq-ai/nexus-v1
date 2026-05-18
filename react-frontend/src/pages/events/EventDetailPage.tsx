@@ -56,7 +56,7 @@ import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
-import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { SocialInteractionPanel } from '@/components/social';
@@ -470,9 +470,29 @@ export function EventDetailPage() {
   const isCancelled = event?.status === 'cancelled';
   const goingAttendees = attendees.filter((a) => a.rsvp_status === 'going' || a.rsvp_status === 'attending' || !a.rsvp_status);
   const checkedInCount = attendees.filter((a) => a.checked_in).length;
+  const checkInPercent = goingAttendees.length > 0 ? Math.round((checkedInCount / goingAttendees.length) * 100) : 0;
+  const getAttendeeName = (attendee: AttendeeWithCheckIn) =>
+    attendee.name || `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || t('detail.community_member');
 
   if (isLoading) {
-    return <LoadingScreen message={t('detail.loading')} />;
+    return (
+      <div className="mx-auto max-w-5xl space-y-6" role="status" aria-live="polite" aria-busy="true">
+        <Skeleton className="h-8 w-48 rounded-lg" />
+        <Card className="overflow-hidden border border-theme-default bg-theme-surface/80 shadow-xl" radius="lg">
+          <Skeleton className="h-64 w-full rounded-none" />
+          <CardBody className="space-y-5 p-5 sm:p-8">
+            <Skeleton className="h-10 w-3/4 rounded-lg" />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+            </div>
+            <Skeleton className="h-28 rounded-lg" />
+          </CardBody>
+        </Card>
+        <span className="sr-only">{t('detail.loading')}</span>
+      </div>
+    );
   }
 
   if (error && !event) {
@@ -532,6 +552,10 @@ export function EventDetailPage() {
   const endTimeLabel = endDate
     ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
     : null;
+  const eventImage = event.cover_image ? resolveAssetUrl(event.cover_image) : undefined;
+  const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160);
+  const organizerName = event.organizer?.name || `${event.organizer?.first_name ?? ''} ${event.organizer?.last_name ?? ''}`.trim() || t('detail.community_member');
+  const attendanceTotal = goingCount + interestedCount;
   const eventSocial = event as Event & {
     is_liked?: boolean;
     likes_count?: number;
@@ -546,8 +570,8 @@ export function EventDetailPage() {
     >
       <PageMeta
         title={event.title}
-        description={event.description?.substring(0, 160)}
-        image={event.cover_image ? resolveAssetUrl(event.cover_image) : undefined}
+        description={seoDescription}
+        image={eventImage}
       />
       <Helmet>
         <script type="application/ld+json">
@@ -559,10 +583,10 @@ export function EventDetailPage() {
             startDate: event.start_date,
             ...(event.end_date ? { endDate: event.end_date } : {}),
             ...(event.location ? { location: { '@type': 'Place', name: event.location } } : {}),
-            ...(event.cover_image ? { image: resolveAssetUrl(event.cover_image) } : {}),
+            ...(eventImage ? { image: eventImage } : {}),
             organizer: {
               '@type': 'Person',
-              name: event.organizer?.name || `${event.organizer?.first_name} ${event.organizer?.last_name}`.trim() || 'Community Member',
+              name: organizerName,
             },
           })}
         </script>
@@ -574,84 +598,135 @@ export function EventDetailPage() {
         { label: event?.title || t('title') },
       ]} />
 
-      {/* Cover Image */}
-      {event.cover_image && (
-        <div className="rounded-xl overflow-hidden">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-2xl border border-theme-default bg-theme-surface shadow-xl">
+        {eventImage ? (
           <img
-            src={resolveAssetUrl(event.cover_image)}
+            src={eventImage}
             alt={t('detail.cover_alt', { title: event.title })}
-            className="w-full h-48 sm:h-64 object-cover"
-            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
           />
-        </div>
-      )}
-
-      {/* Main Content */}
-      <GlassCard className="p-6 sm:p-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            {/* Date Badge */}
-            <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-xl p-4 text-center">
-              <div className="text-amber-400 text-sm font-medium uppercase">
-                {startMonthLabel}
-              </div>
-              <div className="text-theme-primary text-3xl font-bold">
-                {startDate.getDate()}
-              </div>
-            </div>
-
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-indigo-500/10 to-emerald-500/20" aria-hidden="true" />
+        )}
+        <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
+        <div className="relative flex min-h-[22rem] flex-col justify-between gap-8 p-5 sm:min-h-[26rem] sm:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-wrap gap-2">
               {isPast && (
                 <Chip variant="flat" color="default" size="sm">
                   {t('detail.past_event')}
                 </Chip>
               )}
+              {isCancelled && (
+                <Chip variant="flat" color="danger" size="sm">
+                  {t('detail.event_cancelled')}
+                </Chip>
+              )}
               {event.category_name && (
-                <Chip variant="flat" color="secondary" size="sm">
-                  {event.category_name}
+                <Chip variant="flat" color="secondary" size="sm" className="max-w-full">
+                  <span className="truncate">{event.category_name}</span>
+                </Chip>
+              )}
+              {event.is_recurring && (
+                <Chip variant="flat" color="secondary" size="sm" startContent={<Repeat className="w-3 h-3" aria-hidden="true" />}>
+                  {t('detail.recurring_event')}
+                </Chip>
+              )}
+              {event.allow_remote_attendance && (
+                <Chip variant="flat" color="primary" size="sm" startContent={<Video className="w-3 h-3" aria-hidden="true" />}>
+                  {t('detail.remote_attendance_available')}
                 </Chip>
               )}
             </div>
-          </div>
 
-          {isOrganizer && !isCancelled && (
-            <div className="flex gap-2 flex-wrap">
-              <Link to={tenantPath(`/events/${event.id}/edit`)}>
+            {isOrganizer && !isCancelled && (
+              <div className="flex flex-wrap gap-2 sm:justify-end">
                 <Button
+                  as={Link}
+                  to={tenantPath(`/events/${event.id}/edit`)}
                   size="sm"
                   variant="flat"
-                  className="bg-theme-elevated text-theme-primary"
+                  className="bg-white/15 text-white backdrop-blur-md"
                   startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.edit_event_aria', { title: event.title })}
                 >
                   {t('detail.edit')}
                 </Button>
-              </Link>
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-amber-500/10 text-amber-400"
-                startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => setShowCancelModal(true)}
-              >
-                {t('detail.cancel_event')}
-              </Button>
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-red-500/10 text-red-400"
-                startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => setShowDeleteModal(true)}
-              >
-                {t('detail.delete')}
-              </Button>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-amber-500/20 text-amber-100 backdrop-blur-md"
+                  startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => setShowCancelModal(true)}
+                  aria-label={t('detail.cancel_event_aria', { title: event.title })}
+                >
+                  {t('detail.cancel_event')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-red-500/20 text-red-100 backdrop-blur-md"
+                  startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => setShowDeleteModal(true)}
+                  aria-label={t('detail.delete_event_aria', { title: event.title })}
+                >
+                  {t('detail.delete')}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="min-w-0">
+              <div className="mb-4 inline-flex min-w-[5.5rem] flex-col items-center rounded-xl border border-white/20 bg-white/15 px-4 py-3 text-center text-white shadow-lg backdrop-blur-md">
+                <span className="text-xs font-semibold uppercase">{startMonthLabel}</span>
+                <span className="text-4xl font-bold leading-none">{startDate.getDate()}</span>
+              </div>
+              <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white sm:text-5xl">
+                {event.title}
+              </h1>
+              {event.series && (
+                <Link to={tenantPath(`/events?series=${event.series.id}`)} className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm text-white backdrop-blur-md transition-opacity hover:opacity-90">
+                  <Link2 className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                  <span className="truncate">{event.series.title}</span>
+                  <span className="text-white/75">{t('detail.events_in_series', { count: event.series.event_count })}</span>
+                </Link>
+              )}
             </div>
-          )}
+
+            {isAuthenticated && (rsvpStatus || isWaitlisted) && (
+              <div className="flex flex-wrap gap-2 lg:max-w-xs lg:justify-end">
+                {rsvpStatus && (
+                  <Chip
+                    variant="flat"
+                    color={rsvpStatus === 'going' ? 'success' : rsvpStatus === 'interested' ? 'warning' : 'default'}
+                    size="lg"
+                    startContent={
+                      rsvpStatus === 'going'
+                        ? <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                        : rsvpStatus === 'interested'
+                          ? <Heart className="w-4 h-4" aria-hidden="true" />
+                          : <XCircle className="w-4 h-4" aria-hidden="true" />
+                    }
+                  >
+                    {rsvpStatus === 'going' ? t('detail.rsvp_going') : rsvpStatus === 'interested' ? t('detail.rsvp_interested') : t('detail.rsvp_not_going')}
+                  </Chip>
+                )}
+                {isWaitlisted && (
+                  <Chip variant="flat" color="warning" size="lg" startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}>
+                    {waitlistPosition ? t('detail.on_waitlist_position', { position: waitlistPosition }) : t('detail.on_waitlist')}
+                  </Chip>
+                )}
+              </div>
+            )}
+          </div>
         </div>
+      </section>
 
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-theme-primary mb-4">{event.title}</h1>
-
+      {/* Main Content */}
+      <GlassCard className="p-6 sm:p-8">
         {/* E5: Cancellation Banner */}
         {isCancelled && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
@@ -667,130 +742,73 @@ export function EventDetailPage() {
           </div>
         )}
 
-        {/* E1: Recurring event indicator */}
-        {event.is_recurring && (
-          <div className="mb-4">
-            <Chip variant="flat" color="secondary" size="sm" startContent={<Repeat className="w-3 h-3" aria-hidden="true" />}>
-              {t('detail.recurring_event')}
-            </Chip>
-          </div>
-        )}
-
-        {/* INF6: Remote attendance badge */}
-        {event.allow_remote_attendance && (
-          <div className="mb-4">
-            <Chip variant="flat" color="primary" size="sm" startContent={<Video className="w-3 h-3" aria-hidden="true" />}>
-              {t('detail.remote_attendance_available')}
-            </Chip>
-          </div>
-        )}
-
-        {/* E7: Series link (navigable) */}
-        {event.series && (
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            <Link to={tenantPath(`/events?series=${event.series.id}`)}>
-              <Chip
-                variant="flat"
-                color="primary"
-                size="sm"
-                startContent={<Link2 className="w-3 h-3" aria-hidden="true" />}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                {event.series.title}
-              </Chip>
-            </Link>
-            <span className="text-sm text-theme-subtle">
-              {t('detail.events_in_series', { count: event.series.event_count })}
-            </span>
-          </div>
-        )}
-
-        {/* RSVP / Waitlist Status Display */}
-        {isAuthenticated && (rsvpStatus || isWaitlisted) && (
-          <div className="mb-6 flex flex-wrap gap-2">
-            {rsvpStatus && (
-              <Chip
-                variant="flat"
-                color={rsvpStatus === 'going' ? 'success' : rsvpStatus === 'interested' ? 'warning' : 'default'}
-                size="lg"
-                startContent={
-                  rsvpStatus === 'going'
-                    ? <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-                    : rsvpStatus === 'interested'
-                      ? <Heart className="w-4 h-4" aria-hidden="true" />
-                      : <XCircle className="w-4 h-4" aria-hidden="true" />
-                }
-              >
-                {rsvpStatus === 'going' ? t('detail.rsvp_going') : rsvpStatus === 'interested' ? t('detail.rsvp_interested') : t('detail.rsvp_not_going')}
-              </Chip>
-            )}
-            {isWaitlisted && (
-              <Chip variant="flat" color="warning" size="lg" startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}>
-                {t('detail.on_waitlist')}{waitlistPosition ? ` (#${waitlistPosition})` : ''}
-              </Chip>
-            )}
-          </div>
-        )}
-
         {/* Attendee Count Breakdown with Capacity Info (E2) */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-            <span className="text-theme-primary font-medium">{goingCount}</span>
-            <span className="text-theme-muted">{t('detail.going_count')}</span>
-          </div>
-          {interestedCount > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-              <span className="text-theme-primary font-medium">{interestedCount}</span>
-              <span className="text-theme-muted">{t('detail.interested_count')}</span>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+            <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
+              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              <span>{t('detail.going_count')}</span>
             </div>
-          )}
+            <span className="text-theme-primary font-medium">{goingCount}</span>
+          </div>
+          <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+            <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
+              <div className="h-2.5 w-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+              <span>{t('detail.interested_count')}</span>
+            </div>
+            <span className="text-theme-primary font-medium">{interestedCount}</span>
+          </div>
           {event.max_attendees != null && (
-            <>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2.5 h-2.5 rounded-full bg-theme-subtle" />
-                <span className="text-theme-muted">{t('detail.max_capacity', { count: event.max_attendees })}</span>
+            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
+                <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{t('detail.capacity_label')}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-theme-primary font-medium">{t('detail.max_capacity', { count: event.max_attendees })}</span>
+                {event.is_full && (
+                  <Chip size="sm" variant="flat" color="danger">{t('detail.event_full')}</Chip>
+                )}
               </div>
               {event.spots_left != null && event.spots_left > 0 && (
-                <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'}>
+                <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'} className="mt-2">
                   {t('detail.spots_left', { count: event.spots_left })}
                 </Chip>
               )}
-              {event.is_full && (
-                <Chip size="sm" variant="flat" color="danger">{t('detail.event_full')}</Chip>
-              )}
-            </>
+            </div>
           )}
           {(event.waitlist_count ?? 0) > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <ListOrdered className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
-              <span className="text-theme-muted">{t('detail.waitlist_count', { count: event.waitlist_count })}</span>
+            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
+                <ListOrdered className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{t('detail.waitlist_label')}</span>
+              </div>
+              <span className="text-theme-primary font-medium">{t('detail.waitlist_count', { count: event.waitlist_count })}</span>
             </div>
           )}
         </div>
 
         {/* Meta Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <div className="flex items-center gap-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-amber-500/20">
+          <div className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-4 text-theme-muted">
+            <div className="flex-shrink-0 rounded-lg bg-amber-500/20 p-2">
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail.date_label')}</div>
-              <time dateTime={event.start_date} className="text-theme-primary block">
+              <time dateTime={event.start_date} className="block truncate text-theme-primary">
                 {fullDateLabel}
               </time>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-indigo-500/20">
+          <div className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-4 text-theme-muted">
+            <div className="flex-shrink-0 rounded-lg bg-indigo-500/20 p-2">
               <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail.time_label')}</div>
-              <div className="text-theme-primary">
+              <div className="truncate text-theme-primary">
                 <time dateTime={event.start_date}>
                   {startTimeLabel}
                 </time>
@@ -807,13 +825,13 @@ export function EventDetailPage() {
           </div>
 
           {event.location && (
-            <div className="flex items-center gap-3 text-theme-muted">
-              <div className="p-2 rounded-lg bg-emerald-500/20">
+            <div className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-4 text-theme-muted sm:col-span-2 lg:col-span-1">
+              <div className="flex-shrink-0 rounded-lg bg-emerald-500/20 p-2">
                 <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-xs text-theme-subtle">{t('detail.location_label')}</div>
-                <div className="text-theme-primary">{event.location}</div>
+                <div className="truncate text-theme-primary">{event.location}</div>
               </div>
             </div>
           )}
@@ -1025,7 +1043,7 @@ export function EventDetailPage() {
                         <Avatar
                           key={attendee.id}
                           src={resolveAvatarUrl(attendee.avatar)}
-                          name={attendee.name || `${attendee.first_name} ${attendee.last_name}`}
+                          name={getAttendeeName(attendee)}
                           size="sm"
                           className="ring-2 ring-black/50"
                         />
@@ -1051,22 +1069,24 @@ export function EventDetailPage() {
               className="space-y-4"
             >
               {attendees.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-theme-muted">{t('detail.no_attendees')}</p>
-                </div>
+                <EmptyState
+                  icon={<Users className="w-10 h-10 text-theme-subtle" aria-hidden="true" />}
+                  title={t('detail.no_attendees_title')}
+                  description={t('detail.no_attendees')}
+                  className="py-10"
+                />
               ) : (
-                <div className="space-y-2">
+                <div className="grid gap-3 sm:grid-cols-2">
                   {attendees.map((attendee) => (
-                    <div key={attendee.id} className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
+                    <div key={attendee.id} className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3">
                       <Avatar
                         src={resolveAvatarUrl(attendee.avatar)}
-                        name={attendee.name || `${attendee.first_name} ${attendee.last_name}`}
+                        name={getAttendeeName(attendee)}
                         size="sm"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-theme-primary font-medium truncate">
-                          {attendee.name || `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim()}
+                          {getAttendeeName(attendee)}
                         </p>
                       </div>
                       <Chip
@@ -1141,7 +1161,7 @@ export function EventDetailPage() {
                       </defs>
                     </svg>
                     <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-theme-primary">
-                      {goingAttendees.length > 0 ? Math.round((checkedInCount / goingAttendees.length) * 100) : 0}%
+                      {checkInPercent}%
                     </span>
                   </div>
                 </div>
@@ -1149,22 +1169,24 @@ export function EventDetailPage() {
 
               {/* Attendee Check-in List */}
               {goingAttendees.length === 0 ? (
-                <div className="text-center py-8">
-                  <UserCheck className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-theme-muted">{t('detail.no_checkin_attendees')}</p>
-                </div>
+                <EmptyState
+                  icon={<UserCheck className="w-10 h-10 text-theme-subtle" aria-hidden="true" />}
+                  title={t('detail.no_checkin_attendees_title')}
+                  description={t('detail.no_checkin_attendees')}
+                  className="py-10"
+                />
               ) : (
                 <div className="space-y-2">
                   {goingAttendees.map((attendee) => (
-                    <div key={attendee.id} className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
+                    <div key={attendee.id} className="flex min-w-0 flex-col gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3 sm:flex-row sm:items-center">
                       <Avatar
                         src={resolveAvatarUrl(attendee.avatar)}
-                        name={attendee.name || `${attendee.first_name} ${attendee.last_name}`}
+                        name={getAttendeeName(attendee)}
                         size="sm"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-theme-primary font-medium truncate">
-                          {attendee.name || `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim()}
+                          {getAttendeeName(attendee)}
                         </p>
                       </div>
                       {attendee.checked_in ? (
@@ -1197,110 +1219,133 @@ export function EventDetailPage() {
 
         {/* Action Buttons */}
         {isAuthenticated && !isPast && !isCancelled && (
-          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-theme-default mt-8">
-            {/* RSVP Options */}
-            <div className="flex gap-2 flex-wrap" role="group" aria-label={t('detail.rsvp_aria')}>
-              <Button
-                className={
-                  rsvpStatus === 'going'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/20'
-                }
-                startContent={<CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => handleRsvp('going')}
-                isLoading={isSubmitting}
-                aria-pressed={rsvpStatus === 'going'}
-              >
-                {t('detail.going_btn')}
-              </Button>
-              <Button
-                className={
-                  rsvpStatus === 'interested'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-theme-elevated text-theme-primary hover:bg-amber-500/20'
-                }
-                startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => handleRsvp('interested')}
-                isLoading={isSubmitting}
-                aria-pressed={rsvpStatus === 'interested'}
-              >
-                {t('detail.interested_btn')}
-              </Button>
-              <Button
-                className={
-                  rsvpStatus === 'not_going'
-                    ? 'bg-theme-hover text-theme-muted'
-                    : 'bg-theme-elevated text-theme-primary hover:bg-theme-hover'
-                }
-                variant="flat"
-                startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => handleRsvp('not_going')}
-                isLoading={isSubmitting}
-                aria-pressed={rsvpStatus === 'not_going'}
-              >
-                {t('detail.not_going_btn')}
-              </Button>
-
-              {/* E3: Waitlist join/leave button when event is full */}
-              {event.is_full && !rsvpStatus && !isWaitlisted && (
+          <div className="mt-8 rounded-xl border border-theme-default bg-theme-elevated p-4">
+            <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-theme-primary">{t('detail.rsvp_panel_title')}</h2>
+                <p className="text-sm text-theme-muted">{t('detail.rsvp_panel_desc')}</p>
+              </div>
+              <span className="text-sm text-theme-subtle">
+                {t('detail.attendance_total', { count: attendanceTotal })}
+              </span>
+            </div>
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              {/* RSVP Options */}
+              <div className="grid gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap" role="group" aria-label={t('detail.rsvp_aria')}>
                 <Button
-                  className="bg-theme-elevated text-theme-primary hover:bg-amber-500/20"
-                  startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
-                  onPress={handleJoinWaitlist}
+                  className={
+                    rsvpStatus === 'going'
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/20'
+                  }
+                  startContent={<CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => handleRsvp('going')}
                   isLoading={isSubmitting}
+                  aria-pressed={rsvpStatus === 'going'}
+                  aria-label={t('detail.rsvp_going_aria')}
                 >
-                  {t('detail.join_waitlist')}
+                  {t('detail.going_btn')}
                 </Button>
-              )}
-              {isWaitlisted && (
                 <Button
-                  className="bg-amber-500/10 text-amber-400"
+                  className={
+                    rsvpStatus === 'interested'
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-theme-elevated text-theme-primary hover:bg-amber-500/20'
+                  }
+                  startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => handleRsvp('interested')}
+                  isLoading={isSubmitting}
+                  aria-pressed={rsvpStatus === 'interested'}
+                  aria-label={t('detail.rsvp_interested_aria')}
+                >
+                  {t('detail.interested_btn')}
+                </Button>
+                <Button
+                  className={
+                    rsvpStatus === 'not_going'
+                      ? 'bg-theme-hover text-theme-muted'
+                      : 'bg-theme-elevated text-theme-primary hover:bg-theme-hover'
+                  }
                   variant="flat"
                   startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
-                  onPress={handleLeaveWaitlist}
+                  onPress={() => handleRsvp('not_going')}
                   isLoading={isSubmitting}
+                  aria-pressed={rsvpStatus === 'not_going'}
+                  aria-label={t('detail.rsvp_not_going_aria')}
                 >
-                  {t('detail.leave_waitlist')}
+                  {t('detail.not_going_btn')}
+                </Button>
+
+                {/* E3: Waitlist join/leave button when event is full */}
+                {event.is_full && !rsvpStatus && !isWaitlisted && (
+                  <Button
+                    className="bg-theme-elevated text-theme-primary hover:bg-amber-500/20"
+                    startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
+                    onPress={handleJoinWaitlist}
+                    isLoading={isSubmitting}
+                    aria-label={t('detail.join_waitlist_aria')}
+                  >
+                    {t('detail.join_waitlist')}
+                  </Button>
+                )}
+                {isWaitlisted && (
+                  <Button
+                    className="bg-amber-500/10 text-amber-400"
+                    variant="flat"
+                    startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
+                    onPress={handleLeaveWaitlist}
+                    isLoading={isSubmitting}
+                    aria-label={t('detail.leave_waitlist_aria')}
+                  >
+                    {t('detail.leave_waitlist')}
+                  </Button>
+                )}
+              </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+              {/* Share */}
+              <Button
+                variant="flat"
+                className="bg-theme-surface text-theme-primary"
+                startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
+                onPress={handleShare}
+                aria-label={t('detail.share_aria', { title: event.title })}
+              >
+                {t('detail.share')}
+              </Button>
+
+              {/* INF6: Join Meeting button */}
+              {event.video_url && (
+                <Button
+                  as="a"
+                  href={event.video_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                  startContent={<Video className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.join_meeting_aria', { title: event.title })}
+                >
+                  {t('detail.join_meeting')}
                 </Button>
               )}
-            </div>
 
-            {/* Share */}
-            <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-primary"
-              startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
-              onPress={handleShare}
-            >
-              {t('detail.share')}
-            </Button>
-
-            {/* INF6: Join Meeting button */}
-            {event.video_url && (
-              <Button
-                as="a"
-                href={event.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
-                startContent={<Video className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('detail.join_meeting')}
-              </Button>
-            )}
-
-            {/* Online event link */}
-            {event.online_url && (
-              <a href={event.online_url} target="_blank" rel="noopener noreferrer">
+              {/* Online event link */}
+              {event.online_url && (
                 <Button
+                  as="a"
+                  href={event.online_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   variant="flat"
-                  className="bg-theme-elevated text-theme-primary"
+                  className="bg-theme-surface text-theme-primary"
                   startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.event_link_aria', { title: event.title })}
                 >
                   {t('detail.event_link')}
                 </Button>
-              </a>
-            )}
+              )}
+            </div>
+            </div>
           </div>
         )}
 

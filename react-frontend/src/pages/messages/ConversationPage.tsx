@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEv
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Skeleton } from '@heroui/react';
+import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Skeleton, Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
 import Loader2 from 'lucide-react/icons/loader-circle';
@@ -28,6 +28,7 @@ import X from 'lucide-react/icons/x';
 import FileText from 'lucide-react/icons/file-text';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Languages from 'lucide-react/icons/languages';
+import MessageCircle from 'lucide-react/icons/message-circle';
 import { useToast, useNotifications } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
@@ -1350,12 +1351,15 @@ export function ConversationPage() {
 
   if (!conversation) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
-          <p className="text-theme-muted mb-4">{t('conversation_load_failed')}</p>
-          <div className="flex gap-3 justify-center">
+      <div className="mx-auto flex min-h-[50dvh] w-full max-w-3xl items-center justify-center px-4">
+        <PageMeta title={t('page_meta.conversation.title')} noIndex />
+        <GlassCard className="w-full p-6 text-center sm:p-8">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-[var(--color-warning)]">
+            <AlertTriangle className="h-7 w-7" aria-hidden="true" />
+          </div>
+          <h3 className="mb-2 text-lg font-semibold text-theme-primary">{t('load_error_title')}</h3>
+          <p className="mx-auto mb-5 max-w-md text-sm text-theme-muted">{t('conversation_load_failed')}</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button
               variant="flat"
               className="bg-theme-elevated text-theme-muted"
@@ -1377,37 +1381,52 @@ export function ConversationPage() {
 
   const { meta, messages } = conversation;
   const other_user = meta.other_user;
+  const statusLabel = other_user.is_online === undefined
+    ? null
+    : other_user.is_online ? t('online_status') : t('offline_status');
 
   return (
-    <div className="-my-6 sm:-my-8 flex h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-8rem)] min-h-0 max-w-3xl flex-col mx-auto md:h-[calc(100dvh-var(--safe-area-top)-4rem)]">
+    <div className="-my-6 mx-auto flex h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-7rem)] min-h-0 w-full max-w-4xl flex-col gap-3 sm:-my-8 sm:gap-4 md:h-[calc(100dvh-var(--safe-area-top)-4rem)]">
       <PageMeta title={t('page_meta.conversation.title')} noIndex />
       {/* Header */}
-      <GlassCard className="p-4 mb-4">
-        <div className="flex min-w-0 items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+      <GlassCard className="shrink-0 overflow-hidden p-3 sm:p-4">
+        <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
             <Button
               isIconOnly
               size="sm"
               variant="light"
-              className="shrink-0 text-theme-muted"
+              className="shrink-0 text-theme-muted data-[hover=true]:bg-theme-elevated"
               onPress={() => navigate(tenantPath('/messages'))}
               aria-label={t('aria_back')}
             >
               <ArrowLeft className="w-5 h-5" aria-hidden="true" />
             </Button>
 
-            <Link to={tenantPath(`/profile/${other_user.id}`)} className="flex min-w-0 items-center gap-3">
+            <Link
+              to={tenantPath(`/profile/${other_user.id}`)}
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]"
+            >
               <h1 className="sr-only">{t('conversation_with', { name: other_user.name })}</h1>
-              <Avatar
-                src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
-                name={other_user.name}
-                size="md"
-                className="shrink-0 ring-2 ring-white/20"
-              />
-              <div className="min-w-0">
+              <div className="relative shrink-0">
+                <Avatar
+                  src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
+                  name={other_user.name}
+                  size="md"
+                  className="ring-2 ring-white/20"
+                />
+                {other_user.is_online !== undefined && (
+                  <span
+                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-default-400'}`}
+                    aria-label={statusLabel ?? undefined}
+                    role="img"
+                  />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-1.5">
                   {other_user.name ? (
-                    <h2 className="truncate font-semibold text-theme-primary">{other_user.name}</h2>
+                    <h2 className="min-w-0 truncate text-base font-semibold leading-6 text-theme-primary sm:text-lg">{other_user.name}</h2>
                   ) : (
                     <Skeleton className="rounded-md">
                       <div className="h-4 w-32 rounded-md bg-default-300" />
@@ -1415,20 +1434,26 @@ export function ConversationPage() {
                   )}
                   <VerificationBadgeRow userId={other_user.id} size="sm" />
                 </div>
-                {other_user.tagline && (
-                  <p className="truncate text-xs text-theme-subtle">{other_user.tagline}</p>
-                )}
+                <div className="mt-0.5 flex min-w-0 items-center gap-2">
+                  {statusLabel && (
+                    <span className="shrink-0 text-xs font-medium text-theme-subtle">{statusLabel}</span>
+                  )}
+                  {other_user.tagline && (
+                    <p className="min-w-0 truncate text-xs text-theme-subtle">{other_user.tagline}</p>
+                  )}
+                </div>
               </div>
             </Link>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="flex max-w-[44vw] shrink-0 items-center justify-end gap-1 sm:max-w-none sm:gap-2">
             <Button
               isIconOnly
               variant="flat"
               size="sm"
-              className="bg-theme-elevated text-theme-muted"
+              className={`bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-primary/40 text-primary' : ''}`}
               aria-label={t('aria_search_messages')}
+              aria-expanded={showSearch}
               onPress={() => setShowSearch(!showSearch)}
             >
               <Search className="w-4 h-4" />
@@ -1453,7 +1478,10 @@ export function ConversationPage() {
               </Tooltip>
             )}
 
-            <Link to={tenantPath(`/profile/${other_user.id}`)}>
+            <Link
+              to={tenantPath(`/profile/${other_user.id}`)}
+              className="hidden sm:block"
+            >
               <Button
                 isIconOnly
                 variant="flat"
@@ -1504,8 +1532,8 @@ export function ConversationPage() {
 
       {/* Search Bar */}
       {showSearch && (
-        <GlassCard className="p-3 mb-2">
-          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+        <GlassCard className="shrink-0 p-3">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center" role="search">
             <div className="relative min-w-0 flex-1">
               <Input
                 placeholder={t('conversation_search_placeholder')}
@@ -1521,8 +1549,8 @@ export function ConversationPage() {
               />
             </div>
             {searchResults.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-theme-subtle">
+              <div className="flex items-center gap-2 sm:justify-end">
+                <span className="min-w-0 text-sm text-theme-subtle" aria-live="polite">
                   {t('search_result_count', { current: currentSearchIndex + 1, total: searchResults.length })}
                 </span>
                 <Button
@@ -1551,7 +1579,7 @@ export function ConversationPage() {
               isIconOnly
               size="sm"
               variant="flat"
-              className="bg-theme-elevated text-theme-muted"
+              className="self-end bg-theme-elevated text-theme-muted sm:self-auto"
               onPress={() => {
                 setShowSearch(false);
                 setSearchQuery('');
@@ -1567,7 +1595,7 @@ export function ConversationPage() {
 
       {/* Safeguarding / Broker Monitoring Notice */}
       {!isSafeguardingDismissed && (
-        <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg" role="alert">
+        <div className="flex shrink-0 items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3" role="alert">
           <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
             {t('safeguarding_notice')}
@@ -1587,7 +1615,7 @@ export function ConversationPage() {
 
       {/* Translation feature hint — shown once, dismissible */}
       {translationFeatureEnabled && !translationHintDismissed && (
-        <div className="flex items-start gap-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg" role="status">
+        <div className="flex shrink-0 items-start gap-3 rounded-lg border border-indigo-500/20 bg-indigo-500/10 p-3" role="status">
           <Languages className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1 text-sm text-indigo-700 dark:text-indigo-300">
             <p className="font-medium">{t('translate_hint.title')}</p>
@@ -1608,7 +1636,7 @@ export function ConversationPage() {
 
       {/* Auto-translate active indicator */}
       {translationFeatureEnabled && autoTranslateOn && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-indigo-500/10 rounded-lg" role="status">
+        <div className="flex shrink-0 items-center gap-2 rounded-lg bg-indigo-500/10 px-3 py-2" role="status">
           <Languages className="w-4 h-4 text-indigo-500 flex-shrink-0" aria-hidden="true" />
           <p className="text-xs text-indigo-600 dark:text-indigo-300 flex-1">
             {t('auto_translate.active_banner')}
@@ -1626,12 +1654,12 @@ export function ConversationPage() {
 
       {/* Listing Context Card */}
       {listing && (
-        <GlassCard className="p-4">
+        <GlassCard className="shrink-0 p-4">
           <div className="flex items-start gap-3">
             <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-theme-muted mb-1">
-                {t('regarding_context', { type: listing.type === 'offer' ? 'offer' : 'request' })}
+                {t('regarding_context', { type: listing.type === 'offer' ? t('context_offer') : t('context_request') })}
               </p>
               <Link
                 to={tenantPath(`/listings/${listing.id}`)}
@@ -1659,11 +1687,15 @@ export function ConversationPage() {
       )}
 
       {/* Messages */}
-      <GlassCard className="flex min-h-0 flex-1 overflow-hidden flex-col">
+      <GlassCard className="flex min-h-0 flex-1 overflow-hidden flex-col bg-[var(--color-surface)]/90">
         <div
           ref={messagesContainerRef}
-          className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4 space-y-4"
+          className="min-h-0 flex-1 scroll-pb-6 space-y-4 overflow-y-auto p-3 [scrollbar-gutter:stable] sm:p-5"
           onScroll={handleScroll}
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label={t('aria_messages_region', { name: other_user.name })}
         >
           {/* Loading indicator for older messages */}
           {isLoadingOlder && (
@@ -1676,10 +1708,11 @@ export function ConversationPage() {
           {pagination.hasOlderMessages && !isLoadingOlder && (
             <div className="flex justify-center py-2">
               <Button
-                variant="light"
+                variant="flat"
                 size="sm"
-                className="text-sm text-theme-subtle"
+                className="bg-theme-elevated text-sm text-theme-muted"
                 onPress={loadOlderMessages}
+                isLoading={isLoadingOlder}
               >
                 {t('load_older_hint')}
               </Button>
@@ -1687,14 +1720,22 @@ export function ConversationPage() {
           )}
 
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <Avatar
-                src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
-                name={other_user.name}
-                className="w-20 h-20 ring-4 ring-theme-default mb-4"
-              />
-              <h3 className="text-lg font-semibold text-theme-primary mb-1">{other_user.name}</h3>
-              <p className="text-theme-subtle text-sm max-w-xs">
+            <div className="flex h-full min-h-[18rem] flex-col items-center justify-center px-4 text-center">
+              <div className="relative mb-4">
+                <Avatar
+                  src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
+                  name={other_user.name}
+                  className="h-20 w-20 ring-4 ring-theme-default"
+                />
+                <span className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-theme-default bg-theme-card text-primary shadow-sm">
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                </span>
+              </div>
+              <Chip size="sm" variant="flat" className="mb-3 bg-theme-elevated text-theme-muted">
+                {t('new_message')}
+              </Chip>
+              <h3 className="mb-1 max-w-full truncate text-lg font-semibold text-theme-primary">{other_user.name}</h3>
+              <p className="max-w-sm text-sm leading-6 text-theme-subtle">
                 {t('conversation_start', { name: other_user.name })}
               </p>
             </div>
@@ -1732,14 +1773,14 @@ export function ConversationPage() {
         {/* Typing Indicator */}
         <div aria-live="polite" aria-atomic="true">
           {isOtherUserTyping && (
-            <div className="px-4 py-2 border-t border-theme-default">
-              <div className="flex items-center gap-2 text-theme-subtle text-sm">
+            <div className="border-t border-theme-default px-4 py-2">
+              <div className="flex min-w-0 items-center gap-2 text-sm text-theme-subtle">
                 <div className="flex gap-1" aria-hidden="true">
                   <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce" />
                   <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:150ms]" />
                   <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:300ms]" />
                 </div>
-                <span>{t('typing_indicator', { name: other_user.name })}</span>
+                <span className="min-w-0 truncate">{t('typing_indicator', { name: other_user.name })}</span>
               </div>
             </div>
           )}

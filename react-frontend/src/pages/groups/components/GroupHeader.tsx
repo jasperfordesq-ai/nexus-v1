@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   Avatar,
+  Chip,
   Spinner,
 } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
@@ -103,43 +104,84 @@ export function GroupHeader({
 }: GroupHeaderProps) {
   const { t } = useTranslation('groups');
   const createdDateLabel = formatDateValue(group.created_at);
+  const coverImage = group.cover_image_url || group.cover_image || null;
+  const avatarImage = resolveAvatarUrl(group.image_url);
+  const visibilityLabel = group.visibility === 'private' || group.visibility === 'secret'
+    ? t('detail.private_chip')
+    : t('detail.public_chip');
+  const visibilityAria = group.visibility === 'private' || group.visibility === 'secret'
+    ? t('detail.visibility_private_aria')
+    : t('detail.visibility_public_aria');
 
   return (
-    <GlassCard className="p-6 sm:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-            <Users className="w-8 h-8 text-purple-400" aria-hidden="true" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-theme-primary">{group.name}</h1>
-              {group.visibility === 'private' ? (
-                <Lock className="w-5 h-5 text-amber-400" aria-hidden="true" />
-              ) : (
-                <Globe className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-              )}
-            </div>
-            <p className="text-theme-muted text-sm mt-1">
-              {t('detail.members_count', { count: getMemberCount(group) })}
-              {group.location && (
-                <>
-                  {' '}<span aria-hidden="true">&#183;</span>{' '}
-                  <MapPin className="w-3.5 h-3.5 inline" aria-hidden="true" /> {group.location}
-                </>
-              )}
-              {' '}<span aria-hidden="true">&#183;</span>{' '}{t('detail.created')}{' '}
-              <time dateTime={group.created_at}>{createdDateLabel}</time>
-            </p>
-          </div>
-        </div>
+    <GlassCard className="overflow-hidden">
+      <div className="relative min-h-32 bg-gradient-to-br from-[var(--color-primary)]/18 via-[var(--surface-elevated)] to-[var(--color-secondary)]/16">
+        {coverImage && (
+          <img
+            src={coverImage}
+            alt={t('detail.cover_image_alt', { name: group.name })}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-elevated)] via-[var(--surface-elevated)]/55 to-transparent" />
+      </div>
 
-        <div className="flex gap-2 flex-wrap">
+      <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+        <div className="-mt-12 flex flex-col gap-4 sm:-mt-10 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+            <Avatar
+              src={avatarImage}
+              name={group.name}
+              className="h-24 w-24 flex-shrink-0 border-4 border-[var(--surface-elevated)] bg-gradient-to-br from-purple-500/20 to-indigo-500/20 text-theme-primary shadow-lg"
+              imgProps={{ alt: t('detail.group_image_alt', { name: group.name }) }}
+              fallback={<Users className="h-10 w-10 text-purple-400" aria-hidden="true" />}
+            />
+            <div className="min-w-0 pb-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="min-w-0 max-w-full break-words text-2xl font-bold leading-tight text-theme-primary sm:text-3xl">
+                  {group.name}
+                </h1>
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  className={isPrivateGroup
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                    : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                  }
+                  startContent={isPrivateGroup
+                    ? <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                    : <Globe className="h-3.5 w-3.5" aria-hidden="true" />
+                  }
+                  aria-label={visibilityAria}
+                >
+                  {visibilityLabel}
+                </Chip>
+              </div>
+              <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-theme-muted">
+                <span>{t('detail.members_count', { count: getMemberCount(group) })}</span>
+                {group.location && (
+                  <span className="inline-flex min-w-0 items-center gap-1">
+                    <span aria-hidden="true">&#183;</span>
+                    <MapPin className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                    <span className="max-w-56 truncate sm:max-w-xs">{group.location}</span>
+                  </span>
+                )}
+                <span aria-hidden="true">&#183;</span>
+                <span>
+                  {t('detail.created')}{' '}
+                  <time dateTime={group.created_at}>{createdDateLabel}</time>
+                </span>
+              </p>
+            </div>
+          </div>
+
+        <div className="flex flex-col gap-2 sm:items-end" aria-label={t('detail.header_actions_aria')}>
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
           {userIsAdmin && (
             <>
               <Button
                 variant="flat"
-                className="bg-theme-elevated text-theme-primary"
+                className="min-w-0 flex-1 bg-theme-elevated text-theme-primary sm:flex-none"
                 startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                 onPress={onOpenSettings}
               >
@@ -147,7 +189,7 @@ export function GroupHeader({
               </Button>
               <Button
                 variant="flat"
-                className="bg-red-500/10 text-[var(--color-error)] hover:bg-red-500/20"
+                className="min-w-0 flex-1 bg-red-500/10 text-[var(--color-error)] hover:bg-red-500/20 sm:flex-none"
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 onPress={onOpenDelete}
               >
@@ -156,11 +198,11 @@ export function GroupHeader({
             </>
           )}
           {isAuthenticated && (
-            <div className="flex items-center gap-2">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
               <Button
                 className={userIsMember
-                  ? 'bg-theme-hover text-theme-primary'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                  ? 'min-w-0 flex-1 bg-theme-hover text-theme-primary sm:flex-none'
+                  : 'min-w-0 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:flex-none'
                 }
                 startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
                 onPress={onJoinLeave}
@@ -172,7 +214,7 @@ export function GroupHeader({
                 <Button
                   isIconOnly
                   variant="flat"
-                  size="sm"
+                  className="h-10 w-10 flex-shrink-0"
                   onPress={onOpenNotifPrefs}
                   aria-label={t('detail.notification_prefs', 'Notification preferences')}
                 >
@@ -182,7 +224,7 @@ export function GroupHeader({
               {userIsAdmin && (
                 <Button
                   variant="bordered"
-                  size="sm"
+                  className="min-w-0 flex-1 sm:flex-none"
                   startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                   onPress={onOpenInvite}
                   aria-label={t('detail.invite_members', 'Invite Members')}
@@ -192,41 +234,48 @@ export function GroupHeader({
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
 
       {/* Tags */}
       {groupTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="mt-5 flex flex-wrap gap-2">
           {groupTags.map((tag) => (
-            <span
+            <Chip
               key={tag.id}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+              size="sm"
+              variant="flat"
+              className="bg-primary/10 text-primary"
             >
               {tag.name}
-            </span>
+            </Chip>
           ))}
         </div>
       )}
 
       {/* Description */}
-      <SafeHtml content={group.description || t('detail.no_description')} className="text-theme-muted mb-6" as="div" />
+      <SafeHtml
+        content={group.description || t('detail.no_description')}
+        className="mt-5 text-theme-muted [&_*]:break-words"
+        as="div"
+      />
 
       {/* Quick Stats */}
-      <div className="flex flex-wrap gap-3 sm:gap-6">
-        <div className="flex items-center gap-2 text-theme-muted">
+      <div className="mt-6 grid gap-3 text-sm sm:grid-cols-3">
+        <div className="flex min-w-0 items-center gap-2 rounded-lg bg-theme-elevated px-3 py-2 text-theme-muted">
           <Users className="w-5 h-5" aria-hidden="true" />
-          <span>{t('detail.members_count', { count: getMemberCount(group) })}</span>
+          <span className="truncate">{t('detail.members_count', { count: getMemberCount(group) })}</span>
         </div>
         {group.posts_count !== undefined && (
-          <div className="flex items-center gap-2 text-theme-muted">
+          <div className="flex min-w-0 items-center gap-2 rounded-lg bg-theme-elevated px-3 py-2 text-theme-muted">
             <MessageSquare className="w-5 h-5" aria-hidden="true" />
-            <span>{t('detail.posts_count', { count: group.posts_count })}</span>
+            <span className="truncate">{t('detail.posts_count', { count: group.posts_count })}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 text-theme-muted">
+        <div className="flex min-w-0 items-center gap-2 rounded-lg bg-theme-elevated px-3 py-2 text-theme-muted">
           <Calendar className="w-5 h-5" aria-hidden="true" />
-          <span>{t('detail.created')} <time dateTime={group.created_at}>{createdDateLabel}</time></span>
+          <span className="truncate">{t('detail.created')} <time dateTime={group.created_at}>{createdDateLabel}</time></span>
         </div>
       </div>
 
@@ -279,21 +328,21 @@ export function GroupHeader({
           ) : (
             <div className="space-y-2">
               {joinRequests.map((request) => (
-                <div key={request.user_id} className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated">
-                  <div className="flex items-center gap-3">
+                <div key={request.user_id} className="flex flex-col gap-3 p-3 rounded-lg bg-theme-elevated sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-3">
                     <Avatar
                       src={resolveAvatarUrl(request.user.avatar)}
                       name={request.user.name}
                       size="sm"
                     />
-                    <div>
-                      <p className="text-sm font-medium text-theme-primary">{request.user.name}</p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-theme-primary">{request.user.name}</p>
                       <time className="text-xs text-theme-subtle" dateTime={request.created_at}>
                         {formatRelativeTime(request.created_at)}
                       </time>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 sm:flex-shrink-0">
                     <Button
                       size="sm"
                       className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
@@ -320,6 +369,7 @@ export function GroupHeader({
           )}
         </div>
       )}
+      </div>
     </GlassCard>
   );
 }

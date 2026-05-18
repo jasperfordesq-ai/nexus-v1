@@ -88,7 +88,7 @@ export function GroupFeedTab({
 
   if (!isMember) {
     return (
-      <GlassCard className="p-6">
+      <GlassCard className="p-6 sm:p-8">
         <EmptyState
           icon={<Lock className="w-12 h-12" aria-hidden="true" />}
           title={t('detail.join_to_see_feed_title')}
@@ -123,7 +123,19 @@ export function GroupFeedTab({
 
       {/* Create Post Button */}
       {isAuthenticated && (
-        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onComposeOpen}>
+        <GlassCard
+          className="p-3 transition-colors hover:border-[var(--color-primary)]/20 sm:p-4"
+          onClick={onComposeOpen}
+          role="button"
+          tabIndex={0}
+          aria-label={t('detail.feed_create_post_aria')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onComposeOpen();
+            }
+          }}
+        >
           <div className="flex items-center gap-3">
             <Avatar
               name={currentUser?.first_name || t('detail.you')}
@@ -132,7 +144,7 @@ export function GroupFeedTab({
               isBordered
               className="ring-2 ring-[var(--border-default)]"
             />
-            <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
+            <div className="min-w-0 flex-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] px-4 py-2.5 text-sm text-[var(--text-subtle)] transition-colors hover:border-[var(--color-primary)]/30">
               {t('detail.feed_whats_on_your_mind')}
             </div>
           </div>
@@ -162,22 +174,24 @@ export function GroupFeedTab({
           ))}
         </div>
       ) : feedItems.length === 0 ? (
-        <EmptyState
-          icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
-          title={t('detail.feed_empty_title')}
-          description={t('detail.feed_empty_desc')}
-          action={
-            isAuthenticated && (
-              <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                onPress={onComposeOpen}
-              >
-                {t('detail.feed_create_post')}
-              </Button>
-            )
-          }
-        />
+        <GlassCard className="p-6 sm:p-8">
+          <EmptyState
+            icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
+            title={t('detail.feed_empty_title')}
+            description={t('detail.feed_empty_desc')}
+            action={
+              isAuthenticated && (
+                <Button
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                  onPress={onComposeOpen}
+                >
+                  {t('detail.feed_create_post')}
+                </Button>
+              )
+            }
+          />
+        </GlassCard>
       ) : (
         <div className="space-y-4">
           <AnimatePresence mode="popLayout">

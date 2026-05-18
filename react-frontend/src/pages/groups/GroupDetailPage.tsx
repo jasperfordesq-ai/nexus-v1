@@ -1006,6 +1006,12 @@ export function GroupDetailPage() {
   const userIsAdmin = group ? isGroupAdmin(group) : false;
   const hasSubGroups = group?.sub_groups && group.sub_groups.length > 0;
   const isPrivateGroup = group?.visibility === 'private' || group?.visibility === 'secret';
+  const metaDescription = isPrivateGroup
+    ? t('detail.private_meta_description')
+    : group?.description?.substring(0, 160);
+  const metaImage = isPrivateGroup
+    ? undefined
+    : group?.image_url || group?.cover_image_url || undefined;
 
   // ─────────────────────────────────────────────────────────────────────────
   // Loading / Error States
@@ -1057,21 +1063,24 @@ export function GroupDetailPage() {
     >
       <PageMeta
         title={group?.name}
-        description={group?.description?.substring(0, 160)}
-        image={group?.image_url || group?.cover_image_url || undefined}
+        description={metaDescription}
+        image={metaImage}
+        noIndex={isPrivateGroup}
       />
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: group?.name,
-            ...(group?.description ? { description: group.description.substring(0, 300) } : {}),
-            ...(group?.image_url || group?.cover_image_url ? { image: group.image_url || group.cover_image_url } : {}),
-            ...(group?.member_count ? { numberOfEmployees: { '@type': 'QuantitativeValue', value: group.member_count } } : {}),
-          })}
-        </script>
-      </Helmet>
+      {!isPrivateGroup && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: group?.name,
+              ...(group?.description ? { description: group.description.substring(0, 300) } : {}),
+              ...(group?.image_url || group?.cover_image_url ? { image: group.image_url || group.cover_image_url } : {}),
+              ...(group?.member_count ? { numberOfEmployees: { '@type': 'QuantitativeValue', value: group.member_count } } : {}),
+            })}
+          </script>
+        </Helmet>
+      )}
 
       {/* Breadcrumbs */}
       <Breadcrumbs items={[

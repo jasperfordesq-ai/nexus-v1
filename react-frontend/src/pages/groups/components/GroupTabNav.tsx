@@ -72,7 +72,11 @@ export function GroupTabNav({
   const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);
 
   return (
-    <div className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto scrollbar-hide" role="tablist" aria-label={t('detail.tab_nav_aria', 'Group navigation')}>
+    <div
+      className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-content1/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
+      role="tablist"
+      aria-label={t('detail.tab_nav_aria', 'Group navigation')}
+    >
       {/* Primary tabs */}
       {primaryTabs.map((tab) => {
         const Icon = tab.icon;
@@ -85,27 +89,30 @@ export function GroupTabNav({
             aria-selected={isActive}
             aria-label={tab.label}
             onPress={() => onTabChange(tab.key)}
-            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
+            className={`flex h-10 min-w-10 flex-shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-all sm:min-w-0 sm:px-3 ${
               isActive
                 ? 'bg-theme-hover text-theme-primary shadow-sm'
                 : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
             }`}
           >
             <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="hidden md:inline">{tab.label}</span>
+            <span className="hidden max-w-36 truncate sm:inline">{tab.label}</span>
           </Button>
         );
       })}
 
       {/* Divider */}
-      <div className="w-px h-6 bg-theme-default mx-1 flex-shrink-0" aria-hidden="true" />
+      {secondaryTabs.length > 0 && (
+        <div className="w-px h-6 bg-theme-default mx-1 flex-shrink-0" aria-hidden="true" />
+      )}
 
       {/* "More" dropdown for secondary tabs */}
+      {secondaryTabs.length > 0 && (
       <Dropdown>
         <DropdownTrigger>
           <Button
             variant="light"
-            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
+            className={`flex h-10 min-w-10 flex-shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-all sm:min-w-0 sm:px-3 ${
               isSecondaryActive
                 ? 'bg-theme-hover text-theme-primary shadow-sm'
                 : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
@@ -115,13 +122,10 @@ export function GroupTabNav({
             {isSecondaryActive && activeSecondaryTab ? (
               <>
                 {(() => { const Icon = activeSecondaryTab.icon; return <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />; })()}
-                <span className="hidden md:inline">{activeSecondaryTab.label}</span>
+                <span className="hidden max-w-36 truncate sm:inline">{activeSecondaryTab.label}</span>
               </>
             ) : (
-              <>
-                <span className="hidden md:inline">{t('detail.tab_more_label', 'More')}</span>
-                <span className="md:hidden text-xs">+</span>
-              </>
+              <span className="hidden sm:inline">{t('detail.tab_more_label', 'More')}</span>
             )}
             <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
           </Button>
@@ -141,12 +145,13 @@ export function GroupTabNav({
                 startContent={<Icon className="w-4 h-4" />}
                 className={activeTab === tab.key ? 'bg-primary/10 text-primary' : ''}
               >
-                {showSection ? `${tab.section} — ${tab.label}` : tab.label}
+                {showSection ? `${tab.section} - ${tab.label}` : tab.label}
               </DropdownItem>
             );
           })}
         </DropdownMenu>
       </Dropdown>
+      )}
     </div>
   );
 }

@@ -107,7 +107,7 @@ export function GroupDiscussionTab({
 
   if (!isMember) {
     return (
-      <GlassCard className="p-6">
+      <GlassCard className="p-6 sm:p-8">
         <EmptyState
           icon={<Lock className="w-12 h-12" aria-hidden="true" />}
           title={t('detail.join_to_discuss_title')}
@@ -129,13 +129,13 @@ export function GroupDiscussionTab({
   }
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-4 sm:p-6">
       <div className="space-y-4">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-theme-primary">{t('detail.discussions_heading')}</h2>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto"
             size="sm"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={onShowNewDiscussion}
@@ -170,7 +170,7 @@ export function GroupDiscussionTab({
               <Fragment key={discussion.id}>
                 <motion.div
                   layout
-                  className="rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors cursor-pointer overflow-hidden"
+                  className="cursor-pointer overflow-hidden rounded-lg bg-theme-elevated transition-colors hover:bg-theme-hover"
                   onClick={() => onExpandDiscussion(discussion.id)}
                   role="button"
                   tabIndex={0}
@@ -179,7 +179,7 @@ export function GroupDiscussionTab({
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onExpandDiscussion(discussion.id); } }}
                 >
                   <div className="p-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
                       <Avatar
                         src={resolveAvatarUrl(discussion.author.avatar_url)}
                         name={discussion.author.name}
@@ -188,20 +188,20 @@ export function GroupDiscussionTab({
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-medium text-theme-primary truncate">{discussion.title}</h3>
+                          <h3 className="truncate font-medium text-theme-primary">{discussion.title}</h3>
                           {expandedDiscussionId === discussion.id ? (
                             <ChevronUp className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                           ) : (
                             <ChevronDown className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                           )}
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
-                          <span>{discussion.author.name}</span>
-                          <span className="flex items-center gap-1">
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-theme-subtle">
+                          <span className="max-w-40 truncate">{discussion.author.name}</span>
+                          <span className="flex items-center gap-1 whitespace-nowrap">
                             <MessageSquare className="w-3 h-3" aria-hidden="true" />
                             {t('detail.reply_count', { count: discussion.reply_count })}
                           </span>
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 whitespace-nowrap">
                             <Clock className="w-3 h-3" aria-hidden="true" />
                             {formatRelativeTime(discussion.last_reply_at || discussion.created_at)}
                           </span>
@@ -257,8 +257,8 @@ export function GroupDiscussionTab({
                                       className="flex-shrink-0"
                                     />
                                     <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium text-theme-primary">{msg.author.name}</span>
+                                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <span className="max-w-40 truncate text-sm font-medium text-theme-primary">{msg.author.name}</span>
                                         <time className="text-xs text-theme-subtle" dateTime={msg.created_at}>
                                           {formatRelativeTime(msg.created_at)}
                                         </time>

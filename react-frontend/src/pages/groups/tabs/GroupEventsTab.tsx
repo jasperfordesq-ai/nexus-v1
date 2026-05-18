@@ -42,8 +42,8 @@ export function GroupEventsTab({
   const { tenantPath } = useTenant();
 
   return (
-    <GlassCard className="p-6">
-      <div className="flex justify-between items-center mb-4">
+    <GlassCard className="p-4 sm:p-6">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold text-theme-primary">{t('detail.group_events_heading')}</h2>
         {isMember && isAuthenticated && (
           <Link to={tenantPath(`/events/create?group_id=${groupId}`)}>
@@ -90,9 +90,9 @@ export function GroupEventsTab({
 
             return (
               <Link key={event.id} to={tenantPath(`/events/${event.id}`)}>
-                <div className={`flex items-center gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors ${isPast ? 'opacity-60' : ''}`}>
+                <div className={`flex min-w-0 items-center gap-3 rounded-lg bg-theme-elevated p-3 transition-colors hover:bg-theme-hover sm:gap-4 sm:p-4 ${isPast ? 'opacity-60' : ''}`}>
                   {/* Date Badge */}
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex flex-col items-center justify-center text-center">
+                  <div className="flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-center">
                     <span className="text-xs font-medium text-indigo-400 uppercase">
                       {monthLabel}
                     </span>
@@ -103,18 +103,18 @@ export function GroupEventsTab({
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-theme-primary truncate">{event.title}</h3>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
-                      <span className="flex items-center gap-1">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-theme-subtle">
+                      <span className="flex items-center gap-1 whitespace-nowrap">
                         <Clock className="w-3 h-3" aria-hidden="true" />
                         {timeLabel}
                       </span>
                       {event.location && (
-                        <span className="flex items-center gap-1 truncate">
+                        <span className="flex min-w-0 max-w-full items-center gap-1 truncate">
                           <MapPin className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-                          {event.location}
+                          <span className="truncate">{event.location}</span>
                         </span>
                       )}
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1 whitespace-nowrap">
                         <Users className="w-3 h-3" aria-hidden="true" />
                         {event.attendees_count ?? 0} {t('detail.attending')}
                       </span>

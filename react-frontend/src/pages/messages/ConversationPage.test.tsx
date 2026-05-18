@@ -28,6 +28,7 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({
     tenantPath: (p: string) => `/t/test${p}`,
     hasFeature: vi.fn().mockReturnValue(true),
+    hasModule: vi.fn().mockReturnValue(true),
   }),
   usePusherOptional: () => null,
 

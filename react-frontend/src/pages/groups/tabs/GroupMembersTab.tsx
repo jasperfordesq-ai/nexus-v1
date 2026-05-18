@@ -28,7 +28,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, formatDateValue } from '@/lib/helpers';
 import type { User } from '@/types/api';
 
 export interface GroupMember extends User {
@@ -63,42 +63,48 @@ export function GroupMembersTab({
   const { tenantPath } = useTenant();
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-4 sm:p-6">
       {membersLoading ? (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-10" aria-label={t('detail.members_loading_aria')}>
           <Spinner size="lg" />
         </div>
       ) : members.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
           {members.map((member) => {
             const memberIsOwner = member.id === groupOwnerId;
             const memberIsAdmin = member.role === 'admin' || (groupAdminIds?.includes(member.id) ?? false) || memberIsOwner;
             const canManage = userIsAdmin && !memberIsOwner && member.id !== currentUserId;
+            const joinedLabel = member.joined_at ? formatDateValue(member.joined_at) : null;
 
             return (
-              <div key={member.id} className="flex items-center gap-2 sm:gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
-                <Link to={tenantPath(`/profile/${member.id}`)} className="flex items-center gap-4 flex-1 min-w-0">
+              <div key={member.id} className="flex min-w-0 items-center gap-2 rounded-lg bg-theme-elevated p-3 transition-colors hover:bg-theme-hover sm:gap-4 sm:p-4">
+                <Link to={tenantPath(`/profile/${member.id}`)} className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
                   <Avatar
                     src={resolveAvatarUrl(member.avatar_url || member.avatar)}
                     name={member.name}
                     size="md"
                     className="ring-2 ring-white/20 flex-shrink-0"
                   />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium text-theme-primary truncate">{member.name}</p>
                     {member.tagline && (
                       <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
                       {memberIsOwner && (
-                        <Chip size="sm" variant="flat" className="bg-amber-500/20 text-amber-600 dark:text-amber-400" startContent={<ShieldCheck className="w-3 h-3" />}>
+                        <Chip size="sm" variant="flat" className="bg-amber-500/20 text-amber-600 dark:text-amber-400" startContent={<ShieldCheck className="w-3 h-3" aria-hidden="true" />}>
                           {t('detail.member_owner')}
                         </Chip>
                       )}
                       {memberIsAdmin && !memberIsOwner && (
-                        <Chip size="sm" variant="flat" className="bg-purple-500/20 text-purple-600 dark:text-purple-400" startContent={<Shield className="w-3 h-3" />}>
+                        <Chip size="sm" variant="flat" className="bg-purple-500/20 text-purple-600 dark:text-purple-400" startContent={<Shield className="w-3 h-3" aria-hidden="true" />}>
                           {t('detail.member_admin')}
                         </Chip>
+                      )}
+                      {joinedLabel && (
+                        <span className="truncate text-xs text-theme-subtle">
+                          {t('detail.member_joined', { date: joinedLabel })}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -115,14 +121,14 @@ export function GroupMembersTab({
                         aria-label={t('detail.manage_member_aria', { name: member.name })}
                         isLoading={updatingMember === member.id}
                       >
-                        <MoreVertical className="w-4 h-4" />
+                        <MoreVertical className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label={t('detail.member_actions_aria', 'Member actions')}>
                       {memberIsAdmin ? (
                         <DropdownItem
                           key="demote"
-                          startContent={<Users className="w-4 h-4" />}
+                          startContent={<Users className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => onUpdateMemberRole(member.id, 'member')}
                         >
                           {t('detail.demote_to_member')}
@@ -130,7 +136,7 @@ export function GroupMembersTab({
                       ) : (
                         <DropdownItem
                           key="promote"
-                          startContent={<Shield className="w-4 h-4" />}
+                          startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => onUpdateMemberRole(member.id, 'admin')}
                         >
                           {t('detail.promote_to_admin')}
@@ -140,7 +146,7 @@ export function GroupMembersTab({
                         key="remove"
                         className="text-danger"
                         color="danger"
-                        startContent={<UserX className="w-4 h-4" />}
+                        startContent={<UserX className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => onRemoveMember(member.id)}
                       >
                         {t('detail.remove_from_group')}

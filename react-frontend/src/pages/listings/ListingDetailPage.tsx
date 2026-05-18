@@ -406,9 +406,15 @@ export function ListingDetailPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-6xl mx-auto space-y-5 sm:space-y-6"
     >
-      <PageMeta title={listing?.title} description={listing?.description?.substring(0, 160)} image={listing?.image_url || undefined} />
+      <PageMeta
+        title={listing?.title}
+        description={listing?.description?.substring(0, 160)}
+        image={listing?.image_url ? resolveAssetUrl(listing.image_url) : undefined}
+        publishedTime={listing.created_at}
+        modifiedTime={listing.updated_at}
+      />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify(listingStructuredData)}
@@ -421,27 +427,61 @@ export function ListingDetailPage() {
       ]} />
 
       {/* Main Content */}
-      <GlassCard className="p-6 sm:p-8">
+      <GlassCard className="overflow-hidden p-0">
+        {/* Listing Image */}
+        <div className="relative overflow-hidden bg-theme-hover">
+          {listing.image_url && !imageError ? (
+            <img
+              src={resolveAssetUrl(listing.image_url)}
+              alt={t('detail_image_alt', { title: listing.title })}
+              className="h-64 w-full object-cover sm:h-80 lg:h-[24rem]"
+              loading="lazy"
+              decoding="async"
+              width={1200}
+              height={672}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex h-64 items-center justify-center sm:h-80 lg:h-[24rem]">
+              <ImagePlaceholder size="lg" />
+            </div>
+          )}
+          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 via-black/20 to-transparent p-4 sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip
+                variant="flat"
+                className={listing.type === 'offer' ? 'bg-emerald-500/90 text-white' : 'bg-amber-500/90 text-white'}
+              >
+                {listing.type === 'offer' ? t('offering') : t('requesting')}
+              </Chip>
+              {listing.is_featured && <FeaturedBadge size="md" />}
+              {(listing.category || listing.category_name) && (
+                <Chip
+                  variant="flat"
+                  startContent={<Tag className="h-3.5 w-3.5" aria-hidden="true" />}
+                  className="max-w-full bg-white/90 text-slate-800"
+                >
+                  <span className="truncate">{listing.category?.name || listing.category_name}</span>
+                </Chip>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <span className={`
-              text-sm px-3 py-1.5 rounded-full font-medium
-              ${listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}
-            `}>
-              {listing.type === 'offer' ? t('offering') : t('requesting')}
-            </span>
-            {listing.is_featured && <FeaturedBadge size="md" />}
-            {(listing.category || listing.category_name) && (
-              <span className="text-sm px-3 py-1.5 rounded-full bg-theme-hover text-theme-muted flex items-center gap-1">
-                <Tag className="w-3 h-3" aria-hidden="true" />
-                {listing.category?.name || listing.category_name}
-              </span>
-            )}
+        <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="mb-2 text-sm font-medium text-theme-muted">
+              {listing.type === 'offer' ? t('detail_offer_eyebrow') : t('detail_request_eyebrow')}
+            </p>
+            <h1 className="text-2xl font-bold leading-tight text-theme-primary wrap-break-word sm:text-4xl">
+              {listing.title}
+            </h1>
           </div>
 
           {isOwner && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 rounded-2xl border border-theme-default bg-theme-hover/60 p-2">
               <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
                 <Button
                   size="sm"
@@ -487,36 +527,15 @@ export function ListingDetailPage() {
           )}
         </div>
 
-        {/* Listing Image */}
-        <div className="mb-6 overflow-hidden rounded-xl">
-          {listing.image_url && !imageError ? (
-            <img
-              src={resolveAssetUrl(listing.image_url)}
-              alt={listing.title}
-              className="w-full max-h-[28rem] object-cover"
-              loading="lazy"
-              decoding="async"
-              width={800}
-              height={448}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <ImagePlaceholder size="lg" />
-          )}
-        </div>
-
-        {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4 break-words leading-tight">{listing.title}</h1>
-
         {/* Meta Grid - Top Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-          <div className="flex items-center gap-3 text-theme-muted">
+        <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-indigo-500/20" aria-hidden="true">
               <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_duration')}</div>
-              <div className="text-theme-primary">
+              <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
                 {(listing.hours_estimate ?? listing.estimated_hours)
                   ? t('detail_hours', { count: listing.hours_estimate ?? listing.estimated_hours })
                   : t('detail_flexible')}
@@ -524,30 +543,32 @@ export function ListingDetailPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-theme-muted">
+          <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-amber-500/20" aria-hidden="true">
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_posted')}</div>
-              <div className="text-theme-primary">
+              <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
                 {new Date(listing.created_at).toLocaleDateString()}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-theme-muted">
+          <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-purple-500/20" aria-hidden="true">
               <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_status')}</div>
-              <div className="text-theme-primary capitalize">{listing.status}</div>
+              <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
+                {t(`status_${listing.status}`, { defaultValue: listing.status })}
+              </div>
             </div>
           </div>
 
           {listing.service_type && (
-            <div className="flex items-center gap-3 text-theme-muted">
+            <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
               <div className={`p-2 rounded-lg ${
                 listing.service_type === 'remote_only' ? 'bg-blue-500/20' :
                 listing.service_type === 'hybrid' ? 'bg-teal-500/20' :
@@ -559,9 +580,9 @@ export function ListingDetailPage() {
                 {listing.service_type === 'physical_only' && <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
                 {listing.service_type === 'location_dependent' && <HelpCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-xs text-theme-subtle">{t('delivery_mode')}</div>
-                <div className="text-theme-primary">
+                <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
                   {listing.service_type === 'physical_only' && t('service_type_physical_only')}
                   {listing.service_type === 'remote_only' && t('service_type_remote_only')}
                   {listing.service_type === 'hybrid' && t('service_type_hybrid')}
@@ -574,13 +595,13 @@ export function ListingDetailPage() {
 
         {/* Location - Separate Row to prevent text bleeding */}
         {listing.location && (
-          <div className="flex items-center gap-3 text-theme-muted mb-8">
+          <div className="mb-8 flex items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
             <div className="p-2 rounded-lg bg-emerald-500/20" aria-hidden="true">
               <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-xs text-theme-subtle">{t('detail_location')}</div>
-              <div className="text-theme-primary">{listing.location}</div>
+              <div className="wrap-break-word text-sm font-medium text-theme-primary sm:text-base">{listing.location}</div>
             </div>
           </div>
         )}
@@ -607,7 +628,7 @@ export function ListingDetailPage() {
         {!listing.location && <div className="mb-4" />}
 
         {/* Description */}
-        <div className="mb-8">
+        <div className="mb-8 rounded-2xl border border-theme-default bg-theme-surface/60 p-4 sm:p-5">
           <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail_description')}</h2>
           <div className="prose prose-invert max-w-none">
             {(() => {
@@ -675,10 +696,15 @@ export function ListingDetailPage() {
 
         {/* Action Buttons */}
         {isAuthenticated && !isOwner && (
-          <div className="flex flex-wrap gap-2 sm:gap-3 pt-6 border-t border-theme-default">
+          <div className="rounded-2xl border border-theme-default bg-theme-hover/70 p-3 sm:p-4">
+            <div className="mb-3">
+              <h2 className="text-sm font-semibold text-theme-primary">{t('detail_cta_title')}</h2>
+              <p className="text-sm text-theme-muted">{t('detail_cta_body')}</p>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {exchangeConfig?.exchange_workflow_enabled ? (
               activeExchange ? (
-                <Link to={tenantPath(`/exchanges/${activeExchange.id}`)} className="flex-1 sm:flex-none">
+                <Link to={tenantPath(`/exchanges/${activeExchange.id}`)}>
                   <Button
                     className="w-full bg-theme-elevated text-theme-primary"
                     startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
@@ -703,7 +729,7 @@ export function ListingDetailPage() {
                   </Button>
                 </Link>
               ) : (
-                <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)} className="flex-1 sm:flex-none">
+                <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)}>
                   <Button
                     className="w-full bg-linear-to-r from-emerald-500 to-teal-600 text-white"
                     startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
@@ -713,7 +739,7 @@ export function ListingDetailPage() {
                 </Link>
               )
             ) : (
-              <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)} className="flex-1 sm:flex-none">
+              <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)}>
                 <Button
                   className="w-full bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
@@ -724,28 +750,31 @@ export function ListingDetailPage() {
             )}
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
               onPress={() => void social.toggleLike()}
               isDisabled={social.isLiking}
+              aria-label={social.isLiked ? t('detail_unlike_aria', { title: listing.title }) : t('detail_like_aria', { title: listing.title })}
             >
               {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
             </Button>
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
               aria-expanded={showComments}
+              aria-controls="listing-comments"
             >
               {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
             </Button>
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
               onPress={() => void handleSave()}
               isDisabled={isSaving}
+              aria-label={isSaved ? t('detail_unsave_aria', { title: listing.title }) : t('detail_save_aria', { title: listing.title })}
             >
               {isSaved ? t('detail_saved') : t('detail_save')}
             </Button>
@@ -756,37 +785,40 @@ export function ListingDetailPage() {
               isAuthenticated={isAuthenticated}
               canShareToFeed={!isOwner}
               shareToFeedDisabledReason={t('cannot_share_own_content', { ns: 'social' })}
-              className="flex-1 sm:flex-none"
+              className="w-full"
             />
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${isReported ? 'bg-orange-500/20 text-orange-500' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${isReported ? 'bg-orange-500/20 text-orange-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
               onPress={onReportOpen}
               isDisabled={isReported}
             >
               {isReported ? t('detail_reported') : t('detail_report')}
             </Button>
+            </div>
           </div>
         )}
 
         {isAuthenticated && isOwner && (
-          <div className="flex flex-wrap gap-2 sm:gap-3 pt-6 border-t border-theme-default">
+          <div className="grid grid-cols-1 gap-2 rounded-2xl border border-theme-default bg-theme-hover/70 p-3 sm:grid-cols-3 sm:p-4">
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
               onPress={() => void social.toggleLike()}
               isDisabled={social.isLiking}
+              aria-label={social.isLiked ? t('detail_unlike_aria', { title: listing.title }) : t('detail_like_aria', { title: listing.title })}
             >
               {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
             </Button>
             <Button
               variant="flat"
-              className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
               aria-expanded={showComments}
+              aria-controls="listing-comments"
             >
               {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
             </Button>
@@ -797,13 +829,13 @@ export function ListingDetailPage() {
               isAuthenticated={isAuthenticated}
               canShareToFeed={!isOwner}
               shareToFeedDisabledReason={t('cannot_share_own_content', { ns: 'social' })}
-              className="flex-1 sm:flex-none"
+              className="w-full"
             />
           </div>
         )}
 
         {showComments && (
-          <div ref={commentsRegionRef} className="mt-5">
+          <div id="listing-comments" ref={commentsRegionRef} className="mt-5" aria-live="polite">
             <ErrorBoundary fallback={
               <GlassCard className="p-6 text-center text-theme-muted">
                 {t('comments_error')}
@@ -830,6 +862,7 @@ export function ListingDetailPage() {
             </ErrorBoundary>
           </div>
         )}
+        </div>
       </GlassCard>
 
       {/* Delete Confirmation Modal */}
@@ -900,7 +933,7 @@ export function ListingDetailPage() {
         const userAvatar = resolveAvatarUrl(listing.user?.avatar || listing.author_avatar);
 
         return (
-          <GlassCard className="p-6">
+          <GlassCard className="p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               {listing.type === 'offer' ? t('detail_offered_by') : t('detail_requested_by')}
@@ -909,7 +942,8 @@ export function ListingDetailPage() {
             {userId ? (
               <Link
                 to={tenantPath(`/profile/${userId}`)}
-                className="flex items-center gap-4 group hover:bg-theme-hover rounded-lg p-2 -m-2 transition-colors"
+                className="group flex items-start gap-4 rounded-2xl border border-theme-default bg-theme-hover/50 p-3 transition-colors hover:bg-theme-hover"
+                aria-label={t('detail_view_profile_aria', { name: userName })}
               >
                 <Avatar
                   src={userAvatar}
@@ -919,7 +953,7 @@ export function ListingDetailPage() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
+                    <h3 className="truncate font-semibold text-theme-primary transition-colors group-hover:text-indigo-400">
                       {userName}
                     </h3>
                     {listing.user?.id && <VerificationBadgeRow userId={listing.user.id} size="sm" />}
@@ -948,7 +982,7 @@ export function ListingDetailPage() {
                 </div>
               </Link>
             ) : (
-              <span className="flex items-center gap-4 rounded-lg p-2 -m-2">
+              <span className="flex items-start gap-4 rounded-2xl border border-theme-default bg-theme-hover/50 p-3">
                 <Avatar
                   src={userAvatar}
                   name={userName}
@@ -957,7 +991,7 @@ export function ListingDetailPage() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-theme-primary">{userName}</h3>
+                    <h3 className="truncate font-semibold text-theme-primary">{userName}</h3>
                   </div>
                   {listing.user?.tagline && (
                     <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
@@ -988,19 +1022,21 @@ export function ListingDetailPage() {
 
       {/* Skill Tags */}
       {listing.skill_tags && listing.skill_tags.length > 0 && (
-        <GlassCard className="p-4">
+        <GlassCard className="p-5">
           <div className="flex items-center gap-2 mb-3">
             <Tag className="w-4 h-4 text-theme-muted" aria-hidden="true" />
             <span className="text-sm font-medium text-theme-muted">{t('detail_skills')}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {listing.skill_tags.map((tag) => (
-              <span
+              <Chip
                 key={tag}
-                className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium"
+                size="sm"
+                variant="flat"
+                className="max-w-full bg-primary/10 text-primary"
               >
-                {tag}
-              </span>
+                <span className="truncate">{tag}</span>
+              </Chip>
             ))}
           </div>
         </GlassCard>
@@ -1019,8 +1055,8 @@ export function ListingDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {listing.member_offers!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
-                    <Chip variant="flat" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20">
-                      {l.title}
+                    <Chip variant="flat" className="max-w-full cursor-pointer bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400">
+                      <span className="truncate">{l.title}</span>
                     </Chip>
                   </Link>
                 ))}
@@ -1033,8 +1069,8 @@ export function ListingDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {listing.member_requests!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
-                    <Chip variant="flat" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-pointer hover:bg-amber-500/20">
-                      {l.title}
+                    <Chip variant="flat" className="max-w-full cursor-pointer bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400">
+                      <span className="truncate">{l.title}</span>
                     </Chip>
                   </Link>
                 ))}
