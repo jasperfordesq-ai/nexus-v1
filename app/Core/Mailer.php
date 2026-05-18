@@ -46,6 +46,32 @@ class Mailer
     // Tenant context
     private ?int $tenantId = null;
 
+    // -------------------------------------------------------------------------
+    // Email category constants — used as From-address prefixes on the verified
+    // project-nexus.net SendGrid domain (e.g. notifications@project-nexus.net).
+    // These match the audit category strings used by EmailDispatchService.
+    // -------------------------------------------------------------------------
+    public const CATEGORY_NOTIFICATIONS = 'notifications';
+    public const CATEGORY_NEWSLETTERS   = 'newsletters';
+    public const CATEGORY_MESSAGES      = 'messages';
+    public const CATEGORY_NOREPLY       = 'noreply';
+    public const CATEGORY_ADMIN         = 'admin';
+    public const CATEGORY_EVENTS        = 'events';
+    public const CATEGORY_SAFEGUARDING  = 'safeguarding';
+    public const CATEGORY_BILLING       = 'billing';
+
+    /** Verified SendGrid domain for category From addresses. */
+    private const SENDGRID_DOMAIN   = 'project-nexus.net';
+
+    /** Default Reply-To for all platform SendGrid emails. */
+    private const DEFAULT_REPLY_TO  = 'Jasper Ford <jasper@hour-timebank.ie>';
+
+    /**
+     * True when the platform's SENDGRID_API_KEY is the active driver
+     * (not a tenant-specific key). Used to apply category-based From addresses.
+     */
+    private bool $isPlatformSendGrid = false;
+
     // Redis cache key suffixes (tenant-scoped via cacheKey())
     private const CACHE_KEY_ACCESS_TOKEN = 'gmail_oauth_access_token';
     private const CACHE_KEY_TOKEN_EXPIRY = 'gmail_oauth_token_expiry';
@@ -115,6 +141,7 @@ class Mailer
                 $this->fromName = $envValues['SENDGRID_FROM_NAME'];
             }
             $this->driver = 'sendgrid';
+            $this->isPlatformSendGrid = true;
         }
 
         // Per-tenant override
@@ -135,6 +162,61 @@ class Mailer
             ]);
         }
         return new self($tenantId);
+    }
+
+    /**
+     * Resolve the From-address prefix for a given audit category string when
+     * routing via the platform SendGrid domain (project-nexus.net).
+     *
+     * Maps the fine-grained EmailDispatchService audit categories (e.g.
+     * 'newsletter', 'password_reset', 'marketplace_payment') to one of the
+     * eight recognised From-address buckets.
+     */
+    private function resolveSendGridFromPrefix(?string $category): string
+    {
+        if ($category === null || $category === '') {
+            return self::CATEGORY_NOTIFICATIONS;
+        }
+
+        // Newsletter-type bulk mail
+        if (in_array($category, ['newsletter', 'newsletter_test', 'federation_digest', 'group_digest', 'notification_digest', 'gamification_digest'], true)) {
+            return self::CATEGORY_NEWSLETTERS;
+        }
+
+        // Direct messages / cross-community invitations
+        if (in_array($category, ['message', 'federation_message', 'verein_federation'], true)) {
+            return self::CATEGORY_MESSAGES;
+        }
+
+        // System-only / no-reply transactional
+        if (in_array($category, ['password_reset', 'email_verification', 'security_alert', 'activation', 'welcome', 'tenant_provisioning'], true)) {
+            return self::CATEGORY_NOREPLY;
+        }
+
+        // Admin-triggered (moderation, bans, vetting, admin test)
+        if (str_starts_with($category, 'admin_') || in_array($category, ['listing_moderation', 'vetting'], true)) {
+            return self::CATEGORY_ADMIN;
+        }
+
+        // Event notifications
+        if ($category === 'event_notification') {
+            return self::CATEGORY_EVENTS;
+        }
+
+        // Safeguarding alerts
+        if ($category === 'safeguarding') {
+            return self::CATEGORY_SAFEGUARDING;
+        }
+
+        // Billing / payments / marketplace
+        if (
+            str_starts_with($category, 'marketplace_') ||
+            in_array($category, ['billing', 'donation', 'identity_payment', 'verein_dues', 'vol_org_wallet'], true)
+        ) {
+            return self::CATEGORY_BILLING;
+        }
+
+        return self::CATEGORY_NOTIFICATIONS;
     }
 
     /**
@@ -167,6 +249,7 @@ class Mailer
                     if (!empty($apiKey)) {
                         $this->sendgridApiKey = $apiKey;
                         $this->driver = 'sendgrid';
+                        $this->isPlatformSendGrid = false; // tenant's own key, not platform's
                         $fromEmail = EmailSettings::get($tenantId, 'sendgrid_from_email');
                         $fromName = EmailSettings::get($tenantId, 'sendgrid_from_name');
                         if (!empty($fromEmail)) $this->fromEmail = $fromEmail;
@@ -405,6 +488,17 @@ class Mailer
      */
     public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null): bool
     {
+        // When using the platform's SendGrid account, set a category-specific
+        // From address (e.g. newsletters@project-nexus.net) and a default
+        // Reply-To so recipients can reach a human when they reply.
+        // Has no effect for tenant-specific SMTP, Gmail API, or SendGrid.
+        if ($this->isPlatformSendGrid && $this->driver === 'sendgrid') {
+            $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
+            if ($replyTo === null) {
+                $replyTo = self::DEFAULT_REPLY_TO;
+            }
+        }
+
         // Sanitize header-injectable values — strip CR/LF to prevent email header injection
         $to = self::sanitizeHeaderValue($to);
         $subject = self::sanitizeHeaderValue($subject);
