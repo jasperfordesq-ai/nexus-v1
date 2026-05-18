@@ -89,5 +89,9 @@
   "ranked_instructions": "Sleep opties of gebruik de pijlen om ze te rangschikken van hoogste voorkeur (bovenaan) naar laagste voorkeur (onderaan).",
   "view_ranked_results": "Gerangschikte resultaten bekijken",
   "winner_label": "Winnaar: {{name}}",
-  "submit_rankings": "Rangschikking indienen"
+  "submit_rankings": "Rangschikking indienen",
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  }
 }

@@ -89,5 +89,9 @@
   "ranked_instructions": "Tarraing na roghanna nó úsáid na saigheada chun iad a chur ón rogha is fearr (barr) go dtí an rogha is ísle (bun).",
   "view_ranked_results": "Féach ar na torthaí rangaithe",
   "winner_label": "Buaiteoir: {{name}}",
-  "submit_rankings": "Cuir an rangú isteach"
+  "submit_rankings": "Cuir an rangú isteach",
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  }
 }

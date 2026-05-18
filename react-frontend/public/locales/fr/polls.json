@@ -89,5 +89,9 @@
   "ranked_instructions": "Faites glisser les options ou utilisez les flèches pour les classer de la préférence la plus forte (en haut) à la plus faible (en bas).",
   "view_ranked_results": "Voir les résultats classés",
   "winner_label": "Gagnant : {{name}}",
-  "submit_rankings": "Envoyer le classement"
+  "submit_rankings": "Envoyer le classement",
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  }
 }

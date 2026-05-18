@@ -89,5 +89,9 @@
   "ranked_instructions": "Przeciągnij opcje lub użyj strzałek, aby ułożyć je od najbardziej preferowanej (u góry) do najmniej preferowanej (na dole).",
   "view_ranked_results": "Zobacz wyniki rankingowe",
   "winner_label": "Zwycięzca: {{name}}",
-  "submit_rankings": "Prześlij ranking"
+  "submit_rankings": "Prześlij ranking",
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  }
 }

@@ -215,7 +215,8 @@
     "upload_preview_alt": "Upload preview {{number}}",
     "image_remove_number_aria": "Remove image {{number}}",
     "alt_text_add": "Add alt text",
-    "alt_text_edit": "Edit alt text"
+    "alt_text_edit": "Edit alt text",
+    "location_from_profile": "From your profile — update in Settings"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."

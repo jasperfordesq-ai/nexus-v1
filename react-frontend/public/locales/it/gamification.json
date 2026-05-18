@@ -175,7 +175,10 @@
       "social": "Sociale",
       "goal_owner": "Proprietario dell'obiettivo",
       "progress_timeline": "Cronologia progressi",
-      "no_progress": "Nessun aggiornamento dei progressi registrato finora."
+      "no_progress": "Nessun aggiornamento dei progressi registrato finora.",
+      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
+      "insights": "Goal insights",
+      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly."
     },
     "modal": {
       "create_title": "Crea nuovo obiettivo",
@@ -194,7 +197,10 @@
       "save_changes": "Salva modifiche",
       "delete_goal": "Elimina obiettivo",
       "delete_confirm": "È sicuro di voler eliminare \"{{title}}\"?",
-      "delete_warning": "Questa azione non può essere annullata."
+      "delete_warning": "Questa azione non può essere annullata.",
+      "target_value_placeholder": "100",
+      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
+      "checkin_frequency_label": "Check-in cadence"
     },
     "toast": {
       "created": "Obiettivo creato!",
@@ -208,8 +214,23 @@
       "progress_updated": "Progressi aggiornati!",
       "progress_failed": "Impossibile aggiornare i progressi",
       "buddy_joined": "Ora Lei è un compagno!",
-      "buddy_failed": "Impossibile diventare compagno"
-    }
+      "buddy_failed": "Impossibile diventare compagno",
+      "buddy_action_sent": "Buddy support sent",
+      "buddy_action_failed": "Failed to send buddy support"
+    },
+    "buddy_explainer": {
+      "title": "Goal buddies keep people moving",
+      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
+      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
+    },
+    "guide": {
+      "checkins_title": "Check-ins",
+      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
+      "progress_title": "Progress",
+      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
+    },
+    "streak_label": "{{count}} check-in streak",
+    "action_nudge": "Nudge"
   },
   "leaderboard": {
     "page_title": "Classifica",
@@ -329,5 +350,12 @@
     "nexus_score": {
       "title": "NexusScore"
     }
+  },
+  "frequency": {
+    "none": "No cadence",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly"
   }
 }

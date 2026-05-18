@@ -87,7 +87,8 @@
     "service_type_label": "Service delivery",
     "service_type_physical": "In-person only",
     "service_type_remote": "Remote only",
-    "title_too_generic_hint": "Try adding a few words about what you'd actually offer — location, frequency, or who it suits. It helps people decide whether to reach out."
+    "title_too_generic_hint": "Try adding a few words about what you'd actually offer — location, frequency, or who it suits. It helps people decide whether to reach out.",
+    "location_from_profile": "From your profile — update in Settings"
   },
   "page_subtitle": "Przeglądaj usługi i prośby z społeczności",
   "search_placeholder": "Szukaj według tytułu, opisu, lokalizacji lub imienia...",

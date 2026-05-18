@@ -79,6 +79,7 @@
     "description_label": "Description",
     "location_label": "Location",
     "location_placeholder": "Search for a location...",
+    "location_from_profile": "From your profile — update in Settings",
     "post_created": "Post created!",
     "post_failed": "Failed to create post.",
     "post_button": "Post",

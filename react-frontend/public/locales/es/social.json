@@ -129,5 +129,26 @@
     "hours_given": "{{count}} hrs given",
     "connections": "{{count}} connections",
     "listings": "{{count}} listings"
-  }
+  },
+  "like": "Like",
+  "liked": "Liked",
+  "likes_count_one": "{{count}} like",
+  "likes_count_other": "{{count}} likes",
+  "comment_action": "Comment",
+  "comments_count_one": "{{count}} comment",
+  "comments_count_other": "{{count}} comments",
+  "open_comments": "Open comments",
+  "close_comments": "Close comments",
+  "toggle_like": "Toggle like",
+  "view_likes": "View likes",
+  "reaction": {
+    "like": "Like",
+    "love": "Love",
+    "laugh": "Laugh",
+    "wow": "Wow",
+    "sad": "Sad",
+    "celebrate": "Celebrate"
+  },
+  "cannot_share_own_content": "You cannot share your own content to feed",
+  "write_reply_to": "Reply to {{name}}..."
 }

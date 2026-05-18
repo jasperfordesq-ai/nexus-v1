@@ -175,7 +175,10 @@
       "social": "Social",
       "goal_owner": "Propriétaire de l'objectif",
       "progress_timeline": "Historique de progression",
-      "no_progress": "Aucune mise à jour de progression enregistrée pour le moment."
+      "no_progress": "Aucune mise à jour de progression enregistrée pour le moment.",
+      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
+      "insights": "Goal insights",
+      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly."
     },
     "modal": {
       "create_title": "Créer un nouvel objectif",
@@ -194,7 +197,10 @@
       "save_changes": "Enregistrer les modifications",
       "delete_goal": "Supprimer l'objectif",
       "delete_confirm": "Êtes-vous sûr de vouloir supprimer « {{title}} » ?",
-      "delete_warning": "Cette action est irréversible."
+      "delete_warning": "Cette action est irréversible.",
+      "target_value_placeholder": "100",
+      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
+      "checkin_frequency_label": "Check-in cadence"
     },
     "toast": {
       "created": "Objectif créé !",
@@ -208,8 +214,23 @@
       "progress_updated": "Progression mise à jour !",
       "progress_failed": "Impossible de mettre à jour la progression",
       "buddy_joined": "Vous êtes maintenant partenaire !",
-      "buddy_failed": "Impossible de devenir partenaire"
-    }
+      "buddy_failed": "Impossible de devenir partenaire",
+      "buddy_action_sent": "Buddy support sent",
+      "buddy_action_failed": "Failed to send buddy support"
+    },
+    "buddy_explainer": {
+      "title": "Goal buddies keep people moving",
+      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
+      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
+    },
+    "guide": {
+      "checkins_title": "Check-ins",
+      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
+      "progress_title": "Progress",
+      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
+    },
+    "streak_label": "{{count}} check-in streak",
+    "action_nudge": "Nudge"
   },
   "leaderboard": {
     "page_title": "Classement",
@@ -329,5 +350,12 @@
     "nexus_score": {
       "title": "NexusScore"
     }
+  },
+  "frequency": {
+    "none": "No cadence",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly"
   }
 }

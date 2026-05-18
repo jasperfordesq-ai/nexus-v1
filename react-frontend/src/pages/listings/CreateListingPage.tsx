@@ -25,12 +25,11 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Info from 'lucide-react/icons/info';
-import { PlaceAutocompleteInput } from '@/components/location';
 import { SkillTagsInput } from '@/components/listings/SkillTagsInput';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
-import { useToast, useTenant } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -71,10 +70,16 @@ export function CreateListingPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath, listingConfig } = useTenant();
+  const { user } = useAuth();
   const toast = useToast();
   const isEditing = !!id;
 
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [formData, setFormData] = useState<FormData>(() => ({
+    ...initialFormData,
+    location: user?.location ?? '',
+    latitude: user?.latitude ?? undefined,
+    longitude: user?.longitude ?? undefined,
+  }));
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const editAbortRef = useRef<AbortController | null>(null);
@@ -121,23 +126,19 @@ export function CreateListingPage() {
         if (controller.signal.aborted) return;
         if (response.success && response.data) {
           const listing = response.data;
-          setFormData({
+          setFormData((prev) => ({
+            ...prev,
             title: listing.title,
             description: listing.description,
             type: listing.type,
             service_type: listing.service_type || 'hybrid',
             category_id: listing.category_id?.toString() || '',
             hours_estimate: (listing.hours_estimate ?? listing.estimated_hours ?? 1).toString(),
-            location: listing.location || '',
-            latitude: listing.latitude ?? undefined,
-            longitude: listing.longitude ?? undefined,
             skill_tags: Array.isArray(listing.skill_tags) ? listing.skill_tags : [],
-            // experience_level, equipment_provided, accessibility_notes are not restored
-            // when editing because these optional fields are encoded into the description
-            // text at submit time (not stored as separate API fields). The user can
-            // re-enter them if desired; the existing description already contains the
-            // formatted values they entered during creation.
-          });
+            // location/latitude/longitude are always sourced from the user's profile
+            // (set during state initialisation above); do not overwrite with stored
+            // listing values here.
+          }));
           if (listing.image_url) {
             setExistingImageUrl(listing.image_url);
           }
@@ -683,31 +684,16 @@ export function CreateListingPage() {
             </div>
 
             <div>
-              <PlaceAutocompleteInput
+              <Input
                 label={t('form.location_optional_label')}
-                placeholder={t('form.location_placeholder')}
                 value={formData.location}
-                onChange={(val) => updateField('location', val)}
-                onPlaceSelect={(place) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    location: place.formattedAddress,
-                    latitude: place.lat,
-                    longitude: place.lng,
-                  }));
-                }}
-                onClear={() => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    location: '',
-                    latitude: undefined,
-                    longitude: undefined,
-                  }));
-                }}
+                isDisabled
+                description={t('form.location_from_profile')}
+                startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 classNames={{
+                  input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
-                  input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
               />
             </div>

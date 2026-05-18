@@ -9326,5 +9326,47 @@
         "trust_tier": "Trust Tier"
       }
     }
+  },
+  "email_deliverability": {
+    "warnings": {
+      "default_title": "Email warning",
+      "default_body": "Email delivery needs attention.",
+      "email_log_missing": {
+        "title": "Email log missing",
+        "body": "Email health cannot be audited because the email log table is missing."
+      },
+      "recent_email_failures": {
+        "title": "Recent email failures",
+        "body": "{{count}} email attempts failed, bounced, or were suppressed in the last {{window_hours}} hours."
+      },
+      "critical_email_failures": {
+        "title": "Critical email failures",
+        "body": "{{count}} critical account or security emails failed in the last {{window_hours}} hours."
+      },
+      "notification_queue_failures": {
+        "title": "Notification queue failures",
+        "body": "{{count}} queued notifications failed in the last {{window_hours}} hours."
+      },
+      "notification_queue_stale_processing": {
+        "title": "Stale notification queue",
+        "body": "{{count}} notifications have been processing for more than {{minutes}} minutes."
+      },
+      "no_recent_email_activity": {
+        "title": "No recent email activity",
+        "body": "This tenant has active members but no email activity in the last {{days}} days."
+      },
+      "new_users_without_activation_email_log": {
+        "title": "Activation email log missing",
+        "body": "{{count}} new users have no activation, verification, approval, or welcome email log in the last {{window_hours}} hours."
+      },
+      "email_health_unavailable": {
+        "title": "Email health unavailable",
+        "body": "Email health checks could not be loaded."
+      },
+      "email_warning_check_failed": {
+        "title": "Warning check failed",
+        "body": "Email warning checks could not complete."
+      }
+    }
   }
 }

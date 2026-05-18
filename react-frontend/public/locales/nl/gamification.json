@@ -175,7 +175,10 @@
       "social": "Social",
       "goal_owner": "Doel Eigenaar",
       "progress_timeline": "Voortgang Tijdlijn",
-      "no_progress": "Nog geen voortgangsupdates geregistreerd."
+      "no_progress": "Nog geen voortgangsupdates geregistreerd.",
+      "no_buddy": "No buddy yet. Public goals can be picked up from Discover by another member.",
+      "insights": "Goal insights",
+      "progress_explainer": "Progress is calculated from the current value against the target. Check-ins can update this percentage directly."
     },
     "modal": {
       "create_title": "Nieuw Doel Aanmaken",
@@ -194,7 +197,10 @@
       "save_changes": "Wijzigingen Opslaan",
       "delete_goal": "Doel Verwijderen",
       "delete_confirm": "Weet je zeker dat je \"{{title}}\" wilt verwijderen?",
-      "delete_warning": "Dit kan niet ongedaan gemaakt worden."
+      "delete_warning": "Dit kan niet ongedaan gemaakt worden.",
+      "target_value_placeholder": "100",
+      "target_value_help": "Use the target as the amount you want to reach, such as 10 hours, 5 sessions, or 100 percent.",
+      "checkin_frequency_label": "Check-in cadence"
     },
     "toast": {
       "created": "Doel aangemaakt!",
@@ -208,8 +214,23 @@
       "progress_updated": "Voortgang bijgewerkt!",
       "progress_failed": "Mislukt om voortgang bij te werken",
       "buddy_joined": "Je bent nu een buddy!",
-      "buddy_failed": "Mislukt om buddy te worden"
-    }
+      "buddy_failed": "Mislukt om buddy te worden",
+      "buddy_action_sent": "Buddy support sent",
+      "buddy_action_failed": "Failed to send buddy support"
+    },
+    "buddy_explainer": {
+      "title": "Goal buddies keep people moving",
+      "body": "A buddy is another member who chooses to support a public goal. They can see your updates, notice when progress stalls, and offer encouragement without taking over the goal.",
+      "how": "Make a goal public if you want support. Use Discover to become a buddy for someone else, or Goal Buddies to follow goals you are helping with."
+    },
+    "guide": {
+      "checkins_title": "Check-ins",
+      "checkins_body": "Record where the goal stands, how it feels, and any useful context for you or your buddy.",
+      "progress_title": "Progress",
+      "progress_body": "The percentage is your latest estimate against the target value. Check-ins now update the goal and timeline."
+    },
+    "streak_label": "{{count}} check-in streak",
+    "action_nudge": "Nudge"
   },
   "leaderboard": {
     "page_title": "Community",
@@ -329,5 +350,12 @@
     "nexus_score": {
       "title": "NexusScore"
     }
+  },
+  "frequency": {
+    "none": "No cadence",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly"
   }
 }

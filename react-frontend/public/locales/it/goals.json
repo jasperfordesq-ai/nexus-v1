@@ -18,7 +18,10 @@
     "note_placeholder": "Come va? Qualche vittoria o difficoltà?",
     "cancel": "Annulla",
     "submit": "Registra Check-in",
-    "check_in_button": "Check-in"
+    "check_in_button": "Check-in",
+    "progress_help": "Set this to the real progress you want shown on the goal. Recording a check-in updates the goal bar and the timeline.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Progress not recorded"
   },
   "mood": {
     "great": "Ottimo",
@@ -41,7 +44,8 @@
     "daily": "Giornaliero",
     "weekly": "Settimanale",
     "biweekly": "Ogni 2 settimane",
-    "monthly": "Mensile"
+    "monthly": "Mensile",
+    "none": "No cadence"
   },
   "template": {
     "title": "Inizia da un Modello",
@@ -59,7 +63,16 @@
     "load_failed": "Impossibile caricare la cronologia.",
     "retry": "Riprova",
     "no_activity": "Nessuna attività registrata ancora.",
-    "progress_aria": "Progresso: {{percent}}%"
+    "progress_aria": "Progresso: {{percent}}%",
+    "event": {
+      "progress_update": "Progress update",
+      "checkin": "Check-in",
+      "milestone": "Milestone",
+      "buddy_joined": "Buddy joined",
+      "buddy_action": "Buddy support",
+      "completed": "Completed",
+      "created": "Created"
+    }
   },
   "template_picker": {
     "load_error": "Impossibile caricare i modelli. Per favore riprova.",
@@ -79,5 +92,42 @@
   },
   "goals": {
     "load_error": "Failed to load goals. Please try again."
+  },
+  "insights": {
+    "loading": "Loading goal insights",
+    "load_failed": "Failed to load goal insights.",
+    "current_streak": "Current streak",
+    "streak_value": "{{count}} check-ins",
+    "best_streak": "Best streak: {{count}}",
+    "next_checkin": "Next check-in",
+    "no_cadence": "No cadence set",
+    "no_cadence_helper": "Set a cadence when editing this goal.",
+    "checkin_due": "A check-in is due",
+    "frequency": "{{frequency}} cadence",
+    "checkins": "Check-ins",
+    "checkins_value": "{{count}} recorded",
+    "last_checkin": "Last check-in {{time}}",
+    "no_checkins": "No check-ins yet",
+    "milestones": "Milestones",
+    "milestones_value": "{{completed}} of {{total}}",
+    "milestones_progress_aria": "Milestone progress: {{percent}}%",
+    "milestone_plan": "Milestone plan",
+    "milestone_done": "Done",
+    "milestone_target": "{{percent}}%",
+    "buddy_actions_title": "Buddy actions",
+    "buddy_actions_body": "Send a small, visible bit of support. Nudges are gentle reminders, not pressure.",
+    "action_nudge": "Send nudge",
+    "action_encourage": "Encourage",
+    "action_offer_help": "Offer help",
+    "buddy_sent": "Buddy support sent",
+    "buddy_failed": "Failed to send buddy support.",
+    "recent_buddy_support": "Recent buddy support",
+    "note_type": {
+      "nudge": "Nudge",
+      "encouragement": "Encouragement",
+      "offer_help": "Offer to help",
+      "celebration": "Celebration",
+      "note": "Note"
+    }
   }
 }

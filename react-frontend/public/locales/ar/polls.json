@@ -89,5 +89,9 @@
   "ranked_instructions": "اسحب الخيارات أو استخدم الأسهم لترتيبها من الأكثر تفضيلاً (في الأعلى) إلى الأقل تفضيلاً (في الأسفل).",
   "view_ranked_results": "عرض نتائج الترتيب",
   "winner_label": "الفائز: {{name}}",
-  "submit_rankings": "إرسال الترتيب"
+  "submit_rankings": "إرسال الترتيب",
+  "badges": {
+    "ranked": "Ranked",
+    "anonymous": "Anonymous"
+  }
 }

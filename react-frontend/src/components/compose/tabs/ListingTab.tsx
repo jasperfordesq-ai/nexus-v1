@@ -11,15 +11,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
 import ImagePlus from 'lucide-react/icons/image-plus';
+import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { compressImage } from '@/lib/compress-image';
-import { PlaceAutocompleteInput } from '@/components/location';
 import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';
@@ -47,6 +47,7 @@ interface ListingDraft {
 
 export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
   const { t } = useTranslation('feed');
+  const { user } = useAuth();
   const toast = useToast();
   const { register, unregister } = useComposeSubmit();
   const isMobile = useMediaQuery('(max-width: 639px)');
@@ -59,9 +60,9 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
 
   const [categoryId, setCategoryId] = useState('');
   const [hoursEstimate, setHoursEstimate] = useState('1');
-  const [location, setLocation] = useState('');
-  const [latitude, setLatitude] = useState<number | undefined>();
-  const [longitude, setLongitude] = useState<number | undefined>();
+  const [location] = useState(() => user?.location ?? '');
+  const [latitude] = useState<number | undefined>(() => user?.latitude ?? undefined);
+  const [longitude] = useState<number | undefined>(() => user?.longitude ?? undefined);
   const [sdgGoals, setSdgGoals] = useState<number[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -351,16 +352,13 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
         />
       </div>
 
-      <PlaceAutocompleteInput
+      <Input
         label={t('compose.location_label')}
-        placeholder={t('compose.location_placeholder')}
         value={location}
-        onPlaceSelect={(place) => {
-          setLocation(place.formattedAddress);
-          setLatitude(place.lat);
-          setLongitude(place.lng);
-        }}
-        onChange={setLocation}
+        isDisabled
+        description={t('compose.location_from_profile')}
+        startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+        classNames={inputClasses}
       />
 
       <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />

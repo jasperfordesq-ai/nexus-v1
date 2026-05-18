@@ -422,6 +422,28 @@ class UserService
             ]);
         }
 
+        // Sync all of this user's active listings whenever their profile location changes.
+        if (!empty($changedFields ?? []) && !empty(array_intersect($changedFields ?? [], ['location', 'latitude', 'longitude']))
+            && ($updated ?? null) instanceof User) {
+            try {
+                DB::table('listings')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('status', '!=', 'deleted')
+                    ->update([
+                        'location'   => $updated->location,
+                        'latitude'   => $updated->latitude,
+                        'longitude'  => $updated->longitude,
+                        'updated_at' => now(),
+                    ]);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to sync listing locations after profile location update', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+        }
+
         // Security notification: bell + email to OLD address when email is changed
         if ($oldEmail && isset($data['email']) && $oldEmail !== $data['email']) {
             LocaleContext::withLocale($userLocale, function () use ($userId, $oldEmail) {
