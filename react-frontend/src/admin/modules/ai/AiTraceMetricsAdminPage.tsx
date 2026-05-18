@@ -22,6 +22,7 @@ import DollarSign from 'lucide-react/icons/dollar-sign';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -172,7 +173,7 @@ export default function AiTraceMetricsAdminPage() {
 }
 
 interface StatProps {
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   label: string;
   value: string;
   loading?: boolean;

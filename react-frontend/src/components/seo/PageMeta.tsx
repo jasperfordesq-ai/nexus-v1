@@ -108,7 +108,7 @@ export function PageMeta({
   const { i18n } = useTranslation();
 
   // Active language → OG locale (BCP 47). Falls back to en_GB if unknown.
-  const activeLang = (i18n.language || 'en').split('-')[0];
+  const activeLang = (i18n.language || 'en').split('-')[0] ?? 'en';
   const ogLocale = OG_LOCALES[activeLang] || OG_LOCALES.en;
   const ogLocaleAlternates = Object.entries(OG_LOCALES)
     .filter(([code]) => code !== activeLang)

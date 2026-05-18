@@ -461,7 +461,7 @@ export function MarketplaceMapSearchPage() {
                 height="calc(100vh - 280px)"
                 isLoading={isLoading && !listings.length}
                 onRequestLocation={handleUseMyLocation}
-                locationLoading={geo.loading}
+                locationLoading={false}
               />
             </div>
 

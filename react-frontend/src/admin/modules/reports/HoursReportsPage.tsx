@@ -329,8 +329,8 @@ export function HoursReportsPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={tooltipStyle}
-                    formatter={(value: number | undefined, name: string | undefined) =>
-                      [`${(value ?? 0).toFixed(1)} hours`, name ?? '']
+                    formatter={(value, name) =>
+                      [`${Number(value ?? 0).toFixed(1)} hours`, String(name ?? '')] as [string, string]
                     }
                   />
                 </PieChart>

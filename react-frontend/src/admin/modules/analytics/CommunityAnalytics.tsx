@@ -438,8 +438,8 @@ export function CommunityAnalytics() {
                       backgroundColor: 'hsl(var(--heroui-content1))',
                       color: 'hsl(var(--heroui-foreground))',
                     }}
-                    formatter={(value: number | undefined, name: string | undefined): [string, string] =>
-                      [`Listings`, name ?? '']
+                    formatter={(_value, name) =>
+                      ['Listings', String(name ?? '')] as [string, string]
                     }
                   />
                 </PieChart>

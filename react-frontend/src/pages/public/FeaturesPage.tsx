@@ -316,14 +316,19 @@ export function FeaturesPage() {
       </Card>
 
       {/* Feature groups */}
-      <FeatureSection group={GROUPS[0]} icon={<Sparkles className="w-5 h-5 text-primary" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[1]} icon={<Globe className="w-5 h-5 text-primary" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[2]} icon={<CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[3]} icon={<CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[4]} icon={<Shield className="w-5 h-5 text-warning" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[5]} icon={<Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[6]} icon={<Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />} />
-      <FeatureSection group={GROUPS[7]} icon={<Shield className="w-5 h-5 text-primary" aria-hidden="true" />} />
+      {GROUPS.map((group, index) => {
+        const icons = [
+          <Sparkles className="w-5 h-5 text-primary" aria-hidden="true" />,
+          <Globe className="w-5 h-5 text-primary" aria-hidden="true" />,
+          <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
+          <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
+          <Shield className="w-5 h-5 text-warning" aria-hidden="true" />,
+          <Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />,
+          <Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />,
+          <Shield className="w-5 h-5 text-primary" aria-hidden="true" />,
+        ];
+        return <FeatureSection key={group.title} group={group} icon={icons[index]} />;
+      })}
 
       {/* Modern Tech Stack */}
       <Card>

@@ -558,12 +558,12 @@ export function NewsletterStats() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number | undefined, name?: string) => {
-                        const v = value ?? 0;
+                      formatter={(value, name) => {
+                        const v = Number(value ?? 0);
                         return [
                           `${v.toLocaleString()} (${deviceTotal > 0 ? Math.round((v / deviceTotal) * 100) : 0}%)`,
-                          name ?? '',
-                        ];
+                          String(name ?? ''),
+                        ] as [string, string];
                       }}
                     />
                   </PieChart>

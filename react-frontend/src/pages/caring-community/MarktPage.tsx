@@ -324,7 +324,7 @@ export function MarktPage() {
   useEffect(() => {
     setPage(1);
     loadRef.current(true);
-  }, [radiusKm, position, subRegionId]);
+  }, [radiusKm, user?.latitude, user?.longitude, subRegionId]);
 
   if (!isAuthenticated) return null;
 

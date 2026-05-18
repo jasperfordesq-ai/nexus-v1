@@ -949,10 +949,10 @@ export default function OnboardingFunnel() {
                       <YAxis tickLine={false} axisLine={false} allowDecimals={false} tick={{ fontSize: 12 }} />
                       <Tooltip
                         labelFormatter={(value) => formatMonthLabel(String(value))}
-                        formatter={(value: number | string | undefined) => [
+                        formatter={(value) => [
                           Number(value ?? 0).toLocaleString(),
                           "Members",
-                        ]}
+                        ] as [string, string]}
                         contentStyle={{
                           borderRadius: '16px',
                           border: '1px solid hsl(var(--heroui-divider))',

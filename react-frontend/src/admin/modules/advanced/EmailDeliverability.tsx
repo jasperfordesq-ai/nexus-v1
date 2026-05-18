@@ -139,7 +139,8 @@ export default function EmailDeliverability() {
   const loadSummary = useCallback(async () => {
     setLoadingSummary(true);
     try {
-      const r = await api.get<SummaryData>('/v2/admin/email-deliverability/summary', { params: { days: summaryDays } });
+      const query = new URLSearchParams({ days: String(summaryDays) });
+      const r = await api.get<SummaryData>(`/v2/admin/email-deliverability/summary?${query}`);
       if (r.success && r.data) setSummary(r.data);
     } finally {
       setLoadingSummary(false);
@@ -149,17 +150,15 @@ export default function EmailDeliverability() {
   const loadLogs = useCallback(async () => {
     setLoadingLogs(true);
     try {
-      const r = await api.get<{ rows: LogRow[]; total: number }>('/v2/admin/email-deliverability/logs', {
-        params: {
-          email: logSearch || undefined,
-          status: logStatus || undefined,
-          category: logCategory || undefined,
-          since: logSince || undefined,
-          until: logUntil || undefined,
-          limit: logLimit,
-          offset: logOffset,
-        },
-      });
+      const query = new URLSearchParams();
+      if (logSearch) query.set('email', logSearch);
+      if (logStatus) query.set('status', logStatus);
+      if (logCategory) query.set('category', logCategory);
+      if (logSince) query.set('since', logSince);
+      if (logUntil) query.set('until', logUntil);
+      query.set('limit', String(logLimit));
+      query.set('offset', String(logOffset));
+      const r = await api.get<{ rows: LogRow[]; total: number }>(`/v2/admin/email-deliverability/logs?${query}`);
       if (r.success && r.data) {
         setLogRows(r.data.rows ?? []);
         setLogTotal(r.data.total ?? 0);
@@ -172,9 +171,13 @@ export default function EmailDeliverability() {
   const loadSuppressions = useCallback(async () => {
     setLoadingSupp(true);
     try {
+      const query = new URLSearchParams();
+      if (suppSearch) query.set('email', suppSearch);
+      if (suppReason) query.set('reason', suppReason);
+      query.set('limit', String(suppLimit));
+      query.set('offset', String(suppOffset));
       const r = await api.get<{ rows: SuppressionRow[]; total: number }>(
-        '/v2/admin/email-deliverability/suppressions',
-        { params: { email: suppSearch || undefined, reason: suppReason || undefined, limit: suppLimit, offset: suppOffset } }
+        `/v2/admin/email-deliverability/suppressions?${query}`
       );
       if (r.success && r.data) {
         setSuppRows(r.data.rows ?? []);
