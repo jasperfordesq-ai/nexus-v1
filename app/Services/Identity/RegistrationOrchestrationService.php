@@ -699,12 +699,18 @@ class RegistrationOrchestrationService
 
         foreach ($abandoned as $row) {
             try {
-                if (\App\Services\NotificationDispatcher::dispatchVerificationReminder((int) $row['user_id'])) {
-                    // The reminder is now durably queued in notification_queue;
-                    // actual email send/retry status is tracked by that queue.
-                    IdentityVerificationSessionService::markReminderSent((int) $row['id']);
-                    $count++;
+                $queued = TenantContext::runForTenant((int) $row['tenant_id'], function () use ($row): bool {
+                    return \App\Services\NotificationDispatcher::dispatchVerificationReminder((int) $row['user_id']);
+                });
+
+                if (!$queued) {
+                    continue;
                 }
+
+                // The reminder is now durably queued in notification_queue;
+                // actual email send/retry status is tracked by that queue.
+                IdentityVerificationSessionService::markReminderSent((int) $row['id']);
+                $count++;
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning("[VerificationReminder] Failed for session {$row['id']}: " . $e->getMessage());
             }

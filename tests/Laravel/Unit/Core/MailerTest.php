@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Unit\Core;
 
 use App\Core\Mailer;
+use App\Core\TenantContext;
 use Tests\Laravel\TestCase;
 
 class MailerTest extends TestCase
@@ -49,6 +50,19 @@ class MailerTest extends TestCase
     {
         $mailer = Mailer::forCurrentTenant();
         $this->assertInstanceOf(Mailer::class, $mailer);
+    }
+
+    public function test_forCurrentTenant_does_not_resolve_master_when_context_is_missing(): void
+    {
+        TenantContext::reset();
+
+        $mailer = Mailer::forCurrentTenant();
+
+        $tenantProperty = new \ReflectionProperty(Mailer::class, 'tenantId');
+        $tenantProperty->setAccessible(true);
+
+        $this->assertNull($tenantProperty->getValue($mailer));
+        $this->assertNull(TenantContext::currentId());
     }
 
     // -------------------------------------------------------

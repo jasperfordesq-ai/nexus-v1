@@ -83,7 +83,7 @@ class WelcomeEmailCrossTenantTest extends TestCase
         // the finally-reset is in place. Without it the next job picked up
         // by the same worker would inherit this listener's context.
         $this->assertNull(
-            TenantContext::getId(),
+            TenantContext::currentId(),
             'SendWelcomeNotification did not reset TenantContext in finally — risk of cross-tenant leak into next job.'
         );
 

@@ -128,9 +128,9 @@ class Mailer
      */
     public static function forCurrentTenant(): self
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = TenantContext::currentId();
         if ($tenantId === null) {
-            \Illuminate\Support\Facades\Log::warning('Mailer::forCurrentTenant() called with no tenant context — falling back to platform SMTP', [
+            \Illuminate\Support\Facades\Log::warning('Mailer::forCurrentTenant() called with no tenant context; using platform SMTP without resolving a fallback tenant', [
                 'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5),
             ]);
         }
@@ -314,7 +314,7 @@ class Mailer
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_log')) {
                 return;
             }
-            $tenantId = $tenantIdOverride ?? TenantContext::getId();
+            $tenantId = $tenantIdOverride ?? TenantContext::currentId();
             $userId = null;
             try {
                 if ($tenantId !== null) {

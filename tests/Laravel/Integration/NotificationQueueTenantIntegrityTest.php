@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\EventNotificationService;
+use App\Services\Identity\RegistrationOrchestrationService;
 use App\Services\NotificationDispatcher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +159,46 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             $this->assertTrue($sent);
             $this->assertNotNull($row);
             $this->assertSame($this->testTenantId, (int) $row->tenant_id);
+        } finally {
+            TenantContext::setById($this->testTenantId);
+        }
+    }
+
+    public function test_identity_verification_reminder_cron_uses_session_tenant_for_email_body(): void
+    {
+        $otherTenantId = 999;
+        $otherTenantSlug = 'test-999';
+        $user = User::factory()->forTenant($otherTenantId)->create([
+            'status' => 'active',
+            'email' => 'identity-reminder-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        DB::table('identity_verification_sessions')->insert([
+            'tenant_id' => $otherTenantId,
+            'user_id' => $user->id,
+            'provider_slug' => 'mock',
+            'verification_level' => 'document_only',
+            'status' => 'created',
+            'created_at' => now()->subHours(25),
+            'updated_at' => now()->subHours(25),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        try {
+            $sent = RegistrationOrchestrationService::sendVerificationReminders();
+
+            $row = DB::table('notification_queue')
+                ->where('user_id', $user->id)
+                ->where('activity_type', 'verification_reminder')
+                ->orderByDesc('id')
+                ->first();
+
+            $this->assertSame(1, $sent);
+            $this->assertNotNull($row);
+            $this->assertSame($otherTenantId, (int) $row->tenant_id);
+            $this->assertStringContainsString("/{$otherTenantSlug}/verify-identity", (string) $row->email_body);
         } finally {
             TenantContext::setById($this->testTenantId);
         }
