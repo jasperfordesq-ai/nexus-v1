@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chip, Spinner } from '@heroui/react';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Flag from 'lucide-react/icons/flag';
@@ -19,7 +20,8 @@ import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../
 import type { GroupModerationItem } from '../../api/types';
 
 export function GroupModeration() {
-  usePageTitle("Groups");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<GroupModerationItem[]>([]);
@@ -44,11 +46,11 @@ export function GroupModeration() {
         }
       }
     } catch {
-      toast.error("Failed to load moderation data");
+      toast.error(t('groups.failed_to_load_moderation_data'));
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export function GroupModeration() {
   const columns: Column<GroupModerationItem>[] = [
     {
       key: 'name',
-      label: "Group",
+      label: t('groups.label_name'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.name}</span>
@@ -66,13 +68,13 @@ export function GroupModeration() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('groups.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'report_count',
-      label: "Reports",
+      label: t('groups.col_reports'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -83,17 +85,17 @@ export function GroupModeration() {
               color="danger"
               startContent={<Flag size={12} />}
             >
-              {`Report`}
+              {t('groups.report_count')}
             </Chip>
           ) : (
-            <span className="text-sm text-default-400">{"None"}</span>
+            <span className="text-sm text-default-400">{t('groups.none')}</span>
           )}
         </div>
       ),
     },
     {
       key: 'created_at',
-      label: "Created",
+      label: t('groups.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -105,8 +107,8 @@ export function GroupModeration() {
 
   if (loading) {
     return (
-      <div>
-        <PageHeader title={"Group Moderation"} description={"Review flagged content and reports within groups"} />
+      <div className="space-y-6">
+        <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -115,21 +117,21 @@ export function GroupModeration() {
   }
 
   return (
-    <div>
-      <PageHeader title={"Group Moderation"} description={"Review flagged content and reports within groups"} />
+    <div className="space-y-6">
+      <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={ShieldAlert}
-          title={"No flagged content"}
-          description={"There are no groups with reported or flagged content"}
+          title={t('groups.no_flagged_content')}
+          description={t('groups.desc_there_are_no_groups_with_reported_or_fla')}
         />
       ) : (
         <DataTable
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder={"Search flagged content..."}
+          searchPlaceholder={t('groups.search_flagged_placeholder')}
           onRefresh={loadItems}
         />
       )}

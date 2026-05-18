@@ -54,7 +54,7 @@ function scoreColor(score: number): 'danger' | 'warning' | 'success' {
 
 export function MatchApprovals() {
   const { t } = useTranslation('admin');
-  usePageTitle("Matching");
+  usePageTitle(t('matching.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -126,11 +126,11 @@ export function MatchApprovals() {
     setActionLoading(item.id);
     const res = await adminMatching.approveMatch(item.id);
     if (res.success) {
-      toast.success(`Match Approved`);
+      toast.success(t('matching.match_approved'));
       loadItems();
       loadStats();
     } else {
-      toast.error(res.error || "Failed to approve match");
+      toast.error(res.error || t('matching.failed_to_approve_match'));
     }
     setActionLoading(null);
   };
@@ -139,18 +139,18 @@ export function MatchApprovals() {
   const handleReject = async () => {
     if (!rejectModal) return;
     if (!rejectReason.trim()) {
-      toast.error("Please provide a reason for rejection");
+      toast.error(t('matching.please_provide_a_reason_for_rejection'));
       return;
     }
 
     setRejectLoading(true);
     const res = await adminMatching.rejectMatch(rejectModal.item.id, rejectReason.trim());
     if (res.success) {
-      toast.success(`Match Rejected`);
+      toast.success(t('matching.match_rejected'));
       loadItems();
       loadStats();
     } else {
-      toast.error(res.error || "Failed to reject match");
+      toast.error(res.error || t('matching.failed_to_reject_match'));
     }
     setRejectLoading(false);
     setRejectModal(null);
@@ -161,7 +161,7 @@ export function MatchApprovals() {
   const columns: Column<MatchApproval>[] = [
     {
       key: 'match',
-      label: "Match",
+      label: t('matching.col_match'),
       render: (item) => (
         <div className="flex items-center gap-2">
           <Avatar
@@ -192,17 +192,17 @@ export function MatchApprovals() {
     },
     {
       key: 'listing_title',
-      label: "Listing",
+      label: t('matching.col_listing'),
       render: (item) =>
         item.listing_title ? (
           <span className="text-sm text-foreground">{item.listing_title}</span>
         ) : (
-          <span className="text-sm text-default-400 italic">{"No listing found"}</span>
+          <span className="text-sm text-default-400 italic">{t('matching.no_listing')}</span>
         ),
     },
     {
       key: 'match_score',
-      label: "Score",
+      label: t('matching.col_score'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2 min-w-[100px]">
@@ -211,7 +211,7 @@ export function MatchApprovals() {
             value={item.match_score}
             color={scoreColor(item.match_score)}
             className="max-w-[60px]"
-            aria-label={`Match score: ${item.match_score}%`}
+            aria-label={t('matching.match_score_aria', { score: item.match_score })}
           />
           <Chip
             size="sm"
@@ -225,13 +225,13 @@ export function MatchApprovals() {
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('matching.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'created_at',
-      label: "Submitted",
+      label: t('matching.col_submitted'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -241,7 +241,7 @@ export function MatchApprovals() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('matching.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {item.status === 'pending' && (
@@ -253,7 +253,7 @@ export function MatchApprovals() {
                 color="success"
                 onPress={() => handleApprove(item)}
                 isLoading={actionLoading === item.id}
-                aria-label={"Approve Match"}
+                aria-label={t('matching.label_approve_match')}
               >
                 <CheckCircle size={14} />
               </Button>
@@ -266,7 +266,7 @@ export function MatchApprovals() {
                   setRejectModal({ item });
                   setRejectReason('');
                 }}
-                aria-label={"Reject Match"}
+                aria-label={t('matching.label_reject_match')}
               >
                 <XCircle size={14} />
               </Button>
@@ -277,7 +277,7 @@ export function MatchApprovals() {
             size="sm"
             variant="flat"
             onPress={() => navigate(tenantPath(`/admin/match-approvals/${item.id}`))}
-            aria-label={"View Match Details"}
+            aria-label={t('matching.label_view_match_details')}
           >
             <Eye size={14} />
           </Button>
@@ -287,37 +287,37 @@ export function MatchApprovals() {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={"Match Approvals"}
-        description={"Review and approve or reject matches generated by the smart matching engine"}
+        title={t('matching.match_approvals_title')}
+        description={t('matching.match_approvals_desc')}
       />
 
       {/* Stats row */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={"Pending"}
+          label={t('matching.label_pending')}
           value={stats?.pending_count ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label={"Approved"}
+          label={t('matching.label_approved')}
           value={stats?.approved_count ?? 0}
           icon={CheckCircle}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label={"Rejected"}
+          label={t('matching.label_rejected')}
           value={stats?.rejected_count ?? 0}
           icon={XCircle}
           color="danger"
           loading={statsLoading}
         />
         <StatCard
-          label={"Approval Rate"}
+          label={t('matching.label_approval_rate')}
           value={stats ? `${stats.approval_rate}%` : '0%'}
           icon={TrendingUp}
           color="primary"
@@ -326,7 +326,7 @@ export function MatchApprovals() {
       </div>
 
       {/* Status tabs */}
-      <div className="mb-4">
+      <div className="rounded-2xl border border-divider/70 bg-content1 p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
           selectedKey={status}
           onSelectionChange={(key) => {
@@ -339,7 +339,7 @@ export function MatchApprovals() {
           <Tab key="pending" title={
             <div className="flex items-center gap-2">
               <Clock size={14} />
-              <span>{"Pending"}</span>
+              <span>{t('matching.tab_pending')}</span>
               {stats && stats.pending_count > 0 && (
                 <Chip size="sm" variant="flat" color="warning">
                   {stats.pending_count}
@@ -350,19 +350,19 @@ export function MatchApprovals() {
           <Tab key="approved" title={
             <div className="flex items-center gap-2">
               <CheckCircle size={14} />
-              <span>{"Approved"}</span>
+              <span>{t('matching.tab_approved')}</span>
             </div>
           } />
           <Tab key="rejected" title={
             <div className="flex items-center gap-2">
               <XCircle size={14} />
-              <span>{"Rejected"}</span>
+              <span>{t('matching.tab_rejected')}</span>
             </div>
           } />
           <Tab key="all" title={
             <div className="flex items-center gap-2">
               <Users size={14} />
-              <span>{"All"}</span>
+              <span>{t('matching.tab_all')}</span>
             </div>
           } />
         </Tabs>
@@ -387,8 +387,8 @@ export function MatchApprovals() {
             <BarChart3 size={40} className="text-default-300" />
             <p className="text-default-500">
               {status === 'pending'
-                ? 'No pending match approvals'
-                : `No ${status === 'all' ? '' : status} matches found`}
+                ? t('matching.no_pending_match_approvals')
+                : t('matching.no_matches_for_status', { status: status === 'all' ? t('matching.tab_all').toLowerCase() : t(`matching.tab_${status}`).toLowerCase() })}
             </p>
           </div>
         }
@@ -406,7 +406,7 @@ export function MatchApprovals() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={20} className="text-danger" />
-            {"Reject Match"}
+            {t('matching.reject_match')}
           </ModalHeader>
           <ModalBody>
             {rejectModal && (
@@ -420,8 +420,8 @@ export function MatchApprovals() {
               </div>
             )}
             <Textarea
-              label={"Rejection Reason"}
-              placeholder={"Explain Why This Match is Being Rejected..."}
+              label={t('matching.rejection_reason_label')}
+              placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"
@@ -438,7 +438,7 @@ export function MatchApprovals() {
               }}
               isDisabled={rejectLoading}
             >
-              {"Cancel"}
+              {t('matching.cancel')}
             </Button>
             <Button
               color="danger"
@@ -446,7 +446,7 @@ export function MatchApprovals() {
               isLoading={rejectLoading}
               isDisabled={!rejectReason.trim()}
             >
-              {"Reject Match"}
+              {t('matching.reject_match')}
             </Button>
           </ModalFooter>
         </ModalContent>
